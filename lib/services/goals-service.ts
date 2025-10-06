@@ -5,6 +5,9 @@ export interface Milestone {
   goal_id: string;
   title: string;
   description?: string;
+  type: 'percentage' | 'money' | 'count' | 'date';
+  target_value?: number;
+  current_value?: number;
   target_date?: string;
   completed: boolean;
   completed_at?: string;
@@ -42,6 +45,9 @@ export interface CreateMilestoneInput {
   goal_id: string;
   title: string;
   description?: string;
+  type: 'percentage' | 'money' | 'count' | 'date';
+  target_value?: number;
+  current_value?: number;
   target_date?: string;
 }
 
@@ -56,7 +62,7 @@ export const goalsService = {
   async getGoals(spaceId: string): Promise<Goal[]> {
     const { data, error } = await supabase
       .from('goals')
-      .select('*, milestones(*)')
+      .select('*, milestones:goal_milestones(*)')
       .eq('space_id', spaceId)
       .order('created_at', { ascending: false });
 
@@ -67,7 +73,7 @@ export const goalsService = {
   async getGoalById(id: string): Promise<Goal | null> {
     const { data, error } = await supabase
       .from('goals')
-      .select('*, milestones(*)')
+      .select('*, milestones:goal_milestones(*)')
       .eq('id', id)
       .single();
 
@@ -124,7 +130,7 @@ export const goalsService = {
 
   async createMilestone(input: CreateMilestoneInput): Promise<Milestone> {
     const { data, error } = await supabase
-      .from('milestones')
+      .from('goal_milestones')
       .insert([{
         ...input,
         completed: false,
@@ -138,7 +144,7 @@ export const goalsService = {
 
   async updateMilestone(id: string, updates: Partial<CreateMilestoneInput>): Promise<Milestone> {
     const { data, error } = await supabase
-      .from('milestones')
+      .from('goal_milestones')
       .update(updates)
       .eq('id', id)
       .select()
@@ -157,7 +163,7 @@ export const goalsService = {
     }
 
     const { data, error } = await supabase
-      .from('milestones')
+      .from('goal_milestones')
       .update(finalUpdates)
       .eq('id', id)
       .select()
@@ -169,28 +175,46 @@ export const goalsService = {
 
   async deleteMilestone(id: string): Promise<void> {
     const { error } = await supabase
-      .from('milestones')
+      .from('goal_milestones')
       .delete()
       .eq('id', id);
 
     if (error) throw error;
   },
 
-  async getGoalStats(spaceId: string): Promise<GoalStats> {
+  async getAllMilestones(spaceId: string): Promise<Milestone[]> {
     const goals = await this.getGoals(spaceId);
+    const allMilestones: Milestone[] = [];
 
-    let milestonesReached = 0;
     goals.forEach(goal => {
       if (goal.milestones) {
-        milestonesReached += goal.milestones.filter(m => m.completed).length;
+        allMilestones.push(...goal.milestones);
       }
     });
 
+    return allMilestones.sort((a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+  },
+
+  async getGoalStats(spaceId: string): Promise<GoalStats> {
+    const goals = await this.getGoals(spaceId);
+
+    let completedMilestones = 0;
+    goals.forEach(goal => {
+      if (goal.milestones) {
+        completedMilestones += goal.milestones.filter(m => m.completed).length;
+      }
+    });
+
+    const completedGoals = goals.filter(g => g.status === 'completed').length;
+    const totalCompleted = completedGoals + completedMilestones;
+
     return {
       active: goals.filter(g => g.status === 'active').length,
-      completed: goals.filter(g => g.status === 'completed').length,
+      completed: totalCompleted,
       inProgress: goals.filter(g => g.status === 'active' && g.progress > 0 && g.progress < 100).length,
-      milestonesReached,
+      milestonesReached: completedMilestones,
     };
   },
 };
