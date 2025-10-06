@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
+import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ReminderCard } from '@/components/reminders/ReminderCard';
 import { NewReminderModal } from '@/components/reminders/NewReminderModal';
@@ -56,8 +56,37 @@ export default function RemindersPage() {
         remindersService.getReminders(currentSpace.id),
         remindersService.getReminderStats(currentSpace.id),
       ]);
-      setReminders(remindersData);
-      setStats(statsData);
+
+      // Create sample reminder if none exist
+      if (remindersData.length === 0) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(9, 0, 0, 0);
+
+        await remindersService.createReminder({
+          space_id: currentSpace.id,
+          title: 'Team Meeting',
+          description: 'Weekly team sync-up to discuss project progress and upcoming tasks',
+          emoji: '📅',
+          category: 'work',
+          reminder_time: tomorrow.toISOString(),
+          priority: 'medium',
+          status: 'active',
+          repeat_pattern: 'weekly',
+          repeat_days: [1], // Monday
+        });
+
+        // Reload to include the sample
+        const [updatedData, updatedStats] = await Promise.all([
+          remindersService.getReminders(currentSpace.id),
+          remindersService.getReminderStats(currentSpace.id),
+        ]);
+        setReminders(updatedData);
+        setStats(updatedStats);
+      } else {
+        setReminders(remindersData);
+        setStats(statsData);
+      }
     } catch (error) {
       console.error('Failed to load reminders:', error);
     } finally {
@@ -80,17 +109,23 @@ export default function RemindersPage() {
   }
 
   async function handleStatusChange(reminderId: string, status: string) {
+    // Optimistic update - update UI immediately
+    setReminders(prevReminders =>
+      prevReminders.map(reminder =>
+        reminder.id === reminderId ? { ...reminder, status: status as any } : reminder
+      )
+    );
+
+    // Update in background
     try {
       await remindersService.updateReminder(reminderId, { status: status as any });
-      loadReminders();
     } catch (error) {
       console.error('Failed to update reminder status:', error);
+      loadReminders(); // Revert on error
     }
   }
 
   async function handleDeleteReminder(reminderId: string) {
-    if (!confirm('Are you sure you want to delete this reminder?')) return;
-
     try {
       await remindersService.deleteReminder(reminderId);
       loadReminders();
@@ -147,8 +182,9 @@ export default function RemindersPage() {
             </button>
           </div>
 
-          {/* Stats Dashboard */}
+          {/* Stats Cards - Horizontal Row */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {/* Total */}
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total</h3>
@@ -159,6 +195,7 @@ export default function RemindersPage() {
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
             </div>
 
+            {/* Active */}
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Active</h3>
@@ -169,6 +206,7 @@ export default function RemindersPage() {
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.active}</p>
             </div>
 
+            {/* Completed */}
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completed</h3>
@@ -179,6 +217,7 @@ export default function RemindersPage() {
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
             </div>
 
+            {/* Overdue */}
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Overdue</h3>
@@ -192,35 +231,38 @@ export default function RemindersPage() {
 
           {/* Search & Filter Bar */}
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className="flex items-center gap-4">
-              {/* Search */}
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search reminders..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
-                />
+                <div className="flex items-center gap-4">
+                  {/* Search */}
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search reminders..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                    />
+                  </div>
+
+                  {/* Status Filter */}
+                  <div className="relative">
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="pl-4 pr-10 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none w-full"
+                    >
+                      <option value="all">All Status</option>
+                      <option value="active">Active</option>
+                      <option value="completed">Completed</option>
+                      <option value="snoozed">Snoozed</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
               </div>
 
-              {/* Status Filter */}
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
-              >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="completed">Completed</option>
-                <option value="snoozed">Snoozed</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Reminders List */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+              {/* Reminders List */}
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
               All Reminders ({filteredReminders.length})
             </h2>

@@ -22,20 +22,10 @@ import {
   Trash2,
   LogOut,
   Key,
-  Smartphone,
-  Calendar
+  Smartphone
 } from 'lucide-react';
 
 type SettingsTab = 'profile' | 'security' | 'notifications' | 'appearance' | 'privacy' | 'spaces' | 'data' | 'help';
-
-const EVENT_COLORS = [
-  { name: 'Purple', value: '#8b5cf6', defaultLabel: 'Purple' },
-  { name: 'Blue', value: '#3b82f6', defaultLabel: 'Blue' },
-  { name: 'Green', value: '#10b981', defaultLabel: 'Green' },
-  { name: 'Red', value: '#ef4444', defaultLabel: 'Red' },
-  { name: 'Orange', value: '#f97316', defaultLabel: 'Orange' },
-  { name: 'Pink', value: '#ec4899', defaultLabel: 'Pink' },
-];
 
 // Allowed image formats for profile picture
 const ALLOWED_PROFILE_IMAGE_TYPES = [
@@ -53,30 +43,8 @@ const MAX_IMAGE_DIMENSION = 2000;
 export default function SettingsPage() {
   const { user, currentSpace } = useAuth();
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
-  const [colorLabels, setColorLabels] = useState<Record<string, string>>({});
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const profileImageInputRef = useRef<HTMLInputElement>(null);
-
-  // Load color labels from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem('calendarColorLabels');
-    if (saved) {
-      setColorLabels(JSON.parse(saved));
-    } else {
-      // Initialize with default labels
-      const defaults: Record<string, string> = {};
-      EVENT_COLORS.forEach(color => {
-        defaults[color.value] = color.defaultLabel;
-      });
-      setColorLabels(defaults);
-    }
-  }, []);
-
-  const handleColorLabelChange = (colorValue: string, label: string) => {
-    const updated = { ...colorLabels, [colorValue]: label };
-    setColorLabels(updated);
-    localStorage.setItem('calendarColorLabels', JSON.stringify(updated));
-  };
 
   const validateProfileImage = (file: File): Promise<boolean> => {
     return new Promise((resolve, reject) => {
@@ -521,49 +489,6 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-
-                    {/* Calendar Colors */}
-                    <div>
-                      <div className="flex items-center gap-2 mb-4">
-                        <Calendar className="w-5 h-5 text-gray-900 dark:text-white" />
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Calendar Event Colors</h3>
-                      </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                        Customize the meaning of each calendar event color. These labels will appear as tooltips when selecting colors for events.
-                      </p>
-                      <div className="space-y-3">
-                        {EVENT_COLORS.map((color) => (
-                          <div key={color.value} className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
-                            <div
-                              className="w-12 h-12 rounded-lg flex-shrink-0 border-2 border-gray-300 dark:border-gray-600"
-                              style={{ backgroundColor: color.value }}
-                            />
-                            <div className="flex-1">
-                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                {color.name} Color Label
-                              </label>
-                              <input
-                                type="text"
-                                value={colorLabels[color.value] || color.defaultLabel}
-                                onChange={(e) => handleColorLabelChange(color.value, e.target.value)}
-                                placeholder={`e.g., ${color.name === 'Purple' ? 'Work' : color.name === 'Blue' ? 'Personal' : color.name === 'Green' ? 'Family' : color.name === 'Red' ? 'Urgent' : color.name === 'Orange' ? 'Social' : 'Other'}`}
-                                className="w-full px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-4 flex items-start gap-2 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-                        <div className="text-blue-600 dark:text-blue-400 mt-0.5">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                          </svg>
-                        </div>
-                        <p className="text-sm text-blue-700 dark:text-blue-300">
-                          <strong>Tip:</strong> Hover over event color buttons when creating an event to see your custom labels!
-                        </p>
                       </div>
                     </div>
                   </div>

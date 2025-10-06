@@ -12,15 +12,6 @@ interface NewEventModalProps {
   spaceId: string;
 }
 
-const EVENT_COLORS = [
-  { name: 'Purple', value: '#8b5cf6' },
-  { name: 'Blue', value: '#3b82f6' },
-  { name: 'Green', value: '#10b981' },
-  { name: 'Red', value: '#ef4444' },
-  { name: 'Orange', value: '#f97316' },
-  { name: 'Pink', value: '#ec4899' },
-];
-
 // Family-friendly universal emojis (30 total) - organized by theme
 const EMOJIS = [
   // Smiles & Emotions
@@ -76,29 +67,14 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
     end_time: '',
     is_recurring: false,
     location: '',
+    category: 'personal',
   });
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [attachedImages, setAttachedImages] = useState<File[]>([]);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
-  const [colorLabels, setColorLabels] = useState<Record<string, string>>({});
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Load color labels from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('calendarColorLabels');
-    if (saved) {
-      setColorLabels(JSON.parse(saved));
-    } else {
-      // Default labels if not set
-      const defaults: Record<string, string> = {};
-      EVENT_COLORS.forEach(color => {
-        defaults[color.value] = color.name;
-      });
-      setColorLabels(defaults);
-    }
-  }, []);
 
   useEffect(() => {
     if (editEvent) {
@@ -110,6 +86,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
         end_time: editEvent.end_time || '',
         is_recurring: editEvent.is_recurring,
         location: editEvent.location || '',
+        category: editEvent.category || 'personal',
       });
     } else {
       setFormData({
@@ -120,6 +97,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
         end_time: '',
         is_recurring: false,
         location: '',
+        category: 'personal',
       });
     }
     // Reset attachments when modal opens/closes
@@ -140,6 +118,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
       end_time: formData.end_time || undefined,
       is_recurring: formData.is_recurring,
       location: formData.location || undefined,
+      category: formData.category,
     };
 
     onSave(cleanedData);
@@ -431,6 +410,35 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
               placeholder="Add location..."
               className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Category
+            </label>
+            <div className="grid grid-cols-5 gap-3">
+              {[
+                { value: 'work', label: 'Work', icon: '💼', color: 'bg-blue-500' },
+                { value: 'personal', label: 'Personal', icon: '👤', color: 'bg-purple-500' },
+                { value: 'family', label: 'Family', icon: '👨‍👩‍👧‍👦', color: 'bg-pink-500' },
+                { value: 'health', label: 'Health', icon: '💪', color: 'bg-green-500' },
+                { value: 'social', label: 'Social', icon: '🎉', color: 'bg-orange-500' },
+              ].map((category) => (
+                <button
+                  key={category.value}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, category: category.value as any })}
+                  className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${
+                    formData.category === category.value
+                      ? `${category.color} border-transparent text-white`
+                      : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
+                  }`}
+                >
+                  <span className="text-2xl">{category.icon}</span>
+                  <span className="text-xs font-medium">{category.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-4">
