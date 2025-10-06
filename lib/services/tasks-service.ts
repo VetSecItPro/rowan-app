@@ -1,0 +1,625 @@
+import { supabase } from '@/lib/supabase';
+import type {
+  Task,
+  CreateTaskInput,
+  UpdateTaskInput,
+  TaskStats,
+  TaskQueryOptions,
+  PaginatedResponse,
+} from '@/lib/types';
+import type { RealtimeChannel } from '@supabase/supabase-js';
+
+/**
+ * Tasks Service
+ *
+ * Comprehensive service for managing tasks with full CRUD operations,
+ * real-time subscriptions, filtering, and statistics.
+ *
+ * Features:
+ * - Full CRUD operations (Create, Read, Update, Delete)
+ * - Advanced filtering and sorting
+ * - Pagination support
+ * - Real-time subscriptions
+ * - Batch operations
+ * - Task statistics
+ * - Automatic completion timestamp handling
+ */
+export const tasksService = {
+  /**
+   * Get all tasks for a space with optional filtering and sorting
+   *
+   * @param spaceId - The space ID to fetch tasks from
+   * @param options - Optional query parameters for filtering, sorting, and pagination
+   * @returns Promise<Task[]> - Array of tasks
+   *
+   * @example
+   * ```typescript
+   * // Get all tasks
+   * const tasks = await tasksService.getTasks(spaceId);
+   *
+   * // Get only pending tasks
+   * const pending = await tasksService.getTasks(spaceId, { status: 'pending' });
+   *
+   * // Get high priority tasks sorted by due date
+   * const urgent = await tasksService.getTasks(spaceId, {
+   *   priority: 'high',
+   *   sort: 'due_date',
+   *   order: 'asc'
+   * });
+   * ```
+   */
+  async getTasks(spaceId: string, options?: TaskQueryOptions): Promise<Task[]> {
+    try {
+      let query = supabase
+        .from('tasks')
+        .select('*')
+        .eq('space_id', spaceId);
+
+      // Apply filters
+      if (options?.status) {
+        if (Array.isArray(options.status)) {
+          query = query.in('status', options.status);
+        } else {
+          query = query.eq('status', options.status);
+        }
+      }
+
+      if (options?.priority) {
+        if (Array.isArray(options.priority)) {
+          query = query.in('priority', options.priority);
+        } else {
+          query = query.eq('priority', options.priority);
+        }
+      }
+
+      if (options?.category) {
+        query = query.eq('category', options.category);
+      }
+
+      if (options?.assigned_to) {
+        query = query.eq('assigned_to', options.assigned_to);
+      }
+
+      if (options?.created_by) {
+        query = query.eq('created_by', options.created_by);
+      }
+
+      // Search in title and description
+      if (options?.search) {
+        query = query.or(`title.ilike.%${options.search}%,description.ilike.%${options.search}%`);
+      }
+
+      // Apply sorting
+      const sortField = options?.sort || 'created_at';
+      const sortOrder = options?.order === 'asc' ? { ascending: true } : { ascending: false };
+      query = query.order(sortField, sortOrder);
+
+      // Apply pagination
+      if (options?.limit) {
+        query = query.limit(options.limit);
+      }
+
+      if (options?.offset) {
+        query = query.range(options.offset, options.offset + (options.limit || 10) - 1);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        throw new Error(`Failed to fetch tasks: ${error.message}`);
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getTasks:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get paginated tasks with total count
+   *
+   * @param spaceId - The space ID to fetch tasks from
+   * @param page - Page number (1-indexed)
+   * @param limit - Number of items per page
+   * @param options - Optional query parameters for filtering and sorting
+   * @returns Promise<PaginatedResponse<Task>> - Paginated response with tasks and metadata
+   *
+   * @example
+   * ```typescript
+   * const result = await tasksService.getTasksPaginated(spaceId, 1, 20, {
+   *   status: 'pending',
+   *   sort: 'due_date'
+   * });
+   * console.log(result.data); // Tasks array
+   * console.log(result.total); // Total count
+   * console.log(result.hasMore); // Whether there are more pages
+   * ```
+   */
+  async getTasksPaginated(
+    spaceId: string,
+    page: number = 1,
+    limit: number = 20,
+    options?: TaskQueryOptions
+  ): Promise<PaginatedResponse<Task>> {
+    try {
+      const offset = (page - 1) * limit;
+
+      // Get total count
+      let countQuery = supabase
+        .from('tasks')
+        .select('*', { count: 'exact', head: true })
+        .eq('space_id', spaceId);
+
+      // Apply same filters for count
+      if (options?.status) {
+        if (Array.isArray(options.status)) {
+          countQuery = countQuery.in('status', options.status);
+        } else {
+          countQuery = countQuery.eq('status', options.status);
+        }
+      }
+
+      const { count, error: countError } = await countQuery;
+
+      if (countError) {
+        throw new Error(`Failed to get task count: ${countError.message}`);
+      }
+
+      // Get paginated data
+      const data = await this.getTasks(spaceId, {
+        ...options,
+        limit,
+        offset,
+      });
+
+      const total = count || 0;
+      const hasMore = offset + limit < total;
+
+      return {
+        data,
+        total,
+        page,
+        limit,
+        hasMore,
+      };
+    } catch (error) {
+      console.error('Error in getTasksPaginated:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get a single task by ID
+   *
+   * @param id - Task ID
+   * @returns Promise<Task | null> - Task or null if not found
+   *
+   * @example
+   * ```typescript
+   * const task = await tasksService.getTaskById('123-456-789');
+   * if (task) {
+   *   console.log(task.title);
+   * }
+   * ```
+   */
+  async getTaskById(id: string): Promise<Task | null> {
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // Not found
+          return null;
+        }
+        throw new Error(`Failed to fetch task: ${error.message}`);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in getTaskById:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Create a new task
+   *
+   * @param data - Task creation data
+   * @returns Promise<Task> - Created task
+   *
+   * @example
+   * ```typescript
+   * const newTask = await tasksService.createTask({
+   *   space_id: '123',
+   *   title: 'Complete project',
+   *   description: 'Finish the MVP',
+   *   priority: 'high',
+   *   due_date: '2025-10-10',
+   *   assigned_to: 'user-id'
+   * });
+   * ```
+   */
+  async createTask(data: CreateTaskInput): Promise<Task> {
+    try {
+      const { data: task, error } = await supabase
+        .from('tasks')
+        .insert(data)
+        .select()
+        .single();
+
+      if (error) {
+        throw new Error(`Failed to create task: ${error.message}`);
+      }
+
+      return task;
+    } catch (error) {
+      console.error('Error in createTask:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Create multiple tasks in a single operation
+   *
+   * @param tasks - Array of task creation data
+   * @returns Promise<Task[]> - Created tasks
+   *
+   * @example
+   * ```typescript
+   * const tasks = await tasksService.createTasksBatch([
+   *   { space_id: '123', title: 'Task 1', priority: 'high' },
+   *   { space_id: '123', title: 'Task 2', priority: 'medium' },
+   * ]);
+   * ```
+   */
+  async createTasksBatch(tasks: CreateTaskInput[]): Promise<Task[]> {
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .insert(tasks)
+        .select();
+
+      if (error) {
+        throw new Error(`Failed to create tasks: ${error.message}`);
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in createTasksBatch:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Update a task
+   *
+   * Automatically sets completed_at timestamp when status is changed to 'completed'
+   *
+   * @param id - Task ID
+   * @param updates - Partial task data to update
+   * @returns Promise<Task> - Updated task
+   *
+   * @example
+   * ```typescript
+   * const updated = await tasksService.updateTask('task-id', {
+   *   status: 'completed',
+   *   priority: 'low'
+   * });
+   * ```
+   */
+  async updateTask(id: string, updates: UpdateTaskInput): Promise<Task> {
+    try {
+      // If marking as completed, set completed_at timestamp
+      const finalUpdates: any = { ...updates };
+      if (updates.status === 'completed' && !finalUpdates.completed_at) {
+        finalUpdates.completed_at = new Date().toISOString();
+      }
+
+      // If changing from completed to another status, clear completed_at
+      if (updates.status && updates.status !== 'completed') {
+        finalUpdates.completed_at = null;
+      }
+
+      const { data, error } = await supabase
+        .from('tasks')
+        .update(finalUpdates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        throw new Error(`Failed to update task: ${error.message}`);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in updateTask:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Update multiple tasks with the same changes
+   *
+   * @param ids - Array of task IDs
+   * @param updates - Updates to apply to all tasks
+   * @returns Promise<Task[]> - Updated tasks
+   *
+   * @example
+   * ```typescript
+   * const updated = await tasksService.updateTasksBatch(
+   *   ['id-1', 'id-2', 'id-3'],
+   *   { priority: 'urgent' }
+   * );
+   * ```
+   */
+  async updateTasksBatch(ids: string[], updates: UpdateTaskInput): Promise<Task[]> {
+    try {
+      const finalUpdates: any = { ...updates };
+      if (updates.status === 'completed' && !finalUpdates.completed_at) {
+        finalUpdates.completed_at = new Date().toISOString();
+      }
+
+      const { data, error } = await supabase
+        .from('tasks')
+        .update(finalUpdates)
+        .in('id', ids)
+        .select();
+
+      if (error) {
+        throw new Error(`Failed to update tasks: ${error.message}`);
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in updateTasksBatch:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Delete a task
+   *
+   * @param id - Task ID
+   * @returns Promise<void>
+   *
+   * @example
+   * ```typescript
+   * await tasksService.deleteTask('task-id');
+   * ```
+   */
+  async deleteTask(id: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        throw new Error(`Failed to delete task: ${error.message}`);
+      }
+    } catch (error) {
+      console.error('Error in deleteTask:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Delete multiple tasks
+   *
+   * @param ids - Array of task IDs to delete
+   * @returns Promise<void>
+   *
+   * @example
+   * ```typescript
+   * await tasksService.deleteTasksBatch(['id-1', 'id-2', 'id-3']);
+   * ```
+   */
+  async deleteTasksBatch(ids: string[]): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .in('id', ids);
+
+      if (error) {
+        throw new Error(`Failed to delete tasks: ${error.message}`);
+      }
+    } catch (error) {
+      console.error('Error in deleteTasksBatch:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get comprehensive task statistics for a space
+   *
+   * @param spaceId - Space ID
+   * @returns Promise<TaskStats> - Task statistics including totals and breakdowns
+   *
+   * @example
+   * ```typescript
+   * const stats = await tasksService.getTaskStats(spaceId);
+   * console.log(`Total: ${stats.total}`);
+   * console.log(`Completed: ${stats.completed}`);
+   * console.log(`High Priority: ${stats.byPriority.high}`);
+   * ```
+   */
+  async getTaskStats(spaceId: string): Promise<TaskStats> {
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('status, priority')
+        .eq('space_id', spaceId);
+
+      if (error) {
+        throw new Error(`Failed to get task stats: ${error.message}`);
+      }
+
+      const total = data.length;
+      const completed = data.filter(t => t.status === 'completed').length;
+      const inProgress = data.filter(t => t.status === 'in_progress').length;
+      const pending = data.filter(t => t.status === 'pending').length;
+      const cancelled = data.filter(t => t.status === 'cancelled').length;
+
+      const byPriority = {
+        low: data.filter(t => t.priority === 'low').length,
+        medium: data.filter(t => t.priority === 'medium').length,
+        high: data.filter(t => t.priority === 'high').length,
+        urgent: data.filter(t => t.priority === 'urgent').length,
+      };
+
+      return {
+        total,
+        completed,
+        inProgress,
+        pending,
+        cancelled,
+        byPriority,
+      };
+    } catch (error) {
+      console.error('Error in getTaskStats:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Subscribe to real-time task changes for a space
+   *
+   * @param spaceId - Space ID to subscribe to
+   * @param callback - Callback function called when tasks change
+   * @returns RealtimeChannel - Channel object with unsubscribe method
+   *
+   * @example
+   * ```typescript
+   * const channel = tasksService.subscribeToTasks(spaceId, (payload) => {
+   *   console.log('Change:', payload.eventType);
+   *   console.log('Task:', payload.new || payload.old);
+   * });
+   *
+   * // Later, cleanup
+   * channel.unsubscribe();
+   * ```
+   */
+  subscribeToTasks(
+    spaceId: string,
+    callback: (payload: {
+      eventType: 'INSERT' | 'UPDATE' | 'DELETE';
+      new: Task | null;
+      old: Task | null;
+    }) => void
+  ): RealtimeChannel {
+    return supabase
+      .channel(`tasks:${spaceId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'tasks',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        (payload) => {
+          callback({
+            eventType: payload.eventType as 'INSERT' | 'UPDATE' | 'DELETE',
+            new: payload.new as Task | null,
+            old: payload.old as Task | null,
+          });
+        }
+      )
+      .subscribe();
+  },
+
+  /**
+   * Get tasks assigned to a specific user
+   *
+   * @param spaceId - Space ID
+   * @param userId - User ID
+   * @returns Promise<Task[]> - Tasks assigned to user
+   *
+   * @example
+   * ```typescript
+   * const myTasks = await tasksService.getTasksByUser(spaceId, userId);
+   * ```
+   */
+  async getTasksByUser(spaceId: string, userId: string): Promise<Task[]> {
+    return this.getTasks(spaceId, { assigned_to: userId });
+  },
+
+  /**
+   * Get tasks due within a date range
+   *
+   * @param spaceId - Space ID
+   * @param startDate - Start date (ISO string)
+   * @param endDate - End date (ISO string)
+   * @returns Promise<Task[]> - Tasks due in range
+   *
+   * @example
+   * ```typescript
+   * const thisWeek = await tasksService.getTasksByDueDate(
+   *   spaceId,
+   *   '2025-10-05',
+   *   '2025-10-12'
+   * );
+   * ```
+   */
+  async getTasksByDueDate(spaceId: string, startDate: string, endDate: string): Promise<Task[]> {
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('space_id', spaceId)
+        .gte('due_date', startDate)
+        .lte('due_date', endDate)
+        .order('due_date', { ascending: true });
+
+      if (error) {
+        throw new Error(`Failed to fetch tasks by due date: ${error.message}`);
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getTasksByDueDate:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get overdue tasks
+   *
+   * @param spaceId - Space ID
+   * @returns Promise<Task[]> - Overdue tasks that are not completed
+   *
+   * @example
+   * ```typescript
+   * const overdue = await tasksService.getOverdueTasks(spaceId);
+   * ```
+   */
+  async getOverdueTasks(spaceId: string): Promise<Task[]> {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('space_id', spaceId)
+        .lt('due_date', today)
+        .neq('status', 'completed')
+        .order('due_date', { ascending: true });
+
+      if (error) {
+        throw new Error(`Failed to fetch overdue tasks: ${error.message}`);
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getOverdueTasks:', error);
+      throw error;
+    }
+  },
+};

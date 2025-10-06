@@ -1,0 +1,168 @@
+import { supabase } from '@/lib/supabase';
+
+export interface Message {
+  id: string;
+  space_id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  read: boolean;
+  read_at?: string;
+  attachments?: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Conversation {
+  id: string;
+  space_id: string;
+  title?: string;
+  participants: string[];
+  last_message?: Message;
+  unread_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateMessageInput {
+  space_id: string;
+  conversation_id: string;
+  sender_id?: string;
+  content: string;
+  attachments?: string[];
+}
+
+export interface MessageStats {
+  conversations: number;
+  unread: number;
+  today: number;
+  total: number;
+}
+
+export const messagesService = {
+  async getConversations(spaceId: string): Promise<Conversation[]> {
+    const { data, error } = await supabase
+      .from('conversations')
+      .select('*, messages(*, sender:profiles(*))')
+      .eq('space_id', spaceId)
+      .order('updated_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getMessages(conversationId: string): Promise<Message[]> {
+    const { data, error } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('conversation_id', conversationId)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getMessageById(id: string): Promise<Message | null> {
+    const { data, error } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async createMessage(input: CreateMessageInput): Promise<Message> {
+    const { data, error } = await supabase
+      .from('messages')
+      .insert([{
+        ...input,
+        read: false,
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // Update conversation's updated_at
+    await supabase
+      .from('conversations')
+      .update({ updated_at: new Date().toISOString() })
+      .eq('id', input.conversation_id);
+
+    return data;
+  },
+
+  async updateMessage(id: string, updates: Partial<CreateMessageInput>): Promise<Message> {
+    const { data, error } = await supabase
+      .from('messages')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteMessage(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('messages')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  },
+
+  async markAsRead(id: string): Promise<Message> {
+    return this.updateMessage(id, {
+      read: true,
+    } as any);
+  },
+
+  async markConversationAsRead(conversationId: string): Promise<void> {
+    const { error } = await supabase
+      .from('messages')
+      .update({ read: true, read_at: new Date().toISOString() })
+      .eq('conversation_id', conversationId)
+      .eq('read', false);
+
+    if (error) throw error;
+  },
+
+  async getMessageStats(spaceId: string): Promise<MessageStats> {
+    const conversations = await this.getConversations(spaceId);
+
+    const { data: allMessages, error } = await supabase
+      .from('messages')
+      .select('*, conversation:conversations!inner(space_id)')
+      .eq('conversation.space_id', spaceId);
+
+    if (error) throw error;
+
+    const messages = allMessages || [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return {
+      conversations: conversations.length,
+      unread: messages.filter(m => !m.read).length,
+      today: messages.filter(m => new Date(m.created_at) >= today).length,
+      total: messages.length,
+    };
+  },
+
+  async searchMessages(spaceId: string, query: string): Promise<Message[]> {
+    const { data, error } = await supabase
+      .from('messages')
+      .select('*, conversation:conversations!inner(space_id)')
+      .eq('conversation.space_id', spaceId)
+      .ilike('content', `%${query}%`)
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (error) throw error;
+    return data || [];
+  },
+};
