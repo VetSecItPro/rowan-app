@@ -184,11 +184,50 @@ export default function GoalsPage() {
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
       <div className="p-8">
         <div className="max-w-7xl mx-auto space-y-8">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-goals flex items-center justify-center"><Target className="w-6 h-6 text-white" /></div>
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-goals bg-clip-text text-transparent">Goals & Milestones</h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">Achieve your dreams together</p>
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-goals flex items-center justify-center">
+                <Target className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold bg-gradient-goals bg-clip-text text-transparent">Goals & Milestones</h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">Achieve your dreams together</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 flex gap-1">
+                <button
+                  onClick={() => setViewMode('goals')}
+                  className={`px-4 py-2 rounded-md font-medium transition-all flex items-center gap-2 ${
+                    viewMode === 'goals'
+                      ? 'bg-gradient-goals text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                  Goals
+                </button>
+                <button
+                  onClick={() => setViewMode('milestones')}
+                  className={`px-4 py-2 rounded-md font-medium transition-all flex items-center gap-2 ${
+                    viewMode === 'milestones'
+                      ? 'bg-gradient-goals text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <List className="w-4 h-4" />
+                  Milestones
+                </button>
+              </div>
+              <button
+                onClick={() => viewMode === 'goals' ? setIsGoalModalOpen(true) : setIsMilestoneModalOpen(true)}
+                className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                New {viewMode === 'goals' ? 'Goal' : 'Milestone'}
+              </button>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -227,46 +266,11 @@ export default function GoalsPage() {
               <input type="text" placeholder="Search goals..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white" />
             </div>
           </div>
+          {/* Goals/Milestones List */}
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            {/* View Toggle */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` : `Achievement Wall (${filteredMilestones.length})`}
-              </h2>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => viewMode === 'goals' ? setIsGoalModalOpen(true) : setIsMilestoneModalOpen(true)}
-                  className="px-4 py-2 bg-gradient-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg font-medium flex items-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  {viewMode === 'goals' ? 'New Goal' : 'New Milestone'}
-                </button>
-                <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-xl border border-purple-200 dark:border-purple-700">
-                <button
-                  onClick={() => setViewMode('goals')}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[110px] ${
-                    viewMode === 'goals'
-                      ? 'bg-gradient-goals text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                  }`}
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                  <span className="text-sm">Goals</span>
-                </button>
-                <button
-                  onClick={() => setViewMode('milestones')}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[110px] ${
-                    viewMode === 'milestones'
-                      ? 'bg-gradient-goals text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                  <span className="text-sm">Milestones</span>
-                </button>
-              </div>
-            </div>
-          </div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+              {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` : `Achievement Wall (${filteredMilestones.length})`}
+            </h2>
 
             {loading ? (
               <div className="text-center py-12">
