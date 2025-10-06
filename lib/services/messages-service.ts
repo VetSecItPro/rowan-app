@@ -44,12 +44,28 @@ export const messagesService = {
   async getConversations(spaceId: string): Promise<Conversation[]> {
     const { data, error } = await supabase
       .from('conversations')
-      .select('*, messages(*, sender:profiles(*))')
+      .select('*')
       .eq('space_id', spaceId)
       .order('updated_at', { ascending: false });
 
     if (error) throw error;
     return data || [];
+  },
+
+  async createConversation(input: { space_id: string; title?: string; participants: string[] }): Promise<Conversation> {
+    const { data, error } = await supabase
+      .from('conversations')
+      .insert([{
+        space_id: input.space_id,
+        title: input.title,
+        participants: input.participants,
+        unread_count: 0,
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   },
 
   async getMessages(conversationId: string): Promise<Message[]> {

@@ -28,7 +28,7 @@ const EMOJIS = [
 ];
 
 export default function MessagesPage() {
-  const { currentSpace } = useAuth();
+  const { currentSpace, user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [filteredMessages, setFilteredMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,7 +40,7 @@ export default function MessagesPage() {
   const [isSending, setIsSending] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const conversationId = 'default'; // In a real app, this would be dynamic
+  const [conversationId, setConversationId] = useState<string | null>(null);
 
   const [stats, setStats] = useState({
     thisWeek: 0,
@@ -68,8 +68,26 @@ export default function MessagesPage() {
   async function loadMessages() {
     try {
       setLoading(true);
+
+      // Get or create default conversation for the space
+      const conversations = await messagesService.getConversations(currentSpace.id);
+
+      let defaultConversation;
+      if (conversations.length === 0) {
+        // Create a default conversation
+        defaultConversation = await messagesService.createConversation({
+          space_id: currentSpace.id,
+          title: 'General',
+          participants: [],
+        });
+      } else {
+        defaultConversation = conversations[0];
+      }
+
+      setConversationId(defaultConversation.id);
+
       const [messagesData, statsData] = await Promise.all([
-        messagesService.getMessages(conversationId),
+        messagesService.getMessages(defaultConversation.id),
         messagesService.getMessageStats(currentSpace.id),
       ]);
       setMessages(messagesData);
@@ -127,13 +145,14 @@ export default function MessagesPage() {
 
   async function handleSendMessage(e: React.FormEvent) {
     e.preventDefault();
-    if (!messageInput.trim() || isSending) return;
+    if (!messageInput.trim() || isSending || !conversationId) return;
 
     setIsSending(true);
     try {
       await handleCreateMessage({
         space_id: currentSpace.id,
         conversation_id: conversationId,
+        sender_id: user.id,
         content: messageInput,
       });
       setMessageInput('');

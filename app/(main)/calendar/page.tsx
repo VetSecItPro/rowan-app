@@ -159,6 +159,17 @@ export default function CalendarPage() {
     });
   }
 
+  function getCategoryColor(category: string) {
+    const colors = {
+      work: { bg: 'bg-blue-100 dark:bg-blue-900/30', border: 'border-blue-500', text: 'text-blue-700 dark:text-blue-300' },
+      personal: { bg: 'bg-purple-100 dark:bg-purple-900/30', border: 'border-purple-500', text: 'text-purple-700 dark:text-purple-300' },
+      family: { bg: 'bg-pink-100 dark:bg-pink-900/30', border: 'border-pink-500', text: 'text-pink-700 dark:text-pink-300' },
+      health: { bg: 'bg-green-100 dark:bg-green-900/30', border: 'border-green-500', text: 'text-green-700 dark:text-green-300' },
+      social: { bg: 'bg-orange-100 dark:bg-orange-900/30', border: 'border-orange-500', text: 'text-orange-700 dark:text-orange-300' },
+    };
+    return colors[category as keyof typeof colors] || colors.personal;
+  }
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Calendar' }]}>
       <div className="p-8">
@@ -340,20 +351,23 @@ export default function CalendarPage() {
                           </div>
 
                           <div className="space-y-1">
-                            {dayEvents.map((event) => (
-                              <button
-                                key={event.id}
-                                onClick={() => handleEditEvent(event)}
-                                className="w-full text-left px-2 py-1 rounded text-xs bg-purple-100 dark:bg-purple-900/30 border-l-2 border-purple-500 hover:opacity-80 transition-opacity"
-                              >
-                                <p className="font-medium text-purple-700 dark:text-purple-300 truncate">
-                                  {event.title}
-                                </p>
-                                <p className="text-gray-500 dark:text-gray-400 text-[10px]">
-                                  {format(parseISO(event.start_time), 'h:mm a')}
-                                </p>
-                              </button>
-                            ))}
+                            {dayEvents.map((event) => {
+                              const categoryColor = getCategoryColor(event.category);
+                              return (
+                                <button
+                                  key={event.id}
+                                  onClick={() => handleEditEvent(event)}
+                                  className={`w-full text-left px-2 py-1 rounded text-xs ${categoryColor.bg} border-l-2 ${categoryColor.border} hover:opacity-80 transition-opacity`}
+                                >
+                                  <p className={`font-medium ${categoryColor.text} truncate`}>
+                                    {event.title}
+                                  </p>
+                                  <p className="text-gray-500 dark:text-gray-400 text-[10px]">
+                                    {format(parseISO(event.start_time), 'h:mm a')}
+                                  </p>
+                                </button>
+                              );
+                            })}
                             {dayEvents.length === 0 && isCurrentMonth && (
                               <button
                                 onClick={() => setIsModalOpen(true)}

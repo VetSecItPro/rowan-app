@@ -55,12 +55,26 @@ export default function ShoppingPage() {
     }
   }
 
-  async function handleCreateList(listData: CreateListInput) {
+  async function handleCreateList(listData: CreateListInput & { store?: string; items?: { name: string; quantity: number }[] }) {
     try {
       if (editingList) {
         await shoppingService.updateList(editingList.id, listData);
       } else {
-        await shoppingService.createList(listData);
+        // Extract items before creating the list
+        const { items, ...listDataOnly } = listData;
+
+        const newList = await shoppingService.createList(listDataOnly);
+
+        // Add items if provided
+        if (items && items.length > 0) {
+          for (const item of items) {
+            await shoppingService.createItem({
+              list_id: newList.id,
+              name: item.name,
+              quantity: item.quantity || 1,
+            });
+          }
+        }
       }
       loadLists();
       setEditingList(null);
@@ -85,6 +99,21 @@ export default function ShoppingPage() {
       loadLists();
     } catch (error) {
       console.error('Failed to toggle item:', error);
+    }
+  }
+
+  async function handleCompleteList(listId: string) {
+    try {
+      // Mark as completed
+      await shoppingService.updateList(listId, { status: 'completed' });
+
+      // Auto-delete after a short delay
+      setTimeout(async () => {
+        await shoppingService.deleteList(listId);
+        loadLists();
+      }, 1500);
+    } catch (error) {
+      console.error('Failed to complete list:', error);
     }
   }
 
@@ -176,9 +205,9 @@ export default function ShoppingPage() {
                 )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="space-y-4">
                 {filteredLists.map((list) => (
-                  <ShoppingListCard key={list.id} list={list} onEdit={handleEditList} onDelete={handleDeleteList} onToggleItem={handleToggleItem} />
+                  <ShoppingListCard key={list.id} list={list} onEdit={handleEditList} onDelete={handleDeleteList} onToggleItem={handleToggleItem} onComplete={handleCompleteList} />
                 ))}
               </div>
             )}
