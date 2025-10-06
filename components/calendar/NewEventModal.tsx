@@ -130,7 +130,19 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+
+    // Clean up the form data - remove empty strings
+    const cleanedData: CreateEventInput = {
+      space_id: formData.space_id,
+      title: formData.title,
+      description: formData.description || undefined,
+      start_time: formData.start_time,
+      end_time: formData.end_time || undefined,
+      is_recurring: formData.is_recurring,
+      location: formData.location || undefined,
+    };
+
+    onSave(cleanedData);
     onClose();
   };
 
@@ -367,8 +379,12 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
               <input
                 type="datetime-local"
                 required
-                value={formData.start_time ? new Date(formData.start_time).toISOString().slice(0, 16) : ''}
-                onChange={(e) => setFormData({ ...formData, start_time: new Date(e.target.value).toISOString() })}
+                value={formData.start_time ? formData.start_time.slice(0, 16) : ''}
+                onChange={(e) => {
+                  if (e.target.value) {
+                    setFormData({ ...formData, start_time: new Date(e.target.value).toISOString() });
+                  }
+                }}
                 className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
@@ -379,8 +395,14 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
               </label>
               <input
                 type="datetime-local"
-                value={formData.end_time ? new Date(formData.end_time).toISOString().slice(0, 16) : ''}
-                onChange={(e) => setFormData({ ...formData, end_time: e.target.value ? new Date(e.target.value).toISOString() : '' })}
+                value={formData.end_time ? formData.end_time.slice(0, 16) : ''}
+                onChange={(e) => {
+                  if (e.target.value) {
+                    setFormData({ ...formData, end_time: new Date(e.target.value).toISOString() });
+                  } else {
+                    setFormData({ ...formData, end_time: '' });
+                  }
+                }}
                 className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
