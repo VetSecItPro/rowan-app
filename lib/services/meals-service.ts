@@ -1,0 +1,193 @@
+import { supabase } from '@/lib/supabase';
+
+export interface Recipe {
+  id: string;
+  space_id: string;
+  name: string;
+  description?: string;
+  ingredients: string[];
+  instructions?: string;
+  prep_time?: number;
+  cook_time?: number;
+  servings?: number;
+  image_url?: string;
+  tags?: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Meal {
+  id: string;
+  space_id: string;
+  recipe_id?: string;
+  recipe?: Recipe;
+  meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+  scheduled_date: string;
+  notes?: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateMealInput {
+  space_id: string;
+  recipe_id?: string;
+  meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+  scheduled_date: string;
+  notes?: string;
+}
+
+export interface CreateRecipeInput {
+  space_id: string;
+  name: string;
+  description?: string;
+  ingredients: string[];
+  instructions?: string;
+  prep_time?: number;
+  cook_time?: number;
+  servings?: number;
+  image_url?: string;
+  tags?: string[];
+}
+
+export interface MealStats {
+  thisWeek: number;
+  savedRecipes: number;
+  upcoming: number;
+  shoppingItems: number;
+}
+
+export const mealsService = {
+  async getMeals(spaceId: string): Promise<Meal[]> {
+    const { data, error } = await supabase
+      .from('meals')
+      .select('*, recipe:recipes(*)')
+      .eq('space_id', spaceId)
+      .order('scheduled_date', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getMealById(id: string): Promise<Meal | null> {
+    const { data, error } = await supabase
+      .from('meals')
+      .select('*, recipe:recipes(*)')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async createMeal(input: CreateMealInput): Promise<Meal> {
+    const { data, error } = await supabase
+      .from('meals')
+      .insert([input])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async updateMeal(id: string, updates: Partial<CreateMealInput>): Promise<Meal> {
+    const { data, error } = await supabase
+      .from('meals')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteMeal(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('meals')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  },
+
+  async getRecipes(spaceId: string): Promise<Recipe[]> {
+    const { data, error } = await supabase
+      .from('recipes')
+      .select('*')
+      .eq('space_id', spaceId)
+      .order('name', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async createRecipe(input: CreateRecipeInput): Promise<Recipe> {
+    const { data, error } = await supabase
+      .from('recipes')
+      .insert([input])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async updateRecipe(id: string, updates: Partial<CreateRecipeInput>): Promise<Recipe> {
+    const { data, error } = await supabase
+      .from('recipes')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteRecipe(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('recipes')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  },
+
+  async getMealStats(spaceId: string): Promise<MealStats> {
+    const meals = await this.getMeals(spaceId);
+    const recipes = await this.getRecipes(spaceId);
+
+    const now = new Date();
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay());
+
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 7);
+
+    const thisWeek = meals.filter(m => {
+      const mealDate = new Date(m.scheduled_date);
+      return mealDate >= weekStart && mealDate < weekEnd;
+    }).length;
+
+    const upcoming = meals.filter(m =>
+      new Date(m.scheduled_date) >= now
+    ).length;
+
+    // Calculate shopping items from upcoming meals
+    let shoppingItems = 0;
+    meals.forEach(meal => {
+      if (meal.recipe && meal.recipe.ingredients) {
+        shoppingItems += meal.recipe.ingredients.length;
+      }
+    });
+
+    return {
+      thisWeek,
+      savedRecipes: recipes.length,
+      upcoming,
+      shoppingItems,
+    };
+  },
+};

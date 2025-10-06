@@ -1,0 +1,71 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
+import { CreateExpenseInput, Expense } from '@/lib/services/household-service';
+
+interface NewExpenseModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (expense: CreateExpenseInput) => void;
+  editExpense?: Expense | null;
+  spaceId: string;
+}
+
+export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId }: NewExpenseModalProps) {
+  const [formData, setFormData] = useState<CreateExpenseInput>({
+    space_id: spaceId,
+    title: '',
+    amount: 0,
+    category: '',
+    status: 'pending',
+    due_date: '',
+    recurring: false,
+  });
+
+  useEffect(() => {
+    if (editExpense) {
+      setFormData({ space_id: spaceId, title: editExpense.title, amount: editExpense.amount, category: editExpense.category || '', status: editExpense.status, due_date: editExpense.due_date || '', recurring: editExpense.recurring || false });
+    } else {
+      setFormData({ space_id: spaceId, title: '', amount: 0, category: '', status: 'pending', due_date: '', recurring: false });
+    }
+  }, [editExpense, spaceId]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4">
+        <div className="flex items-center justify-between p-6 border-b">
+          <h2 className="text-2xl font-bold">{editExpense ? 'Edit Expense' : 'New Expense'}</h2>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"><X className="w-5 h-5" /></button>
+        </div>
+        <form onSubmit={(e) => { e.preventDefault(); onSave(formData); onClose(); }} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">Title *</label>
+            <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border rounded-lg" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Amount *</label>
+              <input type="number" required step="0.01" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })} className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border rounded-lg" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Category</label>
+              <input type="text" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border rounded-lg" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Due Date</label>
+            <input type="date" value={formData.due_date} onChange={(e) => setFormData({ ...formData, due_date: e.target.value })} className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border rounded-lg" />
+          </div>
+          <div className="flex gap-3 pt-4">
+            <button type="button" onClick={onClose} className="flex-1 px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">Cancel</button>
+            <button type="submit" className="flex-1 px-6 py-2 shimmer-bg text-white rounded-lg">{editExpense ? 'Save' : 'Create'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
