@@ -37,6 +37,7 @@ export interface MessageStats {
   unread: number;
   today: number;
   total: number;
+  conversations: number;
 }
 
 export const messagesService = {
@@ -132,14 +133,22 @@ export const messagesService = {
   },
 
   async getMessageStats(spaceId: string): Promise<MessageStats> {
-    const { data: allMessages, error } = await supabase
-      .from('messages')
-      .select('*, conversation:conversations!inner(space_id)')
-      .eq('conversation.space_id', spaceId);
+    const [messagesResult, conversationsResult] = await Promise.all([
+      supabase
+        .from('messages')
+        .select('*, conversation:conversations!inner(space_id)')
+        .eq('conversation.space_id', spaceId),
+      supabase
+        .from('conversations')
+        .select('id')
+        .eq('space_id', spaceId)
+    ]);
 
-    if (error) throw error;
+    if (messagesResult.error) throw messagesResult.error;
+    if (conversationsResult.error) throw conversationsResult.error;
 
-    const messages = allMessages || [];
+    const messages = messagesResult.data || [];
+    const conversations = conversationsResult.data || [];
     const now = new Date();
 
     // Today's start (midnight)
@@ -156,6 +165,7 @@ export const messagesService = {
       unread: messages.filter(m => !m.read).length,
       today: messages.filter(m => new Date(m.created_at) >= today).length,
       total: messages.length,
+      conversations: conversations.length,
     };
   },
 
