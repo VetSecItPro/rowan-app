@@ -75,7 +75,7 @@ export default function DashboardPage() {
         shoppingStats,
         mealStats,
         choreStats,
-        expenseStats,
+        budgetStats,
         goalStats,
       ] = await Promise.all([
         tasksService.getTaskStats(currentSpace.id),
@@ -84,8 +84,8 @@ export default function DashboardPage() {
         messagesService.getMessageStats(currentSpace.id),
         shoppingService.getShoppingStats(currentSpace.id),
         mealsService.getMealStats(currentSpace.id),
-        householdService.getChoreStats(currentSpace.id),
-        householdService.getExpenseStats(currentSpace.id),
+        householdService.getChoreStats(currentSpace.id, user.id),
+        householdService.getBudgetStats(currentSpace.id),
         goalsService.getGoalStats(currentSpace.id),
       ]);
 
@@ -122,8 +122,8 @@ export default function DashboardPage() {
         },
         household: {
           chores: choreStats.total,
-          pending: choreStats.pending,
-          expenses: expenseStats.total,
+          pending: choreStats.myChores + choreStats.partnerChores,
+          expenses: budgetStats.pendingBills,
         },
         goals: {
           total: goalStats.total,
