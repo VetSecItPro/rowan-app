@@ -11,6 +11,7 @@ export interface CalendarEvent {
   is_recurring: boolean;
   recurrence_pattern?: string;
   location?: string;
+  category: 'work' | 'personal' | 'family' | 'health' | 'social';
   status: 'not-started' | 'in-progress' | 'completed';
   assigned_to?: string;
   created_by?: string;
@@ -28,6 +29,7 @@ export interface CreateEventInput {
   is_recurring?: boolean;
   recurrence_pattern?: string;
   location?: string;
+  category?: 'work' | 'personal' | 'family' | 'health' | 'social';
   assigned_to?: string;
 }
 

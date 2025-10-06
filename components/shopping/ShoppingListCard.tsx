@@ -10,9 +10,10 @@ interface ShoppingListCardProps {
   onEdit: (list: ShoppingList) => void;
   onDelete: (listId: string) => void;
   onToggleItem?: (itemId: string, checked: boolean) => void;
+  onComplete?: (listId: string) => void;
 }
 
-export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem }: ShoppingListCardProps) {
+export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onComplete }: ShoppingListCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const totalItems = list.items?.length || 0;
@@ -22,6 +23,23 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem }: Shopp
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-all duration-200">
       <div className="flex items-start justify-between mb-4">
+        {/* Completion Checkbox */}
+        <div className="relative group">
+          <button
+            onClick={() => onComplete?.(list.id)}
+            className={`mt-1 w-6 h-6 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 mr-3 ${
+              list.status === 'completed'
+                ? 'bg-green-500 border-green-500'
+                : 'bg-transparent border-gray-400 hover:border-green-500'
+            }`}
+          >
+            {list.status === 'completed' && <Check className="w-4 h-4 text-white" />}
+          </button>
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+            {list.status === 'completed' ? 'Completed' : 'Mark as complete'}
+          </div>
+        </div>
+
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 bg-gradient-shopping rounded-lg flex items-center justify-center">

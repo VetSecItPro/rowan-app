@@ -5,13 +5,16 @@ export interface Reminder {
   space_id: string;
   title: string;
   description?: string;
-  reminder_type: 'time' | 'location';
+  emoji?: string;
+  category: 'bills' | 'health' | 'work' | 'personal' | 'household';
+  reminder_type?: 'time' | 'location';
   reminder_time?: string;
   location?: string;
   priority: 'low' | 'medium' | 'high' | 'urgent';
   status: 'active' | 'completed' | 'snoozed';
   snooze_until?: string;
   repeat_pattern?: string;
+  repeat_days?: number[];
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -22,13 +25,16 @@ export interface CreateReminderInput {
   space_id: string;
   title: string;
   description?: string;
-  reminder_type: 'time' | 'location';
+  emoji?: string;
+  category?: 'bills' | 'health' | 'work' | 'personal' | 'household';
+  reminder_type?: 'time' | 'location';
   reminder_time?: string;
   location?: string;
   priority?: 'low' | 'medium' | 'high' | 'urgent';
   status?: 'active' | 'completed' | 'snoozed';
   snooze_until?: string;
   repeat_pattern?: string;
+  repeat_days?: number[];
 }
 
 export interface ReminderStats {
@@ -66,8 +72,11 @@ export const remindersService = {
       .from('reminders')
       .insert([{
         ...input,
+        emoji: input.emoji || '🔔',
+        category: input.category || 'personal',
         priority: input.priority || 'medium',
         status: input.status || 'active',
+        remind_at: input.reminder_time, // Populate original field for backwards compatibility
       }])
       .select()
       .single();

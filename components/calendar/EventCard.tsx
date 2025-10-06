@@ -23,6 +23,42 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange }: EventCard
     return format(new Date(event.start_time), 'MMM d, yyyy');
   };
 
+  const getCategoryConfig = () => {
+    const configs = {
+      work: {
+        icon: '💼',
+        label: 'Work',
+        color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+        barColor: 'bg-blue-500'
+      },
+      personal: {
+        icon: '👤',
+        label: 'Personal',
+        color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
+        barColor: 'bg-purple-500'
+      },
+      family: {
+        icon: '👨‍👩‍👧‍👦',
+        label: 'Family',
+        color: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300',
+        barColor: 'bg-pink-500'
+      },
+      health: {
+        icon: '💪',
+        label: 'Health',
+        color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+        barColor: 'bg-green-500'
+      },
+      social: {
+        icon: '🎉',
+        label: 'Social',
+        color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
+        barColor: 'bg-orange-500'
+      },
+    };
+    return configs[event.category] || configs.personal;
+  };
+
   const handleCheckboxClick = () => {
     const states: Array<'not-started' | 'in-progress' | 'completed'> = ['not-started', 'in-progress', 'completed'];
     const currentIndex = states.indexOf(event.status);
@@ -56,12 +92,17 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange }: EventCard
             </div>
 
             <div
-              className="w-1 h-12 rounded-full bg-purple-500"
+              className={`w-1 h-12 rounded-full ${getCategoryConfig().barColor}`}
             />
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {event.title}
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {event.title}
+                </h3>
+                <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryConfig().color}`}>
+                  {getCategoryConfig().icon} {getCategoryConfig().label}
+                </span>
+              </div>
               <div className="flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-400">
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
