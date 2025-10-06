@@ -1,43 +1,100 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Target, Search, Plus, CheckCircle2, TrendingUp, Clock, Award } from 'lucide-react';
+import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { GoalCard } from '@/components/goals/GoalCard';
+import { MilestoneCard } from '@/components/goals/MilestoneCard';
 import { NewGoalModal } from '@/components/goals/NewGoalModal';
+import { NewMilestoneModal } from '@/components/goals/NewMilestoneModal';
 import { useAuth } from '@/lib/contexts/mock-auth-context';
-import { goalsService, Goal, CreateGoalInput } from '@/lib/services/goals-service';
+import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput } from '@/lib/services/goals-service';
+
+type ViewMode = 'goals' | 'milestones';
 
 export default function GoalsPage() {
   const { currentSpace } = useAuth();
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [filteredGoals, setFilteredGoals] = useState<Goal[]>([]);
+  const [filteredMilestones, setFilteredMilestones] = useState<Milestone[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('goals');
+  const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
+  const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
+  const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [stats, setStats] = useState({ active: 0, completed: 0, inProgress: 0, milestonesReached: 0 });
 
   useEffect(() => {
-    loadGoals();
+    loadData();
   }, [currentSpace.id]);
 
   useEffect(() => {
-    let filtered = goals;
-    if (searchQuery) {
-      filtered = filtered.filter(g => g.title.toLowerCase().includes(searchQuery.toLowerCase()) || g.description?.toLowerCase().includes(searchQuery.toLowerCase()));
-    }
-    setFilteredGoals(filtered);
-  }, [goals, searchQuery]);
+    let filteredG = goals;
+    let filteredM = milestones;
 
-  async function loadGoals() {
+    if (searchQuery) {
+      filteredG = filteredG.filter(g =>
+        g.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        g.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      filteredM = filteredM.filter(m =>
+        m.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        m.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    setFilteredGoals(filteredG);
+    setFilteredMilestones(filteredM);
+  }, [goals, milestones, searchQuery]);
+
+  async function loadData() {
     try {
       setLoading(true);
-      const [goalsData, statsData] = await Promise.all([goalsService.getGoals(currentSpace.id), goalsService.getGoalStats(currentSpace.id)]);
+      let [goalsData, milestonesData, statsData] = await Promise.all([
+        goalsService.getGoals(currentSpace.id),
+        goalsService.getAllMilestones(currentSpace.id),
+        goalsService.getGoalStats(currentSpace.id)
+      ]);
+
+      // Create sample goal in database if none exist
+      if (goalsData.length === 0) {
+        const newGoal = await goalsService.createGoal({
+          space_id: currentSpace.id,
+          title: 'Example Goal',
+          description: 'This is a sample goal to demonstrate the Goals & Milestones feature',
+          category: 'Personal Development',
+          status: 'active',
+          progress: 45,
+        });
+        goalsData = [newGoal];
+      }
+
+      // Create sample milestone in database if none exist and we have a goal
+      if (milestonesData.length === 0 && goalsData.length > 0) {
+        const newMilestone = await goalsService.createMilestone({
+          goal_id: goalsData[0].id,
+          title: 'Save $2,500 by March',
+          description: 'Track your progress toward this milestone',
+          type: 'money',
+          target_value: 2500,
+          current_value: 1125,
+        });
+        milestonesData = [newMilestone];
+      }
+
+      // Refresh stats after creating sample data
+      if (goalsData.length > 0 || milestonesData.length > 0) {
+        statsData = await goalsService.getGoalStats(currentSpace.id);
+      }
+
       setGoals(goalsData);
+      setMilestones(milestonesData);
       setStats(statsData);
     } catch (error) {
-      console.error('Failed to load goals:', error);
+      console.error('Failed to load data:', error);
     } finally {
       setLoading(false);
     }
@@ -50,7 +107,7 @@ export default function GoalsPage() {
       } else {
         await goalsService.createGoal(goalData);
       }
-      loadGoals();
+      loadData();
       setEditingGoal(null);
     } catch (error) {
       console.error('Failed to save goal:', error);
@@ -61,9 +118,65 @@ export default function GoalsPage() {
     if (!confirm('Are you sure you want to delete this goal?')) return;
     try {
       await goalsService.deleteGoal(goalId);
-      loadGoals();
+      loadData();
     } catch (error) {
       console.error('Failed to delete goal:', error);
+    }
+  }
+
+  async function handleCreateMilestone(milestoneData: CreateMilestoneInput) {
+    try {
+      if (editingMilestone) {
+        await goalsService.updateMilestone(editingMilestone.id, milestoneData);
+      } else {
+        await goalsService.createMilestone(milestoneData);
+      }
+      loadData();
+      setEditingMilestone(null);
+    } catch (error) {
+      console.error('Failed to save milestone:', error);
+    }
+  }
+
+  async function handleDeleteMilestone(milestoneId: string) {
+    if (!confirm('Are you sure you want to delete this milestone?')) return;
+    try {
+      await goalsService.deleteMilestone(milestoneId);
+      loadData();
+    } catch (error) {
+      console.error('Failed to delete milestone:', error);
+    }
+  }
+
+  async function handleToggleMilestone(milestoneId: string, completed: boolean) {
+    try {
+      await goalsService.toggleMilestone(milestoneId, completed);
+      loadData();
+    } catch (error) {
+      console.error('Failed to toggle milestone:', error);
+    }
+  }
+
+  async function handleGoalStatusChange(goalId: string, status: 'not-started' | 'in-progress' | 'completed') {
+    try {
+      const statusMap = {
+        'not-started': 'active' as const,
+        'in-progress': 'active' as const,
+        'completed': 'completed' as const,
+      };
+      const progressMap = {
+        'not-started': 0,
+        'in-progress': 50,
+        'completed': 100,
+      };
+
+      await goalsService.updateGoal(goalId, {
+        status: statusMap[status],
+        progress: progressMap[status],
+      });
+      loadData();
+    } catch (error) {
+      console.error('Failed to update goal status:', error);
     }
   }
 
@@ -71,15 +184,12 @@ export default function GoalsPage() {
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
       <div className="p-8">
         <div className="max-w-7xl mx-auto space-y-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-goals flex items-center justify-center"><Target className="w-6 h-6 text-white" /></div>
-              <div>
-                <h1 className="text-4xl font-bold bg-gradient-goals bg-clip-text text-transparent">Goals & Milestones</h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">Achieve your dreams together</p>
-              </div>
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-goals flex items-center justify-center"><Target className="w-6 h-6 text-white" /></div>
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-goals bg-clip-text text-transparent">Goals & Milestones</h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">Achieve your dreams together</p>
             </div>
-            <button onClick={() => setIsModalOpen(true)} className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center gap-2"><Plus className="w-5 h-5" />New Goal</button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
@@ -88,13 +198,6 @@ export default function GoalsPage() {
                 <div className="w-12 h-12 bg-gradient-goals rounded-xl flex items-center justify-center"><Target className="w-6 h-6 text-white" /></div>
               </div>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.active}</p>
-            </div>
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completed</h3>
-                <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"><CheckCircle2 className="w-6 h-6 text-white" /></div>
-              </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
             </div>
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
@@ -110,6 +213,13 @@ export default function GoalsPage() {
               </div>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.milestonesReached}</p>
             </div>
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completed</h3>
+                <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"><CheckCircle2 className="w-6 h-6 text-white" /></div>
+              </div>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
+            </div>
           </div>
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="relative">
@@ -118,18 +228,115 @@ export default function GoalsPage() {
             </div>
           </div>
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">All Goals ({filteredGoals.length})</h2>
+            {/* View Toggle */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` : `Achievement Wall (${filteredMilestones.length})`}
+              </h2>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => viewMode === 'goals' ? setIsGoalModalOpen(true) : setIsMilestoneModalOpen(true)}
+                  className="px-4 py-2 bg-gradient-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg font-medium flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  {viewMode === 'goals' ? 'New Goal' : 'New Milestone'}
+                </button>
+                <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-xl border border-purple-200 dark:border-purple-700">
+                <button
+                  onClick={() => setViewMode('goals')}
+                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[110px] ${
+                    viewMode === 'goals'
+                      ? 'bg-gradient-goals text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                  }`}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                  <span className="text-sm">Goals</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('milestones')}
+                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[110px] ${
+                    viewMode === 'milestones'
+                      ? 'bg-gradient-goals text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                  }`}
+                >
+                  <List className="w-4 h-4" />
+                  <span className="text-sm">Milestones</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
             {loading ? (
-              <div className="text-center py-12"><div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" /><p className="mt-4 text-gray-600 dark:text-gray-400">Loading goals...</p></div>
-            ) : filteredGoals.length === 0 ? (
-              <div className="text-center py-12"><Target className="w-16 h-16 text-gray-400 mx-auto mb-4" /><p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No goals set</p><p className="text-gray-500 dark:text-gray-500 mb-6">{searchQuery ? 'Try adjusting your search' : 'Create your first goal!'}</p>{!searchQuery && (<button onClick={() => setIsModalOpen(true)} className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"><Plus className="w-5 h-5" />Create Goal</button>)}</div>
+              <div className="text-center py-12">
+                <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+              </div>
+            ) : viewMode === 'goals' ? (
+              /* Goals View */
+              filteredGoals.length === 0 ? (
+                <div className="text-center py-12">
+                  <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No goals found</p>
+                  <p className="text-gray-500 dark:text-gray-500">Try adjusting your search</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredGoals.map((goal) => (
+                    <GoalCard
+                      key={goal.id}
+                      goal={goal}
+                      onEdit={(g) => { setEditingGoal(g); setIsGoalModalOpen(true); }}
+                      onDelete={handleDeleteGoal}
+                      onStatusChange={handleGoalStatusChange}
+                    />
+                  ))}
+                </div>
+              )
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">{filteredGoals.map((goal) => (<GoalCard key={goal.id} goal={goal} onEdit={(g) => { setEditingGoal(g); setIsModalOpen(true); }} onDelete={handleDeleteGoal} />))}</div>
+              /* Milestones View */
+              filteredMilestones.length === 0 ? (
+                <div className="text-center py-12">
+                  <Award className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No milestones found</p>
+                  <p className="text-gray-500 dark:text-gray-500">Try adjusting your search</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredMilestones.map((milestone) => {
+                    const relatedGoal = goals.find(g => g.id === milestone.goal_id);
+                    return (
+                      <MilestoneCard
+                        key={milestone.id}
+                        milestone={milestone}
+                        goalTitle={relatedGoal?.title}
+                        onEdit={(m) => { setEditingMilestone(m); setIsMilestoneModalOpen(true); }}
+                        onDelete={handleDeleteMilestone}
+                        onToggle={handleToggleMilestone}
+                      />
+                    );
+                  })}
+                </div>
+              )
             )}
           </div>
         </div>
       </div>
-      <NewGoalModal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setEditingGoal(null); }} onSave={handleCreateGoal} editGoal={editingGoal} spaceId={currentSpace.id} />
+      <NewGoalModal
+        isOpen={isGoalModalOpen}
+        onClose={() => { setIsGoalModalOpen(false); setEditingGoal(null); }}
+        onSave={handleCreateGoal}
+        editGoal={editingGoal}
+        spaceId={currentSpace.id}
+      />
+      <NewMilestoneModal
+        isOpen={isMilestoneModalOpen}
+        onClose={() => { setIsMilestoneModalOpen(false); setEditingMilestone(null); }}
+        onSave={handleCreateMilestone}
+        editMilestone={editingMilestone}
+        goalId={goals[0]?.id || currentSpace.id}
+      />
     </FeatureLayout>
   );
 }
