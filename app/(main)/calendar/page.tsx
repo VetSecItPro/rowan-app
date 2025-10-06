@@ -116,11 +116,20 @@ export default function CalendarPage() {
   }
 
   async function handleStatusChange(eventId: string, status: 'not-started' | 'in-progress' | 'completed') {
+    // Optimistic update - update UI immediately
+    setEvents(prevEvents =>
+      prevEvents.map(event =>
+        event.id === eventId ? { ...event, status } : event
+      )
+    );
+
+    // Update in background
     try {
       await calendarService.updateEventStatus(eventId, status);
-      loadEvents();
     } catch (error) {
       console.error('Failed to update event status:', error);
+      // Revert on error
+      loadEvents();
     }
   }
 
