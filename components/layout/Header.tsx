@@ -22,14 +22,9 @@ export function Header() {
             <span className="text-2xl font-semibold gradient-text">Rowan</span>
           </Link>
 
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#about" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">About</a>
-            <a href="#pricing" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Pricing</a>
-          </nav>
-
           {/* Menu, Theme Toggle & Auth Buttons */}
           <div className="flex items-center gap-4">
+            <a href="#pricing" className="hidden md:block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Pricing</a>
             <HamburgerMenu />
             <ThemeToggle />
             <a
