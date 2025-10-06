@@ -72,12 +72,10 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
     space_id: spaceId,
     title: '',
     description: '',
-    start_date: '',
-    end_date: '',
-    all_day: false,
+    start_time: '',
+    end_time: '',
+    is_recurring: false,
     location: '',
-    color: '#8b5cf6',
-    reminder_minutes: 15,
   });
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -108,24 +106,20 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
         space_id: spaceId,
         title: editEvent.title,
         description: editEvent.description || '',
-        start_date: editEvent.start_date,
-        end_date: editEvent.end_date,
-        all_day: editEvent.all_day,
+        start_time: editEvent.start_time,
+        end_time: editEvent.end_time || '',
+        is_recurring: editEvent.is_recurring,
         location: editEvent.location || '',
-        color: editEvent.color || '#8b5cf6',
-        reminder_minutes: editEvent.reminder_minutes || 15,
       });
     } else {
       setFormData({
         space_id: spaceId,
         title: '',
         description: '',
-        start_date: '',
-        end_date: '',
-        all_day: false,
+        start_time: '',
+        end_time: '',
+        is_recurring: false,
         location: '',
-        color: '#8b5cf6',
-        reminder_minutes: 15,
       });
     }
     // Reset attachments when modal opens/closes
@@ -373,21 +367,20 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
               <input
                 type="datetime-local"
                 required
-                value={formData.start_date}
-                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                value={formData.start_time ? new Date(formData.start_time).toISOString().slice(0, 16) : ''}
+                onChange={(e) => setFormData({ ...formData, start_time: new Date(e.target.value).toISOString() })}
                 className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                End Date & Time *
+                End Date & Time
               </label>
               <input
                 type="datetime-local"
-                required
-                value={formData.end_date}
-                onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                value={formData.end_time ? new Date(formData.end_time).toISOString().slice(0, 16) : ''}
+                onChange={(e) => setFormData({ ...formData, end_time: e.target.value ? new Date(e.target.value).toISOString() : '' })}
                 className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
@@ -397,11 +390,11 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
-                checked={formData.all_day}
-                onChange={(e) => setFormData({ ...formData, all_day: e.target.checked })}
+                checked={formData.is_recurring}
+                onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
                 className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600"
               />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">All-day event</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Recurring event</span>
             </label>
           </div>
 
@@ -416,30 +409,6 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
               placeholder="Add location..."
               className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Event Color
-            </label>
-            <div className="flex gap-3">
-              {EVENT_COLORS.map((color) => (
-                <div key={color.value} className="relative group">
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, color: color.value })}
-                    className={`w-10 h-10 rounded-lg transition-all ${
-                      formData.color === color.value ? 'ring-2 ring-offset-2 ring-purple-500 scale-110' : ''
-                    }`}
-                    style={{ backgroundColor: color.value }}
-                  />
-                  {/* Custom Tooltip */}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                    {colorLabels[color.value] || color.name}
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-4">

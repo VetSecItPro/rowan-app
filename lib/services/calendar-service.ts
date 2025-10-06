@@ -5,14 +5,14 @@ export interface CalendarEvent {
   space_id: string;
   title: string;
   description?: string;
-  start_date: string;
-  end_date: string;
-  all_day: boolean;
+  start_time: string;
+  end_time?: string;
+  event_type?: string;
+  is_recurring: boolean;
+  recurrence_pattern?: string;
   location?: string;
-  color?: string;
-  reminder_minutes?: number;
-  recurrence_rule?: string;
-  created_by: string;
+  assigned_to?: string;
+  created_by?: string;
   created_at: string;
   updated_at: string;
 }
@@ -21,13 +21,13 @@ export interface CreateEventInput {
   space_id: string;
   title: string;
   description?: string;
-  start_date: string;
-  end_date: string;
-  all_day?: boolean;
+  start_time: string;
+  end_time?: string;
+  event_type?: string;
+  is_recurring?: boolean;
+  recurrence_pattern?: string;
   location?: string;
-  color?: string;
-  reminder_minutes?: number;
-  recurrence_rule?: string;
+  assigned_to?: string;
 }
 
 export interface EventStats {
@@ -40,10 +40,10 @@ export interface EventStats {
 export const calendarService = {
   async getEvents(spaceId: string): Promise<CalendarEvent[]> {
     const { data, error } = await supabase
-      .from('calendar_events')
+      .from('events')
       .select('*')
       .eq('space_id', spaceId)
-      .order('start_date', { ascending: true });
+      .order('start_time', { ascending: true });
 
     if (error) throw error;
     return data || [];
@@ -51,7 +51,7 @@ export const calendarService = {
 
   async getEventById(id: string): Promise<CalendarEvent | null> {
     const { data, error } = await supabase
-      .from('calendar_events')
+      .from('events')
       .select('*')
       .eq('id', id)
       .single();
@@ -62,7 +62,7 @@ export const calendarService = {
 
   async createEvent(input: CreateEventInput): Promise<CalendarEvent> {
     const { data, error } = await supabase
-      .from('calendar_events')
+      .from('events')
       .insert([input])
       .select()
       .single();
@@ -73,7 +73,7 @@ export const calendarService = {
 
   async updateEvent(id: string, updates: Partial<CreateEventInput>): Promise<CalendarEvent> {
     const { data, error } = await supabase
-      .from('calendar_events')
+      .from('events')
       .update(updates)
       .eq('id', id)
       .select()
@@ -85,7 +85,7 @@ export const calendarService = {
 
   async deleteEvent(id: string): Promise<void> {
     const { error } = await supabase
-      .from('calendar_events')
+      .from('events')
       .delete()
       .eq('id', id);
 
@@ -103,15 +103,15 @@ export const calendarService = {
     return {
       total: events.length,
       today: events.filter(e => {
-        const eventDate = new Date(e.start_date);
+        const eventDate = new Date(e.start_time);
         return eventDate >= today && eventDate < new Date(today.getTime() + 86400000);
       }).length,
       thisWeek: events.filter(e => {
-        const eventDate = new Date(e.start_date);
+        const eventDate = new Date(e.start_time);
         return eventDate >= weekStart;
       }).length,
       thisMonth: events.filter(e => {
-        const eventDate = new Date(e.start_date);
+        const eventDate = new Date(e.start_time);
         return eventDate >= monthStart;
       }).length,
     };

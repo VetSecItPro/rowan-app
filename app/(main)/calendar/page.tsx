@@ -12,7 +12,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMont
 type ViewMode = 'calendar' | 'list';
 
 export default function CalendarPage() {
-  const { currentSpace } = useAuth();
+  const { user, currentSpace } = useAuth();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,17 +63,22 @@ export default function CalendarPage() {
         const endTime = new Date(tomorrow);
         endTime.setHours(15, 0, 0, 0);
 
-        const newEvent = await calendarService.createEvent({
-          space_id: currentSpace.id,
-          title: 'Team Meeting',
-          description: 'Weekly sync with the team',
-          start_date: tomorrow.toISOString(),
-          end_date: endTime.toISOString(),
-          all_day: false,
-          location: 'Conference Room A',
-        });
-        eventsData = [newEvent];
-        statsData = await calendarService.getEventStats(currentSpace.id);
+        try {
+          const newEvent = await calendarService.createEvent({
+            space_id: currentSpace.id,
+            title: 'Team Meeting',
+            description: 'Weekly sync with the team',
+            start_time: tomorrow.toISOString(),
+            end_time: endTime.toISOString(),
+            is_recurring: false,
+            location: 'Conference Room A',
+          });
+          eventsData = [newEvent];
+          statsData = await calendarService.getEventStats(currentSpace.id);
+        } catch (createError) {
+          console.error('Failed to create sample event:', createError);
+          // Continue without sample event if creation fails
+        }
       }
 
       setEvents(eventsData);
@@ -131,7 +136,7 @@ export default function CalendarPage() {
 
   function getEventsForDate(date: Date) {
     return filteredEvents.filter(event => {
-      const eventDate = parseISO(event.start_date);
+      const eventDate = parseISO(event.start_time);
       return isSameDay(eventDate, date);
     });
   }
@@ -327,7 +332,7 @@ export default function CalendarPage() {
                                   {event.title}
                                 </p>
                                 <p className="text-gray-500 dark:text-gray-400 text-[10px]">
-                                  {format(parseISO(event.start_date), 'h:mm a')}
+                                  {format(parseISO(event.start_time), 'h:mm a')}
                                 </p>
                               </button>
                             ))}
