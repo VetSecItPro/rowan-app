@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, Clock, MapPin, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { Calendar, Clock, MapPin, MoreVertical, Edit, Trash2, Check } from 'lucide-react';
 import { CalendarEvent } from '@/lib/services/calendar-service';
 import { format } from 'date-fns';
 import { useState } from 'react';
@@ -9,9 +9,10 @@ interface EventCardProps {
   event: CalendarEvent;
   onEdit: (event: CalendarEvent) => void;
   onDelete: (id: string) => void;
+  onStatusChange: (id: string, status: 'not-started' | 'in-progress' | 'completed') => void;
 }
 
-export function EventCard({ event, onEdit, onDelete }: EventCardProps) {
+export function EventCard({ event, onEdit, onDelete, onStatusChange }: EventCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const formatEventTime = () => {
@@ -22,11 +23,38 @@ export function EventCard({ event, onEdit, onDelete }: EventCardProps) {
     return format(new Date(event.start_time), 'MMM d, yyyy');
   };
 
+  const handleCheckboxClick = () => {
+    const states: Array<'not-started' | 'in-progress' | 'completed'> = ['not-started', 'in-progress', 'completed'];
+    const currentIndex = states.indexOf(event.status);
+    const nextIndex = (currentIndex + 1) % states.length;
+    onStatusChange(event.id, states[nextIndex]);
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-all duration-200">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
+            {/* Three-state checkbox */}
+            <div className="relative group">
+              <button
+                onClick={handleCheckboxClick}
+                className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+                  event.status === 'completed'
+                    ? 'bg-green-500 border-green-500'
+                    : event.status === 'in-progress'
+                    ? 'bg-amber-500 border-amber-500'
+                    : 'bg-transparent border-red-500'
+                }`}
+              >
+                {event.status === 'completed' && <Check className="w-4 h-4 text-white" />}
+                {event.status === 'in-progress' && <div className="w-2 h-2 bg-white rounded-full" />}
+              </button>
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                {event.status === 'not-started' ? 'Not Started' : event.status === 'in-progress' ? 'In Progress' : 'Completed'}
+              </div>
+            </div>
+
             <div
               className="w-1 h-12 rounded-full bg-purple-500"
             />

@@ -11,6 +11,7 @@ export interface CalendarEvent {
   is_recurring: boolean;
   recurrence_pattern?: string;
   location?: string;
+  status: 'not-started' | 'in-progress' | 'completed';
   assigned_to?: string;
   created_by?: string;
   created_at: string;
@@ -90,6 +91,18 @@ export const calendarService = {
       .eq('id', id);
 
     if (error) throw error;
+  },
+
+  async updateEventStatus(id: string, status: 'not-started' | 'in-progress' | 'completed'): Promise<CalendarEvent> {
+    const { data, error } = await supabase
+      .from('events')
+      .update({ status })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   },
 
   async getEventStats(spaceId: string): Promise<EventStats> {
