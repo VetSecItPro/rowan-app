@@ -15,11 +15,11 @@ export default function TasksFeaturePage() {
           </div>
 
           <h1 className="text-6xl md:text-7xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-            Tasks & Projects
+            Tasks & Chores
           </h1>
 
           <p className="text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Organize your life together. Manage tasks, track progress, and accomplish your goals as a team.
+            Organize your daily life together. Manage tasks, household chores, and responsibilities as a team.
           </p>
         </div>
 
@@ -99,7 +99,7 @@ export default function TasksFeaturePage() {
               Perfect for every situation
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400">
-              From daily chores to major projects
+              From daily chores to family responsibilities
             </p>
           </div>
 
@@ -127,23 +127,23 @@ export default function TasksFeaturePage() {
             </div>
 
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Big Projects</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Family Responsibilities</h3>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400">
                 <li className="flex items-start gap-3">
                   <Calendar className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                  <span>Plan home renovations step by step</span>
+                  <span>Organize family events and celebrations</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Calendar className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                  <span>Organize family vacations and trips</span>
+                  <span>Plan and coordinate family trips</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Calendar className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                  <span>Coordinate moving or relocation tasks</span>
+                  <span>Manage kids' school and activity schedules</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Calendar className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                  <span>Track milestones for family goals</span>
+                  <span>Coordinate pet care and vet appointments</span>
                 </li>
               </ul>
             </div>

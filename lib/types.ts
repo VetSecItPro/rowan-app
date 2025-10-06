@@ -101,7 +101,7 @@ export interface SpaceMember {
 }
 
 // =============================================
-// TASK & PROJECT TYPES
+// TASK TYPES
 // =============================================
 
 export interface Task {
@@ -238,7 +238,7 @@ export interface MealPlan {
 }
 
 // =============================================
-// HOUSEHOLD TYPES
+// HOUSEHOLD TYPES (Chores & Projects)
 // =============================================
 
 export interface Chore {
@@ -262,7 +262,7 @@ export interface ChoreCompletion {
 }
 
 // =============================================
-// FINANCIAL TYPES
+// FINANCIAL TYPES (Budget & Expenses)
 // =============================================
 
 export interface Expense {

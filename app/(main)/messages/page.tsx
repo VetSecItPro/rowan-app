@@ -1,12 +1,31 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { MessageCircle, Search, Plus, Users, Mail, Clock, MessageSquare } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as ImageIcon, Paperclip } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { MessageCard } from '@/components/messages/MessageCard';
 import { NewMessageModal } from '@/components/messages/NewMessageModal';
 import { useAuth } from '@/lib/contexts/mock-auth-context';
 import { messagesService, Message, CreateMessageInput } from '@/lib/services/messages-service';
+import { format, isSameDay, isToday, isYesterday } from 'date-fns';
+
+// Family-friendly universal emojis (30 total) - organized by theme
+const EMOJIS = [
+  // Smiles & Emotions
+  '😊', '😂', '😇', '😎', '😘', '🥰', '🤗', '❤️',
+  // Gestures & Hands
+  '👍', '🙏', '👏', '🤝', '💪',
+  // Celebrations & Parties
+  '🎉', '🎈', '🎂', '🎁', '🎊',
+  // Nature & Flowers
+  '🌸', '🌺', '💐', '🌈', '☀️',
+  // Sparkles & Stars
+  '✨', '🌟',
+  // Food & Drinks
+  '🍕', '☕',
+  // Other
+  '📅', '✅', '🏠'
+];
 
 export default function MessagesPage() {
   const { currentSpace } = useAuth();
@@ -16,10 +35,15 @@ export default function MessagesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [messageInput, setMessageInput] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const conversationId = 'default'; // In a real app, this would be dynamic
 
   const [stats, setStats] = useState({
-    conversations: 0,
+    thisWeek: 0,
     unread: 0,
     today: 0,
     total: 0,
@@ -101,45 +125,86 @@ export default function MessagesPage() {
     setEditingMessage(null);
   }
 
+  async function handleSendMessage(e: React.FormEvent) {
+    e.preventDefault();
+    if (!messageInput.trim() || isSending) return;
+
+    setIsSending(true);
+    try {
+      await handleCreateMessage({
+        space_id: currentSpace.id,
+        conversation_id: conversationId,
+        content: messageInput,
+      });
+      setMessageInput('');
+    } finally {
+      setTimeout(() => setIsSending(false), 300);
+    }
+  }
+
+  function handleEmojiClick(emoji: string) {
+    setMessageInput(prev => prev + emoji);
+    setShowEmojiPicker(false);
+  }
+
+  function getDateLabel(date: Date): string {
+    if (isToday(date)) {
+      return 'Today';
+    } else if (isYesterday(date)) {
+      return 'Yesterday';
+    } else {
+      return format(date, 'EEEE, MMMM d, yyyy'); // e.g., "Monday, January 15, 2024"
+    }
+  }
+
+  function shouldShowDateSeparator(currentMessage: Message, previousMessage: Message | null): boolean {
+    if (!previousMessage) return true;
+
+    const currentDate = new Date(currentMessage.created_at);
+    const previousDate = new Date(previousMessage.created_at);
+
+    return !isSameDay(currentDate, previousDate);
+  }
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Messages' }]}>
       <div className="p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-messages flex items-center justify-center">
-                <MessageCircle className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-4xl font-bold bg-gradient-messages bg-clip-text text-transparent">
-                  Messages
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">
-                  Stay connected with your partner
-                </p>
-              </div>
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-messages flex items-center justify-center">
+              <MessageCircle className="w-6 h-6 text-white" />
             </div>
-
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              New Message
-            </button>
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-messages bg-clip-text text-transparent">
+                Messages
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
+                Stay connected with your partner
+              </p>
+            </div>
           </div>
 
           {/* Stats Dashboard */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Conversations</h3>
-                <div className="w-12 h-12 bg-gradient-messages rounded-xl flex items-center justify-center">
-                  <Users className="w-6 h-6 text-white" />
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Today</h3>
+                <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                  <MessageSquare className="w-6 h-6 text-white" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.conversations}</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.today}</p>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium">This Week</h3>
+                <div className="w-12 h-12 bg-gradient-messages rounded-xl flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.thisWeek}</p>
             </div>
 
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
@@ -154,19 +219,9 @@ export default function MessagesPage() {
 
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Today's Messages</h3>
-                <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-white" />
-                </div>
-              </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.today}</p>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total</h3>
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium">All Time</h3>
                 <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center">
-                  <MessageSquare className="w-6 h-6 text-white" />
+                  <MessageCircle className="w-6 h-6 text-white" />
                 </div>
               </div>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
@@ -187,61 +242,214 @@ export default function MessagesPage() {
             </div>
           </div>
 
-          {/* Messages List */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              Conversation ({filteredMessages.length})
-            </h2>
+          {/* Chat Interface */}
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden flex flex-col" style={{ height: '600px' }}>
+            {/* Chat Header */}
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Conversation
+              </h2>
+            </div>
 
-            {loading ? (
-              <div className="text-center py-12">
-                <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-                <p className="mt-4 text-gray-600 dark:text-gray-400">Loading messages...</p>
-              </div>
-            ) : filteredMessages.length === 0 ? (
-              <div className="text-center py-12">
-                <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No messages yet</p>
-                <p className="text-gray-500 dark:text-gray-500 mb-6">
-                  {searchQuery ? 'Try a different search' : 'Start the conversation!'}
-                </p>
-                {!searchQuery && (
-                  <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
-                  >
-                    <Plus className="w-5 h-5" />
-                    Send Message
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-2 max-h-[600px] overflow-y-auto">
-                {filteredMessages.map((message) => (
-                  <MessageCard
-                    key={message.id}
-                    message={message}
-                    onEdit={handleEditMessage}
-                    onDelete={handleDeleteMessage}
-                    onMarkRead={handleMarkRead}
-                    isOwn={message.sender_id === currentSpace.id}
-                  />
-                ))}
-              </div>
-            )}
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+              {loading ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : filteredMessages.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                  <MessageCircle className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">
+                    {searchQuery ? 'No messages found' : 'No messages yet'}
+                  </p>
+                  <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">
+                    {searchQuery ? 'Try a different search' : 'Start the conversation below!'}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {filteredMessages.map((message, index) => {
+                    const previousMessage = index > 0 ? filteredMessages[index - 1] : null;
+                    const showDateSeparator = shouldShowDateSeparator(message, previousMessage);
+
+                    return (
+                      <div key={message.id}>
+                        {/* Date Separator */}
+                        {showDateSeparator && (
+                          <div className="flex items-center justify-center my-6">
+                            <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+                            <span className="px-4 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-full">
+                              {getDateLabel(new Date(message.created_at))}
+                            </span>
+                            <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+                          </div>
+                        )}
+
+                        {/* Message Card */}
+                        <MessageCard
+                          message={message}
+                          onEdit={handleEditMessage}
+                          onDelete={handleDeleteMessage}
+                          onMarkRead={handleMarkRead}
+                          isOwn={message.sender_id === currentSpace.id}
+                          currentUserId={currentSpace.id}
+                        />
+                      </div>
+                    );
+                  })}
+                </>
+              )}
+            </div>
+
+            {/* Message Input */}
+            <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+              <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+                {/* Message Input - Left */}
+                <input
+                  type="text"
+                  value={messageInput}
+                  onChange={(e) => setMessageInput(e.target.value)}
+                  placeholder="Send message"
+                  className="flex-1 px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
+                />
+
+                {/* Right side buttons - Emoji, Image, File, Send */}
+                <div className="flex items-center gap-1">
+                  {/* Emoji Picker Button */}
+                  <div className="relative group">
+                    <button
+                      type="button"
+                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                      className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    >
+                      <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    </button>
+                    {/* Tooltip */}
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                      Add emoji
+                    </div>
+
+                    {/* Emoji Picker Popup */}
+                    {showEmojiPicker && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-10"
+                          onClick={() => setShowEmojiPicker(false)}
+                        />
+                        <div className="absolute bottom-full mb-2 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 grid grid-cols-5 gap-2 z-20 min-w-[240px]">
+                          {EMOJIS.map((emoji, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => handleEmojiClick(emoji)}
+                              className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-2xl transition-all hover:scale-110 cursor-pointer"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Image Attachment Button */}
+                  <div className="relative group">
+                    <button
+                      type="button"
+                      onClick={() => imageInputRef.current?.click()}
+                      className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    >
+                      <ImageIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    </button>
+                    {/* Tooltip */}
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                      Attach image
+                    </div>
+                  </div>
+
+                  {/* File Attachment Button */}
+                  <div className="relative group">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    >
+                      <Paperclip className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    </button>
+                    {/* Tooltip */}
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                      Attach file
+                    </div>
+                  </div>
+
+                  {/* Send Button with Right-Pointing Arrow */}
+                  <div className="relative group">
+                    <button
+                      type="submit"
+                      disabled={isSending || !messageInput.trim()}
+                      style={{ cursor: messageInput.trim() && !isSending ? 'pointer' : 'not-allowed' }}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg ${
+                        isSending
+                          ? 'bg-green-600 scale-95'
+                          : messageInput.trim()
+                          ? 'bg-blue-500 hover:bg-blue-600 hover:scale-105 active:scale-95'
+                          : 'bg-purple-300 dark:bg-purple-400 opacity-60'
+                      }`}
+                    >
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </button>
+                    {/* Tooltip */}
+                    {messageInput.trim() && (
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        Send message
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </form>
+
+              {/* Hidden File Inputs */}
+              <input
+                ref={imageInputRef}
+                type="file"
+                accept=".jpg,.jpeg,.png,.gif,.webp"
+                multiple
+                onChange={(e) => {
+                  // Handle image selection - could be implemented later
+                  console.log('Image files selected:', e.target.files);
+                }}
+                className="hidden"
+              />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip"
+                multiple
+                onChange={(e) => {
+                  // Handle file selection - could be implemented later
+                  console.log('Files selected:', e.target.files);
+                }}
+                className="hidden"
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* New/Edit Message Modal */}
-      <NewMessageModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSave={handleCreateMessage}
-        editMessage={editingMessage}
-        spaceId={currentSpace.id}
-        conversationId={conversationId}
-      />
+      {/* Edit Message Modal (only for editing) */}
+      {editingMessage && (
+        <NewMessageModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onSave={handleCreateMessage}
+          editMessage={editingMessage}
+          spaceId={currentSpace.id}
+          conversationId={conversationId}
+        />
+      )}
     </FeatureLayout>
   );
 }

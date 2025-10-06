@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import { Home, Search, Plus, CheckCircle2, Users, DollarSign, AlertCircle } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
-import { ChoreCard } from '@/components/household/ChoreCard';
-import { ExpenseCard } from '@/components/household/ExpenseCard';
-import { NewChoreModal } from '@/components/household/NewChoreModal';
-import { NewExpenseModal } from '@/components/household/NewExpenseModal';
+import { ChoreCard } from '@/components/projects/ChoreCard';
+import { ExpenseCard } from '@/components/projects/ExpenseCard';
+import { NewChoreModal } from '@/components/projects/NewChoreModal';
+import { NewExpenseModal } from '@/components/projects/NewExpenseModal';
 import { useAuth } from '@/lib/contexts/mock-auth-context';
-import { householdService, Chore, Expense, CreateChoreInput, CreateExpenseInput } from '@/lib/services/household-service';
+import { projectsService, Chore, Expense, CreateChoreInput, CreateExpenseInput } from '@/lib/services/projects-service';
 
 type TabType = 'chores' | 'budget';
 
@@ -36,9 +36,9 @@ export default function HouseholdPage() {
     try {
       setLoading(true);
       const [choresData, expensesData, statsData] = await Promise.all([
-        householdService.getChores(currentSpace.id),
-        householdService.getExpenses(currentSpace.id),
-        householdService.getHouseholdStats(currentSpace.id, user.id),
+        projectsService.getChores(currentSpace.id),
+        projectsService.getExpenses(currentSpace.id),
+        projectsService.getHouseholdStats(currentSpace.id, user.id),
       ]);
       setChores(choresData);
       setExpenses(expensesData);
@@ -53,9 +53,9 @@ export default function HouseholdPage() {
   async function handleCreateChore(choreData: CreateChoreInput) {
     try {
       if (editingChore) {
-        await householdService.updateChore(editingChore.id, choreData);
+        await projectsService.updateChore(editingChore.id, choreData);
       } else {
-        await householdService.createChore(choreData);
+        await projectsService.createChore(choreData);
       }
       loadData();
       setEditingChore(null);
@@ -67,9 +67,9 @@ export default function HouseholdPage() {
   async function handleCreateExpense(expenseData: CreateExpenseInput) {
     try {
       if (editingExpense) {
-        await householdService.updateExpense(editingExpense.id, expenseData);
+        await projectsService.updateExpense(editingExpense.id, expenseData);
       } else {
-        await householdService.createExpense(expenseData);
+        await projectsService.createExpense(expenseData);
       }
       loadData();
       setEditingExpense(null);
@@ -80,7 +80,7 @@ export default function HouseholdPage() {
 
   async function handleChoreStatusChange(choreId: string, status: string) {
     try {
-      await householdService.updateChore(choreId, { status: status as any });
+      await projectsService.updateChore(choreId, { status: status as any });
       loadData();
     } catch (error) {
       console.error('Failed to update chore:', error);
@@ -90,7 +90,7 @@ export default function HouseholdPage() {
   async function handleDeleteChore(choreId: string) {
     if (!confirm('Are you sure?')) return;
     try {
-      await householdService.deleteChore(choreId);
+      await projectsService.deleteChore(choreId);
       loadData();
     } catch (error) {
       console.error('Failed to delete chore:', error);
@@ -100,7 +100,7 @@ export default function HouseholdPage() {
   async function handleDeleteExpense(expenseId: string) {
     if (!confirm('Are you sure?')) return;
     try {
-      await householdService.deleteExpense(expenseId);
+      await projectsService.deleteExpense(expenseId);
       loadData();
     } catch (error) {
       console.error('Failed to delete expense:', error);
@@ -111,30 +111,30 @@ export default function HouseholdPage() {
   const filteredExpenses = expenses.filter(e => e.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
-    <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Household' }]}>
+    <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Projects & Budget' }]}>
       <div className="p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-household flex items-center justify-center"><Home className="w-6 h-6 text-white" /></div>
+              <div className="w-12 h-12 rounded-xl bg-gradient-projects flex items-center justify-center"><Home className="w-6 h-6 text-white" /></div>
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-household bg-clip-text text-transparent">Household</h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your home together</p>
+                <h1 className="text-4xl font-bold bg-gradient-projects bg-clip-text text-transparent">Projects & Budget</h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">Plan home projects and manage family finances</p>
               </div>
             </div>
             <button onClick={() => activeTab === 'chores' ? setIsChoreModalOpen(true) : setIsExpenseModalOpen(true)} className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center gap-2">
               <Plus className="w-5 h-5" />
-              {activeTab === 'chores' ? 'New Chore' : 'New Expense'}
+              {activeTab === 'chores' ? 'New Project' : 'New Expense'}
             </button>
           </div>
 
           {/* Tab Switcher */}
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-2">
             <div className="flex gap-2">
-              <button onClick={() => setActiveTab('chores')} className={`flex-1 px-6 py-3 rounded-lg font-medium transition-all ${activeTab === 'chores' ? 'bg-gradient-household text-white shadow-lg' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
-                Chores & Tasks
+              <button onClick={() => setActiveTab('chores')} className={`flex-1 px-6 py-3 rounded-lg font-medium transition-all ${activeTab === 'chores' ? 'bg-gradient-projects text-white shadow-lg' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+                Projects
               </button>
-              <button onClick={() => setActiveTab('budget')} className={`flex-1 px-6 py-3 rounded-lg font-medium transition-all ${activeTab === 'budget' ? 'bg-gradient-household text-white shadow-lg' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+              <button onClick={() => setActiveTab('budget')} className={`flex-1 px-6 py-3 rounded-lg font-medium transition-all ${activeTab === 'budget' ? 'bg-gradient-projects text-white shadow-lg' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
                 Budget & Expenses
               </button>
             </div>
@@ -145,8 +145,8 @@ export default function HouseholdPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Chores</h3>
-                  <div className="w-12 h-12 bg-gradient-household rounded-xl flex items-center justify-center"><Home className="w-6 h-6 text-white" /></div>
+                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Projects</h3>
+                  <div className="w-12 h-12 bg-gradient-projects rounded-xl flex items-center justify-center"><Home className="w-6 h-6 text-white" /></div>
                 </div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.chores.total}</p>
               </div>
@@ -159,14 +159,14 @@ export default function HouseholdPage() {
               </div>
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">My Chores</h3>
+                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">My Projects</h3>
                   <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center"><Users className="w-6 h-6 text-white" /></div>
                 </div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.chores.myChores}</p>
               </div>
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">Partner's Chores</h3>
+                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">Partner's Projects</h3>
                   <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center"><Users className="w-6 h-6 text-white" /></div>
                 </div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.chores.partnerChores}</p>
@@ -177,7 +177,7 @@ export default function HouseholdPage() {
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-gray-600 dark:text-gray-400 font-medium">Monthly Budget</h3>
-                  <div className="w-12 h-12 bg-gradient-household rounded-xl flex items-center justify-center"><DollarSign className="w-6 h-6 text-white" /></div>
+                  <div className="w-12 h-12 bg-gradient-projects rounded-xl flex items-center justify-center"><DollarSign className="w-6 h-6 text-white" /></div>
                 </div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white">${stats.budget.monthlyBudget}</p>
               </div>
@@ -215,13 +215,13 @@ export default function HouseholdPage() {
           {/* Content Area - Changes based on active tab */}
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              {activeTab === 'chores' ? `All Chores (${filteredChores.length})` : `All Expenses (${filteredExpenses.length})`}
+              {activeTab === 'chores' ? `All Projects (${filteredChores.length})` : `All Expenses (${filteredExpenses.length})`}
             </h2>
             {loading ? (
               <div className="text-center py-12"><div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" /><p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p></div>
             ) : activeTab === 'chores' ? (
               filteredChores.length === 0 ? (
-                <div className="text-center py-12"><Home className="w-16 h-16 text-gray-400 mx-auto mb-4" /><p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No chores found</p><button onClick={() => setIsChoreModalOpen(true)} className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"><Plus className="w-5 h-5" />Add Chore</button></div>
+                <div className="text-center py-12"><Home className="w-16 h-16 text-gray-400 mx-auto mb-4" /><p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No projects found</p><button onClick={() => setIsChoreModalOpen(true)} className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"><Plus className="w-5 h-5" />Add Project</button></div>
               ) : (
                 <div className="space-y-4">{filteredChores.map((chore) => (<ChoreCard key={chore.id} chore={chore} onStatusChange={handleChoreStatusChange} onEdit={(c) => { setEditingChore(c); setIsChoreModalOpen(true); }} onDelete={handleDeleteChore} />))}</div>
               )
