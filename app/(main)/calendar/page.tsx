@@ -115,6 +115,15 @@ export default function CalendarPage() {
     }
   }
 
+  async function handleStatusChange(eventId: string, status: 'not-started' | 'in-progress' | 'completed') {
+    try {
+      await calendarService.updateEventStatus(eventId, status);
+      loadEvents();
+    } catch (error) {
+      console.error('Failed to update event status:', error);
+    }
+  }
+
   function handleEditEvent(event: CalendarEvent) {
     setEditingEvent(event);
     setIsModalOpen(true);
@@ -368,6 +377,7 @@ export default function CalendarPage() {
                         event={event}
                         onEdit={handleEditEvent}
                         onDelete={handleDeleteEvent}
+                        onStatusChange={handleStatusChange}
                       />
                     ))}
                   </div>
