@@ -34,28 +34,28 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 
 interface DashboardStats {
-  tasks: { total: number; dueToday: number; overdue: number };
+  tasks: { total: number; pending: number; inProgress: number };
   events: { total: number; today: number; thisWeek: number };
-  reminders: { total: number; active: number; snoozed: number };
+  reminders: { total: number; active: number; overdue: number };
   messages: { total: number; unread: number; conversations: number };
-  shopping: { total: number; active: number; items: number };
-  meals: { total: number; thisWeek: number; recipes: number };
+  shopping: { totalLists: number; activeLists: number; itemsThisWeek: number };
+  meals: { thisWeek: number; savedRecipes: number; upcoming: number };
   household: { chores: number; pending: number; expenses: number };
-  goals: { total: number; active: number; completed: number };
+  goals: { active: number; completed: number; inProgress: number };
 }
 
 export default function DashboardPage() {
   const { user, currentSpace } = useAuth();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats>({
-    tasks: { total: 0, dueToday: 0, overdue: 0 },
+    tasks: { total: 0, pending: 0, inProgress: 0 },
     events: { total: 0, today: 0, thisWeek: 0 },
-    reminders: { total: 0, active: 0, snoozed: 0 },
+    reminders: { total: 0, active: 0, overdue: 0 },
     messages: { total: 0, unread: 0, conversations: 0 },
-    shopping: { total: 0, active: 0, items: 0 },
-    meals: { total: 0, thisWeek: 0, recipes: 0 },
+    shopping: { totalLists: 0, activeLists: 0, itemsThisWeek: 0 },
+    meals: { thisWeek: 0, savedRecipes: 0, upcoming: 0 },
     household: { chores: 0, pending: 0, expenses: 0 },
-    goals: { total: 0, active: 0, completed: 0 },
+    goals: { active: 0, completed: 0, inProgress: 0 },
   });
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [checkInNote, setCheckInNote] = useState('');
@@ -92,8 +92,8 @@ export default function DashboardPage() {
       setStats({
         tasks: {
           total: taskStats.total,
-          dueToday: taskStats.dueToday,
-          overdue: taskStats.overdue,
+          pending: taskStats.pending,
+          inProgress: taskStats.inProgress,
         },
         events: {
           total: eventStats.total,
@@ -103,7 +103,7 @@ export default function DashboardPage() {
         reminders: {
           total: reminderStats.total,
           active: reminderStats.active,
-          snoozed: reminderStats.snoozed,
+          overdue: reminderStats.overdue,
         },
         messages: {
           total: messageStats.total,
@@ -111,14 +111,14 @@ export default function DashboardPage() {
           conversations: messageStats.conversations,
         },
         shopping: {
-          total: shoppingStats.total,
-          active: shoppingStats.active,
-          items: shoppingStats.items,
+          totalLists: shoppingStats.totalLists,
+          activeLists: shoppingStats.activeLists,
+          itemsThisWeek: shoppingStats.itemsThisWeek,
         },
         meals: {
-          total: mealStats.total,
           thisWeek: mealStats.thisWeek,
-          recipes: mealStats.recipes,
+          savedRecipes: mealStats.savedRecipes,
+          upcoming: mealStats.upcoming,
         },
         household: {
           chores: choreStats.total,
@@ -126,9 +126,9 @@ export default function DashboardPage() {
           expenses: budgetStats.pendingBills,
         },
         goals: {
-          total: goalStats.total,
           active: goalStats.active,
           completed: goalStats.completed,
+          inProgress: goalStats.inProgress,
         },
       });
     } catch (error) {
@@ -146,8 +146,8 @@ export default function DashboardPage() {
       shadowColor: 'shadow-blue-500/50',
       icon: CheckSquare,
       total: stats.tasks.total,
-      subtitle: `${stats.tasks.dueToday} due today`,
-      urgent: stats.tasks.overdue > 0 ? `${stats.tasks.overdue} overdue` : null,
+      subtitle: `${stats.tasks.pending} pending`,
+      urgent: stats.tasks.inProgress > 0 ? `${stats.tasks.inProgress} in progress` : null,
     },
     {
       title: 'Calendar',
@@ -185,8 +185,8 @@ export default function DashboardPage() {
       gradient: 'bg-gradient-shopping',
       shadowColor: 'shadow-teal-500/50',
       icon: ShoppingCart,
-      total: stats.shopping.total,
-      subtitle: `${stats.shopping.active} active lists`,
+      total: stats.shopping.totalLists,
+      subtitle: `${stats.shopping.activeLists} active lists`,
       urgent: null,
     },
     {
@@ -195,7 +195,7 @@ export default function DashboardPage() {
       gradient: 'bg-gradient-meals',
       shadowColor: 'shadow-red-500/50',
       icon: UtensilsCrossed,
-      total: stats.meals.total,
+      total: stats.meals.savedRecipes,
       subtitle: `${stats.meals.thisWeek} this week`,
       urgent: null,
     },
@@ -215,7 +215,7 @@ export default function DashboardPage() {
       gradient: 'bg-gradient-goals',
       shadowColor: 'shadow-indigo-500/50',
       icon: Target,
-      total: stats.goals.total,
+      total: stats.goals.active + stats.goals.completed + stats.goals.inProgress,
       subtitle: `${stats.goals.active} active`,
       urgent: null,
     },
@@ -354,7 +354,7 @@ export default function DashboardPage() {
               <div className="mt-6 flex items-center gap-2 text-white/90">
                 <TrendingUp className="w-5 h-5" />
                 <span className="text-sm">
-                  You have {stats.tasks.dueToday} tasks due today and {stats.events.today} events scheduled
+                  You have {stats.tasks.pending} pending tasks and {stats.events.today} events scheduled
                 </span>
               </div>
             </div>
@@ -611,7 +611,7 @@ export default function DashboardPage() {
               </div>
               <div className="text-center">
                 <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                  {stats.shopping.active}
+                  {stats.shopping.activeLists}
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                   Active Lists
