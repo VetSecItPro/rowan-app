@@ -9,6 +9,8 @@ import { useAuth } from '@/lib/contexts/mock-auth-context';
 import { tasksService } from '@/lib/services/tasks-service';
 import { Task, CreateTaskInput } from '@/lib/types';
 
+type TaskType = 'task' | 'chore';
+
 export default function TasksPage() {
   const { currentSpace } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -18,6 +20,7 @@ export default function TasksPage() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [activeTab, setActiveTab] = useState<TaskType>('task');
 
   // Stats
   const stats = {
@@ -111,7 +114,7 @@ export default function TasksPage() {
   }
 
   return (
-    <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Tasks & Projects' }]}>
+    <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Tasks & Chores' }]}>
       <div className="p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
@@ -122,29 +125,53 @@ export default function TasksPage() {
               </div>
               <div>
                 <h1 className="text-4xl font-bold bg-gradient-tasks bg-clip-text text-transparent">
-                  Tasks & Projects
+                  Tasks & Chores
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">
-                  Organize and track your tasks together
+                  Organize daily tasks and household chores together
                 </p>
               </div>
             </div>
 
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              New Task
-            </button>
+            <div className="flex items-center gap-3">
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 flex gap-1">
+                <button
+                  onClick={() => setActiveTab('task')}
+                  className={`px-4 py-2 rounded-md font-medium transition-all ${
+                    activeTab === 'task'
+                      ? 'bg-gradient-tasks text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  Tasks
+                </button>
+                <button
+                  onClick={() => setActiveTab('chore')}
+                  className={`px-4 py-2 rounded-md font-medium transition-all ${
+                    activeTab === 'chore'
+                      ? 'bg-gradient-tasks text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  Chores
+                </button>
+              </div>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                New {activeTab === 'task' ? 'Task' : 'Chore'}
+              </button>
+            </div>
           </div>
 
           {/* Stats Dashboard */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {/* Total Tasks */}
+            {/* Total Tasks & Chores */}
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Tasks</h3>
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Tasks & Chores</h3>
                 <div className="w-12 h-12 bg-gradient-tasks rounded-xl flex items-center justify-center">
                   <CheckSquare className="w-6 h-6 text-white" />
                 </div>
@@ -194,7 +221,7 @@ export default function TasksPage() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search tasks..."
+                  placeholder="Search tasks and chores..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
@@ -219,7 +246,7 @@ export default function TasksPage() {
           {/* Tasks List */}
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              All Tasks ({filteredTasks.length})
+              All Tasks & Chores ({filteredTasks.length})
             </h2>
 
             {loading ? (
@@ -230,11 +257,11 @@ export default function TasksPage() {
             ) : filteredTasks.length === 0 ? (
               <div className="text-center py-12">
                 <CheckSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No tasks found</p>
+                <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No tasks or chores found</p>
                 <p className="text-gray-500 dark:text-gray-500 mb-6">
                   {searchQuery || statusFilter !== 'all'
                     ? 'Try adjusting your filters'
-                    : 'Create your first task to get started!'}
+                    : 'Create your first task or chore to get started!'}
                 </p>
                 {!searchQuery && statusFilter === 'all' && (
                   <button

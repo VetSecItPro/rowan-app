@@ -20,7 +20,7 @@ export interface NavItem {
 
 export const NAVIGATION_ITEMS: NavItem[] = [
   {
-    name: 'Tasks & Projects',
+    name: 'Tasks & Chores',
     href: '/tasks',
     icon: CheckSquare,
     gradient: 'bg-gradient-tasks',
@@ -62,11 +62,11 @@ export const NAVIGATION_ITEMS: NavItem[] = [
     description: 'Plan meals',
   },
   {
-    name: 'Household',
+    name: 'Projects & Budget',
     href: '/household',
     icon: Home,
-    gradient: 'bg-gradient-household',
-    description: 'Manage home',
+    gradient: 'bg-gradient-projects',
+    description: 'Plan & track',
   },
   {
     name: 'Goals & Milestones',

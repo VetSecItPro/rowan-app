@@ -83,8 +83,8 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <FeatureCard
-            title="Tasks & Projects"
-            description="Organize your tasks and manage projects with ease"
+            title="Tasks & Chores"
+            description="Organize daily tasks and household chores together"
             icon={CheckSquare}
             gradient="from-blue-500 to-blue-600"
             shadowColor="shadow-blue-500/50"
@@ -137,8 +137,8 @@ export default function HomePage() {
           />
 
           <FeatureCard
-            title="Household"
-            description="Manage household tasks and responsibilities"
+            title="Projects & Budget"
+            description="Plan home projects and track family finances"
             icon={Home}
             gradient="from-amber-500 to-amber-600"
             shadowColor="shadow-amber-500/50"

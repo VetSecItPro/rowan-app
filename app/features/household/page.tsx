@@ -10,16 +10,16 @@ export default function HouseholdFeaturePage() {
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-household rounded-3xl mb-6 shadow-xl shadow-amber-500/30 animate-bounce-subtle">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-projects rounded-3xl mb-6 shadow-xl shadow-amber-500/30 animate-bounce-subtle">
             <Home className="w-10 h-10 text-white" />
           </div>
 
           <h1 className="text-6xl md:text-7xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-            Household Management
+            Projects & Budget
           </h1>
 
           <p className="text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Manage household tasks, track expenses, and maintain your home together as a team.
+            Plan home improvement projects, track budgets, and manage family finances together.
           </p>
         </div>
 
@@ -29,9 +29,9 @@ export default function HouseholdFeaturePage() {
             <div className="w-14 h-14 bg-amber-500 rounded-2xl flex items-center justify-center mb-6">
               <Wrench className="w-7 h-7 text-white" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Maintenance Tracking</h3>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Project Planning</h3>
             <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-              Track home maintenance tasks, repairs, and service schedules. Never miss important upkeep.
+              Plan and track home improvement projects from start to finish. Organize tasks, timelines, and milestones.
             </p>
           </div>
 
@@ -39,9 +39,9 @@ export default function HouseholdFeaturePage() {
             <div className="w-14 h-14 bg-green-500 rounded-2xl flex items-center justify-center mb-6">
               <DollarSign className="w-7 h-7 text-white" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Expense Tracking</h3>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Budget Management</h3>
             <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-              Monitor household expenses, split bills, and track spending by category for better budgeting.
+              Track project budgets, household expenses, and family finances. Set spending limits and monitor costs.
             </p>
           </div>
 
@@ -49,9 +49,9 @@ export default function HouseholdFeaturePage() {
             <div className="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center mb-6">
               <Users className="w-7 h-7 text-white" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Shared Responsibilities</h3>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Collaborative Planning</h3>
             <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-              Assign chores and responsibilities fairly. Everyone knows what they need to do.
+              Work together on family projects and financial decisions. Everyone stays informed and involved.
             </p>
           </div>
         </div>
@@ -65,20 +65,20 @@ export default function HouseholdFeaturePage() {
               Everything you need
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400">
-              Complete household management in one place
+              Complete project and budget management in one place
             </p>
           </div>
 
           <div className="space-y-6 max-w-3xl mx-auto">
             {[
-              'Track recurring chores and cleaning schedules',
-              'Log home repairs and maintenance history',
-              'Store appliance manuals and warranty information',
+              'Plan home renovation and improvement projects',
+              'Track project timelines and milestones',
+              'Set and monitor project budgets',
               'Monitor household expenses and bills',
-              'Set reminders for filter changes, inspections, etc.',
-              'Assign and rotate chores among family members',
-              'Track service provider contacts and schedules',
-              'Manage home inventory and supplies',
+              'Create and track family savings goals',
+              'Split costs and track shared expenses',
+              'Generate budget reports and insights',
+              'Plan for major purchases and investments',
             ].map((feature, index) => (
               <div key={index} className="flex items-start gap-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                 <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mt-1">
@@ -99,51 +99,51 @@ export default function HouseholdFeaturePage() {
               Perfect for every home
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400">
-              From daily upkeep to major projects
+              From home improvements to family finances
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Regular Maintenance</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Home Projects</h3>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400">
                 <li className="flex items-start gap-3">
                   <Home className="w-5 h-5 text-amber-500 mt-1 flex-shrink-0" />
-                  <span>Track HVAC filter changes and servicing</span>
+                  <span>Plan kitchen or bathroom renovations</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Home className="w-5 h-5 text-amber-500 mt-1 flex-shrink-0" />
-                  <span>Schedule lawn care and yard work</span>
+                  <span>Organize landscaping and outdoor projects</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Home className="w-5 h-5 text-amber-500 mt-1 flex-shrink-0" />
-                  <span>Rotate cleaning responsibilities weekly</span>
+                  <span>Track home office setup or improvements</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Home className="w-5 h-5 text-amber-500 mt-1 flex-shrink-0" />
-                  <span>Remember seasonal home tasks</span>
+                  <span>Coordinate basement or attic finishing</span>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Financial Tracking</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Budget & Finances</h3>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400">
                 <li className="flex items-start gap-3">
                   <DollarSign className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                  <span>Track monthly utility bills and payments</span>
+                  <span>Track project costs and expenses</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <DollarSign className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                  <span>Split household expenses fairly</span>
+                  <span>Monitor monthly household budget</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <DollarSign className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                  <span>Budget for home improvements</span>
+                  <span>Plan and save for major purchases</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <DollarSign className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                  <span>Log repair costs and service expenses</span>
+                  <span>Track family financial goals together</span>
                 </li>
               </ul>
             </div>
@@ -155,10 +155,10 @@ export default function HouseholdFeaturePage() {
       <section className="bg-gradient-to-r from-amber-600 to-yellow-600 py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-5xl font-bold text-white mb-6">
-            Run your home like a pro
+            Manage projects and finances with confidence
           </h2>
           <p className="text-xl text-amber-100 mb-10">
-            Join families managing their homes effortlessly
+            Join families planning their future together
           </p>
           <div className="flex items-center justify-center gap-4">
             <Link

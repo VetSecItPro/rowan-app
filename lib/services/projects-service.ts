@@ -73,7 +73,7 @@ export interface HouseholdStats {
   budget: BudgetStats;
 }
 
-export const householdService = {
+export const projectsService = {
   // Chores
   async getChores(spaceId: string): Promise<Chore[]> {
     const { data, error } = await supabase

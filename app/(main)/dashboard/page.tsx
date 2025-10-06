@@ -9,7 +9,7 @@ import { remindersService } from '@/lib/services/reminders-service';
 import { messagesService } from '@/lib/services/messages-service';
 import { shoppingService } from '@/lib/services/shopping-service';
 import { mealsService } from '@/lib/services/meals-service';
-import { householdService } from '@/lib/services/household-service';
+import { projectsService } from '@/lib/services/projects-service';
 import { goalsService } from '@/lib/services/goals-service';
 import {
   CheckSquare,
@@ -84,8 +84,8 @@ export default function DashboardPage() {
         messagesService.getMessageStats(currentSpace.id),
         shoppingService.getShoppingStats(currentSpace.id),
         mealsService.getMealStats(currentSpace.id),
-        householdService.getChoreStats(currentSpace.id, user.id),
-        householdService.getBudgetStats(currentSpace.id),
+        projectsService.getChoreStats(currentSpace.id, user.id),
+        projectsService.getBudgetStats(currentSpace.id),
         goalsService.getGoalStats(currentSpace.id),
       ]);
 
@@ -140,7 +140,7 @@ export default function DashboardPage() {
 
   const featureCards = [
     {
-      title: 'Tasks',
+      title: 'Tasks & Chores',
       href: '/tasks',
       gradient: 'bg-gradient-tasks',
       shadowColor: 'shadow-blue-500/50',
@@ -200,9 +200,9 @@ export default function DashboardPage() {
       urgent: null,
     },
     {
-      title: 'Household',
+      title: 'Projects & Budget',
       href: '/household',
-      gradient: 'bg-gradient-household',
+      gradient: 'bg-gradient-projects',
       shadowColor: 'shadow-yellow-500/50',
       icon: Home,
       total: stats.household.chores,
@@ -381,26 +381,26 @@ export default function DashboardPage() {
                   const Icon = card.icon;
                   const getShadowClass = () => {
                     switch(card.title) {
-                      case 'Tasks': return 'hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)]';
+                      case 'Tasks & Chores': return 'hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)]';
                       case 'Calendar': return 'hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)]';
                       case 'Reminders': return 'hover:shadow-[0_20px_50px_rgba(251,146,60,0.5)]';
                       case 'Messages': return 'hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)]';
                       case 'Shopping': return 'hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)]';
                       case 'Meals': return 'hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)]';
-                      case 'Household': return 'hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)]';
+                      case 'Projects & Budget': return 'hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)]';
                       case 'Goals': return 'hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)]';
                       default: return '';
                     }
                   };
                   const getTitleColorClass = () => {
                     switch(card.title) {
-                      case 'Tasks': return 'text-blue-600 dark:text-blue-400';
+                      case 'Tasks & Chores': return 'text-blue-600 dark:text-blue-400';
                       case 'Calendar': return 'text-purple-600 dark:text-purple-400';
                       case 'Reminders': return 'text-orange-600 dark:text-orange-400';
                       case 'Messages': return 'text-green-600 dark:text-green-400';
                       case 'Shopping': return 'text-teal-600 dark:text-teal-400';
                       case 'Meals': return 'text-red-600 dark:text-red-400';
-                      case 'Household': return 'text-yellow-600 dark:text-yellow-400';
+                      case 'Projects & Budget': return 'text-yellow-600 dark:text-yellow-400';
                       case 'Goals': return 'text-indigo-600 dark:text-indigo-400';
                       default: return 'text-gray-600 dark:text-gray-400';
                     }
