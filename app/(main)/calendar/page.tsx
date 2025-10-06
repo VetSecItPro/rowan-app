@@ -50,10 +50,32 @@ export default function CalendarPage() {
   async function loadEvents() {
     try {
       setLoading(true);
-      const [eventsData, statsData] = await Promise.all([
+      let [eventsData, statsData] = await Promise.all([
         calendarService.getEvents(currentSpace.id),
         calendarService.getEventStats(currentSpace.id),
       ]);
+
+      // Create sample event if none exist
+      if (eventsData.length === 0) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(14, 0, 0, 0);
+        const endTime = new Date(tomorrow);
+        endTime.setHours(15, 0, 0, 0);
+
+        const newEvent = await calendarService.createEvent({
+          space_id: currentSpace.id,
+          title: 'Team Meeting',
+          description: 'Weekly sync with the team',
+          start_date: tomorrow.toISOString(),
+          end_date: endTime.toISOString(),
+          all_day: false,
+          location: 'Conference Room A',
+        });
+        eventsData = [newEvent];
+        statsData = await calendarService.getEventStats(currentSpace.id);
+      }
+
       setEvents(eventsData);
       setStats(statsData);
     } catch (error) {
@@ -329,18 +351,9 @@ export default function CalendarPage() {
                   <div className="text-center py-12">
                     <CalendarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No events found</p>
-                    <p className="text-gray-500 dark:text-gray-500 mb-6">
+                    <p className="text-gray-500 dark:text-gray-500">
                       {searchQuery ? 'Try adjusting your search' : 'Create your first event to get started!'}
                     </p>
-                    {!searchQuery && (
-                      <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
-                      >
-                        <Plus className="w-5 h-5" />
-                        Create Event
-                      </button>
-                    )}
                   </div>
                 ) : (
                   <div className="space-y-4">
