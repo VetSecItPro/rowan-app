@@ -15,14 +15,11 @@ export function EventCard({ event, onEdit, onDelete }: EventCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const formatEventTime = () => {
-    if (event.all_day) {
-      return 'All day';
-    }
-    return format(new Date(event.start_date), 'h:mm a');
+    return format(new Date(event.start_time), 'h:mm a');
   };
 
   const formatEventDate = () => {
-    return format(new Date(event.start_date), 'MMM d, yyyy');
+    return format(new Date(event.start_time), 'MMM d, yyyy');
   };
 
   return (
@@ -31,8 +28,7 @@ export function EventCard({ event, onEdit, onDelete }: EventCardProps) {
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <div
-              className="w-1 h-12 rounded-full"
-              style={{ backgroundColor: event.color || '#8b5cf6' }}
+              className="w-1 h-12 rounded-full bg-purple-500"
             />
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
