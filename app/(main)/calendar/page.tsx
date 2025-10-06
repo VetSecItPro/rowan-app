@@ -119,17 +119,53 @@ export default function CalendarPage() {
       <div className="p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-calendar flex items-center justify-center">
-              <CalendarIcon className="w-6 h-6 text-white" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-calendar flex items-center justify-center">
+                <CalendarIcon className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold bg-gradient-calendar bg-clip-text text-transparent">
+                  Calendar
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                  Shared events and schedules
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-calendar bg-clip-text text-transparent">
-                Calendar
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
-                Shared events and schedules
-              </p>
+
+            <div className="flex items-center gap-3">
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 flex gap-1">
+                <button
+                  onClick={() => setViewMode('calendar')}
+                  className={`px-4 py-2 rounded-md font-medium transition-all flex items-center gap-2 ${
+                    viewMode === 'calendar'
+                      ? 'bg-gradient-calendar text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                  Calendar
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`px-4 py-2 rounded-md font-medium transition-all flex items-center gap-2 ${
+                    viewMode === 'list'
+                      ? 'bg-gradient-calendar text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <List className="w-4 h-4" />
+                  List
+                </button>
+              </div>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                New Event
+              </button>
             </div>
           </div>
 
@@ -190,38 +226,11 @@ export default function CalendarPage() {
             </div>
           </div>
 
-          {/* Events Section with Toggle */}
+          {/* Events Section */}
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            {/* View Toggle */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                {viewMode === 'calendar' ? 'Event Calendar' : `Upcoming Events (${filteredEvents.length})`}
-              </h2>
-              <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 rounded-xl border border-purple-200 dark:border-purple-700">
-                <button
-                  onClick={() => setViewMode('calendar')}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[110px] ${
-                    viewMode === 'calendar'
-                      ? 'bg-gradient-calendar text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                  }`}
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                  <span className="text-sm">Calendar</span>
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[110px] ${
-                    viewMode === 'list'
-                      ? 'bg-gradient-calendar text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                  <span className="text-sm">List</span>
-                </button>
-              </div>
-            </div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+              {viewMode === 'calendar' ? 'Event Calendar' : `Upcoming Events (${filteredEvents.length})`}
+            </h2>
 
             <div className="min-h-[600px]">
               {loading ? (
