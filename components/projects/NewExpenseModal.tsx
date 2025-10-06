@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { CreateExpenseInput, Expense } from '@/lib/services/household-service';
+import { CreateExpenseInput, Expense } from '@/lib/services/projects-service';
 
 interface NewExpenseModalProps {
   isOpen: boolean;

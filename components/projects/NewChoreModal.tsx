@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { CreateChoreInput, Chore } from '@/lib/services/household-service';
+import { CreateChoreInput, Chore } from '@/lib/services/projects-service';
 
 interface NewChoreModalProps {
   isOpen: boolean;

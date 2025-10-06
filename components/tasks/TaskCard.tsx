@@ -33,24 +33,75 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete }: TaskCardPro
   const priorityColor = priorityColors[task.priority as keyof typeof priorityColors] || 'bg-gray-500';
   const statusColor = statusColors[task.status as keyof typeof statusColors] || 'bg-gray-500';
 
+  // Handle status rotation: pending (not started) → in_progress (pending) → completed → pending
+  const handleStatusClick = () => {
+    let newStatus = 'pending';
+    if (task.status === 'pending') {
+      newStatus = 'in_progress';
+    } else if (task.status === 'in_progress') {
+      newStatus = 'completed';
+    } else if (task.status === 'completed') {
+      newStatus = 'pending';
+    }
+    onStatusChange(task.id, newStatus);
+  };
+
+  // Get checkbox styling based on status
+  const getCheckboxStyle = () => {
+    if (task.status === 'completed') {
+      return 'bg-green-500 border-green-500';
+    } else if (task.status === 'in_progress') {
+      return 'bg-amber-500 border-amber-500';
+    } else {
+      return 'border-2 border-red-500 bg-transparent';
+    }
+  };
+
+  // Get status label
+  const getStatusLabel = () => {
+    if (task.status === 'completed') {
+      return { text: 'Completed', color: 'text-green-600 dark:text-green-400' };
+    } else if (task.status === 'in_progress') {
+      return { text: 'Pending', color: 'text-amber-600 dark:text-amber-400' };
+    } else {
+      return { text: 'Not Started', color: 'text-red-600 dark:text-red-400' };
+    }
+  };
+
+  // Get tooltip text for next status
+  const getStatusTooltip = () => {
+    if (task.status === 'pending') {
+      return 'Click for Pending';
+    } else if (task.status === 'in_progress') {
+      return 'Click for Completed';
+    } else if (task.status === 'completed') {
+      return 'Click to reset';
+    }
+    return 'Click to update status';
+  };
+
+  const statusLabel = getStatusLabel();
+
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-lg transition-all duration-200 group">
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-start gap-3 flex-1">
-          {/* Checkbox */}
-          <button
-            onClick={() => onStatusChange(task.id, task.status === 'completed' ? 'pending' : 'completed')}
-            className={`mt-1 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-              task.status === 'completed'
-                ? 'bg-green-500 border-green-500'
-                : 'border-gray-300 dark:border-gray-600 hover:border-green-500'
-            }`}
-          >
-            {task.status === 'completed' && (
-              <CheckSquare className="w-3 h-3 text-white" />
-            )}
-          </button>
+          {/* Checkbox with Status Label */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleStatusClick}
+              title={getStatusTooltip()}
+              className={`mt-1 flex-shrink-0 w-5 h-5 rounded flex items-center justify-center transition-all ${getCheckboxStyle()}`}
+            >
+              {task.status === 'completed' && (
+                <CheckSquare className="w-3 h-3 text-white" />
+              )}
+            </button>
+            <span className={`text-xs font-medium ${statusLabel.color}`}>
+              {statusLabel.text}
+            </span>
+          </div>
 
           {/* Title & Description */}
           <div className="flex-1 min-w-0">
@@ -71,7 +122,8 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete }: TaskCardPro
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 opacity-0 group-hover:opacity-100 transition-opacity"
+            title="Edit or Delete"
+            className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
           >
             <MoreVertical className="w-4 h-4 text-gray-600 dark:text-gray-400" />
           </button>

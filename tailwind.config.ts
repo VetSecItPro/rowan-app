@@ -17,7 +17,7 @@ const config: Config = {
         'gradient-messages': 'linear-gradient(to right, rgb(34 197 94), rgb(22 163 74))', // green-500 to green-600
         'gradient-shopping': 'linear-gradient(to right, rgb(16 185 129), rgb(5 150 105))', // emerald-500 to emerald-600
         'gradient-meals': 'linear-gradient(to right, rgb(249 115 22), rgb(234 88 12))', // orange-500 to orange-600
-        'gradient-household': 'linear-gradient(to right, rgb(245 158 11), rgb(217 119 6))', // amber-500 to amber-600
+        'gradient-projects': 'linear-gradient(to right, rgb(245 158 11), rgb(217 119 6))', // amber-500 to amber-600
         'gradient-goals': 'linear-gradient(to right, rgb(99 102 241), rgb(79 70 229))', // indigo-500 to indigo-600
       },
       // Custom animations

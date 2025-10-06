@@ -1,12 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock } from 'lucide-react';
+import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, List, ChevronLeft, ChevronRight } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { EventCard } from '@/components/calendar/EventCard';
 import { NewEventModal } from '@/components/calendar/NewEventModal';
 import { useAuth } from '@/lib/contexts/mock-auth-context';
 import { calendarService, CalendarEvent, CreateEventInput } from '@/lib/services/calendar-service';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, parseISO } from 'date-fns';
+
+type ViewMode = 'calendar' | 'list';
 
 export default function CalendarPage() {
   const { currentSpace } = useAuth();
@@ -16,6 +19,8 @@ export default function CalendarPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<ViewMode>('calendar');
+  const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const [stats, setStats] = useState({
     total: 0,
@@ -93,47 +98,43 @@ export default function CalendarPage() {
     setEditingEvent(null);
   }
 
+  function getCalendarDays() {
+    const monthStart = startOfMonth(currentMonth);
+    const monthEnd = endOfMonth(currentMonth);
+    const calendarStart = startOfWeek(monthStart);
+    const calendarEnd = endOfWeek(monthEnd);
+
+    return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+  }
+
+  function getEventsForDate(date: Date) {
+    return filteredEvents.filter(event => {
+      const eventDate = parseISO(event.start_time);
+      return isSameDay(eventDate, date);
+    });
+  }
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Calendar' }]}>
       <div className="p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-calendar flex items-center justify-center">
-                <CalendarIcon className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-4xl font-bold bg-gradient-calendar bg-clip-text text-transparent">
-                  Calendar
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">
-                  Shared events and schedules
-                </p>
-              </div>
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-calendar flex items-center justify-center">
+              <CalendarIcon className="w-6 h-6 text-white" />
             </div>
-
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              New Event
-            </button>
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-calendar bg-clip-text text-transparent">
+                Calendar
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
+                Shared events and schedules
+              </p>
+            </div>
           </div>
 
           {/* Stats Dashboard */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Events</h3>
-                <div className="w-12 h-12 bg-gradient-calendar rounded-xl flex items-center justify-center">
-                  <CalendarIcon className="w-6 h-6 text-white" />
-                </div>
-              </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
-            </div>
-
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Today</h3>
@@ -163,6 +164,16 @@ export default function CalendarPage() {
               </div>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.thisMonth}</p>
             </div>
+
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Events</h3>
+                <div className="w-12 h-12 bg-gradient-calendar rounded-xl flex items-center justify-center">
+                  <CalendarIcon className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+            </div>
           </div>
 
           {/* Search Bar */}
@@ -179,46 +190,163 @@ export default function CalendarPage() {
             </div>
           </div>
 
-          {/* Events List */}
+          {/* Events Section with Toggle */}
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              Upcoming Events ({filteredEvents.length})
-            </h2>
+            {/* View Toggle */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                {viewMode === 'calendar' ? 'Event Calendar' : `Upcoming Events (${filteredEvents.length})`}
+              </h2>
+              <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 rounded-xl border border-purple-200 dark:border-purple-700">
+                <button
+                  onClick={() => setViewMode('calendar')}
+                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[110px] ${
+                    viewMode === 'calendar'
+                      ? 'bg-gradient-calendar text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                  }`}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                  <span className="text-sm">Calendar</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[110px] ${
+                    viewMode === 'list'
+                      ? 'bg-gradient-calendar text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                  }`}
+                >
+                  <List className="w-4 h-4" />
+                  <span className="text-sm">List</span>
+                </button>
+              </div>
+            </div>
 
-            {loading ? (
-              <div className="text-center py-12">
-                <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-                <p className="mt-4 text-gray-600 dark:text-gray-400">Loading events...</p>
-              </div>
-            ) : filteredEvents.length === 0 ? (
-              <div className="text-center py-12">
-                <CalendarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No events found</p>
-                <p className="text-gray-500 dark:text-gray-500 mb-6">
-                  {searchQuery ? 'Try adjusting your search' : 'Create your first event to get started!'}
-                </p>
-                {!searchQuery && (
-                  <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
-                  >
-                    <Plus className="w-5 h-5" />
-                    Create Event
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {filteredEvents.map((event) => (
-                  <EventCard
-                    key={event.id}
-                    event={event}
-                    onEdit={handleEditEvent}
-                    onDelete={handleDeleteEvent}
-                  />
-                ))}
-              </div>
-            )}
+            <div className="min-h-[600px]">
+              {loading ? (
+                <div className="text-center py-12">
+                  <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                  <p className="mt-4 text-gray-600 dark:text-gray-400">Loading events...</p>
+                </div>
+              ) : viewMode === 'calendar' ? (
+                /* Calendar View */
+                <div>
+                  {/* Month Navigation */}
+                  <div className="flex items-center justify-between mb-6">
+                    <button
+                      onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    </button>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {format(currentMonth, 'MMMM yyyy')}
+                    </h3>
+                    <button
+                      onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    >
+                      <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    </button>
+                  </div>
+
+                  {/* Calendar Grid */}
+                  <div className="grid grid-cols-7 gap-2">
+                    {/* Day headers */}
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                      <div key={day} className="text-center text-sm font-medium text-gray-600 dark:text-gray-400 py-2">
+                        {day}
+                      </div>
+                    ))}
+
+                    {/* Calendar days */}
+                    {getCalendarDays().map((day, index) => {
+                      const dayEvents = getEventsForDate(day);
+                      const isCurrentMonth = isSameMonth(day, currentMonth);
+                      const isToday = isSameDay(day, new Date());
+
+                      return (
+                        <div
+                          key={index}
+                          className={`min-h-[120px] p-2 rounded-lg border-2 transition-all ${
+                            isCurrentMonth
+                              ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+                              : 'border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50'
+                          } ${isToday ? 'ring-2 ring-purple-500' : ''}`}
+                        >
+                          <div className={`text-sm font-medium mb-2 ${
+                            isCurrentMonth
+                              ? isToday
+                                ? 'text-purple-600 dark:text-purple-400'
+                                : 'text-gray-900 dark:text-white'
+                              : 'text-gray-400 dark:text-gray-600'
+                          }`}>
+                            {format(day, 'd')}
+                          </div>
+
+                          <div className="space-y-1">
+                            {dayEvents.map((event) => (
+                              <button
+                                key={event.id}
+                                onClick={() => handleEditEvent(event)}
+                                className="w-full text-left px-2 py-1 rounded text-xs bg-purple-100 dark:bg-purple-900/30 border-l-2 border-purple-500 hover:opacity-80 transition-opacity"
+                              >
+                                <p className="font-medium text-purple-700 dark:text-purple-300 truncate">
+                                  {event.title}
+                                </p>
+                                <p className="text-gray-500 dark:text-gray-400 text-[10px]">
+                                  {format(parseISO(event.start_time), 'h:mm a')}
+                                </p>
+                              </button>
+                            ))}
+                            {dayEvents.length === 0 && isCurrentMonth && (
+                              <button
+                                onClick={() => setIsModalOpen(true)}
+                                className="w-full text-center py-2 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                              >
+                                + Add
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                /* List View */
+                filteredEvents.length === 0 ? (
+                  <div className="text-center py-12">
+                    <CalendarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No events found</p>
+                    <p className="text-gray-500 dark:text-gray-500 mb-6">
+                      {searchQuery ? 'Try adjusting your search' : 'Create your first event to get started!'}
+                    </p>
+                    {!searchQuery && (
+                      <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                      >
+                        <Plus className="w-5 h-5" />
+                        Create Event
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {filteredEvents.map((event) => (
+                      <EventCard
+                        key={event.id}
+                        event={event}
+                        onEdit={handleEditEvent}
+                        onDelete={handleDeleteEvent}
+                      />
+                    ))}
+                  </div>
+                )
+              )}
+            </div>
           </div>
         </div>
       </div>

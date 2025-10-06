@@ -33,7 +33,7 @@ export interface CreateMessageInput {
 }
 
 export interface MessageStats {
-  conversations: number;
+  thisWeek: number;
   unread: number;
   today: number;
   total: number;
@@ -132,8 +132,6 @@ export const messagesService = {
   },
 
   async getMessageStats(spaceId: string): Promise<MessageStats> {
-    const conversations = await this.getConversations(spaceId);
-
     const { data: allMessages, error } = await supabase
       .from('messages')
       .select('*, conversation:conversations!inner(space_id)')
@@ -142,11 +140,19 @@ export const messagesService = {
     if (error) throw error;
 
     const messages = allMessages || [];
-    const today = new Date();
+    const now = new Date();
+
+    // Today's start (midnight)
+    const today = new Date(now);
     today.setHours(0, 0, 0, 0);
 
+    // This week's start (last Sunday or Monday, depending on your preference)
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay()); // Sunday
+    weekStart.setHours(0, 0, 0, 0);
+
     return {
-      conversations: conversations.length,
+      thisWeek: messages.filter(m => new Date(m.created_at) >= weekStart).length,
       unread: messages.filter(m => !m.read).length,
       today: messages.filter(m => new Date(m.created_at) >= today).length,
       total: messages.length,
