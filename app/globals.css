@@ -2,7 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+  }
+}
+
 @layer utilities {
+  .gradient-primary {
+    @apply bg-gradient-to-r from-purple-600 to-blue-600;
+  }
+
   @keyframes bounce-subtle {
     0%, 100% {
       transform: translateY(0);
@@ -14,5 +30,97 @@
 
   .animate-bounce-subtle {
     animation: bounce-subtle 2s ease-in-out infinite;
+  }
+
+  /* Shimmer effect for text and buttons */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% center;
+    }
+    100% {
+      background-position: 200% center;
+    }
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      #3b82f6 0%,
+      #8b5cf6 25%,
+      #ec4899 50%,
+      #8b5cf6 75%,
+      #3b82f6 100%
+    );
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s linear infinite;
+  }
+
+  .shimmer-bg {
+    background: linear-gradient(
+      90deg,
+      #7c3aed 0%,
+      #2563eb 25%,
+      #7c3aed 50%,
+      #2563eb 75%,
+      #7c3aed 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  /* Gradient text with hover shimmer effect */
+  .gradient-text {
+    background: linear-gradient(
+      90deg,
+      #7c3aed 0%,
+      #2563eb 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: transform 0.2s ease;
+  }
+
+  .gradient-text:hover {
+    background: linear-gradient(
+      90deg,
+      #3b82f6 0%,
+      #8b5cf6 25%,
+      #ec4899 50%,
+      #8b5cf6 75%,
+      #3b82f6 100%
+    );
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s linear infinite;
+    transform: scale(1.02);
+  }
+
+  /* Shimmer effect for gradient backgrounds */
+  @keyframes shimmer-gradient {
+    0% {
+      background-position: 0% center;
+    }
+    100% {
+      background-position: 200% center;
+    }
+  }
+
+  .shimmer-gradient {
+    background: linear-gradient(
+      90deg,
+      #9333ea 0%,
+      #ec4899 25%,
+      #f97316 50%,
+      #ec4899 75%,
+      #9333ea 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer-gradient 4s linear infinite;
   }
 }
