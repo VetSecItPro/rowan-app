@@ -109,7 +109,7 @@ export default function CalendarPage() {
 
   function getEventsForDate(date: Date) {
     return filteredEvents.filter(event => {
-      const eventDate = parseISO(event.start_time);
+      const eventDate = parseISO(event.start_date);
       return isSameDay(eventDate, date);
     });
   }
@@ -296,7 +296,7 @@ export default function CalendarPage() {
                                   {event.title}
                                 </p>
                                 <p className="text-gray-500 dark:text-gray-400 text-[10px]">
-                                  {format(parseISO(event.start_time), 'h:mm a')}
+                                  {format(parseISO(event.start_date), 'h:mm a')}
                                 </p>
                               </button>
                             ))}
