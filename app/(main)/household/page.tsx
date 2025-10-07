@@ -89,7 +89,7 @@ export default function HouseholdPage() {
 
   async function handleChoreStatusChange(choreId: string, status: string) {
     try {
-      await projectsService.updateChore(choreId, { status: status as 'pending' | 'in-progress' | 'completed' });
+      await projectsService.updateChore(choreId, { status: status as 'pending' | 'completed' | 'skipped' });
       loadData();
     } catch (error) {
       console.error('Failed to update chore:', error);
