@@ -720,7 +720,7 @@ export default function DashboardPage() {
                 {/* Tasks & Chores Card */}
                 <Link
                   href="/tasks"
-                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30 flex flex-col"
+                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-3 sm:mb-4">
                     <div className="flex-1">
@@ -781,7 +781,7 @@ export default function DashboardPage() {
                 {/* Calendar Card */}
                 <Link
                   href="/calendar"
-                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30 flex flex-col"
+                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -829,7 +829,7 @@ export default function DashboardPage() {
                 {/* Reminders Card */}
                 <Link
                   href="/reminders"
-                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(251,146,60,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30 flex flex-col"
+                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(251,146,60,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -885,7 +885,7 @@ export default function DashboardPage() {
                 {/* Messages Card */}
                 <Link
                   href="/messages"
-                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30 flex flex-col"
+                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -938,7 +938,7 @@ export default function DashboardPage() {
                 {/* Shopping Card */}
                 <Link
                   href="/shopping"
-                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30 flex flex-col"
+                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -987,7 +987,7 @@ export default function DashboardPage() {
                 {/* Meals Card */}
                 <Link
                   href="/meals"
-                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30 flex flex-col"
+                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1035,7 +1035,7 @@ export default function DashboardPage() {
                 {/* Household Card */}
                 <Link
                   href="/household"
-                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30 flex flex-col"
+                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1099,7 +1099,7 @@ export default function DashboardPage() {
                 {/* Goals Card */}
                 <Link
                   href="/goals"
-                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30 flex flex-col"
+                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1158,7 +1158,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Daily Check-In Section */}
-          <div className="bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-white/20 dark:border-gray-700/30">
+          <div className="bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
               <Heart className="w-5 h-5 text-pink-500" />
               Daily Check-In
@@ -1212,25 +1212,25 @@ export default function DashboardPage() {
               <div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">Space Overview</p>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl border border-blue-200/30 dark:border-blue-500/20">
+                  <div className="p-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl">
                     <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                       {stats.tasks.total + stats.events.total + stats.reminders.total}
                     </p>
                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Total Items</p>
                   </div>
-                  <div className="p-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl border border-green-200/30 dark:border-green-500/20">
+                  <div className="p-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl">
                     <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                       {stats.goals.completed}
                     </p>
                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Goals Done</p>
                   </div>
-                  <div className="p-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl border border-purple-200/30 dark:border-purple-500/20">
+                  <div className="p-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl">
                     <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                       {stats.shopping.activeLists}
                     </p>
                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Active Lists</p>
                   </div>
-                  <div className="p-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl border border-orange-200/30 dark:border-orange-500/20">
+                  <div className="p-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl">
                     <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                       {stats.meals.thisWeek}
                     </p>
