@@ -5,7 +5,7 @@ import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, Ca
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { EventCard } from '@/components/calendar/EventCard';
 import { NewEventModal } from '@/components/calendar/NewEventModal';
-import { useAuth } from '@/lib/contexts/mock-auth-context';
+import { useAuth } from '@/lib/contexts/auth-context';
 import { calendarService, CalendarEvent, CreateEventInput } from '@/lib/services/calendar-service';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, parseISO } from 'date-fns';
 

@@ -7,7 +7,7 @@ import { GoalCard } from '@/components/goals/GoalCard';
 import { MilestoneCard } from '@/components/goals/MilestoneCard';
 import { NewGoalModal } from '@/components/goals/NewGoalModal';
 import { NewMilestoneModal } from '@/components/goals/NewMilestoneModal';
-import { useAuth } from '@/lib/contexts/mock-auth-context';
+import { useAuth } from '@/lib/contexts/auth-context';
 import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput } from '@/lib/services/goals-service';
 
 type ViewMode = 'goals' | 'milestones';

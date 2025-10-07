@@ -5,7 +5,7 @@ import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package, Chevron
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
 import { NewShoppingListModal } from '@/components/shopping/NewShoppingListModal';
-import { useAuth } from '@/lib/contexts/mock-auth-context';
+import { useAuth } from '@/lib/contexts/auth-context';
 import { shoppingService, ShoppingList, CreateListInput } from '@/lib/services/shopping-service';
 
 export default function ShoppingPage() {

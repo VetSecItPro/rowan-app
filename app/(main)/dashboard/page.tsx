@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
-import { useAuth } from '@/lib/contexts/mock-auth-context';
+import { useAuth } from '@/lib/contexts/auth-context';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { tasksService } from '@/lib/services/tasks-service';
 import { calendarService } from '@/lib/services/calendar-service';

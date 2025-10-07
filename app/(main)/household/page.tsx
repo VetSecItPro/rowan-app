@@ -9,7 +9,7 @@ import { NewChoreModal } from '@/components/projects/NewChoreModal';
 import { NewExpenseModal } from '@/components/projects/NewExpenseModal';
 import { NewBudgetModal } from '@/components/projects/NewBudgetModal';
 import { UpdateProgressModal } from '@/components/projects/UpdateProgressModal';
-import { useAuth } from '@/lib/contexts/mock-auth-context';
+import { useAuth } from '@/lib/contexts/auth-context';
 import { projectsService, Chore, Expense, CreateChoreInput, CreateExpenseInput } from '@/lib/services/projects-service';
 
 type TabType = 'projects' | 'budget' | 'expenses';

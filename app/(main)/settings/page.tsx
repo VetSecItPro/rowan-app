@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
-import { useAuth } from '@/lib/contexts/mock-auth-context';
+import { useAuth } from '@/lib/contexts/auth-context';
 import {
   Settings,
   User,
