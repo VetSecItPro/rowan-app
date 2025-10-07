@@ -11,6 +11,7 @@ import { shoppingService } from '@/lib/services/shopping-service';
 import { mealsService } from '@/lib/services/meals-service';
 import { projectsService } from '@/lib/services/projects-service';
 import { goalsService } from '@/lib/services/goals-service';
+import { createClient } from '@/lib/supabase/client';
 import {
   CheckSquare,
   Calendar,
@@ -21,112 +22,487 @@ import {
   Home,
   Target,
   TrendingUp,
+  TrendingDown,
   Clock,
   AlertCircle,
   Sparkles,
   Activity,
-  Heart
+  Heart,
+  ArrowRight,
+  Plus,
+  Filter,
+  ChevronRight,
+  Zap
 } from 'lucide-react';
 import Link from 'next/link';
-import { format } from 'date-fns';
+import { format, isToday, isThisWeek, isPast, parseISO, startOfWeek, subWeeks } from 'date-fns';
 
-interface DashboardStats {
-  tasks: { total: number; pending: number; inProgress: number };
-  events: { total: number; today: number; thisWeek: number };
-  reminders: { total: number; active: number; overdue: number };
-  messages: { total: number; unread: number; conversations: number };
-  shopping: { totalLists: number; activeLists: number; itemsThisWeek: number };
-  meals: { thisWeek: number; savedRecipes: number; upcoming: number };
-  household: { chores: number; pending: number; expenses: number };
-  goals: { active: number; completed: number; inProgress: number };
+// Enhanced stats interface with detailed metrics
+interface EnhancedDashboardStats {
+  tasks: {
+    total: number;
+    pending: number;
+    inProgress: number;
+    completed: number;
+    dueToday: number;
+    overdue: number;
+    highPriority: number;
+    assignedToMe: number;
+    completionRate: number;
+    trend: number; // compared to last week
+    recentTasks: Array<{ id: string; title: string; due_date?: string; priority?: string }>;
+  };
+  events: {
+    total: number;
+    today: number;
+    thisWeek: number;
+    upcoming: number;
+    personal: number;
+    shared: number;
+    nextEvent: { title: string; start_time: string } | null;
+    categories: Record<string, number>;
+    trend: number;
+  };
+  reminders: {
+    total: number;
+    active: number;
+    completed: number;
+    overdue: number;
+    dueToday: number;
+    byCategory: Record<string, number>;
+    nextDue: { title: string; reminder_time: string } | null;
+    trend: number;
+  };
+  messages: {
+    total: number;
+    unread: number;
+    today: number;
+    conversations: number;
+    lastMessage: { content: string; sender: string; created_at: string } | null;
+    mostActive: string;
+    trend: number;
+  };
+  shopping: {
+    totalLists: number;
+    activeLists: number;
+    totalItems: number;
+    checkedToday: number;
+    uncheckedItems: number;
+    urgentList: string | null;
+    estimatedBudget: number;
+    trend: number;
+  };
+  meals: {
+    thisWeek: number;
+    savedRecipes: number;
+    mealsToday: number;
+    missingIngredients: number;
+    nextMeal: { title: string; meal_time: string } | null;
+    favoriteCategory: string;
+    shoppingListGenerated: boolean;
+    trend: number;
+  };
+  household: {
+    totalChores: number;
+    completedThisWeek: number;
+    assignedToMe: number;
+    assignedToPartner: number;
+    overdue: number;
+    monthlyBudget: number;
+    spent: number;
+    remaining: number;
+    pendingBills: number;
+    nextBill: { title: string; due_date: string; amount: number } | null;
+    trend: number;
+  };
+  goals: {
+    total: number;
+    active: number;
+    completed: number;
+    inProgress: number;
+    milestonesReached: number;
+    totalMilestones: number;
+    overallProgress: number;
+    topGoal: { title: string; progress: number } | null;
+    endingThisMonth: number;
+    trend: number;
+  };
+}
+
+// Progress Bar Component
+function ProgressBar({ value, max, color = 'blue', showLabel = true }: { value: number; max: number; color?: string; showLabel?: boolean }) {
+  const percentage = max > 0 ? Math.round((value / max) * 100) : 0;
+  const colorClasses = {
+    blue: 'bg-blue-500',
+    green: 'bg-green-500',
+    purple: 'bg-purple-500',
+    orange: 'bg-orange-500',
+    red: 'bg-red-500',
+    teal: 'bg-teal-500',
+    amber: 'bg-amber-500',
+    indigo: 'bg-indigo-500',
+  };
+
+  return (
+    <div className="w-full">
+      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+        <div
+          className={`${colorClasses[color as keyof typeof colorClasses]} h-2 rounded-full transition-all duration-500`}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+      {showLabel && (
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{percentage}% complete</p>
+      )}
+    </div>
+  );
+}
+
+// Trend Indicator Component
+function TrendIndicator({ value, label }: { value: number; label: string }) {
+  if (value === 0) return null;
+
+  const isPositive = value > 0;
+  const Icon = isPositive ? TrendingUp : TrendingDown;
+  const colorClass = isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+
+  return (
+    <div className={`flex items-center gap-1 text-xs ${colorClass} font-medium`}>
+      <Icon className="w-3 h-3" />
+      <span>{Math.abs(value)} {label}</span>
+    </div>
+  );
 }
 
 export default function DashboardPage() {
   const { user, currentSpace } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<DashboardStats>({
-    tasks: { total: 0, pending: 0, inProgress: 0 },
-    events: { total: 0, today: 0, thisWeek: 0 },
-    reminders: { total: 0, active: 0, overdue: 0 },
-    messages: { total: 0, unread: 0, conversations: 0 },
-    shopping: { totalLists: 0, activeLists: 0, itemsThisWeek: 0 },
-    meals: { thisWeek: 0, savedRecipes: 0, upcoming: 0 },
-    household: { chores: 0, pending: 0, expenses: 0 },
-    goals: { active: 0, completed: 0, inProgress: 0 },
+  const [stats, setStats] = useState<EnhancedDashboardStats>({
+    tasks: {
+      total: 0,
+      pending: 0,
+      inProgress: 0,
+      completed: 0,
+      dueToday: 0,
+      overdue: 0,
+      highPriority: 0,
+      assignedToMe: 0,
+      completionRate: 0,
+      trend: 0,
+      recentTasks: [],
+    },
+    events: {
+      total: 0,
+      today: 0,
+      thisWeek: 0,
+      upcoming: 0,
+      personal: 0,
+      shared: 0,
+      nextEvent: null,
+      categories: {},
+      trend: 0,
+    },
+    reminders: {
+      total: 0,
+      active: 0,
+      completed: 0,
+      overdue: 0,
+      dueToday: 0,
+      byCategory: {},
+      nextDue: null,
+      trend: 0,
+    },
+    messages: {
+      total: 0,
+      unread: 0,
+      today: 0,
+      conversations: 0,
+      lastMessage: null,
+      mostActive: '',
+      trend: 0,
+    },
+    shopping: {
+      totalLists: 0,
+      activeLists: 0,
+      totalItems: 0,
+      checkedToday: 0,
+      uncheckedItems: 0,
+      urgentList: null,
+      estimatedBudget: 0,
+      trend: 0,
+    },
+    meals: {
+      thisWeek: 0,
+      savedRecipes: 0,
+      mealsToday: 0,
+      missingIngredients: 0,
+      nextMeal: null,
+      favoriteCategory: '',
+      shoppingListGenerated: false,
+      trend: 0,
+    },
+    household: {
+      totalChores: 0,
+      completedThisWeek: 0,
+      assignedToMe: 0,
+      assignedToPartner: 0,
+      overdue: 0,
+      monthlyBudget: 3000,
+      spent: 0,
+      remaining: 3000,
+      pendingBills: 0,
+      nextBill: null,
+      trend: 0,
+    },
+    goals: {
+      total: 0,
+      active: 0,
+      completed: 0,
+      inProgress: 0,
+      milestonesReached: 0,
+      totalMilestones: 0,
+      overallProgress: 0,
+      topGoal: null,
+      endingThisMonth: 0,
+      trend: 0,
+    },
   });
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [checkInNote, setCheckInNote] = useState('');
 
-  useEffect(() => {
-    loadAllStats();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSpace.id]);
-
+  // Load all comprehensive stats
   async function loadAllStats() {
     try {
       setLoading(true);
+
+      // Fetch all data concurrently
       const [
+        allTasks,
         taskStats,
+        allEvents,
         eventStats,
+        allReminders,
         reminderStats,
+        allMessages,
         messageStats,
+        shoppingLists,
         shoppingStats,
+        mealPlans,
+        recipes,
         mealStats,
+        allChores,
         choreStats,
         budgetStats,
+        allGoals,
         goalStats,
       ] = await Promise.all([
+        tasksService.getTasks(currentSpace.id),
         tasksService.getTaskStats(currentSpace.id),
+        calendarService.getEvents(currentSpace.id),
         calendarService.getEventStats(currentSpace.id),
+        remindersService.getReminders(currentSpace.id),
         remindersService.getReminderStats(currentSpace.id),
+        messagesService.getMessages(currentSpace.id),
         messagesService.getMessageStats(currentSpace.id),
+        shoppingService.getLists(currentSpace.id),
         shoppingService.getShoppingStats(currentSpace.id),
+        mealsService.getMealPlans(currentSpace.id, startOfWeek(new Date())),
+        mealsService.getRecipes(currentSpace.id),
         mealsService.getMealStats(currentSpace.id),
+        projectsService.getChores(currentSpace.id),
         projectsService.getChoreStats(currentSpace.id, user.id),
         projectsService.getBudgetStats(currentSpace.id),
+        goalsService.getGoals(currentSpace.id),
         goalsService.getGoalStats(currentSpace.id),
       ]);
+
+      const now = new Date();
+      const today = format(now, 'yyyy-MM-dd');
+      const weekAgo = subWeeks(now, 1);
+
+      // Calculate detailed task stats
+      const tasksDueToday = allTasks.filter(t => t.due_date === today && t.status !== 'completed').length;
+      const tasksOverdue = allTasks.filter(t =>
+        t.due_date && isPast(parseISO(t.due_date)) && !isToday(parseISO(t.due_date)) && t.status !== 'completed'
+      ).length;
+      const tasksLastWeek = allTasks.filter(t =>
+        t.created_at && parseISO(t.created_at) < weekAgo
+      ).length;
+      const taskTrend = allTasks.length - tasksLastWeek;
+      const recentTasks = allTasks
+        .filter(t => t.status !== 'completed')
+        .sort((a, b) => {
+          if (!a.due_date) return 1;
+          if (!b.due_date) return -1;
+          return parseISO(a.due_date).getTime() - parseISO(b.due_date).getTime();
+        })
+        .slice(0, 3)
+        .map(t => ({ id: t.id, title: t.title, due_date: t.due_date, priority: t.priority }));
+
+      // Calculate detailed event stats
+      const eventsToday = allEvents.filter(e => isToday(parseISO(e.start_time))).length;
+      const eventsThisWeek = allEvents.filter(e => isThisWeek(parseISO(e.start_time))).length;
+      const upcomingEvents = allEvents.filter(e => parseISO(e.start_time) > now).length;
+      const personalEvents = allEvents.filter(e => e.is_all_day === false).length;
+      const nextEvent = allEvents
+        .filter(e => parseISO(e.start_time) > now)
+        .sort((a, b) => parseISO(a.start_time).getTime() - parseISO(b.start_time).getTime())[0];
+      const eventTrend = allEvents.filter(e => parseISO(e.created_at) > weekAgo).length;
+
+      // Calculate detailed reminder stats
+      const activeReminders = allReminders.filter(r => r.status === 'active').length;
+      const completedReminders = allReminders.filter(r => r.status === 'completed').length;
+      const overdueReminders = allReminders.filter(r =>
+        r.reminder_time && isPast(parseISO(r.reminder_time)) && r.status === 'active'
+      ).length;
+      const remindersDueToday = allReminders.filter(r =>
+        r.reminder_time && isToday(parseISO(r.reminder_time)) && r.status === 'active'
+      ).length;
+      const remindersByCategory = allReminders.reduce((acc, r) => {
+        acc[r.category] = (acc[r.category] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      const nextDueReminder = allReminders
+        .filter(r => r.reminder_time && parseISO(r.reminder_time) > now && r.status === 'active')
+        .sort((a, b) => parseISO(a.reminder_time!).getTime() - parseISO(b.reminder_time!).getTime())[0];
+      const reminderTrend = allReminders.filter(r => parseISO(r.created_at) > weekAgo).length;
+
+      // Calculate detailed message stats
+      const messagesToday = allMessages.filter(m => isToday(parseISO(m.created_at))).length;
+      const lastMessage = allMessages.length > 0 ? allMessages[allMessages.length - 1] : null;
+      const messageTrend = allMessages.filter(m => parseISO(m.created_at) > weekAgo).length;
+
+      // Calculate detailed shopping stats
+      let totalItems = 0;
+      let checkedToday = 0;
+      let uncheckedItems = 0;
+      for (const list of shoppingLists) {
+        const items = await shoppingService.getItems(list.id);
+        totalItems += items.length;
+        uncheckedItems += items.filter(i => !i.is_checked).length;
+        checkedToday += items.filter(i =>
+          i.is_checked && i.updated_at && isToday(parseISO(i.updated_at))
+        ).length;
+      }
+      const activeLists = shoppingLists.filter(l => l.status === 'active').length;
+      const shoppingTrend = shoppingLists.filter(l => parseISO(l.created_at) > weekAgo).length;
+
+      // Calculate detailed meal stats
+      const mealsToday = mealPlans.filter(m => m.meal_date && isToday(parseISO(m.meal_date))).length;
+      const nextMeal = mealPlans
+        .filter(m => m.meal_time && parseISO(m.meal_time) > now)
+        .sort((a, b) => parseISO(a.meal_time!).getTime() - parseISO(b.meal_time!).getTime())[0];
+      const mealTrend = mealPlans.filter(m => parseISO(m.created_at) > weekAgo).length;
+
+      // Calculate detailed household stats
+      const choresAssignedToMe = allChores.filter(c => c.assigned_to === user.id).length;
+      const choresAssignedToPartner = allChores.filter(c => c.assigned_to && c.assigned_to !== user.id).length;
+      const choresOverdue = allChores.filter(c =>
+        c.due_date && isPast(parseISO(c.due_date)) && c.status !== 'completed'
+      ).length;
+      const householdTrend = allChores.filter(c => parseISO(c.created_at) > weekAgo).length;
+
+      // Calculate detailed goal stats
+      const activeGoals = allGoals.filter(g => g.status === 'active').length;
+      const completedGoals = allGoals.filter(g => g.status === 'completed').length;
+      const inProgressGoals = allGoals.filter(g => g.status === 'in_progress').length;
+      const topGoal = allGoals.length > 0
+        ? { title: allGoals[0].title, progress: allGoals[0].progress || 0 }
+        : null;
+      const goalTrend = allGoals.filter(g => parseISO(g.created_at) > weekAgo).length;
 
       setStats({
         tasks: {
           total: taskStats.total,
           pending: taskStats.pending,
           inProgress: taskStats.inProgress,
+          completed: taskStats.completed,
+          dueToday: tasksDueToday,
+          overdue: tasksOverdue,
+          highPriority: taskStats.byPriority.high + taskStats.byPriority.urgent,
+          assignedToMe: allTasks.filter(t => t.assigned_to === user.id).length,
+          completionRate: taskStats.total > 0 ? Math.round((taskStats.completed / taskStats.total) * 100) : 0,
+          trend: taskTrend,
+          recentTasks,
         },
         events: {
           total: eventStats.total,
-          today: eventStats.today,
-          thisWeek: eventStats.thisWeek,
+          today: eventsToday,
+          thisWeek: eventsThisWeek,
+          upcoming: upcomingEvents,
+          personal: personalEvents,
+          shared: allEvents.length - personalEvents,
+          nextEvent: nextEvent ? { title: nextEvent.title, start_time: nextEvent.start_time } : null,
+          categories: {},
+          trend: eventTrend,
         },
         reminders: {
           total: reminderStats.total,
-          active: reminderStats.active,
-          overdue: reminderStats.overdue,
+          active: activeReminders,
+          completed: completedReminders,
+          overdue: overdueReminders,
+          dueToday: remindersDueToday,
+          byCategory: remindersByCategory,
+          nextDue: nextDueReminder ? { title: nextDueReminder.title, reminder_time: nextDueReminder.reminder_time! } : null,
+          trend: reminderTrend,
         },
         messages: {
           total: messageStats.total,
           unread: messageStats.unread,
+          today: messagesToday,
           conversations: messageStats.conversations,
+          lastMessage: lastMessage ? {
+            content: lastMessage.content,
+            sender: lastMessage.sender_id === user.id ? 'You' : 'Partner',
+            created_at: lastMessage.created_at,
+          } : null,
+          mostActive: 'Personal chat',
+          trend: messageTrend,
         },
         shopping: {
           totalLists: shoppingStats.totalLists,
-          activeLists: shoppingStats.activeLists,
-          itemsThisWeek: shoppingStats.itemsThisWeek,
+          activeLists,
+          totalItems,
+          checkedToday,
+          uncheckedItems,
+          urgentList: shoppingLists.length > 0 ? shoppingLists[0].name : null,
+          estimatedBudget: 0,
+          trend: shoppingTrend,
         },
         meals: {
           thisWeek: mealStats.thisWeek,
           savedRecipes: mealStats.savedRecipes,
-          upcoming: mealStats.upcoming,
+          mealsToday,
+          missingIngredients: 0,
+          nextMeal: nextMeal ? { title: nextMeal.recipe_id || 'Meal', meal_time: nextMeal.meal_time! } : null,
+          favoriteCategory: 'Pasta',
+          shoppingListGenerated: false,
+          trend: mealTrend,
         },
         household: {
-          chores: choreStats.total,
-          pending: choreStats.myChores + choreStats.partnerChores,
-          expenses: budgetStats.pendingBills,
+          totalChores: choreStats.total,
+          completedThisWeek: choreStats.completedThisWeek,
+          assignedToMe: choresAssignedToMe,
+          assignedToPartner: choresAssignedToPartner,
+          overdue: choresOverdue,
+          monthlyBudget: budgetStats.monthlyBudget,
+          spent: budgetStats.spentThisMonth,
+          remaining: budgetStats.remaining,
+          pendingBills: budgetStats.pendingBills,
+          nextBill: null,
+          trend: householdTrend,
         },
         goals: {
-          active: goalStats.active,
-          completed: goalStats.completed,
-          inProgress: goalStats.inProgress,
+          total: allGoals.length,
+          active: activeGoals,
+          completed: completedGoals,
+          inProgress: inProgressGoals,
+          milestonesReached: 0,
+          totalMilestones: 0,
+          overallProgress: goalStats.overallProgress || 0,
+          topGoal,
+          endingThisMonth: 0,
+          trend: goalTrend,
         },
       });
     } catch (error) {
@@ -136,176 +512,131 @@ export default function DashboardPage() {
     }
   }
 
-  const featureCards = [
-    {
-      title: 'Tasks & Chores',
-      href: '/tasks',
-      gradient: 'bg-gradient-tasks',
-      shadowColor: 'shadow-blue-500/50',
-      icon: CheckSquare,
-      total: stats.tasks.total,
-      subtitle: `${stats.tasks.pending} pending`,
-      urgent: stats.tasks.inProgress > 0 ? `${stats.tasks.inProgress} in progress` : null,
-    },
-    {
-      title: 'Calendar',
-      href: '/calendar',
-      gradient: 'bg-gradient-calendar',
-      shadowColor: 'shadow-purple-500/50',
-      icon: Calendar,
-      total: stats.events.total,
-      subtitle: `${stats.events.today} today`,
-      urgent: null,
-    },
-    {
-      title: 'Reminders',
-      href: '/reminders',
-      gradient: 'bg-gradient-reminders',
-      shadowColor: 'shadow-orange-500/50',
-      icon: Bell,
-      total: stats.reminders.total,
-      subtitle: `${stats.reminders.active} active`,
-      urgent: null,
-    },
-    {
-      title: 'Messages',
-      href: '/messages',
-      gradient: 'bg-gradient-messages',
-      shadowColor: 'shadow-green-500/50',
-      icon: MessageCircle,
-      total: stats.messages.total,
-      subtitle: `${stats.messages.conversations} conversations`,
-      urgent: stats.messages.unread > 0 ? `${stats.messages.unread} unread` : null,
-    },
-    {
-      title: 'Shopping',
-      href: '/shopping',
-      gradient: 'bg-gradient-shopping',
-      shadowColor: 'shadow-teal-500/50',
-      icon: ShoppingCart,
-      total: stats.shopping.totalLists,
-      subtitle: `${stats.shopping.activeLists} active lists`,
-      urgent: null,
-    },
-    {
-      title: 'Meals',
-      href: '/meals',
-      gradient: 'bg-gradient-meals',
-      shadowColor: 'shadow-red-500/50',
-      icon: UtensilsCrossed,
-      total: stats.meals.savedRecipes,
-      subtitle: `${stats.meals.thisWeek} this week`,
-      urgent: null,
-    },
-    {
-      title: 'Projects & Budget',
-      href: '/household',
-      gradient: 'bg-gradient-projects',
-      shadowColor: 'shadow-yellow-500/50',
-      icon: Home,
-      total: stats.household.chores,
-      subtitle: `${stats.household.pending} pending`,
-      urgent: null,
-    },
-    {
-      title: 'Goals',
-      href: '/goals',
-      gradient: 'bg-gradient-goals',
-      shadowColor: 'shadow-indigo-500/50',
-      icon: Target,
-      total: stats.goals.active + stats.goals.completed + stats.goals.inProgress,
-      subtitle: `${stats.goals.active} active`,
-      urgent: null,
-    },
-  ];
+  // Real-time subscriptions
+  useEffect(() => {
+    loadAllStats();
 
-  // Mock recent activity data - in production, this would come from a real activity log
-  const recentActivity = [
-    {
-      id: 1,
-      user: 'Sarah',
-      action: 'completed',
-      item: 'Buy groceries',
-      feature: 'Tasks',
-      icon: CheckSquare,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
-      time: '10 min ago',
-    },
-    {
-      id: 2,
-      user: 'John',
-      action: 'added',
-      item: 'Dinner with friends',
-      feature: 'Calendar',
-      icon: Calendar,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50 dark:bg-purple-900/20',
-      time: '1 hour ago',
-    },
-    {
-      id: 3,
-      user: 'Sarah',
-      action: 'planned',
-      item: 'Spaghetti Bolognese',
-      feature: 'Meals',
-      icon: UtensilsCrossed,
-      color: 'text-red-600',
-      bgColor: 'bg-red-50 dark:bg-red-900/20',
-      time: '2 hours ago',
-    },
-    {
-      id: 4,
-      user: 'John',
-      action: 'added to',
-      item: 'Weekly groceries',
-      feature: 'Shopping',
-      icon: ShoppingCart,
-      color: 'text-teal-600',
-      bgColor: 'bg-teal-50 dark:bg-teal-900/20',
-      time: '3 hours ago',
-    },
-    {
-      id: 5,
-      user: 'Sarah',
-      action: 'sent',
-      item: 'Meeting reminder message',
-      feature: 'Messages',
-      icon: MessageCircle,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50 dark:bg-green-900/20',
-      time: '5 hours ago',
-    },
-  ];
+    const supabase = createClient();
+    const channels: any[] = [];
 
-  // Mock space members data
-  const spaceMembers = [
-    {
-      id: 1,
-      name: 'Sarah',
-      avatar: 'S',
-      tasksToday: 5,
-      checkedIn: true,
-      bgColor: 'bg-purple-500',
-    },
-    {
-      id: 2,
-      name: 'John',
-      avatar: 'J',
-      tasksToday: 3,
-      checkedIn: false,
-      bgColor: 'bg-blue-500',
-    },
-  ];
+    // Tasks subscription
+    const tasksChannel = supabase
+      .channel('dashboard_tasks')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'tasks',
+        filter: `space_id=eq.${currentSpace.id}`,
+      }, () => {
+        loadAllStats(); // Reload stats on any task change
+      })
+      .subscribe();
+    channels.push(tasksChannel);
 
-  // Mock check-in data
-  const partnerCheckIn = {
-    name: 'Sarah',
-    mood: '😊',
-    moodLabel: 'Great',
-    note: 'Excited for our date night tonight!',
-    time: '2 hours ago',
-  };
+    // Events subscription
+    const eventsChannel = supabase
+      .channel('dashboard_events')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'calendar_events',
+        filter: `space_id=eq.${currentSpace.id}`,
+      }, () => {
+        loadAllStats();
+      })
+      .subscribe();
+    channels.push(eventsChannel);
+
+    // Reminders subscription
+    const remindersChannel = supabase
+      .channel('dashboard_reminders')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'reminders',
+        filter: `space_id=eq.${currentSpace.id}`,
+      }, () => {
+        loadAllStats();
+      })
+      .subscribe();
+    channels.push(remindersChannel);
+
+    // Messages subscription
+    const messagesChannel = supabase
+      .channel('dashboard_messages')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'messages',
+        filter: `space_id=eq.${currentSpace.id}`,
+      }, () => {
+        loadAllStats();
+      })
+      .subscribe();
+    channels.push(messagesChannel);
+
+    // Shopping subscription
+    const shoppingChannel = supabase
+      .channel('dashboard_shopping')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'shopping_lists',
+        filter: `space_id=eq.${currentSpace.id}`,
+      }, () => {
+        loadAllStats();
+      })
+      .subscribe();
+    channels.push(shoppingChannel);
+
+    // Meals subscription
+    const mealsChannel = supabase
+      .channel('dashboard_meals')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'meal_plans',
+        filter: `space_id=eq.${currentSpace.id}`,
+      }, () => {
+        loadAllStats();
+      })
+      .subscribe();
+    channels.push(mealsChannel);
+
+    // Chores subscription
+    const choresChannel = supabase
+      .channel('dashboard_chores')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'household_chores',
+        filter: `space_id=eq.${currentSpace.id}`,
+      }, () => {
+        loadAllStats();
+      })
+      .subscribe();
+    channels.push(choresChannel);
+
+    // Goals subscription
+    const goalsChannel = supabase
+      .channel('dashboard_goals')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'goals',
+        filter: `space_id=eq.${currentSpace.id}`,
+      }, () => {
+        loadAllStats();
+      })
+      .subscribe();
+    channels.push(goalsChannel);
+
+    // Cleanup subscriptions
+    return () => {
+      channels.forEach(channel => supabase.removeChannel(channel));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSpace.id]);
 
   // Mood options
   const moodOptions = [
@@ -318,9 +649,7 @@ export default function DashboardPage() {
 
   const handleCheckIn = () => {
     if (!selectedMood) return;
-    // In production, this would save to backend
     console.log('Check-in:', { mood: selectedMood, note: checkInNote });
-    // Reset form
     setSelectedMood(null);
     setCheckInNote('');
   };
@@ -346,174 +675,499 @@ export default function DashboardPage() {
                   {greeting()}, {user.name}!
                 </h1>
               </div>
-              <p className="text-purple-100 text-lg">
+              <p className="text-purple-100 text-lg text-center">
                 {currentSpace.name} • {format(new Date(), 'EEEE, MMMM d, yyyy')}
               </p>
-              <div className="mt-6 flex items-center gap-2 text-white/90">
-                <TrendingUp className="w-5 h-5" />
-                <span className="text-sm">
-                  You have {stats.tasks.pending} pending tasks and {stats.events.today} events scheduled
-                </span>
+              <div className="mt-6 flex items-center justify-center gap-6 text-white/90">
+                <div className="flex items-center gap-2">
+                  <CheckSquare className="w-5 h-5" />
+                  <span className="text-sm">{stats.tasks.pending} pending tasks</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5" />
+                  <span className="text-sm">{stats.events.today} events today</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5" />
+                  <span className="text-sm">{stats.tasks.overdue + stats.reminders.overdue} overdue items</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Quick Stats - 8 Feature Cards */}
+          {/* Enhanced Feature Cards - 8 Cards */}
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-              <Home className="w-6 h-6" />
-              Your Features at a Glance
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <Zap className="w-6 h-6 text-purple-500" />
+                Live Stats
+              </h2>
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <Activity className="w-4 h-4 text-green-500 animate-pulse" />
+                <span>Real-time updates</span>
+              </div>
+            </div>
 
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[...Array(8)].map((_, i) => (
                   <div key={i} className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-2xl p-6 shadow-lg animate-pulse">
-                    <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded" />
+                    <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded" />
                   </div>
                 ))}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {featureCards.map((card) => {
-                  const Icon = card.icon;
-                  const getShadowClass = () => {
-                    switch(card.title) {
-                      case 'Tasks & Chores': return 'hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)]';
-                      case 'Calendar': return 'hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)]';
-                      case 'Reminders': return 'hover:shadow-[0_20px_50px_rgba(251,146,60,0.5)]';
-                      case 'Messages': return 'hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)]';
-                      case 'Shopping': return 'hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)]';
-                      case 'Meals': return 'hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)]';
-                      case 'Projects & Budget': return 'hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)]';
-                      case 'Goals': return 'hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)]';
-                      default: return '';
-                    }
-                  };
-                  const getTitleColorClass = () => {
-                    switch(card.title) {
-                      case 'Tasks & Chores': return 'text-blue-600 dark:text-blue-400';
-                      case 'Calendar': return 'text-purple-600 dark:text-purple-400';
-                      case 'Reminders': return 'text-orange-600 dark:text-orange-400';
-                      case 'Messages': return 'text-green-600 dark:text-green-400';
-                      case 'Shopping': return 'text-teal-600 dark:text-teal-400';
-                      case 'Meals': return 'text-red-600 dark:text-red-400';
-                      case 'Projects & Budget': return 'text-yellow-600 dark:text-yellow-400';
-                      case 'Goals': return 'text-indigo-600 dark:text-indigo-400';
-                      default: return 'text-gray-600 dark:text-gray-400';
-                    }
-                  };
-                  return (
-                    <Link
-                      key={card.title}
-                      href={card.href}
-                      className={`group bg-transparent rounded-2xl p-6 ${getShadowClass()} hover:-translate-y-2 transition-all duration-300 cursor-pointer`}
-                    >
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <p className={`text-lg font-bold ${getTitleColorClass()} mb-1`}>
-                            {card.title}
-                          </p>
-                          <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                            {card.total}
-                          </p>
-                        </div>
-                        <div className={`w-14 h-14 ${card.gradient} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
-                          <Icon className="w-7 h-7 text-white" />
-                        </div>
+                {/* Tasks & Chores Card */}
+                <Link
+                  href="/tasks"
+                  className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-2 transition-all duration-300"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-lg font-bold text-blue-600 dark:text-blue-400">Tasks</h3>
+                        {stats.tasks.trend !== 0 && <TrendIndicator value={stats.tasks.trend} label="this week" />}
                       </div>
-                      <div className="space-y-1">
-                        <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {card.subtitle}
+                      <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                        {stats.tasks.total}
+                      </p>
+                    </div>
+                    <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <CheckSquare className="w-7 h-7 text-white" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600 dark:text-gray-400">{stats.tasks.pending} pending</span>
+                      <span className="text-gray-600 dark:text-gray-400">{stats.tasks.inProgress} in progress</span>
+                    </div>
+                    {stats.tasks.dueToday > 0 && (
+                      <p className="text-sm text-orange-600 dark:text-orange-400 flex items-center gap-1 font-medium">
+                        <Clock className="w-3 h-3" />
+                        {stats.tasks.dueToday} due today
+                      </p>
+                    )}
+                    {stats.tasks.overdue > 0 && (
+                      <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1 font-medium">
+                        <AlertCircle className="w-3 h-3" />
+                        {stats.tasks.overdue} overdue
+                      </p>
+                    )}
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {stats.tasks.highPriority} high priority • {stats.tasks.assignedToMe} assigned to you
+                    </p>
+                  </div>
+
+                  <ProgressBar value={stats.tasks.completed} max={stats.tasks.total} color="blue" />
+
+                  {stats.tasks.recentTasks.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">Recent:</p>
+                      {stats.tasks.recentTasks.slice(0, 2).map(task => (
+                        <p key={task.id} className="text-xs text-gray-700 dark:text-gray-300 truncate">
+                          • {task.title}
                         </p>
-                        {card.urgent && (
-                          <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1 font-medium">
-                            <AlertCircle className="w-3 h-3" />
-                            {card.urgent}
-                          </p>
-                        )}
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="mt-3 flex items-center justify-end text-blue-600 dark:text-blue-400 text-sm font-medium group-hover:gap-2 transition-all">
+                    <span>View all</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </div>
+                </Link>
+
+                {/* Calendar Card */}
+                <Link
+                  href="/calendar"
+                  className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-2 transition-all duration-300"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-lg font-bold text-purple-600 dark:text-purple-400">Calendar</h3>
+                        {stats.events.trend !== 0 && <TrendIndicator value={stats.events.trend} label="this week" />}
                       </div>
-                    </Link>
-                  );
-                })}
+                      <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                        {stats.events.total}
+                      </p>
+                    </div>
+                    <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <Calendar className="w-7 h-7 text-white" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600 dark:text-gray-400">{stats.events.today} today</span>
+                      <span className="text-gray-600 dark:text-gray-400">{stats.events.thisWeek} this week</span>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {stats.events.personal} personal • {stats.events.shared} shared
+                    </p>
+                  </div>
+
+                  {stats.events.nextEvent && (
+                    <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg mb-3">
+                      <p className="text-xs text-purple-700 dark:text-purple-300 font-medium mb-1">Next event:</p>
+                      <p className="text-sm text-gray-900 dark:text-white font-medium truncate">
+                        {stats.events.nextEvent.title}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        {format(parseISO(stats.events.nextEvent.start_time), 'MMM d, h:mm a')}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="mt-3 flex items-center justify-end text-purple-600 dark:text-purple-400 text-sm font-medium group-hover:gap-2 transition-all">
+                    <span>View all</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </div>
+                </Link>
+
+                {/* Reminders Card */}
+                <Link
+                  href="/reminders"
+                  className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(251,146,60,0.5)] hover:-translate-y-2 transition-all duration-300"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-lg font-bold text-orange-600 dark:text-orange-400">Reminders</h3>
+                        {stats.reminders.trend !== 0 && <TrendIndicator value={stats.reminders.trend} label="this week" />}
+                      </div>
+                      <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                        {stats.reminders.active}
+                      </p>
+                    </div>
+                    <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <Bell className="w-7 h-7 text-white" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    {stats.reminders.overdue > 0 && (
+                      <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1 font-medium">
+                        <AlertCircle className="w-3 h-3" />
+                        {stats.reminders.overdue} overdue
+                      </p>
+                    )}
+                    {stats.reminders.dueToday > 0 && (
+                      <p className="text-sm text-orange-600 dark:text-orange-400 flex items-center gap-1 font-medium">
+                        <Clock className="w-3 h-3" />
+                        {stats.reminders.dueToday} due today
+                      </p>
+                    )}
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {stats.reminders.completed} completed • {stats.reminders.total} total
+                    </p>
+                  </div>
+
+                  {stats.reminders.nextDue && (
+                    <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg mb-3">
+                      <p className="text-xs text-orange-700 dark:text-orange-300 font-medium mb-1">Next due:</p>
+                      <p className="text-sm text-gray-900 dark:text-white font-medium truncate">
+                        {stats.reminders.nextDue.title}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        {format(parseISO(stats.reminders.nextDue.reminder_time), 'MMM d, h:mm a')}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="mt-3 flex items-center justify-end text-orange-600 dark:text-orange-400 text-sm font-medium group-hover:gap-2 transition-all">
+                    <span>View all</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </div>
+                </Link>
+
+                {/* Messages Card */}
+                <Link
+                  href="/messages"
+                  className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-2 transition-all duration-300"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-lg font-bold text-green-600 dark:text-green-400">Messages</h3>
+                        {stats.messages.trend !== 0 && <TrendIndicator value={stats.messages.trend} label="this week" />}
+                      </div>
+                      <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                        {stats.messages.total}
+                      </p>
+                    </div>
+                    <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <MessageCircle className="w-7 h-7 text-white" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600 dark:text-gray-400">{stats.messages.today} today</span>
+                      <span className="text-gray-600 dark:text-gray-400">{stats.messages.conversations} conversations</span>
+                    </div>
+                    {stats.messages.unread > 0 && (
+                      <p className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1 font-medium">
+                        <AlertCircle className="w-3 h-3" />
+                        {stats.messages.unread} unread
+                      </p>
+                    )}
+                  </div>
+
+                  {stats.messages.lastMessage && (
+                    <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg mb-3">
+                      <p className="text-xs text-green-700 dark:text-green-300 font-medium mb-1">
+                        {stats.messages.lastMessage.sender}:
+                      </p>
+                      <p className="text-sm text-gray-900 dark:text-white truncate">
+                        "{stats.messages.lastMessage.content}"
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                        {format(parseISO(stats.messages.lastMessage.created_at), 'h:mm a')}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="mt-3 flex items-center justify-end text-green-600 dark:text-green-400 text-sm font-medium group-hover:gap-2 transition-all">
+                    <span>View all</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </div>
+                </Link>
+
+                {/* Shopping Card */}
+                <Link
+                  href="/shopping"
+                  className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-2 transition-all duration-300"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-lg font-bold text-teal-600 dark:text-teal-400">Shopping</h3>
+                        {stats.shopping.trend !== 0 && <TrendIndicator value={stats.shopping.trend} label="this week" />}
+                      </div>
+                      <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                        {stats.shopping.totalItems}
+                      </p>
+                    </div>
+                    <div className="w-14 h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <ShoppingCart className="w-7 h-7 text-white" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600 dark:text-gray-400">{stats.shopping.totalLists} lists</span>
+                      <span className="text-gray-600 dark:text-gray-400">{stats.shopping.activeLists} active</span>
+                    </div>
+                    <p className="text-sm text-teal-600 dark:text-teal-400 flex items-center gap-1">
+                      <CheckSquare className="w-3 h-3" />
+                      {stats.shopping.checkedToday} checked today
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {stats.shopping.uncheckedItems} items remaining
+                    </p>
+                  </div>
+
+                  {stats.shopping.urgentList && (
+                    <div className="p-3 bg-teal-50 dark:bg-teal-900/20 rounded-lg mb-3">
+                      <p className="text-xs text-teal-700 dark:text-teal-300 font-medium mb-1">Urgent:</p>
+                      <p className="text-sm text-gray-900 dark:text-white font-medium truncate">
+                        {stats.shopping.uncheckedItems} items for "{stats.shopping.urgentList}"
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="mt-3 flex items-center justify-end text-teal-600 dark:text-teal-400 text-sm font-medium group-hover:gap-2 transition-all">
+                    <span>View all</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </div>
+                </Link>
+
+                {/* Meals Card */}
+                <Link
+                  href="/meals"
+                  className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-2 transition-all duration-300"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-lg font-bold text-red-600 dark:text-red-400">Meals</h3>
+                        {stats.meals.trend !== 0 && <TrendIndicator value={stats.meals.trend} label="this week" />}
+                      </div>
+                      <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                        {stats.meals.thisWeek}
+                      </p>
+                    </div>
+                    <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <UtensilsCrossed className="w-7 h-7 text-white" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600 dark:text-gray-400">{stats.meals.mealsToday} today</span>
+                      <span className="text-gray-600 dark:text-gray-400">{stats.meals.thisWeek} this week</span>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {stats.meals.savedRecipes} saved recipes
+                    </p>
+                  </div>
+
+                  {stats.meals.nextMeal && (
+                    <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg mb-3">
+                      <p className="text-xs text-red-700 dark:text-red-300 font-medium mb-1">Next meal:</p>
+                      <p className="text-sm text-gray-900 dark:text-white font-medium truncate">
+                        {stats.meals.nextMeal.title}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        {format(parseISO(stats.meals.nextMeal.meal_time), 'h:mm a')}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="mt-3 flex items-center justify-end text-red-600 dark:text-red-400 text-sm font-medium group-hover:gap-2 transition-all">
+                    <span>View all</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </div>
+                </Link>
+
+                {/* Household Card */}
+                <Link
+                  href="/household"
+                  className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-2 transition-all duration-300"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-lg font-bold text-amber-600 dark:text-amber-400">Household</h3>
+                        {stats.household.trend !== 0 && <TrendIndicator value={stats.household.trend} label="this week" />}
+                      </div>
+                      <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                        {stats.household.totalChores}
+                      </p>
+                    </div>
+                    <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <Home className="w-7 h-7 text-white" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600 dark:text-gray-400">{stats.household.assignedToMe} yours</span>
+                      <span className="text-gray-600 dark:text-gray-400">{stats.household.assignedToPartner} partner's</span>
+                    </div>
+                    <p className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
+                      <CheckSquare className="w-3 h-3" />
+                      {stats.household.completedThisWeek} done this week
+                    </p>
+                    {stats.household.overdue > 0 && (
+                      <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1 font-medium">
+                        <AlertCircle className="w-3 h-3" />
+                        {stats.household.overdue} overdue
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg mb-3">
+                    <p className="text-xs text-amber-700 dark:text-amber-300 font-medium mb-1">Budget:</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-900 dark:text-white font-bold">
+                        ${stats.household.spent.toLocaleString()}
+                      </span>
+                      <span className="text-xs text-gray-600 dark:text-gray-400">
+                        / ${stats.household.monthlyBudget.toLocaleString()}
+                      </span>
+                    </div>
+                    <ProgressBar
+                      value={stats.household.spent}
+                      max={stats.household.monthlyBudget}
+                      color="amber"
+                      showLabel={false}
+                    />
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                      {stats.household.pendingBills} pending bills
+                    </p>
+                  </div>
+
+                  <div className="mt-3 flex items-center justify-end text-amber-600 dark:text-amber-400 text-sm font-medium group-hover:gap-2 transition-all">
+                    <span>View all</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </div>
+                </Link>
+
+                {/* Goals Card */}
+                <Link
+                  href="/goals"
+                  className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-2 transition-all duration-300"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-lg font-bold text-indigo-600 dark:text-indigo-400">Goals</h3>
+                        {stats.goals.trend !== 0 && <TrendIndicator value={stats.goals.trend} label="this week" />}
+                      </div>
+                      <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                        {stats.goals.active}
+                      </p>
+                    </div>
+                    <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <Target className="w-7 h-7 text-white" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600 dark:text-gray-400">{stats.goals.inProgress} in progress</span>
+                      <span className="text-gray-600 dark:text-gray-400">{stats.goals.completed} completed</span>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {stats.goals.total} total goals
+                    </p>
+                  </div>
+
+                  {stats.goals.topGoal && (
+                    <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg mb-3">
+                      <p className="text-xs text-indigo-700 dark:text-indigo-300 font-medium mb-2">Top goal:</p>
+                      <p className="text-sm text-gray-900 dark:text-white font-medium truncate mb-2">
+                        {stats.goals.topGoal.title}
+                      </p>
+                      <ProgressBar
+                        value={stats.goals.topGoal.progress}
+                        max={100}
+                        color="indigo"
+                        showLabel={false}
+                      />
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                        {stats.goals.topGoal.progress}% complete
+                      </p>
+                    </div>
+                  )}
+
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                    Overall progress: {stats.goals.overallProgress}%
+                  </p>
+
+                  <div className="mt-3 flex items-center justify-end text-indigo-600 dark:text-indigo-400 text-sm font-medium group-hover:gap-2 transition-all">
+                    <span>View all</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </div>
+                </Link>
               </div>
             )}
           </div>
 
-          {/* Recent Activity & Quick Actions */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Recent Activity */}
-            <div className="bg-transparent rounded-2xl p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-purple-500" />
-                  Recent Activity
-                </h2>
-                <span className="text-sm text-gray-500 dark:text-gray-400">
-                  Family updates
-                </span>
-              </div>
+          {/* Daily Check-In Section */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+              <Heart className="w-5 h-5 text-pink-500" />
+              Daily Check-In
+            </h2>
 
-              <div className="space-y-3">
-                {recentActivity.map((activity) => {
-                  const Icon = activity.icon;
-                  return (
-                    <div
-                      key={activity.id}
-                      className="flex items-center gap-3 p-4 rounded-xl hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors"
-                    >
-                      <div className={`w-10 h-10 ${activity.bgColor} rounded-xl flex items-center justify-center flex-shrink-0`}>
-                        <Icon className={`w-5 h-5 ${activity.color}`} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-900 dark:text-white">
-                          <span className="font-semibold">{activity.user}</span>{' '}
-                          <span className="text-gray-600 dark:text-gray-400">{activity.action}</span>{' '}
-                          <span className="font-medium">{activity.item}</span>
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          {activity.feature} • {activity.time}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Space Members & Daily Check-In */}
-            <div className="bg-transparent rounded-2xl p-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-                <Heart className="w-5 h-5 text-pink-500" />
-                Daily Check-In
-              </h2>
-
-              {/* Space Members */}
-              <div className="mb-6">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Space Members</p>
-                <div className="flex items-center gap-3">
-                  {spaceMembers.map((member) => (
-                    <div key={member.id} className="flex flex-col items-center">
-                      <div className="relative">
-                        <div className={`w-12 h-12 ${member.bgColor} rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
-                          {member.avatar}
-                        </div>
-                        {member.checkedIn && (
-                          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center">
-                            <Heart className="w-3 h-3 text-white fill-white" />
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{member.name}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500">{member.tasksToday} tasks</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Your Check-In */}
-              <div className="mb-6">
+              <div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">How are you feeling today?</p>
                 <div className="flex gap-2 mb-4">
                   {moodOptions.map((mood) => (
@@ -536,8 +1190,8 @@ export default function DashboardPage() {
                   value={checkInNote}
                   onChange={(e) => setCheckInNote(e.target.value)}
                   maxLength={200}
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white text-sm"
-                  rows={2}
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white text-sm"
+                  rows={3}
                 />
                 <div className="flex items-center justify-between mt-2">
                   <span className="text-xs text-gray-500 dark:text-gray-400">{checkInNote.length}/200</span>
@@ -555,73 +1209,35 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Partner's Check-In */}
-              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{partnerCheckIn.name}&apos;s Check-In</p>
-                {partnerCheckIn.mood ? (
-                  <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl">
-                    <div className="text-3xl">{partnerCheckIn.mood}</div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                        Feeling {partnerCheckIn.moodLabel}
-                      </p>
-                      <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                        &ldquo;{partnerCheckIn.note}&rdquo;
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{partnerCheckIn.time}</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl text-center">
-                    <Clock className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Waiting for {partnerCheckIn.name} to check in today
+              {/* Space Overview Stats */}
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">Space Overview</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl">
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                      {stats.tasks.total + stats.events.total + stats.reminders.total}
                     </p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Total Items</p>
                   </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Stats Summary */}
-          <div className="bg-transparent rounded-2xl p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-green-500" />
-              Space Overview
-            </h2>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="text-center">
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {stats.tasks.total + stats.events.total + stats.reminders.total}
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Total Items
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl font-bold text-green-600 dark:text-green-400">
-                  {stats.goals.completed}
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Goals Completed
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                  {stats.shopping.activeLists}
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Active Lists
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-                  {stats.meals.thisWeek}
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Meals This Week
-                </p>
+                  <div className="p-4 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl">
+                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                      {stats.goals.completed}
+                    </p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Goals Done</p>
+                  </div>
+                  <div className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl">
+                    <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                      {stats.shopping.activeLists}
+                    </p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Active Lists</p>
+                  </div>
+                  <div className="p-4 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-xl">
+                    <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+                      {stats.meals.thisWeek}
+                    </p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Meals Planned</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
