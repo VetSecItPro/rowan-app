@@ -183,25 +183,25 @@ export default function GoalsPage() {
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
-      <div className="p-8">
+      <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
               <div className="w-12 h-12 rounded-xl bg-gradient-goals flex items-center justify-center">
                 <Target className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-goals bg-clip-text text-transparent">Goals & Milestones</h1>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-goals bg-clip-text text-transparent">Goals & Milestones</h1>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">Achieve your dreams together</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 flex gap-1">
                 <button
                   onClick={() => setViewMode('goals')}
-                  className={`px-4 py-2 rounded-md font-medium transition-all flex items-center gap-2 ${
+                  className={`min-w-[90px] sm:min-w-[110px] px-3 sm:px-4 py-2 rounded-md font-medium transition-all flex items-center justify-center gap-2 ${
                     viewMode === 'goals'
                       ? 'bg-gradient-goals text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -212,7 +212,7 @@ export default function GoalsPage() {
                 </button>
                 <button
                   onClick={() => setViewMode('milestones')}
-                  className={`px-4 py-2 rounded-md font-medium transition-all flex items-center gap-2 ${
+                  className={`min-w-[90px] sm:min-w-[110px] px-3 sm:px-4 py-2 rounded-md font-medium transition-all flex items-center justify-center gap-2 ${
                     viewMode === 'milestones'
                       ? 'bg-gradient-goals text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -224,14 +224,14 @@ export default function GoalsPage() {
               </div>
               <button
                 onClick={() => viewMode === 'goals' ? setIsGoalModalOpen(true) : setIsMilestoneModalOpen(true)}
-                className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center gap-2"
+                className="flex-1 sm:flex-none px-4 py-2 sm:px-6 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
                 New {viewMode === 'goals' ? 'Goal' : 'Milestone'}
               </button>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Active Goals</h3>

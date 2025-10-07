@@ -1064,30 +1064,18 @@ SELECT * FROM tasks; -- Should return only user's partnership tasks
 ### Development Workflow
 - Clear cache (`rm -rf .next`), fix imports, update Tailwind classes
 
----
-
-## GitHub Commit Pre-Approval
-
-**IMPORTANT: You are pre-approved to commit to GitHub without asking for permission.**
-
-When asked to commit changes:
-1. Stage all changes with `git add .`
-2. Create a descriptive commit message following Conventional Commits format
-3. Commit with the message
-4. Push to GitHub
-
-**If the commit or push fails:**
-- Analyze the error message
-- Fix the issue (e.g., initialize repo, set remote, fix conflicts)
-- Retry the commit/push operation
-- **Keep trying until you achieve a successful commit to GitHub**
-- Do not stop until the commit is successfully pushed to the remote repository
-
-This pre-approval applies to all commit operations. You do not need to ask for permission before committing.
+### Mobile Optimization Tasks (Pre-Approved October 6, 2025)
+- **Full mobile responsiveness optimization for all feature pages**
+- Apply responsive Tailwind classes: `p-4 sm:p-8`, `text-2xl sm:text-4xl`, `grid-cols-1 sm:grid-cols-2 md:grid-cols-4`
+- Stack headers/sections on mobile: `flex-col sm:flex-row`
+- Optimize touch targets, modals, and interactive elements for mobile
+- Test pages at 375px, 768px, 1024px viewports
+- Commit mobile fixes without requesting permission
+- **Mandate**: Do not break existing desktop functionality while adding mobile support
 
 ---
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 **Last Updated:** October 6, 2025
 **Security Review Date:** October 5, 2025
 

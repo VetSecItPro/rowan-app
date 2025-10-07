@@ -194,16 +194,16 @@ export default function CalendarPage() {
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Calendar' }]}>
-      <div className="p-8">
+      <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-gradient-calendar flex items-center justify-center">
                 <CalendarIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-calendar bg-clip-text text-transparent">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-calendar bg-clip-text text-transparent">
                   Calendar
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">
@@ -212,81 +212,81 @@ export default function CalendarPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 flex gap-1">
                 <button
                   onClick={() => setViewMode('calendar')}
-                  className={`px-4 py-2 rounded-md font-medium transition-all flex items-center gap-2 ${
+                  className={`px-3 sm:px-4 py-2 rounded-md font-medium transition-all flex items-center justify-center gap-2 flex-1 sm:flex-initial ${
                     viewMode === 'calendar'
                       ? 'bg-gradient-calendar text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
                 >
                   <LayoutGrid className="w-4 h-4" />
-                  Calendar
+                  <span className="text-sm">Calendar</span>
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`px-4 py-2 rounded-md font-medium transition-all flex items-center gap-2 ${
+                  className={`px-3 sm:px-4 py-2 rounded-md font-medium transition-all flex items-center justify-center gap-2 flex-1 sm:flex-initial ${
                     viewMode === 'list'
                       ? 'bg-gradient-calendar text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
                 >
                   <List className="w-4 h-4" />
-                  List
+                  <span className="text-sm">List</span>
                 </button>
               </div>
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center gap-2"
+                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
-                New Event
+                <span>New Event</span>
               </button>
             </div>
           </div>
 
           {/* Stats Dashboard */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Today</h3>
-                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
-                  <CalendarDays className="w-6 h-6 text-white" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Today</h3>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+                  <CalendarDays className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.today}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.today}</p>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">This Week</h3>
-                <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
-                  <CalendarRange className="w-6 h-6 text-white" />
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">This Week</h3>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                  <CalendarRange className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.thisWeek}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.thisWeek}</p>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">This Month</h3>
-                <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center">
-                  <CalendarClock className="w-6 h-6 text-white" />
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">This Month</h3>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-500 rounded-xl flex items-center justify-center">
+                  <CalendarClock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.thisMonth}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.thisMonth}</p>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Events</h3>
-                <div className="w-12 h-12 bg-gradient-calendar rounded-xl flex items-center justify-center">
-                  <CalendarIcon className="w-6 h-6 text-white" />
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Total Events</h3>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-calendar rounded-xl flex items-center justify-center">
+                  <CalendarIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
             </div>
           </div>
 
@@ -305,8 +305,8 @@ export default function CalendarPage() {
           </div>
 
           {/* Events Section */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
               {viewMode === 'calendar' ? 'Event Calendar' : `Upcoming Events (${filteredEvents.length})`}
             </h2>
 
@@ -320,14 +320,14 @@ export default function CalendarPage() {
                 /* Calendar View */
                 <div>
                   {/* Month Navigation */}
-                  <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center justify-between mb-4 sm:mb-6">
                     <button
                       onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                     >
                       <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                     </button>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                       {format(currentMonth, 'MMMM yyyy')}
                     </h3>
                     <button
@@ -339,11 +339,12 @@ export default function CalendarPage() {
                   </div>
 
                   {/* Calendar Grid */}
-                  <div className="grid grid-cols-7 gap-2">
+                  <div className="grid grid-cols-7 gap-1 sm:gap-2">
                     {/* Day headers */}
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                      <div key={day} className="text-center text-sm font-medium text-gray-600 dark:text-gray-400 py-2">
-                        {day}
+                      <div key={day} className="text-center text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 py-1 sm:py-2">
+                        <span className="hidden sm:inline">{day}</span>
+                        <span className="sm:hidden">{day.slice(0, 1)}</span>
                       </div>
                     ))}
 
@@ -356,13 +357,13 @@ export default function CalendarPage() {
                       return (
                         <div
                           key={index}
-                          className={`min-h-[120px] p-2 rounded-lg border-2 transition-all ${
+                          className={`min-h-[80px] sm:min-h-[120px] p-1 sm:p-2 rounded-lg border transition-all ${
                             isCurrentMonth
                               ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
                               : 'border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50'
-                          } ${isToday ? 'ring-2 ring-purple-500' : ''}`}
+                          } ${isToday ? 'ring-1 sm:ring-2 ring-purple-500' : ''}`}
                         >
-                          <div className={`text-sm font-medium mb-2 ${
+                          <div className={`text-xs sm:text-sm font-medium mb-1 sm:mb-2 ${
                             isCurrentMonth
                               ? isToday
                                 ? 'text-purple-600 dark:text-purple-400'
@@ -372,28 +373,33 @@ export default function CalendarPage() {
                             {format(day, 'd')}
                           </div>
 
-                          <div className="space-y-1">
-                            {dayEvents.map((event) => {
+                          <div className="space-y-0.5 sm:space-y-1">
+                            {dayEvents.slice(0, 2).map((event) => {
                               const categoryColor = getCategoryColor(event.category);
                               return (
                                 <button
                                   key={event.id}
                                   onClick={() => handleEditEvent(event)}
-                                  className={`w-full text-left px-2 py-1 rounded text-xs ${categoryColor.bg} border-l-2 ${categoryColor.border} hover:opacity-80 transition-opacity`}
+                                  className={`w-full text-left px-1 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs ${categoryColor.bg} border-l-2 ${categoryColor.border} hover:opacity-80 transition-opacity`}
                                 >
                                   <p className={`font-medium ${categoryColor.text} truncate`}>
                                     {event.title}
                                   </p>
-                                  <p className="text-gray-500 dark:text-gray-400 text-[10px]">
+                                  <p className="hidden sm:block text-gray-500 dark:text-gray-400 text-[10px]">
                                     {format(parseISO(event.start_time), 'h:mm a')}
                                   </p>
                                 </button>
                               );
                             })}
+                            {dayEvents.length > 2 && (
+                              <p className="text-[10px] text-gray-500 dark:text-gray-400 text-center">
+                                +{dayEvents.length - 2} more
+                              </p>
+                            )}
                             {dayEvents.length === 0 && isCurrentMonth && (
                               <button
                                 onClick={() => setIsModalOpen(true)}
-                                className="w-full text-center py-2 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                                className="hidden sm:block w-full text-center py-2 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                               >
                                 + Add
                               </button>
