@@ -70,12 +70,15 @@ export const shoppingService = {
     return data;
   },
 
-  async createList(input: CreateListInput): Promise<ShoppingList> {
+  async createList(input: CreateListInput & { items?: any }): Promise<ShoppingList> {
+    // Remove items field if it exists (items are created separately)
+    const { items, ...listData } = input as any;
+
     const { data, error } = await supabase
       .from('shopping_lists')
       .insert([{
-        ...input,
-        status: input.status || 'active',
+        ...listData,
+        status: listData.status || 'active',
       }])
       .select()
       .single();
@@ -84,14 +87,16 @@ export const shoppingService = {
     return data;
   },
 
-  async updateList(id: string, updates: Partial<CreateListInput>): Promise<ShoppingList> {
-    const finalUpdates: any = { ...updates };
+  async updateList(id: string, updates: Partial<CreateListInput> & { items?: any }): Promise<ShoppingList> {
+    // Remove items field if it exists (items are managed separately)
+    const { items, ...updateData } = updates as any;
+    const finalUpdates: any = { ...updateData };
 
-    if (updates.status === 'completed' && !finalUpdates.completed_at) {
+    if (updateData.status === 'completed' && !finalUpdates.completed_at) {
       finalUpdates.completed_at = new Date().toISOString();
     }
 
-    if (updates.status && updates.status !== 'completed') {
+    if (updateData.status && updateData.status !== 'completed') {
       finalUpdates.completed_at = null;
     }
 
