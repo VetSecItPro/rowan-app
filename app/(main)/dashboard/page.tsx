@@ -1069,7 +1069,7 @@ export default function DashboardPage() {
                     )}
                   </div>
 
-                  <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg mb-3">
+                  <div className="p-3 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-lg mb-3">
                     <p className="text-xs text-amber-700 dark:text-amber-300 font-medium mb-1">Budget:</p>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-900 dark:text-white font-bold">
