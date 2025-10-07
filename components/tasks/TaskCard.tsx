@@ -4,6 +4,7 @@ import { CheckSquare, Clock, Flag, User, Calendar as CalendarIcon, MoreVertical 
 import { Task } from '@/lib/types';
 import { format } from 'date-fns';
 import { useState } from 'react';
+import { TASK_CATEGORIES } from './NewTaskModal';
 
 interface TaskCardProps {
   task: Task;
@@ -105,11 +106,24 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete }: TaskCardPro
 
           {/* Title & Description */}
           <div className="flex-1 min-w-0">
-            <h3 className={`font-semibold text-gray-900 dark:text-white mb-1 ${
-              task.status === 'completed' ? 'line-through opacity-60' : ''
-            }`}>
-              {task.title}
-            </h3>
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <h3 className={`font-semibold text-gray-900 dark:text-white ${
+                task.status === 'completed' ? 'line-through opacity-60' : ''
+              }`}>
+                {task.title}
+              </h3>
+              {/* Category Badge */}
+              {task.category && TASK_CATEGORIES[task.category as keyof typeof TASK_CATEGORIES] && (
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                  TASK_CATEGORIES[task.category as keyof typeof TASK_CATEGORIES].lightBg
+                } ${
+                  TASK_CATEGORIES[task.category as keyof typeof TASK_CATEGORIES].textColor
+                }`}>
+                  <span>{TASK_CATEGORIES[task.category as keyof typeof TASK_CATEGORIES].emoji}</span>
+                  <span>{TASK_CATEGORIES[task.category as keyof typeof TASK_CATEGORIES].label}</span>
+                </span>
+              )}
+            </div>
             {task.description && (
               <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                 {task.description}
@@ -174,13 +188,6 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete }: TaskCardPro
             <span>{format(new Date(task.due_date), 'MMM d, yyyy')}</span>
             {isOverdue && <span className="font-semibold">Overdue</span>}
           </div>
-        )}
-
-        {/* Category */}
-        {task.category && (
-          <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full">
-            {task.category}
-          </span>
         )}
 
         {/* Status Badge */}

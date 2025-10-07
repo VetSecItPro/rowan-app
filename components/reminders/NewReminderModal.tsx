@@ -26,6 +26,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedWeekdays, setSelectedWeekdays] = useState<number[]>([]);
   const [selectedMonthDays, setSelectedMonthDays] = useState<number[]>([]);
+  const [dateError, setDateError] = useState<string>('');
 
   // Helper function to convert ISO string to datetime-local format
   const formatDatetimeLocal = (isoString: string) => {
@@ -69,10 +70,25 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
       setSelectedWeekdays([]);
       setSelectedMonthDays([]);
     }
+    setDateError('');
   }, [editReminder, spaceId]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate reminder time is not in the past
+    if (formData.reminder_time) {
+      const reminderDate = new Date(formData.reminder_time);
+      const now = new Date();
+
+      if (reminderDate < now) {
+        setDateError('Reminder time cannot be in the past');
+        return;
+      }
+    }
+
+    // Clear any previous errors
+    setDateError('');
 
     // Prepare data with repeat_days based on pattern
     const submissionData: CreateReminderInput = {
@@ -227,9 +243,33 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
             <input
               type="datetime-local"
               value={formData.reminder_time || ''}
-              onChange={(e) => setFormData({ ...formData, reminder_time: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+              onChange={(e) => {
+                setFormData({ ...formData, reminder_time: e.target.value });
+
+                // Validate on change
+                if (e.target.value) {
+                  const reminderDate = new Date(e.target.value);
+                  const now = new Date();
+
+                  if (reminderDate < now) {
+                    setDateError('Reminder time cannot be in the past');
+                  } else {
+                    setDateError('');
+                  }
+                } else {
+                  setDateError('');
+                }
+              }}
+              className={`w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white ${
+                dateError ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'
+              }`}
             />
+            {dateError && (
+              <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                <span className="font-medium">⚠</span>
+                {dateError}
+              </p>
+            )}
           </div>
 
           {/* Priority & Status Row */}
@@ -352,7 +392,10 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
             </button>
             <button
               type="submit"
-              className="px-6 py-2 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg"
+              disabled={!!dateError}
+              className={`px-6 py-2 shimmer-bg text-white rounded-lg transition-all shadow-lg ${
+                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
+              }`}
             >
               {editReminder ? 'Save Changes' : 'Create Reminder'}
             </button>

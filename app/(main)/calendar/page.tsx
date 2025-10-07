@@ -21,13 +21,38 @@ export default function CalendarPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('calendar');
   const [currentMonth, setCurrentMonth] = useState(new Date());
-
   const [stats, setStats] = useState({
     total: 0,
     today: 0,
     thisWeek: 0,
     thisMonth: 0,
   });
+
+  // Calculate stats from events, excluding completed ones
+  useEffect(() => {
+    const activeEvents = events.filter(e => e.status !== 'completed');
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - today.getDay());
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    setStats({
+      total: activeEvents.length,
+      today: activeEvents.filter(e => {
+        const eventDate = new Date(e.start_time);
+        return eventDate >= today && eventDate < new Date(today.getTime() + 86400000);
+      }).length,
+      thisWeek: activeEvents.filter(e => {
+        const eventDate = new Date(e.start_time);
+        return eventDate >= weekStart;
+      }).length,
+      thisMonth: activeEvents.filter(e => {
+        const eventDate = new Date(e.start_time);
+        return eventDate >= monthStart;
+      }).length,
+    });
+  }, [events]);
 
   useEffect(() => {
     loadEvents();
@@ -51,10 +76,7 @@ export default function CalendarPage() {
   async function loadEvents() {
     try {
       setLoading(true);
-      let [eventsData, statsData] = await Promise.all([
-        calendarService.getEvents(currentSpace.id),
-        calendarService.getEventStats(currentSpace.id),
-      ]);
+      let eventsData = await calendarService.getEvents(currentSpace.id);
 
       // Create sample event if none exist
       if (eventsData.length === 0) {
@@ -75,7 +97,6 @@ export default function CalendarPage() {
             location: 'Conference Room A',
           });
           eventsData = [newEvent];
-          statsData = await calendarService.getEventStats(currentSpace.id);
         } catch (createError) {
           console.error('Failed to create sample event:', createError);
           // Continue without sample event if creation fails
@@ -83,7 +104,6 @@ export default function CalendarPage() {
       }
 
       setEvents(eventsData);
-      setStats(statsData);
     } catch (error) {
       console.error('Failed to load events:', error);
     } finally {
@@ -127,6 +147,7 @@ export default function CalendarPage() {
     // Update in background
     try {
       await calendarService.updateEventStatus(eventId, status);
+      // Stats will automatically update via useMemo when events state changes
     } catch (error) {
       console.error('Failed to update event status:', error);
       // Revert on error
