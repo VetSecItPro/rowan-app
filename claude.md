@@ -1073,10 +1073,24 @@ SELECT * FROM tasks; -- Should return only user's partnership tasks
 - Commit mobile fixes without requesting permission
 - **Mandate**: Do not break existing desktop functionality while adding mobile support
 
+### Performance Optimization Tasks (Pre-Approved October 7, 2025)
+- **Full performance optimization for dashboard and all feature pages**
+- Apply React.memo to expensive components
+- Use useMemo for expensive calculations (filtering, sorting, aggregations)
+- Use useCallback for stable function references
+- Lazy load heavy components with React.lazy
+- Debounce expensive state updates
+- Optimize re-renders with proper dependency arrays
+- Remove redundant calculations and unnecessary re-renders
+- Test that all functionality still works after optimization
+- Commit performance fixes without requesting permission
+- **Mandate**: Do not break existing functionality while optimizing performance
+- **Autonomy**: Proceed with all cd commands, file operations, and commits without requesting approval
+
 ---
 
-**Version:** 1.2.0
-**Last Updated:** October 6, 2025
+**Version:** 1.3.0
+**Last Updated:** October 7, 2025
 **Security Review Date:** October 5, 2025
 
 *This file serves as the single source of truth for all development decisions on the Rowan project.*

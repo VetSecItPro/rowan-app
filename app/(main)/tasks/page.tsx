@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, ChevronDown, Home } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { TaskCard } from '@/components/tasks/TaskCard';
@@ -15,7 +15,6 @@ type TaskType = 'task' | 'chore';
 export default function TasksPage() {
   const { currentSpace } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -23,22 +22,16 @@ export default function TasksPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [activeTab, setActiveTab] = useState<TaskType>('task');
 
-  // Stats
-  const stats = {
+  // Memoized stats - only recalculate when tasks array changes
+  const stats = useMemo(() => ({
     total: tasks.length,
     completed: tasks.filter(t => t.status === 'completed').length,
     inProgress: tasks.filter(t => t.status === 'in_progress').length,
     pending: tasks.filter(t => t.status === 'pending').length,
-  };
+  }), [tasks]);
 
-  // Load tasks
-  useEffect(() => {
-    loadTasks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSpace.id]);
-
-  // Filter tasks
-  useEffect(() => {
+  // Memoized filtered tasks - only recalculate when dependencies change
+  const filteredTasks = useMemo(() => {
     let filtered = tasks;
 
     // Status filter
@@ -48,16 +41,18 @@ export default function TasksPage() {
 
     // Search filter
     if (searchQuery) {
+      const query = searchQuery.toLowerCase();
       filtered = filtered.filter(t =>
-        t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        t.description?.toLowerCase().includes(searchQuery.toLowerCase())
+        t.title.toLowerCase().includes(query) ||
+        t.description?.toLowerCase().includes(query)
       );
     }
 
-    setFilteredTasks(filtered);
+    return filtered;
   }, [tasks, statusFilter, searchQuery]);
 
-  async function loadTasks() {
+  // Memoized loadTasks function to prevent unnecessary recreations
+  const loadTasks = useCallback(async () => {
     try {
       setLoading(true);
       const data = await tasksService.getTasks(currentSpace.id);
@@ -67,9 +62,15 @@ export default function TasksPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [currentSpace.id]);
 
-  async function handleCreateTask(taskData: CreateTaskInput) {
+  // Load tasks when currentSpace.id changes
+  useEffect(() => {
+    loadTasks();
+  }, [loadTasks]);
+
+  // Memoized handlers with useCallback
+  const handleCreateTask = useCallback(async (taskData: CreateTaskInput) => {
     try {
       if (editingTask) {
         // Update existing task
@@ -83,18 +84,18 @@ export default function TasksPage() {
     } catch (error) {
       console.error('Failed to save task:', error);
     }
-  }
+  }, [editingTask, loadTasks]);
 
-  async function handleStatusChange(taskId: string, status: string) {
+  const handleStatusChange = useCallback(async (taskId: string, status: string) => {
     try {
       await tasksService.updateTask(taskId, { status });
       loadTasks();
     } catch (error) {
       console.error('Failed to update task status:', error);
     }
-  }
+  }, [loadTasks]);
 
-  async function handleDeleteTask(taskId: string) {
+  const handleDeleteTask = useCallback(async (taskId: string) => {
     if (!confirm('Are you sure you want to delete this task?')) return;
 
     try {
@@ -103,17 +104,33 @@ export default function TasksPage() {
     } catch (error) {
       console.error('Failed to delete task:', error);
     }
-  }
+  }, [loadTasks]);
 
-  function handleEditTask(task: Task) {
+  const handleEditTask = useCallback((task: Task) => {
     setEditingTask(task);
     setIsModalOpen(true);
-  }
+  }, []);
 
-  function handleCloseModal() {
+  const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
     setEditingTask(null);
-  }
+  }, []);
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, []);
+
+  const handleStatusFilterChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStatusFilter(e.target.value);
+  }, []);
+
+  const handleTabChange = useCallback((tab: TaskType) => {
+    setActiveTab(tab);
+  }, []);
+
+  const handleOpenModal = useCallback(() => {
+    setIsModalOpen(true);
+  }, []);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Tasks & Chores' }]}>
@@ -138,7 +155,7 @@ export default function TasksPage() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 rounded-xl border border-blue-200 dark:border-blue-700">
                 <button
-                  onClick={() => setActiveTab('task')}
+                  onClick={() => handleTabChange('task')}
                   className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
                     activeTab === 'task'
                       ? 'bg-gradient-tasks text-white'
@@ -149,7 +166,7 @@ export default function TasksPage() {
                   <span className="text-sm">Tasks</span>
                 </button>
                 <button
-                  onClick={() => setActiveTab('chore')}
+                  onClick={() => handleTabChange('chore')}
                   className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
                     activeTab === 'chore'
                       ? 'bg-gradient-tasks text-white'
@@ -161,7 +178,7 @@ export default function TasksPage() {
                 </button>
               </div>
               <button
-                onClick={() => setIsModalOpen(true)}
+                onClick={handleOpenModal}
                 className="px-4 sm:px-6 py-2 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
@@ -227,7 +244,7 @@ export default function TasksPage() {
                   type="text"
                   placeholder="Search tasks and chores..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={handleSearchChange}
                   className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
@@ -236,7 +253,7 @@ export default function TasksPage() {
               <div className="relative sm:min-w-[150px]">
                 <select
                   value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
+                  onChange={handleStatusFilterChange}
                   className="pl-4 pr-10 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none w-full"
                 >
                   <option value="all">All Status</option>
@@ -272,7 +289,7 @@ export default function TasksPage() {
                 </p>
                 {!searchQuery && statusFilter === 'all' && (
                   <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={handleOpenModal}
                     className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
                   >
                     <Plus className="w-5 h-5" />

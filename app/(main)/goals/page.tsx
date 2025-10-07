@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { GoalCard } from '@/components/goals/GoalCard';
@@ -16,8 +16,6 @@ export default function GoalsPage() {
   const { currentSpace } = useAuth();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
-  const [filteredGoals, setFilteredGoals] = useState<Goal[]>([]);
-  const [filteredMilestones, setFilteredMilestones] = useState<Milestone[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>('goals');
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
@@ -25,39 +23,50 @@ export default function GoalsPage() {
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [stats, setStats] = useState({ active: 0, completed: 0, inProgress: 0, milestonesReached: 0 });
+
+  // Memoized filtered goals with search
+  const filteredGoals = useMemo(() => {
+    if (!searchQuery) return goals;
+
+    const lowerQuery = searchQuery.toLowerCase();
+    return goals.filter(g =>
+      g.title.toLowerCase().includes(lowerQuery) ||
+      g.description?.toLowerCase().includes(lowerQuery)
+    );
+  }, [goals, searchQuery]);
+
+  // Memoized filtered milestones with search
+  const filteredMilestones = useMemo(() => {
+    if (!searchQuery) return milestones;
+
+    const lowerQuery = searchQuery.toLowerCase();
+    return milestones.filter(m =>
+      m.title.toLowerCase().includes(lowerQuery) ||
+      m.description?.toLowerCase().includes(lowerQuery)
+    );
+  }, [milestones, searchQuery]);
+
+  // Memoized stats calculation
+  const stats = useMemo(() => {
+    const active = goals.filter(g => g.status === 'active').length;
+    const completed = goals.filter(g => g.status === 'completed').length;
+    const inProgress = goals.filter(g => g.status === 'active' && g.progress > 0 && g.progress < 100).length;
+    const milestonesReached = milestones.filter(m => m.completed).length;
+
+    return { active, completed, inProgress, milestonesReached };
+  }, [goals, milestones]);
 
   useEffect(() => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSpace.id]);
 
-  useEffect(() => {
-    let filteredG = goals;
-    let filteredM = milestones;
-
-    if (searchQuery) {
-      filteredG = filteredG.filter(g =>
-        g.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        g.description?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      filteredM = filteredM.filter(m =>
-        m.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.description?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    setFilteredGoals(filteredG);
-    setFilteredMilestones(filteredM);
-  }, [goals, milestones, searchQuery]);
-
-  async function loadData() {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
-      let [goalsData, milestonesData, statsData] = await Promise.all([
+      let [goalsData, milestonesData] = await Promise.all([
         goalsService.getGoals(currentSpace.id),
-        goalsService.getAllMilestones(currentSpace.id),
-        goalsService.getGoalStats(currentSpace.id)
+        goalsService.getAllMilestones(currentSpace.id)
       ]);
 
       // Create sample goal in database if none exist
@@ -86,22 +95,16 @@ export default function GoalsPage() {
         milestonesData = [newMilestone];
       }
 
-      // Refresh stats after creating sample data
-      if (goalsData.length > 0 || milestonesData.length > 0) {
-        statsData = await goalsService.getGoalStats(currentSpace.id);
-      }
-
       setGoals(goalsData);
       setMilestones(milestonesData);
-      setStats(statsData);
     } catch (error) {
       console.error('Failed to load data:', error);
     } finally {
       setLoading(false);
     }
-  }
+  }, [currentSpace.id]);
 
-  async function handleCreateGoal(goalData: CreateGoalInput) {
+  const handleCreateGoal = useCallback(async (goalData: CreateGoalInput) => {
     try {
       if (editingGoal) {
         await goalsService.updateGoal(editingGoal.id, goalData);
@@ -113,9 +116,9 @@ export default function GoalsPage() {
     } catch (error) {
       console.error('Failed to save goal:', error);
     }
-  }
+  }, [editingGoal, loadData]);
 
-  async function handleDeleteGoal(goalId: string) {
+  const handleDeleteGoal = useCallback(async (goalId: string) => {
     if (!confirm('Are you sure you want to delete this goal?')) return;
     try {
       await goalsService.deleteGoal(goalId);
@@ -123,9 +126,9 @@ export default function GoalsPage() {
     } catch (error) {
       console.error('Failed to delete goal:', error);
     }
-  }
+  }, [loadData]);
 
-  async function handleCreateMilestone(milestoneData: CreateMilestoneInput) {
+  const handleCreateMilestone = useCallback(async (milestoneData: CreateMilestoneInput) => {
     try {
       if (editingMilestone) {
         await goalsService.updateMilestone(editingMilestone.id, milestoneData);
@@ -137,9 +140,9 @@ export default function GoalsPage() {
     } catch (error) {
       console.error('Failed to save milestone:', error);
     }
-  }
+  }, [editingMilestone, loadData]);
 
-  async function handleDeleteMilestone(milestoneId: string) {
+  const handleDeleteMilestone = useCallback(async (milestoneId: string) => {
     if (!confirm('Are you sure you want to delete this milestone?')) return;
     try {
       await goalsService.deleteMilestone(milestoneId);
@@ -147,18 +150,18 @@ export default function GoalsPage() {
     } catch (error) {
       console.error('Failed to delete milestone:', error);
     }
-  }
+  }, [loadData]);
 
-  async function handleToggleMilestone(milestoneId: string, completed: boolean) {
+  const handleToggleMilestone = useCallback(async (milestoneId: string, completed: boolean) => {
     try {
       await goalsService.toggleMilestone(milestoneId, completed);
       loadData();
     } catch (error) {
       console.error('Failed to toggle milestone:', error);
     }
-  }
+  }, [loadData]);
 
-  async function handleGoalStatusChange(goalId: string, status: 'not-started' | 'in-progress' | 'completed') {
+  const handleGoalStatusChange = useCallback(async (goalId: string, status: 'not-started' | 'in-progress' | 'completed') => {
     try {
       const statusMap = {
         'not-started': 'active' as const,
@@ -179,7 +182,51 @@ export default function GoalsPage() {
     } catch (error) {
       console.error('Failed to update goal status:', error);
     }
-  }
+  }, [loadData]);
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, []);
+
+  const handleViewModeChange = useCallback((mode: ViewMode) => {
+    setViewMode(mode);
+  }, []);
+
+  const handleOpenGoalModal = useCallback(() => {
+    setIsGoalModalOpen(true);
+  }, []);
+
+  const handleOpenMilestoneModal = useCallback(() => {
+    setIsMilestoneModalOpen(true);
+  }, []);
+
+  const handleCloseGoalModal = useCallback(() => {
+    setIsGoalModalOpen(false);
+    setEditingGoal(null);
+  }, []);
+
+  const handleCloseMilestoneModal = useCallback(() => {
+    setIsMilestoneModalOpen(false);
+    setEditingMilestone(null);
+  }, []);
+
+  const handleEditGoal = useCallback((goal: Goal) => {
+    setEditingGoal(goal);
+    setIsGoalModalOpen(true);
+  }, []);
+
+  const handleEditMilestone = useCallback((milestone: Milestone) => {
+    setEditingMilestone(milestone);
+    setIsMilestoneModalOpen(true);
+  }, []);
+
+  const handleNewButtonClick = useCallback(() => {
+    if (viewMode === 'goals') {
+      handleOpenGoalModal();
+    } else {
+      handleOpenMilestoneModal();
+    }
+  }, [viewMode, handleOpenGoalModal, handleOpenMilestoneModal]);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
@@ -200,7 +247,7 @@ export default function GoalsPage() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 flex gap-1">
                 <button
-                  onClick={() => setViewMode('goals')}
+                  onClick={() => handleViewModeChange('goals')}
                   className={`min-w-[90px] sm:min-w-[110px] px-3 sm:px-4 py-2 rounded-md font-medium transition-all flex items-center justify-center gap-2 ${
                     viewMode === 'goals'
                       ? 'bg-gradient-goals text-white shadow-md'
@@ -211,7 +258,7 @@ export default function GoalsPage() {
                   Goals
                 </button>
                 <button
-                  onClick={() => setViewMode('milestones')}
+                  onClick={() => handleViewModeChange('milestones')}
                   className={`min-w-[90px] sm:min-w-[110px] px-3 sm:px-4 py-2 rounded-md font-medium transition-all flex items-center justify-center gap-2 ${
                     viewMode === 'milestones'
                       ? 'bg-gradient-goals text-white shadow-md'
@@ -223,7 +270,7 @@ export default function GoalsPage() {
                 </button>
               </div>
               <button
-                onClick={() => viewMode === 'goals' ? setIsGoalModalOpen(true) : setIsMilestoneModalOpen(true)}
+                onClick={handleNewButtonClick}
                 className="flex-1 sm:flex-none px-4 py-2 sm:px-6 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
@@ -264,7 +311,7 @@ export default function GoalsPage() {
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input type="text" placeholder="Search goals..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white" />
+              <input type="text" placeholder="Search goals..." value={searchQuery} onChange={handleSearchChange} className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white" />
             </div>
           </div>
           {/* Goals/Milestones List */}
@@ -292,7 +339,7 @@ export default function GoalsPage() {
                     <GoalCard
                       key={goal.id}
                       goal={goal}
-                      onEdit={(g) => { setEditingGoal(g); setIsGoalModalOpen(true); }}
+                      onEdit={handleEditGoal}
                       onDelete={handleDeleteGoal}
                       onStatusChange={handleGoalStatusChange}
                     />
@@ -316,7 +363,7 @@ export default function GoalsPage() {
                         key={milestone.id}
                         milestone={milestone}
                         goalTitle={relatedGoal?.title}
-                        onEdit={(m) => { setEditingMilestone(m); setIsMilestoneModalOpen(true); }}
+                        onEdit={handleEditMilestone}
                         onDelete={handleDeleteMilestone}
                         onToggle={handleToggleMilestone}
                       />
@@ -330,14 +377,14 @@ export default function GoalsPage() {
       </div>
       <NewGoalModal
         isOpen={isGoalModalOpen}
-        onClose={() => { setIsGoalModalOpen(false); setEditingGoal(null); }}
+        onClose={handleCloseGoalModal}
         onSave={handleCreateGoal}
         editGoal={editingGoal}
         spaceId={currentSpace.id}
       />
       <NewMilestoneModal
         isOpen={isMilestoneModalOpen}
-        onClose={() => { setIsMilestoneModalOpen(false); setEditingMilestone(null); }}
+        onClose={handleCloseMilestoneModal}
         onSave={handleCreateMilestone}
         editMilestone={editingMilestone}
         goalId={goals[0]?.id || currentSpace.id}

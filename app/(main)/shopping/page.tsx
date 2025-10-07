@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package, ChevronDown } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
@@ -11,7 +11,6 @@ import { shoppingService, ShoppingList, CreateListInput } from '@/lib/services/s
 export default function ShoppingPage() {
   const { currentSpace } = useAuth();
   const [lists, setLists] = useState<ShoppingList[]>([]);
-  const [filteredLists, setFilteredLists] = useState<ShoppingList[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingList, setEditingList] = useState<ShoppingList | null>(null);
@@ -25,12 +24,8 @@ export default function ShoppingPage() {
     completedLists: 0,
   });
 
-  useEffect(() => {
-    loadLists();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSpace.id]);
-
-  useEffect(() => {
+  // Memoized filtered lists calculation
+  const filteredLists = useMemo(() => {
     let filtered = lists;
 
     // Filter by status
@@ -40,15 +35,20 @@ export default function ShoppingPage() {
 
     // Filter by search
     if (searchQuery) {
+      const query = searchQuery.toLowerCase();
       filtered = filtered.filter(l =>
-        l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        l.description?.toLowerCase().includes(searchQuery.toLowerCase())
+        l.title.toLowerCase().includes(query) ||
+        l.description?.toLowerCase().includes(query)
       );
     }
 
-    setFilteredLists(filtered);
+    return filtered;
   }, [lists, searchQuery, statusFilter]);
 
+  // Memoized stats calculations
+  const memoizedStats = useMemo(() => stats, [stats]);
+
+  // Load lists function (stable reference not needed as it's called in useEffect)
   async function loadLists() {
     try {
       setLoading(true);
@@ -65,7 +65,13 @@ export default function ShoppingPage() {
     }
   }
 
-  async function handleCreateList(listData: CreateListInput & { store?: string; items?: { id?: string; name: string; quantity: number }[] }) {
+  useEffect(() => {
+    loadLists();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSpace.id]);
+
+  // Memoized callback for creating/updating lists
+  const handleCreateList = useCallback(async (listData: CreateListInput & { store?: string; items?: { id?: string; name: string; quantity: number }[] }) => {
     try {
       if (editingList) {
         // Extract items before updating the list
@@ -106,9 +112,10 @@ export default function ShoppingPage() {
     } catch (error) {
       console.error('Failed to save list:', error);
     }
-  }
+  }, [editingList]);
 
-  async function handleDeleteList(listId: string) {
+  // Memoized callback for deleting lists
+  const handleDeleteList = useCallback(async (listId: string) => {
     if (!confirm('Are you sure you want to delete this list?')) return;
     try {
       await shoppingService.deleteList(listId);
@@ -116,9 +123,36 @@ export default function ShoppingPage() {
     } catch (error) {
       console.error('Failed to delete list:', error);
     }
-  }
+  }, []);
 
-  async function handleToggleItem(itemId: string, checked: boolean) {
+  // Memoized callback for completing lists
+  const handleCompleteList = useCallback(async (listId: string) => {
+    try {
+      // Optimistically update list status
+      setLists(prevLists =>
+        prevLists.map(list =>
+          list.id === listId ? { ...list, status: 'completed' as const } : list
+        )
+      );
+
+      // Optimistically update stats
+      setStats(prevStats => ({
+        ...prevStats,
+        activeLists: prevStats.activeLists - 1,
+        completedLists: prevStats.completedLists + 1,
+      }));
+
+      // Mark as completed in database (keep for history/productivity tracking)
+      await shoppingService.updateList(listId, { status: 'completed' });
+    } catch (error) {
+      console.error('Failed to complete list:', error);
+      // Revert on error
+      loadLists();
+    }
+  }, []);
+
+  // Memoized callback for toggling items
+  const handleToggleItem = useCallback(async (itemId: string, checked: boolean) => {
     // Optimistic update
     setLists(prevLists =>
       prevLists.map(list => ({
@@ -152,42 +186,34 @@ export default function ShoppingPage() {
       // Revert on error
       loadLists();
     }
-  }
+  }, [lists, handleCompleteList]);
 
-  async function handleCompleteList(listId: string) {
-    try {
-      // Optimistically update list status
-      setLists(prevLists =>
-        prevLists.map(list =>
-          list.id === listId ? { ...list, status: 'completed' as const } : list
-        )
-      );
-
-      // Optimistically update stats
-      setStats(prevStats => ({
-        ...prevStats,
-        activeLists: prevStats.activeLists - 1,
-        completedLists: prevStats.completedLists + 1,
-      }));
-
-      // Mark as completed in database (keep for history/productivity tracking)
-      await shoppingService.updateList(listId, { status: 'completed' });
-    } catch (error) {
-      console.error('Failed to complete list:', error);
-      // Revert on error
-      loadLists();
-    }
-  }
-
-  function handleEditList(list: ShoppingList) {
+  // Memoized callback for editing lists
+  const handleEditList = useCallback((list: ShoppingList) => {
     setEditingList(list);
     setIsModalOpen(true);
-  }
+  }, []);
 
-  function handleCloseModal() {
+  // Memoized callback for closing modal
+  const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
     setEditingList(null);
-  }
+  }, []);
+
+  // Memoized callback for opening new list modal
+  const handleOpenNewListModal = useCallback(() => {
+    setIsModalOpen(true);
+  }, []);
+
+  // Memoized callback for search input change
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, []);
+
+  // Memoized callback for status filter change
+  const handleStatusFilterChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStatusFilter(e.target.value as 'all' | 'active' | 'completed');
+  }, []);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Shopping Lists' }]}>
@@ -203,7 +229,7 @@ export default function ShoppingPage() {
                 <p className="text-gray-600 dark:text-gray-400 mt-1">Collaborative shopping made easy</p>
               </div>
             </div>
-            <button onClick={() => setIsModalOpen(true)} className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
+            <button onClick={handleOpenNewListModal} className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
               <Plus className="w-5 h-5" />
               New List
             </button>
@@ -215,28 +241,28 @@ export default function ShoppingPage() {
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Lists</h3>
                 <div className="w-12 h-12 bg-gradient-shopping rounded-xl flex items-center justify-center"><List className="w-6 h-6 text-white" /></div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalLists}</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.totalLists}</p>
             </div>
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Active Lists</h3>
                 <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center"><Clock className="w-6 h-6 text-white" /></div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.activeLists}</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.activeLists}</p>
             </div>
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Items This Week</h3>
                 <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center"><Package className="w-6 h-6 text-white" /></div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.itemsThisWeek}</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.itemsThisWeek}</p>
             </div>
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completed Lists</h3>
                 <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"><CheckCircle2 className="w-6 h-6 text-white" /></div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.completedLists}</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.completedLists}</p>
             </div>
           </div>
 
@@ -244,12 +270,12 @@ export default function ShoppingPage() {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input type="text" placeholder="Search lists..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white" />
+                <input type="text" placeholder="Search lists..." value={searchQuery} onChange={handleSearchChange} className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white" />
               </div>
               <div className="relative">
                 <select
                   value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'completed')}
+                  onChange={handleStatusFilterChange}
                   className="pl-4 pr-10 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none w-full"
                 >
                   <option value="all">All Lists</option>
@@ -276,7 +302,7 @@ export default function ShoppingPage() {
                 <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No lists found</p>
                 <p className="text-gray-500 dark:text-gray-500 mb-6">{searchQuery ? 'Try adjusting your search' : 'Create your first shopping list!'}</p>
                 {!searchQuery && (
-                  <button onClick={() => setIsModalOpen(true)} className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                  <button onClick={handleOpenNewListModal} className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
                     <Plus className="w-5 h-5" />
                     Create List
                   </button>

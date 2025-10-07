@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as ImageIcon, Paperclip } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { MessageCard } from '@/components/messages/MessageCard';
@@ -30,7 +30,6 @@ const EMOJIS = [
 export default function MessagesPage() {
   const { currentSpace, user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [filteredMessages, setFilteredMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
@@ -49,24 +48,40 @@ export default function MessagesPage() {
     total: 0,
   });
 
-  useEffect(() => {
-    loadMessages();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSpace.id]);
-
-  useEffect(() => {
-    let filtered = messages;
-
-    if (searchQuery) {
-      filtered = filtered.filter(m =>
-        m.content.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+  // Memoize filtered messages based on search query
+  const filteredMessages = useMemo(() => {
+    if (!searchQuery) {
+      return messages;
     }
 
-    setFilteredMessages(filtered);
+    return messages.filter(m =>
+      m.content.toLowerCase().includes(searchQuery.toLowerCase())
+    );
   }, [messages, searchQuery]);
 
-  async function loadMessages() {
+  // Memoize date label computation
+  const getDateLabel = useCallback((date: Date): string => {
+    if (isToday(date)) {
+      return 'Today';
+    } else if (isYesterday(date)) {
+      return 'Yesterday';
+    } else {
+      return format(date, 'EEEE, MMMM d, yyyy');
+    }
+  }, []);
+
+  // Memoize date separator logic
+  const shouldShowDateSeparator = useCallback((currentMessage: Message, previousMessage: Message | null): boolean => {
+    if (!previousMessage) return true;
+
+    const currentDate = new Date(currentMessage.created_at);
+    const previousDate = new Date(previousMessage.created_at);
+
+    return !isSameDay(currentDate, previousDate);
+  }, []);
+
+  // Memoize loadMessages callback
+  const loadMessages = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -98,9 +113,14 @@ export default function MessagesPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [currentSpace.id]);
 
-  async function handleCreateMessage(messageData: CreateMessageInput) {
+  useEffect(() => {
+    loadMessages();
+  }, [loadMessages]);
+
+  // Memoize handleCreateMessage callback
+  const handleCreateMessage = useCallback(async (messageData: CreateMessageInput) => {
     try {
       if (editingMessage) {
         await messagesService.updateMessage(editingMessage.id, messageData);
@@ -112,9 +132,10 @@ export default function MessagesPage() {
     } catch (error) {
       console.error('Failed to save message:', error);
     }
-  }
+  }, [editingMessage, loadMessages]);
 
-  async function handleDeleteMessage(messageId: string) {
+  // Memoize handleDeleteMessage callback
+  const handleDeleteMessage = useCallback(async (messageId: string) => {
     if (!confirm('Are you sure you want to delete this message?')) return;
 
     try {
@@ -123,28 +144,32 @@ export default function MessagesPage() {
     } catch (error) {
       console.error('Failed to delete message:', error);
     }
-  }
+  }, [loadMessages]);
 
-  async function handleMarkRead(messageId: string) {
+  // Memoize handleMarkRead callback
+  const handleMarkRead = useCallback(async (messageId: string) => {
     try {
       await messagesService.markAsRead(messageId);
       loadMessages();
     } catch (error) {
       console.error('Failed to mark message as read:', error);
     }
-  }
+  }, [loadMessages]);
 
-  function handleEditMessage(message: Message) {
+  // Memoize handleEditMessage callback
+  const handleEditMessage = useCallback((message: Message) => {
     setEditingMessage(message);
     setIsModalOpen(true);
-  }
+  }, []);
 
-  function handleCloseModal() {
+  // Memoize handleCloseModal callback
+  const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
     setEditingMessage(null);
-  }
+  }, []);
 
-  async function handleSendMessage(e: React.FormEvent) {
+  // Memoize handleSendMessage callback
+  const handleSendMessage = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!messageInput.trim() || isSending || !conversationId) return;
 
@@ -160,31 +185,67 @@ export default function MessagesPage() {
     } finally {
       setTimeout(() => setIsSending(false), 300);
     }
-  }
+  }, [messageInput, isSending, conversationId, currentSpace.id, user.id, handleCreateMessage]);
 
-  function handleEmojiClick(emoji: string) {
+  // Memoize handleEmojiClick callback
+  const handleEmojiClick = useCallback((emoji: string) => {
     setMessageInput(prev => prev + emoji);
     setShowEmojiPicker(false);
-  }
+  }, []);
 
-  function getDateLabel(date: Date): string {
-    if (isToday(date)) {
-      return 'Today';
-    } else if (isYesterday(date)) {
-      return 'Yesterday';
-    } else {
-      return format(date, 'EEEE, MMMM d, yyyy'); // e.g., "Monday, January 15, 2024"
+  // Memoize handleSearchChange callback
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, []);
+
+  // Memoize handleMessageInputChange callback
+  const handleMessageInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessageInput(e.target.value);
+  }, []);
+
+  // Memoize toggleEmojiPicker callback
+  const toggleEmojiPicker = useCallback(() => {
+    setShowEmojiPicker(prev => !prev);
+  }, []);
+
+  // Memoize closeEmojiPicker callback
+  const closeEmojiPicker = useCallback(() => {
+    setShowEmojiPicker(false);
+  }, []);
+
+  // Memoize handleImageClick callback
+  const handleImageClick = useCallback(() => {
+    imageInputRef.current?.click();
+  }, []);
+
+  // Memoize handleFileClick callback
+  const handleFileClick = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  // Memoize handleImageChange callback
+  const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('Image files selected:', e.target.files);
+  }, []);
+
+  // Memoize handleFileChange callback
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('Files selected:', e.target.files);
+  }, []);
+
+  // Memoize empty state message
+  const emptyStateMessage = useMemo(() => {
+    if (searchQuery) {
+      return {
+        primary: 'No messages found',
+        secondary: 'Try a different search'
+      };
     }
-  }
-
-  function shouldShowDateSeparator(currentMessage: Message, previousMessage: Message | null): boolean {
-    if (!previousMessage) return true;
-
-    const currentDate = new Date(currentMessage.created_at);
-    const previousDate = new Date(previousMessage.created_at);
-
-    return !isSameDay(currentDate, previousDate);
-  }
+    return {
+      primary: 'No messages yet',
+      secondary: 'Start the conversation below!'
+    };
+  }, [searchQuery]);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Messages' }]}>
@@ -256,7 +317,7 @@ export default function MessagesPage() {
                 type="text"
                 placeholder="Search messages..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchChange}
                 className="w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-2.5 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
@@ -281,10 +342,10 @@ export default function MessagesPage() {
                 <div className="flex flex-col items-center justify-center h-full text-center">
                   <MessageCircle className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
                   <p className="text-gray-500 dark:text-gray-400 text-sm">
-                    {searchQuery ? 'No messages found' : 'No messages yet'}
+                    {emptyStateMessage.primary}
                   </p>
                   <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">
-                    {searchQuery ? 'Try a different search' : 'Start the conversation below!'}
+                    {emptyStateMessage.secondary}
                   </p>
                 </div>
               ) : (
@@ -329,7 +390,7 @@ export default function MessagesPage() {
                 <input
                   type="text"
                   value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
+                  onChange={handleMessageInputChange}
                   placeholder="Send message"
                   className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
                 />
@@ -340,7 +401,7 @@ export default function MessagesPage() {
                   <div className="relative group">
                     <button
                       type="button"
-                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                      onClick={toggleEmojiPicker}
                       className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                     >
                       <Smile className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
@@ -355,7 +416,7 @@ export default function MessagesPage() {
                       <>
                         <div
                           className="fixed inset-0 z-10"
-                          onClick={() => setShowEmojiPicker(false)}
+                          onClick={closeEmojiPicker}
                         />
                         <div className="absolute bottom-full mb-2 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-3 sm:p-4 grid grid-cols-4 sm:grid-cols-5 gap-1.5 sm:gap-2 z-20 min-w-[200px] sm:min-w-[240px]">
                           {EMOJIS.map((emoji, idx) => (
@@ -377,7 +438,7 @@ export default function MessagesPage() {
                   <div className="relative group hidden sm:block">
                     <button
                       type="button"
-                      onClick={() => imageInputRef.current?.click()}
+                      onClick={handleImageClick}
                       className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                     >
                       <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
@@ -392,7 +453,7 @@ export default function MessagesPage() {
                   <div className="relative group hidden sm:block">
                     <button
                       type="button"
-                      onClick={() => fileInputRef.current?.click()}
+                      onClick={handleFileClick}
                       className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                     >
                       <Paperclip className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
@@ -437,10 +498,7 @@ export default function MessagesPage() {
                 type="file"
                 accept=".jpg,.jpeg,.png,.gif,.webp"
                 multiple
-                onChange={(e) => {
-                  // Handle image selection - could be implemented later
-                  console.log('Image files selected:', e.target.files);
-                }}
+                onChange={handleImageChange}
                 className="hidden"
               />
               <input
@@ -448,10 +506,7 @@ export default function MessagesPage() {
                 type="file"
                 accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip"
                 multiple
-                onChange={(e) => {
-                  // Handle file selection - could be implemented later
-                  console.log('Files selected:', e.target.files);
-                }}
+                onChange={handleFileChange}
                 className="hidden"
               />
             </div>

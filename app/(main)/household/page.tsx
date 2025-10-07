@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { Home, Search, Plus, CheckCircle2, DollarSign, AlertCircle, Hammer, Wallet, Receipt } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ChoreCard } from '@/components/projects/ChoreCard';
@@ -13,6 +13,88 @@ import { useAuth } from '@/lib/contexts/mock-auth-context';
 import { projectsService, Chore, Expense, CreateChoreInput, CreateExpenseInput } from '@/lib/services/projects-service';
 
 type TabType = 'projects' | 'budget' | 'expenses';
+
+// Memoized Stats Card Component
+const StatsCard = memo(({
+  title,
+  value,
+  icon: Icon,
+  iconBgClass
+}: {
+  title: string;
+  value: string | number;
+  icon: React.ElementType;
+  iconBgClass: string;
+}) => (
+  <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+    <div className="flex items-center justify-between mb-4">
+      <h3 className="text-gray-600 dark:text-gray-400 font-medium">{title}</h3>
+      <div className={`w-12 h-12 ${iconBgClass} rounded-xl flex items-center justify-center`}>
+        <Icon className="w-6 h-6 text-white" />
+      </div>
+    </div>
+    <p className="text-3xl font-bold text-gray-900 dark:text-white">{value}</p>
+  </div>
+));
+StatsCard.displayName = 'StatsCard';
+
+// Memoized Budget Progress Bar Component
+const BudgetProgressBar = memo(({
+  spentAmount,
+  totalBudget
+}: {
+  spentAmount: number;
+  totalBudget: number;
+}) => {
+  const percentage = useMemo(() =>
+    Math.round((spentAmount / totalBudget) * 100),
+    [spentAmount, totalBudget]
+  );
+
+  const progressColor = useMemo(() => {
+    const ratio = spentAmount / totalBudget;
+    if (ratio <= 0.7) return 'bg-gradient-to-r from-green-400 to-green-500';
+    if (ratio <= 0.9) return 'bg-gradient-to-r from-amber-400 to-orange-500';
+    return 'bg-gradient-to-r from-orange-500 to-red-600';
+  }, [spentAmount, totalBudget]);
+
+  const remaining = useMemo(() =>
+    totalBudget - spentAmount,
+    [totalBudget, spentAmount]
+  );
+
+  return (
+    <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-6">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-sm text-gray-600 dark:text-gray-400">Spending Progress</p>
+        <span className="text-sm font-semibold text-gray-900 dark:text-white">
+          {percentage}%
+        </span>
+      </div>
+      <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+        <div
+          className={`h-full transition-all ${progressColor}`}
+          style={{ width: `${Math.min(percentage, 100)}%` }}
+        />
+      </div>
+      <div className="flex justify-between mt-3 text-sm">
+        <div>
+          <p className="text-gray-500 dark:text-gray-400 text-xs">Spent</p>
+          <p className="font-semibold text-gray-900 dark:text-white">
+            ${spentAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-gray-500 dark:text-gray-400 text-xs">Remaining</p>
+          <p className="font-semibold text-gray-900 dark:text-white">
+            ${remaining.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+});
+BudgetProgressBar.displayName = 'BudgetProgressBar';
 
 export default function HouseholdPage() {
   const { currentSpace, user } = useAuth();
@@ -34,12 +116,7 @@ export default function HouseholdPage() {
     budget: { monthlyBudget: 0, spentThisMonth: 0, remaining: 0, pendingBills: 0 },
   });
 
-  useEffect(() => {
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSpace.id]);
-
-  async function loadData() {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       const [choresData, expensesData, statsData, budgetData] = await Promise.all([
@@ -57,9 +134,13 @@ export default function HouseholdPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [currentSpace.id, user.id]);
 
-  async function handleCreateChore(choreData: CreateChoreInput) {
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const handleCreateChore = useCallback(async (choreData: CreateChoreInput) => {
     try {
       if (editingChore) {
         await projectsService.updateChore(editingChore.id, choreData);
@@ -71,9 +152,9 @@ export default function HouseholdPage() {
     } catch (error) {
       console.error('Failed to save chore:', error);
     }
-  }
+  }, [editingChore, loadData]);
 
-  async function handleCreateExpense(expenseData: CreateExpenseInput) {
+  const handleCreateExpense = useCallback(async (expenseData: CreateExpenseInput) => {
     try {
       if (editingExpense) {
         await projectsService.updateExpense(editingExpense.id, expenseData);
@@ -85,18 +166,18 @@ export default function HouseholdPage() {
     } catch (error) {
       console.error('Failed to save expense:', error);
     }
-  }
+  }, [editingExpense, loadData]);
 
-  async function handleChoreStatusChange(choreId: string, status: string) {
+  const handleChoreStatusChange = useCallback(async (choreId: string, status: string) => {
     try {
       await projectsService.updateChore(choreId, { status: status as 'pending' | 'completed' | 'skipped' });
       loadData();
     } catch (error) {
       console.error('Failed to update chore:', error);
     }
-  }
+  }, [loadData]);
 
-  async function handleDeleteChore(choreId: string) {
+  const handleDeleteChore = useCallback(async (choreId: string) => {
     if (!confirm('Are you sure?')) return;
     try {
       await projectsService.deleteChore(choreId);
@@ -104,9 +185,9 @@ export default function HouseholdPage() {
     } catch (error) {
       console.error('Failed to delete chore:', error);
     }
-  }
+  }, [loadData]);
 
-  async function handleDeleteExpense(expenseId: string) {
+  const handleDeleteExpense = useCallback(async (expenseId: string) => {
     if (!confirm('Are you sure?')) return;
     try {
       await projectsService.deleteExpense(expenseId);
@@ -114,9 +195,9 @@ export default function HouseholdPage() {
     } catch (error) {
       console.error('Failed to delete expense:', error);
     }
-  }
+  }, [loadData]);
 
-  async function handleSetBudget(amount: number) {
+  const handleSetBudget = useCallback(async (amount: number) => {
     try {
       await projectsService.setBudget(
         { space_id: currentSpace.id, monthly_budget: amount },
@@ -126,24 +207,128 @@ export default function HouseholdPage() {
     } catch (error) {
       console.error('Failed to set budget:', error);
     }
-  }
+  }, [currentSpace.id, user.id, loadData]);
 
-  async function handleUpdateProgress(choreId: string, completion: number, notes: string) {
+  const handleUpdateProgress = useCallback(async (choreId: string, completion: number, notes: string) => {
     try {
       await projectsService.updateChore(choreId, {
         completion_percentage: completion,
         notes,
-        // Auto-complete if 100%
         status: completion === 100 ? 'completed' : undefined,
       } as Partial<CreateChoreInput>);
       loadData();
     } catch (error) {
       console.error('Failed to update progress:', error);
     }
-  }
+  }, [loadData]);
 
-  const filteredChores = chores.filter(c => c.title.toLowerCase().includes(searchQuery.toLowerCase()));
-  const filteredExpenses = expenses.filter(e => e.title.toLowerCase().includes(searchQuery.toLowerCase()));
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, []);
+
+  const handleTabChange = useCallback((tab: TabType) => {
+    setActiveTab(tab);
+  }, []);
+
+  const handleNewButtonClick = useCallback(() => {
+    if (activeTab === 'projects') setIsChoreModalOpen(true);
+    else if (activeTab === 'budget') setIsBudgetModalOpen(true);
+    else setIsExpenseModalOpen(true);
+  }, [activeTab]);
+
+  const handleEditChore = useCallback((chore: Chore) => {
+    setEditingChore(chore);
+    setIsChoreModalOpen(true);
+  }, []);
+
+  const handleEditExpense = useCallback((expense: Expense) => {
+    setEditingExpense(expense);
+    setIsExpenseModalOpen(true);
+  }, []);
+
+  const handleUpdateProgressClick = useCallback((chore: Chore) => {
+    setUpdatingChore(chore);
+    setIsProgressModalOpen(true);
+  }, []);
+
+  const handleCloseChoreModal = useCallback(() => {
+    setIsChoreModalOpen(false);
+    setEditingChore(null);
+  }, []);
+
+  const handleCloseExpenseModal = useCallback(() => {
+    setIsExpenseModalOpen(false);
+    setEditingExpense(null);
+  }, []);
+
+  const handleCloseBudgetModal = useCallback(() => {
+    setIsBudgetModalOpen(false);
+  }, []);
+
+  const handleCloseProgressModal = useCallback(() => {
+    setIsProgressModalOpen(false);
+    setUpdatingChore(null);
+  }, []);
+
+  const handleSwitchToExpenses = useCallback(() => {
+    setActiveTab('expenses');
+  }, []);
+
+  // Memoized filtered data
+  const filteredChores = useMemo(() =>
+    chores.filter(c => c.title.toLowerCase().includes(searchQuery.toLowerCase())),
+    [chores, searchQuery]
+  );
+
+  const filteredExpenses = useMemo(() =>
+    expenses.filter(e => e.title.toLowerCase().includes(searchQuery.toLowerCase())),
+    [expenses, searchQuery]
+  );
+
+  // Memoized project stats calculations
+  const projectStats = useMemo(() => {
+    const activeProjects = chores.filter(c => c.status === 'pending').length;
+    const overdueProjects = chores.filter(c =>
+      c.due_date && new Date(c.due_date) < new Date() && c.status !== 'completed'
+    ).length;
+    const completionRate = chores.length > 0
+      ? Math.round((chores.filter(c => c.status === 'completed').length / chores.length) * 100)
+      : 0;
+
+    return { activeProjects, overdueProjects, completionRate };
+  }, [chores]);
+
+  // Memoized expense stats calculations
+  const expenseStats = useMemo(() => {
+    const paidAmount = expenses
+      .filter(e => e.status === 'paid')
+      .reduce((sum, e) => sum + Number(e.amount), 0);
+
+    const pendingAmount = expenses
+      .filter(e => e.status === 'pending')
+      .reduce((sum, e) => sum + Number(e.amount), 0);
+
+    const overdueCount = expenses.filter(e => e.status === 'overdue').length;
+
+    return { paidAmount, pendingAmount, overdueCount };
+  }, [expenses]);
+
+  // Memoized budget health calculation
+  const budgetHealth = useMemo(() => {
+    if (stats.budget.monthlyBudget === 0) {
+      return { status: 'Not Set', color: 'bg-gray-500' };
+    }
+
+    const currentDay = new Date().getDate();
+    const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+    const expectedSpendRatio = currentDay / daysInMonth;
+    const actualSpendRatio = stats.budget.spentThisMonth / stats.budget.monthlyBudget;
+
+    if (actualSpendRatio <= expectedSpendRatio) {
+      return { status: 'On Track', color: 'bg-green-500' };
+    }
+    return { status: 'Over Pace', color: 'bg-orange-500' };
+  }, [stats.budget.monthlyBudget, stats.budget.spentThisMonth]);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Projects & Budget' }]}>
@@ -161,7 +346,7 @@ export default function HouseholdPage() {
               {/* View Toggle */}
               <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 rounded-xl border border-amber-200 dark:border-amber-700 w-full sm:w-auto">
                 <button
-                  onClick={() => setActiveTab('projects')}
+                  onClick={() => handleTabChange('projects')}
                   className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
                     activeTab === 'projects'
                       ? 'bg-gradient-projects text-white'
@@ -172,7 +357,7 @@ export default function HouseholdPage() {
                   <span className="text-sm">Projects</span>
                 </button>
                 <button
-                  onClick={() => setActiveTab('budget')}
+                  onClick={() => handleTabChange('budget')}
                   className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
                     activeTab === 'budget'
                       ? 'bg-gradient-projects text-white'
@@ -183,7 +368,7 @@ export default function HouseholdPage() {
                   <span className="text-sm">Budget</span>
                 </button>
                 <button
-                  onClick={() => setActiveTab('expenses')}
+                  onClick={() => handleTabChange('expenses')}
                   className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
                     activeTab === 'expenses'
                       ? 'bg-gradient-projects text-white'
@@ -195,11 +380,7 @@ export default function HouseholdPage() {
                 </button>
               </div>
               <button
-                onClick={() => {
-                  if (activeTab === 'projects') setIsChoreModalOpen(true);
-                  else if (activeTab === 'budget') setIsBudgetModalOpen(true);
-                  else setIsExpenseModalOpen(true);
-                }}
+                onClick={handleNewButtonClick}
                 className="px-4 py-2 sm:px-6 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
@@ -212,120 +393,84 @@ export default function HouseholdPage() {
           {/* Stats Dashboard - Changes based on active tab */}
           {activeTab === 'projects' ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">Active Projects</h3>
-                  <div className="w-12 h-12 bg-gradient-projects rounded-xl flex items-center justify-center"><Hammer className="w-6 h-6 text-white" /></div>
-                </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {chores.filter(c => c.status === 'pending').length}
-                </p>
-              </div>
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completed This Week</h3>
-                  <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"><CheckCircle2 className="w-6 h-6 text-white" /></div>
-                </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.chores.completedThisWeek}</p>
-              </div>
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">Overdue Projects</h3>
-                  <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center"><AlertCircle className="w-6 h-6 text-white" /></div>
-                </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {chores.filter(c => c.due_date && new Date(c.due_date) < new Date() && c.status !== 'completed').length}
-                </p>
-              </div>
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completion Rate</h3>
-                  <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center"><CheckCircle2 className="w-6 h-6 text-white" /></div>
-                </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {chores.length > 0 ? Math.round((chores.filter(c => c.status === 'completed').length / chores.length) * 100) : 0}%
-                </p>
-              </div>
+              <StatsCard
+                title="Active Projects"
+                value={projectStats.activeProjects}
+                icon={Hammer}
+                iconBgClass="bg-gradient-projects"
+              />
+              <StatsCard
+                title="Completed This Week"
+                value={stats.chores.completedThisWeek}
+                icon={CheckCircle2}
+                iconBgClass="bg-green-500"
+              />
+              <StatsCard
+                title="Overdue Projects"
+                value={projectStats.overdueProjects}
+                icon={AlertCircle}
+                iconBgClass="bg-red-500"
+              />
+              <StatsCard
+                title="Completion Rate"
+                value={`${projectStats.completionRate}%`}
+                icon={CheckCircle2}
+                iconBgClass="bg-blue-500"
+              />
             </div>
           ) : activeTab === 'budget' ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">Monthly Budget</h3>
-                  <div className="w-12 h-12 bg-gradient-projects rounded-xl flex items-center justify-center"><Wallet className="w-6 h-6 text-white" /></div>
-                </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">${stats.budget.monthlyBudget.toLocaleString()}</p>
-              </div>
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">Spent This Month</h3>
-                  <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center"><DollarSign className="w-6 h-6 text-white" /></div>
-                </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">${stats.budget.spentThisMonth.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-              </div>
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">Remaining Budget</h3>
-                  <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"><DollarSign className="w-6 h-6 text-white" /></div>
-                </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">${stats.budget.remaining.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-              </div>
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">Budget Health</h3>
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                    stats.budget.monthlyBudget === 0 ? 'bg-gray-500' :
-                    (stats.budget.spentThisMonth / stats.budget.monthlyBudget) <= (new Date().getDate() / new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate())
-                      ? 'bg-green-500'
-                      : 'bg-orange-500'
-                  }`}>
-                    <AlertCircle className="w-6 h-6 text-white" />
-                  </div>
-                </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {stats.budget.monthlyBudget === 0 ? 'Not Set' :
-                   (stats.budget.spentThisMonth / stats.budget.monthlyBudget) <= (new Date().getDate() / new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate())
-                     ? 'On Track'
-                     : 'Over Pace'}
-                </p>
-              </div>
+              <StatsCard
+                title="Monthly Budget"
+                value={`$${stats.budget.monthlyBudget.toLocaleString()}`}
+                icon={Wallet}
+                iconBgClass="bg-gradient-projects"
+              />
+              <StatsCard
+                title="Spent This Month"
+                value={`$${stats.budget.spentThisMonth.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`}
+                icon={DollarSign}
+                iconBgClass="bg-red-500"
+              />
+              <StatsCard
+                title="Remaining Budget"
+                value={`$${stats.budget.remaining.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`}
+                icon={DollarSign}
+                iconBgClass="bg-green-500"
+              />
+              <StatsCard
+                title="Budget Health"
+                value={budgetHealth.status}
+                icon={AlertCircle}
+                iconBgClass={budgetHealth.color}
+              />
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Expenses</h3>
-                  <div className="w-12 h-12 bg-gradient-projects rounded-xl flex items-center justify-center"><Receipt className="w-6 h-6 text-white" /></div>
-                </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">{expenses.length}</p>
-              </div>
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">Paid This Month</h3>
-                  <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"><CheckCircle2 className="w-6 h-6 text-white" /></div>
-                </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  ${expenses.filter(e => e.status === 'paid').reduce((sum, e) => sum + Number(e.amount), 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                </p>
-              </div>
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">Pending Payments</h3>
-                  <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center"><DollarSign className="w-6 h-6 text-white" /></div>
-                </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  ${expenses.filter(e => e.status === 'pending').reduce((sum, e) => sum + Number(e.amount), 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                </p>
-              </div>
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium">Overdue</h3>
-                  <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center"><AlertCircle className="w-6 h-6 text-white" /></div>
-                </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {expenses.filter(e => e.status === 'overdue').length}
-                </p>
-              </div>
+              <StatsCard
+                title="Total Expenses"
+                value={expenses.length}
+                icon={Receipt}
+                iconBgClass="bg-gradient-projects"
+              />
+              <StatsCard
+                title="Paid This Month"
+                value={`$${expenseStats.paidAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`}
+                icon={CheckCircle2}
+                iconBgClass="bg-green-500"
+              />
+              <StatsCard
+                title="Pending Payments"
+                value={`$${expenseStats.pendingAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`}
+                icon={DollarSign}
+                iconBgClass="bg-orange-500"
+              />
+              <StatsCard
+                title="Overdue"
+                value={expenseStats.overdueCount}
+                icon={AlertCircle}
+                iconBgClass="bg-red-500"
+              />
             </div>
           )}
 
@@ -342,7 +487,7 @@ export default function HouseholdPage() {
                     : 'Search expenses...'
                 }
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchChange}
                 className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
@@ -359,7 +504,7 @@ export default function HouseholdPage() {
               filteredChores.length === 0 ? (
                 <div className="text-center py-12"><Hammer className="w-16 h-16 text-gray-400 mx-auto mb-4" /><p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No projects found</p><button onClick={() => setIsChoreModalOpen(true)} className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"><Plus className="w-5 h-5" />Add Project</button></div>
               ) : (
-                <div className="space-y-4">{filteredChores.map((chore) => (<ChoreCard key={chore.id} chore={chore} onStatusChange={handleChoreStatusChange} onEdit={(c) => { setEditingChore(c); setIsChoreModalOpen(true); }} onDelete={handleDeleteChore} onUpdateProgress={(c) => { setUpdatingChore(c); setIsProgressModalOpen(true); }} />))}</div>
+                <div className="space-y-4">{filteredChores.map((chore) => (<ChoreCard key={chore.id} chore={chore} onStatusChange={handleChoreStatusChange} onEdit={handleEditChore} onDelete={handleDeleteChore} onUpdateProgress={handleUpdateProgressClick} />))}</div>
               )
             ) : activeTab === 'budget' ? (
               currentBudget === 0 ? (
@@ -389,45 +534,14 @@ export default function HouseholdPage() {
                     </button>
                   </div>
 
-                  {/* Budget Progress Bar with dynamic color gradient */}
-                  <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-6">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Spending Progress</p>
-                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {Math.round((stats.budget.spentThisMonth / stats.budget.monthlyBudget) * 100)}%
-                      </span>
-                    </div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full transition-all ${
-                          (stats.budget.spentThisMonth / stats.budget.monthlyBudget) <= 0.7
-                            ? 'bg-gradient-to-r from-green-400 to-green-500'
-                            : (stats.budget.spentThisMonth / stats.budget.monthlyBudget) <= 0.9
-                            ? 'bg-gradient-to-r from-amber-400 to-orange-500'
-                            : 'bg-gradient-to-r from-orange-500 to-red-600'
-                        }`}
-                        style={{ width: `${Math.min((stats.budget.spentThisMonth / stats.budget.monthlyBudget) * 100, 100)}%` }}
-                      />
-                    </div>
-                    <div className="flex justify-between mt-3 text-sm">
-                      <div>
-                        <p className="text-gray-500 dark:text-gray-400 text-xs">Spent</p>
-                        <p className="font-semibold text-gray-900 dark:text-white">
-                          ${stats.budget.spentThisMonth.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-gray-500 dark:text-gray-400 text-xs">Remaining</p>
-                        <p className="font-semibold text-gray-900 dark:text-white">
-                          ${stats.budget.remaining.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  <BudgetProgressBar
+                    spentAmount={stats.budget.spentThisMonth}
+                    totalBudget={stats.budget.monthlyBudget}
+                  />
 
                   <div className="text-center py-8">
                     <p className="text-gray-600 dark:text-gray-400">
-                      View expenses in the <button onClick={() => setActiveTab('expenses')} className="text-purple-600 dark:text-purple-400 font-medium hover:underline">Expenses tab</button>
+                      View expenses in the <button onClick={handleSwitchToExpenses} className="text-purple-600 dark:text-purple-400 font-medium hover:underline">Expenses tab</button>
                     </p>
                   </div>
                 </div>
@@ -436,16 +550,16 @@ export default function HouseholdPage() {
               filteredExpenses.length === 0 ? (
                 <div className="text-center py-12"><Receipt className="w-16 h-16 text-gray-400 mx-auto mb-4" /><p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No expenses found</p><button onClick={() => setIsExpenseModalOpen(true)} className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"><Plus className="w-5 h-5" />Add Expense</button></div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">{filteredExpenses.map((expense) => (<ExpenseCard key={expense.id} expense={expense} onEdit={(e) => { setEditingExpense(e); setIsExpenseModalOpen(true); }} onDelete={handleDeleteExpense} />))}</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">{filteredExpenses.map((expense) => (<ExpenseCard key={expense.id} expense={expense} onEdit={handleEditExpense} onDelete={handleDeleteExpense} />))}</div>
               )
             )}
           </div>
         </div>
       </div>
-      <NewChoreModal isOpen={isChoreModalOpen} onClose={() => { setIsChoreModalOpen(false); setEditingChore(null); }} onSave={handleCreateChore} editChore={editingChore} spaceId={currentSpace.id} />
-      <NewExpenseModal isOpen={isExpenseModalOpen} onClose={() => { setIsExpenseModalOpen(false); setEditingExpense(null); }} onSave={handleCreateExpense} editExpense={editingExpense} spaceId={currentSpace.id} />
-      <NewBudgetModal isOpen={isBudgetModalOpen} onClose={() => setIsBudgetModalOpen(false)} onSave={handleSetBudget} currentBudget={currentBudget} spaceId={currentSpace.id} />
-      <UpdateProgressModal isOpen={isProgressModalOpen} onClose={() => { setIsProgressModalOpen(false); setUpdatingChore(null); }} onSave={handleUpdateProgress} chore={updatingChore} />
+      <NewChoreModal isOpen={isChoreModalOpen} onClose={handleCloseChoreModal} onSave={handleCreateChore} editChore={editingChore} spaceId={currentSpace.id} />
+      <NewExpenseModal isOpen={isExpenseModalOpen} onClose={handleCloseExpenseModal} onSave={handleCreateExpense} editExpense={editingExpense} spaceId={currentSpace.id} />
+      <NewBudgetModal isOpen={isBudgetModalOpen} onClose={handleCloseBudgetModal} onSave={handleSetBudget} currentBudget={currentBudget} spaceId={currentSpace.id} />
+      <UpdateProgressModal isOpen={isProgressModalOpen} onClose={handleCloseProgressModal} onSave={handleUpdateProgress} chore={updatingChore} />
     </FeatureLayout>
   );
 }

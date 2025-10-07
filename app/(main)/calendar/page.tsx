@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, List, ChevronLeft, ChevronRight } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { EventCard } from '@/components/calendar/EventCard';
@@ -14,22 +14,15 @@ type ViewMode = 'calendar' | 'list';
 export default function CalendarPage() {
   const { currentSpace } = useAuth();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [filteredEvents, setFilteredEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('calendar');
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [stats, setStats] = useState({
-    total: 0,
-    today: 0,
-    thisWeek: 0,
-    thisMonth: 0,
-  });
 
-  // Calculate stats from events, excluding completed ones
-  useEffect(() => {
+  // Memoize stats calculations
+  const stats = useMemo(() => {
     const activeEvents = events.filter(e => e.status !== 'completed');
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -37,7 +30,7 @@ export default function CalendarPage() {
     weekStart.setDate(today.getDate() - today.getDay());
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    setStats({
+    return {
       total: activeEvents.length,
       today: activeEvents.filter(e => {
         const eventDate = new Date(e.start_time);
@@ -51,29 +44,61 @@ export default function CalendarPage() {
         const eventDate = new Date(e.start_time);
         return eventDate >= monthStart;
       }).length,
-    });
+    };
   }, [events]);
 
-  useEffect(() => {
-    loadEvents();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSpace.id]);
+  // Memoize filtered events
+  const filteredEvents = useMemo(() => {
+    if (!searchQuery) return events;
 
-  useEffect(() => {
-    let filtered = events;
-
-    if (searchQuery) {
-      filtered = filtered.filter(e =>
-        e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        e.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        e.location?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    setFilteredEvents(filtered);
+    return events.filter(e =>
+      e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      e.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      e.location?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
   }, [events, searchQuery]);
 
-  async function loadEvents() {
+  // Memoize calendar days calculation
+  const calendarDays = useMemo(() => {
+    const monthStart = startOfMonth(currentMonth);
+    const monthEnd = endOfMonth(currentMonth);
+    const calendarStart = startOfWeek(monthStart);
+    const calendarEnd = endOfWeek(monthEnd);
+
+    return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+  }, [currentMonth]);
+
+  // Memoize events by date for calendar view
+  const eventsByDate = useMemo(() => {
+    const eventsMap = new Map<string, CalendarEvent[]>();
+
+    filteredEvents.forEach(event => {
+      const eventDate = parseISO(event.start_time);
+      const dateKey = format(eventDate, 'yyyy-MM-dd');
+
+      if (!eventsMap.has(dateKey)) {
+        eventsMap.set(dateKey, []);
+      }
+      eventsMap.get(dateKey)!.push(event);
+    });
+
+    return eventsMap;
+  }, [filteredEvents]);
+
+  // Memoize category colors lookup
+  const getCategoryColor = useCallback((category: string) => {
+    const colors = {
+      work: { bg: 'bg-blue-100 dark:bg-blue-900/30', border: 'border-blue-500', text: 'text-blue-700 dark:text-blue-300' },
+      personal: { bg: 'bg-purple-100 dark:bg-purple-900/30', border: 'border-purple-500', text: 'text-purple-700 dark:text-purple-300' },
+      family: { bg: 'bg-pink-100 dark:bg-pink-900/30', border: 'border-pink-500', text: 'text-pink-700 dark:text-pink-300' },
+      health: { bg: 'bg-green-100 dark:bg-green-900/30', border: 'border-green-500', text: 'text-green-700 dark:text-green-300' },
+      social: { bg: 'bg-orange-100 dark:bg-orange-900/30', border: 'border-orange-500', text: 'text-orange-700 dark:text-orange-300' },
+    };
+    return colors[category as keyof typeof colors] || colors.personal;
+  }, []);
+
+  // Stable callback for loading events
+  const loadEvents = useCallback(async () => {
     try {
       setLoading(true);
       let eventsData = await calendarService.getEvents(currentSpace.id);
@@ -109,9 +134,10 @@ export default function CalendarPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [currentSpace.id]);
 
-  async function handleCreateEvent(eventData: CreateEventInput) {
+  // Stable callback for creating/updating events
+  const handleCreateEvent = useCallback(async (eventData: CreateEventInput) => {
     try {
       if (editingEvent) {
         await calendarService.updateEvent(editingEvent.id, eventData);
@@ -123,9 +149,10 @@ export default function CalendarPage() {
     } catch (error) {
       console.error('Failed to save event:', error);
     }
-  }
+  }, [editingEvent, loadEvents]);
 
-  async function handleDeleteEvent(eventId: string) {
+  // Stable callback for deleting events
+  const handleDeleteEvent = useCallback(async (eventId: string) => {
     if (!confirm('Are you sure you want to delete this event?')) return;
 
     try {
@@ -134,9 +161,10 @@ export default function CalendarPage() {
     } catch (error) {
       console.error('Failed to delete event:', error);
     }
-  }
+  }, [loadEvents]);
 
-  async function handleStatusChange(eventId: string, status: 'not-started' | 'in-progress' | 'completed') {
+  // Stable callback for status changes
+  const handleStatusChange = useCallback(async (eventId: string, status: 'not-started' | 'in-progress' | 'completed') => {
     // Optimistic update - update UI immediately
     setEvents(prevEvents =>
       prevEvents.map(event =>
@@ -147,50 +175,47 @@ export default function CalendarPage() {
     // Update in background
     try {
       await calendarService.updateEventStatus(eventId, status);
-      // Stats will automatically update via useMemo when events state changes
     } catch (error) {
       console.error('Failed to update event status:', error);
       // Revert on error
       loadEvents();
     }
-  }
+  }, [loadEvents]);
 
-  function handleEditEvent(event: CalendarEvent) {
+  // Stable callback for editing events
+  const handleEditEvent = useCallback((event: CalendarEvent) => {
     setEditingEvent(event);
     setIsModalOpen(true);
-  }
+  }, []);
 
-  function handleCloseModal() {
+  // Stable callback for closing modal
+  const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
     setEditingEvent(null);
-  }
+  }, []);
 
-  function getCalendarDays() {
-    const monthStart = startOfMonth(currentMonth);
-    const monthEnd = endOfMonth(currentMonth);
-    const calendarStart = startOfWeek(monthStart);
-    const calendarEnd = endOfWeek(monthEnd);
+  // Stable callback for view mode changes
+  const handleSetViewCalendar = useCallback(() => setViewMode('calendar'), []);
+  const handleSetViewList = useCallback(() => setViewMode('list'), []);
 
-    return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
-  }
+  // Stable callback for month navigation
+  const handlePrevMonth = useCallback(() => {
+    setCurrentMonth(prev => subMonths(prev, 1));
+  }, []);
 
-  function getEventsForDate(date: Date) {
-    return filteredEvents.filter(event => {
-      const eventDate = parseISO(event.start_time);
-      return isSameDay(eventDate, date);
-    });
-  }
+  const handleNextMonth = useCallback(() => {
+    setCurrentMonth(prev => addMonths(prev, 1));
+  }, []);
 
-  function getCategoryColor(category: string) {
-    const colors = {
-      work: { bg: 'bg-blue-100 dark:bg-blue-900/30', border: 'border-blue-500', text: 'text-blue-700 dark:text-blue-300' },
-      personal: { bg: 'bg-purple-100 dark:bg-purple-900/30', border: 'border-purple-500', text: 'text-purple-700 dark:text-purple-300' },
-      family: { bg: 'bg-pink-100 dark:bg-pink-900/30', border: 'border-pink-500', text: 'text-pink-700 dark:text-pink-300' },
-      health: { bg: 'bg-green-100 dark:bg-green-900/30', border: 'border-green-500', text: 'text-green-700 dark:text-green-300' },
-      social: { bg: 'bg-orange-100 dark:bg-orange-900/30', border: 'border-orange-500', text: 'text-orange-700 dark:text-orange-300' },
-    };
-    return colors[category as keyof typeof colors] || colors.personal;
-  }
+  // Helper to get events for a specific date
+  const getEventsForDate = useCallback((date: Date) => {
+    const dateKey = format(date, 'yyyy-MM-dd');
+    return eventsByDate.get(dateKey) || [];
+  }, [eventsByDate]);
+
+  useEffect(() => {
+    loadEvents();
+  }, [loadEvents]);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Calendar' }]}>
@@ -215,7 +240,7 @@ export default function CalendarPage() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 flex gap-1">
                 <button
-                  onClick={() => setViewMode('calendar')}
+                  onClick={handleSetViewCalendar}
                   className={`px-3 sm:px-4 py-2 rounded-md font-medium transition-all flex items-center justify-center gap-2 flex-1 sm:flex-initial ${
                     viewMode === 'calendar'
                       ? 'bg-gradient-calendar text-white shadow-md'
@@ -226,7 +251,7 @@ export default function CalendarPage() {
                   <span className="text-sm">Calendar</span>
                 </button>
                 <button
-                  onClick={() => setViewMode('list')}
+                  onClick={handleSetViewList}
                   className={`px-3 sm:px-4 py-2 rounded-md font-medium transition-all flex items-center justify-center gap-2 flex-1 sm:flex-initial ${
                     viewMode === 'list'
                       ? 'bg-gradient-calendar text-white shadow-md'
@@ -322,7 +347,7 @@ export default function CalendarPage() {
                   {/* Month Navigation */}
                   <div className="flex items-center justify-between mb-4 sm:mb-6">
                     <button
-                      onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+                      onClick={handlePrevMonth}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                     >
                       <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -331,7 +356,7 @@ export default function CalendarPage() {
                       {format(currentMonth, 'MMMM yyyy')}
                     </h3>
                     <button
-                      onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+                      onClick={handleNextMonth}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                     >
                       <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -349,7 +374,7 @@ export default function CalendarPage() {
                     ))}
 
                     {/* Calendar days */}
-                    {getCalendarDays().map((day, index) => {
+                    {calendarDays.map((day, index) => {
                       const dayEvents = getEventsForDate(day);
                       const isCurrentMonth = isSameMonth(day, currentMonth);
                       const isToday = isSameDay(day, new Date());
