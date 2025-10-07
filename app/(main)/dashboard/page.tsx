@@ -343,7 +343,7 @@ export default function DashboardPage() {
       const eventsToday = allEvents.filter(e => isToday(parseISO(e.start_time))).length;
       const eventsThisWeek = allEvents.filter(e => isThisWeek(parseISO(e.start_time))).length;
       const upcomingEvents = allEvents.filter(e => parseISO(e.start_time) > now).length;
-      const personalEvents = allEvents.filter(e => e.is_all_day === false).length;
+      const personalEvents = allEvents.filter(e => e.category === 'personal').length;
       const nextEvent = allEvents
         .filter(e => parseISO(e.start_time) > now)
         .sort((a, b) => parseISO(a.start_time).getTime() - parseISO(b.start_time).getTime())[0];
@@ -405,7 +405,7 @@ export default function DashboardPage() {
       // Calculate detailed goal stats
       const activeGoals = allGoals.filter(g => g.status === 'active').length;
       const completedGoals = allGoals.filter(g => g.status === 'completed').length;
-      const inProgressGoals = allGoals.filter(g => g.status === 'in_progress').length;
+      const inProgressGoals = allGoals.filter(g => g.status === 'active').length; // 'active' goals are in progress
       const topGoal = allGoals.length > 0
         ? { title: allGoals[0].title, progress: allGoals[0].progress || 0 }
         : null;
@@ -465,7 +465,7 @@ export default function DashboardPage() {
           totalItems,
           checkedToday,
           uncheckedItems,
-          urgentList: shoppingLists.length > 0 ? shoppingLists[0].name : null,
+          urgentList: shoppingLists.length > 0 ? shoppingLists[0].title : null,
           estimatedBudget: 0,
           trend: shoppingTrend,
         },
@@ -499,7 +499,9 @@ export default function DashboardPage() {
           inProgress: inProgressGoals,
           milestonesReached: 0,
           totalMilestones: 0,
-          overallProgress: goalStats.overallProgress || 0,
+          overallProgress: allGoals.length > 0
+            ? Math.round(allGoals.reduce((sum, g) => sum + (g.progress || 0), 0) / allGoals.length)
+            : 0,
           topGoal,
           endingThisMonth: 0,
           trend: goalTrend,
