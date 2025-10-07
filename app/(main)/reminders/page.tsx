@@ -156,16 +156,16 @@ export default function RemindersPage() {
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Reminders' }]}>
-      <div className="p-8">
+      <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
               <div className="w-12 h-12 rounded-xl bg-gradient-reminders flex items-center justify-center">
                 <Bell className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-reminders bg-clip-text text-transparent">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-reminders bg-clip-text text-transparent">
                   Reminders
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">
@@ -176,7 +176,7 @@ export default function RemindersPage() {
 
             <button
               onClick={() => setIsModalOpen(true)}
-              className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center gap-2"
+              className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
             >
               <Plus className="w-5 h-5" />
               New Reminder
@@ -184,7 +184,7 @@ export default function RemindersPage() {
           </div>
 
           {/* Stats Cards - Horizontal Row */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {/* Total */}
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
@@ -232,7 +232,7 @@ export default function RemindersPage() {
 
           {/* Search & Filter Bar */}
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                   {/* Search */}
                   <div className="flex-1 relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />

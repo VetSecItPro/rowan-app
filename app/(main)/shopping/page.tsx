@@ -191,25 +191,25 @@ export default function ShoppingPage() {
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Shopping Lists' }]}>
-      <div className="p-8">
+      <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
               <div className="w-12 h-12 rounded-xl bg-gradient-shopping flex items-center justify-center">
                 <ShoppingCart className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-shopping bg-clip-text text-transparent">Shopping Lists</h1>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-shopping bg-clip-text text-transparent">Shopping Lists</h1>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">Collaborative shopping made easy</p>
               </div>
             </div>
-            <button onClick={() => setIsModalOpen(true)} className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center gap-2">
+            <button onClick={() => setIsModalOpen(true)} className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
               <Plus className="w-5 h-5" />
               New List
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Lists</h3>
@@ -241,7 +241,7 @@ export default function ShoppingPage() {
           </div>
 
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input type="text" placeholder="Search lists..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white" />
