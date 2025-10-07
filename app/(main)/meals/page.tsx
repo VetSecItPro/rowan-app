@@ -150,22 +150,22 @@ export default function MealsPage() {
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Meal Planning' }]}>
-      <div className="p-8">
+      <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-gradient-meals flex items-center justify-center"><UtensilsCrossed className="w-6 h-6 text-white" /></div>
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-meals bg-clip-text text-transparent">Meal Planning</h1>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-meals bg-clip-text text-transparent">Meal Planning</h1>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">Plan your meals together</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {/* View Toggle */}
-              <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700">
+              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700 w-full sm:w-auto">
                 <button
                   onClick={() => setViewMode('calendar')}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[110px] ${
+                  className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
                     viewMode === 'calendar'
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
@@ -176,7 +176,7 @@ export default function MealsPage() {
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[110px] ${
+                  className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
                     viewMode === 'list'
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
@@ -187,7 +187,7 @@ export default function MealsPage() {
                 </button>
                 <button
                   onClick={() => setViewMode('recipes')}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[110px] ${
+                  className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
                     viewMode === 'recipes'
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
@@ -197,17 +197,19 @@ export default function MealsPage() {
                   <span className="text-sm">Recipes</span>
                 </button>
               </div>
-              <button onClick={() => setIsRecipeModalOpen(true)} className="px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center gap-2">
+              <button onClick={() => setIsRecipeModalOpen(true)} className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
                 <ChefHat className="w-5 h-5" />
-                New Recipe
+                <span className="hidden sm:inline">New Recipe</span>
+                <span className="sm:hidden">Recipe</span>
               </button>
-              <button onClick={() => setIsModalOpen(true)} className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center gap-2">
+              <button onClick={() => setIsModalOpen(true)} className="px-4 py-2 sm:px-6 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
                 <Plus className="w-5 h-5" />
-                New Meal
+                <span className="hidden sm:inline">New Meal</span>
+                <span className="sm:hidden">Meal</span>
               </button>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">This Week</h3>
@@ -277,7 +279,7 @@ export default function MealsPage() {
                   )}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {filteredRecipes.map((recipe) => (
                     <RecipeCard
                       key={recipe.id}

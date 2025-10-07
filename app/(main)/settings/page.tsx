@@ -130,26 +130,27 @@ export default function SettingsPage() {
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Settings' }]}>
-      <div className="min-h-screen bg-gradient-to-t from-purple-200 via-purple-100/50 to-white dark:from-purple-900 dark:via-purple-900/50 dark:to-black p-8">
+      <div className="min-h-screen bg-gradient-to-t from-purple-200 via-purple-100/50 to-white dark:from-purple-900 dark:via-purple-900/50 dark:to-black p-4 sm:p-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center gap-4 mb-2">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center shadow-lg">
-                <Settings className="w-7 h-7 text-white" />
+          <div className="mb-4 sm:mb-8">
+            <div className="flex items-center gap-3 sm:gap-4 mb-2">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center shadow-lg">
+                <Settings className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-br from-purple-600 to-blue-600 bg-clip-text text-transparent">Settings</h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your account and preferences</p>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-br from-purple-600 to-blue-600 bg-clip-text text-transparent">Settings</h1>
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1">Manage your account and preferences</p>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
             {/* Sidebar Navigation */}
             <div className="lg:col-span-1">
-              <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-2xl p-4 shadow-lg">
-                <nav className="space-y-1">
+              <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg">
+                {/* Mobile: Horizontal scrolling tabs */}
+                <nav className="lg:space-y-1 flex lg:flex-col overflow-x-auto lg:overflow-x-visible -mx-3 px-3 lg:mx-0 lg:px-0 pb-2 lg:pb-0 gap-2 lg:gap-0">
                   {tabs.map((tab) => {
                     const Icon = tab.icon;
                     const isActive = activeTab === tab.id;
@@ -157,14 +158,14 @@ export default function SettingsPage() {
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                        className={`flex-shrink-0 lg:w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all ${
                           isActive
                             ? 'bg-purple-600 text-white shadow-lg'
                             : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                         }`}
                       >
-                        <Icon className="w-5 h-5" />
-                        <span className="text-sm font-medium">{tab.name}</span>
+                        <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <span className="text-xs sm:text-sm font-medium whitespace-nowrap">{tab.name}</span>
                       </button>
                     );
                   })}
@@ -174,18 +175,18 @@ export default function SettingsPage() {
 
             {/* Content Area */}
             <div className="lg:col-span-3">
-              <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-2xl p-8 shadow-lg">
+              <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg">
                 {/* Profile Tab */}
                 {activeTab === 'profile' && (
-                  <div className="space-y-8">
+                  <div className="space-y-6 sm:space-y-8">
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Profile Settings</h2>
-                      <p className="text-gray-600 dark:text-gray-400">Update your personal information and profile picture</p>
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Profile Settings</h2>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Update your personal information and profile picture</p>
                     </div>
 
                     {/* Avatar Upload */}
-                    <div className="flex items-center gap-6">
-                      <div className="relative w-24 h-24 flex-shrink-0">
+                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0">
                         {profileImage ? (
                           <img
                             src={profileImage}
@@ -193,23 +194,23 @@ export default function SettingsPage() {
                             className="w-full h-full rounded-full object-cover shadow-xl"
                           />
                         ) : (
-                          <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-3xl font-bold shadow-xl">
+                          <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow-xl">
                             {user.name.charAt(0).toUpperCase()}
                           </div>
                         )}
                         <button
                           onClick={() => profileImageInputRef.current?.click()}
-                          className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white hover:bg-purple-700 transition-colors shadow-lg"
+                          className="absolute bottom-0 right-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-purple-600 flex items-center justify-center text-white hover:bg-purple-700 transition-colors shadow-lg"
                         >
-                          <Camera className="w-4 h-4" />
+                          <Camera className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </button>
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{user.name}</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{user.email}</p>
+                      <div className="text-center sm:text-left">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{user.name}</h3>
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{user.email}</p>
                         <button
                           onClick={() => profileImageInputRef.current?.click()}
-                          className="mt-2 text-sm text-purple-600 dark:text-purple-400 hover:underline"
+                          className="mt-2 text-xs sm:text-sm text-purple-600 dark:text-purple-400 hover:underline"
                         >
                           Change profile picture
                         </button>
@@ -229,55 +230,55 @@ export default function SettingsPage() {
                     />
 
                     {/* Form Fields */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Full Name
                         </label>
                         <input
                           type="text"
                           defaultValue={user.name}
-                          className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Email Address
                         </label>
                         <input
                           type="email"
                           defaultValue={user.email}
-                          className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          <Phone className="w-4 h-4 inline mr-1" />
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <Phone className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
                           Phone Number
                         </label>
                         <input
                           type="tel"
                           placeholder="+1 (555) 000-0000"
-                          className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          <Globe className="w-4 h-4 inline mr-1" />
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <Globe className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
                           Time Zone
                         </label>
                         <div className="relative">
-                          <select className="w-full px-4 py-3 pr-11 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer">
+                          <select className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-11 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer">
                             <option>Pacific Time (PT)</option>
                             <option>Eastern Time (ET)</option>
                             <option>Central Time (CT)</option>
                             <option>Mountain Time (MT)</option>
                           </select>
-                          <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                            <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-3 sm:pr-4 pointer-events-none">
+                            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>
                           </div>
@@ -286,18 +287,18 @@ export default function SettingsPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Bio
                       </label>
                       <textarea
                         rows={4}
                         placeholder="Tell us about yourself..."
-                        className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
                       />
                     </div>
 
-                    <button className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors shadow-lg flex items-center gap-2">
-                      <Save className="w-4 h-4" />
+                    <button className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-purple-600 text-white rounded-lg sm:rounded-xl hover:bg-purple-700 transition-colors shadow-lg flex items-center justify-center gap-2">
+                      <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       Save Changes
                     </button>
                   </div>
@@ -305,38 +306,38 @@ export default function SettingsPage() {
 
                 {/* Security Tab */}
                 {activeTab === 'security' && (
-                  <div className="space-y-8">
+                  <div className="space-y-6 sm:space-y-8">
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Security Settings</h2>
-                      <p className="text-gray-600 dark:text-gray-400">Manage your password and authentication methods</p>
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Security Settings</h2>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Manage your password and authentication methods</p>
                     </div>
 
                     {/* Change Password */}
-                    <div className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                          <Key className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                    <div className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                          <Key className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400" />
                         </div>
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Change Password</h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Update your password regularly to keep your account secure</p>
-                          <div className="space-y-4">
+                        <div className="flex-1 w-full">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Change Password</h3>
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">Update your password regularly to keep your account secure</p>
+                          <div className="space-y-3 sm:space-y-4">
                             <input
                               type="password"
                               placeholder="Current password"
-                              className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                              className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                             />
                             <input
                               type="password"
                               placeholder="New password"
-                              className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                              className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                             />
                             <input
                               type="password"
                               placeholder="Confirm new password"
-                              className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                              className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                             />
-                            <button className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors shadow-lg">
+                            <button className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-purple-600 text-white rounded-lg sm:rounded-xl hover:bg-purple-700 transition-colors shadow-lg">
                               Update Password
                             </button>
                           </div>
@@ -345,19 +346,19 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Two-Factor Authentication */}
-                    <div className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-4 flex-1">
-                          <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                            <Smartphone className="w-6 h-6 text-green-600 dark:text-green-400" />
+                    <div className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+                        <div className="flex items-start gap-3 sm:gap-4 flex-1">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                            <Smartphone className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" />
                           </div>
                           <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Two-Factor Authentication</h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Add an extra layer of security to your account</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">Status: <span className="text-red-600 dark:text-red-400 font-medium">Not Enabled</span></p>
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Two-Factor Authentication</h3>
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Add an extra layer of security to your account</p>
+                            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-500 mt-2">Status: <span className="text-red-600 dark:text-red-400 font-medium">Not Enabled</span></p>
                           </div>
                         </div>
-                        <button className="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors shadow-lg">
+                        <button className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-green-600 text-white rounded-lg sm:rounded-xl hover:bg-green-700 transition-colors shadow-lg">
                           Enable 2FA
                         </button>
                       </div>
@@ -381,10 +382,10 @@ export default function SettingsPage() {
 
                 {/* Notifications Tab */}
                 {activeTab === 'notifications' && (
-                  <div className="space-y-8">
+                  <div className="space-y-6 sm:space-y-8">
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Notification Preferences</h2>
-                      <p className="text-gray-600 dark:text-gray-400">Choose how you want to be notified about updates</p>
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Notification Preferences</h2>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Choose how you want to be notified about updates</p>
                     </div>
 
                     {/* Email Notifications */}
@@ -444,10 +445,10 @@ export default function SettingsPage() {
 
                 {/* Appearance Tab */}
                 {activeTab === 'appearance' && (
-                  <div className="space-y-8">
+                  <div className="space-y-6 sm:space-y-8">
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Appearance Settings</h2>
-                      <p className="text-gray-600 dark:text-gray-400">Customize how Rowan looks for you</p>
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Appearance Settings</h2>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Customize how Rowan looks for you</p>
                     </div>
 
                     {/* Language */}
@@ -496,10 +497,10 @@ export default function SettingsPage() {
 
                 {/* Privacy Tab */}
                 {activeTab === 'privacy' && (
-                  <div className="space-y-8">
+                  <div className="space-y-6 sm:space-y-8">
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Privacy Settings</h2>
-                      <p className="text-gray-600 dark:text-gray-400">Control your data and visibility preferences</p>
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Privacy Settings</h2>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Control your data and visibility preferences</p>
                     </div>
 
                     <div className="space-y-4">
@@ -526,26 +527,26 @@ export default function SettingsPage() {
 
                 {/* Spaces Tab */}
                 {activeTab === 'spaces' && (
-                  <div className="space-y-8">
+                  <div className="space-y-6 sm:space-y-8">
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Space Management</h2>
-                      <p className="text-gray-600 dark:text-gray-400">Manage your spaces and members</p>
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Space Management</h2>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Manage your spaces and members</p>
                     </div>
 
                     {/* Current Space */}
-                    <div className="p-6 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-xl">
-                      <div className="flex items-center justify-between mb-4">
+                    <div className="p-4 sm:p-6 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg sm:rounded-xl">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4">
                         <div>
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{currentSpace.name}</h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Current Space • 4 members</p>
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{currentSpace.name}</h3>
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Current Space • 4 members</p>
                         </div>
-                        <span className="px-3 py-1 bg-purple-600 text-white text-xs font-medium rounded-full">Admin</span>
+                        <span className="px-2.5 sm:px-3 py-1 bg-purple-600 text-white text-xs font-medium rounded-full self-start sm:self-auto">Admin</span>
                       </div>
-                      <div className="flex gap-3">
-                        <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm">
+                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                        <button className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-xs sm:text-sm">
                           Invite Members
                         </button>
-                        <button className="px-4 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm">
+                        <button className="px-3 sm:px-4 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-xs sm:text-sm">
                           Manage Members
                         </button>
                       </div>
@@ -564,23 +565,23 @@ export default function SettingsPage() {
 
                 {/* Data & Storage Tab */}
                 {activeTab === 'data' && (
-                  <div className="space-y-8">
+                  <div className="space-y-6 sm:space-y-8">
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Data & Storage</h2>
-                      <p className="text-gray-600 dark:text-gray-400">Export your data or delete your account</p>
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Data & Storage</h2>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Export your data or delete your account</p>
                     </div>
 
                     {/* Export Data */}
-                    <div className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                          <Download className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    <div className="p-4 sm:p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl">
+                      <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                          <Download className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
                         </div>
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Export Your Data</h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Download a copy of all your data in JSON format</p>
-                          <button className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-lg flex items-center gap-2">
-                            <Download className="w-4 h-4" />
+                        <div className="flex-1 w-full">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Export Your Data</h3>
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">Download a copy of all your data in JSON format</p>
+                          <button className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded-lg sm:rounded-xl hover:bg-blue-700 transition-colors shadow-lg flex items-center justify-center gap-2">
+                            <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             Request Data Export
                           </button>
                         </div>
@@ -588,16 +589,16 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Delete Account */}
-                    <div className="p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                          <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
+                    <div className="p-4 sm:p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg sm:rounded-xl">
+                      <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                          <Trash2 className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 dark:text-red-400" />
                         </div>
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Delete Account</h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Permanently delete your account and all associated data. This action cannot be undone.</p>
-                          <button className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors shadow-lg flex items-center gap-2">
-                            <Trash2 className="w-4 h-4" />
+                        <div className="flex-1 w-full">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Delete Account</h3>
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">Permanently delete your account and all associated data. This action cannot be undone.</p>
+                          <button className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-red-600 text-white rounded-lg sm:rounded-xl hover:bg-red-700 transition-colors shadow-lg flex items-center justify-center gap-2">
+                            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             Delete My Account
                           </button>
                         </div>
@@ -605,16 +606,16 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Sign Out */}
-                    <div className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                          <LogOut className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                    <div className="p-4 sm:p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl">
+                      <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                          <LogOut className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600 dark:text-gray-400" />
                         </div>
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Sign Out</h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Sign out from all devices and sessions</p>
-                          <button className="px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl hover:opacity-90 transition-opacity shadow-lg flex items-center gap-2">
-                            <LogOut className="w-4 h-4" />
+                        <div className="flex-1 w-full">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Sign Out</h3>
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">Sign out from all devices and sessions</p>
+                          <button className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg sm:rounded-xl hover:opacity-90 transition-opacity shadow-lg flex items-center justify-center gap-2">
+                            <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             Sign Out Everywhere
                           </button>
                         </div>
@@ -625,13 +626,13 @@ export default function SettingsPage() {
 
                 {/* Help & Support Tab */}
                 {activeTab === 'help' && (
-                  <div className="space-y-8">
+                  <div className="space-y-6 sm:space-y-8">
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Help & Support</h2>
-                      <p className="text-gray-600 dark:text-gray-400">Get help and learn more about Rowan</p>
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Help & Support</h2>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Get help and learn more about Rowan</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                       <a href="#" className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg transition-shadow">
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Documentation</h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400">Browse our guides and tutorials</p>
