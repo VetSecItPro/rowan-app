@@ -97,7 +97,7 @@ interface EnhancedDashboardStats {
     savedRecipes: number;
     mealsToday: number;
     missingIngredients: number;
-    nextMeal: { title: string; meal_time: string } | null;
+    nextMeal: { title: string; scheduled_date: string; meal_type?: string } | null;
     favoriteCategory: string;
     shoppingListGenerated: boolean;
     trend: number;
@@ -287,7 +287,7 @@ export default function DashboardPage() {
         messageStats,
         shoppingLists,
         shoppingStats,
-        mealPlans,
+        meals,
         recipes,
         mealStats,
         allChores,
@@ -306,7 +306,7 @@ export default function DashboardPage() {
         messagesService.getMessageStats(currentSpace.id),
         shoppingService.getLists(currentSpace.id),
         shoppingService.getShoppingStats(currentSpace.id),
-        mealsService.getMealPlans(currentSpace.id, startOfWeek(new Date())),
+        mealsService.getMeals(currentSpace.id),
         mealsService.getRecipes(currentSpace.id),
         mealsService.getMealStats(currentSpace.id),
         projectsService.getChores(currentSpace.id),
@@ -388,11 +388,11 @@ export default function DashboardPage() {
       const shoppingTrend = shoppingLists.filter(l => parseISO(l.created_at) > weekAgo).length;
 
       // Calculate detailed meal stats
-      const mealsToday = mealPlans.filter(m => m.meal_date && isToday(parseISO(m.meal_date))).length;
-      const nextMeal = mealPlans
-        .filter(m => m.meal_time && parseISO(m.meal_time) > now)
-        .sort((a, b) => parseISO(a.meal_time!).getTime() - parseISO(b.meal_time!).getTime())[0];
-      const mealTrend = mealPlans.filter(m => parseISO(m.created_at) > weekAgo).length;
+      const mealsToday = meals.filter(m => m.scheduled_date && isToday(parseISO(m.scheduled_date))).length;
+      const nextMeal = meals
+        .filter(m => m.scheduled_date && parseISO(m.scheduled_date) > now)
+        .sort((a, b) => parseISO(a.scheduled_date).getTime() - parseISO(b.scheduled_date).getTime())[0];
+      const mealTrend = meals.filter(m => parseISO(m.created_at) > weekAgo).length;
 
       // Calculate detailed household stats
       const choresAssignedToMe = allChores.filter(c => c.assigned_to === user.id).length;
@@ -474,7 +474,7 @@ export default function DashboardPage() {
           savedRecipes: mealStats.savedRecipes,
           mealsToday,
           missingIngredients: 0,
-          nextMeal: nextMeal ? { title: nextMeal.recipe_id || 'Meal', meal_time: nextMeal.meal_time! } : null,
+          nextMeal: nextMeal ? { title: nextMeal.recipe?.name || nextMeal.meal_type || 'Meal', scheduled_date: nextMeal.scheduled_date, meal_type: nextMeal.meal_type } : null,
           favoriteCategory: 'Pasta',
           shoppingListGenerated: false,
           trend: mealTrend,
@@ -1021,7 +1021,7 @@ export default function DashboardPage() {
                         {stats.meals.nextMeal.title}
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {format(parseISO(stats.meals.nextMeal.meal_time), 'h:mm a')}
+                        {format(parseISO(stats.meals.nextMeal.scheduled_date), 'MMM d, h:mm a')}
                       </p>
                     </div>
                   )}
