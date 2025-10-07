@@ -29,6 +29,7 @@ export default function GoalsPage() {
 
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSpace.id]);
 
   useEffect(() => {

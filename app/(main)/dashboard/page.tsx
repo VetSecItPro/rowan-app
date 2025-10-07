@@ -20,15 +20,12 @@ import {
   UtensilsCrossed,
   Home,
   Target,
-  Plus,
   TrendingUp,
   Clock,
   AlertCircle,
-  ArrowRight,
   Sparkles,
   Activity,
-  Heart,
-  Users
+  Heart
 } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
@@ -62,6 +59,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     loadAllStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSpace.id]);
 
   async function loadAllStats() {
@@ -568,7 +566,7 @@ export default function DashboardPage() {
                         Feeling {partnerCheckIn.moodLabel}
                       </p>
                       <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                        "{partnerCheckIn.note}"
+                        &ldquo;{partnerCheckIn.note}&rdquo;
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">{partnerCheckIn.time}</p>
                     </div>

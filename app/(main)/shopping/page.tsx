@@ -27,6 +27,7 @@ export default function ShoppingPage() {
 
   useEffect(() => {
     loadLists();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSpace.id]);
 
   useEffect(() => {

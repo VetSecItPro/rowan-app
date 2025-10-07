@@ -12,7 +12,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMont
 type ViewMode = 'calendar' | 'list';
 
 export default function CalendarPage() {
-  const { user, currentSpace } = useAuth();
+  const { currentSpace } = useAuth();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,6 +31,7 @@ export default function CalendarPage() {
 
   useEffect(() => {
     loadEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSpace.id]);
 
   useEffect(() => {

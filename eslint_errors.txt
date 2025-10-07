@@ -1,0 +1,219 @@
+
+> rowan-app@0.1.0 lint
+> next lint
+
+`next lint` is deprecated and will be removed in Next.js 16.
+For new projects, use create-next-app to choose your preferred linter.
+For existing projects, migrate to the ESLint CLI:
+npx @next/codemod@canary next-lint-to-eslint-cli .
+
+
+./app/(main)/calendar/page.tsx
+15:11  Warning: 'user' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+34:6  Warning: React Hook useEffect has a missing dependency: 'loadEvents'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/(main)/dashboard/page.tsx
+23:3  Warning: 'Plus' is defined but never used.  @typescript-eslint/no-unused-vars
+27:3  Warning: 'ArrowRight' is defined but never used.  @typescript-eslint/no-unused-vars
+31:3  Warning: 'Users' is defined but never used.  @typescript-eslint/no-unused-vars
+65:6  Warning: React Hook useEffect has a missing dependency: 'loadAllStats'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+562:99  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+571:25  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+571:47  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+
+./app/(main)/goals/page.tsx
+32:6  Warning: React Hook useEffect has a missing dependency: 'loadData'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/(main)/household/page.tsx
+4:44  Warning: 'Users' is defined but never used.  @typescript-eslint/no-unused-vars
+39:6  Warning: React Hook useEffect has a missing dependency: 'loadData'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+91:70  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+137:12  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/(main)/meals/page.tsx
+17:25  Warning: 'user' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+35:6  Warning: React Hook useEffect has missing dependencies: 'loadMeals' and 'loadRecipes'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+289:36  Warning: 'r' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/(main)/messages/page.tsx
+54:6  Warning: React Hook useEffect has a missing dependency: 'loadMessages'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/(main)/reminders/page.tsx
+30:6  Warning: React Hook useEffect has a missing dependency: 'loadReminders'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+115:71  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+121:77  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/(main)/settings/page.tsx
+3:20  Warning: 'useEffect' is defined but never used.  @typescript-eslint/no-unused-vars
+190:27  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+651:102  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+659:87  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/(main)/shopping/page.tsx
+30:6  Warning: React Hook useEffect has a missing dependency: 'loadLists'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/(main)/tasks/page.tsx
+36:6  Warning: React Hook useEffect has a missing dependency: 'loadTasks'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/features/calendar/page.tsx
+1:20  Warning: 'Users' is defined but never used.  @typescript-eslint/no-unused-vars
+116:35  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/features/goals/page.tsx
+1:44  Warning: 'Calendar' is defined but never used.  @typescript-eslint/no-unused-vars
+44:63  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+44:80  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/features/household/page.tsx
+1:43  Warning: 'Calendar' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/features/meals/page.tsx
+116:39  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/features/messages/page.tsx
+112:25  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+112:60  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+116:25  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+116:61  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+120:25  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+120:60  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+124:25  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+124:52  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+138:44  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/features/reminders/page.tsx
+1:39  Warning: 'Users' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/features/shopping/page.tsx
+34:62  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/features/tasks/page.tsx
+116:35  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+142:36  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/privacy/page.tsx
+54:108  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+92:73  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+177:95  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+179:156  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+186:59  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+193:70  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/security/page.tsx
+51:75  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+57:37  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+57:58  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+57:124  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+57:156  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+92:70  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+235:22  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+236:22  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+237:22  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+238:22  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+290:62  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/terms/page.tsx
+54:126  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+54:161  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+133:22  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+134:40  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+144:56  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+151:60  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+152:22  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+177:96  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+189:25  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+192:21  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+231:17  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+238:99  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+238:105  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+240:33  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+240:39  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+240:45  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+240:58  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+240:125  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+281:36  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+293:73  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+312:57  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./components/calendar/NewEventModal.tsx
+430:89  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/goals/NewGoalModal.tsx
+77:6  Warning: React Hook useEffect has a missing dependency: 'categoryOptions'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/goals/NewMilestoneModal.tsx
+179:85  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/meals/MealCard.tsx
+3:27  Warning: 'Clock' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/meals/NewMealModal.tsx
+99:79  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/meals/RecipeCard.tsx
+18:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/messages/MessageCard.tsx
+3:10  Warning: 'Clock' is defined but never used.  @typescript-eslint/no-unused-vars
+23:3  Warning: 'onMarkRead' is defined but never used.  @typescript-eslint/no-unused-vars
+25:3  Warning: 'currentUserId' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/projects/ChoreCard.tsx
+3:10  Warning: 'Home' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/projects/NewBudgetModal.tsx
+19:3  Warning: 'spaceId' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/projects/NewChoreModal.tsx
+4:64  Warning: 'User' is defined but never used.  @typescript-eslint/no-unused-vars
+158:66  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+184:92  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/reminders/NewReminderModal.tsx
+208:89  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+245:91  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/reminders/ReminderCard.tsx
+43:9  Warning: 'statusColor' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./components/shopping/NewShoppingListModal.tsx
+33:29  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/shopping/ShoppingListCard.tsx
+3:45  Warning: 'Plus' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/tasks/TaskCard.tsx
+3:23  Warning: 'Clock' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./lib/services/goals-service.ts
+100:25  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+158:25  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/services/messages-service.ts
+138:10  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/services/projects-service.ts
+131:25  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+217:25  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/services/reminders-service.ts
+89:25  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/services/shopping-service.ts
+73:55  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+75:13  Warning: 'items' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+75:45  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+90:78  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+92:13  Warning: 'items' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+92:49  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+93:25  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+151:47  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/services/tasks-service.ts
+318:27  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+363:27  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/types.ts
+358:29  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules

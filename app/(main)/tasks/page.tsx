@@ -33,6 +33,7 @@ export default function TasksPage() {
   // Load tasks
   useEffect(() => {
     loadTasks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSpace.id]);
 
   // Filter tasks
