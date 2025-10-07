@@ -63,17 +63,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .from('space_members')
         .select('space_id, spaces(id, name)')
         .eq('user_id', userId)
-        .limit(1)
-        .single();
+        .limit(1);
 
       if (error) {
         console.error('Error loading user space:', error);
         return;
       }
 
-      if (data?.spaces) {
+      // Handle case where user has no space yet
+      if (!data || data.length === 0) {
+        console.log('User has no space yet');
+        setCurrentSpace(null);
+        return;
+      }
+
+      const firstSpace = data[0];
+      if (firstSpace?.spaces) {
         // @ts-ignore - Supabase types are complex for nested selects
-        setCurrentSpace(data.spaces);
+        setCurrentSpace(firstSpace.spaces);
       }
     } catch (error) {
       console.error('Error loading user space:', error);
