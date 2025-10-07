@@ -300,31 +300,42 @@ export const projectsService = {
   },
 
   async getBudgetStats(spaceId: string): Promise<BudgetStats> {
-    const [budget, expenses] = await Promise.all([
-      this.getBudget(spaceId),
-      this.getExpenses(spaceId),
-    ]);
+    try {
+      const [budget, expenses] = await Promise.all([
+        this.getBudget(spaceId),
+        this.getExpenses(spaceId),
+      ]);
 
-    const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const thisMonthExpenses = expenses.filter(e =>
-      new Date(e.created_at) >= monthStart
-    );
+      const thisMonthExpenses = expenses.filter(e =>
+        new Date(e.created_at) >= monthStart
+      );
 
-    // Include both paid and pending expenses in spent calculation
-    const spentThisMonth = thisMonthExpenses
-      .filter(e => e.status === 'paid' || e.status === 'pending')
-      .reduce((sum, e) => sum + e.amount, 0);
+      // Include both paid and pending expenses in spent calculation
+      const spentThisMonth = thisMonthExpenses
+        .filter(e => e.status === 'paid' || e.status === 'pending')
+        .reduce((sum, e) => sum + e.amount, 0);
 
-    const monthlyBudget = budget?.monthly_budget || 0;
+      const monthlyBudget = budget?.monthly_budget || 0;
 
-    return {
-      monthlyBudget,
-      spentThisMonth,
-      remaining: monthlyBudget - spentThisMonth,
-      pendingBills: expenses.filter(e => e.status === 'pending').length,
-    };
+      return {
+        monthlyBudget,
+        spentThisMonth,
+        remaining: monthlyBudget - spentThisMonth,
+        pendingBills: expenses.filter(e => e.status === 'pending').length,
+      };
+    } catch (error) {
+      console.error('getBudgetStats error:', error);
+      // Return default values if there's an error
+      return {
+        monthlyBudget: 0,
+        spentThisMonth: 0,
+        remaining: 0,
+        pendingBills: 0,
+      };
+    }
   },
 
   async getHouseholdStats(spaceId: string, currentUserId: string): Promise<HouseholdStats> {
