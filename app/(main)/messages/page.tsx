@@ -5,7 +5,7 @@ import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as Imag
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { MessageCard } from '@/components/messages/MessageCard';
 import { NewMessageModal } from '@/components/messages/NewMessageModal';
-import { useAuth } from '@/lib/contexts/mock-auth-context';
+import { useAuth } from '@/lib/contexts/auth-context';
 import { messagesService, Message, CreateMessageInput } from '@/lib/services/messages-service';
 import { format, isSameDay, isToday, isYesterday } from 'date-fns';
 
