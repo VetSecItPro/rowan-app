@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Home, Search, Plus, CheckCircle2, Users, DollarSign, AlertCircle, Hammer, Wallet, Receipt } from 'lucide-react';
+import { Home, Search, Plus, CheckCircle2, DollarSign, AlertCircle, Hammer, Wallet, Receipt } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ChoreCard } from '@/components/projects/ChoreCard';
 import { ExpenseCard } from '@/components/projects/ExpenseCard';
@@ -36,6 +36,7 @@ export default function HouseholdPage() {
 
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSpace.id]);
 
   async function loadData() {
@@ -88,7 +89,7 @@ export default function HouseholdPage() {
 
   async function handleChoreStatusChange(choreId: string, status: string) {
     try {
-      await projectsService.updateChore(choreId, { status: status as any });
+      await projectsService.updateChore(choreId, { status: status as 'pending' | 'in-progress' | 'completed' });
       loadData();
     } catch (error) {
       console.error('Failed to update chore:', error);
@@ -134,7 +135,7 @@ export default function HouseholdPage() {
         notes,
         // Auto-complete if 100%
         status: completion === 100 ? 'completed' : undefined,
-      } as any);
+      } as Partial<CreateChoreInput>);
       loadData();
     } catch (error) {
       console.error('Failed to update progress:', error);

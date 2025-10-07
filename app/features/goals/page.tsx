@@ -1,4 +1,4 @@
-import { Target, TrendingUp, Award, Users, Calendar, Check } from 'lucide-react';
+import { Target, TrendingUp, Award, Users, Check } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import Link from 'next/link';
 
