@@ -3,7 +3,7 @@
 import { Calendar, Clock, MapPin, MoreVertical, Edit, Trash2, Check } from 'lucide-react';
 import { CalendarEvent } from '@/lib/services/calendar-service';
 import { format } from 'date-fns';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface EventCardProps {
   event: CalendarEvent;
@@ -14,6 +14,23 @@ interface EventCardProps {
 
 export function EventCard({ event, onEdit, onDelete, onStatusChange }: EventCardProps) {
   const [showMenu, setShowMenu] = useState(false);
+  const [isHiding, setIsHiding] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
+
+  // Auto-hide when event is marked as completed
+  useEffect(() => {
+    if (event.status === 'completed' && !isHiding) {
+      // Wait 1 second then remove the card
+      const hideTimer = setTimeout(() => {
+        setIsHidden(true);
+      }, 1000);
+
+      return () => clearTimeout(hideTimer);
+    }
+  }, [event.status, isHiding]);
+
+  // Don't render if hidden
+  if (isHidden) return null;
 
   const formatEventTime = () => {
     return format(new Date(event.start_time), 'h:mm a');
@@ -96,14 +113,20 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange }: EventCard
             />
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className={`text-lg font-semibold text-gray-900 dark:text-white ${
+                  event.status === 'completed' ? 'line-through opacity-60' : ''
+                }`}>
                   {event.title}
                 </h3>
-                <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryConfig().color}`}>
+                <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryConfig().color} ${
+                  event.status === 'completed' ? 'opacity-60' : ''
+                }`}>
                   {getCategoryConfig().icon} {getCategoryConfig().label}
                 </span>
               </div>
-              <div className="flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-400">
+              <div className={`flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-400 ${
+                event.status === 'completed' ? 'line-through opacity-60' : ''
+              }`}>
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
                   {formatEventDate()}
@@ -117,13 +140,17 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange }: EventCard
           </div>
 
           {event.description && (
-            <p className="text-gray-600 dark:text-gray-400 mt-3 ml-4">
+            <p className={`text-gray-600 dark:text-gray-400 mt-3 ml-4 ${
+              event.status === 'completed' ? 'line-through opacity-60' : ''
+            }`}>
               {event.description}
             </p>
           )}
 
           {event.location && (
-            <div className="flex items-center gap-2 mt-3 ml-4 text-gray-600 dark:text-gray-400">
+            <div className={`flex items-center gap-2 mt-3 ml-4 text-gray-600 dark:text-gray-400 ${
+              event.status === 'completed' ? 'line-through opacity-60' : ''
+            }`}>
               <MapPin className="w-4 h-4" />
               <span className="text-sm">{event.location}</span>
             </div>

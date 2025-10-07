@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Smile, Image as ImageIcon, Paperclip } from 'lucide-react';
+import { X, Smile, Image as ImageIcon, Paperclip, Calendar, ChevronDown } from 'lucide-react';
 import { CreateEventInput, CalendarEvent } from '@/lib/services/calendar-service';
 
 interface NewEventModalProps {
@@ -12,23 +12,8 @@ interface NewEventModalProps {
   spaceId: string;
 }
 
-// Family-friendly universal emojis (30 total) - organized by theme
-const EMOJIS = [
-  // Smiles & Emotions
-  '😊', '😂', '😇', '😎', '😘', '🥰', '🤗', '❤️',
-  // Gestures & Hands
-  '👍', '🙏', '👏', '🤝', '💪',
-  // Celebrations & Parties
-  '🎉', '🎈', '🎂', '🎁', '🎊',
-  // Nature & Flowers
-  '🌸', '🌺', '💐', '🌈', '☀️',
-  // Sparkles & Stars
-  '✨', '🌟',
-  // Food & Drinks
-  '🍕', '☕',
-  // Other
-  '📅', '✅', '🏠'
-];
+// Family-friendly universal emojis (20 total)
+const EMOJIS = ['😊', '😂', '❤️', '👍', '🎉', '🙏', '👏', '🤝', '💪', '🌟', '✨', '🎈', '🌸', '🌈', '☀️', '🍕', '☕', '📅', '✅', '🏠'];
 
 // Allowed image formats (excluding SVG for security)
 const ALLOWED_IMAGE_TYPES = [
@@ -73,6 +58,10 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [attachedImages, setAttachedImages] = useState<File[]>([]);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [recurringFrequency, setRecurringFrequency] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
+  const [selectedDaysOfWeek, setSelectedDaysOfWeek] = useState<number[]>([]);
+  const [selectedDaysOfMonth, setSelectedDaysOfMonth] = useState<number[]>([]);
+  const [dateError, setDateError] = useState<string>('');
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -104,10 +93,25 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
     setAttachedImages([]);
     setAttachedFiles([]);
     setShowEmojiPicker(false);
+    setDateError('');
   }, [editEvent, spaceId, isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate end time is not before start time
+    if (formData.start_time && formData.end_time) {
+      const startDate = new Date(formData.start_time);
+      const endDate = new Date(formData.end_time);
+
+      if (endDate < startDate) {
+        setDateError('End date & time cannot be before start date & time');
+        return;
+      }
+    }
+
+    // Clear any previous errors
+    setDateError('');
 
     // Clean up the form data - remove empty strings
     const cleanedData: CreateEventInput = {
@@ -126,7 +130,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
   };
 
   const handleEmojiClick = (emoji: string) => {
-    setFormData({ ...formData, description: formData.description + emoji });
+    setFormData({ ...formData, title: formData.title + emoji });
     setShowEmojiPicker(false);
   };
 
@@ -203,98 +207,112 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {editEvent ? 'Edit Event' : 'Create New Event'}
-          </h2>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-          </button>
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-6 rounded-t-2xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Calendar className="w-6 h-6" />
+              <h2 className="text-2xl font-bold">
+                {editEvent ? 'Edit Event' : 'Create New Event'}
+              </h2>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
+        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Event Title *
             </label>
-            <input
-              type="text"
-              required
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="Enter event title..."
-              className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                required
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="e.g., Team meeting"
+                className="w-full px-4 py-3 pr-12 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+              />
+
+              {/* Emoji Picker Button */}
+              <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                <button
+                  type="button"
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  title="Add emoji"
+                  className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                </button>
+
+                {/* Emoji Picker Popup */}
+                {showEmojiPicker && (
+                  <div className="absolute top-full mt-2 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 grid grid-cols-5 gap-2 z-10 min-w-[240px]">
+                    {EMOJIS.map((emoji, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleEmojiClick(emoji)}
+                        className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-2xl transition-all hover:scale-110"
+                        title="Click to add emoji"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
+          {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Description
             </label>
-            <div className="relative">
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Add a description..."
-                rows={3}
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
-              />
-              <div className="flex items-center gap-2 mt-2">
-                {/* Emoji Picker Button */}
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  >
-                    <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                  </button>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Add event details..."
+              rows={3}
+              className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+            />
+            <div className="flex items-center gap-2 mt-2">
+              {/* Image Attachment Button */}
+              <button
+                type="button"
+                onClick={() => imageInputRef.current?.click()}
+                className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                title="Attach images"
+              >
+                <ImageIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              </button>
 
-                  {/* Emoji Picker Popup */}
-                  {showEmojiPicker && (
-                    <>
-                      <div
-                        className="fixed inset-0 z-10"
-                        onClick={() => setShowEmojiPicker(false)}
-                      />
-                      <div className="absolute bottom-full mb-2 left-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 grid grid-cols-5 gap-2 z-20 min-w-[240px]">
-                        {EMOJIS.map((emoji, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => handleEmojiClick(emoji)}
-                            className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-2xl transition-all hover:scale-110"
-                          >
-                            {emoji}
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {/* Image Attachment Button */}
-                <button
-                  type="button"
-                  onClick={() => imageInputRef.current?.click()}
-                  className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <ImageIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                </button>
-
-                {/* File Attachment Button */}
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <Paperclip className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                </button>
-              </div>
+              {/* File Attachment Button */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                title="Attach files"
+              >
+                <Paperclip className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              </button>
             </div>
           </div>
 
@@ -350,6 +368,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
             </div>
           )}
 
+          {/* Date & Time */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -361,10 +380,23 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                 value={formData.start_time ? formData.start_time.slice(0, 16) : ''}
                 onChange={(e) => {
                   if (e.target.value) {
-                    setFormData({ ...formData, start_time: new Date(e.target.value).toISOString() });
+                    const newStartTime = new Date(e.target.value).toISOString();
+                    setFormData({ ...formData, start_time: newStartTime });
+
+                    // Re-validate if end time is already set
+                    if (formData.end_time) {
+                      const startDate = new Date(newStartTime);
+                      const endDate = new Date(formData.end_time);
+
+                      if (endDate < startDate) {
+                        setDateError('End date & time cannot be before start date & time');
+                      } else {
+                        setDateError('');
+                      }
+                    }
                   }
                 }}
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
 
@@ -377,18 +409,55 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                 value={formData.end_time ? formData.end_time.slice(0, 16) : ''}
                 onChange={(e) => {
                   if (e.target.value) {
-                    setFormData({ ...formData, end_time: new Date(e.target.value).toISOString() });
+                    const newEndTime = new Date(e.target.value).toISOString();
+                    setFormData({ ...formData, end_time: newEndTime });
+
+                    // Validate end time is not before start time
+                    if (formData.start_time) {
+                      const startDate = new Date(formData.start_time);
+                      const endDate = new Date(newEndTime);
+
+                      if (endDate < startDate) {
+                        setDateError('End date & time cannot be before start date & time');
+                      } else {
+                        setDateError('');
+                      }
+                    }
                   } else {
                     setFormData({ ...formData, end_time: '' });
+                    setDateError('');
                   }
                 }}
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white ${
+                  dateError ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'
+                }`}
               />
+              {dateError && (
+                <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                  <span className="font-medium">⚠</span>
+                  {dateError}
+                </p>
+              )}
             </div>
           </div>
 
+          {/* Location */}
           <div>
-            <label className="flex items-center gap-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Location
+            </label>
+            <input
+              type="text"
+              value={formData.location}
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+              placeholder="Add location..."
+              className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+            />
+          </div>
+
+          {/* Recurring */}
+          <div>
+            <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={formData.is_recurring}
@@ -399,21 +468,95 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
             </label>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Location
-            </label>
-            <input
-              type="text"
-              value={formData.location}
-              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              placeholder="Add location..."
-              className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
-            />
-          </div>
+          {/* Recurring Frequency Panel */}
+          {formData.is_recurring && (
+            <div className="space-y-4 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-700">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Frequency
+                </label>
+                <div className="relative">
+                  <select
+                    value={recurringFrequency}
+                    onChange={(e) => setRecurringFrequency(e.target.value as any)}
+                    className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
+                    style={{ paddingRight: '2.5rem' }}
+                  >
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                </div>
+              </div>
 
+              {/* Day Selection for Weekly */}
+              {recurringFrequency === 'weekly' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Select Days of Week
+                  </label>
+                  <div className="grid grid-cols-7 gap-2">
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => {
+                          setSelectedDaysOfWeek(prev =>
+                            prev.includes(index)
+                              ? prev.filter(d => d !== index)
+                              : [...prev, index]
+                          );
+                        }}
+                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                          selectedDaysOfWeek.includes(index)
+                            ? 'bg-purple-500 text-white'
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
+                        }`}
+                      >
+                        {day}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Day Selection for Monthly */}
+              {recurringFrequency === 'monthly' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Select Days of Month
+                  </label>
+                  <div className="grid grid-cols-7 gap-2">
+                    {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                      <button
+                        key={day}
+                        type="button"
+                        onClick={() => {
+                          setSelectedDaysOfMonth(prev =>
+                            prev.includes(day)
+                              ? prev.filter(d => d !== day)
+                              : [...prev, day]
+                          );
+                        }}
+                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                          selectedDaysOfMonth.includes(day)
+                            ? 'bg-purple-500 text-white'
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
+                        }`}
+                      >
+                        {day}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Category */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               Category
             </label>
             <div className="grid grid-cols-5 gap-3">
@@ -441,19 +584,23 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4">
+          {/* Actions */}
+          <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg"
+              disabled={!!dateError}
+              className={`flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl transition-all shadow-lg font-medium ${
+                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
+              }`}
             >
-              {editEvent ? 'Save Changes' : 'Create Event'}
+              {editEvent ? 'Update Event' : 'Create Event'}
             </button>
           </div>
 
