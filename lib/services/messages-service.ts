@@ -26,7 +26,7 @@ export interface Conversation {
 
 export interface CreateMessageInput {
   space_id: string;
-  conversation_id: string;
+  conversation_id: string | null;
   sender_id?: string;
   content: string;
   attachments?: string[];
