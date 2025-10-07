@@ -10,7 +10,7 @@ interface NewMessageModalProps {
   onSave: (message: CreateMessageInput) => void;
   editMessage?: Message | null;
   spaceId: string;
-  conversationId: string;
+  conversationId: string | null;
 }
 
 // 20 family-friendly universal emojis
