@@ -11,7 +11,7 @@ import { shoppingService } from '@/lib/services/shopping-service';
 import { mealsService } from '@/lib/services/meals-service';
 import { projectsService } from '@/lib/services/projects-service';
 import { goalsService } from '@/lib/services/goals-service';
-import { createClient } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase';
 import {
   CheckSquare,
   Calendar,
@@ -516,7 +516,6 @@ export default function DashboardPage() {
   useEffect(() => {
     loadAllStats();
 
-    const supabase = createClient();
     const channels: any[] = [];
 
     // Tasks subscription
@@ -663,33 +662,33 @@ export default function DashboardPage() {
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard' }]}>
-      <div className="min-h-screen bg-gradient-to-b from-white via-purple-100/30 via-40% to-purple-200 dark:from-black dark:via-purple-900/30 dark:via-40% dark:to-purple-900 p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
+      <div className="min-h-screen bg-gradient-to-b from-white via-purple-100/30 via-40% to-purple-200 dark:from-black dark:via-purple-900/30 dark:via-40% dark:to-purple-900 p-4 sm:p-6 md:p-8">
+        <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
           {/* Welcome Header */}
-          <div className="relative overflow-hidden shimmer-gradient rounded-2xl p-8 text-white shadow-2xl">
+          <div className="relative overflow-hidden shimmer-gradient rounded-xl sm:rounded-2xl p-6 sm:p-8 text-white shadow-2xl">
             <div className="absolute inset-0 bg-black/10" />
             <div className="relative z-10">
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <Sparkles className="w-8 h-8" />
-                <h1 className="text-4xl font-bold">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <Sparkles className="w-6 h-6 sm:w-8 sm:h-8" />
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center">
                   {greeting()}, {user.name}!
                 </h1>
               </div>
-              <p className="text-purple-100 text-lg text-center">
+              <p className="text-purple-100 text-sm sm:text-base md:text-lg text-center px-2">
                 {currentSpace.name} • {format(new Date(), 'EEEE, MMMM d, yyyy')}
               </p>
-              <div className="mt-6 flex items-center justify-center gap-6 text-white/90">
+              <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 md:gap-6 text-white/90">
                 <div className="flex items-center gap-2">
-                  <CheckSquare className="w-5 h-5" />
-                  <span className="text-sm">{stats.tasks.pending} pending tasks</span>
+                  <CheckSquare className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-xs sm:text-sm">{stats.tasks.pending} pending tasks</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
-                  <span className="text-sm">{stats.events.today} events today</span>
+                  <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-xs sm:text-sm">{stats.events.today} events today</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5" />
-                  <span className="text-sm">{stats.tasks.overdue + stats.reminders.overdue} overdue items</span>
+                  <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-xs sm:text-sm">{stats.tasks.overdue + stats.reminders.overdue} overdue items</span>
                 </div>
               </div>
             </div>
@@ -697,44 +696,44 @@ export default function DashboardPage() {
 
           {/* Enhanced Feature Cards - 8 Cards */}
           <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <Zap className="w-6 h-6 text-purple-500" />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-purple-500" />
                 Live Stats
               </h2>
-              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <Activity className="w-4 h-4 text-green-500 animate-pulse" />
+              <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 animate-pulse" />
                 <span>Real-time updates</span>
               </div>
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 {[...Array(8)].map((_, i) => (
-                  <div key={i} className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-2xl p-6 shadow-lg animate-pulse">
-                    <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded" />
+                  <div key={i} className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg animate-pulse">
+                    <div className="h-28 sm:h-32 bg-gray-200 dark:bg-gray-700 rounded" />
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 {/* Tasks & Chores Card */}
                 <Link
                   href="/tasks"
-                  className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-2 transition-all duration-300"
+                  className="group bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300"
                 >
-                  <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start justify-between mb-3 sm:mb-4">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-bold text-blue-600 dark:text-blue-400">Tasks</h3>
+                      <div className="flex items-center gap-2 mb-1 sm:mb-2">
+                        <h3 className="text-base sm:text-lg font-bold text-blue-600 dark:text-blue-400">Tasks</h3>
                         {stats.tasks.trend !== 0 && <TrendIndicator value={stats.tasks.trend} label="this week" />}
                       </div>
-                      <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
                         {stats.tasks.total}
                       </p>
                     </div>
-                    <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <CheckSquare className="w-7 h-7 text-white" />
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <CheckSquare className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                     </div>
                   </div>
 
@@ -782,20 +781,20 @@ export default function DashboardPage() {
                 {/* Calendar Card */}
                 <Link
                   href="/calendar"
-                  className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-2 transition-all duration-300"
+                  className="group bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-bold text-purple-600 dark:text-purple-400">Calendar</h3>
+                        <h3 className="text-base sm:text-lg font-bold text-purple-600 dark:text-purple-400">Calendar</h3>
                         {stats.events.trend !== 0 && <TrendIndicator value={stats.events.trend} label="this week" />}
                       </div>
-                      <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
                         {stats.events.total}
                       </p>
                     </div>
-                    <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <Calendar className="w-7 h-7 text-white" />
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <Calendar className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                     </div>
                   </div>
 
@@ -830,20 +829,20 @@ export default function DashboardPage() {
                 {/* Reminders Card */}
                 <Link
                   href="/reminders"
-                  className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(251,146,60,0.5)] hover:-translate-y-2 transition-all duration-300"
+                  className="group bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(251,146,60,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-bold text-orange-600 dark:text-orange-400">Reminders</h3>
+                        <h3 className="text-base sm:text-lg font-bold text-orange-600 dark:text-orange-400">Reminders</h3>
                         {stats.reminders.trend !== 0 && <TrendIndicator value={stats.reminders.trend} label="this week" />}
                       </div>
-                      <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
                         {stats.reminders.active}
                       </p>
                     </div>
-                    <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <Bell className="w-7 h-7 text-white" />
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <Bell className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                     </div>
                   </div>
 
@@ -886,20 +885,20 @@ export default function DashboardPage() {
                 {/* Messages Card */}
                 <Link
                   href="/messages"
-                  className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-2 transition-all duration-300"
+                  className="group bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-bold text-green-600 dark:text-green-400">Messages</h3>
+                        <h3 className="text-base sm:text-lg font-bold text-green-600 dark:text-green-400">Messages</h3>
                         {stats.messages.trend !== 0 && <TrendIndicator value={stats.messages.trend} label="this week" />}
                       </div>
-                      <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
                         {stats.messages.total}
                       </p>
                     </div>
-                    <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <MessageCircle className="w-7 h-7 text-white" />
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                     </div>
                   </div>
 
@@ -939,20 +938,20 @@ export default function DashboardPage() {
                 {/* Shopping Card */}
                 <Link
                   href="/shopping"
-                  className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-2 transition-all duration-300"
+                  className="group bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-bold text-teal-600 dark:text-teal-400">Shopping</h3>
+                        <h3 className="text-base sm:text-lg font-bold text-teal-600 dark:text-teal-400">Shopping</h3>
                         {stats.shopping.trend !== 0 && <TrendIndicator value={stats.shopping.trend} label="this week" />}
                       </div>
-                      <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
                         {stats.shopping.totalItems}
                       </p>
                     </div>
-                    <div className="w-14 h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <ShoppingCart className="w-7 h-7 text-white" />
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <ShoppingCart className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                     </div>
                   </div>
 
@@ -988,20 +987,20 @@ export default function DashboardPage() {
                 {/* Meals Card */}
                 <Link
                   href="/meals"
-                  className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-2 transition-all duration-300"
+                  className="group bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-bold text-red-600 dark:text-red-400">Meals</h3>
+                        <h3 className="text-base sm:text-lg font-bold text-red-600 dark:text-red-400">Meals</h3>
                         {stats.meals.trend !== 0 && <TrendIndicator value={stats.meals.trend} label="this week" />}
                       </div>
-                      <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
                         {stats.meals.thisWeek}
                       </p>
                     </div>
-                    <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <UtensilsCrossed className="w-7 h-7 text-white" />
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <UtensilsCrossed className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                     </div>
                   </div>
 
@@ -1036,20 +1035,20 @@ export default function DashboardPage() {
                 {/* Household Card */}
                 <Link
                   href="/household"
-                  className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-2 transition-all duration-300"
+                  className="group bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-bold text-amber-600 dark:text-amber-400">Household</h3>
+                        <h3 className="text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400">Household</h3>
                         {stats.household.trend !== 0 && <TrendIndicator value={stats.household.trend} label="this week" />}
                       </div>
-                      <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
                         {stats.household.totalChores}
                       </p>
                     </div>
-                    <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <Home className="w-7 h-7 text-white" />
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <Home className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                     </div>
                   </div>
 
@@ -1100,20 +1099,20 @@ export default function DashboardPage() {
                 {/* Goals Card */}
                 <Link
                   href="/goals"
-                  className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-2 transition-all duration-300"
+                  className="group bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-bold text-indigo-600 dark:text-indigo-400">Goals</h3>
+                        <h3 className="text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400">Goals</h3>
                         {stats.goals.trend !== 0 && <TrendIndicator value={stats.goals.trend} label="this week" />}
                       </div>
-                      <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
                         {stats.goals.active}
                       </p>
                     </div>
-                    <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <Target className="w-7 h-7 text-white" />
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <Target className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                     </div>
                   </div>
 
@@ -1159,7 +1158,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Daily Check-In Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+          <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
               <Heart className="w-5 h-5 text-pink-500" />
               Daily Check-In
