@@ -10,6 +10,8 @@ export interface Chore {
   status: 'pending' | 'completed' | 'skipped';
   due_date?: string;
   completed_at?: string;
+  completion_percentage?: number;
+  notes?: string;
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -71,6 +73,20 @@ export interface BudgetStats {
 export interface HouseholdStats {
   chores: ChoreStats;
   budget: BudgetStats;
+}
+
+export interface Budget {
+  id: string;
+  space_id: string;
+  monthly_budget: number;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateBudgetInput {
+  space_id: string;
+  monthly_budget: number;
 }
 
 export const projectsService = {
@@ -228,8 +244,58 @@ export const projectsService = {
     if (error) throw error;
   },
 
+  // Budget
+  async getBudget(spaceId: string): Promise<Budget | null> {
+    const { data, error } = await supabase
+      .from('budgets')
+      .select('*')
+      .eq('space_id', spaceId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
+  },
+
+  async setBudget(input: CreateBudgetInput, userId: string): Promise<Budget> {
+    // Check if budget exists
+    const existing = await this.getBudget(input.space_id);
+
+    if (existing) {
+      // Update existing budget
+      const { data, error } = await supabase
+        .from('budgets')
+        .update({
+          monthly_budget: input.monthly_budget,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('space_id', input.space_id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } else {
+      // Create new budget
+      const { data, error } = await supabase
+        .from('budgets')
+        .insert([{
+          ...input,
+          created_by: userId,
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    }
+  },
+
   async getBudgetStats(spaceId: string): Promise<BudgetStats> {
-    const expenses = await this.getExpenses(spaceId);
+    const [budget, expenses] = await Promise.all([
+      this.getBudget(spaceId),
+      this.getExpenses(spaceId),
+    ]);
+
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
@@ -237,11 +303,12 @@ export const projectsService = {
       new Date(e.created_at) >= monthStart
     );
 
+    // Include both paid and pending expenses in spent calculation
     const spentThisMonth = thisMonthExpenses
-      .filter(e => e.status === 'paid')
+      .filter(e => e.status === 'paid' || e.status === 'pending')
       .reduce((sum, e) => sum + e.amount, 0);
 
-    const monthlyBudget = 5000; // This should come from user settings
+    const monthlyBudget = budget?.monthly_budget || 0;
 
     return {
       monthlyBudget,

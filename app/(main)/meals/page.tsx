@@ -160,6 +160,42 @@ export default function MealsPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
+              {/* View Toggle */}
+              <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700">
+                <button
+                  onClick={() => setViewMode('calendar')}
+                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[110px] ${
+                    viewMode === 'calendar'
+                      ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                  }`}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                  <span className="text-sm">Calendar</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[110px] ${
+                    viewMode === 'list'
+                      ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                  }`}
+                >
+                  <List className="w-4 h-4" />
+                  <span className="text-sm">List</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('recipes')}
+                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[110px] ${
+                    viewMode === 'recipes'
+                      ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                  }`}
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span className="text-sm">Recipes</span>
+                </button>
+              </div>
               <button onClick={() => setIsRecipeModalOpen(true)} className="px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center gap-2">
                 <ChefHat className="w-5 h-5" />
                 New Recipe
@@ -213,49 +249,8 @@ export default function MealsPage() {
             </div>
           </div>
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            {/* View Toggle */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                {viewMode === 'recipes' ? `Recipe Library (${filteredRecipes.length})` : `Planned Meals (${filteredMeals.length})`}
-              </h2>
-              <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl border border-purple-200 dark:border-purple-700">
-                <button
-                  onClick={() => setViewMode('calendar')}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[110px] ${
-                    viewMode === 'calendar'
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                  }`}
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                  <span className="text-sm">Calendar</span>
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[110px] ${
-                    viewMode === 'list'
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                  <span className="text-sm">List</span>
-                </button>
-                <button
-                  onClick={() => setViewMode('recipes')}
-                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[110px] ${
-                    viewMode === 'recipes'
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                  }`}
-                >
-                  <BookOpen className="w-4 h-4" />
-                  <span className="text-sm">Recipes</span>
-                </button>
-              </div>
-            </div>
 
-            <div className="min-h-[600px]">
+            <div className="h-[600px] overflow-y-auto">
               {loading ? (
                 <div className="text-center py-12">
                   <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
@@ -311,7 +306,7 @@ export default function MealsPage() {
                   >
                     <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                   </button>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
                     {format(currentMonth, 'MMMM yyyy')}
                   </h3>
                   <button
