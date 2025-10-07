@@ -377,11 +377,11 @@ export default function DashboardPage() {
       let checkedToday = 0;
       let uncheckedItems = 0;
       for (const list of shoppingLists) {
-        const items = await shoppingService.getItems(list.id);
+        const items = list.items || [];
         totalItems += items.length;
-        uncheckedItems += items.filter(i => !i.is_checked).length;
+        uncheckedItems += items.filter(i => !i.checked).length;
         checkedToday += items.filter(i =>
-          i.is_checked && i.updated_at && isToday(parseISO(i.updated_at))
+          i.checked && i.updated_at && isToday(parseISO(i.updated_at))
         ).length;
       }
       const activeLists = shoppingLists.filter(l => l.status === 'active').length;
