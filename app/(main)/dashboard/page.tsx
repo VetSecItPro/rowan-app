@@ -720,7 +720,7 @@ export default function DashboardPage() {
                 {/* Tasks & Chores Card */}
                 <Link
                   href="/tasks"
-                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30"
+                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-3 sm:mb-4">
                     <div className="flex-1">
@@ -772,7 +772,7 @@ export default function DashboardPage() {
                     </div>
                   )}
 
-                  <div className="mt-3 flex items-center justify-end text-blue-600 dark:text-blue-400 text-sm font-medium group-hover:gap-2 transition-all">
+                  <div className="mt-auto pt-3 flex items-center justify-end text-blue-600 dark:text-blue-400 text-sm font-medium group-hover:gap-2 transition-all">
                     <span>View all</span>
                     <ChevronRight className="w-4 h-4" />
                   </div>
@@ -781,7 +781,7 @@ export default function DashboardPage() {
                 {/* Calendar Card */}
                 <Link
                   href="/calendar"
-                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30"
+                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -820,7 +820,7 @@ export default function DashboardPage() {
                     </div>
                   )}
 
-                  <div className="mt-3 flex items-center justify-end text-purple-600 dark:text-purple-400 text-sm font-medium group-hover:gap-2 transition-all">
+                  <div className="mt-auto pt-3 flex items-center justify-end text-purple-600 dark:text-purple-400 text-sm font-medium group-hover:gap-2 transition-all">
                     <span>View all</span>
                     <ChevronRight className="w-4 h-4" />
                   </div>
@@ -829,7 +829,7 @@ export default function DashboardPage() {
                 {/* Reminders Card */}
                 <Link
                   href="/reminders"
-                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(251,146,60,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30"
+                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(251,146,60,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -876,7 +876,7 @@ export default function DashboardPage() {
                     </div>
                   )}
 
-                  <div className="mt-3 flex items-center justify-end text-orange-600 dark:text-orange-400 text-sm font-medium group-hover:gap-2 transition-all">
+                  <div className="mt-auto pt-3 flex items-center justify-end text-orange-600 dark:text-orange-400 text-sm font-medium group-hover:gap-2 transition-all">
                     <span>View all</span>
                     <ChevronRight className="w-4 h-4" />
                   </div>
@@ -885,7 +885,7 @@ export default function DashboardPage() {
                 {/* Messages Card */}
                 <Link
                   href="/messages"
-                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30"
+                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -929,7 +929,7 @@ export default function DashboardPage() {
                     </div>
                   )}
 
-                  <div className="mt-3 flex items-center justify-end text-green-600 dark:text-green-400 text-sm font-medium group-hover:gap-2 transition-all">
+                  <div className="mt-auto pt-3 flex items-center justify-end text-green-600 dark:text-green-400 text-sm font-medium group-hover:gap-2 transition-all">
                     <span>View all</span>
                     <ChevronRight className="w-4 h-4" />
                   </div>
@@ -938,7 +938,7 @@ export default function DashboardPage() {
                 {/* Shopping Card */}
                 <Link
                   href="/shopping"
-                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30"
+                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -978,7 +978,7 @@ export default function DashboardPage() {
                     </div>
                   )}
 
-                  <div className="mt-3 flex items-center justify-end text-teal-600 dark:text-teal-400 text-sm font-medium group-hover:gap-2 transition-all">
+                  <div className="mt-auto pt-3 flex items-center justify-end text-teal-600 dark:text-teal-400 text-sm font-medium group-hover:gap-2 transition-all">
                     <span>View all</span>
                     <ChevronRight className="w-4 h-4" />
                   </div>
@@ -987,7 +987,7 @@ export default function DashboardPage() {
                 {/* Meals Card */}
                 <Link
                   href="/meals"
-                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30"
+                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1026,7 +1026,7 @@ export default function DashboardPage() {
                     </div>
                   )}
 
-                  <div className="mt-3 flex items-center justify-end text-red-600 dark:text-red-400 text-sm font-medium group-hover:gap-2 transition-all">
+                  <div className="mt-auto pt-3 flex items-center justify-end text-red-600 dark:text-red-400 text-sm font-medium group-hover:gap-2 transition-all">
                     <span>View all</span>
                     <ChevronRight className="w-4 h-4" />
                   </div>
@@ -1035,7 +1035,7 @@ export default function DashboardPage() {
                 {/* Household Card */}
                 <Link
                   href="/household"
-                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30"
+                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1090,7 +1090,7 @@ export default function DashboardPage() {
                     </p>
                   </div>
 
-                  <div className="mt-3 flex items-center justify-end text-amber-600 dark:text-amber-400 text-sm font-medium group-hover:gap-2 transition-all">
+                  <div className="mt-auto pt-3 flex items-center justify-end text-amber-600 dark:text-amber-400 text-sm font-medium group-hover:gap-2 transition-all">
                     <span>View all</span>
                     <ChevronRight className="w-4 h-4" />
                   </div>
@@ -1099,7 +1099,7 @@ export default function DashboardPage() {
                 {/* Goals Card */}
                 <Link
                   href="/goals"
-                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30"
+                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 border border-white/20 dark:border-gray-700/30 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1148,7 +1148,7 @@ export default function DashboardPage() {
                     Overall progress: {stats.goals.overallProgress}%
                   </p>
 
-                  <div className="mt-3 flex items-center justify-end text-indigo-600 dark:text-indigo-400 text-sm font-medium group-hover:gap-2 transition-all">
+                  <div className="mt-auto pt-3 flex items-center justify-end text-indigo-600 dark:text-indigo-400 text-sm font-medium group-hover:gap-2 transition-all">
                     <span>View all</span>
                     <ChevronRight className="w-4 h-4" />
                   </div>
