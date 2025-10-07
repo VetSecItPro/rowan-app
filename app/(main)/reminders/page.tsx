@@ -27,6 +27,7 @@ export default function RemindersPage() {
 
   useEffect(() => {
     loadReminders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSpace.id]);
 
   useEffect(() => {
@@ -112,13 +113,13 @@ export default function RemindersPage() {
     // Optimistic update - update UI immediately
     setReminders(prevReminders =>
       prevReminders.map(reminder =>
-        reminder.id === reminderId ? { ...reminder, status: status as any } : reminder
+        reminder.id === reminderId ? { ...reminder, status: status as 'active' | 'completed' | 'snoozed' } : reminder
       )
     );
 
     // Update in background
     try {
-      await remindersService.updateReminder(reminderId, { status: status as any });
+      await remindersService.updateReminder(reminderId, { status: status as 'active' | 'completed' | 'snoozed' });
     } catch (error) {
       console.error('Failed to update reminder status:', error);
       loadReminders(); // Revert on error

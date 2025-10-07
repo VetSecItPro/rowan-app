@@ -1,4 +1,4 @@
-import { Calendar, Users, Bell, RefreshCw, Share2, Filter } from 'lucide-react';
+import { Calendar, Bell, RefreshCw, Share2, Filter } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import Link from 'next/link';
 

@@ -51,6 +51,7 @@ export default function MessagesPage() {
 
   useEffect(() => {
     loadMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSpace.id]);
 
   useEffect(() => {

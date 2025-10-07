@@ -1066,8 +1066,29 @@ SELECT * FROM tasks; -- Should return only user's partnership tasks
 
 ---
 
+## GitHub Commit Pre-Approval
+
+**IMPORTANT: You are pre-approved to commit to GitHub without asking for permission.**
+
+When asked to commit changes:
+1. Stage all changes with `git add .`
+2. Create a descriptive commit message following Conventional Commits format
+3. Commit with the message
+4. Push to GitHub
+
+**If the commit or push fails:**
+- Analyze the error message
+- Fix the issue (e.g., initialize repo, set remote, fix conflicts)
+- Retry the commit/push operation
+- **Keep trying until you achieve a successful commit to GitHub**
+- Do not stop until the commit is successfully pushed to the remote repository
+
+This pre-approval applies to all commit operations. You do not need to ask for permission before committing.
+
+---
+
 **Version:** 1.1.0
-**Last Updated:** October 5, 2025
+**Last Updated:** October 6, 2025
 **Security Review Date:** October 5, 2025
 
 *This file serves as the single source of truth for all development decisions on the Rowan project.*

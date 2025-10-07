@@ -14,7 +14,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMont
 type ViewMode = 'calendar' | 'list' | 'recipes';
 
 export default function MealsPage() {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace } = useAuth();
   const [meals, setMeals] = useState<Meal[]>([]);
   const [filteredMeals, setFilteredMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,6 +32,7 @@ export default function MealsPage() {
   useEffect(() => {
     loadMeals();
     loadRecipes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSpace.id]);
 
   useEffect(() => {
@@ -281,12 +282,12 @@ export default function MealsPage() {
                     <RecipeCard
                       key={recipe.id}
                       recipe={recipe}
-                      onEdit={(r) => {
-                        setEditingRecipe(r);
+                      onEdit={(recipe) => {
+                        setEditingRecipe(recipe);
                         setIsRecipeModalOpen(true);
                       }}
                       onDelete={handleDeleteRecipe}
-                      onPlanMeal={(r) => {
+                      onPlanMeal={() => {
                         setEditingMeal(null);
                         setIsModalOpen(true);
                         // TODO: Pre-select this recipe in the meal modal
