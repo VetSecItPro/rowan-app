@@ -557,7 +557,7 @@ export default function DashboardPage() {
 
               {/* Partner's Check-In */}
               <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{partnerCheckIn.name}'s Check-In</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{partnerCheckIn.name}&apos;s Check-In</p>
                 {partnerCheckIn.mood ? (
                   <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl">
                     <div className="text-3xl">{partnerCheckIn.mood}</div>

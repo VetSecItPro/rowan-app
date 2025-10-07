@@ -113,7 +113,7 @@ export default function CalendarFeaturePage() {
                 </li>
                 <li className="flex items-start gap-3">
                   <Bell className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                  <span>Track kids' activities and practice schedules</span>
+                  <span>Track kids&apos; activities and practice schedules</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Bell className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
