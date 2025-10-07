@@ -318,13 +318,13 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
               <div className="relative">
                 <select
                   value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value as 'pending' | 'completed' | 'skipped' })}
                   className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
                   style={{ paddingRight: '2.5rem' }}
                 >
                   <option value="pending">Pending</option>
-                  <option value="in_progress">In Progress</option>
                   <option value="completed">Completed</option>
+                  <option value="skipped">Skipped</option>
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
