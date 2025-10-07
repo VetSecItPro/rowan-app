@@ -22,10 +22,38 @@ import {
   Trash2,
   LogOut,
   Key,
-  Smartphone
+  Smartphone,
+  X,
+  UserPlus,
+  Crown,
+  Eye,
+  AlertTriangle,
+  Check,
+  Copy,
+  Monitor,
+  ChevronDown
 } from 'lucide-react';
 
 type SettingsTab = 'profile' | 'security' | 'notifications' | 'appearance' | 'privacy' | 'spaces' | 'data' | 'help';
+type UserRole = 'Admin' | 'Member' | 'Viewer';
+type ExportStatus = 'idle' | 'pending' | 'processing' | 'ready';
+
+interface SpaceMember {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  avatar?: string;
+  isCurrentUser?: boolean;
+}
+
+interface ActiveSession {
+  id: string;
+  device: string;
+  location: string;
+  lastActive: string;
+  isCurrent: boolean;
+}
 
 // Allowed image formats for profile picture
 const ALLOWED_PROFILE_IMAGE_TYPES = [
@@ -40,11 +68,111 @@ const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const MIN_IMAGE_DIMENSION = 100;
 const MAX_IMAGE_DIMENSION = 2000;
 
+// Mock data for space members
+const mockSpaceMembers: SpaceMember[] = [
+  { id: '1', name: 'Alex Johnson', email: 'alex@example.com', role: 'Admin', isCurrentUser: true },
+  { id: '2', name: 'Jordan Smith', email: 'jordan@example.com', role: 'Admin' },
+  { id: '3', name: 'Taylor Brown', email: 'taylor@example.com', role: 'Member' },
+  { id: '4', name: 'Casey Wilson', email: 'casey@example.com', role: 'Viewer' },
+];
+
+// Mock data for active sessions
+const mockSessions: ActiveSession[] = [
+  { id: '1', device: 'MacBook Pro - Chrome', location: 'San Francisco, CA', lastActive: 'Active now', isCurrent: true },
+  { id: '2', device: 'iPhone 15 - Safari', location: 'San Francisco, CA', lastActive: '2 hours ago', isCurrent: false },
+  { id: '3', device: 'iPad Pro - Safari', location: 'Oakland, CA', lastActive: '1 day ago', isCurrent: false },
+];
+
+// Mock pending invitations
+const mockPendingInvitations = [
+  { email: 'newuser@example.com', role: 'Member', sentAt: '2 days ago' },
+];
+
 export default function SettingsPage() {
   const { user, currentSpace } = useAuth();
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const profileImageInputRef = useRef<HTMLInputElement>(null);
+
+  // Profile state
+  const [profileData, setProfileData] = useState({
+    name: user.name,
+    email: user.email,
+    phone: '',
+    timezone: 'Pacific Time (PT)',
+    bio: ''
+  });
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+
+  // Modal states
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showManageMembersModal, setShowManageMembersModal] = useState(false);
+  const [showLeaveSpaceModal, setShowLeaveSpaceModal] = useState(false);
+  const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const [show2FAModal, setShow2FAModal] = useState(false);
+  const [showRevokeSessionModal, setShowRevokeSessionModal] = useState(false);
+
+  // Invite modal state
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState<UserRole>('Member');
+  const [isSendingInvite, setIsSendingInvite] = useState(false);
+
+  // Space members state
+  const [spaceMembers, setSpaceMembers] = useState<SpaceMember[]>(mockSpaceMembers);
+  const [pendingInvitations, setPendingInvitations] = useState(mockPendingInvitations);
+
+  // Create space state
+  const [newSpaceName, setNewSpaceName] = useState('');
+  const [isCreatingSpace, setIsCreatingSpace] = useState(false);
+
+  // Export state
+  const [exportStatus, setExportStatus] = useState<ExportStatus>('idle');
+
+  // Delete account state
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleteAcknowledged, setDeleteAcknowledged] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+
+  // 2FA state
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [isEnabling2FA, setIsEnabling2FA] = useState(false);
+  const [backupCodes] = useState([
+    'ABCD-1234-EFGH',
+    'IJKL-5678-MNOP',
+    'QRST-9012-UVWX',
+    'YZAB-3456-CDEF',
+    'GHIJ-7890-KLMN',
+    'OPQR-2345-STUV'
+  ]);
+
+  // Active sessions state
+  const [activeSessions, setActiveSessions] = useState<ActiveSession[]>(mockSessions);
+  const [sessionToRevoke, setSessionToRevoke] = useState<string | null>(null);
+
+  // Notification toggles state
+  const [emailNotifications, setEmailNotifications] = useState({
+    taskAssignments: true,
+    eventReminders: true,
+    messages: true,
+    weeklyDigest: true,
+  });
+
+  const [pushNotifications, setPushNotifications] = useState({
+    desktop: true,
+    mobile: true,
+    sound: true,
+  });
+
+  // Privacy toggles state
+  const [privacySettings, setPrivacySettings] = useState({
+    profileVisibility: true,
+    activityStatus: true,
+    readReceipts: true,
+    analytics: true,
+  });
 
   const validateProfileImage = (file: File): Promise<boolean> => {
     return new Promise((resolve, reject) => {
@@ -115,6 +243,208 @@ export default function SettingsPage() {
 
     // Reset input
     e.target.value = '';
+  };
+
+  const handleSaveProfile = async () => {
+    setIsSavingProfile(true);
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(profileData.email)) {
+      console.log('Error: Invalid email format');
+      alert('Please enter a valid email address');
+      setIsSavingProfile(false);
+      return;
+    }
+
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    console.log('Profile saved:', profileData);
+    console.log('Toast: Settings saved successfully');
+    setIsSavingProfile(false);
+  };
+
+  const handleSendInvite = async () => {
+    if (!inviteEmail) {
+      alert('Please enter an email address');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(inviteEmail)) {
+      alert('Please enter a valid email address');
+      return;
+    }
+
+    setIsSendingInvite(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    console.log('Sending invite to:', inviteEmail, 'with role:', inviteRole);
+    setPendingInvitations([...pendingInvitations, { email: inviteEmail, role: inviteRole, sentAt: 'Just now' }]);
+    console.log('Toast: Invitation sent successfully');
+
+    setInviteEmail('');
+    setInviteRole('Member');
+    setIsSendingInvite(false);
+    setShowInviteModal(false);
+  };
+
+  const handleUpdateMemberRole = async (memberId: string, newRole: UserRole) => {
+    console.log('Updating member role:', memberId, 'to', newRole);
+    setSpaceMembers(spaceMembers.map(member =>
+      member.id === memberId ? { ...member, role: newRole } : member
+    ));
+    console.log('Toast: Member role updated');
+  };
+
+  const handleRemoveMember = async (memberId: string) => {
+    const member = spaceMembers.find(m => m.id === memberId);
+    if (!member) return;
+
+    if (member.isCurrentUser) {
+      alert('You cannot remove yourself. Use "Leave Space" instead.');
+      return;
+    }
+
+    const adminCount = spaceMembers.filter(m => m.role === 'Admin').length;
+    if (member.role === 'Admin' && adminCount === 1) {
+      alert('Cannot remove the last admin. Promote another member to admin first.');
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to remove ${member.name} from this space?`)) {
+      return;
+    }
+
+    console.log('Removing member:', memberId);
+    setSpaceMembers(spaceMembers.filter(m => m.id !== memberId));
+    console.log('Toast: Member removed successfully');
+  };
+
+  const handleLeaveSpace = async () => {
+    const adminCount = spaceMembers.filter(m => m.role === 'Admin').length;
+    const currentUserMember = spaceMembers.find(m => m.isCurrentUser);
+
+    if (currentUserMember?.role === 'Admin' && adminCount === 1) {
+      alert('You are the last admin. Please promote another member to admin before leaving.');
+      return;
+    }
+
+    console.log('User leaving space');
+    console.log('Toast: You have left the space');
+    setShowLeaveSpaceModal(false);
+  };
+
+  const handleCreateSpace = async () => {
+    if (!newSpaceName.trim()) {
+      alert('Please enter a space name');
+      return;
+    }
+
+    setIsCreatingSpace(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    console.log('Creating new space:', newSpaceName);
+    console.log('Toast: Space created successfully');
+
+    setNewSpaceName('');
+    setIsCreatingSpace(false);
+    setShowCreateSpaceModal(false);
+  };
+
+  const handleRequestExport = async () => {
+    console.log('Requesting data export');
+    setExportStatus('pending');
+    setShowExportModal(false);
+    console.log('Toast: Export request submitted. We will email you when ready.');
+
+    // Simulate processing
+    setTimeout(() => {
+      setExportStatus('processing');
+      console.log('Toast: Your export is being processed...');
+    }, 2000);
+
+    setTimeout(() => {
+      setExportStatus('ready');
+      console.log('Toast: Your export is ready for download!');
+    }, 5000);
+  };
+
+  const handleDownloadExport = () => {
+    console.log('Downloading data export');
+    console.log('Toast: Download started');
+    setExportStatus('idle');
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!deletePassword) {
+      alert('Please enter your password');
+      return;
+    }
+
+    if (deleteConfirmText !== 'DELETE') {
+      alert('Please type DELETE to confirm');
+      return;
+    }
+
+    if (!deleteAcknowledged) {
+      alert('Please acknowledge that this action is permanent');
+      return;
+    }
+
+    setIsDeletingAccount(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    console.log('Deleting account - password verified');
+    console.log('Toast: Account deleted. You will be redirected to the login page.');
+
+    setIsDeletingAccount(false);
+    setShowDeleteAccountModal(false);
+  };
+
+  const handleEnable2FA = async () => {
+    if (!twoFactorCode || twoFactorCode.length !== 6) {
+      alert('Please enter a valid 6-digit code');
+      return;
+    }
+
+    setIsEnabling2FA(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    console.log('Enabling 2FA with code:', twoFactorCode);
+    console.log('Toast: Two-factor authentication enabled successfully');
+
+    setTwoFactorCode('');
+    setIsEnabling2FA(false);
+    setShow2FAModal(false);
+  };
+
+  const handleRevokeSession = async (sessionId: string) => {
+    console.log('Revoking session:', sessionId);
+    setActiveSessions(activeSessions.filter(s => s.id !== sessionId));
+    console.log('Toast: Session revoked successfully');
+    setShowRevokeSessionModal(false);
+    setSessionToRevoke(null);
+  };
+
+  const copyBackupCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    console.log('Toast: Backup code copied to clipboard');
+  };
+
+  const handleNotificationToggle = (category: 'email' | 'push', key: string) => {
+    if (category === 'email') {
+      setEmailNotifications(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
+    } else {
+      setPushNotifications(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
+    }
+    console.log('Toast: Settings saved');
+  };
+
+  const handlePrivacyToggle = (key: string) => {
+    setPrivacySettings(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
+    console.log('Toast: Settings saved');
   };
 
   const tabs = [
@@ -195,7 +525,7 @@ export default function SettingsPage() {
                           />
                         ) : (
                           <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow-xl">
-                            {user.name.charAt(0).toUpperCase()}
+                            {profileData.name.charAt(0).toUpperCase()}
                           </div>
                         )}
                         <button
@@ -206,8 +536,8 @@ export default function SettingsPage() {
                         </button>
                       </div>
                       <div className="text-center sm:text-left">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{user.name}</h3>
-                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{user.email}</p>
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{profileData.name}</h3>
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{profileData.email}</p>
                         <button
                           onClick={() => profileImageInputRef.current?.click()}
                           className="mt-2 text-xs sm:text-sm text-purple-600 dark:text-purple-400 hover:underline"
@@ -237,7 +567,8 @@ export default function SettingsPage() {
                         </label>
                         <input
                           type="text"
-                          defaultValue={user.name}
+                          value={profileData.name}
+                          onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
                           className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
                       </div>
@@ -248,7 +579,8 @@ export default function SettingsPage() {
                         </label>
                         <input
                           type="email"
-                          defaultValue={user.email}
+                          value={profileData.email}
+                          onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
                           className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
                       </div>
@@ -260,6 +592,8 @@ export default function SettingsPage() {
                         </label>
                         <input
                           type="tel"
+                          value={profileData.phone}
+                          onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
                           placeholder="+1 (555) 000-0000"
                           className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
@@ -271,16 +605,18 @@ export default function SettingsPage() {
                           Time Zone
                         </label>
                         <div className="relative">
-                          <select className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-11 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer">
+                          <select
+                            value={profileData.timezone}
+                            onChange={(e) => setProfileData({ ...profileData, timezone: e.target.value })}
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-11 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer"
+                          >
                             <option>Pacific Time (PT)</option>
                             <option>Eastern Time (ET)</option>
                             <option>Central Time (CT)</option>
                             <option>Mountain Time (MT)</option>
                           </select>
                           <div className="absolute inset-y-0 right-0 flex items-center pr-3 sm:pr-4 pointer-events-none">
-                            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
+                            <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 dark:text-gray-400" />
                           </div>
                         </div>
                       </div>
@@ -292,14 +628,29 @@ export default function SettingsPage() {
                       </label>
                       <textarea
                         rows={4}
+                        value={profileData.bio}
+                        onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
                         placeholder="Tell us about yourself..."
                         className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
                       />
                     </div>
 
-                    <button className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-purple-600 text-white rounded-lg sm:rounded-xl hover:bg-purple-700 transition-colors shadow-lg flex items-center justify-center gap-2">
-                      <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      Save Changes
+                    <button
+                      onClick={handleSaveProfile}
+                      disabled={isSavingProfile}
+                      className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-purple-600 text-white rounded-lg sm:rounded-xl hover:bg-purple-700 transition-colors shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isSavingProfile ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          Save Changes
+                        </>
+                      )}
                     </button>
                   </div>
                 )}
@@ -358,7 +709,10 @@ export default function SettingsPage() {
                             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-500 mt-2">Status: <span className="text-red-600 dark:text-red-400 font-medium">Not Enabled</span></p>
                           </div>
                         </div>
-                        <button className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-green-600 text-white rounded-lg sm:rounded-xl hover:bg-green-700 transition-colors shadow-lg">
+                        <button
+                          onClick={() => setShow2FAModal(true)}
+                          className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-green-600 text-white rounded-lg sm:rounded-xl hover:bg-green-700 transition-colors shadow-lg"
+                        >
                           Enable 2FA
                         </button>
                       </div>
@@ -368,13 +722,30 @@ export default function SettingsPage() {
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Active Sessions</h3>
                       <div className="space-y-3">
-                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
-                          <div>
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">MacBook Pro - Chrome</p>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">San Francisco, CA • Active now</p>
+                        {activeSessions.map((session) => (
+                          <div key={session.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
+                            <div className="flex items-center gap-3">
+                              <Monitor className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                              <div>
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">{session.device}</p>
+                                <p className="text-xs text-gray-600 dark:text-gray-400">{session.location} • {session.lastActive}</p>
+                              </div>
+                            </div>
+                            {session.isCurrent ? (
+                              <span className="text-xs text-green-600 dark:text-green-400 font-medium">Current</span>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  setSessionToRevoke(session.id);
+                                  setShowRevokeSessionModal(true);
+                                }}
+                                className="text-xs text-red-600 dark:text-red-400 hover:underline"
+                              >
+                                Revoke
+                              </button>
+                            )}
                           </div>
-                          <span className="text-xs text-green-600 dark:text-green-400 font-medium">Current</span>
-                        </div>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -396,18 +767,23 @@ export default function SettingsPage() {
                       </h3>
                       <div className="space-y-4">
                         {[
-                          { label: 'Task assignments', desc: 'Get notified when someone assigns you a task' },
-                          { label: 'Event reminders', desc: 'Receive email reminders for upcoming events' },
-                          { label: 'Messages', desc: 'Get notified about new messages' },
-                          { label: 'Weekly digest', desc: 'Receive a weekly summary of your activity' },
-                        ].map((item, idx) => (
-                          <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
+                          { key: 'taskAssignments', label: 'Task assignments', desc: 'Get notified when someone assigns you a task' },
+                          { key: 'eventReminders', label: 'Event reminders', desc: 'Receive email reminders for upcoming events' },
+                          { key: 'messages', label: 'Messages', desc: 'Get notified about new messages' },
+                          { key: 'weeklyDigest', label: 'Weekly digest', desc: 'Receive a weekly summary of your activity' },
+                        ].map((item) => (
+                          <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
                             <div>
                               <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
                               <p className="text-xs text-gray-600 dark:text-gray-400">{item.desc}</p>
                             </div>
                             <label className="relative inline-flex items-center cursor-pointer">
-                              <input type="checkbox" defaultChecked className="sr-only peer" />
+                              <input
+                                type="checkbox"
+                                checked={emailNotifications[item.key as keyof typeof emailNotifications]}
+                                onChange={() => handleNotificationToggle('email', item.key)}
+                                className="sr-only peer"
+                              />
                               <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
                             </label>
                           </div>
@@ -423,17 +799,22 @@ export default function SettingsPage() {
                       </h3>
                       <div className="space-y-4">
                         {[
-                          { label: 'Desktop notifications', desc: 'Show notifications on your desktop' },
-                          { label: 'Mobile push', desc: 'Receive push notifications on your mobile device' },
-                          { label: 'Sound alerts', desc: 'Play a sound when you receive a notification' },
-                        ].map((item, idx) => (
-                          <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
+                          { key: 'desktop', label: 'Desktop notifications', desc: 'Show notifications on your desktop' },
+                          { key: 'mobile', label: 'Mobile push', desc: 'Receive push notifications on your mobile device' },
+                          { key: 'sound', label: 'Sound alerts', desc: 'Play a sound when you receive a notification' },
+                        ].map((item) => (
+                          <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
                             <div>
                               <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
                               <p className="text-xs text-gray-600 dark:text-gray-400">{item.desc}</p>
                             </div>
                             <label className="relative inline-flex items-center cursor-pointer">
-                              <input type="checkbox" defaultChecked className="sr-only peer" />
+                              <input
+                                type="checkbox"
+                                checked={pushNotifications[item.key as keyof typeof pushNotifications]}
+                                onChange={() => handleNotificationToggle('push', item.key)}
+                                className="sr-only peer"
+                              />
                               <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
                             </label>
                           </div>
@@ -467,9 +848,7 @@ export default function SettingsPage() {
                               <option>Deutsch</option>
                             </select>
                             <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                              <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                              </svg>
+                              <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                             </div>
                           </div>
                         </div>
@@ -484,9 +863,7 @@ export default function SettingsPage() {
                               <option>YYYY-MM-DD</option>
                             </select>
                             <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                              <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                              </svg>
+                              <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                             </div>
                           </div>
                         </div>
@@ -505,18 +882,23 @@ export default function SettingsPage() {
 
                     <div className="space-y-4">
                       {[
-                        { label: 'Profile visibility', desc: 'Allow other space members to see your profile' },
-                        { label: 'Activity status', desc: 'Show when you\'re online and active' },
-                        { label: 'Read receipts', desc: 'Let others know when you\'ve read their messages' },
-                        { label: 'Analytics', desc: 'Help us improve Rowan by sharing anonymous usage data' },
-                      ].map((item, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
+                        { key: 'profileVisibility', label: 'Profile visibility', desc: 'Allow other space members to see your profile' },
+                        { key: 'activityStatus', label: 'Activity status', desc: 'Show when you\'re online and active' },
+                        { key: 'readReceipts', label: 'Read receipts', desc: 'Let others know when you\'ve read their messages' },
+                        { key: 'analytics', label: 'Analytics', desc: 'Help us improve Rowan by sharing anonymous usage data' },
+                      ].map((item) => (
+                        <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
                           <div>
                             <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
                             <p className="text-xs text-gray-600 dark:text-gray-400">{item.desc}</p>
                           </div>
                           <label className="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" defaultChecked className="sr-only peer" />
+                            <input
+                              type="checkbox"
+                              checked={privacySettings[item.key as keyof typeof privacySettings]}
+                              onChange={() => handlePrivacyToggle(item.key)}
+                              className="sr-only peer"
+                            />
                             <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
                           </label>
                         </div>
@@ -538,16 +920,50 @@ export default function SettingsPage() {
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4">
                         <div>
                           <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{currentSpace.name}</h3>
-                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Current Space • 4 members</p>
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Current Space • {spaceMembers.length} members</p>
                         </div>
                         <span className="px-2.5 sm:px-3 py-1 bg-purple-600 text-white text-xs font-medium rounded-full self-start sm:self-auto">Admin</span>
                       </div>
-                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                        <button className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-xs sm:text-sm">
+                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4">
+                        <button
+                          onClick={() => setShowInviteModal(true)}
+                          className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-xs sm:text-sm flex items-center justify-center gap-2"
+                        >
+                          <UserPlus className="w-4 h-4" />
                           Invite Members
                         </button>
-                        <button className="px-3 sm:px-4 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-xs sm:text-sm">
+                        <button
+                          onClick={() => setShowManageMembersModal(true)}
+                          className="px-3 sm:px-4 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-xs sm:text-sm flex items-center justify-center gap-2"
+                        >
+                          <Users className="w-4 h-4" />
                           Manage Members
+                        </button>
+                      </div>
+
+                      {/* Pending Invitations */}
+                      {pendingInvitations.length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-purple-200 dark:border-purple-800">
+                          <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Pending Invitations</h4>
+                          <div className="space-y-2">
+                            {pendingInvitations.map((invite, idx) => (
+                              <div key={idx} className="flex items-center justify-between text-xs bg-white/50 dark:bg-gray-900/50 p-2 rounded-lg">
+                                <span className="text-gray-700 dark:text-gray-300">{invite.email}</span>
+                                <span className="text-gray-500 dark:text-gray-400">{invite.role} • {invite.sentAt}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Leave Space */}
+                      <div className="mt-4 pt-4 border-t border-purple-200 dark:border-purple-800">
+                        <button
+                          onClick={() => setShowLeaveSpaceModal(true)}
+                          className="text-sm text-red-600 dark:text-red-400 hover:underline flex items-center gap-2"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Leave Space
                         </button>
                       </div>
                     </div>
@@ -556,7 +972,10 @@ export default function SettingsPage() {
                     <div className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Create New Space</h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Start a new space for another family or team</p>
-                      <button className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:opacity-90 transition-opacity text-sm">
+                      <button
+                        onClick={() => setShowCreateSpaceModal(true)}
+                        className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:opacity-90 transition-opacity text-sm"
+                      >
                         + New Space
                       </button>
                     </div>
@@ -580,10 +999,40 @@ export default function SettingsPage() {
                         <div className="flex-1 w-full">
                           <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Export Your Data</h3>
                           <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">Download a copy of all your data in JSON format</p>
-                          <button className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded-lg sm:rounded-xl hover:bg-blue-700 transition-colors shadow-lg flex items-center justify-center gap-2">
-                            <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                            Request Data Export
-                          </button>
+
+                          {exportStatus === 'idle' && (
+                            <button
+                              onClick={() => setShowExportModal(true)}
+                              className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded-lg sm:rounded-xl hover:bg-blue-700 transition-colors shadow-lg flex items-center justify-center gap-2"
+                            >
+                              <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                              Request Data Export
+                            </button>
+                          )}
+
+                          {exportStatus === 'pending' && (
+                            <div className="flex items-center gap-2 text-sm text-yellow-600 dark:text-yellow-400">
+                              <div className="w-4 h-4 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
+                              Export request pending...
+                            </div>
+                          )}
+
+                          {exportStatus === 'processing' && (
+                            <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
+                              <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                              Processing your export...
+                            </div>
+                          )}
+
+                          {exportStatus === 'ready' && (
+                            <button
+                              onClick={handleDownloadExport}
+                              className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-green-600 text-white rounded-lg sm:rounded-xl hover:bg-green-700 transition-colors shadow-lg flex items-center justify-center gap-2"
+                            >
+                              <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                              Download Export
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -597,7 +1046,10 @@ export default function SettingsPage() {
                         <div className="flex-1 w-full">
                           <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Delete Account</h3>
                           <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">Permanently delete your account and all associated data. This action cannot be undone.</p>
-                          <button className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-red-600 text-white rounded-lg sm:rounded-xl hover:bg-red-700 transition-colors shadow-lg flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => setShowDeleteAccountModal(true)}
+                            className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-red-600 text-white rounded-lg sm:rounded-xl hover:bg-red-700 transition-colors shadow-lg flex items-center justify-center gap-2"
+                          >
                             <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             Delete My Account
                           </button>
@@ -666,6 +1118,528 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+
+      {/* Invite Members Modal */}
+      {showInviteModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Invite Members</h3>
+              <button onClick={() => setShowInviteModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  placeholder="user@example.com"
+                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Role
+                </label>
+                <div className="relative">
+                  <select
+                    value={inviteRole}
+                    onChange={(e) => setInviteRole(e.target.value as UserRole)}
+                    className="w-full px-4 py-3 pr-11 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer"
+                  >
+                    <option value="Admin">Admin - Full access</option>
+                    <option value="Member">Member - Can edit</option>
+                    <option value="Viewer">Viewer - Read only</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                    <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => setShowInviteModal(false)}
+                  className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSendInvite}
+                  disabled={isSendingInvite}
+                  className="flex-1 px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isSendingInvite ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Mail className="w-4 h-4" />
+                      Send Invite
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Manage Members Modal */}
+      {showManageMembersModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full p-6 max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Manage Members</h3>
+              <button onClick={() => setShowManageMembersModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {spaceMembers.map((member) => (
+                <div key={member.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold">
+                      {member.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {member.name}
+                        {member.isCurrentUser && <span className="ml-2 text-xs text-purple-600 dark:text-purple-400">(You)</span>}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">{member.email}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {!member.isCurrentUser && (
+                      <div className="relative">
+                        <select
+                          value={member.role}
+                          onChange={(e) => handleUpdateMemberRole(member.id, e.target.value as UserRole)}
+                          className="px-3 py-1.5 pr-8 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg appearance-none cursor-pointer text-gray-900 dark:text-white"
+                        >
+                          <option value="Admin">Admin</option>
+                          <option value="Member">Member</option>
+                          <option value="Viewer">Viewer</option>
+                        </select>
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                          <ChevronDown className="w-3 h-3 text-gray-500 dark:text-gray-400" />
+                        </div>
+                      </div>
+                    )}
+
+                    {member.isCurrentUser ? (
+                      <span className="px-3 py-1.5 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg flex items-center gap-1">
+                        <Crown className="w-3 h-3" />
+                        {member.role}
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => handleRemoveMember(member.id)}
+                        className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => setShowManageMembersModal(false)}
+                className="w-full px-4 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl hover:opacity-90 transition-opacity"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Leave Space Modal */}
+      {showLeaveSpaceModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Leave Space</h3>
+              </div>
+              <button onClick={() => setShowLeaveSpaceModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              Are you sure you want to leave &quot;{currentSpace.name}&quot;? You will need to be invited again to rejoin.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowLeaveSpaceModal(false)}
+                className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLeaveSpace}
+                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors"
+              >
+                Leave Space
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Space Modal */}
+      {showCreateSpaceModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Create New Space</h3>
+              <button onClick={() => setShowCreateSpaceModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Space Name
+                </label>
+                <input
+                  type="text"
+                  value={newSpaceName}
+                  onChange={(e) => setNewSpaceName(e.target.value)}
+                  placeholder="Family, Team, etc."
+                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => setShowCreateSpaceModal(false)}
+                  className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateSpace}
+                  disabled={isCreatingSpace}
+                  className="flex-1 px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isCreatingSpace ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    'Create Space'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Export Data Modal */}
+      {showExportModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Export Your Data</h3>
+              <button onClick={() => setShowExportModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                We will create a complete export of your data including:
+              </p>
+
+              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  All tasks and assignments
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  Calendar events and reminders
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  Messages and conversations
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  Shopping lists and meal plans
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  Goals and milestones
+                </li>
+              </ul>
+
+              <p className="text-xs text-gray-500 dark:text-gray-500 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg">
+                The export will be available for 7 days. We will send you an email when it&apos;s ready.
+              </p>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => setShowExportModal(false)}
+                  className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleRequestExport}
+                  className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
+                >
+                  Request Export
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Account Modal */}
+      {showDeleteAccountModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Delete Account</h3>
+              </div>
+              <button onClick={() => setShowDeleteAccountModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                <p className="text-sm text-red-800 dark:text-red-200 font-semibold">
+                  Warning: This action cannot be undone
+                </p>
+                <p className="text-xs text-red-700 dark:text-red-300 mt-1">
+                  All your data will be permanently deleted, including tasks, events, messages, and all other content.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Enter your password to confirm
+                </label>
+                <input
+                  type="password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  placeholder="Your password"
+                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Type DELETE to confirm
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="DELETE"
+                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 dark:text-white"
+                />
+              </div>
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={deleteAcknowledged}
+                  onChange={(e) => setDeleteAcknowledged(e.target.checked)}
+                  className="mt-1 w-4 h-4 text-red-600 rounded focus:ring-red-500"
+                />
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  I understand this action is permanent and cannot be reversed
+                </span>
+              </label>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => setShowDeleteAccountModal(false)}
+                  className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={isDeletingAccount || !deletePassword || deleteConfirmText !== 'DELETE' || !deleteAcknowledged}
+                  className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isDeletingAccount ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    'Delete Account'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2FA Modal */}
+      {show2FAModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Enable 2FA</h3>
+              <button onClick={() => setShow2FAModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  Scan this QR code with your authenticator app:
+                </p>
+                <div className="bg-gray-100 dark:bg-gray-900 rounded-xl p-8 flex items-center justify-center">
+                  <div className="w-48 h-48 bg-white dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                    <div className="text-center text-gray-400 dark:text-gray-500 text-xs">
+                      [QR Code Placeholder]
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Backup Codes</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                  Save these codes in a safe place. You can use them to access your account if you lose your device.
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {backupCodes.map((code, idx) => (
+                    <div key={idx} className="flex items-center gap-2 bg-gray-50 dark:bg-gray-900 p-2 rounded-lg">
+                      <code className="text-xs text-gray-900 dark:text-white flex-1">{code}</code>
+                      <button
+                        onClick={() => copyBackupCode(code)}
+                        className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                      >
+                        <Copy className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Verification Code
+                </label>
+                <input
+                  type="text"
+                  value={twoFactorCode}
+                  onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="000000"
+                  maxLength={6}
+                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 dark:text-white text-center text-lg tracking-widest"
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                  Enter the 6-digit code from your authenticator app
+                </p>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => setShow2FAModal(false)}
+                  className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleEnable2FA}
+                  disabled={isEnabling2FA || twoFactorCode.length !== 6}
+                  className="flex-1 px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isEnabling2FA ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Enabling...
+                    </>
+                  ) : (
+                    'Enable 2FA'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Revoke Session Modal */}
+      {showRevokeSessionModal && sessionToRevoke && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Revoke Session</h3>
+              </div>
+              <button onClick={() => setShowRevokeSessionModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              Are you sure you want to revoke this session? The device will be logged out immediately.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowRevokeSessionModal(false)}
+                className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleRevokeSession(sessionToRevoke)}
+                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors"
+              >
+                Revoke Session
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </FeatureLayout>
   );
 }
