@@ -11,6 +11,8 @@ const nextConfig: NextConfig = {
     // Our TypeScript code is valid (verified by type-check passing)
     ignoreBuildErrors: true,
   },
+  // Use standalone output for Vercel deployment
+  output: 'standalone',
 };
 
 export default nextConfig;
