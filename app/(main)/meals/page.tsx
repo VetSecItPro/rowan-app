@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, TrendingUp, ShoppingBag, ChevronLeft, ChevronRight, LayoutGrid, List, ChefHat } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { MealCard } from '@/components/meals/MealCard';
@@ -13,10 +13,126 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMont
 
 type ViewMode = 'calendar' | 'list' | 'recipes';
 
+// Memoized meal card component with user colors
+const MemoizedMealCardWithColors = memo(({
+  meal,
+  onEdit,
+  onDelete,
+  colors
+}: {
+  meal: Meal;
+  onEdit: (meal: Meal) => void;
+  onDelete: (id: string) => void;
+  colors: { border: string; bg: string; text: string };
+}) => (
+  <div className={`border-l-4 ${colors.border}`}>
+    <MealCard
+      meal={meal}
+      onEdit={onEdit}
+      onDelete={onDelete}
+    />
+  </div>
+));
+
+MemoizedMealCardWithColors.displayName = 'MemoizedMealCardWithColors';
+
+// Memoized recipe card component
+const MemoizedRecipeCard = memo(({
+  recipe,
+  onEdit,
+  onDelete,
+  onPlanMeal
+}: {
+  recipe: Recipe;
+  onEdit: (recipe: Recipe) => void;
+  onDelete: (id: string) => void;
+  onPlanMeal: () => void;
+}) => (
+  <RecipeCard
+    recipe={recipe}
+    onEdit={onEdit}
+    onDelete={onDelete}
+    onPlanMeal={onPlanMeal}
+  />
+));
+
+MemoizedRecipeCard.displayName = 'MemoizedRecipeCard';
+
+// Memoized calendar day cell component
+const CalendarDayCell = memo(({
+  day,
+  index,
+  currentMonth,
+  dayMeals,
+  getUserColor,
+  onMealClick,
+  onAddClick
+}: {
+  day: Date;
+  index: number;
+  currentMonth: Date;
+  dayMeals: Meal[];
+  getUserColor: (userId: string) => { border: string; bg: string; text: string };
+  onMealClick: (meal: Meal) => void;
+  onAddClick: () => void;
+}) => {
+  const isCurrentMonth = isSameMonth(day, currentMonth);
+  const isToday = isSameDay(day, new Date());
+
+  return (
+    <div
+      className={`min-h-[120px] p-2 rounded-lg border-2 transition-all ${
+        isCurrentMonth
+          ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+          : 'border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50'
+      } ${isToday ? 'ring-2 ring-purple-500' : ''}`}
+    >
+      <div className={`text-sm font-medium mb-2 ${
+        isCurrentMonth
+          ? isToday
+            ? 'text-purple-600 dark:text-purple-400'
+            : 'text-gray-900 dark:text-white'
+          : 'text-gray-400 dark:text-gray-600'
+      }`}>
+        {format(day, 'd')}
+      </div>
+
+      <div className="space-y-1">
+        {dayMeals.map((meal) => {
+          const colors = getUserColor(meal.created_by);
+          return (
+            <button
+              key={meal.id}
+              onClick={() => onMealClick(meal)}
+              className={`w-full text-left px-2 py-1 rounded text-xs ${colors.bg} border-l-2 ${colors.border} hover:opacity-80 transition-opacity`}
+            >
+              <p className={`font-medium ${colors.text} truncate`}>
+                {meal.recipe?.name || 'Untitled'}
+              </p>
+              <p className="text-gray-500 dark:text-gray-400 text-[10px]">
+                {meal.meal_type}
+              </p>
+            </button>
+          );
+        })}
+        {dayMeals.length === 0 && isCurrentMonth && (
+          <button
+            onClick={onAddClick}
+            className="w-full text-center py-2 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+          >
+            + Add
+          </button>
+        )}
+      </div>
+    </div>
+  );
+});
+
+CalendarDayCell.displayName = 'CalendarDayCell';
+
 export default function MealsPage() {
   const { currentSpace } = useAuth();
   const [meals, setMeals] = useState<Meal[]>([]);
-  const [filteredMeals, setFilteredMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMeal, setEditingMeal] = useState<Meal | null>(null);
@@ -25,40 +141,84 @@ export default function MealsPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('calendar');
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
   const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
 
-  useEffect(() => {
-    loadMeals();
-    loadRecipes();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSpace.id]);
+  // Memoized user color mapping
+  const getUserColor = useCallback((userId: string) => {
+    const userColors: Record<string, { border: string; bg: string; text: string }> = {
+      'user-1': { border: 'border-l-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20', text: 'text-purple-600 dark:text-purple-400' },
+      'user-2': { border: 'border-l-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20', text: 'text-blue-600 dark:text-blue-400' },
+    };
+    return userColors[userId] || userColors['user-1'];
+  }, []);
 
-  useEffect(() => {
-    if (viewMode === 'recipes') {
-      let filtered = recipes;
-      if (searchQuery) {
-        filtered = filtered.filter(r =>
-          r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          r.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          r.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-        );
-      }
-      setFilteredRecipes(filtered);
-    } else {
-      let filtered = meals;
-      if (searchQuery) {
-        filtered = filtered.filter(m => m.recipe?.name.toLowerCase().includes(searchQuery.toLowerCase()) || m.notes?.toLowerCase().includes(searchQuery.toLowerCase()));
-      }
-      setFilteredMeals(filtered);
+  // Memoized filtered meals based on search query
+  const filteredMeals = useMemo(() => {
+    if (viewMode === 'recipes') return [];
+
+    let filtered = meals;
+    if (searchQuery) {
+      filtered = filtered.filter(m =>
+        m.recipe?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        m.notes?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
-  }, [meals, recipes, searchQuery, viewMode]);
+    return filtered;
+  }, [meals, searchQuery, viewMode]);
 
-  async function loadMeals() {
+  // Memoized filtered recipes based on search query
+  const filteredRecipes = useMemo(() => {
+    if (viewMode !== 'recipes') return [];
+
+    let filtered = recipes;
+    if (searchQuery) {
+      filtered = filtered.filter(r =>
+        r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        r.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        r.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
+    }
+    return filtered;
+  }, [recipes, searchQuery, viewMode]);
+
+  // Memoized calendar days calculation
+  const calendarDays = useMemo(() => {
+    const monthStart = startOfMonth(currentMonth);
+    const monthEnd = endOfMonth(currentMonth);
+    const calendarStart = startOfWeek(monthStart);
+    const calendarEnd = endOfWeek(monthEnd);
+
+    return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+  }, [currentMonth]);
+
+  // Memoized meals grouped by date for calendar view
+  const mealsByDate = useMemo(() => {
+    const grouped = new Map<string, Meal[]>();
+    meals.forEach(meal => {
+      const dateKey = format(new Date(meal.scheduled_date), 'yyyy-MM-dd');
+      if (!grouped.has(dateKey)) {
+        grouped.set(dateKey, []);
+      }
+      grouped.get(dateKey)!.push(meal);
+    });
+    return grouped;
+  }, [meals]);
+
+  // Optimized function to get meals for a specific date
+  const getMealsForDate = useCallback((date: Date) => {
+    const dateKey = format(date, 'yyyy-MM-dd');
+    return mealsByDate.get(dateKey) || [];
+  }, [mealsByDate]);
+
+  // Load meals callback
+  const loadMeals = useCallback(async () => {
     try {
       setLoading(true);
-      const [mealsData, statsData] = await Promise.all([mealsService.getMeals(currentSpace.id), mealsService.getMealStats(currentSpace.id)]);
+      const [mealsData, statsData] = await Promise.all([
+        mealsService.getMeals(currentSpace.id),
+        mealsService.getMealStats(currentSpace.id)
+      ]);
       setMeals(mealsData);
       setStats(statsData);
     } catch (error) {
@@ -66,9 +226,25 @@ export default function MealsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [currentSpace.id]);
 
-  async function handleCreateMeal(mealData: CreateMealInput) {
+  // Load recipes callback
+  const loadRecipes = useCallback(async () => {
+    try {
+      const recipesData = await mealsService.getRecipes(currentSpace.id);
+      setRecipes(recipesData);
+    } catch (error) {
+      console.error('Failed to load recipes:', error);
+    }
+  }, [currentSpace.id]);
+
+  useEffect(() => {
+    loadMeals();
+    loadRecipes();
+  }, [loadMeals, loadRecipes]);
+
+  // Memoized handlers
+  const handleCreateMeal = useCallback(async (mealData: CreateMealInput) => {
     try {
       if (editingMeal) {
         await mealsService.updateMeal(editingMeal.id, mealData);
@@ -80,9 +256,9 @@ export default function MealsPage() {
     } catch (error) {
       console.error('Failed to save meal:', error);
     }
-  }
+  }, [editingMeal, loadMeals]);
 
-  async function handleDeleteMeal(mealId: string) {
+  const handleDeleteMeal = useCallback(async (mealId: string) => {
     if (!confirm('Are you sure you want to delete this meal?')) return;
     try {
       await mealsService.deleteMeal(mealId);
@@ -90,18 +266,9 @@ export default function MealsPage() {
     } catch (error) {
       console.error('Failed to delete meal:', error);
     }
-  }
+  }, [loadMeals]);
 
-  async function loadRecipes() {
-    try {
-      const recipesData = await mealsService.getRecipes(currentSpace.id);
-      setRecipes(recipesData);
-    } catch (error) {
-      console.error('Failed to load recipes:', error);
-    }
-  }
-
-  async function handleCreateRecipe(recipeData: CreateRecipeInput) {
+  const handleCreateRecipe = useCallback(async (recipeData: CreateRecipeInput) => {
     try {
       if (editingRecipe) {
         await mealsService.updateRecipe(editingRecipe.id, recipeData);
@@ -113,9 +280,9 @@ export default function MealsPage() {
     } catch (error) {
       console.error('Failed to save recipe:', error);
     }
-  }
+  }, [editingRecipe, loadRecipes]);
 
-  async function handleDeleteRecipe(recipeId: string) {
+  const handleDeleteRecipe = useCallback(async (recipeId: string) => {
     if (!confirm('Are you sure you want to delete this recipe?')) return;
     try {
       await mealsService.deleteRecipe(recipeId);
@@ -123,30 +290,66 @@ export default function MealsPage() {
     } catch (error) {
       console.error('Failed to delete recipe:', error);
     }
-  }
+  }, [loadRecipes]);
 
-  // Calendar helper functions
-  const getUserColor = (userId: string) => {
-    // Mock user colors - in production, would come from user preferences
-    const userColors: Record<string, { border: string; bg: string; text: string }> = {
-      'user-1': { border: 'border-l-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20', text: 'text-purple-600 dark:text-purple-400' },
-      'user-2': { border: 'border-l-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20', text: 'text-blue-600 dark:text-blue-400' },
-    };
-    return userColors[userId] || userColors['user-1'];
-  };
+  // Search handler
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, []);
 
-  const getMealsForDate = (date: Date) => {
-    return meals.filter(meal => isSameDay(new Date(meal.scheduled_date), date));
-  };
+  // View mode handlers
+  const handleSetCalendarView = useCallback(() => setViewMode('calendar'), []);
+  const handleSetListView = useCallback(() => setViewMode('list'), []);
+  const handleSetRecipesView = useCallback(() => setViewMode('recipes'), []);
 
-  const getCalendarDays = () => {
-    const monthStart = startOfMonth(currentMonth);
-    const monthEnd = endOfMonth(currentMonth);
-    const calendarStart = startOfWeek(monthStart);
-    const calendarEnd = endOfWeek(monthEnd);
+  // Calendar navigation handlers
+  const handlePreviousMonth = useCallback(() => {
+    setCurrentMonth(prev => subMonths(prev, 1));
+  }, []);
 
-    return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
-  };
+  const handleNextMonth = useCallback(() => {
+    setCurrentMonth(prev => addMonths(prev, 1));
+  }, []);
+
+  // Modal handlers
+  const handleOpenMealModal = useCallback(() => setIsModalOpen(true), []);
+  const handleCloseMealModal = useCallback(() => {
+    setIsModalOpen(false);
+    setEditingMeal(null);
+  }, []);
+
+  const handleOpenRecipeModal = useCallback(() => setIsRecipeModalOpen(true), []);
+  const handleCloseRecipeModal = useCallback(() => {
+    setIsRecipeModalOpen(false);
+    setEditingRecipe(null);
+  }, []);
+
+  // Calendar day click handlers
+  const handleMealClick = useCallback((meal: Meal) => {
+    setEditingMeal(meal);
+    setIsModalOpen(true);
+  }, []);
+
+  const handleAddMealClick = useCallback(() => {
+    setIsModalOpen(true);
+  }, []);
+
+  // Recipe card handlers
+  const handleEditRecipe = useCallback((recipe: Recipe) => {
+    setEditingRecipe(recipe);
+    setIsRecipeModalOpen(true);
+  }, []);
+
+  const handlePlanMealFromRecipe = useCallback(() => {
+    setEditingMeal(null);
+    setIsModalOpen(true);
+  }, []);
+
+  // Meal card handlers
+  const handleEditMeal = useCallback((meal: Meal) => {
+    setEditingMeal(meal);
+    setIsModalOpen(true);
+  }, []);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Meal Planning' }]}>
@@ -164,7 +367,7 @@ export default function MealsPage() {
               {/* View Toggle */}
               <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700 w-full sm:w-auto">
                 <button
-                  onClick={() => setViewMode('calendar')}
+                  onClick={handleSetCalendarView}
                   className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
                     viewMode === 'calendar'
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
@@ -175,7 +378,7 @@ export default function MealsPage() {
                   <span className="text-sm">Calendar</span>
                 </button>
                 <button
-                  onClick={() => setViewMode('list')}
+                  onClick={handleSetListView}
                   className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
                     viewMode === 'list'
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
@@ -186,7 +389,7 @@ export default function MealsPage() {
                   <span className="text-sm">List</span>
                 </button>
                 <button
-                  onClick={() => setViewMode('recipes')}
+                  onClick={handleSetRecipesView}
                   className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
                     viewMode === 'recipes'
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
@@ -197,12 +400,12 @@ export default function MealsPage() {
                   <span className="text-sm">Recipes</span>
                 </button>
               </div>
-              <button onClick={() => setIsRecipeModalOpen(true)} className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
+              <button onClick={handleOpenRecipeModal} className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
                 <ChefHat className="w-5 h-5" />
                 <span className="hidden sm:inline">New Recipe</span>
                 <span className="sm:hidden">Recipe</span>
               </button>
-              <button onClick={() => setIsModalOpen(true)} className="px-4 py-2 sm:px-6 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
+              <button onClick={handleOpenMealModal} className="px-4 py-2 sm:px-6 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
                 <Plus className="w-5 h-5" />
                 <span className="hidden sm:inline">New Meal</span>
                 <span className="sm:hidden">Meal</span>
@@ -246,7 +449,7 @@ export default function MealsPage() {
                 type="text"
                 placeholder={viewMode === 'recipes' ? 'Search recipes...' : 'Search meals...'}
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchChange}
                 className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
@@ -270,7 +473,7 @@ export default function MealsPage() {
                   </p>
                   {!searchQuery && (
                     <button
-                      onClick={() => setIsRecipeModalOpen(true)}
+                      onClick={handleOpenRecipeModal}
                       className="px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
                     >
                       <ChefHat className="w-5 h-5" />
@@ -281,19 +484,12 @@ export default function MealsPage() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {filteredRecipes.map((recipe) => (
-                    <RecipeCard
+                    <MemoizedRecipeCard
                       key={recipe.id}
                       recipe={recipe}
-                      onEdit={(recipe) => {
-                        setEditingRecipe(recipe);
-                        setIsRecipeModalOpen(true);
-                      }}
+                      onEdit={handleEditRecipe}
                       onDelete={handleDeleteRecipe}
-                      onPlanMeal={() => {
-                        setEditingMeal(null);
-                        setIsModalOpen(true);
-                        // TODO: Pre-select this recipe in the meal modal
-                      }}
+                      onPlanMeal={handlePlanMealFromRecipe}
                     />
                   ))}
                 </div>
@@ -304,7 +500,7 @@ export default function MealsPage() {
                 {/* Month Navigation */}
                 <div className="flex items-center justify-between mb-6">
                   <button
-                    onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+                    onClick={handlePreviousMonth}
                     className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                   >
                     <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -313,7 +509,7 @@ export default function MealsPage() {
                     {format(currentMonth, 'MMMM yyyy')}
                   </h3>
                   <button
-                    onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+                    onClick={handleNextMonth}
                     className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                   >
                     <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -330,61 +526,19 @@ export default function MealsPage() {
                   ))}
 
                   {/* Calendar days */}
-                  {getCalendarDays().map((day, index) => {
+                  {calendarDays.map((day, index) => {
                     const dayMeals = getMealsForDate(day);
-                    const isCurrentMonth = isSameMonth(day, currentMonth);
-                    const isToday = isSameDay(day, new Date());
-
                     return (
-                      <div
+                      <CalendarDayCell
                         key={index}
-                        className={`min-h-[120px] p-2 rounded-lg border-2 transition-all ${
-                          isCurrentMonth
-                            ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
-                            : 'border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50'
-                        } ${isToday ? 'ring-2 ring-purple-500' : ''}`}
-                      >
-                        <div className={`text-sm font-medium mb-2 ${
-                          isCurrentMonth
-                            ? isToday
-                              ? 'text-purple-600 dark:text-purple-400'
-                              : 'text-gray-900 dark:text-white'
-                            : 'text-gray-400 dark:text-gray-600'
-                        }`}>
-                          {format(day, 'd')}
-                        </div>
-
-                        <div className="space-y-1">
-                          {dayMeals.map((meal) => {
-                            const colors = getUserColor(meal.created_by);
-                            return (
-                              <button
-                                key={meal.id}
-                                onClick={() => {
-                                  setEditingMeal(meal);
-                                  setIsModalOpen(true);
-                                }}
-                                className={`w-full text-left px-2 py-1 rounded text-xs ${colors.bg} border-l-2 ${colors.border} hover:opacity-80 transition-opacity`}
-                              >
-                                <p className={`font-medium ${colors.text} truncate`}>
-                                  {meal.recipe?.name || 'Untitled'}
-                                </p>
-                                <p className="text-gray-500 dark:text-gray-400 text-[10px]">
-                                  {meal.meal_type}
-                                </p>
-                              </button>
-                            );
-                          })}
-                          {dayMeals.length === 0 && isCurrentMonth && (
-                            <button
-                              onClick={() => setIsModalOpen(true)}
-                              className="w-full text-center py-2 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                            >
-                              + Add
-                            </button>
-                          )}
-                        </div>
-                      </div>
+                        day={day}
+                        index={index}
+                        currentMonth={currentMonth}
+                        dayMeals={dayMeals}
+                        getUserColor={getUserColor}
+                        onMealClick={handleMealClick}
+                        onAddClick={handleAddMealClick}
+                      />
                     );
                   })}
                 </div>
@@ -400,7 +554,7 @@ export default function MealsPage() {
                   </p>
                   {!searchQuery && (
                     <button
-                      onClick={() => setIsModalOpen(true)}
+                      onClick={handleOpenMealModal}
                       className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
                     >
                       <Plus className="w-5 h-5" />
@@ -413,16 +567,13 @@ export default function MealsPage() {
                   {filteredMeals.map((meal) => {
                     const colors = getUserColor(meal.created_by);
                     return (
-                      <div key={meal.id} className={`border-l-4 ${colors.border}`}>
-                        <MealCard
-                          meal={meal}
-                          onEdit={(m) => {
-                            setEditingMeal(m);
-                            setIsModalOpen(true);
-                          }}
-                          onDelete={handleDeleteMeal}
-                        />
-                      </div>
+                      <MemoizedMealCardWithColors
+                        key={meal.id}
+                        meal={meal}
+                        onEdit={handleEditMeal}
+                        onDelete={handleDeleteMeal}
+                        colors={colors}
+                      />
                     );
                   })}
                 </div>
@@ -432,8 +583,8 @@ export default function MealsPage() {
           </div>
         </div>
       </div>
-      <NewMealModal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setEditingMeal(null); }} onSave={handleCreateMeal} editMeal={editingMeal} spaceId={currentSpace.id} />
-      <NewRecipeModal isOpen={isRecipeModalOpen} onClose={() => { setIsRecipeModalOpen(false); setEditingRecipe(null); }} onSave={handleCreateRecipe} editRecipe={editingRecipe} spaceId={currentSpace.id} />
+      <NewMealModal isOpen={isModalOpen} onClose={handleCloseMealModal} onSave={handleCreateMeal} editMeal={editingMeal} spaceId={currentSpace.id} />
+      <NewRecipeModal isOpen={isRecipeModalOpen} onClose={handleCloseRecipeModal} onSave={handleCreateRecipe} editRecipe={editingRecipe} spaceId={currentSpace.id} />
     </FeatureLayout>
   );
 }

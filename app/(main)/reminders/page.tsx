@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ReminderCard } from '@/components/reminders/ReminderCard';
@@ -11,26 +11,14 @@ import { remindersService, Reminder, CreateReminderInput } from '@/lib/services/
 export default function RemindersPage() {
   const { currentSpace } = useAuth();
   const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [filteredReminders, setFilteredReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const [stats, setStats] = useState({
-    total: 0,
-    active: 0,
-    completed: 0,
-    overdue: 0,
-  });
-
-  useEffect(() => {
-    loadReminders();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSpace.id]);
-
-  useEffect(() => {
+  // Memoized filtered reminders - expensive filtering operation
+  const filteredReminders = useMemo(() => {
     let filtered = reminders;
 
     // Status filter
@@ -40,17 +28,35 @@ export default function RemindersPage() {
 
     // Search filter
     if (searchQuery) {
+      const query = searchQuery.toLowerCase();
       filtered = filtered.filter(r =>
-        r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        r.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        r.location?.toLowerCase().includes(searchQuery.toLowerCase())
+        r.title.toLowerCase().includes(query) ||
+        r.description?.toLowerCase().includes(query) ||
+        r.location?.toLowerCase().includes(query)
       );
     }
 
-    setFilteredReminders(filtered);
+    return filtered;
   }, [reminders, statusFilter, searchQuery]);
 
-  async function loadReminders() {
+  // Memoized stats calculation - expensive computation
+  const stats = useMemo(() => {
+    const now = new Date();
+
+    const total = reminders.length;
+    const active = reminders.filter(r => r.status === 'active').length;
+    const completed = reminders.filter(r => r.status === 'completed').length;
+    const overdue = reminders.filter(r => {
+      if (r.status !== 'active') return false;
+      const reminderTime = new Date(r.reminder_time);
+      return reminderTime < now;
+    }).length;
+
+    return { total, active, completed, overdue };
+  }, [reminders]);
+
+  // Stable reference to loadReminders
+  const loadReminders = useCallback(async () => {
     try {
       setLoading(true);
       const [remindersData, statsData] = await Promise.all([
@@ -83,19 +89,22 @@ export default function RemindersPage() {
           remindersService.getReminderStats(currentSpace.id),
         ]);
         setReminders(updatedData);
-        setStats(updatedStats);
       } else {
         setReminders(remindersData);
-        setStats(statsData);
       }
     } catch (error) {
       console.error('Failed to load reminders:', error);
     } finally {
       setLoading(false);
     }
-  }
+  }, [currentSpace.id]);
 
-  async function handleCreateReminder(reminderData: CreateReminderInput) {
+  useEffect(() => {
+    loadReminders();
+  }, [loadReminders]);
+
+  // Memoized callback for creating/updating reminders
+  const handleCreateReminder = useCallback(async (reminderData: CreateReminderInput) => {
     try {
       if (editingReminder) {
         await remindersService.updateReminder(editingReminder.id, reminderData);
@@ -107,9 +116,10 @@ export default function RemindersPage() {
     } catch (error) {
       console.error('Failed to save reminder:', error);
     }
-  }
+  }, [editingReminder, loadReminders]);
 
-  async function handleStatusChange(reminderId: string, status: string) {
+  // Memoized callback for status changes
+  const handleStatusChange = useCallback(async (reminderId: string, status: string) => {
     // Optimistic update - update UI immediately
     setReminders(prevReminders =>
       prevReminders.map(reminder =>
@@ -124,35 +134,54 @@ export default function RemindersPage() {
       console.error('Failed to update reminder status:', error);
       loadReminders(); // Revert on error
     }
-  }
+  }, [loadReminders]);
 
-  async function handleDeleteReminder(reminderId: string) {
+  // Memoized callback for deleting reminders
+  const handleDeleteReminder = useCallback(async (reminderId: string) => {
     try {
       await remindersService.deleteReminder(reminderId);
       loadReminders();
     } catch (error) {
       console.error('Failed to delete reminder:', error);
     }
-  }
+  }, [loadReminders]);
 
-  async function handleSnoozeReminder(reminderId: string, minutes: number) {
+  // Memoized callback for snoozing reminders
+  const handleSnoozeReminder = useCallback(async (reminderId: string, minutes: number) => {
     try {
       await remindersService.snoozeReminder(reminderId, minutes);
       loadReminders();
     } catch (error) {
       console.error('Failed to snooze reminder:', error);
     }
-  }
+  }, [loadReminders]);
 
-  function handleEditReminder(reminder: Reminder) {
+  // Memoized callback for editing reminders
+  const handleEditReminder = useCallback((reminder: Reminder) => {
     setEditingReminder(reminder);
     setIsModalOpen(true);
-  }
+  }, []);
 
-  function handleCloseModal() {
+  // Memoized callback for closing modal
+  const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
     setEditingReminder(null);
-  }
+  }, []);
+
+  // Memoized callback for opening new reminder modal
+  const handleOpenModal = useCallback(() => {
+    setIsModalOpen(true);
+  }, []);
+
+  // Memoized callback for search query changes
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, []);
+
+  // Memoized callback for status filter changes
+  const handleStatusFilterChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStatusFilter(e.target.value);
+  }, []);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Reminders' }]}>
@@ -175,7 +204,7 @@ export default function RemindersPage() {
             </div>
 
             <button
-              onClick={() => setIsModalOpen(true)}
+              onClick={handleOpenModal}
               className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
             >
               <Plus className="w-5 h-5" />
@@ -240,7 +269,7 @@ export default function RemindersPage() {
                       type="text"
                       placeholder="Search reminders..."
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={handleSearchChange}
                       className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                     />
                   </div>
@@ -249,7 +278,7 @@ export default function RemindersPage() {
                   <div className="relative">
                     <select
                       value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
+                      onChange={handleStatusFilterChange}
                       className="pl-4 pr-10 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none w-full"
                     >
                       <option value="all">All Status</option>
@@ -284,7 +313,7 @@ export default function RemindersPage() {
                 </p>
                 {!searchQuery && statusFilter === 'all' && (
                   <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={handleOpenModal}
                     className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
                   >
                     <Plus className="w-5 h-5" />
