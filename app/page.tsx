@@ -31,12 +31,12 @@ export default function HomePage() {
               <a href="#pricing" className="hidden md:block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Pricing</a>
               <HamburgerMenu />
               <ThemeToggle />
-              <a
-                href="#login"
+              <Link
+                href="/login"
                 className="px-6 py-2 shimmer-bg text-white rounded-full hover:opacity-90 transition-all shadow-lg shadow-purple-500/30"
               >
                 Login
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -67,12 +67,12 @@ export default function HomePage() {
         </p>
 
         <div className="flex items-center justify-center">
-          <a
-            href="#create-account"
+          <Link
+            href="/signup"
             className="px-8 py-4 shimmer-bg text-white rounded-full font-semibold hover:opacity-90 transition-all shadow-xl shadow-purple-500/50"
           >
             Create Your Account
-          </a>
+          </Link>
         </div>
       </section>
 
