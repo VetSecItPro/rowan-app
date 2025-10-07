@@ -1160,84 +1160,140 @@ export default function DashboardPage() {
           </div>
 
           {/* Daily Check-In Section */}
-          <div className="bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-              <Heart className="w-5 h-5 text-pink-500" />
-              Daily Check-In
-            </h2>
+          <div className="bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-blue-50/50 dark:from-pink-900/10 dark:via-purple-900/10 dark:to-blue-900/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-lg border border-pink-200/20 dark:border-pink-500/20">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Heart className="w-6 h-6 text-pink-500 fill-pink-500 animate-pulse" />
+                  <Sparkles className="w-3 h-3 text-yellow-400 absolute -top-1 -right-1" />
+                </div>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Daily Check-In</h2>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Take a moment for yourself</p>
+                </div>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Your Check-In */}
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">How are you feeling today?</p>
-                <div className="flex gap-2 mb-4">
+              <div className="space-y-4">
+                <div className="text-center sm:text-left">
+                  <p className="text-base font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                    How are you feeling today?
+                    <Sparkles className="w-4 h-4 text-yellow-400" />
+                  </p>
+                  <p className="text-sm text-pink-600 dark:text-pink-400 italic">
+                    "Every feeling is valid. You're doing great!"
+                  </p>
+                </div>
+
+                <div className="flex gap-2 sm:gap-3">
                   {moodOptions.map((mood) => (
                     <button
                       key={mood.value}
                       onClick={() => setSelectedMood(mood.value)}
-                      className={`flex-1 p-3 rounded-xl border-2 transition-all ${
+                      className={`flex-1 p-4 rounded-2xl border-2 transition-all transform hover:scale-110 ${
                         selectedMood === mood.value
-                          ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 scale-105'
-                          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                          ? 'border-pink-500 bg-pink-100 dark:bg-pink-900/30 scale-110 shadow-lg shadow-pink-500/20'
+                          : 'border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-600 bg-white/50 dark:bg-gray-800/50'
                       }`}
                       title={mood.label}
                     >
-                      <div className="text-2xl">{mood.emoji}</div>
+                      <div className="text-3xl sm:text-4xl">{mood.emoji}</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mt-1 font-medium">{mood.label}</div>
                     </button>
                   ))}
                 </div>
-                <textarea
-                  placeholder="Share what's on your mind..."
-                  value={checkInNote}
-                  onChange={(e) => setCheckInNote(e.target.value)}
-                  maxLength={200}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white text-sm"
-                  rows={3}
-                />
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">{checkInNote.length}/200</span>
-                  <button
-                    onClick={handleCheckIn}
-                    disabled={!selectedMood}
-                    className={`px-4 py-2 rounded-lg text-white text-sm font-medium transition-all ${
-                      selectedMood
-                        ? 'shimmer-bg hover:opacity-90 shadow-lg'
-                        : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'
-                    }`}
-                  >
-                    Check In
-                  </button>
+
+                <div>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                    What's on your mind? (Optional)
+                  </label>
+                  <textarea
+                    placeholder="Share your thoughts, gratitude, or what made you smile today..."
+                    value={checkInNote}
+                    onChange={(e) => setCheckInNote(e.target.value)}
+                    maxLength={200}
+                    className="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-pink-200 dark:border-pink-800 rounded-2xl resize-none focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 dark:text-white text-sm transition-all"
+                    rows={3}
+                  />
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{checkInNote.length}/200</span>
+                    <button
+                      onClick={handleCheckIn}
+                      disabled={!selectedMood}
+                      className={`px-6 py-2 rounded-full text-white text-sm font-semibold transition-all transform ${
+                        selectedMood
+                          ? 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 hover:scale-105 shadow-lg hover:shadow-pink-500/50'
+                          : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed opacity-50'
+                      }`}
+                    >
+                      ✨ Check In
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              {/* Space Overview Stats */}
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">Space Overview</p>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl">
-                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                      {stats.tasks.total + stats.events.total + stats.reminders.total}
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Total Items</p>
+              {/* Today's Wins */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-yellow-500" />
+                  <p className="text-base font-semibold text-gray-900 dark:text-white">Today's Wins</p>
+                </div>
+
+                <div className="space-y-3">
+                  {/* Tasks completed today */}
+                  <div className="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-2xl border border-blue-200/30 dark:border-blue-500/20">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <CheckSquare className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                          {stats.tasks.completed}
+                        </p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">Tasks completed</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="p-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl">
-                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                      {stats.goals.completed}
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Goals Done</p>
+
+                  {/* Goals progress */}
+                  <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl border border-purple-200/30 dark:border-purple-500/20">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Target className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                          {Math.round(stats.goals.overallProgress)}%
+                        </p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">Goals progress</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="p-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl">
-                    <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                      {stats.shopping.activeLists}
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Active Lists</p>
+
+                  {/* Reminders completed */}
+                  <div className="p-4 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-2xl border border-orange-200/30 dark:border-orange-500/20">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Bell className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                          {stats.reminders.completed}
+                        </p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">Reminders done</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="p-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl">
-                    <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                      {stats.meals.thisWeek}
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Meals Planned</p>
-                  </div>
+                </div>
+
+                {/* Motivational quote */}
+                <div className="p-4 bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/20 dark:to-purple-900/20 rounded-2xl border border-pink-300/30 dark:border-pink-500/20 text-center">
+                  <p className="text-sm text-gray-700 dark:text-gray-300 italic">
+                    "Small steps every day lead to big changes!"
+                  </p>
+                  <p className="text-xs text-pink-600 dark:text-pink-400 mt-1">Keep going! 💪</p>
                 </div>
               </div>
             </div>
