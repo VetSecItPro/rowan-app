@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { useAuth } from '@/lib/contexts/mock-auth-context';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { tasksService } from '@/lib/services/tasks-service';
@@ -129,8 +129,8 @@ interface EnhancedDashboardStats {
   };
 }
 
-// Progress Bar Component
-function ProgressBar({ value, max, color = 'blue', showLabel = true }: { value: number; max: number; color?: string; showLabel?: boolean }) {
+// Progress Bar Component - Memoized
+const ProgressBar = memo(function ProgressBar({ value, max, color = 'blue', showLabel = true }: { value: number; max: number; color?: string; showLabel?: boolean }) {
   const percentage = max > 0 ? Math.round((value / max) * 100) : 0;
   const colorClasses = {
     blue: 'bg-blue-500',
@@ -156,10 +156,10 @@ function ProgressBar({ value, max, color = 'blue', showLabel = true }: { value: 
       )}
     </div>
   );
-}
+});
 
-// Trend Indicator Component
-function TrendIndicator({ value, label }: { value: number; label: string }) {
+// Trend Indicator Component - Memoized
+const TrendIndicator = memo(function TrendIndicator({ value, label }: { value: number; label: string }) {
   if (value === 0) return null;
 
   const isPositive = value > 0;
@@ -172,7 +172,7 @@ function TrendIndicator({ value, label }: { value: number; label: string }) {
       <span>{Math.abs(value)} {label}</span>
     </div>
   );
-}
+});
 
 export default function DashboardPage() {
   const { user, currentSpace } = useAuth();
@@ -270,8 +270,8 @@ export default function DashboardPage() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [checkInNote, setCheckInNote] = useState('');
 
-  // Load all comprehensive stats
-  async function loadAllStats() {
+  // Load all comprehensive stats - Memoized with useCallback
+  const loadAllStats = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -512,7 +512,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [currentSpace.id, user.id]);
 
   // Real-time subscriptions
   useEffect(() => {
@@ -636,31 +636,35 @@ export default function DashboardPage() {
     return () => {
       channels.forEach(channel => supabase.removeChannel(channel));
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSpace.id]);
+  }, [currentSpace.id, loadAllStats]);
 
-  // Mood options
-  const moodOptions = [
+  // Mood options - Memoized
+  const moodOptions = useMemo(() => [
     { emoji: '😊', label: 'Great', value: 'great' },
     { emoji: '🙂', label: 'Good', value: 'good' },
     { emoji: '😐', label: 'Okay', value: 'okay' },
     { emoji: '😔', label: 'Meh', value: 'meh' },
     { emoji: '😫', label: 'Rough', value: 'rough' },
-  ];
+  ], []);
 
-  const handleCheckIn = () => {
+  // Stable callback with useCallback
+  const handleCheckIn = useCallback(() => {
     if (!selectedMood) return;
     console.log('Check-in:', { mood: selectedMood, note: checkInNote });
     setSelectedMood(null);
     setCheckInNote('');
-  };
+  }, [selectedMood, checkInNote]);
 
-  const greeting = () => {
+  // Greeting function - Memoized
+  const greetingText = useMemo(() => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good morning';
     if (hour < 18) return 'Good afternoon';
     return 'Good evening';
-  };
+  }, []);
+
+  // Memoize current date string
+  const currentDate = useMemo(() => format(new Date(), 'EEEE, MMMM d, yyyy'), []);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard' }]}>
@@ -673,11 +677,11 @@ export default function DashboardPage() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                 <Sparkles className="w-6 h-6 sm:w-8 sm:h-8" />
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center">
-                  {greeting()}, {user.name}!
+                  {greetingText}, {user.name}!
                 </h1>
               </div>
               <p className="text-purple-100 text-sm sm:text-base md:text-lg text-center px-2">
-                {currentSpace.name} • {format(new Date(), 'EEEE, MMMM d, yyyy')}
+                {currentSpace.name} • {currentDate}
               </p>
               <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 md:gap-6 text-white/90">
                 <div className="flex items-center gap-2">
@@ -1228,7 +1232,7 @@ export default function DashboardPage() {
                           : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed opacity-50'
                       }`}
                     >
-                      ✨ Check In
+                      Check In
                     </button>
                   </div>
                 </div>
@@ -1293,7 +1297,7 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-700 dark:text-gray-300 italic">
                     "Small steps every day lead to big changes!"
                   </p>
-                  <p className="text-xs text-pink-600 dark:text-pink-400 mt-1">Keep going! 💪</p>
+                  <p className="text-xs text-pink-600 dark:text-pink-400 mt-1">Keep going!</p>
                 </div>
               </div>
             </div>
