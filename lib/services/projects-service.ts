@@ -246,14 +246,23 @@ export const projectsService = {
 
   // Budget
   async getBudget(spaceId: string): Promise<Budget | null> {
-    const { data, error } = await supabase
-      .from('budgets')
-      .select('*')
-      .eq('space_id', spaceId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('budgets')
+        .select('*')
+        .eq('space_id', spaceId)
+        .single();
 
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
+      // PGRST116 = no rows returned (not an error)
+      if (error && error.code !== 'PGRST116') {
+        console.error('getBudget error:', error);
+        return null;
+      }
+      return data;
+    } catch (error) {
+      console.error('getBudget exception:', error);
+      return null;
+    }
   },
 
   async setBudget(input: CreateBudgetInput, userId: string): Promise<Budget> {
