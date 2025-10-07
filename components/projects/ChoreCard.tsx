@@ -10,9 +10,10 @@ interface ChoreCardProps {
   onStatusChange: (choreId: string, status: string) => void;
   onEdit: (chore: Chore) => void;
   onDelete: (choreId: string) => void;
+  onUpdateProgress?: (chore: Chore) => void;
 }
 
-export function ChoreCard({ chore, onStatusChange, onEdit, onDelete }: ChoreCardProps) {
+export function ChoreCard({ chore, onStatusChange, onEdit, onDelete, onUpdateProgress }: ChoreCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
@@ -24,7 +25,34 @@ export function ChoreCard({ chore, onStatusChange, onEdit, onDelete }: ChoreCard
           </button>
           <div className="flex-1">
             <h3 className={`font-semibold text-gray-900 dark:text-white ${chore.status === 'completed' ? 'line-through opacity-60' : ''}`}>{chore.title}</h3>
-            {chore.description && <p className="text-sm text-gray-600 dark:text-gray-400">{chore.description}</p>}
+            {chore.description && <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{chore.description}</p>}
+
+            {/* Progress Bar */}
+            {chore.completion_percentage !== undefined && chore.completion_percentage > 0 && (
+              <div className="mt-2">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Progress</span>
+                  <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">{chore.completion_percentage}%</span>
+                </div>
+                <div className="h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full transition-all ${
+                      chore.completion_percentage < 30
+                        ? 'bg-gradient-to-r from-red-400 to-red-500'
+                        : chore.completion_percentage < 70
+                        ? 'bg-gradient-to-r from-amber-400 to-orange-500'
+                        : 'bg-gradient-to-r from-green-400 to-green-500'
+                    }`}
+                    style={{ width: `${chore.completion_percentage}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {chore.notes && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 italic">Note: {chore.notes}</p>
+            )}
+
             <div className="flex items-center gap-3 mt-2 text-xs text-gray-600 dark:text-gray-400">
               <span className="capitalize">{chore.frequency}</span>
               {chore.due_date && <span>{format(new Date(chore.due_date), 'MMM d')}</span>}
@@ -36,8 +64,11 @@ export function ChoreCard({ chore, onStatusChange, onEdit, onDelete }: ChoreCard
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-gray-800 border rounded-lg shadow-lg z-20">
+              <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 border rounded-lg shadow-lg z-20">
                 <button onClick={() => { onEdit(chore); setShowMenu(false); }} className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg">Edit</button>
+                {onUpdateProgress && (
+                  <button onClick={() => { onUpdateProgress(chore); setShowMenu(false); }} className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700">Update Progress</button>
+                )}
                 <button onClick={() => { onDelete(chore.id); setShowMenu(false); }} className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg">Delete</button>
               </div>
             </>

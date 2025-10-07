@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package } from 'lucide-react';
+import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package, ChevronDown } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
 import { NewShoppingListModal } from '@/components/shopping/NewShoppingListModal';
@@ -16,6 +16,7 @@ export default function ShoppingPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingList, setEditingList] = useState<ShoppingList | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed'>('active');
 
   const [stats, setStats] = useState({
     totalLists: 0,
@@ -30,14 +31,22 @@ export default function ShoppingPage() {
 
   useEffect(() => {
     let filtered = lists;
+
+    // Filter by status
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(l => l.status === statusFilter);
+    }
+
+    // Filter by search
     if (searchQuery) {
       filtered = filtered.filter(l =>
         l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         l.description?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
+
     setFilteredLists(filtered);
-  }, [lists, searchQuery]);
+  }, [lists, searchQuery, statusFilter]);
 
   async function loadLists() {
     try {
@@ -55,10 +64,25 @@ export default function ShoppingPage() {
     }
   }
 
-  async function handleCreateList(listData: CreateListInput & { store?: string; items?: { name: string; quantity: number }[] }) {
+  async function handleCreateList(listData: CreateListInput & { store?: string; items?: { id?: string; name: string; quantity: number }[] }) {
     try {
       if (editingList) {
-        await shoppingService.updateList(editingList.id, listData);
+        // Extract items before updating the list
+        const { items, ...listDataOnly } = listData;
+
+        await shoppingService.updateList(editingList.id, listDataOnly);
+
+        // Only add NEW items (items without an ID)
+        if (items && items.length > 0) {
+          const newItems = items.filter(item => !item.id);
+          for (const item of newItems) {
+            await shoppingService.createItem({
+              list_id: editingList.id,
+              name: item.name,
+              quantity: item.quantity || 1,
+            });
+          }
+        }
       } else {
         // Extract items before creating the list
         const { items, ...listDataOnly } = listData;
@@ -94,26 +118,63 @@ export default function ShoppingPage() {
   }
 
   async function handleToggleItem(itemId: string, checked: boolean) {
+    // Optimistic update
+    setLists(prevLists =>
+      prevLists.map(list => ({
+        ...list,
+        items: list.items?.map(item =>
+          item.id === itemId ? { ...item, checked } : item
+        )
+      }))
+    );
+
     try {
       await shoppingService.toggleItem(itemId, checked);
-      loadLists();
+
+      // Check if all items in the list are now checked
+      const updatedList = lists.find(list =>
+        list.items?.some(item => item.id === itemId)
+      );
+
+      if (updatedList && updatedList.items && updatedList.items.length > 0) {
+        const allChecked = updatedList.items.every(item =>
+          item.id === itemId ? checked : item.checked
+        );
+
+        // Auto-complete the list if all items are checked
+        if (allChecked && checked) {
+          await handleCompleteList(updatedList.id);
+        }
+      }
     } catch (error) {
       console.error('Failed to toggle item:', error);
+      // Revert on error
+      loadLists();
     }
   }
 
   async function handleCompleteList(listId: string) {
     try {
-      // Mark as completed
-      await shoppingService.updateList(listId, { status: 'completed' });
+      // Optimistically update list status
+      setLists(prevLists =>
+        prevLists.map(list =>
+          list.id === listId ? { ...list, status: 'completed' as const } : list
+        )
+      );
 
-      // Auto-delete after a short delay
-      setTimeout(async () => {
-        await shoppingService.deleteList(listId);
-        loadLists();
-      }, 1500);
+      // Optimistically update stats
+      setStats(prevStats => ({
+        ...prevStats,
+        activeLists: prevStats.activeLists - 1,
+        completedLists: prevStats.completedLists + 1,
+      }));
+
+      // Mark as completed in database (keep for history/productivity tracking)
+      await shoppingService.updateList(listId, { status: 'completed' });
     } catch (error) {
       console.error('Failed to complete list:', error);
+      // Revert on error
+      loadLists();
     }
   }
 
@@ -179,14 +240,30 @@ export default function ShoppingPage() {
           </div>
 
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input type="text" placeholder="Search lists..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white" />
+            <div className="flex gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input type="text" placeholder="Search lists..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white" />
+              </div>
+              <div className="relative">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'completed')}
+                  className="pl-4 pr-10 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none w-full"
+                >
+                  <option value="all">All Lists</option>
+                  <option value="active">Active</option>
+                  <option value="completed">Completed</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              </div>
             </div>
           </div>
 
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">All Lists ({filteredLists.length})</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+              {statusFilter === 'active' ? 'Active Lists' : statusFilter === 'completed' ? 'Completed Lists' : 'All Lists'} ({filteredLists.length})
+            </h2>
             {loading ? (
               <div className="text-center py-12">
                 <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
@@ -207,7 +284,7 @@ export default function ShoppingPage() {
             ) : (
               <div className="space-y-4">
                 {filteredLists.map((list) => (
-                  <ShoppingListCard key={list.id} list={list} onEdit={handleEditList} onDelete={handleDeleteList} onToggleItem={handleToggleItem} onComplete={handleCompleteList} />
+                  <ShoppingListCard key={list.id} list={list} onEdit={handleEditList} onDelete={handleDeleteList} onToggleItem={handleToggleItem} />
                 ))}
               </div>
             )}

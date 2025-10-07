@@ -7,7 +7,7 @@ import { CreateListInput, ShoppingList } from '@/lib/services/shopping-service';
 interface NewShoppingListModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (list: CreateListInput & { store?: string; items?: { name: string; quantity: number }[] }) => void;
+  onSave: (list: CreateListInput & { store?: string; items?: { id?: string; name: string; quantity: number }[] }) => void;
   editList?: ShoppingList | null;
   spaceId: string;
 }
@@ -21,7 +21,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
     status: 'active',
   });
 
-  const [items, setItems] = useState<{ name: string; quantity: number; checked: boolean }[]>([]);
+  const [items, setItems] = useState<{ id?: string; name: string; quantity: number; checked: boolean }[]>([]);
   const [newItemName, setNewItemName] = useState('');
 
   useEffect(() => {
@@ -34,6 +34,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
         status: editList.status,
       });
       setItems((editList.items || []).map(item => ({
+        id: item.id, // Preserve existing item ID
         name: item.name,
         quantity: item.quantity,
         checked: item.checked,
@@ -54,7 +55,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
     e.preventDefault();
     onSave({
       ...formData,
-      items: items.map(item => ({ name: item.name, quantity: item.quantity })),
+      items: items.map(item => ({ id: item.id, name: item.name, quantity: item.quantity })),
     });
     onClose();
     // Reset form
