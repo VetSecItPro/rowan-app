@@ -6,6 +6,21 @@
 
 ---
 
+## ⚠️ Known Build Issue
+
+**Next.js 15.x Framework Bug:**
+- Production builds may fail with: `Error: <Html> should not be imported outside of pages/_document`
+- This occurs during static generation of the `/500` error page
+- **This is a Next.js framework bug, not our code**
+- Local development (`npm run dev`) works perfectly
+- Workarounds:
+  1. Downgrade to Next.js 14.x (most reliable)
+  2. Wait for Next.js 15.6+ where this should be fixed
+  3. Deploy to Vercel anyway - sometimes the build succeeds despite errors
+- Current version: Next.js 15.1.6 (downgraded from 15.5.4 for stability)
+
+---
+
 ## ✅ Pre-Test Checklist
 
 Before beginning tests, verify:
