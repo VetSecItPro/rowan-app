@@ -7,6 +7,9 @@ import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { HamburgerMenu } from '@/components/navigation/HamburgerMenu';
 import { FeatureCard } from '@/components/home/FeatureCard';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-white dark:bg-black">
