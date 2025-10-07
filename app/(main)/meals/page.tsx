@@ -7,7 +7,7 @@ import { MealCard } from '@/components/meals/MealCard';
 import { NewMealModal } from '@/components/meals/NewMealModal';
 import { NewRecipeModal } from '@/components/meals/NewRecipeModal';
 import { RecipeCard } from '@/components/meals/RecipeCard';
-import { useAuth } from '@/lib/contexts/mock-auth-context';
+import { useAuth } from '@/lib/contexts/auth-context';
 import { mealsService, Meal, CreateMealInput, Recipe, CreateRecipeInput } from '@/lib/services/meals-service';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth } from 'date-fns';
 

@@ -6,7 +6,7 @@ import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { TaskCard } from '@/components/tasks/TaskCard';
 import { NewTaskModal } from '@/components/tasks/NewTaskModal';
 import { NewChoreModal } from '@/components/projects/NewChoreModal';
-import { useAuth } from '@/lib/contexts/mock-auth-context';
+import { useAuth } from '@/lib/contexts/auth-context';
 import { tasksService } from '@/lib/services/tasks-service';
 import { Task, CreateTaskInput } from '@/lib/types';
 

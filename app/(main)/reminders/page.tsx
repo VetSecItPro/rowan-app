@@ -5,7 +5,7 @@ import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown } fro
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ReminderCard } from '@/components/reminders/ReminderCard';
 import { NewReminderModal } from '@/components/reminders/NewReminderModal';
-import { useAuth } from '@/lib/contexts/mock-auth-context';
+import { useAuth } from '@/lib/contexts/auth-context';
 import { remindersService, Reminder, CreateReminderInput } from '@/lib/services/reminders-service';
 
 export default function RemindersPage() {
