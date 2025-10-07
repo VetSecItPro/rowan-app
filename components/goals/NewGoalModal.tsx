@@ -114,18 +114,43 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{editGoal ? 'Edit Goal' : 'New Goal'}</h2>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"><X className="w-5 h-5" /></button>
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-6 rounded-t-2xl">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">{editGoal ? 'Edit Goal' : 'New Goal'}</h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Title */}
           <div>
-            <label className="block text-sm font-medium mb-2">Title *</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Title *
+            </label>
             <div className="relative">
-              <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2 pr-12 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white" />
+              <input
+                type="text"
+                required
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="e.g., Save for dream vacation"
+                className="w-full px-4 py-3 pr-12 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+              />
 
               {/* Emoji Picker Button */}
               <div className="absolute right-2 top-1/2 -translate-y-1/2">
@@ -140,7 +165,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
 
                 {/* Emoji Picker Popup */}
                 {showEmojiPicker && (
-                  <div className="absolute bottom-full mb-2 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 grid grid-cols-5 gap-2 z-10 min-w-[240px]">
+                  <div className="absolute top-full mt-2 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 grid grid-cols-5 gap-2 z-10 min-w-[240px]">
                     {EMOJIS.map((emoji, idx) => (
                       <button
                         key={idx}
@@ -157,17 +182,29 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
               </div>
             </div>
           </div>
+          {/* Description */}
           <div>
-            <label className="block text-sm font-medium mb-2">Description</label>
-            <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white resize-none" />
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Description
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Add details about this goal..."
+              rows={3}
+              className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+            />
           </div>
+          {/* Category & Progress */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Category</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Category
+              </label>
               <select
                 value={selectedCategory}
                 onChange={(e) => handleCategoryChange(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               >
                 <option value="">Select a category</option>
                 {categoryOptions.map((category) => (
@@ -176,30 +213,64 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Progress (%)</label>
-              <input type="number" min="0" max="100" value={formData.progress} onChange={(e) => setFormData({ ...formData, progress: parseInt(e.target.value) })} className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white" />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Progress (%)
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={formData.progress}
+                onChange={(e) => setFormData({ ...formData, progress: parseInt(e.target.value) })}
+                placeholder="0"
+                className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+              />
             </div>
           </div>
+          {/* Custom Category */}
           {selectedCategory === 'Other' && (
             <div>
-              <label className="block text-sm font-medium mb-2">Custom Category Name *</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Custom Category Name *
+              </label>
               <input
                 type="text"
                 required
                 value={customCategory}
                 onChange={(e) => handleCustomCategoryChange(e.target.value)}
                 placeholder="Enter custom category name"
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
           )}
+
+          {/* Target Date */}
           <div>
-            <label className="block text-sm font-medium mb-2">Target Date</label>
-            <input type="date" value={formData.target_date} onChange={(e) => setFormData({ ...formData, target_date: e.target.value })} className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white" />
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Target Date
+            </label>
+            <input
+              type="date"
+              value={formData.target_date}
+              onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
+              className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+            />
           </div>
-          <div className="flex items-center justify-end gap-3 pt-4">
-            <button type="button" onClick={onClose} className="px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">Cancel</button>
-            <button type="submit" className="px-6 py-2 shimmer-bg text-white rounded-lg">{editGoal ? 'Save' : 'Create'}</button>
+          {/* Actions */}
+          <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:opacity-90 transition-all shadow-lg font-medium"
+            >
+              {editGoal ? 'Update Goal' : 'Create Goal'}
+            </button>
           </div>
         </form>
       </div>

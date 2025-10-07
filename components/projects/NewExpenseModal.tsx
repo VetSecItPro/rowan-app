@@ -22,6 +22,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
     due_date: '',
     recurring: false,
   });
+  const [dateError, setDateError] = useState<string>('');
 
   useEffect(() => {
     if (editExpense) {
@@ -29,6 +30,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
     } else {
       setFormData({ space_id: spaceId, title: '', amount: 0, category: '', status: 'pending', due_date: '', recurring: false });
     }
+    setDateError('');
   }, [editExpense, spaceId]);
 
   if (!isOpen) return null;
@@ -41,7 +43,25 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
           <h2 className="text-2xl font-bold">{editExpense ? 'Edit Expense' : 'New Expense'}</h2>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"><X className="w-5 h-5" /></button>
         </div>
-        <form onSubmit={(e) => { e.preventDefault(); onSave(formData); onClose(); }} className="p-6 space-y-4">
+        <form onSubmit={(e) => {
+          e.preventDefault();
+
+          // Validate due date is not in the past
+          if (formData.due_date) {
+            const dueDate = new Date(formData.due_date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (dueDate < today) {
+              setDateError('Due date is in the past');
+              return;
+            }
+          }
+
+          setDateError('');
+          onSave(formData);
+          onClose();
+        }} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium mb-2">Title *</label>
             <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border rounded-lg" />
@@ -58,11 +78,49 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">Due Date</label>
-            <input type="date" value={formData.due_date} onChange={(e) => setFormData({ ...formData, due_date: e.target.value })} className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border rounded-lg" />
+            <input
+              type="date"
+              value={formData.due_date}
+              onChange={(e) => {
+                setFormData({ ...formData, due_date: e.target.value });
+
+                // Validate on change
+                if (e.target.value) {
+                  const dueDate = new Date(e.target.value);
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+
+                  if (dueDate < today) {
+                    setDateError('Due date is in the past');
+                  } else {
+                    setDateError('');
+                  }
+                } else {
+                  setDateError('');
+                }
+              }}
+              className={`w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border rounded-lg ${
+                dateError ? 'border-red-500 dark:border-red-500' : ''
+              }`}
+            />
+            {dateError && (
+              <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                <span className="font-medium">⚠</span>
+                {dateError}
+              </p>
+            )}
           </div>
           <div className="flex gap-3 pt-4">
             <button type="button" onClick={onClose} className="flex-1 px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">Cancel</button>
-            <button type="submit" className="flex-1 px-6 py-2 shimmer-bg text-white rounded-lg">{editExpense ? 'Save' : 'Create'}</button>
+            <button
+              type="submit"
+              disabled={!!dateError}
+              className={`flex-1 px-6 py-2 shimmer-bg text-white rounded-lg ${
+                dateError ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {editExpense ? 'Save' : 'Create'}
+            </button>
           </div>
         </form>
       </div>

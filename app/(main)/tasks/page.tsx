@@ -5,6 +5,7 @@ import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, ChevronDow
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { TaskCard } from '@/components/tasks/TaskCard';
 import { NewTaskModal } from '@/components/tasks/NewTaskModal';
+import { NewChoreModal } from '@/components/projects/NewChoreModal';
 import { useAuth } from '@/lib/contexts/mock-auth-context';
 import { tasksService } from '@/lib/services/tasks-service';
 import { Task, CreateTaskInput } from '@/lib/types';
@@ -296,14 +297,24 @@ export default function TasksPage() {
         </div>
       </div>
 
-      {/* New/Edit Task Modal */}
-      <NewTaskModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSave={handleCreateTask}
-        editTask={editingTask}
-        spaceId={currentSpace.id}
-      />
+      {/* New/Edit Modal - conditionally render based on activeTab */}
+      {activeTab === 'task' ? (
+        <NewTaskModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onSave={handleCreateTask}
+          editTask={editingTask}
+          spaceId={currentSpace.id}
+        />
+      ) : (
+        <NewChoreModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onSave={handleCreateTask as any}
+          editChore={editingTask as any}
+          spaceId={currentSpace.id}
+        />
+      )}
     </FeatureLayout>
   );
 }
