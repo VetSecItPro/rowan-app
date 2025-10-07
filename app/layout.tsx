@@ -3,6 +3,9 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthProvider } from "@/lib/contexts/auth-context";
 
+// Force dynamic rendering for all pages (needed for auth context)
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "Rowan - Your Life, Organized",
   description: "Collaborative life management for couples and families",
