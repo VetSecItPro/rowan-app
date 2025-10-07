@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuth } from '@/lib/contexts/mock-auth-context';
 import {
@@ -648,7 +648,7 @@ export default function SettingsPage() {
                       </a>
 
                       <a href="#" className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg transition-shadow">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">What's New</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">What&apos;s New</h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400">See the latest features and updates</p>
                       </a>
                     </div>
@@ -656,7 +656,7 @@ export default function SettingsPage() {
                     <div className="p-6 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl">
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">App Version</h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">Rowan v1.0.0</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">You're running the latest version</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">You&apos;re running the latest version</p>
                     </div>
                   </div>
                 )}

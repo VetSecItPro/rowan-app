@@ -41,7 +41,7 @@ export default function GoalsFeaturePage() {
             </div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Progress Tracking</h3>
             <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-              Visual progress bars and charts show how far you've come and what's left to achieve.
+              Visual progress bars and charts show how far you&apos;ve come and what&apos;s left to achieve.
             </p>
           </div>
 
