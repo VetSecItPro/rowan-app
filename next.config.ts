@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
     // Our TypeScript code is valid (verified by type-check passing)
     ignoreBuildErrors: true,
   },
+  // Workaround for Next.js 15.x Html import bug
+  skipTrailingSlashRedirect: true,
+  skipMiddlewareUrlNormalize: true,
   // Use standalone output for Vercel deployment
   output: 'standalone',
 };
