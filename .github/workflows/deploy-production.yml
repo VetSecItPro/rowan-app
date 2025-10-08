@@ -39,9 +39,10 @@ jobs:
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
         run: |
           echo "### 🗃️ Running Database Migrations" >> $GITHUB_STEP_SUMMARY
-          # Use direct database connection (port 5432) for migrations - pooler doesn't support prepared statements
-          DB_URL="postgresql://postgres.${SUPABASE_PROJECT_ID}:${SUPABASE_DB_PASSWORD}@db.${SUPABASE_PROJECT_ID}.supabase.co:5432/postgres"
-          supabase db push --db-url "$DB_URL"
+          # Link to Supabase project using access token (uses Supabase API, avoids IPv6/connection issues)
+          supabase link --project-ref $SUPABASE_PROJECT_ID
+          # Push migrations
+          supabase db push
           echo "✅ Database migrations completed successfully" >> $GITHUB_STEP_SUMMARY
 
       - name: Install Vercel CLI
