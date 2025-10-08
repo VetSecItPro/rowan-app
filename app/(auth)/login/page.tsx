@@ -50,7 +50,11 @@ export default function LoginPage() {
       setError('Invalid email or password. Please try again.');
       setIsLoading(false);
     } else {
-      router.push('/dashboard');
+      // Wait a moment for auth state to update, then redirect
+      setTimeout(() => {
+        setIsLoading(false);
+        router.push('/dashboard');
+      }, 500);
     }
   };
 

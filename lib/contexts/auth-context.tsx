@@ -124,13 +124,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('user_id', userId)
         .order('joined_at', { ascending: false });
 
+      // Gracefully handle all errors (user might not have spaces yet)
       if (error) {
-        console.error('Error loading user spaces:', error);
+        console.log('User has no spaces yet or error loading spaces:', error.message);
+        setSpaces([]);
+        setCurrentSpace(null);
         return;
       }
 
       // Handle case where user has no spaces yet (silently)
       if (!data || data.length === 0) {
+        console.log('User has no spaces yet');
         setSpaces([]);
         setCurrentSpace(null);
         return;
@@ -149,7 +153,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setCurrentSpace(userSpaces[0]);
       }
     } catch (error) {
-      console.error('Error loading user spaces:', error);
+      console.log('Exception loading user spaces (non-blocking):', error);
+      // Don't block login - user can create/join spaces later
+      setSpaces([]);
+      setCurrentSpace(null);
     }
   }
 
