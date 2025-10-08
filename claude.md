@@ -108,8 +108,12 @@ USING (partnership_id IN (
 - Dark mode: `dark:` variants on all colors
 - Error messages: user-friendly, no technical details
 
-## Git Workflow
-**Pre-approved to commit without asking**
+## Git Workflow & Deployment
+**Pre-approved tasks (no permission needed):**
+- Git commits and pushes
+- Database migrations (`npx supabase db push`)
+- Vercel deployments and monitoring
+- Deployment troubleshooting and fixes
 
 Format: `type(scope): description`
 - feat, fix, docs, style, refactor, test, chore
@@ -118,6 +122,9 @@ Commit flow:
 1. `git add .`
 2. `git commit -m "message\n\n🤖 Generated with Claude Code\n\nCo-Authored-By: Claude <noreply@anthropic.com>"`
 3. `git push`
+4. Monitor Vercel deployment with `vercel ls`
+5. If deployment fails: check logs, fix issues, retry until successful
+6. If migration fails: analyze error, fix, retry until successful
 
 If commit fails: fix issue and retry until successful
 
