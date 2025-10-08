@@ -56,10 +56,14 @@ export default function LoginPage() {
         setError('Invalid email or password. Please try again.');
         setIsLoading(false);
       } else {
-        // Login successful - use window.location for full page reload
-        // This ensures middleware sees the updated session cookies
-        console.log('Login successful, redirecting to dashboard...');
-        window.location.href = '/dashboard';
+        // Login successful - wait for cookies to be written, then full page reload
+        console.log('Login successful, waiting for session cookies...');
+
+        // Give Supabase time to write session cookies before redirecting
+        setTimeout(() => {
+          console.log('Redirecting to dashboard...');
+          window.location.href = '/dashboard';
+        }, 500);
       }
     } catch (error) {
       console.error('Unexpected error during sign in:', error);
