@@ -39,8 +39,8 @@ jobs:
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
         run: |
           echo "### 🗃️ Running Database Migrations" >> $GITHUB_STEP_SUMMARY
-          # Use direct database URL (not pooler) for migrations
-          DB_URL="postgresql://postgres.${SUPABASE_PROJECT_ID}:${SUPABASE_DB_PASSWORD}@aws-1-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+          # Use direct database connection (port 5432) for migrations - pooler doesn't support prepared statements
+          DB_URL="postgresql://postgres.${SUPABASE_PROJECT_ID}:${SUPABASE_DB_PASSWORD}@aws-1-us-east-1.connect.supabase.com:5432/postgres"
           supabase db push --db-url "$DB_URL"
           echo "✅ Database migrations completed successfully" >> $GITHUB_STEP_SUMMARY
 
