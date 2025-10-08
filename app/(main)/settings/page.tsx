@@ -99,8 +99,8 @@ export default function SettingsPage() {
 
   // Profile state
   const [profileData, setProfileData] = useState({
-    name: user.name,
-    email: user.email,
+    name: user?.name || '',
+    email: user?.email || '',
     phone: '',
     timezone: 'Pacific Time (PT)',
     bio: ''
