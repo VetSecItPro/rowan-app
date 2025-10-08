@@ -11,6 +11,7 @@ import { shoppingService } from '@/lib/services/shopping-service';
 import { mealsService } from '@/lib/services/meals-service';
 import { choresService } from '@/lib/services/chores-service';
 import { projectsService } from '@/lib/services/budgets-service';
+import { projectsOnlyService } from '@/lib/services/projects-service';
 import { goalsService } from '@/lib/services/goals-service';
 import { supabase } from '@/lib/supabase';
 import {
@@ -120,6 +121,16 @@ interface EnhancedDashboardStats {
     remaining: number;
     pendingBills: number;
     nextBill: { title: string; due_date: string; amount: number } | null;
+    trend: number;
+  };
+  projects: {
+    total: number;
+    planning: number;
+    inProgress: number;
+    completed: number;
+    onHold: number;
+    totalBudget: number;
+    totalExpenses: number;
     trend: number;
   };
   goals: {
@@ -264,6 +275,16 @@ export default function DashboardPage() {
       nextBill: null,
       trend: 0,
     },
+    projects: {
+      total: 0,
+      planning: 0,
+      inProgress: 0,
+      completed: 0,
+      onHold: 0,
+      totalBudget: 0,
+      totalExpenses: 0,
+      trend: 0,
+    },
     goals: {
       total: 0,
       active: 0,
@@ -316,6 +337,7 @@ export default function DashboardPage() {
         allChores,
         choreStats,
         budgetStats,
+        projectStats,
         allGoals,
         goalStats,
       ] = await Promise.all([
@@ -335,6 +357,7 @@ export default function DashboardPage() {
         choresService.getChores(currentSpace.id),
         choresService.getChoreStats(currentSpace.id, user.id),
         projectsService.getBudgetStats(currentSpace.id),
+        projectsOnlyService.getProjectStats(currentSpace.id),
         goalsService.getGoals(currentSpace.id),
         goalsService.getGoalStats(currentSpace.id),
       ]);
@@ -425,6 +448,11 @@ export default function DashboardPage() {
       ).length;
       const householdTrend = allChores.filter(c => parseISO(c.created_at) > weekAgo).length;
 
+      // Calculate detailed project stats
+      const allExpenses = await projectsService.getExpenses(currentSpace.id);
+      const totalExpenses = allExpenses.reduce((sum, e) => sum + e.amount, 0);
+      const projectTrend = 0; // Could be calculated based on project creation dates
+
       // Calculate detailed goal stats
       const activeGoals = allGoals.filter(g => g.status === 'active').length;
       const completedGoals = allGoals.filter(g => g.status === 'completed').length;
@@ -514,6 +542,16 @@ export default function DashboardPage() {
           pendingBills: budgetStats.pendingBills,
           nextBill: null,
           trend: householdTrend,
+        },
+        projects: {
+          total: projectStats.total,
+          planning: projectStats.planning,
+          inProgress: projectStats.inProgress,
+          completed: projectStats.completed,
+          onHold: projectStats.onHold,
+          totalBudget: projectStats.totalBudget,
+          totalExpenses,
+          trend: projectTrend,
         },
         goals: {
           total: allGoals.length,
@@ -656,6 +694,34 @@ export default function DashboardPage() {
         })
         .subscribe();
       channels.push(goalsChannel);
+
+      // Projects subscription
+      const projectsChannel = supabase
+        .channel('dashboard_projects')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'projects',
+          filter: `space_id=eq.${currentSpace.id}`,
+        }, () => {
+          loadAllStats();
+        })
+        .subscribe();
+      channels.push(projectsChannel);
+
+      // Expenses subscription
+      const expensesChannel = supabase
+        .channel('dashboard_expenses')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'expenses',
+          filter: `space_id=eq.${currentSpace.id}`,
+        }, () => {
+          loadAllStats();
+        })
+        .subscribe();
+      channels.push(expensesChannel);
     }
 
     // Cleanup subscriptions
@@ -1071,19 +1137,19 @@ export default function DashboardPage() {
                   </div>
                 </Link>
 
-                {/* Budget Card */}
+                {/* Projects & Budget Card */}
                 <Link
-                  href="/budget"
+                  href="/projects"
                   className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400">Projects & Budget</h3>
-                        {stats.household.trend !== 0 && <TrendIndicator value={stats.household.trend} label="this week" />}
+                        {stats.projects.trend !== 0 && <TrendIndicator value={stats.projects.trend} label="this week" />}
                       </div>
                       <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                        {stats.household.totalChores}
+                        {stats.projects.total}
                       </p>
                     </div>
                     <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
@@ -1093,23 +1159,22 @@ export default function DashboardPage() {
 
                   <div className="space-y-2 mb-3">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">{stats.household.assignedToMe} yours</span>
-                      <span className="text-gray-600 dark:text-gray-400">{stats.household.assignedToPartner} partner's</span>
+                      <span className="text-gray-600 dark:text-gray-400">{stats.projects.inProgress} in progress</span>
+                      <span className="text-gray-600 dark:text-gray-400">{stats.projects.completed} completed</span>
                     </div>
-                    <p className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
-                      <CheckSquare className="w-3 h-3" />
-                      {stats.household.completedThisWeek} done this week
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {stats.projects.planning} planning • {stats.projects.onHold} on hold
                     </p>
-                    {stats.household.overdue > 0 && (
-                      <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1 font-medium">
-                        <AlertCircle className="w-3 h-3" />
-                        {stats.household.overdue} overdue
+                    {stats.projects.totalBudget > 0 && (
+                      <p className="text-sm text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                        <DollarSign className="w-3 h-3" />
+                        ${stats.projects.totalBudget.toLocaleString()} total budget
                       </p>
                     )}
                   </div>
 
                   <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg mb-3">
-                    <p className="text-xs text-amber-700 dark:text-amber-300 font-medium mb-1">Budget:</p>
+                    <p className="text-xs text-amber-700 dark:text-amber-300 font-medium mb-1">Monthly Budget:</p>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-900 dark:text-white font-bold">
                         ${stats.household.spent.toLocaleString()}
@@ -1125,7 +1190,7 @@ export default function DashboardPage() {
                       showLabel={false}
                     />
                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                      {stats.household.pendingBills} pending bills
+                      {stats.household.pendingBills} pending bills • ${stats.projects.totalExpenses.toLocaleString()} total expenses
                     </p>
                   </div>
 
