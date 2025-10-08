@@ -1,18 +1,15 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, memo } from 'react';
-import { Home, Search, Plus, CheckCircle2, DollarSign, AlertCircle, Hammer, Wallet, Receipt } from 'lucide-react';
+import { Home, Search, Plus, CheckCircle2, DollarSign, AlertCircle, Wallet, Receipt } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
-import { ChoreCard } from '@/components/projects/ChoreCard';
 import { ExpenseCard } from '@/components/projects/ExpenseCard';
-import { NewChoreModal } from '@/components/projects/NewChoreModal';
 import { NewExpenseModal } from '@/components/projects/NewExpenseModal';
 import { NewBudgetModal } from '@/components/projects/NewBudgetModal';
-import { UpdateProgressModal } from '@/components/projects/UpdateProgressModal';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { projectsService, Chore, Expense, CreateChoreInput, CreateExpenseInput } from '@/lib/services/projects-service';
+import { projectsService, Expense, CreateExpenseInput } from '@/lib/services/projects-service';
 
-type TabType = 'projects' | 'budget' | 'expenses';
+type TabType = 'budget' | 'expenses';
 
 // Memoized Stats Card Component
 const StatsCard = memo(({
@@ -98,21 +95,15 @@ BudgetProgressBar.displayName = 'BudgetProgressBar';
 
 export default function HouseholdPage() {
   const { currentSpace, user } = useAuth();
-  const [activeTab, setActiveTab] = useState<TabType>('projects');
-  const [chores, setChores] = useState<Chore[]>([]);
+  const [activeTab, setActiveTab] = useState<TabType>('budget');
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isChoreModalOpen, setIsChoreModalOpen] = useState(false);
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
-  const [isProgressModalOpen, setIsProgressModalOpen] = useState(false);
-  const [editingChore, setEditingChore] = useState<Chore | null>(null);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
-  const [updatingChore, setUpdatingChore] = useState<Chore | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentBudget, setCurrentBudget] = useState<number>(0);
   const [stats, setStats] = useState({
-    chores: { total: 0, completedThisWeek: 0, myChores: 0, partnerChores: 0 },
     budget: { monthlyBudget: 0, spentThisMonth: 0, remaining: 0, pendingBills: 0 },
   });
 
@@ -125,18 +116,18 @@ export default function HouseholdPage() {
 
     try {
       setLoading(true);
-      const [choresData, expensesData, statsData, budgetData] = await Promise.all([
-        projectsService.getChores(currentSpace.id),
+      const [expensesData, budgetStats, budgetData] = await Promise.all([
         projectsService.getExpenses(currentSpace.id),
-        projectsService.getHouseholdStats(currentSpace.id, user.id),
+        projectsService.getBudgetStats(currentSpace.id),
         projectsService.getBudget(currentSpace.id),
       ]);
-      setChores(choresData);
       setExpenses(expensesData);
-      setStats(statsData);
+      setStats({
+        budget: budgetStats,
+      });
       setCurrentBudget(budgetData?.monthly_budget || 0);
     } catch (error) {
-      console.error('Failed to load household data:', error);
+      console.error('Failed to load budget data:', error);
     } finally {
       setLoading(false);
     }
@@ -145,20 +136,6 @@ export default function HouseholdPage() {
   useEffect(() => {
     loadData();
   }, [loadData]);
-
-  const handleCreateChore = useCallback(async (choreData: CreateChoreInput) => {
-    try {
-      if (editingChore) {
-        await projectsService.updateChore(editingChore.id, choreData);
-      } else {
-        await projectsService.createChore(choreData);
-      }
-      loadData();
-      setEditingChore(null);
-    } catch (error) {
-      console.error('Failed to save chore:', error);
-    }
-  }, [editingChore, loadData]);
 
   const handleCreateExpense = useCallback(async (expenseData: CreateExpenseInput) => {
     try {
@@ -173,25 +150,6 @@ export default function HouseholdPage() {
       console.error('Failed to save expense:', error);
     }
   }, [editingExpense, loadData]);
-
-  const handleChoreStatusChange = useCallback(async (choreId: string, status: string) => {
-    try {
-      await projectsService.updateChore(choreId, { status: status as 'pending' | 'completed' | 'skipped' });
-      loadData();
-    } catch (error) {
-      console.error('Failed to update chore:', error);
-    }
-  }, [loadData]);
-
-  const handleDeleteChore = useCallback(async (choreId: string) => {
-    if (!confirm('Are you sure?')) return;
-    try {
-      await projectsService.deleteChore(choreId);
-      loadData();
-    } catch (error) {
-      console.error('Failed to delete chore:', error);
-    }
-  }, [loadData]);
 
   const handleDeleteExpense = useCallback(async (expenseId: string) => {
     if (!confirm('Are you sure?')) return;
@@ -216,19 +174,6 @@ export default function HouseholdPage() {
     }
   }, [currentSpace, user, loadData]);
 
-  const handleUpdateProgress = useCallback(async (choreId: string, completion: number, notes: string) => {
-    try {
-      await projectsService.updateChore(choreId, {
-        completion_percentage: completion,
-        notes,
-        status: completion === 100 ? 'completed' : undefined,
-      } as Partial<CreateChoreInput>);
-      loadData();
-    } catch (error) {
-      console.error('Failed to update progress:', error);
-    }
-  }, [loadData]);
-
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   }, []);
@@ -238,29 +183,13 @@ export default function HouseholdPage() {
   }, []);
 
   const handleNewButtonClick = useCallback(() => {
-    if (activeTab === 'projects') setIsChoreModalOpen(true);
-    else if (activeTab === 'budget') setIsBudgetModalOpen(true);
+    if (activeTab === 'budget') setIsBudgetModalOpen(true);
     else setIsExpenseModalOpen(true);
   }, [activeTab]);
-
-  const handleEditChore = useCallback((chore: Chore) => {
-    setEditingChore(chore);
-    setIsChoreModalOpen(true);
-  }, []);
 
   const handleEditExpense = useCallback((expense: Expense) => {
     setEditingExpense(expense);
     setIsExpenseModalOpen(true);
-  }, []);
-
-  const handleUpdateProgressClick = useCallback((chore: Chore) => {
-    setUpdatingChore(chore);
-    setIsProgressModalOpen(true);
-  }, []);
-
-  const handleCloseChoreModal = useCallback(() => {
-    setIsChoreModalOpen(false);
-    setEditingChore(null);
   }, []);
 
   const handleCloseExpenseModal = useCallback(() => {
@@ -272,38 +201,15 @@ export default function HouseholdPage() {
     setIsBudgetModalOpen(false);
   }, []);
 
-  const handleCloseProgressModal = useCallback(() => {
-    setIsProgressModalOpen(false);
-    setUpdatingChore(null);
-  }, []);
-
   const handleSwitchToExpenses = useCallback(() => {
     setActiveTab('expenses');
   }, []);
 
   // Memoized filtered data
-  const filteredChores = useMemo(() =>
-    chores.filter(c => c.title.toLowerCase().includes(searchQuery.toLowerCase())),
-    [chores, searchQuery]
-  );
-
   const filteredExpenses = useMemo(() =>
     expenses.filter(e => e.title.toLowerCase().includes(searchQuery.toLowerCase())),
     [expenses, searchQuery]
   );
-
-  // Memoized project stats calculations
-  const projectStats = useMemo(() => {
-    const activeProjects = chores.filter(c => c.status === 'pending').length;
-    const overdueProjects = chores.filter(c =>
-      c.due_date && new Date(c.due_date) < new Date() && c.status !== 'completed'
-    ).length;
-    const completionRate = chores.length > 0
-      ? Math.round((chores.filter(c => c.status === 'completed').length / chores.length) * 100)
-      : 0;
-
-    return { activeProjects, overdueProjects, completionRate };
-  }, [chores]);
 
   // Memoized expense stats calculations
   const expenseStats = useMemo(() => {
@@ -338,31 +244,20 @@ export default function HouseholdPage() {
   }, [stats.budget.monthlyBudget, stats.budget.spentThisMonth]);
 
   return (
-    <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Projects & Budget' }]}>
+    <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Budget & Expenses' }]}>
       <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-gradient-projects flex items-center justify-center"><Home className="w-6 h-6 text-white" /></div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-projects bg-clip-text text-transparent">Projects & Budget</h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">Plan home projects and manage family finances</p>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-projects bg-clip-text text-transparent">Budget & Expenses</h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">Track your budget and manage household expenses</p>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {/* View Toggle */}
               <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 rounded-xl border border-amber-200 dark:border-amber-700 w-full sm:w-auto">
-                <button
-                  onClick={() => handleTabChange('projects')}
-                  className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
-                    activeTab === 'projects'
-                      ? 'bg-gradient-projects text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                  }`}
-                >
-                  <Hammer className="w-4 h-4" />
-                  <span className="text-sm">Projects</span>
-                </button>
                 <button
                   onClick={() => handleTabChange('budget')}
                   className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
@@ -391,41 +286,14 @@ export default function HouseholdPage() {
                 className="px-4 py-2 sm:px-6 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
-                <span className="hidden sm:inline">{activeTab === 'projects' ? 'New Project' : activeTab === 'budget' ? 'Set Budget' : 'New Expense'}</span>
-                <span className="sm:hidden">{activeTab === 'projects' ? 'Project' : activeTab === 'budget' ? 'Budget' : 'Expense'}</span>
+                <span className="hidden sm:inline">{activeTab === 'budget' ? 'Set Budget' : 'New Expense'}</span>
+                <span className="sm:hidden">{activeTab === 'budget' ? 'Budget' : 'Expense'}</span>
               </button>
             </div>
           </div>
 
           {/* Stats Dashboard - Changes based on active tab */}
-          {activeTab === 'projects' ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-              <StatsCard
-                title="Active Projects"
-                value={projectStats.activeProjects}
-                icon={Hammer}
-                iconBgClass="bg-gradient-projects"
-              />
-              <StatsCard
-                title="Completed This Week"
-                value={stats.chores.completedThisWeek}
-                icon={CheckCircle2}
-                iconBgClass="bg-green-500"
-              />
-              <StatsCard
-                title="Overdue Projects"
-                value={projectStats.overdueProjects}
-                icon={AlertCircle}
-                iconBgClass="bg-red-500"
-              />
-              <StatsCard
-                title="Completion Rate"
-                value={`${projectStats.completionRate}%`}
-                icon={CheckCircle2}
-                iconBgClass="bg-blue-500"
-              />
-            </div>
-          ) : activeTab === 'budget' ? (
+          {activeTab === 'budget' ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
               <StatsCard
                 title="Monthly Budget"
@@ -487,9 +355,7 @@ export default function HouseholdPage() {
               <input
                 type="text"
                 placeholder={
-                  activeTab === 'projects'
-                    ? 'Search projects...'
-                    : activeTab === 'budget'
+                  activeTab === 'budget'
                     ? 'Search budget items...'
                     : 'Search expenses...'
                 }
@@ -503,16 +369,10 @@ export default function HouseholdPage() {
           {/* Content Area - Changes based on active tab */}
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              {activeTab === 'projects' ? `All Projects (${filteredChores.length})` : activeTab === 'budget' ? 'Budget Overview' : `All Expenses (${filteredExpenses.length})`}
+              {activeTab === 'budget' ? 'Budget Overview' : `All Expenses (${filteredExpenses.length})`}
             </h2>
             {loading ? (
               <div className="text-center py-12"><div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" /><p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p></div>
-            ) : activeTab === 'projects' ? (
-              filteredChores.length === 0 ? (
-                <div className="text-center py-12"><Hammer className="w-16 h-16 text-gray-400 mx-auto mb-4" /><p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No projects found</p><button onClick={() => setIsChoreModalOpen(true)} className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"><Plus className="w-5 h-5" />Add Project</button></div>
-              ) : (
-                <div className="space-y-4">{filteredChores.map((chore) => (<ChoreCard key={chore.id} chore={chore} onStatusChange={handleChoreStatusChange} onEdit={handleEditChore} onDelete={handleDeleteChore} onUpdateProgress={handleUpdateProgressClick} />))}</div>
-              )
             ) : activeTab === 'budget' ? (
               currentBudget === 0 ? (
                 <div className="text-center py-12">
@@ -565,10 +425,8 @@ export default function HouseholdPage() {
       </div>
       {currentSpace && (
         <>
-          <NewChoreModal isOpen={isChoreModalOpen} onClose={handleCloseChoreModal} onSave={handleCreateChore} editChore={editingChore} spaceId={currentSpace.id} />
           <NewExpenseModal isOpen={isExpenseModalOpen} onClose={handleCloseExpenseModal} onSave={handleCreateExpense} editExpense={editingExpense} spaceId={currentSpace.id} />
           <NewBudgetModal isOpen={isBudgetModalOpen} onClose={handleCloseBudgetModal} onSave={handleSetBudget} currentBudget={currentBudget} spaceId={currentSpace.id} />
-          <UpdateProgressModal isOpen={isProgressModalOpen} onClose={handleCloseProgressModal} onSave={handleUpdateProgress} chore={updatingChore} />
         </>
       )}
     </FeatureLayout>

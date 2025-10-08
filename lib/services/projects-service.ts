@@ -1,22 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 
-export interface Chore {
-  id: string;
-  space_id: string;
-  title: string;
-  description?: string;
-  frequency: 'daily' | 'weekly' | 'monthly' | 'once';
-  assigned_to?: string;
-  status: 'pending' | 'completed' | 'skipped';
-  due_date?: string;
-  completed_at?: string;
-  completion_percentage?: number;
-  notes?: string;
-  created_by: string;
-  created_at: string;
-  updated_at: string;
-}
-
+// Expense Types
 export interface Expense {
   id: string;
   space_id: string;
@@ -34,16 +18,6 @@ export interface Expense {
   updated_at: string;
 }
 
-export interface CreateChoreInput {
-  space_id: string;
-  title: string;
-  description?: string;
-  frequency: 'daily' | 'weekly' | 'monthly' | 'once';
-  assigned_to?: string;
-  status?: 'pending' | 'completed' | 'skipped';
-  due_date?: string;
-}
-
 export interface CreateExpenseInput {
   space_id: string;
   title: string;
@@ -56,13 +30,7 @@ export interface CreateExpenseInput {
   recurring?: boolean;
 }
 
-export interface ChoreStats {
-  total: number;
-  completedThisWeek: number;
-  myChores: number;
-  partnerChores: number;
-}
-
+// Budget Types
 export interface BudgetStats {
   monthlyBudget: number;
   spentThisMonth: number;
@@ -70,10 +38,7 @@ export interface BudgetStats {
   pendingBills: number;
 }
 
-export interface HouseholdStats {
-  chores: ChoreStats;
-  budget: BudgetStats;
-}
+// Removed: HouseholdStats moved to appropriate services (chores-service.ts for chores, this file for budgets)
 
 export interface Budget {
   id: string;
@@ -90,96 +55,6 @@ export interface CreateBudgetInput {
 }
 
 export const projectsService = {
-  // Chores
-  async getChores(spaceId: string): Promise<Chore[]> {
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from('chores')
-      .select('*')
-      .eq('space_id', spaceId)
-      .order('due_date', { ascending: true });
-
-    if (error) throw error;
-    return data || [];
-  },
-
-  async getChoreById(id: string): Promise<Chore | null> {
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from('chores')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) throw error;
-    return data;
-  },
-
-  async createChore(input: CreateChoreInput): Promise<Chore> {
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from('chores')
-      .insert([{
-        ...input,
-        status: input.status || 'pending',
-      }])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  },
-
-  async updateChore(id: string, updates: Partial<CreateChoreInput>): Promise<Chore> {
-    const supabase = createClient();
-    const finalUpdates: any = { ...updates };
-
-    if (updates.status === 'completed' && !finalUpdates.completed_at) {
-      finalUpdates.completed_at = new Date().toISOString();
-    }
-
-    if (updates.status && updates.status !== 'completed') {
-      finalUpdates.completed_at = null;
-    }
-
-    const { data, error } = await supabase
-      .from('chores')
-      .update(finalUpdates)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  },
-
-  async deleteChore(id: string): Promise<void> {
-    const supabase = createClient();
-    const { error } = await supabase
-      .from('chores')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-  },
-
-  async getChoreStats(spaceId: string, currentUserId: string): Promise<ChoreStats> {
-    const chores = await this.getChores(spaceId);
-    const now = new Date();
-    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-
-    return {
-      total: chores.length,
-      completedThisWeek: chores.filter(c =>
-        c.status === 'completed' &&
-        c.completed_at &&
-        new Date(c.completed_at) >= weekAgo
-      ).length,
-      myChores: chores.filter(c => c.assigned_to === currentUserId && c.status === 'pending').length,
-      partnerChores: chores.filter(c => c.assigned_to !== currentUserId && c.status === 'pending').length,
-    };
-  },
-
   // Expenses
   async getExpenses(spaceId: string): Promise<Expense[]> {
     const supabase = createClient();
@@ -355,15 +230,5 @@ export const projectsService = {
     }
   },
 
-  async getHouseholdStats(spaceId: string, currentUserId: string): Promise<HouseholdStats> {
-    const [choreStats, budgetStats] = await Promise.all([
-      this.getChoreStats(spaceId, currentUserId),
-      this.getBudgetStats(spaceId),
-    ]);
-
-    return {
-      chores: choreStats,
-      budget: budgetStats,
-    };
-  },
+  // Removed: getHouseholdStats - moved to household page to combine choresService and projectsService
 };
