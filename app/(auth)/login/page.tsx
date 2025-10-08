@@ -56,11 +56,13 @@ export default function LoginPage() {
         setError('Invalid email or password. Please try again.');
         setIsLoading(false);
       } else {
-        // Wait a moment for auth state to update, then redirect
+        // Login successful - wait for auth state to settle then redirect
+        console.log('Login successful, redirecting to dashboard...');
         setTimeout(() => {
-          setIsLoading(false);
+          console.log('Executing redirect...');
           router.push('/dashboard');
-        }, 500);
+          router.refresh(); // Force a refresh to update middleware session check
+        }, 1000); // Increased to 1 second to ensure cookies are set
       }
     } catch (error) {
       console.error('Unexpected error during sign in:', error);
