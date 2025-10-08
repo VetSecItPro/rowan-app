@@ -70,6 +70,13 @@ export enum BudgetPeriod {
   YEARLY = 'yearly',
 }
 
+export enum ProjectStatus {
+  PLANNING = 'planning',
+  IN_PROGRESS = 'in_progress',
+  COMPLETED = 'completed',
+  ON_HOLD = 'on_hold',
+}
+
 // =============================================
 // BASE TYPES
 // =============================================
@@ -265,6 +272,20 @@ export interface ChoreCompletion {
 // FINANCIAL TYPES (Budget & Expenses)
 // =============================================
 
+export interface Project {
+  id: string;
+  space_id: string;
+  name: string;
+  description?: string;
+  status: string;
+  start_date?: string;
+  target_date?: string;
+  budget_amount?: number;
+  created_by?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Expense {
   id: string;
   space_id: string;
@@ -274,6 +295,7 @@ export interface Expense {
   date: string;
   paid_by?: string;
   description?: string;
+  project_id?: string;
   created_at: string;
   updated_at: string;
 }
