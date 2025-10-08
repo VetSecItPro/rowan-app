@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 export interface Reminder {
   id: string;
@@ -46,6 +46,7 @@ export interface ReminderStats {
 
 export const remindersService = {
   async getReminders(spaceId: string): Promise<Reminder[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('reminders')
       .select('*')
@@ -57,6 +58,7 @@ export const remindersService = {
   },
 
   async getReminderById(id: string): Promise<Reminder | null> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('reminders')
       .select('*')
@@ -68,6 +70,7 @@ export const remindersService = {
   },
 
   async createReminder(input: CreateReminderInput): Promise<Reminder> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('reminders')
       .insert([{
@@ -86,6 +89,7 @@ export const remindersService = {
   },
 
   async updateReminder(id: string, updates: Partial<CreateReminderInput>): Promise<Reminder> {
+    const supabase = createClient();
     const finalUpdates: any = { ...updates };
 
     // Set completed_at timestamp when status is completed
@@ -110,6 +114,7 @@ export const remindersService = {
   },
 
   async deleteReminder(id: string): Promise<void> {
+    const supabase = createClient();
     const { error } = await supabase
       .from('reminders')
       .delete()
@@ -119,6 +124,7 @@ export const remindersService = {
   },
 
   async getReminderStats(spaceId: string): Promise<ReminderStats> {
+    const supabase = createClient();
     const reminders = await this.getReminders(spaceId);
     const now = new Date();
 
@@ -135,6 +141,7 @@ export const remindersService = {
   },
 
   async snoozeReminder(id: string, minutes: number): Promise<Reminder> {
+    const supabase = createClient();
     const snoozeUntil = new Date();
     snoozeUntil.setMinutes(snoozeUntil.getMinutes() + minutes);
 

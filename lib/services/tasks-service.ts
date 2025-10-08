@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import type {
   Task,
   CreateTaskInput,
@@ -49,6 +49,7 @@ export const tasksService = {
    * ```
    */
   async getTasks(spaceId: string, options?: TaskQueryOptions): Promise<Task[]> {
+    const supabase = createClient();
     try {
       let query = supabase
         .from('tasks')
@@ -142,6 +143,7 @@ export const tasksService = {
     limit: number = 20,
     options?: TaskQueryOptions
   ): Promise<PaginatedResponse<Task>> {
+    const supabase = createClient();
     try {
       const offset = (page - 1) * limit;
 
@@ -204,6 +206,7 @@ export const tasksService = {
    * ```
    */
   async getTaskById(id: string): Promise<Task | null> {
+    const supabase = createClient();
     try {
       const { data, error } = await supabase
         .from('tasks')
@@ -245,6 +248,7 @@ export const tasksService = {
    * ```
    */
   async createTask(data: CreateTaskInput): Promise<Task> {
+    const supabase = createClient();
     try {
       const { data: task, error } = await supabase
         .from('tasks')
@@ -278,6 +282,7 @@ export const tasksService = {
    * ```
    */
   async createTasksBatch(tasks: CreateTaskInput[]): Promise<Task[]> {
+    const supabase = createClient();
     try {
       const { data, error } = await supabase
         .from('tasks')
@@ -313,6 +318,7 @@ export const tasksService = {
    * ```
    */
   async updateTask(id: string, updates: UpdateTaskInput): Promise<Task> {
+    const supabase = createClient();
     try {
       // If marking as completed, set completed_at timestamp
       const finalUpdates: any = { ...updates };
@@ -359,6 +365,7 @@ export const tasksService = {
    * ```
    */
   async updateTasksBatch(ids: string[], updates: UpdateTaskInput): Promise<Task[]> {
+    const supabase = createClient();
     try {
       const finalUpdates: any = { ...updates };
       if (updates.status === 'completed' && !finalUpdates.completed_at) {
@@ -394,6 +401,7 @@ export const tasksService = {
    * ```
    */
   async deleteTask(id: string): Promise<void> {
+    const supabase = createClient();
     try {
       const { error } = await supabase
         .from('tasks')
@@ -421,6 +429,7 @@ export const tasksService = {
    * ```
    */
   async deleteTasksBatch(ids: string[]): Promise<void> {
+    const supabase = createClient();
     try {
       const { error } = await supabase
         .from('tasks')
@@ -451,6 +460,7 @@ export const tasksService = {
    * ```
    */
   async getTaskStats(spaceId: string): Promise<TaskStats> {
+    const supabase = createClient();
     try {
       const { data, error } = await supabase
         .from('tasks')
@@ -514,6 +524,7 @@ export const tasksService = {
       old: Task | null;
     }) => void
   ): RealtimeChannel {
+    const supabase = createClient();
     return supabase
       .channel(`tasks:${spaceId}`)
       .on(
@@ -548,6 +559,7 @@ export const tasksService = {
    * ```
    */
   async getTasksByUser(spaceId: string, userId: string): Promise<Task[]> {
+    const supabase = createClient();
     return this.getTasks(spaceId, { assigned_to: userId });
   },
 
@@ -569,6 +581,7 @@ export const tasksService = {
    * ```
    */
   async getTasksByDueDate(spaceId: string, startDate: string, endDate: string): Promise<Task[]> {
+    const supabase = createClient();
     try {
       const { data, error } = await supabase
         .from('tasks')
@@ -601,6 +614,7 @@ export const tasksService = {
    * ```
    */
   async getOverdueTasks(spaceId: string): Promise<Task[]> {
+    const supabase = createClient();
     try {
       const today = new Date().toISOString().split('T')[0];
 

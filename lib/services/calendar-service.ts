@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 export interface CalendarEvent {
   id: string;
@@ -42,6 +42,7 @@ export interface EventStats {
 
 export const calendarService = {
   async getEvents(spaceId: string): Promise<CalendarEvent[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('events')
       .select('*')
@@ -53,7 +54,8 @@ export const calendarService = {
   },
 
   async getEventById(id: string): Promise<CalendarEvent | null> {
-    const { data, error } = await supabase
+    const supabase = createClient();
+    const { data, error} = await supabase
       .from('events')
       .select('*')
       .eq('id', id)
@@ -64,6 +66,7 @@ export const calendarService = {
   },
 
   async createEvent(input: CreateEventInput): Promise<CalendarEvent> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('events')
       .insert([input])
@@ -75,6 +78,7 @@ export const calendarService = {
   },
 
   async updateEvent(id: string, updates: Partial<CreateEventInput>): Promise<CalendarEvent> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('events')
       .update(updates)
@@ -87,6 +91,7 @@ export const calendarService = {
   },
 
   async deleteEvent(id: string): Promise<void> {
+    const supabase = createClient();
     const { error } = await supabase
       .from('events')
       .delete()
@@ -96,6 +101,7 @@ export const calendarService = {
   },
 
   async updateEventStatus(id: string, status: 'not-started' | 'in-progress' | 'completed'): Promise<CalendarEvent> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('events')
       .update({ status })

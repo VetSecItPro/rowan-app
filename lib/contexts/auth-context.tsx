@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { getUserTimezone } from '@/lib/utils/timezone';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Space } from '@/lib/types';
@@ -44,6 +44,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [spaces, setSpaces] = useState<(Space & { role: string })[]>([]);
   const [currentSpace, setCurrentSpace] = useState<(Space & { role: string }) | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Create SSR-compatible Supabase client that stores sessions in cookies
+  const supabase = createClient();
 
   async function loadUserProfile(userId: string) {
     // Validate userId before making the query
