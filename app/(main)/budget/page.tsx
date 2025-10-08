@@ -7,7 +7,7 @@ import { ExpenseCard } from '@/components/projects/ExpenseCard';
 import { NewExpenseModal } from '@/components/projects/NewExpenseModal';
 import { NewBudgetModal } from '@/components/projects/NewBudgetModal';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { projectsService, Expense, CreateExpenseInput } from '@/lib/services/projects-service';
+import { projectsService, Expense, CreateExpenseInput } from '@/lib/services/budgets-service';
 
 type TabType = 'budget' | 'expenses';
 

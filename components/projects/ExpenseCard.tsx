@@ -1,7 +1,7 @@
 'use client';
 
 import { DollarSign, MoreVertical } from 'lucide-react';
-import { Expense } from '@/lib/services/projects-service';
+import { Expense } from '@/lib/services/budgets-service';
 import { format } from 'date-fns';
 import { useState } from 'react';
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, TrendingUp } from 'lucide-react';
-import { Chore } from '@/lib/services/projects-service';
+import { Chore } from '@/lib/services/budgets-service';
 
 interface UpdateProgressModalProps {
   isOpen: boolean;
