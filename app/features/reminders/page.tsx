@@ -71,14 +71,14 @@ export default function RemindersFeaturePage() {
 
           <div className="space-y-6 max-w-3xl mx-auto">
             {[
-              'Create reminders for yourself or assign to family members',
-              'Set time-based reminders with custom schedules',
-              'Enable location-based reminders for errands',
-              'Add priority levels (urgent, high, normal, low)',
-              'Attach notes, photos, or links to reminders',
-              'Snooze reminders or mark them complete',
-              'Get notifications via push, email, or SMS',
-              'View all upcoming reminders in one place',
+              'Create reminders with custom titles and descriptions',
+              'Set specific reminder times and dates',
+              'Add emoji icons to make reminders more visual',
+              'Organize by category (work, personal, health, bills, events)',
+              'Set priority levels (urgent, high, medium, low)',
+              'Set up recurring reminders (daily, weekly, monthly, custom)',
+              'Snooze reminders for later',
+              'Track overdue, active, and completed reminders',
             ].map((feature, index) => (
               <div key={index} className="flex items-start gap-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                 <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mt-1">

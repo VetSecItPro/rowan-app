@@ -71,14 +71,14 @@ export default function MessagesFeaturePage() {
 
           <div className="space-y-6 max-w-3xl mx-auto">
             {[
-              'Send text messages, emojis, and GIFs instantly',
-              'Share photos and videos with your family',
-              'Attach documents, PDFs, and important files',
-              'Create group conversations for different topics',
-              'Reply to specific messages to keep context',
+              'Send text messages with built-in emoji picker',
+              'Real-time message delivery and updates',
+              'View statistics for today, this week, and all time',
+              'Track unread message counts',
               'Search through message history effortlessly',
-              'Get notifications on all your devices',
-              'Pin important messages for quick access',
+              'Date separators for easy conversation navigation',
+              'Edit and delete your own messages',
+              'Clean, chat-style interface with smooth animations',
             ].map((feature, index) => (
               <div key={index} className="flex items-start gap-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                 <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mt-1">

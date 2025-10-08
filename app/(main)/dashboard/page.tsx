@@ -25,6 +25,7 @@ import {
   TrendingDown,
   Clock,
   AlertCircle,
+  Hand,
   Sparkles,
   Activity,
   Heart,
@@ -32,9 +33,14 @@ import {
   Plus,
   Filter,
   ChevronRight,
-  Zap
+  Zap,
+  Users
 } from 'lucide-react';
+import { SpaceSelector } from '@/components/spaces/SpaceSelector';
+import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
+import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { format, isToday, isThisWeek, isPast, parseISO, startOfWeek, subWeeks } from 'date-fns';
 
 // Enhanced stats interface with detailed metrics
@@ -175,8 +181,11 @@ const TrendIndicator = memo(function TrendIndicator({ value, label }: { value: n
 });
 
 export default function DashboardPage() {
-  const { user, currentSpace } = useAuth();
+  const router = useRouter();
+  const { user, spaces, currentSpace, loading: authLoading, switchSpace, refreshSpaces } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
   const [stats, setStats] = useState<EnhancedDashboardStats>({
     tasks: {
       total: 0,
@@ -270,8 +279,21 @@ export default function DashboardPage() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [checkInNote, setCheckInNote] = useState('');
 
+  // Auth protection - redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, authLoading, router]);
+
   // Load all comprehensive stats - Memoized with useCallback
   const loadAllStats = useCallback(async () => {
+    // Don't load data if user doesn't have a space yet
+    if (!currentSpace || !user) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -512,7 +534,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentSpace.id, user.id]);
+  }, [currentSpace, user]);
 
   // Real-time subscriptions
   useEffect(() => {
@@ -520,123 +542,126 @@ export default function DashboardPage() {
 
     const channels: any[] = [];
 
-    // Tasks subscription
-    const tasksChannel = supabase
-      .channel('dashboard_tasks')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'tasks',
-        filter: `space_id=eq.${currentSpace.id}`,
-      }, () => {
-        loadAllStats(); // Reload stats on any task change
-      })
-      .subscribe();
-    channels.push(tasksChannel);
+    // Only subscribe if we have a space
+    if (currentSpace) {
+      // Tasks subscription
+      const tasksChannel = supabase
+        .channel('dashboard_tasks')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'tasks',
+          filter: `space_id=eq.${currentSpace.id}`,
+        }, () => {
+          loadAllStats(); // Reload stats on any task change
+        })
+        .subscribe();
+      channels.push(tasksChannel);
 
-    // Events subscription
-    const eventsChannel = supabase
-      .channel('dashboard_events')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'calendar_events',
-        filter: `space_id=eq.${currentSpace.id}`,
-      }, () => {
-        loadAllStats();
-      })
-      .subscribe();
-    channels.push(eventsChannel);
+      // Events subscription
+      const eventsChannel = supabase
+        .channel('dashboard_events')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'calendar_events',
+          filter: `space_id=eq.${currentSpace.id}`,
+        }, () => {
+          loadAllStats();
+        })
+        .subscribe();
+      channels.push(eventsChannel);
 
-    // Reminders subscription
-    const remindersChannel = supabase
-      .channel('dashboard_reminders')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'reminders',
-        filter: `space_id=eq.${currentSpace.id}`,
-      }, () => {
-        loadAllStats();
-      })
-      .subscribe();
-    channels.push(remindersChannel);
+      // Reminders subscription
+      const remindersChannel = supabase
+        .channel('dashboard_reminders')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'reminders',
+          filter: `space_id=eq.${currentSpace.id}`,
+        }, () => {
+          loadAllStats();
+        })
+        .subscribe();
+      channels.push(remindersChannel);
 
-    // Messages subscription
-    const messagesChannel = supabase
-      .channel('dashboard_messages')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'messages',
-        filter: `space_id=eq.${currentSpace.id}`,
-      }, () => {
-        loadAllStats();
-      })
-      .subscribe();
-    channels.push(messagesChannel);
+      // Messages subscription
+      const messagesChannel = supabase
+        .channel('dashboard_messages')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'messages',
+          filter: `space_id=eq.${currentSpace.id}`,
+        }, () => {
+          loadAllStats();
+        })
+        .subscribe();
+      channels.push(messagesChannel);
 
-    // Shopping subscription
-    const shoppingChannel = supabase
-      .channel('dashboard_shopping')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'shopping_lists',
-        filter: `space_id=eq.${currentSpace.id}`,
-      }, () => {
-        loadAllStats();
-      })
-      .subscribe();
-    channels.push(shoppingChannel);
+      // Shopping subscription
+      const shoppingChannel = supabase
+        .channel('dashboard_shopping')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'shopping_lists',
+          filter: `space_id=eq.${currentSpace.id}`,
+        }, () => {
+          loadAllStats();
+        })
+        .subscribe();
+      channels.push(shoppingChannel);
 
-    // Meals subscription
-    const mealsChannel = supabase
-      .channel('dashboard_meals')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'meal_plans',
-        filter: `space_id=eq.${currentSpace.id}`,
-      }, () => {
-        loadAllStats();
-      })
-      .subscribe();
-    channels.push(mealsChannel);
+      // Meals subscription
+      const mealsChannel = supabase
+        .channel('dashboard_meals')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'meal_plans',
+          filter: `space_id=eq.${currentSpace.id}`,
+        }, () => {
+          loadAllStats();
+        })
+        .subscribe();
+      channels.push(mealsChannel);
 
-    // Chores subscription
-    const choresChannel = supabase
-      .channel('dashboard_chores')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'household_chores',
-        filter: `space_id=eq.${currentSpace.id}`,
-      }, () => {
-        loadAllStats();
-      })
-      .subscribe();
-    channels.push(choresChannel);
+      // Chores subscription
+      const choresChannel = supabase
+        .channel('dashboard_chores')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'household_chores',
+          filter: `space_id=eq.${currentSpace.id}`,
+        }, () => {
+          loadAllStats();
+        })
+        .subscribe();
+      channels.push(choresChannel);
 
-    // Goals subscription
-    const goalsChannel = supabase
-      .channel('dashboard_goals')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'goals',
-        filter: `space_id=eq.${currentSpace.id}`,
-      }, () => {
-        loadAllStats();
-      })
-      .subscribe();
-    channels.push(goalsChannel);
+      // Goals subscription
+      const goalsChannel = supabase
+        .channel('dashboard_goals')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'goals',
+          filter: `space_id=eq.${currentSpace.id}`,
+        }, () => {
+          loadAllStats();
+        })
+        .subscribe();
+      channels.push(goalsChannel);
+    }
 
     // Cleanup subscriptions
     return () => {
       channels.forEach(channel => supabase.removeChannel(channel));
     };
-  }, [currentSpace.id, loadAllStats]);
+  }, [currentSpace, loadAllStats]);
 
   // Mood options - Memoized
   const moodOptions = useMemo(() => [
@@ -675,27 +700,34 @@ export default function DashboardPage() {
             <div className="absolute inset-0 bg-black/10" />
             <div className="relative z-10">
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <Sparkles className="w-6 h-6 sm:w-8 sm:h-8" />
+                <Hand className="w-6 h-6 sm:w-8 sm:h-8" />
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center">
-                  {greetingText}, {user.name}!
+                  {greetingText}{user ? `, ${user.name}!` : '!'}
                 </h1>
               </div>
-              <p className="text-purple-100 text-sm sm:text-base md:text-lg text-center px-2">
-                {currentSpace.name} • {currentDate}
-              </p>
-              <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 md:gap-6 text-white/90">
-                <div className="flex items-center gap-2">
-                  <CheckSquare className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="text-xs sm:text-sm">{stats.tasks.pending} pending tasks</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="text-xs sm:text-sm">{stats.events.today} events today</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="text-xs sm:text-sm">{stats.tasks.overdue + stats.reminders.overdue} overdue items</span>
-                </div>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 px-2">
+                {currentSpace ? (
+                  <>
+                    <p className="text-blue-100 text-sm sm:text-base md:text-lg text-center">
+                      {currentDate}
+                    </p>
+                    <SpaceSelector
+                      spaces={spaces}
+                      currentSpace={currentSpace}
+                      onSpaceChange={switchSpace}
+                      onCreateSpace={() => setShowCreateSpaceModal(true)}
+                      onInvitePartner={() => setShowInviteModal(true)}
+                    />
+                  </>
+                ) : (
+                  <button
+                    onClick={() => setShowCreateSpaceModal(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl transition-all font-medium"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Create Your Space
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -1304,6 +1336,23 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Space Management Modals */}
+      <CreateSpaceModal
+        isOpen={showCreateSpaceModal}
+        onClose={() => setShowCreateSpaceModal(false)}
+        onSpaceCreated={(spaceId, spaceName) => {
+          refreshSpaces();
+          setShowCreateSpaceModal(false);
+        }}
+      />
+
+      <InvitePartnerModal
+        isOpen={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+        spaceId={currentSpace?.id || ''}
+        spaceName={currentSpace?.name || ''}
+      />
     </FeatureLayout>
   );
 }

@@ -99,6 +99,12 @@ export default function CalendarPage() {
 
   // Stable callback for loading events
   const loadEvents = useCallback(async () => {
+    // Don't load data if user doesn't have a space yet
+    if (!currentSpace) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       let eventsData = await calendarService.getEvents(currentSpace.id);
@@ -134,7 +140,7 @@ export default function CalendarPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentSpace.id]);
+  }, [currentSpace]);
 
   // Stable callback for creating/updating events
   const handleCreateEvent = useCallback(async (eventData: CreateEventInput) => {

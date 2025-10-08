@@ -71,14 +71,14 @@ export default function MealsFeaturePage() {
 
           <div className="space-y-6 max-w-3xl mx-auto">
             {[
-              'Plan breakfast, lunch, and dinner for the week',
-              'Save unlimited recipes with ingredients and instructions',
-              'Add photos and notes to your favorite dishes',
-              'Generate shopping lists from planned meals',
-              'Track dietary preferences and restrictions',
-              'Schedule recurring meals (Taco Tuesday!)',
-              'Share meal plans with family members',
-              'View nutrition information and serving sizes',
+              'Plan meals on a visual calendar view',
+              'Create and save unlimited recipes with ingredients',
+              'Add detailed instructions and notes to recipes',
+              'Assign meal types (breakfast, lunch, dinner, snack)',
+              'View planned meals in calendar, list, or recipe format',
+              'Search through meals and recipes',
+              'Track statistics for meals this week and saved recipes',
+              'Navigate through months to plan ahead',
             ].map((feature, index) => (
               <div key={index} className="flex items-start gap-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                 <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mt-1">

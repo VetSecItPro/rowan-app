@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { UserPlus, Mail, Lock, User, Heart, Sparkles, Home } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, Heart, Home, Eye, EyeOff } from 'lucide-react';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
@@ -15,8 +16,17 @@ export default function SignUpPage() {
   const [colorTheme, setColorTheme] = useState('emerald');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { signUp } = useAuth();
+  const [mounted, setMounted] = useState(false);
+  const [accountCreated, setAccountCreated] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const { signUp, signOut } = useAuth();
   const router = useRouter();
+
+  // Smooth fade-in animation on mount
+  useEffect(() => {
+    const timer = setTimeout(() => setMounted(true), 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   const colorThemes = [
     { value: 'emerald', label: 'Emerald', colors: 'from-emerald-400 to-teal-500' },
@@ -53,29 +63,106 @@ export default function SignUpPage() {
       }
       setIsLoading(false);
     } else {
-      router.push('/dashboard');
+      // Show success message
+      setAccountCreated(true);
+
+      // Wait 2 seconds before redirecting
+      setTimeout(async () => {
+        // Sign out the user to force them to log in again (bot prevention)
+        await signOut();
+        // Redirect to login page
+        router.push('/login?registered=true');
+      }, 2000);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20 flex items-center justify-center p-4 py-12">
-      <div className="w-full max-w-2xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 rounded-2xl mb-4 shadow-lg">
-            <Sparkles className="w-8 h-8 text-white" />
+    <div className="min-h-screen flex transition-all duration-500">
+      {/* Left side - Branding */}
+      <div
+        className={`hidden lg:flex lg:w-1/2 bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 dark:from-purple-900 dark:via-indigo-900 dark:to-blue-900 flex-col items-center justify-center p-12 relative overflow-hidden transform transition-all duration-700 ${
+          mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+        }`}
+      >
+        {/* Animated background shimmer effect */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -inset-[10px] opacity-20">
+            <div className="shimmer-gradient w-full h-full" />
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
-            Join Rowan
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Create your account to start collaborating
-          </p>
         </div>
 
-        {/* Sign Up Form */}
-        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Logo and branding */}
+        <div className="relative z-10 text-center">
+          {/* Logo and Rowan inline */}
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <Image
+              src="/rowan-logo.png"
+              alt="Rowan Logo"
+              width={120}
+              height={120}
+              className="w-28 h-28 drop-shadow-2xl transform hover:scale-110 transition-transform duration-300"
+            />
+            <h1 className="text-8xl font-bold text-white drop-shadow-lg">
+              Rowan
+            </h1>
+          </div>
+          <p className="text-xl text-purple-100 dark:text-purple-200 mb-8 whitespace-nowrap">
+            Collaborative life management for couples and families
+          </p>
+          <div className="space-y-4 text-lg text-purple-100 dark:text-purple-200 max-w-md mx-auto">
+            <p className="flex items-center gap-3">
+              <span className="w-2 h-2 bg-purple-300 rounded-full flex-shrink-0"></span>
+              Shared calendars & task management
+            </p>
+            <p className="flex items-center gap-3">
+              <span className="w-2 h-2 bg-purple-300 rounded-full flex-shrink-0"></span>
+              Shopping lists & meal planning
+            </p>
+            <p className="flex items-center gap-3">
+              <span className="w-2 h-2 bg-purple-300 rounded-full flex-shrink-0"></span>
+              Goal tracking & household management
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Right side - Sign up form */}
+      <div
+        className={`w-full lg:w-1/2 bg-white dark:bg-gray-900 flex items-center justify-center p-4 sm:p-8 overflow-y-auto transform transition-all duration-700 ${
+          mounted ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
+        }`}
+      >
+        <div className="w-full max-w-md py-8">
+          {/* Mobile logo */}
+          <div className="lg:hidden flex justify-center mb-8">
+            <Image
+              src="/rowan-logo.png"
+              alt="Rowan Logo"
+              width={64}
+              height={64}
+              className="w-16 h-16"
+            />
+          </div>
+
+          {/* Header */}
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              {accountCreated ? 'Account created successfully!' : 'Create Your Account'}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              {accountCreated ? 'Redirecting you to login...' : 'Join Rowan to start collaborating'}
+            </p>
+          </div>
+
+          {/* Sign up form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Error message */}
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm animate-in slide-in-from-top-2 duration-300">
+                {error}
+              </div>
+            )}
+
             {/* Name Field */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -89,9 +176,10 @@ export default function SignUpPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400"
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                   placeholder="Alex Johnson"
                   disabled={isLoading}
+                  autoFocus
                 />
               </div>
             </div>
@@ -99,7 +187,7 @@ export default function SignUpPage() {
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email address <span className="text-red-500">*</span>
+                Email Address <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -109,9 +197,10 @@ export default function SignUpPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400"
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                   placeholder="alex@example.com"
                   disabled={isLoading}
+                  autoComplete="email"
                 />
               </div>
             </div>
@@ -125,15 +214,27 @@ export default function SignUpPage() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={8}
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400"
+                  className="w-full pl-11 pr-12 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                   placeholder="••••••••"
                   disabled={isLoading}
+                  autoComplete="new-password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
               </div>
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Must be at least 8 characters
@@ -152,7 +253,7 @@ export default function SignUpPage() {
                   type="text"
                   value={pronouns}
                   onChange={(e) => setPronouns(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400"
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                   placeholder="they/them, she/her, he/him, etc."
                   disabled={isLoading}
                 />
@@ -171,7 +272,7 @@ export default function SignUpPage() {
                   type="text"
                   value={spaceName}
                   onChange={(e) => setSpaceName(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-900 dark:text-white placeholder-gray-400"
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                   placeholder="Our Family, Team Workspace, etc."
                   disabled={isLoading}
                 />
@@ -192,15 +293,15 @@ export default function SignUpPage() {
                     key={theme.value}
                     type="button"
                     onClick={() => setColorTheme(theme.value)}
-                    className={`relative rounded-xl p-4 transition-all ${
+                    className={`relative rounded-xl p-3 transition-all ${
                       colorTheme === theme.value
-                        ? 'ring-2 ring-purple-500 ring-offset-2 dark:ring-offset-gray-800'
+                        ? 'ring-2 ring-purple-500 ring-offset-2 dark:ring-offset-gray-900'
                         : 'hover:scale-105'
                     }`}
                     disabled={isLoading}
                   >
-                    <div className={`w-full h-12 bg-gradient-to-br ${theme.colors} rounded-lg shadow-lg`} />
-                    <p className="mt-2 text-xs text-center text-gray-600 dark:text-gray-400 font-medium">
+                    <div className={`w-full h-10 bg-gradient-to-br ${theme.colors} rounded-lg shadow-lg`} />
+                    <p className="mt-1.5 text-xs text-center text-gray-600 dark:text-gray-400 font-medium">
                       {theme.label}
                     </p>
                   </button>
@@ -208,59 +309,36 @@ export default function SignUpPage() {
               </div>
             </div>
 
-            {/* Error Message */}
-            {error && (
-              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
-                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-              </div>
-            )}
-
             {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 px-4 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-pink-600 hover:via-purple-600 hover:to-blue-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Creating account...
-                </>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
                   <UserPlus className="w-5 h-5" />
-                  Create account
+                  Create Account
                 </>
               )}
             </button>
           </form>
 
-          {/* Links */}
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300 dark:border-gray-600" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                  Already have an account?
-                </span>
-              </div>
-            </div>
-
-            <Link
-              href="/login"
-              className="mt-4 block w-full py-3 px-4 border-2 border-gray-300 dark:border-gray-600 hover:border-purple-500 dark:hover:border-purple-500 text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 font-semibold rounded-xl transition-all duration-200 text-center"
-            >
-              Sign in instead
-            </Link>
+          {/* Sign in link */}
+          <div className="mt-6 text-center">
+            <p className="text-gray-600 dark:text-gray-400">
+              Already have an account?{' '}
+              <Link
+                href="/login"
+                className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-semibold transition-colors duration-200"
+              >
+                Sign in
+              </Link>
+            </p>
           </div>
         </div>
-
-        {/* Footer */}
-        <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-8">
-          By creating an account, you agree to our Terms of Service and Privacy Policy
-        </p>
       </div>
     </div>
   );

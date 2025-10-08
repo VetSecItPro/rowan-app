@@ -59,9 +59,15 @@ export default function GoalsPage() {
   useEffect(() => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSpace.id]);
+  }, [currentSpace]);
 
   const loadData = useCallback(async () => {
+    // Don't load data if user doesn't have a space yet
+    if (!currentSpace) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       let [goalsData, milestonesData] = await Promise.all([
@@ -102,7 +108,7 @@ export default function GoalsPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentSpace.id]);
+  }, [currentSpace]);
 
   const handleCreateGoal = useCallback(async (goalData: CreateGoalInput) => {
     try {

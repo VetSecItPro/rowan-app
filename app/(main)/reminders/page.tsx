@@ -57,6 +57,12 @@ export default function RemindersPage() {
 
   // Stable reference to loadReminders
   const loadReminders = useCallback(async () => {
+    // Don't load data if user doesn't have a space yet
+    if (!currentSpace) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const [remindersData, statsData] = await Promise.all([
@@ -97,7 +103,7 @@ export default function RemindersPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentSpace.id]);
+  }, [currentSpace]);
 
   useEffect(() => {
     loadReminders();
