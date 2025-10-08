@@ -1,0 +1,272 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { Folder, Plus, Search, Wallet, Receipt, DollarSign } from 'lucide-react';
+import { FeatureLayout } from '@/components/layout/FeatureLayout';
+import { ProjectCard } from '@/components/projects/ProjectCard';
+import { NewProjectModal } from '@/components/projects/NewProjectModal';
+import { ExpenseCard } from '@/components/projects/ExpenseCard';
+import { NewExpenseModal } from '@/components/projects/NewExpenseModal';
+import { NewBudgetModal } from '@/components/projects/NewBudgetModal';
+import { useAuth } from '@/lib/contexts/auth-context';
+import { projectsOnlyService, type CreateProjectInput } from '@/lib/services/projects-service';
+import { projectsService, type Expense, type CreateExpenseInput } from '@/lib/services/budgets-service';
+import type { Project } from '@/lib/types';
+
+type TabType = 'projects' | 'budgets' | 'expenses';
+
+export default function ProjectsPage() {
+  const { currentSpace, user } = useAuth();
+  const [activeTab, setActiveTab] = useState<TabType>('projects');
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentBudget, setCurrentBudget] = useState<number>(0);
+  const [budgetStats, setBudgetStats] = useState({ monthlyBudget: 0, spentThisMonth: 0, remaining: 0, pendingBills: 0 });
+
+  const loadData = useCallback(async () => {
+    if (!currentSpace || !user) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const [projectsData, expensesData, budgetData, stats] = await Promise.all([
+        projectsOnlyService.getProjects(currentSpace.id),
+        projectsService.getExpenses(currentSpace.id),
+        projectsService.getBudget(currentSpace.id),
+        projectsService.getBudgetStats(currentSpace.id),
+      ]);
+      setProjects(projectsData);
+      setExpenses(expensesData);
+      setCurrentBudget(budgetData?.monthly_budget || 0);
+      setBudgetStats(stats);
+    } catch (error) {
+      console.error('Failed to load data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentSpace, user]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const handleCreateProject = useCallback(async (data: CreateProjectInput) => {
+    try {
+      if (editingProject) {
+        await projectsOnlyService.updateProject(editingProject.id, data);
+      } else {
+        await projectsOnlyService.createProject(data);
+      }
+      loadData();
+      setEditingProject(null);
+    } catch (error) {
+      console.error('Failed to save project:', error);
+    }
+  }, [editingProject, loadData]);
+
+  const handleDeleteProject = useCallback(async (projectId: string) => {
+    if (!confirm('Are you sure?')) return;
+    try {
+      await projectsOnlyService.deleteProject(projectId);
+      loadData();
+    } catch (error) {
+      console.error('Failed to delete project:', error);
+    }
+  }, [loadData]);
+
+  const handleCreateExpense = useCallback(async (data: CreateExpenseInput) => {
+    try {
+      if (editingExpense) {
+        await projectsService.updateExpense(editingExpense.id, data);
+      } else {
+        await projectsService.createExpense(data);
+      }
+      loadData();
+      setEditingExpense(null);
+    } catch (error) {
+      console.error('Failed to save expense:', error);
+    }
+  }, [editingExpense, loadData]);
+
+  const handleDeleteExpense = useCallback(async (expenseId: string) => {
+    if (!confirm('Are you sure?')) return;
+    try {
+      await projectsService.deleteExpense(expenseId);
+      loadData();
+    } catch (error) {
+      console.error('Failed to delete expense:', error);
+    }
+  }, [loadData]);
+
+  const handleSetBudget = useCallback(async (amount: number) => {
+    if (!currentSpace || !user) return;
+    try {
+      await projectsService.setBudget({ space_id: currentSpace.id, monthly_budget: amount }, user.id);
+      loadData();
+    } catch (error) {
+      console.error('Failed to set budget:', error);
+    }
+  }, [currentSpace, user, loadData]);
+
+  const filteredProjects = projects.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredExpenses = expenses.filter(e => e.title.toLowerCase().includes(searchQuery.toLowerCase()));
+
+  return (
+    <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Projects & Budget' }]}>
+      <div className="p-4 sm:p-8">
+        <div className="max-w-7xl mx-auto space-y-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                <Folder className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                  Projects & Budget
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">Manage projects, budgets, and expenses</p>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-xl border border-indigo-200 dark:border-indigo-700 w-full sm:w-auto">
+                {(['projects', 'budgets', 'expenses'] as TabType[]).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] ${
+                      activeTab === tab
+                        ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                    }`}
+                  >
+                    {tab === 'projects' && <Folder className="w-4 h-4" />}
+                    {tab === 'budgets' && <Wallet className="w-4 h-4" />}
+                    {tab === 'expenses' && <Receipt className="w-4 h-4" />}
+                    <span className="text-sm capitalize">{tab}</span>
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => {
+                  if (activeTab === 'projects') setIsProjectModalOpen(true);
+                  else if (activeTab === 'budgets') setIsBudgetModalOpen(true);
+                  else setIsExpenseModalOpen(true);
+                }}
+                className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                <span className="hidden sm:inline">
+                  {activeTab === 'projects' ? 'New Project' : activeTab === 'budgets' ? 'Set Budget' : 'New Expense'}
+                </span>
+                <span className="sm:hidden">{activeTab === 'projects' ? 'Project' : activeTab === 'budgets' ? 'Budget' : 'Expense'}</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder={`Search ${activeTab}...`}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+              {activeTab === 'projects' && `All Projects (${filteredProjects.length})`}
+              {activeTab === 'budgets' && 'Budget Overview'}
+              {activeTab === 'expenses' && `All Expenses (${filteredExpenses.length})`}
+            </h2>
+
+            {loading ? (
+              <div className="text-center py-12">
+                <div className="inline-block w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+              </div>
+            ) : activeTab === 'projects' ? (
+              filteredProjects.length === 0 ? (
+                <div className="text-center py-12">
+                  <Folder className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No projects found</p>
+                  <button onClick={() => setIsProjectModalOpen(true)} className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                    <Plus className="w-5 h-5" />
+                    Create Project
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {filteredProjects.map((project) => (
+                    <ProjectCard key={project.id} project={project} onEdit={(p) => { setEditingProject(p); setIsProjectModalOpen(true); }} onDelete={handleDeleteProject} />
+                  ))}
+                </div>
+              )
+            ) : activeTab === 'budgets' ? (
+              currentBudget === 0 ? (
+                <div className="text-center py-12">
+                  <Wallet className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No Budget Set</p>
+                  <button onClick={() => setIsBudgetModalOpen(true)} className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                    <Plus className="w-5 h-5" />
+                    Set Budget
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                        ${budgetStats.monthlyBudget.toLocaleString()}
+                      </h3>
+                      <p className="text-gray-500 dark:text-gray-400">Monthly Budget</p>
+                    </div>
+                    <button onClick={() => setIsBudgetModalOpen(true)} className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all">
+                      Update Budget
+                    </button>
+                  </div>
+                </div>
+              )
+            ) : (
+              filteredExpenses.length === 0 ? (
+                <div className="text-center py-12">
+                  <Receipt className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No expenses found</p>
+                  <button onClick={() => setIsExpenseModalOpen(true)} className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                    <Plus className="w-5 h-5" />
+                    Add Expense
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {filteredExpenses.map((expense) => (
+                    <ExpenseCard key={expense.id} expense={expense} onEdit={(e) => { setEditingExpense(e); setIsExpenseModalOpen(true); }} onDelete={handleDeleteExpense} />
+                  ))}
+                </div>
+              )
+            )}
+          </div>
+        </div>
+      </div>
+      {currentSpace && (
+        <>
+          <NewProjectModal isOpen={isProjectModalOpen} onClose={() => { setIsProjectModalOpen(false); setEditingProject(null); }} onSave={handleCreateProject} editProject={editingProject} spaceId={currentSpace.id} />
+          <NewExpenseModal isOpen={isExpenseModalOpen} onClose={() => { setIsExpenseModalOpen(false); setEditingExpense(null); }} onSave={handleCreateExpense} editExpense={editingExpense} spaceId={currentSpace.id} />
+          <NewBudgetModal isOpen={isBudgetModalOpen} onClose={() => setIsBudgetModalOpen(false)} onSave={handleSetBudget} currentBudget={currentBudget} spaceId={currentSpace.id} />
+        </>
+      )}
+    </FeatureLayout>
+  );
+}
