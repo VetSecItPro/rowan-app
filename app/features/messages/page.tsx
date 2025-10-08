@@ -162,7 +162,7 @@ export default function MessagesFeaturePage() {
           </p>
           <div className="flex items-center justify-center gap-4">
             <Link
-              href="/#create-account"
+              href="/signup"
               className="px-8 py-4 shimmer-bg text-white rounded-full font-semibold hover:opacity-90 transition-all shadow-xl shadow-purple-500/50"
             >
               Create Your Account
