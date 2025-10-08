@@ -15,15 +15,9 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const auth = useAuth();
-  const { signIn } = auth;
+  const { signIn } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  // Debug: Log auth context
-  useEffect(() => {
-    console.log('Auth context:', auth);
-  }, [auth]);
 
   // Smooth fade-in animation on mount
   useEffect(() => {
