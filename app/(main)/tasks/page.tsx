@@ -8,51 +8,62 @@ import { NewTaskModal } from '@/components/tasks/NewTaskModal';
 import { NewChoreModal } from '@/components/projects/NewChoreModal';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { tasksService } from '@/lib/services/tasks-service';
+import { choresService, Chore, CreateChoreInput } from '@/lib/services/chores-service';
 import { Task, CreateTaskInput } from '@/lib/types';
 
 type TaskType = 'task' | 'chore';
+type TaskOrChore = (Task & { type: 'task' }) | (Chore & { type: 'chore' });
 
 export default function TasksPage() {
   const { currentSpace } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [chores, setChores] = useState<Chore[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editingChore, setEditingChore] = useState<Chore | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [activeTab, setActiveTab] = useState<TaskType>('task');
 
-  // Memoized stats - only recalculate when tasks array changes
-  const stats = useMemo(() => ({
-    total: tasks.length,
-    completed: tasks.filter(t => t.status === 'completed').length,
-    inProgress: tasks.filter(t => t.status === 'in_progress').length,
-    pending: tasks.filter(t => t.status === 'pending').length,
-  }), [tasks]);
+  // Combine tasks and chores for unified display
+  const allItems = useMemo((): TaskOrChore[] => {
+    const tasksWithType = tasks.map(t => ({ ...t, type: 'task' as const }));
+    const choresWithType = chores.map(c => ({ ...c, type: 'chore' as const }));
+    return [...tasksWithType, ...choresWithType];
+  }, [tasks, chores]);
 
-  // Memoized filtered tasks - only recalculate when dependencies change
-  const filteredTasks = useMemo(() => {
-    let filtered = tasks;
+  // Memoized stats - calculate from combined items
+  const stats = useMemo(() => ({
+    total: allItems.length,
+    completed: allItems.filter(item => item.status === 'completed').length,
+    inProgress: allItems.filter(item => item.status === 'in_progress' || item.status === 'pending').length,
+    pending: allItems.filter(item => item.status === 'pending').length,
+  }), [allItems]);
+
+  // Memoized filtered items - filter combined tasks and chores
+  const filteredItems = useMemo(() => {
+    let filtered = allItems;
 
     // Status filter
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(t => t.status === statusFilter);
+      filtered = filtered.filter(item => item.status === statusFilter);
     }
 
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(t =>
-        t.title.toLowerCase().includes(query) ||
-        t.description?.toLowerCase().includes(query)
+      filtered = filtered.filter(item =>
+        item.title.toLowerCase().includes(query) ||
+        item.description?.toLowerCase().includes(query)
       );
     }
 
     return filtered;
-  }, [tasks, statusFilter, searchQuery]);
+  }, [allItems, statusFilter, searchQuery]);
 
-  // Memoized loadTasks function to prevent unnecessary recreations
-  const loadTasks = useCallback(async () => {
+  // Memoized loadData function to fetch both tasks and chores
+  const loadData = useCallback(async () => {
     // Don't load data if user doesn't have a space yet
     if (!currentSpace) {
       setLoading(false);
@@ -61,10 +72,15 @@ export default function TasksPage() {
 
     try {
       setLoading(true);
-      const data = await tasksService.getTasks(currentSpace.id);
-      setTasks(data);
+      // Fetch both tasks and chores in parallel
+      const [tasksData, choresData] = await Promise.all([
+        tasksService.getTasks(currentSpace.id),
+        choresService.getChores(currentSpace.id),
+      ]);
+      setTasks(tasksData);
+      setChores(choresData);
     } catch (error) {
-      console.error('Failed to load tasks:', error);
+      console.error('Failed to load data:', error);
     } finally {
       setLoading(false);
     }
@@ -72,8 +88,8 @@ export default function TasksPage() {
 
   // Load tasks when currentSpace.id changes
   useEffect(() => {
-    loadTasks();
-  }, [loadTasks]);
+    loadData();
+  }, [loadData]);
 
   // Memoized handlers with useCallback
   const handleCreateTask = useCallback(async (taskData: CreateTaskInput) => {
@@ -85,32 +101,48 @@ export default function TasksPage() {
         // Create new task
         await tasksService.createTask(taskData);
       }
-      loadTasks();
+      loadData();
       setEditingTask(null);
     } catch (error) {
       console.error('Failed to save task:', error);
     }
-  }, [editingTask, loadTasks]);
+  }, [editingTask, loadData]);
+
+  const handleCreateChore = useCallback(async (choreData: CreateChoreInput) => {
+    try {
+      if (editingChore) {
+        // Update existing chore
+        await choresService.updateChore(editingChore.id, choreData);
+      } else {
+        // Create new chore
+        await choresService.createChore(choreData);
+      }
+      loadData();
+      setEditingChore(null);
+    } catch (error) {
+      console.error('Failed to save chore:', error);
+    }
+  }, [editingChore, loadData]);
 
   const handleStatusChange = useCallback(async (taskId: string, status: string) => {
     try {
       await tasksService.updateTask(taskId, { status });
-      loadTasks();
+      loadData();
     } catch (error) {
       console.error('Failed to update task status:', error);
     }
-  }, [loadTasks]);
+  }, [loadData]);
 
   const handleDeleteTask = useCallback(async (taskId: string) => {
     if (!confirm('Are you sure you want to delete this task?')) return;
 
     try {
       await tasksService.deleteTask(taskId);
-      loadTasks();
+      loadData();
     } catch (error) {
       console.error('Failed to delete task:', error);
     }
-  }, [loadTasks]);
+  }, [loadData]);
 
   const handleEditTask = useCallback((task: Task) => {
     setEditingTask(task);
@@ -276,7 +308,7 @@ export default function TasksPage() {
           {/* Tasks List */}
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
-              All Tasks & Chores ({filteredTasks.length})
+              All Tasks & Chores ({filteredItems.length})
             </h2>
 
             {loading ? (
@@ -284,7 +316,7 @@ export default function TasksPage() {
                 <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                 <p className="mt-4 text-gray-600 dark:text-gray-400">Loading tasks...</p>
               </div>
-            ) : filteredTasks.length === 0 ? (
+            ) : filteredItems.length === 0 ? (
               <div className="text-center py-12">
                 <CheckSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No tasks or chores found</p>
@@ -299,16 +331,16 @@ export default function TasksPage() {
                     className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
                   >
                     <Plus className="w-5 h-5" />
-                    Create Task
+                    Create {activeTab === 'task' ? 'Task' : 'Chore'}
                   </button>
                 )}
               </div>
             ) : (
               <div className="space-y-4">
-                {filteredTasks.map((task) => (
+                {filteredItems.map((item) => (
                   <TaskCard
-                    key={task.id}
-                    task={task}
+                    key={item.id}
+                    task={item}
                     onStatusChange={handleStatusChange}
                     onEdit={handleEditTask}
                     onDelete={handleDeleteTask}
@@ -321,22 +353,26 @@ export default function TasksPage() {
       </div>
 
       {/* New/Edit Modal - conditionally render based on activeTab */}
-      {activeTab === 'task' ? (
-        <NewTaskModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          onSave={handleCreateTask}
-          editTask={editingTask}
-          spaceId={currentSpace.id}
-        />
-      ) : (
-        <NewChoreModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          onSave={handleCreateTask as any}
-          editChore={editingTask as any}
-          spaceId={currentSpace.id}
-        />
+      {currentSpace && (
+        <>
+          {activeTab === 'task' ? (
+            <NewTaskModal
+              isOpen={isModalOpen}
+              onClose={handleCloseModal}
+              onSave={handleCreateTask}
+              editTask={editingTask}
+              spaceId={currentSpace.id}
+            />
+          ) : (
+            <NewChoreModal
+              isOpen={isModalOpen}
+              onClose={handleCloseModal}
+              onSave={handleCreateChore}
+              editChore={editingChore}
+              spaceId={currentSpace.id}
+            />
+          )}
+        </>
       )}
     </FeatureLayout>
   );

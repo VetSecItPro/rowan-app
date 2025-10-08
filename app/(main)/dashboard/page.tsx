@@ -9,6 +9,7 @@ import { remindersService } from '@/lib/services/reminders-service';
 import { messagesService } from '@/lib/services/messages-service';
 import { shoppingService } from '@/lib/services/shopping-service';
 import { mealsService } from '@/lib/services/meals-service';
+import { choresService } from '@/lib/services/chores-service';
 import { projectsService } from '@/lib/services/projects-service';
 import { goalsService } from '@/lib/services/goals-service';
 import { supabase } from '@/lib/supabase';
@@ -331,8 +332,8 @@ export default function DashboardPage() {
         mealsService.getMeals(currentSpace.id),
         mealsService.getRecipes(currentSpace.id),
         mealsService.getMealStats(currentSpace.id),
-        projectsService.getChores(currentSpace.id),
-        projectsService.getChoreStats(currentSpace.id, user.id),
+        choresService.getChores(currentSpace.id),
+        choresService.getChoreStats(currentSpace.id, user.id),
         projectsService.getBudgetStats(currentSpace.id),
         goalsService.getGoals(currentSpace.id),
         goalsService.getGoalStats(currentSpace.id),
@@ -1070,9 +1071,9 @@ export default function DashboardPage() {
                   </div>
                 </Link>
 
-                {/* Household Card */}
+                {/* Budget Card */}
                 <Link
-                  href="/household"
+                  href="/budget"
                   className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">

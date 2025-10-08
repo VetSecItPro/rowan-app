@@ -1,7 +1,7 @@
 'use client';
 
 import { Home, Check, MoreVertical } from 'lucide-react';
-import { Chore } from '@/lib/services/projects-service';
+import { Chore } from '@/lib/services/chores-service';
 import { format } from 'date-fns';
 import { useState } from 'react';
 
