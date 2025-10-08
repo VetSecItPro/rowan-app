@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 export interface Recipe {
   id: string;
@@ -59,6 +59,7 @@ export interface MealStats {
 
 export const mealsService = {
   async getMeals(spaceId: string): Promise<Meal[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('meals')
       .select('*, recipe:recipes(*)')
@@ -70,6 +71,7 @@ export const mealsService = {
   },
 
   async getMealById(id: string): Promise<Meal | null> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('meals')
       .select('*, recipe:recipes(*)')
@@ -81,6 +83,7 @@ export const mealsService = {
   },
 
   async createMeal(input: CreateMealInput): Promise<Meal> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('meals')
       .insert([input])
@@ -92,6 +95,7 @@ export const mealsService = {
   },
 
   async updateMeal(id: string, updates: Partial<CreateMealInput>): Promise<Meal> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('meals')
       .update(updates)
@@ -104,6 +108,7 @@ export const mealsService = {
   },
 
   async deleteMeal(id: string): Promise<void> {
+    const supabase = createClient();
     const { error } = await supabase
       .from('meals')
       .delete()
@@ -113,6 +118,7 @@ export const mealsService = {
   },
 
   async getRecipes(spaceId: string): Promise<Recipe[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('recipes')
       .select('*')
@@ -124,6 +130,7 @@ export const mealsService = {
   },
 
   async createRecipe(input: CreateRecipeInput): Promise<Recipe> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('recipes')
       .insert([input])
@@ -135,6 +142,7 @@ export const mealsService = {
   },
 
   async updateRecipe(id: string, updates: Partial<CreateRecipeInput>): Promise<Recipe> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('recipes')
       .update(updates)
@@ -147,6 +155,7 @@ export const mealsService = {
   },
 
   async deleteRecipe(id: string): Promise<void> {
+    const supabase = createClient();
     const { error } = await supabase
       .from('recipes')
       .delete()
@@ -156,6 +165,7 @@ export const mealsService = {
   },
 
   async getMealStats(spaceId: string): Promise<MealStats> {
+    const supabase = createClient();
     const meals = await this.getMeals(spaceId);
     const recipes = await this.getRecipes(spaceId);
 
