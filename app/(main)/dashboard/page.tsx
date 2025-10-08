@@ -10,7 +10,7 @@ import { messagesService } from '@/lib/services/messages-service';
 import { shoppingService } from '@/lib/services/shopping-service';
 import { mealsService } from '@/lib/services/meals-service';
 import { choresService } from '@/lib/services/chores-service';
-import { projectsService } from '@/lib/services/projects-service';
+import { projectsService } from '@/lib/services/budgets-service';
 import { goalsService } from '@/lib/services/goals-service';
 import { supabase } from '@/lib/supabase';
 import {
