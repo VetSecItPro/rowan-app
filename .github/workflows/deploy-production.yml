@@ -39,8 +39,9 @@ jobs:
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
         run: |
           echo "### 🗃️ Running Database Migrations" >> $GITHUB_STEP_SUMMARY
-          supabase link --project-ref $SUPABASE_PROJECT_ID
-          supabase db push
+          # Use direct database URL (not pooler) for migrations
+          DB_URL="postgresql://postgres.${SUPABASE_PROJECT_ID}:${SUPABASE_DB_PASSWORD}@aws-1-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+          supabase db push --db-url "$DB_URL"
           echo "✅ Database migrations completed successfully" >> $GITHUB_STEP_SUMMARY
 
       - name: Install Vercel CLI
