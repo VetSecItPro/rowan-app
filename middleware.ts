@@ -66,7 +66,7 @@ export async function middleware(req: NextRequest) {
     '/reminders',
     '/shopping',
     '/meals',
-    '/household',
+    '/budget',
     '/goals',
     '/settings',
   ];
@@ -102,7 +102,7 @@ export const config = {
     '/reminders/:path*',
     '/shopping/:path*',
     '/meals/:path*',
-    '/household/:path*',
+    '/budget/:path*',
     '/goals/:path*',
     '/settings/:path*',
     '/login',

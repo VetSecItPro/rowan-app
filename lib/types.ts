@@ -507,6 +507,21 @@ export interface CreateMilestoneInput {
   target_date?: string;
 }
 
+export interface CreateChoreInput {
+  space_id: string;
+  title: string;
+  description?: string;
+  frequency: string;
+  assigned_to?: string;
+}
+
+export interface UpdateChoreInput {
+  title?: string;
+  description?: string;
+  frequency?: string;
+  assigned_to?: string;
+}
+
 // =============================================
 // SPACE & INVITATION TYPES
 // =============================================

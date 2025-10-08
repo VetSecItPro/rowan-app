@@ -141,12 +141,12 @@ export default function HomePage() {
           />
 
           <FeatureCard
-            title="Projects & Budget"
-            description="Plan home projects and track family finances"
+            title="Budget & Expenses"
+            description="Track your budget and manage household expenses"
             icon={Home}
             gradient="from-amber-500 to-amber-600"
             shadowColor="shadow-amber-500/50"
-            href="/features/household"
+            href="/features/budget"
           />
 
           <FeatureCard

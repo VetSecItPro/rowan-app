@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Smile, ChevronDown, Home } from 'lucide-react';
-import { CreateChoreInput, Chore } from '@/lib/services/projects-service';
+import { CreateChoreInput, Chore } from '@/lib/services/chores-service';
 
 // 20 family-friendly universal emojis
 const EMOJIS = ['😊', '😂', '❤️', '👍', '🎉', '🙏', '👏', '🤝', '💪', '🌟', '✨', '🎈', '🌸', '🌈', '☀️', '🍕', '☕', '📅', '✅', '🏠'];
