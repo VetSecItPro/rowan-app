@@ -184,33 +184,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: new Error('Failed to create user profile') };
       }
 
-      // Create space if provided
+      // Create space if provided (optional - don't block signup if it fails)
       if (profile.space_name) {
-        const { data: space, error: spaceError } = await supabase
-          .from('spaces')
-          .insert({ name: profile.space_name })
-          .select()
-          .single();
+        try {
+          const { data: space, error: spaceError } = await supabase
+            .from('spaces')
+            .insert({ name: profile.space_name })
+            .select()
+            .single();
 
-        if (spaceError) {
-          console.error('Error creating space:', spaceError);
-          return { error: new Error('Failed to create space') };
-        }
+          if (spaceError) {
+            console.error('Error creating space:', spaceError);
+            // Don't block signup - space creation is optional
+          } else if (space) {
+            // Add user as owner of the new space
+            const { error: memberError } = await supabase.from('space_members').insert({
+              space_id: space.id,
+              user_id: data.user.id,
+              role: 'owner',
+            });
 
-        if (space) {
-          const { error: memberError } = await supabase.from('space_members').insert({
-            space_id: space.id,
-            user_id: data.user.id,
-            role: 'owner',
-          });
-
-          if (memberError) {
-            console.error('Error adding user to space:', memberError);
-          } else {
-            const spaceWithRole = { ...space, role: 'owner' };
-            setSpaces([spaceWithRole]);
-            setCurrentSpace(spaceWithRole);
+            if (memberError) {
+              console.error('Error adding user to space:', memberError);
+            } else {
+              const spaceWithRole = { ...space, role: 'owner' };
+              setSpaces([spaceWithRole]);
+              setCurrentSpace(spaceWithRole);
+            }
           }
+        } catch (error) {
+          console.error('Space creation failed (non-blocking):', error);
+          // Continue with signup even if space creation fails
         }
       }
 
