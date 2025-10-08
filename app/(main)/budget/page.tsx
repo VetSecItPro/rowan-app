@@ -251,7 +251,12 @@ export default function HouseholdPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-gradient-projects flex items-center justify-center"><Home className="w-6 h-6 text-white" /></div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-projects bg-clip-text text-transparent">Budget & Expenses</h1>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-projects bg-clip-text text-transparent">Budget & Expenses</h1>
+                  <span className="px-3 py-1 bg-gradient-projects text-white text-sm font-semibold rounded-full shadow-lg">
+                    {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                  </span>
+                </div>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">Track your budget and manage household expenses</p>
               </div>
             </div>
