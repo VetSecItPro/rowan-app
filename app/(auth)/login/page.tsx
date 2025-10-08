@@ -15,9 +15,15 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { signIn } = useAuth();
+  const auth = useAuth();
+  const { signIn } = auth;
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Debug: Log auth context
+  useEffect(() => {
+    console.log('Auth context:', auth);
+  }, [auth]);
 
   // Smooth fade-in animation on mount
   useEffect(() => {
@@ -34,27 +40,38 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log('handleSubmit called', { email, password: '***' });
     setError('');
     setIsLoading(true);
 
     // Basic client-side validation
     if (!email || !password) {
+      console.log('Validation failed: missing email or password');
       setError('Please enter both email and password');
       setIsLoading(false);
       return;
     }
 
-    const { error: signInError } = await signIn(email, password);
+    try {
+      console.log('Calling signIn...');
+      const { error: signInError } = await signIn(email, password);
+      console.log('signIn returned:', { error: signInError });
 
-    if (signInError) {
-      setError('Invalid email or password. Please try again.');
-      setIsLoading(false);
-    } else {
-      // Wait a moment for auth state to update, then redirect
-      setTimeout(() => {
+      if (signInError) {
+        console.error('Sign in error:', signInError);
+        setError('Invalid email or password. Please try again.');
         setIsLoading(false);
-        router.push('/dashboard');
-      }, 500);
+      } else {
+        // Wait a moment for auth state to update, then redirect
+        setTimeout(() => {
+          setIsLoading(false);
+          router.push('/dashboard');
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Unexpected error during sign in:', error);
+      setError('An unexpected error occurred. Please try again.');
+      setIsLoading(false);
     }
   };
 
