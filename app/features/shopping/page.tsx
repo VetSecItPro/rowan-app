@@ -71,14 +71,14 @@ export default function ShoppingFeaturePage() {
 
           <div className="space-y-6 max-w-3xl mx-auto">
             {[
-              'Create unlimited shopping lists for different stores',
-              'Add items with quantities, notes, and photos',
-              'Organize items by category (produce, dairy, etc.)',
-              'Share lists with family members instantly',
+              'Create unlimited shopping lists with custom titles',
+              'Add items with quantities to each list',
               'Check off items in real-time as you shop',
-              'Save frequently purchased items for quick adding',
-              'Set budget targets and track spending',
-              'View purchase history and patterns',
+              'Auto-complete lists when all items are checked',
+              'Filter lists by status (active, completed, all)',
+              'Search across all your shopping lists',
+              'View stats for total lists, active lists, and items this week',
+              'Track completed lists for reference',
             ].map((feature, index) => (
               <div key={index} className="flex items-start gap-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                 <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mt-1">

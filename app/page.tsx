@@ -55,6 +55,7 @@ export default function HomePage() {
               width={160}
               height={160}
               className="w-32 h-32 md:w-40 md:h-40 drop-shadow-2xl"
+              priority
             />
             <h1 className="text-8xl md:text-9xl font-bold text-gray-900 dark:text-white">Rowan</h1>
           </div>

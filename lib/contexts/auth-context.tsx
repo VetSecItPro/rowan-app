@@ -4,15 +4,28 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { supabase } from '@/lib/supabase';
 import { getUserTimezone } from '@/lib/utils/timezone';
 import type { User, Session } from '@supabase/supabase-js';
+import type { Space } from '@/lib/types';
+
+interface UserProfile {
+  id: string;
+  email: string;
+  name: string;
+  pronouns?: string;
+  color_theme: string;
+  timezone: string;
+}
 
 interface AuthContextType {
-  user: User | null;
+  user: UserProfile | null;
   session: Session | null;
-  currentSpace: { id: string; name: string } | null;
+  spaces: (Space & { role: string })[];
+  currentSpace: (Space & { role: string }) | null;
   loading: boolean;
   signUp: (email: string, password: string, profile: ProfileData) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  switchSpace: (space: Space & { role: string }) => void;
+  refreshSpaces: () => Promise<void>;
 }
 
 interface ProfileData {
@@ -26,17 +39,46 @@ interface ProfileData {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [currentSpace, setCurrentSpace] = useState<{ id: string; name: string } | null>(null);
+  const [spaces, setSpaces] = useState<(Space & { role: string })[]>([]);
+  const [currentSpace, setCurrentSpace] = useState<(Space & { role: string }) | null>(null);
   const [loading, setLoading] = useState(true);
+
+  async function loadUserProfile(userId: string) {
+    // Validate userId before making the query
+    if (!userId || userId === 'undefined' || userId === 'null' || userId.length < 36) {
+      console.warn('Invalid userId, skipping profile load:', userId);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      // PGRST116 = no rows returned (user hasn't completed signup yet)
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error loading user profile:', error);
+        return;
+      }
+
+      if (data) {
+        setUser(data as UserProfile);
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+    }
+  }
 
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      setUser(session?.user ?? null);
       if (session?.user) {
+        loadUserProfile(session.user.id);
         loadUserSpace(session.user.id);
       }
       setLoading(false);
@@ -45,10 +87,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      setUser(session?.user ?? null);
       if (session?.user) {
+        loadUserProfile(session.user.id);
         loadUserSpace(session.user.id);
       } else {
+        setUser(null);
         setCurrentSpace(null);
       }
       setLoading(false);
@@ -58,32 +101,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   async function loadUserSpace(userId: string) {
+    // Validate userId before making the query
+    if (!userId || userId === 'undefined' || userId === 'null' || userId.length < 36) {
+      console.warn('Invalid userId, skipping space load:', userId);
+      setSpaces([]);
+      setCurrentSpace(null);
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('space_members')
-        .select('space_id, spaces(id, name)')
+        .select(`
+          role,
+          spaces (
+            id,
+            name,
+            created_at,
+            updated_at
+          )
+        `)
         .eq('user_id', userId)
-        .limit(1);
+        .order('joined_at', { ascending: false });
 
       if (error) {
-        console.error('Error loading user space:', error);
+        console.error('Error loading user spaces:', error);
         return;
       }
 
-      // Handle case where user has no space yet
+      // Handle case where user has no spaces yet (silently)
       if (!data || data.length === 0) {
-        console.log('User has no space yet');
+        setSpaces([]);
         setCurrentSpace(null);
         return;
       }
 
-      const firstSpace = data[0];
-      if (firstSpace?.spaces) {
-        // @ts-ignore - Supabase types are complex for nested selects
-        setCurrentSpace(firstSpace.spaces);
+      // Transform data to include role at top level
+      const userSpaces = data.map((item: any) => ({
+        ...item.spaces,
+        role: item.role,
+      }));
+
+      setSpaces(userSpaces);
+
+      // Set current space to first one if not already set
+      if (!currentSpace && userSpaces.length > 0) {
+        setCurrentSpace(userSpaces[0]);
       }
     } catch (error) {
-      console.error('Error loading user space:', error);
+      console.error('Error loading user spaces:', error);
     }
   }
 
@@ -141,7 +207,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (memberError) {
             console.error('Error adding user to space:', memberError);
           } else {
-            setCurrentSpace(space);
+            const spaceWithRole = { ...space, role: 'owner' };
+            setSpaces([spaceWithRole]);
+            setCurrentSpace(spaceWithRole);
           }
         }
       }
@@ -175,14 +243,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
+      setSpaces([]);
       setCurrentSpace(null);
     } catch (error) {
       console.error('Sign out error:', error);
     }
   };
 
+  const switchSpace = (space: Space & { role: string }) => {
+    setCurrentSpace(space);
+  };
+
+  const refreshSpaces = async () => {
+    if (session?.user?.id) {
+      await loadUserSpace(session.user.id);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, currentSpace, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{
+      user,
+      session,
+      spaces,
+      currentSpace,
+      loading,
+      signUp,
+      signIn,
+      signOut,
+      switchSpace,
+      refreshSpaces
+    }}>
       {children}
     </AuthContext.Provider>
   );

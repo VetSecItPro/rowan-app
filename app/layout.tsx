@@ -19,7 +19,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased bg-white dark:bg-black text-gray-900 dark:text-white">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          storageKey="rowan-theme"
+          disableTransitionOnChange
+        >
           <AuthProvider>
             {children}
           </AuthProvider>

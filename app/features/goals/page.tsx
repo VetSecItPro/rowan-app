@@ -71,14 +71,14 @@ export default function GoalsFeaturePage() {
 
           <div className="space-y-6 max-w-3xl mx-auto">
             {[
-              'Set short-term and long-term goals for the family',
-              'Track individual goals for each family member',
-              'Break down big goals into actionable milestones',
-              'Add progress updates and notes along the way',
-              'Set target dates and receive progress reminders',
-              'Visualize progress with charts and statistics',
-              'Share achievements and celebrate together',
-              'Archive completed goals to reflect on success',
+              'Create goals with custom titles and detailed descriptions',
+              'Organize goals by category (fitness, financial, education, etc.)',
+              'Track progress with visual progress bars',
+              'Set goal status (active, paused, completed)',
+              'Break down goals into trackable milestones',
+              'Track different milestone types (money, count, percentage, custom)',
+              'View statistics for active, in progress, and completed goals',
+              'Search across all goals and milestones',
             ].map((feature, index) => (
               <div key={index} className="flex items-start gap-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                 <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mt-1">

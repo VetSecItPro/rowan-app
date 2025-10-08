@@ -506,3 +506,48 @@ export interface CreateMilestoneInput {
   description?: string;
   target_date?: string;
 }
+
+// =============================================
+// SPACE & INVITATION TYPES
+// =============================================
+
+export enum InvitationStatus {
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  EXPIRED = 'expired',
+  CANCELLED = 'cancelled',
+}
+
+export interface Space {
+  id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SpaceMember {
+  space_id: string;
+  user_id: string;
+  role: string;
+  joined_at: string;
+}
+
+export interface SpaceInvitation {
+  id: string;
+  space_id: string;
+  email: string;
+  invited_by: string | null;
+  token: string;
+  status: InvitationStatus;
+  created_at: string;
+  expires_at: string;
+}
+
+export interface CreateSpaceInput {
+  name: string;
+}
+
+export interface CreateInvitationInput {
+  space_id: string;
+  email: string;
+}

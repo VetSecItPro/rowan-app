@@ -71,14 +71,14 @@ export default function HouseholdFeaturePage() {
 
           <div className="space-y-6 max-w-3xl mx-auto">
             {[
-              'Plan home renovation and improvement projects',
-              'Track project timelines and milestones',
-              'Set and monitor project budgets',
-              'Monitor household expenses and bills',
-              'Create and track family savings goals',
-              'Split costs and track shared expenses',
-              'Generate budget reports and insights',
-              'Plan for major purchases and investments',
+              'Plan home improvement projects with detailed descriptions',
+              'Track project progress with completion percentages',
+              'Set project due dates and monitor status',
+              'Set monthly household budgets',
+              'Track budget health and spending pace',
+              'Log and categorize household expenses',
+              'Monitor pending, paid, and overdue expenses',
+              'View comprehensive statistics across projects, budget, and expenses',
             ].map((feature, index) => (
               <div key={index} className="flex items-start gap-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                 <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mt-1">

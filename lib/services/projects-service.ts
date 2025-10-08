@@ -246,6 +246,11 @@ export const projectsService = {
 
   // Budget
   async getBudget(spaceId: string): Promise<Budget | null> {
+    // Return null if spaceId is invalid
+    if (!spaceId || spaceId === 'undefined' || spaceId === 'null') {
+      return null;
+    }
+
     try {
       const { data, error } = await supabase
         .from('budgets')
