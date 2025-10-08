@@ -181,6 +181,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (profileError) {
         console.error('Error creating user profile:', profileError);
+
+        // CRITICAL: Delete the orphaned auth user to prevent account without profile
+        try {
+          const response = await fetch('/api/auth/cleanup-orphaned-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: data.user.id }),
+          });
+
+          if (response.ok) {
+            console.log('Cleaned up orphaned auth user');
+          } else {
+            console.error('Failed to cleanup orphaned auth user');
+          }
+        } catch (deleteError) {
+          console.error('Failed to cleanup orphaned auth user:', deleteError);
+        }
+
+        // Return user-friendly error
+        if (profileError.message.includes('duplicate') || profileError.message.includes('unique')) {
+          return { error: new Error('An account with this email already exists') };
+        }
         return { error: new Error('Failed to create user profile') };
       }
 
