@@ -3,6 +3,9 @@
 import { useState, useRef } from 'react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
+import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
+import { supabase } from '@/lib/supabase';
 import {
   Settings,
   User,
@@ -89,7 +92,7 @@ const mockPendingInvitations = [
 ];
 
 export default function SettingsPage() {
-  const { user, currentSpace } = useAuth();
+  const { user, currentSpace, spaces, switchSpace, refreshSpaces } = useAuth();
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const profileImageInputRef = useRef<HTMLInputElement>(null);
@@ -103,6 +106,10 @@ export default function SettingsPage() {
     bio: ''
   });
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+
+  // Password reset state
+  const [isRequestingReset, setIsRequestingReset] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
 
   // Modal states
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -447,6 +454,29 @@ export default function SettingsPage() {
     console.log('Toast: Settings saved');
   };
 
+  const handleRequestPasswordReset = async () => {
+    setIsRequestingReset(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) {
+        console.error('Password reset error:', error);
+        alert('Failed to send password reset email. Please try again.');
+      } else {
+        setResetEmailSent(true);
+        console.log('Toast: Password reset email sent! Check your inbox.');
+      }
+    } catch (error) {
+      console.error('Password reset error:', error);
+      alert('Failed to send password reset email. Please try again.');
+    } finally {
+      setIsRequestingReset(false);
+    }
+  };
+
   const tabs = [
     { id: 'profile' as SettingsTab, name: 'Profile', icon: User, description: 'Manage your personal information' },
     { id: 'security' as SettingsTab, name: 'Security', icon: Shield, description: 'Password and authentication' },
@@ -663,35 +693,68 @@ export default function SettingsPage() {
                       <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Manage your password and authentication methods</p>
                     </div>
 
-                    {/* Change Password */}
+                    {/* Password Reset */}
                     <div className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl p-4 sm:p-6">
                       <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
                           <Key className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400" />
                         </div>
                         <div className="flex-1 w-full">
-                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Change Password</h3>
-                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">Update your password regularly to keep your account secure</p>
-                          <div className="space-y-3 sm:space-y-4">
-                            <input
-                              type="password"
-                              placeholder="Current password"
-                              className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
-                            />
-                            <input
-                              type="password"
-                              placeholder="New password"
-                              className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
-                            />
-                            <input
-                              type="password"
-                              placeholder="Confirm new password"
-                              className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
-                            />
-                            <button className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-purple-600 text-white rounded-lg sm:rounded-xl hover:bg-purple-700 transition-colors shadow-lg">
-                              Update Password
-                            </button>
-                          </div>
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Reset Password</h3>
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
+                            We'll send you an email with a secure link to reset your password
+                          </p>
+
+                          {resetEmailSent ? (
+                            <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg mb-3">
+                              <div className="flex items-start gap-2">
+                                <Check className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                                <div>
+                                  <p className="text-sm font-medium text-green-800 dark:text-green-200">Password reset email sent!</p>
+                                  <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                                    Check your inbox at <span className="font-semibold">{user.email}</span> for instructions to reset your password.
+                                  </p>
+                                  <p className="text-xs text-green-600 dark:text-green-400 mt-2">
+                                    Didn't receive it? Check your spam folder or{' '}
+                                    <button
+                                      onClick={() => {
+                                        setResetEmailSent(false);
+                                        handleRequestPasswordReset();
+                                      }}
+                                      className="underline hover:no-underline font-medium"
+                                    >
+                                      resend the email
+                                    </button>
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg mb-4">
+                                <p className="text-xs text-blue-700 dark:text-blue-300">
+                                  <strong>Current email:</strong> {user.email}
+                                </p>
+                              </div>
+                              <button
+                                onClick={handleRequestPasswordReset}
+                                disabled={isRequestingReset}
+                                className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-purple-600 text-white rounded-lg sm:rounded-xl hover:bg-purple-700 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                              >
+                                {isRequestingReset ? (
+                                  <>
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    Sending...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Mail className="w-4 h-4" />
+                                    Send Reset Email
+                                  </>
+                                )}
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -912,61 +975,66 @@ export default function SettingsPage() {
                   <div className="space-y-6 sm:space-y-8">
                     <div>
                       <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Space Management</h2>
-                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Manage your spaces and members</p>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Manage your spaces and switch between them</p>
                     </div>
 
-                    {/* Current Space */}
-                    <div className="p-4 sm:p-6 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg sm:rounded-xl">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4">
-                        <div>
-                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{currentSpace.name}</h3>
-                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Current Space • {spaceMembers.length} members</p>
-                        </div>
-                        <span className="px-2.5 sm:px-3 py-1 bg-purple-600 text-white text-xs font-medium rounded-full self-start sm:self-auto">Admin</span>
-                      </div>
-                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4">
-                        <button
-                          onClick={() => setShowInviteModal(true)}
-                          className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-xs sm:text-sm flex items-center justify-center gap-2"
-                        >
-                          <UserPlus className="w-4 h-4" />
-                          Invite Members
-                        </button>
-                        <button
-                          onClick={() => setShowManageMembersModal(true)}
-                          className="px-3 sm:px-4 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-xs sm:text-sm flex items-center justify-center gap-2"
-                        >
-                          <Users className="w-4 h-4" />
-                          Manage Members
-                        </button>
-                      </div>
-
-                      {/* Pending Invitations */}
-                      {pendingInvitations.length > 0 && (
-                        <div className="mt-4 pt-4 border-t border-purple-200 dark:border-purple-800">
-                          <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Pending Invitations</h4>
-                          <div className="space-y-2">
-                            {pendingInvitations.map((invite, idx) => (
-                              <div key={idx} className="flex items-center justify-between text-xs bg-white/50 dark:bg-gray-900/50 p-2 rounded-lg">
-                                <span className="text-gray-700 dark:text-gray-300">{invite.email}</span>
-                                <span className="text-gray-500 dark:text-gray-400">{invite.role} • {invite.sentAt}</span>
+                    {/* All Spaces */}
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Your Spaces</h3>
+                      <div className="space-y-3">
+                        {spaces && spaces.length > 0 ? (
+                          spaces.map((space) => (
+                            <div
+                              key={space.id}
+                              className={`p-4 rounded-xl border transition-all cursor-pointer ${
+                                currentSpace?.id === space.id
+                                  ? 'bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-purple-200 dark:border-purple-800 shadow-lg'
+                                  : 'bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-800'
+                              }`}
+                              onClick={() => switchSpace(space)}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold">
+                                    {space.name.charAt(0).toUpperCase()}
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-900 dark:text-white">{space.name}</p>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                                      {space.role === 'owner' ? 'Owner' : 'Member'}
+                                      {currentSpace?.id === space.id && ' • Active'}
+                                    </p>
+                                  </div>
+                                </div>
+                                {currentSpace?.id === space.id && (
+                                  <Check className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                                )}
                               </div>
-                            ))}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl text-center">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">No spaces yet. Create your first space to get started.</p>
                           </div>
-                        </div>
-                      )}
-
-                      {/* Leave Space */}
-                      <div className="mt-4 pt-4 border-t border-purple-200 dark:border-purple-800">
-                        <button
-                          onClick={() => setShowLeaveSpaceModal(true)}
-                          className="text-sm text-red-600 dark:text-red-400 hover:underline flex items-center gap-2"
-                        >
-                          <LogOut className="w-4 h-4" />
-                          Leave Space
-                        </button>
+                        )}
                       </div>
                     </div>
+
+                    {/* Current Space Actions */}
+                    {currentSpace && (
+                      <div className="p-4 sm:p-6 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg sm:rounded-xl">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4">Current Space: {currentSpace.name}</h3>
+                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                          <button
+                            onClick={() => setShowInviteModal(true)}
+                            className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-xs sm:text-sm flex items-center justify-center gap-2"
+                          >
+                            <UserPlus className="w-4 h-4" />
+                            Invite Members
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Create New Space */}
                     <div className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
@@ -974,9 +1042,10 @@ export default function SettingsPage() {
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Start a new space for another family or team</p>
                       <button
                         onClick={() => setShowCreateSpaceModal(true)}
-                        className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:opacity-90 transition-opacity text-sm"
+                        className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:opacity-90 transition-opacity text-sm flex items-center gap-2"
                       >
-                        + New Space
+                        <UserPlus className="w-4 h-4" />
+                        New Space
                       </button>
                     </div>
                   </div>
@@ -1119,246 +1188,23 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Modals */}
+      {/* Space Management Modals */}
+      <CreateSpaceModal
+        isOpen={showCreateSpaceModal}
+        onClose={() => setShowCreateSpaceModal(false)}
+        onSpaceCreated={(spaceId, spaceName) => {
+          refreshSpaces();
+          setShowCreateSpaceModal(false);
+        }}
+      />
 
-      {/* Invite Members Modal */}
-      {showInviteModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Invite Members</h3>
-              <button onClick={() => setShowInviteModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                  placeholder="user@example.com"
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Role
-                </label>
-                <div className="relative">
-                  <select
-                    value={inviteRole}
-                    onChange={(e) => setInviteRole(e.target.value as UserRole)}
-                    className="w-full px-4 py-3 pr-11 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer"
-                  >
-                    <option value="Admin">Admin - Full access</option>
-                    <option value="Member">Member - Can edit</option>
-                    <option value="Viewer">Viewer - Read only</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                    <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  onClick={() => setShowInviteModal(false)}
-                  className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSendInvite}
-                  disabled={isSendingInvite}
-                  className="flex-1 px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {isSendingInvite ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Mail className="w-4 h-4" />
-                      Send Invite
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Manage Members Modal */}
-      {showManageMembersModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full p-6 max-h-[80vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Manage Members</h3>
-              <button onClick={() => setShowManageMembersModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              {spaceMembers.map((member) => (
-                <div key={member.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold">
-                      {member.name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {member.name}
-                        {member.isCurrentUser && <span className="ml-2 text-xs text-purple-600 dark:text-purple-400">(You)</span>}
-                      </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">{member.email}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    {!member.isCurrentUser && (
-                      <div className="relative">
-                        <select
-                          value={member.role}
-                          onChange={(e) => handleUpdateMemberRole(member.id, e.target.value as UserRole)}
-                          className="px-3 py-1.5 pr-8 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg appearance-none cursor-pointer text-gray-900 dark:text-white"
-                        >
-                          <option value="Admin">Admin</option>
-                          <option value="Member">Member</option>
-                          <option value="Viewer">Viewer</option>
-                        </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                          <ChevronDown className="w-3 h-3 text-gray-500 dark:text-gray-400" />
-                        </div>
-                      </div>
-                    )}
-
-                    {member.isCurrentUser ? (
-                      <span className="px-3 py-1.5 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg flex items-center gap-1">
-                        <Crown className="w-3 h-3" />
-                        {member.role}
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => handleRemoveMember(member.id)}
-                        className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <button
-                onClick={() => setShowManageMembersModal(false)}
-                className="w-full px-4 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl hover:opacity-90 transition-opacity"
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Leave Space Modal */}
-      {showLeaveSpaceModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                  <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Leave Space</h3>
-              </div>
-              <button onClick={() => setShowLeaveSpaceModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-              Are you sure you want to leave &quot;{currentSpace.name}&quot;? You will need to be invited again to rejoin.
-            </p>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowLeaveSpaceModal(false)}
-                className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleLeaveSpace}
-                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors"
-              >
-                Leave Space
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Create Space Modal */}
-      {showCreateSpaceModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Create New Space</h3>
-              <button onClick={() => setShowCreateSpaceModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Space Name
-                </label>
-                <input
-                  type="text"
-                  value={newSpaceName}
-                  onChange={(e) => setNewSpaceName(e.target.value)}
-                  placeholder="Family, Team, etc."
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  onClick={() => setShowCreateSpaceModal(false)}
-                  className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleCreateSpace}
-                  disabled={isCreatingSpace}
-                  className="flex-1 px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {isCreatingSpace ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Creating...
-                    </>
-                  ) : (
-                    'Create Space'
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      {currentSpace && (
+        <InvitePartnerModal
+          isOpen={showInviteModal}
+          onClose={() => setShowInviteModal(false)}
+          spaceId={currentSpace.id}
+          spaceName={currentSpace.name}
+        />
       )}
 
       {/* Export Data Modal */}

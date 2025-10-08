@@ -71,14 +71,14 @@ export default function TasksFeaturePage() {
 
           <div className="space-y-6 max-w-3xl mx-auto">
             {[
-              'Create unlimited tasks with detailed descriptions',
-              'Set due dates and receive smart reminders',
-              'Organize with custom categories and tags',
-              'Assign tasks to specific family members',
-              'Track completion status in real-time',
-              'Filter and search through your tasks instantly',
-              'View statistics and productivity insights',
-              'Mark tasks as urgent, high, medium, or low priority',
+              'Create unlimited tasks and chores with detailed descriptions',
+              'Set due dates and track deadlines',
+              'Assign tasks to specific space members',
+              'Track completion status in real-time with live updates',
+              'Filter by status (pending, in progress, completed, cancelled)',
+              'Search through your tasks and chores instantly',
+              'View statistics showing total, completed, in progress, and pending',
+              'Set priority levels (low, medium, high) for better organization',
             ].map((feature, index) => (
               <div key={index} className="flex items-start gap-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                 <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mt-1">

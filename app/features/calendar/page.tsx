@@ -71,14 +71,14 @@ export default function CalendarFeaturePage() {
 
           <div className="space-y-6 max-w-3xl mx-auto">
             {[
-              'Create and share events with your family instantly',
-              'Set up recurring events that repeat automatically',
-              'Color-code events by person or category',
-              'Add notes, locations, and attachments to any event',
-              'Receive smart reminders before important events',
-              'View in day, week, month, or agenda format',
-              'Subscribe to external calendars (work, school, etc.)',
-              'Export and share your calendar with anyone',
+              'Create and share events with your space members instantly',
+              'Add detailed descriptions and locations to events',
+              'Color-code events by category (work, personal, family, health, social)',
+              'View in calendar grid or list format',
+              'Switch between months with easy navigation',
+              'See today, this week, and this month statistics at a glance',
+              'Search through all your events quickly',
+              'Track event status (not-started, in-progress, completed)',
             ].map((feature, index) => (
               <div key={index} className="flex items-start gap-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                 <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mt-1">

@@ -117,6 +117,12 @@ export default function HouseholdPage() {
   });
 
   const loadData = useCallback(async () => {
+    // Don't load data if user doesn't have a space yet
+    if (!currentSpace || !user) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const [choresData, expensesData, statsData, budgetData] = await Promise.all([
@@ -134,7 +140,7 @@ export default function HouseholdPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentSpace.id, user.id]);
+  }, [currentSpace, user]);
 
   useEffect(() => {
     loadData();

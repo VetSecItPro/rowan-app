@@ -82,6 +82,12 @@ export default function MessagesPage() {
 
   // Memoize loadMessages callback
   const loadMessages = useCallback(async () => {
+    // Don't load data if user doesn't have a space yet
+    if (!currentSpace || !user) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -113,7 +119,7 @@ export default function MessagesPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentSpace.id]);
+  }, [currentSpace, user]);
 
   useEffect(() => {
     loadMessages();

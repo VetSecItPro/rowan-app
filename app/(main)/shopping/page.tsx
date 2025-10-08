@@ -50,6 +50,12 @@ export default function ShoppingPage() {
 
   // Load lists function (stable reference not needed as it's called in useEffect)
   async function loadLists() {
+    // Don't load data if user doesn't have a space yet
+    if (!currentSpace) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const [listsData, statsData] = await Promise.all([
@@ -68,7 +74,7 @@ export default function ShoppingPage() {
   useEffect(() => {
     loadLists();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSpace.id]);
+  }, [currentSpace]);
 
   // Memoized callback for creating/updating lists
   const handleCreateList = useCallback(async (listData: CreateListInput & { store?: string; items?: { id?: string; name: string; quantity: number }[] }) => {

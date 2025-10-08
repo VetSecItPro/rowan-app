@@ -53,6 +53,12 @@ export default function TasksPage() {
 
   // Memoized loadTasks function to prevent unnecessary recreations
   const loadTasks = useCallback(async () => {
+    // Don't load data if user doesn't have a space yet
+    if (!currentSpace) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const data = await tasksService.getTasks(currentSpace.id);
@@ -62,7 +68,7 @@ export default function TasksPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentSpace.id]);
+  }, [currentSpace]);
 
   // Load tasks when currentSpace.id changes
   useEffect(() => {

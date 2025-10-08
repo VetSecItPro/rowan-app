@@ -11,27 +11,31 @@ export function ThemeToggle() {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    console.log('ThemeToggle mounted, current theme:', theme);
+  }, [theme]);
 
   if (!mounted) {
     return <div className="w-9 h-9" />;
   }
 
-  const tooltipText = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+  const isDark = theme === 'dark';
+
+  const handleToggle = () => {
+    const newTheme = isDark ? 'light' : 'dark';
+    console.log('Toggling theme from', theme, 'to', newTheme);
+    setTheme(newTheme);
+  };
 
   return (
     <div className="relative">
       <button
-        onClick={() => {
-          console.log('Theme toggle clicked, current theme:', theme);
-          setTheme(theme === 'dark' ? 'light' : 'dark');
-        }}
+        onClick={handleToggle}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
         className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
         aria-label="Toggle theme"
       >
-        {theme === 'dark' ? (
+        {isDark ? (
           <Sun className="w-5 h-5 text-gray-300" />
         ) : (
           <Moon className="w-5 h-5 text-gray-700" />
@@ -41,7 +45,7 @@ export function ThemeToggle() {
       {/* Tooltip */}
       {showTooltip && (
         <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 bg-gray-900 dark:bg-gray-700 text-white text-sm rounded-lg whitespace-nowrap z-50 pointer-events-none">
-          {tooltipText}
+          {isDark ? 'Switch to light mode' : 'Switch to dark mode'}
           <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-gray-700 rotate-45"></div>
         </div>
       )}

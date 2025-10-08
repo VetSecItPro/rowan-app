@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Enable class-based dark mode for Tailwind CSS v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* Define custom background images as utilities */
   --background-image-gradient-tasks: linear-gradient(to right, rgb(59 130 246), rgb(37 99 235));
@@ -170,11 +173,11 @@
   .shimmer-gradient {
     background: linear-gradient(
       90deg,
-      #9333ea 0%,
-      #ec4899 25%,
-      #f97316 50%,
-      #ec4899 75%,
-      #9333ea 100%
+      #7c3aed 0%,
+      #6366f1 25%,
+      #3b82f6 50%,
+      #6366f1 75%,
+      #7c3aed 100%
     );
     background-size: 200% auto;
     animation: shimmer-gradient 4s linear infinite;

@@ -1,5 +1,35 @@
 # Rowan App - Future Enhancements & TODO
 
+## 💎 Monetization & Premium Features (Priority: HIGH)
+
+### Multiple Spaces Premium Feature 🎯
+**Status:** Feature implemented, needs pricing tier gating
+
+**Recommendation:** Gate multiple spaces as a premium feature
+- ✅ **Free Tier:** 1 shared space with unlimited members
+- 💰 **Premium Tier ($4.99-9.99/month):** Unlimited spaces
+
+**Implementation Tasks:**
+- [ ] Add `max_spaces` field to user/subscription model
+- [ ] Create subscription tiers table (free, premium, enterprise)
+- [ ] Add limit check in CreateSpaceModal before allowing creation
+- [ ] Build upgrade prompt modal with pricing details
+- [ ] Add "Upgrade to Premium" CTA when limit reached
+- [ ] Implement payment integration (Stripe)
+- [ ] Create subscription management page
+- [ ] Add billing portal integration
+- [ ] Display current plan on Settings page
+- [ ] Add plan comparison page
+
+**Rationale:**
+- 80% of users (couples, single families) only need 1 space
+- Proven monetization model (Slack, Notion, Trello)
+- Feature already built - just gate it
+- Clear value proposition for power users
+- No wasted development effort
+
+---
+
 ## 🔐 Authentication & Security (Priority: HIGH)
 
 - [ ] Implement Supabase Auth (replace mock auth context)

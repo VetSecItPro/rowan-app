@@ -213,6 +213,12 @@ export default function MealsPage() {
 
   // Load meals callback
   const loadMeals = useCallback(async () => {
+    // Don't load data if user doesn't have a space yet
+    if (!currentSpace) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const [mealsData, statsData] = await Promise.all([
@@ -226,17 +232,22 @@ export default function MealsPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentSpace.id]);
+  }, [currentSpace]);
 
   // Load recipes callback
   const loadRecipes = useCallback(async () => {
+    // Don't load data if user doesn't have a space yet
+    if (!currentSpace) {
+      return;
+    }
+
     try {
       const recipesData = await mealsService.getRecipes(currentSpace.id);
       setRecipes(recipesData);
     } catch (error) {
       console.error('Failed to load recipes:', error);
     }
-  }, [currentSpace.id]);
+  }, [currentSpace]);
 
   useEffect(() => {
     loadMeals();
