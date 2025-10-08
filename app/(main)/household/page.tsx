@@ -204,6 +204,7 @@ export default function HouseholdPage() {
   }, [loadData]);
 
   const handleSetBudget = useCallback(async (amount: number) => {
+    if (!currentSpace || !user) return;
     try {
       await projectsService.setBudget(
         { space_id: currentSpace.id, monthly_budget: amount },
@@ -213,7 +214,7 @@ export default function HouseholdPage() {
     } catch (error) {
       console.error('Failed to set budget:', error);
     }
-  }, [currentSpace.id, user.id, loadData]);
+  }, [currentSpace, user, loadData]);
 
   const handleUpdateProgress = useCallback(async (choreId: string, completion: number, notes: string) => {
     try {
@@ -562,10 +563,14 @@ export default function HouseholdPage() {
           </div>
         </div>
       </div>
-      <NewChoreModal isOpen={isChoreModalOpen} onClose={handleCloseChoreModal} onSave={handleCreateChore} editChore={editingChore} spaceId={currentSpace.id} />
-      <NewExpenseModal isOpen={isExpenseModalOpen} onClose={handleCloseExpenseModal} onSave={handleCreateExpense} editExpense={editingExpense} spaceId={currentSpace.id} />
-      <NewBudgetModal isOpen={isBudgetModalOpen} onClose={handleCloseBudgetModal} onSave={handleSetBudget} currentBudget={currentBudget} spaceId={currentSpace.id} />
-      <UpdateProgressModal isOpen={isProgressModalOpen} onClose={handleCloseProgressModal} onSave={handleUpdateProgress} chore={updatingChore} />
+      {currentSpace && (
+        <>
+          <NewChoreModal isOpen={isChoreModalOpen} onClose={handleCloseChoreModal} onSave={handleCreateChore} editChore={editingChore} spaceId={currentSpace.id} />
+          <NewExpenseModal isOpen={isExpenseModalOpen} onClose={handleCloseExpenseModal} onSave={handleCreateExpense} editExpense={editingExpense} spaceId={currentSpace.id} />
+          <NewBudgetModal isOpen={isBudgetModalOpen} onClose={handleCloseBudgetModal} onSave={handleSetBudget} currentBudget={currentBudget} spaceId={currentSpace.id} />
+          <UpdateProgressModal isOpen={isProgressModalOpen} onClose={handleCloseProgressModal} onSave={handleUpdateProgress} chore={updatingChore} />
+        </>
+      )}
     </FeatureLayout>
   );
 }

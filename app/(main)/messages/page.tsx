@@ -178,6 +178,7 @@ export default function MessagesPage() {
   const handleSendMessage = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!messageInput.trim() || isSending || !conversationId) return;
+    if (!currentSpace || !user) return;
 
     setIsSending(true);
     try {
@@ -191,7 +192,7 @@ export default function MessagesPage() {
     } finally {
       setTimeout(() => setIsSending(false), 300);
     }
-  }, [messageInput, isSending, conversationId, currentSpace.id, user.id, handleCreateMessage]);
+  }, [messageInput, isSending, conversationId, currentSpace, user, handleCreateMessage]);
 
   // Memoize handleEmojiClick callback
   const handleEmojiClick = useCallback((emoji: string) => {

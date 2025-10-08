@@ -381,20 +381,24 @@ export default function GoalsPage() {
           </div>
         </div>
       </div>
-      <NewGoalModal
-        isOpen={isGoalModalOpen}
-        onClose={handleCloseGoalModal}
-        onSave={handleCreateGoal}
-        editGoal={editingGoal}
-        spaceId={currentSpace.id}
-      />
-      <NewMilestoneModal
-        isOpen={isMilestoneModalOpen}
-        onClose={handleCloseMilestoneModal}
-        onSave={handleCreateMilestone}
-        editMilestone={editingMilestone}
-        goalId={goals[0]?.id || currentSpace.id}
-      />
+      {currentSpace && (
+        <>
+          <NewGoalModal
+            isOpen={isGoalModalOpen}
+            onClose={handleCloseGoalModal}
+            onSave={handleCreateGoal}
+            editGoal={editingGoal}
+            spaceId={currentSpace.id}
+          />
+          <NewMilestoneModal
+            isOpen={isMilestoneModalOpen}
+            onClose={handleCloseMilestoneModal}
+            onSave={handleCreateMilestone}
+            editMilestone={editingMilestone}
+            goalId={goals[0]?.id || currentSpace.id}
+          />
+        </>
+      )}
     </FeatureLayout>
   );
 }
