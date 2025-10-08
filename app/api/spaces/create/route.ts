@@ -9,15 +9,20 @@ import { ratelimit } from '@/lib/ratelimit';
  */
 export async function POST(req: NextRequest) {
   try {
-    // Rate limiting
-    const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
-    const { success: rateLimitSuccess } = await ratelimit.limit(ip);
+    // Rate limiting (with graceful fallback)
+    try {
+      const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
+      const { success: rateLimitSuccess } = await ratelimit.limit(ip);
 
-    if (!rateLimitSuccess) {
-      return NextResponse.json(
-        { error: 'Too many requests. Please try again later.' },
-        { status: 429 }
-      );
+      if (!rateLimitSuccess) {
+        return NextResponse.json(
+          { error: 'Too many requests. Please try again later.' },
+          { status: 429 }
+        );
+      }
+    } catch (rateLimitError) {
+      // Log rate limit error but continue with request
+      console.warn('[API] Rate limiting failed, continuing without rate limit:', rateLimitError);
     }
 
     // Verify authentication

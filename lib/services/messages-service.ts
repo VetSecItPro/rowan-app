@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 export interface Message {
   id: string;
@@ -42,6 +42,7 @@ export interface MessageStats {
 
 export const messagesService = {
   async getConversations(spaceId: string): Promise<Conversation[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('conversations')
       .select('*')
@@ -53,6 +54,7 @@ export const messagesService = {
   },
 
   async createConversation(input: { space_id: string; title?: string; participants: string[] }): Promise<Conversation> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('conversations')
       .insert([{
@@ -69,6 +71,7 @@ export const messagesService = {
   },
 
   async getMessages(conversationId: string): Promise<Message[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('messages')
       .select('*')
@@ -80,6 +83,7 @@ export const messagesService = {
   },
 
   async getMessageById(id: string): Promise<Message | null> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('messages')
       .select('*')
@@ -91,6 +95,7 @@ export const messagesService = {
   },
 
   async createMessage(input: CreateMessageInput): Promise<Message> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('messages')
       .insert([{
@@ -112,6 +117,7 @@ export const messagesService = {
   },
 
   async updateMessage(id: string, updates: Partial<CreateMessageInput>): Promise<Message> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('messages')
       .update(updates)
@@ -124,6 +130,7 @@ export const messagesService = {
   },
 
   async deleteMessage(id: string): Promise<void> {
+    const supabase = createClient();
     const { error } = await supabase
       .from('messages')
       .delete()
@@ -133,12 +140,14 @@ export const messagesService = {
   },
 
   async markAsRead(id: string): Promise<Message> {
+    const supabase = createClient();
     return this.updateMessage(id, {
       read: true,
     } as any);
   },
 
   async markConversationAsRead(conversationId: string): Promise<void> {
+    const supabase = createClient();
     const { error } = await supabase
       .from('messages')
       .update({ read: true, read_at: new Date().toISOString() })
@@ -149,6 +158,7 @@ export const messagesService = {
   },
 
   async getMessageStats(spaceId: string): Promise<MessageStats> {
+    const supabase = createClient();
     const [messagesResult, conversationsResult] = await Promise.all([
       supabase
         .from('messages')
@@ -186,6 +196,7 @@ export const messagesService = {
   },
 
   async searchMessages(spaceId: string, query: string): Promise<Message[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('messages')
       .select('*, conversation:conversations!inner(space_id)')

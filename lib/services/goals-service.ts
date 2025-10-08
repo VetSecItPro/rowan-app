@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 export interface Milestone {
   id: string;
@@ -60,6 +60,7 @@ export interface GoalStats {
 
 export const goalsService = {
   async getGoals(spaceId: string): Promise<Goal[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('goals')
       .select('*, milestones:goal_milestones(*)')
@@ -71,6 +72,7 @@ export const goalsService = {
   },
 
   async getGoalById(id: string): Promise<Goal | null> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('goals')
       .select('*, milestones:goal_milestones(*)')
@@ -82,6 +84,7 @@ export const goalsService = {
   },
 
   async createGoal(input: CreateGoalInput): Promise<Goal> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('goals')
       .insert([{
@@ -97,6 +100,7 @@ export const goalsService = {
   },
 
   async updateGoal(id: string, updates: Partial<CreateGoalInput>): Promise<Goal> {
+    const supabase = createClient();
     const finalUpdates: any = { ...updates };
 
     if (updates.status === 'completed' && !finalUpdates.completed_at) {
@@ -120,6 +124,7 @@ export const goalsService = {
   },
 
   async deleteGoal(id: string): Promise<void> {
+    const supabase = createClient();
     const { error } = await supabase
       .from('goals')
       .delete()
@@ -129,6 +134,7 @@ export const goalsService = {
   },
 
   async createMilestone(input: CreateMilestoneInput): Promise<Milestone> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('goal_milestones')
       .insert([{
@@ -143,6 +149,7 @@ export const goalsService = {
   },
 
   async updateMilestone(id: string, updates: Partial<CreateMilestoneInput>): Promise<Milestone> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('goal_milestones')
       .update(updates)
@@ -155,6 +162,7 @@ export const goalsService = {
   },
 
   async toggleMilestone(id: string, completed: boolean): Promise<Milestone> {
+    const supabase = createClient();
     const finalUpdates: any = { completed };
     if (completed) {
       finalUpdates.completed_at = new Date().toISOString();
@@ -174,6 +182,7 @@ export const goalsService = {
   },
 
   async deleteMilestone(id: string): Promise<void> {
+    const supabase = createClient();
     const { error } = await supabase
       .from('goal_milestones')
       .delete()
@@ -183,6 +192,7 @@ export const goalsService = {
   },
 
   async getAllMilestones(spaceId: string): Promise<Milestone[]> {
+    const supabase = createClient();
     const goals = await this.getGoals(spaceId);
     const allMilestones: Milestone[] = [];
 
@@ -198,6 +208,7 @@ export const goalsService = {
   },
 
   async getGoalStats(spaceId: string): Promise<GoalStats> {
+    const supabase = createClient();
     const goals = await this.getGoals(spaceId);
 
     let completedMilestones = 0;

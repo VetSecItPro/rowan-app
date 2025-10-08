@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 export interface Chore {
   id: string;
@@ -92,6 +92,7 @@ export interface CreateBudgetInput {
 export const projectsService = {
   // Chores
   async getChores(spaceId: string): Promise<Chore[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('chores')
       .select('*')
@@ -103,6 +104,7 @@ export const projectsService = {
   },
 
   async getChoreById(id: string): Promise<Chore | null> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('chores')
       .select('*')
@@ -114,6 +116,7 @@ export const projectsService = {
   },
 
   async createChore(input: CreateChoreInput): Promise<Chore> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('chores')
       .insert([{
@@ -128,6 +131,7 @@ export const projectsService = {
   },
 
   async updateChore(id: string, updates: Partial<CreateChoreInput>): Promise<Chore> {
+    const supabase = createClient();
     const finalUpdates: any = { ...updates };
 
     if (updates.status === 'completed' && !finalUpdates.completed_at) {
@@ -150,6 +154,7 @@ export const projectsService = {
   },
 
   async deleteChore(id: string): Promise<void> {
+    const supabase = createClient();
     const { error } = await supabase
       .from('chores')
       .delete()
@@ -177,6 +182,7 @@ export const projectsService = {
 
   // Expenses
   async getExpenses(spaceId: string): Promise<Expense[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('expenses')
       .select('*')
@@ -188,6 +194,7 @@ export const projectsService = {
   },
 
   async getExpenseById(id: string): Promise<Expense | null> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('expenses')
       .select('*')
@@ -199,6 +206,7 @@ export const projectsService = {
   },
 
   async createExpense(input: CreateExpenseInput): Promise<Expense> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('expenses')
       .insert([{
@@ -214,6 +222,7 @@ export const projectsService = {
   },
 
   async updateExpense(id: string, updates: Partial<CreateExpenseInput>): Promise<Expense> {
+    const supabase = createClient();
     const finalUpdates: any = { ...updates };
 
     if (updates.status === 'paid' && !finalUpdates.paid_at) {
@@ -236,6 +245,7 @@ export const projectsService = {
   },
 
   async deleteExpense(id: string): Promise<void> {
+    const supabase = createClient();
     const { error } = await supabase
       .from('expenses')
       .delete()
@@ -252,6 +262,7 @@ export const projectsService = {
     }
 
     try {
+      const supabase = createClient();
       const { data, error } = await supabase
         .from('budgets')
         .select('*')
@@ -271,6 +282,7 @@ export const projectsService = {
   },
 
   async setBudget(input: CreateBudgetInput, userId: string): Promise<Budget> {
+    const supabase = createClient();
     // Check if budget exists
     const existing = await this.getBudget(input.space_id);
 
