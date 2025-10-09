@@ -126,25 +126,25 @@ export default function ProjectsPage() {
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center">
                 <Folder className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-amber-600 to-amber-600 bg-clip-text text-transparent">
                   Projects & Budget
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">Manage projects, budgets, and expenses</p>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-xl border border-indigo-200 dark:border-indigo-700 w-full sm:w-auto">
+              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-amber-100 to-amber-100 dark:from-amber-900/30 dark:to-amber-900/30 rounded-xl border border-amber-200 dark:border-amber-700 w-full sm:w-auto">
                 {(['projects', 'budgets', 'expenses'] as TabType[]).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] ${
                       activeTab === tab
-                        ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white'
                         : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                     }`}
                   >
@@ -161,7 +161,7 @@ export default function ProjectsPage() {
                   else if (activeTab === 'budgets') setIsBudgetModalOpen(true);
                   else setIsExpenseModalOpen(true);
                 }}
-                className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
                 <span className="hidden sm:inline">
@@ -180,7 +180,7 @@ export default function ProjectsPage() {
                 placeholder={`Search ${activeTab}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
           </div>
@@ -194,7 +194,7 @@ export default function ProjectsPage() {
 
             {loading ? (
               <div className="text-center py-12">
-                <div className="inline-block w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                <div className="inline-block w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
                 <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
               </div>
             ) : activeTab === 'projects' ? (
@@ -202,7 +202,7 @@ export default function ProjectsPage() {
                 <div className="text-center py-12">
                   <Folder className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No projects found</p>
-                  <button onClick={() => setIsProjectModalOpen(true)} className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                  <button onClick={() => setIsProjectModalOpen(true)} className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
                     <Plus className="w-5 h-5" />
                     Create Project
                   </button>
@@ -219,7 +219,7 @@ export default function ProjectsPage() {
                 <div className="text-center py-12">
                   <Wallet className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No Budget Set</p>
-                  <button onClick={() => setIsBudgetModalOpen(true)} className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                  <button onClick={() => setIsBudgetModalOpen(true)} className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
                     <Plus className="w-5 h-5" />
                     Set Budget
                   </button>
@@ -244,7 +244,7 @@ export default function ProjectsPage() {
                 <div className="text-center py-12">
                   <Receipt className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No expenses found</p>
-                  <button onClick={() => setIsExpenseModalOpen(true)} className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                  <button onClick={() => setIsExpenseModalOpen(true)} className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
                     <Plus className="w-5 h-5" />
                     Add Expense
                   </button>
