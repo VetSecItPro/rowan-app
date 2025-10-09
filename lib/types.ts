@@ -303,10 +303,8 @@ export interface Expense {
 export interface Budget {
   id: string;
   space_id: string;
-  category: string;
-  amount: number;
-  period: string;
-  created_by?: string;
+  monthly_budget: number;
+  created_by: string;
   created_at: string;
   updated_at: string;
 }

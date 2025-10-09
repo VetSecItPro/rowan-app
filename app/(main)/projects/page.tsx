@@ -226,6 +226,7 @@ export default function ProjectsPage() {
                 </div>
               ) : (
                 <div className="space-y-6">
+                  {/* Budget Header */}
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -236,6 +237,72 @@ export default function ProjectsPage() {
                     <button onClick={() => setIsBudgetModalOpen(true)} className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all">
                       Update Budget
                     </button>
+                  </div>
+
+                  {/* Budget Progress Bar */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600 dark:text-gray-400">Spent this month</span>
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        {budgetStats.monthlyBudget > 0
+                          ? `${Math.min(100, Math.round((budgetStats.spentThisMonth / budgetStats.monthlyBudget) * 100))}%`
+                          : '0%'}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-300 ${
+                          budgetStats.monthlyBudget > 0 && (budgetStats.spentThisMonth / budgetStats.monthlyBudget) >= 0.9
+                            ? 'bg-gradient-to-r from-red-500 to-red-600'
+                            : budgetStats.monthlyBudget > 0 && (budgetStats.spentThisMonth / budgetStats.monthlyBudget) >= 0.7
+                            ? 'bg-gradient-to-r from-yellow-500 to-yellow-600'
+                            : 'bg-gradient-to-r from-green-500 to-green-600'
+                        }`}
+                        style={{
+                          width: budgetStats.monthlyBudget > 0
+                            ? `${Math.min(100, (budgetStats.spentThisMonth / budgetStats.monthlyBudget) * 100)}%`
+                            : '0%'
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Budget Stats Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {/* Monthly Budget */}
+                    <div className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 border border-amber-200 dark:border-amber-700 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <DollarSign className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                        <p className="text-sm font-medium text-amber-900 dark:text-amber-100">Monthly Budget</p>
+                      </div>
+                      <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+                        ${budgetStats.monthlyBudget.toLocaleString()}
+                      </p>
+                    </div>
+
+                    {/* Spent This Month */}
+                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 border border-orange-200 dark:border-orange-700 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Receipt className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                        <p className="text-sm font-medium text-orange-900 dark:text-orange-100">Spent</p>
+                      </div>
+                      <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                        ${budgetStats.spentThisMonth.toLocaleString()}
+                      </p>
+                    </div>
+
+                    {/* Remaining */}
+                    <div className={`bg-gradient-to-br ${budgetStats.remaining >= 0 ? 'from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200 dark:border-green-700' : 'from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 border-red-200 dark:border-red-700'} border rounded-lg p-4`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Wallet className={`w-5 h-5 ${budgetStats.remaining >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`} />
+                        <p className={`text-sm font-medium ${budgetStats.remaining >= 0 ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100'}`}>
+                          {budgetStats.remaining >= 0 ? 'Remaining' : 'Over Budget'}
+                        </p>
+                      </div>
+                      <p className={`text-2xl font-bold ${budgetStats.remaining >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                        ${Math.abs(budgetStats.remaining).toLocaleString()}
+                      </p>
+                    </div>
                   </div>
                 </div>
               )
