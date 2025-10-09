@@ -186,11 +186,18 @@ export default function ProjectsPage() {
           </div>
 
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              {activeTab === 'projects' && `All Projects (${filteredProjects.length})`}
-              {activeTab === 'budgets' && 'Budget Overview'}
-              {activeTab === 'expenses' && `All Expenses (${filteredExpenses.length})`}
-            </h2>
+            <div className="flex items-center gap-3 mb-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                {activeTab === 'projects' && `All Projects (${filteredProjects.length})`}
+                {activeTab === 'budgets' && 'Budget Overview'}
+                {activeTab === 'expenses' && `All Expenses (${filteredExpenses.length})`}
+              </h2>
+              {activeTab === 'budgets' && (
+                <span className="px-3 py-1.5 bg-gradient-to-r from-amber-100 to-amber-200 dark:from-amber-900/40 dark:to-amber-800/40 border border-amber-300 dark:border-amber-600 text-amber-700 dark:text-amber-300 rounded-lg text-sm font-medium">
+                  {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                </span>
+              )}
+            </div>
 
             {loading ? (
               <div className="text-center py-12">
