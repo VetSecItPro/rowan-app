@@ -41,6 +41,8 @@ jobs:
           echo "### 🗃️ Running Database Migrations" >> $GITHUB_STEP_SUMMARY
           # Link to Supabase project using access token (uses Supabase API, avoids IPv6/connection issues)
           supabase link --project-ref $SUPABASE_PROJECT_ID
+          # Repair migration history for renamed migrations (one-time fix)
+          supabase migration repair --status reverted 20251006000000 20251008000000 || true
           # Push migrations
           supabase db push
           echo "✅ Database migrations completed successfully" >> $GITHUB_STEP_SUMMARY
