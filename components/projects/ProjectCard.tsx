@@ -46,7 +46,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete }: ProjectCardProps
           </div>
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white">{project.name}</h3>
-            <span className={`text-xs px-2 py-1 rounded-full ${statusInfo.color}`}>
+            <span className={`text-xs pl-1.5 pr-2.5 py-1 rounded-full ${statusInfo.color}`}>
               {statusInfo.label}
             </span>
           </div>
