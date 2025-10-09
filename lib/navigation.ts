@@ -62,8 +62,8 @@ export const NAVIGATION_ITEMS: NavItem[] = [
     description: 'Plan meals',
   },
   {
-    name: 'Budget & Expenses',
-    href: '/budget',
+    name: 'Projects & Budget',
+    href: '/projects',
     icon: Home,
     gradient: 'bg-gradient-projects',
     description: 'Track & manage',
