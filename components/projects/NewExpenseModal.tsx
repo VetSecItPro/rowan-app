@@ -59,7 +59,29 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
           }
 
           setDateError('');
-          onSave(formData);
+
+          // Clean up form data - remove empty optional fields
+          const cleanedData: CreateExpenseInput = {
+            space_id: formData.space_id,
+            title: formData.title,
+            amount: formData.amount,
+          };
+
+          if (formData.category && formData.category.trim() !== '') {
+            cleanedData.category = formData.category;
+          }
+          if (formData.due_date && formData.due_date.trim() !== '') {
+            cleanedData.due_date = formData.due_date;
+            cleanedData.date = formData.due_date; // Also set date for backwards compatibility
+          }
+          if (formData.status) {
+            cleanedData.status = formData.status;
+          }
+          if (formData.recurring !== undefined) {
+            cleanedData.recurring = formData.recurring;
+          }
+
+          onSave(cleanedData);
           onClose();
         }} className="p-6 space-y-4">
           <div>

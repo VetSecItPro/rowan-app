@@ -292,10 +292,16 @@ export interface Expense {
   title: string;
   amount: number;
   category?: string;
-  date: string;
+  date?: string;
+  due_date?: string;
   paid_by?: string;
   description?: string;
   project_id?: string;
+  status?: 'pending' | 'paid' | 'overdue';
+  payment_method?: string;
+  paid_at?: string;
+  recurring?: boolean;
+  created_by?: string;
   created_at: string;
   updated_at: string;
 }

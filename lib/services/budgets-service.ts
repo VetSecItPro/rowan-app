@@ -27,7 +27,9 @@ export interface CreateExpenseInput {
   paid_by?: string;
   status?: 'pending' | 'paid' | 'overdue';
   due_date?: string;
+  date?: string;
   recurring?: boolean;
+  description?: string;
 }
 
 // Budget Types
