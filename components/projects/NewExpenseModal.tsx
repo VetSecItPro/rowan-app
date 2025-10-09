@@ -89,9 +89,14 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
           } else if (formData.category && formData.category.trim() !== '' && formData.category !== 'other') {
             cleanedData.category = formData.category;
           }
+
+          // Always set date - use due_date if provided, otherwise use today's date
           if (formData.due_date && formData.due_date.trim() !== '') {
             cleanedData.due_date = formData.due_date;
-            cleanedData.date = formData.due_date; // Also set date for backwards compatibility
+            cleanedData.date = formData.due_date;
+          } else {
+            // If no due_date, use today's date as the expense date
+            cleanedData.date = new Date().toISOString().split('T')[0];
           }
           if (formData.status) {
             cleanedData.status = formData.status;
