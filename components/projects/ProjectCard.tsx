@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { Folder, Calendar, DollarSign, MoreVertical } from 'lucide-react';
 import type { Project } from '@/lib/types';
 
@@ -18,13 +18,30 @@ const statusConfig = {
 };
 
 export const ProjectCard = memo(({ project, onEdit, onDelete }: ProjectCardProps) => {
-  const statusInfo = statusConfig[project.status as keyof typeof statusConfig] || statusConfig.planning;
+  const [showMenu, setShowMenu] = useState(false);
+
+  // Use custom progress if available, otherwise calculate from status
+  const progress = project.progress_percentage !== undefined
+    ? project.progress_percentage
+    : (() => {
+        switch (project.status) {
+          case 'planning': return 10;
+          case 'in_progress': return 50;
+          case 'completed': return 100;
+          case 'on_hold': return 25;
+          default: return 0;
+        }
+      })();
+
+  // Determine status based on progress
+  const effectiveStatus = progress === 100 ? 'completed' : project.status;
+  const statusInfo = statusConfig[effectiveStatus as keyof typeof statusConfig] || statusConfig.planning;
 
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+          <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center">
             <Folder className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -34,13 +51,32 @@ export const ProjectCard = memo(({ project, onEdit, onDelete }: ProjectCardProps
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="relative">
           <button
-            onClick={() => onEdit(project)}
+            onClick={() => setShowMenu(!showMenu)}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
             <MoreVertical className="w-4 h-4 text-gray-500 dark:text-gray-400" />
           </button>
+          {showMenu && (
+            <>
+              <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
+              <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+                <button
+                  onClick={() => { onEdit(project); setShowMenu(false); }}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg text-gray-900 dark:text-white"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => { onDelete(project.id); setShowMenu(false); }}
+                  className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg"
+                >
+                  Delete
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -50,7 +86,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete }: ProjectCardProps
         </p>
       )}
 
-      <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+      <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
         {project.target_date && (
           <div className="flex items-center gap-1">
             <Calendar className="w-4 h-4" />
@@ -65,19 +101,18 @@ export const ProjectCard = memo(({ project, onEdit, onDelete }: ProjectCardProps
         )}
       </div>
 
-      <div className="mt-4 flex gap-2">
-        <button
-          onClick={() => onEdit(project)}
-          className="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium"
-        >
-          Edit
-        </button>
-        <button
-          onClick={() => onDelete(project.id)}
-          className="px-4 py-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors text-sm font-medium"
-        >
-          Delete
-        </button>
+      {/* Progress Bar */}
+      <div className="mt-4">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
+          <span className="text-sm font-medium text-gray-900 dark:text-white">{progress}%</span>
+        </div>
+        <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-amber-500 to-amber-600 transition-all duration-500"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
       </div>
     </div>
   );

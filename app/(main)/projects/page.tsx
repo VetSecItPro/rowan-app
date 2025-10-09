@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Folder, Plus, Search, Wallet, Receipt, DollarSign } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Folder, Plus, Search, Wallet, Receipt, DollarSign, CheckCircle, Clock, FileText } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ProjectCard } from '@/components/projects/ProjectCard';
 import { NewProjectModal } from '@/components/projects/NewProjectModal';
@@ -107,6 +107,15 @@ export default function ProjectsPage() {
     }
   }, [loadData]);
 
+  const handleStatusChange = useCallback(async (expenseId: string, newStatus: 'pending' | 'paid') => {
+    try {
+      await projectsService.updateExpense(expenseId, { status: newStatus });
+      loadData();
+    } catch (error) {
+      console.error('Failed to update expense status:', error);
+    }
+  }, [loadData]);
+
   const handleSetBudget = useCallback(async (amount: number) => {
     if (!currentSpace || !user) return;
     try {
@@ -119,6 +128,15 @@ export default function ProjectsPage() {
 
   const filteredProjects = projects.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredExpenses = expenses.filter(e => e.title.toLowerCase().includes(searchQuery.toLowerCase()));
+
+  const expenseStats = useMemo(() => {
+    const totalCount = expenses.length;
+    const pendingCount = expenses.filter(e => e.status === 'pending').length;
+    const paidCount = expenses.filter(e => e.status === 'paid').length;
+    const totalAmount = expenses.reduce((sum, e) => sum + e.amount, 0);
+
+    return { totalCount, pendingCount, paidCount, totalAmount };
+  }, [expenses]);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Projects & Budget' }]}>
@@ -198,6 +216,54 @@ export default function ProjectsPage() {
                 </span>
               )}
             </div>
+
+            {activeTab === 'expenses' && expenses.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                {/* Total Expenses */}
+                <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FileText className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Expenses</p>
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {expenseStats.totalCount}
+                  </p>
+                </div>
+
+                {/* Pending */}
+                <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Clock className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Pending</p>
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {expenseStats.pendingCount}
+                  </p>
+                </div>
+
+                {/* Paid */}
+                <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Paid</p>
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {expenseStats.paidCount}
+                  </p>
+                </div>
+
+                {/* Total Amount */}
+                <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <DollarSign className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Amount</p>
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    ${expenseStats.totalAmount.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            )}
 
             {loading ? (
               <div className="text-center py-12">
@@ -326,7 +392,7 @@ export default function ProjectsPage() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {filteredExpenses.map((expense) => (
-                    <ExpenseCard key={expense.id} expense={expense} onEdit={(e) => { setEditingExpense(e); setIsExpenseModalOpen(true); }} onDelete={handleDeleteExpense} />
+                    <ExpenseCard key={expense.id} expense={expense} onEdit={(e) => { setEditingExpense(e); setIsExpenseModalOpen(true); }} onDelete={handleDeleteExpense} onStatusChange={handleStatusChange} />
                   ))}
                 </div>
               )
