@@ -1,8 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { X, ChevronDown } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { X, ChevronDown, Smile } from 'lucide-react';
 import { CreateExpenseInput, Expense } from '@/lib/services/budgets-service';
+
+// Expense-appropriate emojis
+const EMOJIS = ['💰', '💵', '💳', '💸', '🏦', '🛒', '🍽️', '☕', '⚡', '🏠', '🚗', '⛽', '💊', '🏥', '🎬', '🎮', '📚', '✈️', '🏨', '👕'];
 
 // Expense categories with amber theme colors
 const EXPENSE_CATEGORIES = {
@@ -39,6 +43,9 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
   });
   const [dateError, setDateError] = useState<string>('');
   const [customCategory, setCustomCategory] = useState<string>('');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [emojiButtonRect, setEmojiButtonRect] = useState<DOMRect | null>(null);
+  const emojiButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (editExpense) {
@@ -46,18 +53,29 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
     } else {
       setFormData({ space_id: spaceId, title: '', amount: 0, category: '', status: 'pending', due_date: '', recurring: false });
     }
+    setShowEmojiPicker(false);
     setDateError('');
   }, [editExpense, spaceId]);
+
+  const handleEmojiClick = (emoji: string) => {
+    setFormData({ ...formData, title: formData.title + emoji });
+    setShowEmojiPicker(false);
+  };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4">
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-2xl font-bold">{editExpense ? 'Edit Expense' : 'New Expense'}</h2>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"><X className="w-5 h-5" /></button>
+      <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg mx-4">
+        {/* Header with amber gradient */}
+        <div className="sticky top-0 bg-gradient-to-r from-amber-500 to-amber-600 text-white p-6 rounded-t-2xl">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">{editExpense ? 'Edit Expense' : 'Create New Expense'}</h2>
+            <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
         <form onSubmit={(e) => {
           e.preventDefault();
@@ -110,7 +128,33 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
         }} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium mb-2">Title *</label>
-            <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border rounded-lg" />
+            <div className="relative">
+              <input
+                type="text"
+                required
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="w-full px-4 py-2 pr-12 bg-gray-50 dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              />
+
+              {/* Emoji Picker Button */}
+              <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                <button
+                  ref={emojiButtonRef}
+                  type="button"
+                  onClick={() => {
+                    if (emojiButtonRef.current) {
+                      setEmojiButtonRect(emojiButtonRef.current.getBoundingClientRect());
+                    }
+                    setShowEmojiPicker(!showEmojiPicker);
+                  }}
+                  title="Add emoji"
+                  className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                </button>
+              </div>
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -197,20 +241,49 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
               </p>
             )}
           </div>
-          <div className="flex gap-3 pt-4">
-            <button type="button" onClick={onClose} className="flex-1 px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">Cancel</button>
+          <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+            >
+              Cancel
+            </button>
             <button
               type="submit"
               disabled={!!dateError}
-              className={`flex-1 px-6 py-2 shimmer-bg text-white rounded-lg ${
-                dateError ? 'opacity-50 cursor-not-allowed' : ''
+              className={`flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl transition-all shadow-lg font-medium ${
+                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
               }`}
             >
-              {editExpense ? 'Save' : 'Create'}
+              {editExpense ? 'Save Expense' : 'Create Expense'}
             </button>
           </div>
         </form>
       </div>
+      {/* Emoji Picker Portal */}
+      {showEmojiPicker && emojiButtonRect && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 grid grid-cols-5 gap-2 z-[9999] min-w-[240px]"
+          style={{
+            top: `${emojiButtonRect.bottom + 8}px`,
+            left: `${emojiButtonRect.right - 240}px`,
+          }}
+        >
+          {EMOJIS.map((emoji, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => handleEmojiClick(emoji)}
+              className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-2xl transition-all hover:scale-110"
+              title="Click to add emoji"
+            >
+              {emoji}
+            </button>
+          ))}
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

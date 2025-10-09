@@ -22,6 +22,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
     start_date: '',
     target_date: '',
     budget_amount: undefined,
+    progress_percentage: undefined,
   });
   const [loading, setLoading] = useState(false);
 
@@ -35,6 +36,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
         start_date: editProject.start_date || '',
         target_date: editProject.target_date || '',
         budget_amount: editProject.budget_amount || undefined,
+        progress_percentage: editProject.progress_percentage || undefined,
       });
     } else {
       setFormData({
@@ -45,6 +47,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
         start_date: '',
         target_date: '',
         budget_amount: undefined,
+        progress_percentage: undefined,
       });
     }
   }, [editProject, spaceId, isOpen]);
@@ -66,17 +69,19 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            {editProject ? 'Edit Project' : 'New Project'}
-          </h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-            <X className="w-5 h-5" />
-          </button>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full overflow-hidden">
+        <div className="sticky top-0 bg-gradient-to-r from-amber-500 to-amber-600 text-white p-6 rounded-t-2xl">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">
+              {editProject ? 'Edit Project' : 'Create New Project'}
+            </h2>
+            <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 p-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Project Name *
@@ -109,7 +114,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
             <select
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              className="w-full pl-3 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
             >
               <option value="planning">Planning</option>
               <option value="in_progress">In Progress</option>
@@ -143,33 +148,56 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Budget Amount
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              value={formData.budget_amount || ''}
-              onChange={(e) => setFormData({ ...formData, budget_amount: e.target.value ? Number(e.target.value) : undefined })}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Budget Amount
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.budget_amount || ''}
+                onChange={(e) => setFormData({ ...formData, budget_amount: e.target.value ? Number(e.target.value) : undefined })}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Progress %
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={formData.progress_percentage || ''}
+                onChange={(e) => {
+                  const value = e.target.value ? Number(e.target.value) : undefined;
+                  setFormData({
+                    ...formData,
+                    progress_percentage: value,
+                    status: value === 100 ? 'completed' : formData.status
+                  });
+                }}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                placeholder="0-100"
+              />
+            </div>
           </div>
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:opacity-90 disabled:opacity-50"
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl transition-all shadow-lg font-medium hover:opacity-90 disabled:opacity-50"
             >
-              {loading ? 'Saving...' : editProject ? 'Update' : 'Create'}
+              {loading ? 'Saving...' : editProject ? 'Save Project' : 'Create Project'}
             </button>
           </div>
         </form>
