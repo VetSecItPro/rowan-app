@@ -26,6 +26,13 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
   });
   const [loading, setLoading] = useState(false);
 
+  // Helper function to format date for HTML input (yyyy-MM-dd)
+  const formatDateForInput = (dateString: string | null | undefined): string => {
+    if (!dateString) return '';
+    // Extract just the date portion (yyyy-MM-dd) from timestamp
+    return dateString.split('T')[0];
+  };
+
   useEffect(() => {
     if (editProject) {
       setFormData({
@@ -33,8 +40,8 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
         name: editProject.name,
         description: editProject.description || '',
         status: editProject.status as any,
-        start_date: editProject.start_date || '',
-        target_date: editProject.target_date || '',
+        start_date: formatDateForInput(editProject.start_date),
+        target_date: formatDateForInput(editProject.target_date),
         budget_amount: editProject.budget_amount || undefined,
         progress_percentage: editProject.progress_percentage || undefined,
       });
@@ -68,8 +75,8 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full overflow-hidden">
+    <div onClick={onClose} className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div onClick={(e) => e.stopPropagation()} className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full overflow-hidden">
         <div className="sticky top-0 bg-gradient-to-r from-amber-500 to-amber-600 text-white p-6 rounded-t-2xl">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">
@@ -114,7 +121,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
             <select
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-              className="w-full pl-1 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              className="w-full pl-1 pr-1 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
             >
               <option value="planning">Planning</option>
               <option value="in_progress">In Progress</option>
