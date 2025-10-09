@@ -36,7 +36,8 @@ import {
   Filter,
   ChevronRight,
   Zap,
-  Users
+  Users,
+  DollarSign
 } from 'lucide-react';
 import { SpaceSelector } from '@/components/spaces/SpaceSelector';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
@@ -1162,13 +1163,9 @@ export default function DashboardPage() {
                       <span className="text-gray-600 dark:text-gray-400">{stats.projects.inProgress} in progress</span>
                       <span className="text-gray-600 dark:text-gray-400">{stats.projects.completed} completed</span>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {stats.projects.planning} planning • {stats.projects.onHold} on hold
-                    </p>
-                    {stats.projects.totalBudget > 0 && (
-                      <p className="text-sm text-blue-600 dark:text-blue-400 flex items-center gap-1">
-                        <DollarSign className="w-3 h-3" />
-                        ${stats.projects.totalBudget.toLocaleString()} total budget
+                    {(stats.projects.planning > 0 || stats.projects.onHold > 0) && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {stats.projects.planning} planning • {stats.projects.onHold} on hold
                       </p>
                     )}
                   </div>
@@ -1190,7 +1187,7 @@ export default function DashboardPage() {
                       showLabel={false}
                     />
                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                      {stats.household.pendingBills} pending bills • ${stats.projects.totalExpenses.toLocaleString()} total expenses
+                      {stats.household.pendingBills} pending {stats.household.pendingBills === 1 ? 'bill' : 'bills'} • ${stats.projects.totalExpenses.toLocaleString()} total expenses
                     </p>
                   </div>
 
