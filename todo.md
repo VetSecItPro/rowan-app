@@ -130,6 +130,19 @@
 - [ ] Split expenses between members
 - [ ] Bill reminders
 
+### 💎 Advanced Expense Management (Premium Feature)
+**Status:** Planned for Premium Tier
+- [ ] **Payment status tracking** (pending/paid/overdue)
+  - Toggle between pending and paid status
+  - Automatic overdue detection based on due dates
+  - Visual status indicators on expense cards
+- [ ] **Recurring expenses** automation
+- [ ] **Expense analytics** and spending insights
+- [ ] **Budget alerts** when approaching limits
+- [ ] **Smart categorization** with ML
+- [ ] **Multi-currency** support
+- [ ] **Tax reporting** and deductions tracking
+
 ## 🎯 Goals Enhancements
 
 - [ ] **Progress visualization** (charts, graphs)

@@ -190,6 +190,54 @@ export default function ProjectsPage() {
             </div>
           </div>
 
+          {activeTab === 'expenses' && expenses.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Total Expenses */}
+              <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <FileText className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Expenses</p>
+                </div>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {expenseStats.totalCount}
+                </p>
+              </div>
+
+              {/* Pending */}
+              <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Clock className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Pending</p>
+                </div>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {expenseStats.pendingCount}
+                </p>
+              </div>
+
+              {/* Paid */}
+              <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Paid</p>
+                </div>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {expenseStats.paidCount}
+                </p>
+              </div>
+
+              {/* Total Amount */}
+              <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <DollarSign className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Amount</p>
+                </div>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  ${expenseStats.totalAmount.toLocaleString()}
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -216,54 +264,6 @@ export default function ProjectsPage() {
                 </span>
               )}
             </div>
-
-            {activeTab === 'expenses' && expenses.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                {/* Total Expenses */}
-                <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <FileText className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Expenses</p>
-                  </div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {expenseStats.totalCount}
-                  </p>
-                </div>
-
-                {/* Pending */}
-                <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Clock className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Pending</p>
-                  </div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {expenseStats.pendingCount}
-                  </p>
-                </div>
-
-                {/* Paid */}
-                <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Paid</p>
-                  </div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {expenseStats.paidCount}
-                  </p>
-                </div>
-
-                {/* Total Amount */}
-                <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <DollarSign className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Amount</p>
-                  </div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    ${expenseStats.totalAmount.toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            )}
 
             {loading ? (
               <div className="text-center py-12">
