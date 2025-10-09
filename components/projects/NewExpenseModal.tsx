@@ -1,8 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, ChevronDown } from 'lucide-react';
 import { CreateExpenseInput, Expense } from '@/lib/services/budgets-service';
+
+// Expense categories with amber theme colors
+const EXPENSE_CATEGORIES = {
+  groceries: { emoji: '🛒', label: 'Groceries', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
+  utilities: { emoji: '⚡', label: 'Utilities', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
+  transportation: { emoji: '🚗', label: 'Transportation', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
+  healthcare: { emoji: '🏥', label: 'Healthcare', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
+  entertainment: { emoji: '🎬', label: 'Entertainment', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
+  dining: { emoji: '🍽️', label: 'Dining', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
+  shopping: { emoji: '🛍️', label: 'Shopping', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
+  housing: { emoji: '🏠', label: 'Housing', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
+  insurance: { emoji: '🛡️', label: 'Insurance', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
+  education: { emoji: '📚', label: 'Education', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
+  other: { emoji: '📌', label: 'Other', color: 'bg-gray-500', textColor: 'text-gray-600', lightBg: 'bg-gray-100 dark:bg-gray-900/30' },
+};
 
 interface NewExpenseModalProps {
   isOpen: boolean;
@@ -23,6 +38,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
     recurring: false,
   });
   const [dateError, setDateError] = useState<string>('');
+  const [customCategory, setCustomCategory] = useState<string>('');
 
   useEffect(() => {
     if (editExpense) {
@@ -67,7 +83,10 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
             amount: formData.amount,
           };
 
-          if (formData.category && formData.category.trim() !== '') {
+          // Use custom category if "other" is selected, otherwise use dropdown value
+          if (formData.category === 'other' && customCategory.trim() !== '') {
+            cleanedData.category = customCategory;
+          } else if (formData.category && formData.category.trim() !== '' && formData.category !== 'other') {
             cleanedData.category = formData.category;
           }
           if (formData.due_date && formData.due_date.trim() !== '') {
@@ -95,9 +114,50 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Category</label>
-              <input type="text" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border rounded-lg" />
+              <div className="relative">
+                <select
+                  value={formData.category}
+                  onChange={(e) => {
+                    setFormData({ ...formData, category: e.target.value });
+                    if (e.target.value !== 'other') {
+                      setCustomCategory('');
+                    }
+                  }}
+                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border rounded-lg appearance-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  style={{ paddingRight: '2.5rem' }}
+                >
+                  <option value="">Select category...</option>
+                  <option value="groceries">🛒 Groceries</option>
+                  <option value="utilities">⚡ Utilities</option>
+                  <option value="transportation">🚗 Transportation</option>
+                  <option value="healthcare">🏥 Healthcare</option>
+                  <option value="entertainment">🎬 Entertainment</option>
+                  <option value="dining">🍽️ Dining</option>
+                  <option value="shopping">🛍️ Shopping</option>
+                  <option value="housing">🏠 Housing</option>
+                  <option value="insurance">🛡️ Insurance</option>
+                  <option value="education">📚 Education</option>
+                  <option value="other">📌 Other</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              </div>
             </div>
           </div>
+
+          {/* Custom Category Input - shows when "Other" is selected */}
+          {formData.category === 'other' && (
+            <div>
+              <label className="block text-sm font-medium mb-2">Custom Category *</label>
+              <input
+                type="text"
+                required
+                value={customCategory}
+                onChange={(e) => setCustomCategory(e.target.value)}
+                placeholder="Enter custom category..."
+                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              />
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium mb-2">Due Date</label>
             <input
