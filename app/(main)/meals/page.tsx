@@ -594,8 +594,12 @@ export default function MealsPage() {
           </div>
         </div>
       </div>
-      <NewMealModal isOpen={isModalOpen} onClose={handleCloseMealModal} onSave={handleCreateMeal} editMeal={editingMeal} spaceId={currentSpace.id} />
-      <NewRecipeModal isOpen={isRecipeModalOpen} onClose={handleCloseRecipeModal} onSave={handleCreateRecipe} editRecipe={editingRecipe} spaceId={currentSpace.id} />
+      {currentSpace && (
+        <>
+          <NewMealModal isOpen={isModalOpen} onClose={handleCloseMealModal} onSave={handleCreateMeal} editMeal={editingMeal} spaceId={currentSpace.id} />
+          <NewRecipeModal isOpen={isRecipeModalOpen} onClose={handleCloseRecipeModal} onSave={handleCreateRecipe} editRecipe={editingRecipe} spaceId={currentSpace.id} />
+        </>
+      )}
     </FeatureLayout>
   );
 }
