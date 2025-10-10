@@ -140,6 +140,7 @@ export const choresService = {
 
   /**
    * Update a chore
+   * Automatically sets completed_at timestamp when status is changed to 'completed'
    *
    * @param id - Chore ID
    * @param updates - Partial chore data to update
@@ -148,9 +149,22 @@ export const choresService = {
   async updateChore(id: string, updates: UpdateChoreInput): Promise<Chore> {
     const supabase = createClient();
     try {
+      // Handle completed_at timestamp automatically
+      const finalUpdates = { ...updates };
+
+      // If marking as completed, set completed_at timestamp
+      if (updates.status === 'completed' && !finalUpdates.completed_at) {
+        finalUpdates.completed_at = new Date().toISOString();
+      }
+
+      // If changing from completed to another status, clear completed_at
+      if (updates.status && updates.status !== 'completed') {
+        finalUpdates.completed_at = null;
+      }
+
       const { data, error } = await supabase
         .from('chores')
-        .update(updates)
+        .update(finalUpdates)
         .eq('id', id)
         .select()
         .single();
