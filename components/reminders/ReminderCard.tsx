@@ -50,7 +50,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-lg transition-all duration-200 group">
+    <div className="bg-white dark:bg-gray-800 border border-transparent rounded-lg p-4 hover:shadow-lg transition-all duration-200 group">
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-start gap-3 flex-1">
