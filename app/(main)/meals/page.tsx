@@ -10,7 +10,7 @@ import { RecipeCard } from '@/components/meals/RecipeCard';
 import GuidedMealCreation from '@/components/guided/GuidedMealCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { mealsService, Meal, CreateMealInput, Recipe, CreateRecipeInput } from '@/lib/services/meals-service';
-import { getUserProgress } from '@/lib/services/user-progress-service';
+import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth } from 'date-fns';
 
 type ViewMode = 'calendar' | 'list' | 'recipes';
@@ -239,8 +239,12 @@ export default function MealsPage() {
         setHasCompletedGuide(userProgress.first_meal_planned);
       }
 
-      // Show guided flow if no meals exist and user hasn't completed the guide
-      if (mealsData.length === 0 && !userProgress?.first_meal_planned) {
+      // Show guided flow if no meals exist, user hasn't completed the guide, AND user hasn't skipped it
+      if (
+        mealsData.length === 0 &&
+        !userProgress?.first_meal_planned &&
+        !userProgress?.skipped_meal_guide
+      ) {
         setShowGuidedFlow(true);
       }
     } catch (error) {
@@ -384,9 +388,18 @@ export default function MealsPage() {
     loadMeals(); // Reload to show newly created meal
   }, [loadMeals]);
 
-  const handleGuidedFlowSkip = useCallback(() => {
+  const handleGuidedFlowSkip = useCallback(async () => {
     setShowGuidedFlow(false);
-  }, []);
+
+    // Mark the guide as skipped in user progress
+    if (user) {
+      try {
+        await markFlowSkipped(user.id, 'meal_guide');
+      } catch (error) {
+        console.error('Failed to mark meal guide as skipped:', error);
+      }
+    }
+  }, [user]);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Meal Planning' }]}>

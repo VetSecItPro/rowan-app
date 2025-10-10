@@ -612,6 +612,16 @@ export interface UserProgress {
   first_household_task_created: boolean;
   first_goal_set: boolean;
 
+  // Guided flow skip tracking
+  skipped_task_guide: boolean;
+  skipped_event_guide: boolean;
+  skipped_reminder_guide: boolean;
+  skipped_message_guide: boolean;
+  skipped_shopping_guide: boolean;
+  skipped_meal_guide: boolean;
+  skipped_household_guide: boolean;
+  skipped_goal_guide: boolean;
+
   // Onboarding status
   onboarding_completed: boolean;
   partnership_setup_completed: boolean;
@@ -629,6 +639,14 @@ export interface UpdateUserProgressInput {
   first_meal_planned?: boolean;
   first_household_task_created?: boolean;
   first_goal_set?: boolean;
+  skipped_task_guide?: boolean;
+  skipped_event_guide?: boolean;
+  skipped_reminder_guide?: boolean;
+  skipped_message_guide?: boolean;
+  skipped_shopping_guide?: boolean;
+  skipped_meal_guide?: boolean;
+  skipped_household_guide?: boolean;
+  skipped_goal_guide?: boolean;
   onboarding_completed?: boolean;
   partnership_setup_completed?: boolean;
 }

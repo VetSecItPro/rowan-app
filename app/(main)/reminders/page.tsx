@@ -9,7 +9,7 @@ import { NewReminderModal } from '@/components/reminders/NewReminderModal';
 import GuidedReminderCreation from '@/components/guided/GuidedReminderCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { remindersService, Reminder, CreateReminderInput } from '@/lib/services/reminders-service';
-import { getUserProgress } from '@/lib/services/user-progress-service';
+import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 
 export default function RemindersPage() {
   const { currentSpace, user } = useAuth();
@@ -84,8 +84,12 @@ export default function RemindersPage() {
         setHasCompletedGuide(userProgress.first_reminder_created);
       }
 
-      // Show guided flow if no reminders exist and user hasn't completed the guide
-      if (remindersData.length === 0 && !userProgress?.first_reminder_created) {
+      // Show guided flow if no reminders exist, user hasn't completed the guide, AND user hasn't skipped it
+      if (
+        remindersData.length === 0 &&
+        !userProgress?.first_reminder_created &&
+        !userProgress?.skipped_reminder_guide
+      ) {
         setShowGuidedFlow(true);
       }
     } catch (error) {
@@ -185,9 +189,18 @@ export default function RemindersPage() {
     loadReminders(); // Reload to show newly created reminder
   }, [loadReminders]);
 
-  const handleGuidedFlowSkip = useCallback(() => {
+  const handleGuidedFlowSkip = useCallback(async () => {
     setShowGuidedFlow(false);
-  }, []);
+
+    // Mark the guide as skipped in user progress
+    if (user) {
+      try {
+        await markFlowSkipped(user.id, 'reminder_guide');
+      } catch (error) {
+        console.error('Failed to mark reminder guide as skipped:', error);
+      }
+    }
+  }, [user]);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Reminders' }]}>
@@ -229,17 +242,6 @@ export default function RemindersPage() {
           {/* Stats Cards - Horizontal Row - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            {/* Total */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total</h3>
-                <div className="w-12 h-12 bg-gradient-reminders rounded-xl flex items-center justify-center">
-                  <Bell className="w-6 h-6 text-white" />
-                </div>
-              </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
-            </div>
-
             {/* Active */}
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
@@ -249,6 +251,17 @@ export default function RemindersPage() {
                 </div>
               </div>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.active}</p>
+            </div>
+
+            {/* Overdue */}
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Overdue</h3>
+                <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center">
+                  <AlertCircle className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.overdue}</p>
             </div>
 
             {/* Completed */}
@@ -262,15 +275,15 @@ export default function RemindersPage() {
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
             </div>
 
-            {/* Overdue */}
+            {/* Total */}
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Overdue</h3>
-                <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center">
-                  <AlertCircle className="w-6 h-6 text-white" />
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total</h3>
+                <div className="w-12 h-12 bg-gradient-reminders rounded-xl flex items-center justify-center">
+                  <Bell className="w-6 h-6 text-white" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.overdue}</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
             </div>
           </div>
           )}

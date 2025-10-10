@@ -157,6 +157,43 @@ export async function markFlowComplete(
 }
 
 /**
+ * Mark a specific guided flow as skipped
+ * @param userId - User UUID
+ * @param flowType - Type of guided flow skipped
+ * @returns Updated user progress
+ */
+export async function markFlowSkipped(
+  userId: string,
+  flowType:
+    | 'task_guide'
+    | 'event_guide'
+    | 'reminder_guide'
+    | 'message_guide'
+    | 'shopping_guide'
+    | 'meal_guide'
+    | 'household_guide'
+    | 'goal_guide'
+): Promise<{
+  success: boolean;
+  data?: UserProgress;
+  error?: string;
+}> {
+  const skipFieldMap: Record<typeof flowType, keyof UpdateUserProgressInput> = {
+    'task_guide': 'skipped_task_guide',
+    'event_guide': 'skipped_event_guide',
+    'reminder_guide': 'skipped_reminder_guide',
+    'message_guide': 'skipped_message_guide',
+    'shopping_guide': 'skipped_shopping_guide',
+    'meal_guide': 'skipped_meal_guide',
+    'household_guide': 'skipped_household_guide',
+    'goal_guide': 'skipped_goal_guide',
+  };
+
+  const fieldToUpdate = skipFieldMap[flowType];
+  return updateUserProgress(userId, { [fieldToUpdate]: true });
+}
+
+/**
  * Check if all onboarding flows are complete
  * @param userId - User UUID
  * @returns Whether onboarding is complete

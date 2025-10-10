@@ -8,7 +8,7 @@ import { NewEventModal } from '@/components/calendar/NewEventModal';
 import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { calendarService, CalendarEvent, CreateEventInput } from '@/lib/services/calendar-service';
-import { getUserProgress } from '@/lib/services/user-progress-service';
+import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, parseISO } from 'date-fns';
 
 type ViewMode = 'calendar' | 'list';
@@ -135,8 +135,12 @@ export default function CalendarPage() {
         setHasCompletedGuide(userProgress.first_event_created);
       }
 
-      // Show guided flow if no events exist and user hasn't completed the guide
-      if (eventsData.length === 0 && !userProgress?.first_event_created) {
+      // Show guided flow if no events exist, user hasn't completed the guide, AND user hasn't skipped it
+      if (
+        eventsData.length === 0 &&
+        !userProgress?.first_event_created &&
+        !userProgress?.skipped_event_guide
+      ) {
         setShowGuidedFlow(true);
       }
     } catch (error) {
@@ -238,9 +242,18 @@ export default function CalendarPage() {
     loadEvents(); // Reload to show newly created event
   }, [loadEvents]);
 
-  const handleGuidedFlowSkip = useCallback(() => {
+  const handleGuidedFlowSkip = useCallback(async () => {
     setShowGuidedFlow(false);
-  }, []);
+
+    // Mark the guide as skipped in user progress
+    if (user) {
+      try {
+        await markFlowSkipped(user.id, 'event_guide');
+      } catch (error) {
+        console.error('Failed to mark event guide as skipped:', error);
+      }
+    }
+  }, [user]);
 
   useEffect(() => {
     loadEvents();
