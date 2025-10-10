@@ -13,6 +13,7 @@ import { choresService } from '@/lib/services/chores-service';
 import { projectsService } from '@/lib/services/budgets-service';
 import { projectsOnlyService } from '@/lib/services/projects-service';
 import { goalsService } from '@/lib/services/goals-service';
+import { checkInsService, type DailyCheckIn, type CheckInStats } from '@/lib/services/checkins-service';
 import { supabase } from '@/lib/supabase';
 import {
   CheckSquare,
@@ -301,6 +302,10 @@ export default function DashboardPage() {
   });
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [checkInNote, setCheckInNote] = useState('');
+  const [recentCheckIns, setRecentCheckIns] = useState<DailyCheckIn[]>([]);
+  const [checkInStats, setCheckInStats] = useState<CheckInStats | null>(null);
+  const [todayCheckIn, setTodayCheckIn] = useState<DailyCheckIn | null>(null);
+  const [checkInSaving, setCheckInSaving] = useState(false);
 
   // Auth protection - redirect to login if not authenticated
   useEffect(() => {
@@ -741,12 +746,34 @@ export default function DashboardPage() {
   ], []);
 
   // Stable callback with useCallback
-  const handleCheckIn = useCallback(() => {
-    if (!selectedMood) return;
-    console.log('Check-in:', { mood: selectedMood, note: checkInNote });
-    setSelectedMood(null);
-    setCheckInNote('');
-  }, [selectedMood, checkInNote]);
+  const handleCheckIn = useCallback(async () => {
+    if (!selectedMood || !user || !currentSpace) return;
+
+    setCheckInSaving(true);
+    try {
+      const checkIn = await checkInsService.createCheckIn(user.id, {
+        space_id: currentSpace.id,
+        mood: selectedMood,
+        note: checkInNote || undefined,
+      });
+
+      setTodayCheckIn(checkIn);
+      setSelectedMood(null);
+      setCheckInNote('');
+
+      // Reload stats
+      const stats = await checkInsService.getCheckInStats(currentSpace.id, user.id);
+      setCheckInStats(stats);
+
+      // Reload recent check-ins
+      const recent = await checkInsService.getCheckIns(currentSpace.id, 7);
+      setRecentCheckIns(recent);
+    } catch (error) {
+      console.error('Failed to create check-in:', error);
+    } finally {
+      setCheckInSaving(false);
+    }
+  }, [selectedMood, checkInNote, user, currentSpace]);
 
   // Greeting function - Memoized
   const greetingText = useMemo(() => {
