@@ -43,12 +43,13 @@ export function ExpenseCard({ expense, onEdit, onDelete, onStatusChange }: Expen
               onClick={handleMarkAsPaid}
               className="p-1.5 hover:bg-green-50 dark:hover:bg-green-900/20 rounded transition-colors"
               title="Mark as paid"
+              aria-label="Mark expense as paid"
             >
               <CheckCircle className="w-5 h-5 text-gray-400 hover:text-green-600 dark:hover:text-green-400" />
             </button>
           )}
           <div className="relative">
-            <button onClick={() => setShowMenu(!showMenu)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"><MoreVertical className="w-4 h-4" /></button>
+            <button onClick={() => setShowMenu(!showMenu)} aria-label="Expense options menu" className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"><MoreVertical className="w-4 h-4" /></button>
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />

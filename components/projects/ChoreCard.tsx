@@ -20,7 +20,7 @@ export function ChoreCard({ chore, onStatusChange, onEdit, onDelete, onUpdatePro
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-lg transition-all">
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-3 flex-1">
-          <button onClick={() => onStatusChange(chore.id, chore.status === 'completed' ? 'pending' : 'completed')} className={`mt-1 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center ${chore.status === 'completed' ? 'bg-green-500 border-green-500' : 'border-gray-300 dark:border-gray-600'}`}>
+          <button onClick={() => onStatusChange(chore.id, chore.status === 'completed' ? 'pending' : 'completed')} aria-label={`Toggle chore status: ${chore.status === 'completed' ? 'Completed' : 'Pending'}`} className={`mt-1 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center ${chore.status === 'completed' ? 'bg-green-500 border-green-500' : 'border-gray-300 dark:border-gray-600'}`}>
             {chore.status === 'completed' && <Check className="w-3 h-3 text-white" />}
           </button>
           <div className="flex-1">
@@ -60,7 +60,7 @@ export function ChoreCard({ chore, onStatusChange, onEdit, onDelete, onUpdatePro
           </div>
         </div>
         <div className="relative">
-          <button onClick={() => setShowMenu(!showMenu)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"><MoreVertical className="w-4 h-4" /></button>
+          <button onClick={() => setShowMenu(!showMenu)} aria-label="Chore options menu" className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"><MoreVertical className="w-4 h-4" /></button>
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />

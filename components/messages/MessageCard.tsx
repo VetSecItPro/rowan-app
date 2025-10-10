@@ -86,6 +86,7 @@ export function MessageCard({
                 <button
                   onClick={() => setShowMenu(!showMenu)}
                   title="Edit or Delete"
+                  aria-label="Message options menu"
                   className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all opacity-0 group-hover:opacity-100"
                 >
                   <MoreVertical className="w-3 h-3 text-gray-600 dark:text-gray-400" />

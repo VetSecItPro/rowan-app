@@ -61,6 +61,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem }: Shopp
                 <div key={item.id} className="flex items-center gap-2">
                   <button
                     onClick={() => onToggleItem?.(item.id, !item.checked)}
+                    aria-label={`Toggle item: ${item.name}`}
                     className={`flex-shrink-0 w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${
                       item.checked
                         ? 'bg-green-500 border-green-500'
@@ -90,6 +91,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem }: Shopp
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
+            aria-label="Shopping list options menu"
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
             <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />

@@ -36,6 +36,7 @@ export function RecipeCard({ recipe, onEdit, onDelete, onPlanMeal }: RecipeCardP
               onClick={() => onEdit(recipe)}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               title="Edit recipe"
+              aria-label="Edit recipe"
             >
               <Edit className="w-4 h-4 text-gray-600 dark:text-gray-400" />
             </button>
@@ -43,6 +44,7 @@ export function RecipeCard({ recipe, onEdit, onDelete, onPlanMeal }: RecipeCardP
               onClick={() => onDelete(recipe.id)}
               className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
               title="Delete recipe"
+              aria-label="Delete recipe"
             >
               <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
             </button>
