@@ -101,7 +101,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
       <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white dark:bg-gray-800 flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 z-10">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{editRecipe ? 'Edit Recipe' : 'New Recipe'}</h2>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+          <button onClick={onClose} aria-label="Close modal" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
             <X className="w-5 h-5" />
           </button>
         </div>

@@ -1,8 +1,8 @@
 -- Create user_progress table to track onboarding completion
 CREATE TABLE IF NOT EXISTS user_progress (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) NOT NULL,
-  partnership_id UUID REFERENCES partnerships(id),
+  space_id UUID REFERENCES spaces(id),
 
   -- Track completion of guided flows
   first_task_created BOOLEAN DEFAULT FALSE,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS user_progress (
 
   -- Onboarding status
   onboarding_completed BOOLEAN DEFAULT FALSE,
-  partnership_setup_completed BOOLEAN DEFAULT FALSE,
+  space_setup_completed BOOLEAN DEFAULT FALSE,
 
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

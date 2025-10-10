@@ -93,6 +93,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete }: TaskCardPro
             <button
               onClick={handleStatusClick}
               title={getStatusTooltip()}
+              aria-label={`Toggle task status: ${statusLabel.text}`}
               className={`mt-1 flex-shrink-0 w-5 h-5 rounded flex items-center justify-center transition-all ${getCheckboxStyle()}`}
             >
               {task.status === 'completed' && (
@@ -137,6 +138,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete }: TaskCardPro
           <button
             onClick={() => setShowMenu(!showMenu)}
             title="Edit or Delete"
+            aria-label="Task options menu"
             className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
           >
             <MoreVertical className="w-4 h-4 text-gray-600 dark:text-gray-400" />

@@ -106,6 +106,7 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
         <div className="relative group">
           <button
             onClick={handleCheckboxClick}
+            aria-label={`Toggle milestone status: ${milestoneState === 'not-started' ? 'Not Started' : milestoneState === 'in-progress' ? 'In Progress' : 'Completed'}`}
             className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${
               milestoneState === 'completed'
                 ? 'bg-green-500 border-green-500'
@@ -145,6 +146,7 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
           <div className="relative group">
             <button
               onClick={() => setShowMenu(!showMenu)}
+              aria-label="Milestone options menu"
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
               <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />

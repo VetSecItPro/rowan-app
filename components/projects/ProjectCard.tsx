@@ -54,6 +54,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete }: ProjectCardProps
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
+            aria-label="Project options menu"
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
             <MoreVertical className="w-4 h-4 text-gray-500 dark:text-gray-400" />

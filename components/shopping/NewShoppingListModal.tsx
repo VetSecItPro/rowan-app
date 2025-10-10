@@ -90,7 +90,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             {editList ? 'Edit Shopping List' : 'New Shopping List'}
           </h2>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          <button onClick={onClose} aria-label="Close modal" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
           </button>
         </div>

@@ -82,7 +82,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
             <h2 className="text-2xl font-bold">
               {editProject ? 'Edit Project' : 'Create New Project'}
             </h2>
-            <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg transition-colors">
+            <button onClick={onClose} aria-label="Close modal" className="p-2 hover:bg-white/20 rounded-lg transition-colors">
               <X className="w-5 h-5" />
             </button>
           </div>
