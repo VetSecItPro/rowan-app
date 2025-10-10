@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Link from 'next/link';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
@@ -34,10 +35,15 @@ import {
   Check,
   Copy,
   Monitor,
-  ChevronDown
+  ChevronDown,
+  BarChart3,
+  ArrowRight,
+  CheckCircle2,
+  TrendingUp,
+  Calendar
 } from 'lucide-react';
 
-type SettingsTab = 'profile' | 'security' | 'notifications' | 'appearance' | 'privacy' | 'spaces' | 'data' | 'help';
+type SettingsTab = 'profile' | 'security' | 'notifications' | 'appearance' | 'privacy' | 'spaces' | 'analytics' | 'data' | 'help';
 type UserRole = 'Admin' | 'Member' | 'Viewer';
 type ExportStatus = 'idle' | 'pending' | 'processing' | 'ready';
 
@@ -485,6 +491,7 @@ export default function SettingsPage() {
     { id: 'appearance' as SettingsTab, name: 'Appearance', icon: Palette, description: 'Theme and display settings' },
     { id: 'privacy' as SettingsTab, name: 'Privacy', icon: Lock, description: 'Data and visibility settings' },
     { id: 'spaces' as SettingsTab, name: 'Spaces', icon: Users, description: 'Manage your spaces and members' },
+    { id: 'analytics' as SettingsTab, name: 'Analytics', icon: BarChart3, description: 'Track productivity trends' },
     { id: 'data' as SettingsTab, name: 'Data & Storage', icon: Database, description: 'Export and delete your data' },
     { id: 'help' as SettingsTab, name: 'Help & Support', icon: HelpCircle, description: 'Get help and contact us' },
   ];
@@ -1049,6 +1056,59 @@ export default function SettingsPage() {
                         New Space
                       </button>
                     </div>
+                  </div>
+                )}
+
+                {/* Analytics Tab */}
+                {activeTab === 'analytics' && (
+                  <div className="space-y-6 sm:space-y-8">
+                    <div>
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Analytics & Insights</h2>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">View your productivity trends and completion rates</p>
+                    </div>
+
+                    <Link href="/settings/analytics" className="block">
+                      <div className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 rounded-xl hover:shadow-lg transition-all group">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center">
+                              <BarChart3 className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">View Full Analytics Dashboard</h3>
+                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Track tasks, chores, and productivity metrics</p>
+                            </div>
+                          </div>
+                          <ArrowRight className="w-6 h-6 text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform" />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm mb-1">
+                              <CheckCircle2 className="w-4 h-4" />
+                              <span>Completion Rates</span>
+                            </div>
+                            <p className="text-xs text-gray-500 dark:text-gray-500">Track monthly progress</p>
+                          </div>
+
+                          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm mb-1">
+                              <TrendingUp className="w-4 h-4" />
+                              <span>Productivity Trends</span>
+                            </div>
+                            <p className="text-xs text-gray-500 dark:text-gray-500">View historical data</p>
+                          </div>
+
+                          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm mb-1">
+                              <Calendar className="w-4 h-4" />
+                              <span>Time Range Views</span>
+                            </div>
+                            <p className="text-xs text-gray-500 dark:text-gray-500">1, 3, 6, or 12 months</p>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
                   </div>
                 )}
 
