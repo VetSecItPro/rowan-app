@@ -394,7 +394,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
             <button
               type="submit"
               disabled={!!dateError}
-              className={`px-6 py-2 shimmer-bg text-white rounded-lg transition-all shadow-lg ${
+              className={`px-6 py-2 shimmer-reminders text-white rounded-lg transition-all shadow-lg ${
                 dateError ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
               }`}
             >

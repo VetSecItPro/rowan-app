@@ -330,7 +330,7 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg"
+                className="px-6 py-2 shimmer-messages text-white rounded-lg hover:opacity-90 transition-all shadow-lg"
               >
                 {editMessage ? 'Save Changes' : 'Send Message'}
               </button>
