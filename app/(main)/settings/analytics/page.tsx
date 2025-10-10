@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
+import { Breadcrumb } from '@/components/layout/Breadcrumb';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { tasksService } from '@/lib/services/tasks-service';
 import { choresService } from '@/lib/services/chores-service';
@@ -11,8 +12,7 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
-  AlertCircle,
-  ArrowLeft
+  AlertCircle
 } from 'lucide-react';
 import Link from 'next/link';
 import { format, startOfMonth, endOfMonth, subMonths, parseISO, isWithinInterval } from 'date-fns';
@@ -148,17 +148,13 @@ export default function AnalyticsPage() {
       description="Track your productivity and completion trends"
       icon={BarChart3}
     >
+      <Breadcrumb
+        items={[
+          { label: 'Settings', href: '/settings' },
+          { label: 'Analytics' }
+        ]}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header with Back Button */}
-        <div className="flex items-center gap-4 mb-6">
-          <Link
-            href="/settings"
-            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <span>Back to Settings</span>
-          </Link>
-        </div>
 
         {/* Time Range Selector */}
         <div className="mb-6">
