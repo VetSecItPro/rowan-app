@@ -455,6 +455,7 @@ export default function SettingsPage() {
   };
 
   const handleRequestPasswordReset = async () => {
+    if (!user?.email) return;
     setIsRequestingReset(true);
 
     try {
@@ -712,7 +713,7 @@ export default function SettingsPage() {
                                 <div>
                                   <p className="text-sm font-medium text-green-800 dark:text-green-200">Password reset email sent!</p>
                                   <p className="text-xs text-green-700 dark:text-green-300 mt-1">
-                                    Check your inbox at <span className="font-semibold">{user.email}</span> for instructions to reset your password.
+                                    Check your inbox at <span className="font-semibold">{user?.email}</span> for instructions to reset your password.
                                   </p>
                                   <p className="text-xs text-green-600 dark:text-green-400 mt-2">
                                     Didn't receive it? Check your spam folder or{' '}
@@ -733,7 +734,7 @@ export default function SettingsPage() {
                             <>
                               <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg mb-4">
                                 <p className="text-xs text-blue-700 dark:text-blue-300">
-                                  <strong>Current email:</strong> {user.email}
+                                  <strong>Current email:</strong> {user?.email}
                                 </p>
                               </div>
                               <button
