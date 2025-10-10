@@ -43,8 +43,8 @@ jobs:
           supabase link --project-ref $SUPABASE_PROJECT_ID
           # Repair migration history for renamed migrations (one-time fix)
           supabase migration repair --status reverted 20251006000000 20251008000000 || true
-          # Push migrations
-          supabase db push
+          # Push migrations (--include-all to handle migrations inserted before last migration)
+          supabase db push --include-all
           echo "✅ Database migrations completed successfully" >> $GITHUB_STEP_SUMMARY
 
       - name: Install Vercel CLI
