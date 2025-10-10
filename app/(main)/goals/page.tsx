@@ -284,6 +284,17 @@ export default function GoalsPage() {
               </button>
             </div>
           </div>
+
+          {/* Guided Creation - MOVED TO TOP */}
+          {!loading && showGuidedFlow && (
+            <GuidedGoalCreation
+              onComplete={handleGuidedFlowComplete}
+              onSkip={handleGuidedFlowSkip}
+            />
+          )}
+
+          {/* Stats Dashboard - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
@@ -314,13 +325,20 @@ export default function GoalsPage() {
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
             </div>
           </div>
+          )}
+
+          {/* Search Bar - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input type="text" placeholder="Search goals..." value={searchQuery} onChange={handleSearchChange} className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white" />
             </div>
           </div>
-          {/* Goals/Milestones List */}
+          )}
+
+          {/* Goals/Milestones List - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
               {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` : `Achievement Wall (${filteredMilestones.length})`}
@@ -331,11 +349,6 @@ export default function GoalsPage() {
                 <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                 <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
               </div>
-            ) : showGuidedFlow && filteredGoals.length === 0 && !searchQuery && viewMode === 'goals' ? (
-              <GuidedGoalCreation
-                onComplete={handleGuidedFlowComplete}
-                onSkip={handleGuidedFlowSkip}
-              />
             ) : viewMode === 'goals' ? (
               /* Goals View */
               filteredGoals.length === 0 ? (
@@ -406,6 +419,7 @@ export default function GoalsPage() {
               )
             )}
           </div>
+          )}
         </div>
       </div>
       {currentSpace && (

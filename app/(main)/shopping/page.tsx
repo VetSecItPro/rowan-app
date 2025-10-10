@@ -267,6 +267,16 @@ export default function ShoppingPage() {
             </button>
           </div>
 
+          {/* Guided Creation - MOVED TO TOP */}
+          {!loading && showGuidedFlow && (
+            <GuidedShoppingCreation
+              onComplete={handleGuidedFlowComplete}
+              onSkip={handleGuidedFlowSkip}
+            />
+          )}
+
+          {/* Stats Dashboard - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
@@ -297,7 +307,10 @@ export default function ShoppingPage() {
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.completedLists}</p>
             </div>
           </div>
+          )}
 
+          {/* Search & Filter Bar - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="relative flex-1">
@@ -318,7 +331,10 @@ export default function ShoppingPage() {
               </div>
             </div>
           </div>
+          )}
 
+          {/* Shopping Lists - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
               {statusFilter === 'active' ? 'Active Lists' : statusFilter === 'completed' ? 'Completed Lists' : 'All Lists'} ({filteredLists.length})
@@ -328,11 +344,6 @@ export default function ShoppingPage() {
                 <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                 <p className="mt-4 text-gray-600 dark:text-gray-400">Loading lists...</p>
               </div>
-            ) : showGuidedFlow && filteredLists.length === 0 && !searchQuery && statusFilter === 'active' ? (
-              <GuidedShoppingCreation
-                onComplete={handleGuidedFlowComplete}
-                onSkip={handleGuidedFlowSkip}
-              />
             ) : filteredLists.length === 0 ? (
               <div className="text-center py-12">
                 <ShoppingCart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -364,6 +375,7 @@ export default function ShoppingPage() {
               </div>
             )}
           </div>
+          )}
         </div>
       </div>
       <NewShoppingListModal isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleCreateList} editList={editingList} spaceId={currentSpace.id} />

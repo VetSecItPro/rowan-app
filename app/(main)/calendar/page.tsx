@@ -281,7 +281,16 @@ export default function CalendarPage() {
             </div>
           </div>
 
-          {/* Stats Dashboard */}
+          {/* Guided Creation - MOVED TO TOP */}
+          {!loading && showGuidedFlow && (
+            <GuidedEventCreation
+              onComplete={handleGuidedFlowComplete}
+              onSkip={handleGuidedFlowSkip}
+            />
+          )}
+
+          {/* Stats Dashboard - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
@@ -323,8 +332,10 @@ export default function CalendarPage() {
               <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
             </div>
           </div>
+          )}
 
-          {/* Search Bar */}
+          {/* Search Bar - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -337,8 +348,10 @@ export default function CalendarPage() {
               />
             </div>
           </div>
+          )}
 
-          {/* Events Section */}
+          {/* Events Section - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
               {viewMode === 'calendar' ? 'Event Calendar' : `Upcoming Events (${filteredEvents.length})`}
@@ -350,11 +363,6 @@ export default function CalendarPage() {
                   <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                   <p className="mt-4 text-gray-600 dark:text-gray-400">Loading events...</p>
                 </div>
-              ) : showGuidedFlow && filteredEvents.length === 0 && !searchQuery && viewMode === 'list' ? (
-                <GuidedEventCreation
-                  onComplete={handleGuidedFlowComplete}
-                  onSkip={handleGuidedFlowSkip}
-                />
               ) : viewMode === 'calendar' ? (
                 /* Calendar View */
                 <div>
@@ -495,6 +503,7 @@ export default function CalendarPage() {
               )}
             </div>
           </div>
+          )}
         </div>
       </div>
 

@@ -449,6 +449,17 @@ export default function MealsPage() {
               </button>
             </div>
           </div>
+
+          {/* Guided Creation - MOVED TO TOP */}
+          {!loading && showGuidedFlow && (
+            <GuidedMealCreation
+              onComplete={handleGuidedFlowComplete}
+              onSkip={handleGuidedFlowSkip}
+            />
+          )}
+
+          {/* Stats Dashboard - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
@@ -479,6 +490,10 @@ export default function MealsPage() {
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.shoppingItems}</p>
             </div>
           </div>
+          )}
+
+          {/* Search Bar - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -491,6 +506,10 @@ export default function MealsPage() {
               />
             </div>
           </div>
+          )}
+
+          {/* Meals/Recipes Section - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
 
             <div className="h-[600px] overflow-y-auto">
@@ -499,11 +518,6 @@ export default function MealsPage() {
                   <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                   <p className="mt-4 text-gray-600 dark:text-gray-400">Loading meals...</p>
                 </div>
-              ) : showGuidedFlow && filteredMeals.length === 0 && !searchQuery && viewMode === 'list' ? (
-                <GuidedMealCreation
-                  onComplete={handleGuidedFlowComplete}
-                  onSkip={handleGuidedFlowSkip}
-                />
               ) : viewMode === 'recipes' ? (
               /* Recipes View */
               filteredRecipes.length === 0 ? (
@@ -634,6 +648,7 @@ export default function MealsPage() {
             )}
             </div>
           </div>
+          )}
         </div>
       </div>
       {currentSpace && (
