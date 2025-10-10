@@ -91,7 +91,7 @@ export function NewBudgetModal({
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg font-medium"
+              className="flex-1 px-4 py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg font-medium"
             >
               {currentBudget ? 'Update Budget' : 'Set Budget'}
             </button>

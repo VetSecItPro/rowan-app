@@ -179,7 +179,7 @@ export default function ProjectsPage() {
                   else if (activeTab === 'budgets') setIsBudgetModalOpen(true);
                   else setIsExpenseModalOpen(true);
                 }}
-                className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                className="px-4 py-2 sm:px-6 sm:py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
                 <span className="hidden sm:inline">
@@ -275,7 +275,7 @@ export default function ProjectsPage() {
                 <div className="text-center py-12">
                   <Folder className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No projects found</p>
-                  <button onClick={() => setIsProjectModalOpen(true)} className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                  <button onClick={() => setIsProjectModalOpen(true)} className="px-6 py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
                     <Plus className="w-5 h-5" />
                     Create Project
                   </button>
@@ -292,7 +292,7 @@ export default function ProjectsPage() {
                 <div className="text-center py-12">
                   <Wallet className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No Budget Set</p>
-                  <button onClick={() => setIsBudgetModalOpen(true)} className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                  <button onClick={() => setIsBudgetModalOpen(true)} className="px-6 py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
                     <Plus className="w-5 h-5" />
                     Set Budget
                   </button>
@@ -384,7 +384,7 @@ export default function ProjectsPage() {
                 <div className="text-center py-12">
                   <Receipt className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No expenses found</p>
-                  <button onClick={() => setIsExpenseModalOpen(true)} className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                  <button onClick={() => setIsExpenseModalOpen(true)} className="px-6 py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
                     <Plus className="w-5 h-5" />
                     Add Expense
                   </button>

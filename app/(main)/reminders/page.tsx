@@ -211,7 +211,7 @@ export default function RemindersPage() {
 
             <button
               onClick={handleOpenModal}
-              className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 shimmer-reminders text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
             >
               <Plus className="w-5 h-5" />
               New Reminder
@@ -371,7 +371,7 @@ export default function RemindersPage() {
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                     <button
                       onClick={handleOpenModal}
-                      className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                      className="px-6 py-3 shimmer-reminders text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
                     >
                       <Plus className="w-5 h-5" />
                       Create Reminder

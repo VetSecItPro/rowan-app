@@ -119,7 +119,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId }: New
           </div>
           <div className="flex items-center justify-end gap-3 pt-4">
             <button type="button" onClick={onClose} className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg">Cancel</button>
-            <button type="submit" className="px-6 py-2 shimmer-bg text-white rounded-lg">{editMeal ? 'Save' : 'Create'}</button>
+            <button type="submit" className="px-6 py-2 shimmer-meals text-white rounded-lg">{editMeal ? 'Save' : 'Create'}</button>
           </div>
         </form>
       </div>

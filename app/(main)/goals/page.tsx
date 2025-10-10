@@ -277,7 +277,7 @@ export default function GoalsPage() {
               </div>
               <button
                 onClick={handleNewButtonClick}
-                className="flex-1 sm:flex-none px-4 py-2 sm:px-6 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                className="flex-1 sm:flex-none px-4 py-2 sm:px-6 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
                 New {viewMode === 'goals' ? 'Goal' : 'Milestone'}
@@ -362,7 +362,7 @@ export default function GoalsPage() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                       <button
                         onClick={handleOpenGoalModal}
-                        className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                        className="px-6 py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
                       >
                         <Plus className="w-5 h-5" />
                         Create Goal

@@ -442,7 +442,7 @@ export default function MealsPage() {
                 <span className="hidden sm:inline">New Recipe</span>
                 <span className="sm:hidden">Recipe</span>
               </button>
-              <button onClick={handleOpenMealModal} className="px-4 py-2 sm:px-6 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
+              <button onClick={handleOpenMealModal} className="px-4 py-2 sm:px-6 sm:py-3 shimmer-meals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
                 <Plus className="w-5 h-5" />
                 <span className="hidden sm:inline">New Meal</span>
                 <span className="sm:hidden">Meal</span>
@@ -612,7 +612,7 @@ export default function MealsPage() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                       <button
                         onClick={handleOpenMealModal}
-                        className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                        className="px-6 py-3 shimmer-meals text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
                       >
                         <Plus className="w-5 h-5" />
                         Plan Meal
