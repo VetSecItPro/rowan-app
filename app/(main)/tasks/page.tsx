@@ -269,7 +269,7 @@ export default function TasksPage() {
               </div>
               <button
                 onClick={handleOpenModal}
-                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-tasks text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
                 <span>New {activeTab === 'task' ? 'Task' : 'Chore'}</span>
@@ -399,7 +399,7 @@ export default function TasksPage() {
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                     <button
                       onClick={handleOpenModal}
-                      className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                      className="px-6 py-3 shimmer-tasks text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
                     >
                       <Plus className="w-5 h-5" />
                       Create {activeTab === 'task' ? 'Task' : 'Chore'}

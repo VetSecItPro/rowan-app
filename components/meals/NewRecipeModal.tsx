@@ -263,7 +263,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
             >
               Cancel
             </button>
-            <button type="submit" className="px-6 py-2 shimmer-bg text-white rounded-lg hover:opacity-90">
+            <button type="submit" className="px-6 py-2 shimmer-meals text-white rounded-lg hover:opacity-90">
               {editRecipe ? 'Save' : 'Create'}
             </button>
           </div>

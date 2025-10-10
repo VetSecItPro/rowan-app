@@ -130,6 +130,95 @@
     animation: shimmer 3s linear infinite;
   }
 
+  /* Feature-specific shimmer backgrounds with solid colors */
+  .shimmer-tasks {
+    background: linear-gradient(
+      90deg,
+      #3b82f6 0%,
+      #2563eb 50%,
+      #3b82f6 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  .shimmer-calendar {
+    background: linear-gradient(
+      90deg,
+      #a855f7 0%,
+      #9333ea 50%,
+      #a855f7 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  .shimmer-reminders {
+    background: linear-gradient(
+      90deg,
+      #ec4899 0%,
+      #db2777 50%,
+      #ec4899 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  .shimmer-messages {
+    background: linear-gradient(
+      90deg,
+      #22c55e 0%,
+      #16a34a 50%,
+      #22c55e 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  .shimmer-shopping {
+    background: linear-gradient(
+      90deg,
+      #10b981 0%,
+      #059669 50%,
+      #10b981 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  .shimmer-meals {
+    background: linear-gradient(
+      90deg,
+      #f97316 0%,
+      #ea580c 50%,
+      #f97316 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  .shimmer-projects {
+    background: linear-gradient(
+      90deg,
+      #f59e0b 0%,
+      #d97706 50%,
+      #f59e0b 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  .shimmer-goals {
+    background: linear-gradient(
+      90deg,
+      #6366f1 0%,
+      #4f46e5 50%,
+      #6366f1 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
   /* Gradient text with hover shimmer effect */
   .gradient-text {
     background: linear-gradient(

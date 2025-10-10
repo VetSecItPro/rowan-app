@@ -261,7 +261,7 @@ export default function ShoppingPage() {
                 <p className="text-gray-600 dark:text-gray-400 mt-1">Collaborative shopping made easy</p>
               </div>
             </div>
-            <button onClick={handleOpenNewListModal} className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
+            <button onClick={handleOpenNewListModal} className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 shimmer-shopping text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
               <Plus className="w-5 h-5" />
               New List
             </button>
@@ -351,7 +351,7 @@ export default function ShoppingPage() {
                 <p className="text-gray-500 dark:text-gray-500 mb-6">{searchQuery || statusFilter !== 'active' ? 'Try adjusting your filters' : 'Create your first shopping list!'}</p>
                 {!searchQuery && statusFilter === 'active' && (
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <button onClick={handleOpenNewListModal} className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                    <button onClick={handleOpenNewListModal} className="px-6 py-3 shimmer-shopping text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
                       <Plus className="w-5 h-5" />
                       Create List
                     </button>
