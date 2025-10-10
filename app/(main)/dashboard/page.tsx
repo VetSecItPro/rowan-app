@@ -381,16 +381,17 @@ export default function DashboardPage() {
       const now = new Date();
       const today = getCurrentDateString();
       const weekAgo = subWeeks(now, 1);
+      const weekStart = startOfWeek(now);
 
       // Calculate detailed task stats
       const tasksDueToday = allTasks.filter(t => t.due_date === today && t.status !== 'completed').length;
       const tasksOverdue = allTasks.filter(t =>
         t.due_date && isPast(parseISO(t.due_date)) && !isToday(parseISO(t.due_date)) && t.status !== 'completed'
       ).length;
-      const tasksLastWeek = allTasks.filter(t =>
-        t.created_at && parseISO(t.created_at) < weekAgo
+      // Trend: Tasks completed this week
+      const taskTrend = allTasks.filter(t =>
+        t.status === 'completed' && t.updated_at && parseISO(t.updated_at) >= weekStart
       ).length;
-      const taskTrend = allTasks.length - tasksLastWeek;
       const recentTasks = allTasks
         .filter(t => t.status !== 'completed')
         .sort((a, b) => {
@@ -409,7 +410,11 @@ export default function DashboardPage() {
       const nextEvent = allEvents
         .filter(e => parseISO(e.start_time) > now)
         .sort((a, b) => parseISO(a.start_time).getTime() - parseISO(b.start_time).getTime())[0];
-      const eventTrend = allEvents.filter(e => parseISO(e.created_at) > weekAgo).length;
+      // Trend: Events that occurred this week
+      const eventTrend = allEvents.filter(e => {
+        const startTime = parseISO(e.start_time);
+        return startTime >= weekStart && startTime <= now;
+      }).length;
 
       // Calculate detailed reminder stats
       const activeReminders = allReminders.filter(r => r.status === 'active').length;
@@ -427,17 +432,22 @@ export default function DashboardPage() {
       const nextDueReminder = allReminders
         .filter(r => r.reminder_time && parseISO(r.reminder_time) > now && r.status === 'active')
         .sort((a, b) => parseISO(a.reminder_time!).getTime() - parseISO(b.reminder_time!).getTime())[0];
-      const reminderTrend = allReminders.filter(r => parseISO(r.created_at) > weekAgo).length;
+      // Trend: Reminders completed this week
+      const reminderTrend = allReminders.filter(r =>
+        r.status === 'completed' && r.updated_at && parseISO(r.updated_at) >= weekStart
+      ).length;
 
       // Calculate detailed message stats
       const messagesToday = allMessages.filter(m => isToday(parseISO(m.created_at))).length;
       const lastMessage = allMessages.length > 0 ? allMessages[allMessages.length - 1] : null;
-      const messageTrend = allMessages.filter(m => parseISO(m.created_at) > weekAgo).length;
+      // Trend: Messages sent this week (keep as is - this makes sense)
+      const messageTrend = allMessages.filter(m => parseISO(m.created_at) >= weekStart).length;
 
       // Calculate detailed shopping stats
       let totalItems = 0;
       let checkedToday = 0;
       let uncheckedItems = 0;
+      let checkedThisWeek = 0;
       for (const list of shoppingLists) {
         const items = list.items || [];
         totalItems += items.length;
@@ -445,16 +455,23 @@ export default function DashboardPage() {
         checkedToday += items.filter(i =>
           i.checked && i.updated_at && isToday(parseISO(i.updated_at))
         ).length;
+        checkedThisWeek += items.filter(i =>
+          i.checked && i.updated_at && parseISO(i.updated_at) >= weekStart
+        ).length;
       }
       const activeLists = shoppingLists.filter(l => l.status === 'active').length;
-      const shoppingTrend = shoppingLists.filter(l => parseISO(l.created_at) > weekAgo).length;
+      // Trend: Items checked off this week
+      const shoppingTrend = checkedThisWeek;
 
       // Calculate detailed meal stats
       const mealsToday = meals.filter(m => m.scheduled_date && isToday(parseISO(m.scheduled_date))).length;
       const nextMeal = meals
         .filter(m => m.scheduled_date && parseISO(m.scheduled_date) > now)
         .sort((a, b) => parseISO(a.scheduled_date).getTime() - parseISO(b.scheduled_date).getTime())[0];
-      const mealTrend = meals.filter(m => parseISO(m.created_at) > weekAgo).length;
+      // Trend: Meals completed this week (meals with past scheduled dates)
+      const mealTrend = meals.filter(m =>
+        m.scheduled_date && parseISO(m.scheduled_date) >= weekStart && parseISO(m.scheduled_date) <= now
+      ).length;
 
       // Calculate detailed household stats
       const choresAssignedToMe = allChores.filter(c => c.assigned_to === user.id).length;
@@ -462,12 +479,18 @@ export default function DashboardPage() {
       const choresOverdue = allChores.filter(c =>
         c.due_date && isPast(parseISO(c.due_date)) && c.status !== 'completed'
       ).length;
-      const householdTrend = allChores.filter(c => parseISO(c.created_at) > weekAgo).length;
+      // Trend: Chores completed this week
+      const householdTrend = allChores.filter(c =>
+        c.status === 'completed' && c.updated_at && parseISO(c.updated_at) >= weekStart
+      ).length;
 
       // Calculate detailed project stats
       const allExpenses = await projectsService.getExpenses(currentSpace.id);
       const totalExpenses = allExpenses.reduce((sum, e) => sum + e.amount, 0);
-      const projectTrend = 0; // Could be calculated based on project creation dates
+      // Trend: Projects completed this week
+      const projectTrend = allProjects.filter(p =>
+        p.status === 'completed' && p.updated_at && parseISO(p.updated_at) >= weekStart
+      ).length;
 
       // Calculate detailed goal stats
       const activeGoals = allGoals.filter(g => g.status === 'active').length;
@@ -476,7 +499,10 @@ export default function DashboardPage() {
       const topGoal = allGoals.length > 0
         ? { title: allGoals[0].title, progress: allGoals[0].progress || 0 }
         : null;
-      const goalTrend = allGoals.filter(g => parseISO(g.created_at) > weekAgo).length;
+      // Trend: Goals completed this week
+      const goalTrend = allGoals.filter(g =>
+        g.status === 'completed' && g.updated_at && parseISO(g.updated_at) >= weekStart
+      ).length;
 
       setStats({
         tasks: {
@@ -929,9 +955,12 @@ export default function DashboardPage() {
                         <h3 className="text-base sm:text-lg font-bold text-blue-600 dark:text-blue-400">Tasks</h3>
                         {stats.tasks.trend !== 0 && <TrendIndicator value={stats.tasks.trend} label="this week" />}
                       </div>
-                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                        {stats.tasks.total}
-                      </p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                          {stats.tasks.pending}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">pending</p>
+                      </div>
                     </div>
                     <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
                       <CheckSquare className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
@@ -990,9 +1019,12 @@ export default function DashboardPage() {
                         <h3 className="text-base sm:text-lg font-bold text-purple-600 dark:text-purple-400">Calendar</h3>
                         {stats.events.trend !== 0 && <TrendIndicator value={stats.events.trend} label="this week" />}
                       </div>
-                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                        {stats.events.total}
-                      </p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                          {stats.events.upcoming}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">upcoming</p>
+                      </div>
                     </div>
                     <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
                       <Calendar className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
@@ -1038,9 +1070,12 @@ export default function DashboardPage() {
                         <h3 className="text-base sm:text-lg font-bold text-orange-600 dark:text-orange-400">Reminders</h3>
                         {stats.reminders.trend !== 0 && <TrendIndicator value={stats.reminders.trend} label="this week" />}
                       </div>
-                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                        {stats.reminders.active}
-                      </p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                          {stats.reminders.active}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">active</p>
+                      </div>
                     </div>
                     <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
                       <Bell className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
@@ -1094,9 +1129,12 @@ export default function DashboardPage() {
                         <h3 className="text-base sm:text-lg font-bold text-green-600 dark:text-green-400">Messages</h3>
                         {stats.messages.trend !== 0 && <TrendIndicator value={stats.messages.trend} label="this week" />}
                       </div>
-                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                        {stats.messages.total}
-                      </p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                          {stats.messages.total}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">total</p>
+                      </div>
                     </div>
                     <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
                       <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
@@ -1147,9 +1185,12 @@ export default function DashboardPage() {
                         <h3 className="text-base sm:text-lg font-bold text-teal-600 dark:text-teal-400">Shopping</h3>
                         {stats.shopping.trend !== 0 && <TrendIndicator value={stats.shopping.trend} label="this week" />}
                       </div>
-                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                        {stats.shopping.totalItems}
-                      </p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                          {stats.shopping.uncheckedItems}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">remaining</p>
+                      </div>
                     </div>
                     <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
                       <ShoppingCart className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
@@ -1196,9 +1237,12 @@ export default function DashboardPage() {
                         <h3 className="text-base sm:text-lg font-bold text-red-600 dark:text-red-400">Meals</h3>
                         {stats.meals.trend !== 0 && <TrendIndicator value={stats.meals.trend} label="this week" />}
                       </div>
-                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                        {stats.meals.thisWeek}
-                      </p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                          {stats.meals.thisWeek}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">this week</p>
+                      </div>
                     </div>
                     <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
                       <UtensilsCrossed className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
@@ -1244,9 +1288,12 @@ export default function DashboardPage() {
                         <h3 className="text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400">Projects & Budget</h3>
                         {stats.projects.trend !== 0 && <TrendIndicator value={stats.projects.trend} label="this week" />}
                       </div>
-                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                        {stats.projects.total}
-                      </p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                          {stats.projects.inProgress}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">active</p>
+                      </div>
                     </div>
                     <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
                       <Home className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
@@ -1303,9 +1350,12 @@ export default function DashboardPage() {
                         <h3 className="text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400">Goals</h3>
                         {stats.goals.trend !== 0 && <TrendIndicator value={stats.goals.trend} label="this week" />}
                       </div>
-                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                        {stats.goals.active}
-                      </p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                          {stats.goals.active}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">active</p>
+                      </div>
                     </div>
                     <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
                       <Target className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
@@ -1317,14 +1367,11 @@ export default function DashboardPage() {
                       <span className="text-gray-600 dark:text-gray-400">{stats.goals.inProgress} in progress</span>
                       <span className="text-gray-600 dark:text-gray-400">{stats.goals.completed} completed</span>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {stats.goals.total} total goals
-                    </p>
                   </div>
 
                   {stats.goals.topGoal && (
                     <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg mb-3">
-                      <p className="text-xs text-indigo-700 dark:text-indigo-300 font-medium mb-2">Top goal:</p>
+                      <p className="text-xs text-indigo-700 dark:text-indigo-300 font-medium mb-1">Top goal:</p>
                       <p className="text-sm text-gray-900 dark:text-white font-medium truncate mb-2">
                         {stats.goals.topGoal.title}
                       </p>
@@ -1340,9 +1387,23 @@ export default function DashboardPage() {
                     </div>
                   )}
 
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                    Overall progress: {stats.goals.overallProgress}%
-                  </p>
+                  <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg mb-3">
+                    <p className="text-xs text-indigo-700 dark:text-indigo-300 font-medium mb-1">Overall progress:</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-900 dark:text-white font-bold">
+                        {stats.goals.overallProgress}%
+                      </span>
+                    </div>
+                    <ProgressBar
+                      value={stats.goals.overallProgress}
+                      max={100}
+                      color="indigo"
+                      showLabel={false}
+                    />
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                      {stats.goals.total} total goals
+                    </p>
+                  </div>
 
                   <div className="mt-auto pt-3 flex items-center justify-end text-indigo-600 dark:text-indigo-400 text-sm font-medium group-hover:gap-2 transition-all">
                     <span>View all</span>
