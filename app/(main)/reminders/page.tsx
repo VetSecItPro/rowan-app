@@ -199,18 +199,13 @@ export default function RemindersPage() {
               <div className="w-12 h-12 rounded-xl bg-gradient-reminders flex items-center justify-center">
                 <Bell className="w-6 h-6 text-white" />
               </div>
-              <div className="flex items-center gap-3">
-                <div>
-                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-reminders bg-clip-text text-transparent">
-                    Reminders
-                  </h1>
-                  <p className="text-gray-600 dark:text-gray-400 mt-1">
-                    Never forget important moments
-                  </p>
-                </div>
-                <span className="px-3 py-1 bg-pink-100 dark:bg-pink-900/30 border border-pink-300 dark:border-pink-700 text-pink-700 dark:text-pink-300 text-sm font-medium rounded-full hidden sm:inline-block">
-                  {format(new Date(), 'MMM yyyy')}
-                </span>
+              <div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-reminders bg-clip-text text-transparent">
+                  Reminders
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                  Never forget important moments
+                </p>
               </div>
             </div>
 
@@ -295,50 +290,6 @@ export default function RemindersPage() {
                       className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                     />
                   </div>
-
-                  {/* Status Filter - Segmented Buttons */}
-                  <div className="bg-white dark:bg-gray-800 border-2 border-pink-200 dark:border-pink-700 rounded-lg p-1 flex gap-1 w-fit">
-                    <button
-                      onClick={() => setStatusFilter('all')}
-                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
-                        statusFilter === 'all'
-                          ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
-                          : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
-                      }`}
-                    >
-                      All
-                    </button>
-                    <button
-                      onClick={() => setStatusFilter('active')}
-                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
-                        statusFilter === 'active'
-                          ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
-                          : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
-                      }`}
-                    >
-                      Active
-                    </button>
-                    <button
-                      onClick={() => setStatusFilter('snoozed')}
-                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[70px] ${
-                        statusFilter === 'snoozed'
-                          ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
-                          : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
-                      }`}
-                    >
-                      Snoozed
-                    </button>
-                    <button
-                      onClick={() => setStatusFilter('completed')}
-                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
-                        statusFilter === 'completed'
-                          ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
-                          : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
-                      }`}
-                    >
-                      Completed
-                    </button>
-                  </div>
                 </div>
               </div>
           )}
@@ -346,9 +297,61 @@ export default function RemindersPage() {
               {/* Reminders List - Only show when NOT in guided flow */}
               {!showGuidedFlow && (
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              All Reminders ({filteredReminders.length})
-            </h2>
+            {/* Header with Month Badge and Status Filter */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  All Reminders ({filteredReminders.length})
+                </h2>
+                <span className="px-3 py-1 bg-pink-100 dark:bg-pink-900/30 border border-pink-300 dark:border-pink-700 text-pink-700 dark:text-pink-300 text-sm font-medium rounded-full">
+                  {format(new Date(), 'MMM yyyy')}
+                </span>
+              </div>
+
+              {/* Status Filter - Segmented Buttons */}
+              <div className="bg-gray-50 dark:bg-gray-900 border-2 border-pink-200 dark:border-pink-700 rounded-lg p-1 flex gap-1 w-fit">
+                <button
+                  onClick={() => setStatusFilter('all')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                    statusFilter === 'all'
+                      ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setStatusFilter('active')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                    statusFilter === 'active'
+                      ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
+                  }`}
+                >
+                  Active
+                </button>
+                <button
+                  onClick={() => setStatusFilter('snoozed')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[70px] ${
+                    statusFilter === 'snoozed'
+                      ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
+                  }`}
+                >
+                  Snoozed
+                </button>
+                <button
+                  onClick={() => setStatusFilter('completed')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
+                    statusFilter === 'completed'
+                      ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
+                  }`}
+                >
+                  Completed
+                </button>
+              </div>
+            </div>
 
             {loading ? (
               <div className="text-center py-12">
