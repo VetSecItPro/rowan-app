@@ -736,6 +736,46 @@ export default function DashboardPage() {
     };
   }, [currentSpace, loadAllStats]);
 
+  // Load check-ins data and subscribe to updates
+  useEffect(() => {
+    if (!currentSpace || !user) return;
+
+    const loadCheckIns = async () => {
+      try {
+        // Load recent check-ins for the space (last 7 days)
+        const recent = await checkInsService.getCheckIns(currentSpace.id, 7);
+        setRecentCheckIns(recent);
+
+        // Load current user's stats
+        const stats = await checkInsService.getCheckInStats(currentSpace.id, user.id);
+        setCheckInStats(stats);
+
+        // Load today's check-in if exists
+        const today = await checkInsService.getTodayCheckIn(currentSpace.id, user.id);
+        setTodayCheckIn(today);
+
+        // Pre-populate form if user already checked in today
+        if (today) {
+          setSelectedMood(today.mood);
+          setCheckInNote(today.note || '');
+        }
+      } catch (error) {
+        console.error('Failed to load check-ins:', error);
+      }
+    };
+
+    loadCheckIns();
+
+    // Subscribe to real-time check-in updates
+    const channel = checkInsService.subscribeToCheckIns(currentSpace.id, () => {
+      loadCheckIns();
+    });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentSpace, user]);
+
   // Mood options - Memoized
   const moodOptions = useMemo(() => [
     { emoji: '😊', label: 'Great', value: 'great' },
@@ -1347,79 +1387,113 @@ export default function DashboardPage() {
                     <span className="text-xs text-gray-500 dark:text-gray-400">{checkInNote.length}/200</span>
                     <button
                       onClick={handleCheckIn}
-                      disabled={!selectedMood}
-                      className={`px-6 py-2 rounded-full text-white text-sm font-semibold transition-all transform ${
-                        selectedMood
+                      disabled={!selectedMood || checkInSaving}
+                      className={`px-6 py-2 rounded-full text-white text-sm font-semibold transition-all transform flex items-center gap-2 ${
+                        selectedMood && !checkInSaving
                           ? 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 hover:scale-105 shadow-lg hover:shadow-pink-500/50'
                           : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed opacity-50'
                       }`}
                     >
-                      Check In
+                      {checkInSaving ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span>Saving...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Heart className="w-4 h-4" />
+                          <span>Check In</span>
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* Today's Wins */}
+              {/* Check-In Stats & History */}
               <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-yellow-500" />
-                  <p className="text-base font-semibold text-gray-900 dark:text-white">Today's Wins</p>
-                </div>
+                {/* Streak & Stats */}
+                {checkInStats && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-4 bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 rounded-2xl border border-orange-200/30 dark:border-orange-500/20">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Zap className="w-4 h-4 text-orange-500" />
+                        <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Current Streak</p>
+                      </div>
+                      <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">
+                        {checkInStats.currentStreak}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">days in a row</p>
+                    </div>
 
-                <div className="space-y-3">
-                  {/* Tasks completed today */}
-                  <div className="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-2xl border border-blue-200/30 dark:border-blue-500/20">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                        <CheckSquare className="w-5 h-5 text-white" />
+                    <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl border border-purple-200/30 dark:border-purple-500/20">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Heart className="w-4 h-4 text-purple-500" />
+                        <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Total Check-Ins</p>
                       </div>
-                      <div className="flex-1">
-                        <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                          {stats.tasks.completed}
-                        </p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">Tasks completed</p>
-                      </div>
+                      <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                        {checkInStats.totalCheckIns}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">all time</p>
                     </div>
                   </div>
+                )}
 
-                  {/* Goals progress */}
-                  <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl border border-purple-200/30 dark:border-purple-500/20">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Target className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                          {Math.round(stats.goals.overallProgress)}%
-                        </p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">Goals progress</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Reminders completed */}
-                  <div className="p-4 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-2xl border border-orange-200/30 dark:border-orange-500/20">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Bell className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                          {stats.reminders.completed}
-                        </p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">Reminders done</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Motivational quote */}
-                <div className="p-4 bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/20 dark:to-purple-900/20 rounded-2xl border border-pink-300/30 dark:border-pink-500/20 text-center">
-                  <p className="text-sm text-gray-700 dark:text-gray-300 italic">
-                    "Small steps every day lead to big changes!"
+                {/* Recent Check-Ins */}
+                <div>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-pink-500" />
+                    Recent Check-Ins
                   </p>
-                  <p className="text-xs text-pink-600 dark:text-pink-400 mt-1">Keep going!</p>
+
+                  {recentCheckIns.length === 0 ? (
+                    <div className="p-6 bg-white/50 dark:bg-gray-800/50 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 text-center">
+                      <Heart className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        No check-ins yet. Be the first to share how you're feeling!
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2 max-h-64 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-pink-300 dark:scrollbar-thumb-pink-700 scrollbar-track-transparent">
+                      {recentCheckIns.map((checkIn, index) => {
+                        const moodEmoji = moodOptions.find(m => m.value === checkIn.mood)?.emoji || '😊';
+                        const isToday = checkIn.date === format(new Date(), 'yyyy-MM-dd');
+                        const isCurrentUser = checkIn.user_id === user?.id;
+
+                        return (
+                          <div
+                            key={checkIn.id}
+                            style={{ animationDelay: `${index * 50}ms` }}
+                            className="p-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-pink-300 dark:hover:border-pink-600 transition-all duration-300 transform hover:scale-[1.02] animate-fadeIn opacity-0"
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className="text-2xl transform transition-transform hover:scale-125">{moodEmoji}</div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                    {isCurrentUser ? 'You' : 'Your Partner'}
+                                  </p>
+                                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                                    {isToday ? 'Today' : format(new Date(checkIn.date), 'MMM d')}
+                                  </span>
+                                  {isToday && (
+                                    <span className="px-2 py-0.5 bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 text-pink-600 dark:text-pink-400 text-xs rounded-full font-medium animate-pulse">
+                                      New
+                                    </span>
+                                  )}
+                                </div>
+                                {checkIn.note && (
+                                  <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 italic">
+                                    "{checkIn.note}"
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
