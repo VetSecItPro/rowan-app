@@ -129,6 +129,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
             <button
               onClick={onClose}
               className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              aria-label="Close modal"
             >
               <X className="w-5 h-5" />
             </button>
@@ -158,6 +159,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
                   type="button"
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                   title="Add emoji"
+                  aria-label="Add emoji to title"
                   className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                 >
                   <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />

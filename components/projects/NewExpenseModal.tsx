@@ -72,7 +72,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
         <div className="sticky top-0 bg-gradient-to-r from-amber-500 to-amber-600 text-white p-6 rounded-t-2xl">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">{editExpense ? 'Edit Expense' : 'Create New Expense'}</h2>
-            <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg transition-colors">
+            <button onClick={onClose} aria-label="Close modal" className="p-2 hover:bg-white/20 rounded-lg transition-colors">
               <X className="w-5 h-5" />
             </button>
           </div>

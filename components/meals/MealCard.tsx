@@ -47,7 +47,7 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
           )}
         </div>
         <div className="relative">
-          <button onClick={() => setShowMenu(!showMenu)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+          <button onClick={() => setShowMenu(!showMenu)} aria-label="Meal options menu" className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
             <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
           </button>
           {showMenu && (

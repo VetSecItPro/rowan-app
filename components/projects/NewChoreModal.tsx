@@ -126,6 +126,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
             <button
               onClick={onClose}
               className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              aria-label="Close modal"
             >
               <X className="w-5 h-5" />
             </button>
