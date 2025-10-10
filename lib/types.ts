@@ -592,3 +592,43 @@ export interface CreateInvitationInput {
   space_id: string;
   email: string;
 }
+
+// =============================================
+// USER PROGRESS & ONBOARDING TYPES
+// =============================================
+
+export interface UserProgress {
+  id: string;
+  user_id: string;
+  partnership_id: string | null;
+
+  // Guided flow completion tracking
+  first_task_created: boolean;
+  first_event_created: boolean;
+  first_reminder_created: boolean;
+  first_message_sent: boolean;
+  first_shopping_item_added: boolean;
+  first_meal_planned: boolean;
+  first_household_task_created: boolean;
+  first_goal_set: boolean;
+
+  // Onboarding status
+  onboarding_completed: boolean;
+  partnership_setup_completed: boolean;
+
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UpdateUserProgressInput {
+  first_task_created?: boolean;
+  first_event_created?: boolean;
+  first_reminder_created?: boolean;
+  first_message_sent?: boolean;
+  first_shopping_item_added?: boolean;
+  first_meal_planned?: boolean;
+  first_household_task_created?: boolean;
+  first_goal_set?: boolean;
+  onboarding_completed?: boolean;
+  partnership_setup_completed?: boolean;
+}
