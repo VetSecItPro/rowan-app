@@ -23,6 +23,7 @@ const config: Config = {
       animation: {
         'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
         'fade-in': 'fade-in 0.3s ease-in-out',
+        'fadeIn': 'fadeIn 0.5s ease-in-out forwards',
         'slide-up': 'slide-up 0.3s ease-out',
         'slide-down': 'slide-down 0.3s ease-out',
       },
@@ -34,6 +35,10 @@ const config: Config = {
         'fade-in': {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
+        },
+        'fadeIn': {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         'slide-up': {
           '0%': { transform: 'translateY(10px)', opacity: '0' },
