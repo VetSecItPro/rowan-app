@@ -4,13 +4,13 @@ import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 
 interface BreadcrumbProps {
-  items: {
+  items?: {
     label: string;
     href?: string;
   }[];
 }
 
-export function Breadcrumb({ items }: BreadcrumbProps) {
+export function Breadcrumb({ items = [] }: BreadcrumbProps) {
   return (
     <nav className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -26,7 +26,7 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
           </li>
 
           {/* Dynamic Items */}
-          {items.map((item, index) => {
+          {items?.map((item, index) => {
             const isLast = index === items.length - 1;
 
             return (
