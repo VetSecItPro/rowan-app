@@ -7,10 +7,10 @@ import { useState } from 'react';
 import { TASK_CATEGORIES } from './NewTaskModal';
 
 interface TaskCardProps {
-  task: Task;
-  onStatusChange: (taskId: string, status: string) => void;
-  onEdit: (task: Task) => void;
-  onDelete: (taskId: string) => void;
+  task: Task & { type?: 'task' | 'chore' };
+  onStatusChange: (taskId: string, status: string, type?: 'task' | 'chore') => void;
+  onEdit: (task: Task & { type?: 'task' | 'chore' }) => void;
+  onDelete: (taskId: string, type?: 'task' | 'chore') => void;
 }
 
 const priorityColors = {
@@ -34,17 +34,31 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete }: TaskCardPro
   const priorityColor = priorityColors[task.priority as keyof typeof priorityColors] || 'bg-gray-500';
   const statusColor = statusColors[task.status as keyof typeof statusColors] || 'bg-gray-500';
 
-  // Handle status rotation: pending (not started) → in_progress (pending) → completed → pending
+  // Handle status rotation
+  // Tasks: pending → in_progress → completed → pending
+  // Chores: pending → completed → pending
   const handleStatusClick = () => {
     let newStatus = 'pending';
-    if (task.status === 'pending') {
-      newStatus = 'in_progress';
-    } else if (task.status === 'in_progress') {
-      newStatus = 'completed';
-    } else if (task.status === 'completed') {
-      newStatus = 'pending';
+
+    if (task.type === 'chore') {
+      // Chores only have: pending, completed, skipped
+      if (task.status === 'pending') {
+        newStatus = 'completed';
+      } else if (task.status === 'completed') {
+        newStatus = 'pending';
+      }
+    } else {
+      // Tasks have: pending, in_progress, completed, cancelled
+      if (task.status === 'pending') {
+        newStatus = 'in_progress';
+      } else if (task.status === 'in_progress') {
+        newStatus = 'completed';
+      } else if (task.status === 'completed') {
+        newStatus = 'pending';
+      }
     }
-    onStatusChange(task.id, newStatus);
+
+    onStatusChange(task.id, newStatus, task.type);
   };
 
   // Get checkbox styling based on status
@@ -113,6 +127,12 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete }: TaskCardPro
               }`}>
                 {task.title}
               </h3>
+              {/* Task/Chore Type Badge */}
+              {task.type && (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border-2 border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20">
+                  {task.type === 'task' ? 'Task' : 'Chore'}
+                </span>
+              )}
               {/* Category Badge */}
               {task.category && TASK_CATEGORIES[task.category as keyof typeof TASK_CATEGORIES] && (
                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
@@ -162,7 +182,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete }: TaskCardPro
                 </button>
                 <button
                   onClick={() => {
-                    onDelete(task.id);
+                    onDelete(task.id, task.type);
                     setShowMenu(false);
                   }}
                   className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg"

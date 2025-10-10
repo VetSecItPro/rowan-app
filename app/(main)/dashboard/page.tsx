@@ -404,6 +404,25 @@ export default function DashboardPage() {
         .slice(0, 3)
         .map(t => ({ id: t.id, title: t.title, due_date: t.due_date, priority: t.priority }));
 
+      // Calculate detailed chore stats (similar to tasks)
+      const choresDueToday = allChores.filter(c => c.due_date === today && c.status !== 'completed').length;
+      const choresOverdueCount = allChores.filter(c =>
+        c.due_date && isPast(parseISO(c.due_date)) && !isToday(parseISO(c.due_date)) && c.status !== 'completed'
+      ).length;
+      // Trend: Chores completed this week
+      const choreTrend = allChores.filter(c =>
+        c.status === 'completed' && c.updated_at && parseISO(c.updated_at) >= weekStart
+      ).length;
+      const recentChores = allChores
+        .filter(c => c.status !== 'completed')
+        .sort((a, b) => {
+          if (!a.due_date) return 1;
+          if (!b.due_date) return -1;
+          return parseISO(a.due_date).getTime() - parseISO(b.due_date).getTime();
+        })
+        .slice(0, 3)
+        .map(c => ({ id: c.id, title: c.title, due_date: c.due_date, priority: undefined }));
+
       // Calculate detailed event stats
       const eventsToday = allEvents.filter(e => isToday(parseISO(e.start_time))).length;
       const eventsThisWeek = allEvents.filter(e => isThisWeek(parseISO(e.start_time))).length;
@@ -506,19 +525,31 @@ export default function DashboardPage() {
         g.status === 'completed' && g.updated_at && parseISO(g.updated_at) >= weekStart
       ).length;
 
+      // Combine tasks and chores stats with proper null checks
+      const combinedTotal = (taskStats?.total || 0) + (choreStats?.total || 0);
+      const combinedCompleted = (taskStats?.completed || 0) + (choreStats?.completed || 0);
+      const combinedPending = (taskStats?.pending || 0) + (choreStats?.pending || 0);
+      const combinedRecentItems = [...recentTasks, ...recentChores]
+        .sort((a, b) => {
+          if (!a.due_date) return 1;
+          if (!b.due_date) return -1;
+          return parseISO(a.due_date).getTime() - parseISO(b.due_date).getTime();
+        })
+        .slice(0, 3);
+
       setStats({
         tasks: {
-          total: taskStats.total,
-          pending: taskStats.pending,
-          inProgress: taskStats.inProgress,
-          completed: taskStats.completed,
-          dueToday: tasksDueToday,
-          overdue: tasksOverdue,
-          highPriority: taskStats.byPriority.high + taskStats.byPriority.urgent,
-          assignedToMe: allTasks.filter(t => t.assigned_to === user.id).length,
-          completionRate: taskStats.total > 0 ? Math.round((taskStats.completed / taskStats.total) * 100) : 0,
-          trend: taskTrend,
-          recentTasks,
+          total: combinedTotal,
+          pending: combinedPending,
+          inProgress: taskStats?.inProgress || 0, // Only tasks have "in progress" status
+          completed: combinedCompleted,
+          dueToday: tasksDueToday + choresDueToday,
+          overdue: tasksOverdue + choresOverdueCount,
+          highPriority: (taskStats?.byPriority?.high || 0) + (taskStats?.byPriority?.urgent || 0),
+          assignedToMe: allTasks.filter(t => t.assigned_to === user.id).length + allChores.filter(c => c.assigned_to === user.id).length,
+          completionRate: combinedTotal > 0 ? Math.round((combinedCompleted / combinedTotal) * 100) : 0,
+          trend: taskTrend + choreTrend,
+          recentTasks: combinedRecentItems,
         },
         events: {
           total: eventStats.total,
@@ -954,7 +985,7 @@ export default function DashboardPage() {
                   <div className="flex items-start justify-between mb-3 sm:mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1 sm:mb-2">
-                        <h3 className="text-base sm:text-lg font-bold text-blue-600 dark:text-blue-400">Tasks</h3>
+                        <h3 className="text-base sm:text-lg font-bold text-blue-600 dark:text-blue-400">Tasks & Chores</h3>
                         {stats.tasks.trend !== 0 && <TrendIndicator value={stats.tasks.trend} label="this week" />}
                       </div>
                       <div className="flex items-baseline gap-2">

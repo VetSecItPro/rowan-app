@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, ChevronDown, Home } from 'lucide-react';
+import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { TaskCard } from '@/components/tasks/TaskCard';
 import { NewTaskModal } from '@/components/tasks/NewTaskModal';
@@ -47,7 +48,8 @@ export default function TasksPage() {
 
   // Memoized filtered items - filter combined tasks and chores
   const filteredItems = useMemo(() => {
-    let filtered = allItems;
+    // Hide completed items by default
+    let filtered = allItems.filter(item => item.status !== 'completed');
 
     // Status filter
     if (statusFilter !== 'all') {
@@ -77,22 +79,26 @@ export default function TasksPage() {
     try {
       setLoading(true);
       // Fetch both tasks and chores in parallel
-      const [tasksData, choresData, userProgress] = await Promise.all([
+      const [tasksData, choresData] = await Promise.all([
         tasksService.getTasks(currentSpace.id),
         choresService.getChores(currentSpace.id),
-        getUserProgress(user.id),
       ]);
       setTasks(tasksData);
       setChores(choresData);
 
-      // Check if user has completed the guided task flow
-      if (userProgress) {
-        setHasCompletedGuide(userProgress.first_task_created);
-      }
+      // Try to fetch user progress (non-blocking)
+      try {
+        const userProgressResult = await getUserProgress(user.id);
+        if (userProgressResult.success && userProgressResult.data) {
+          setHasCompletedGuide(userProgressResult.data.first_task_created);
 
-      // Show guided flow if no tasks exist and user hasn't completed the guide
-      if (tasksData.length === 0 && choresData.length === 0 && !userProgress?.first_task_created) {
-        setShowGuidedFlow(true);
+          // Show guided flow if no tasks exist and user hasn't completed the guide
+          if (tasksData.length === 0 && choresData.length === 0 && !userProgressResult.data.first_task_created) {
+            setShowGuidedFlow(true);
+          }
+        }
+      } catch (progressError) {
+        console.warn('Failed to load user progress (non-critical):', progressError);
       }
     } catch (error) {
       console.error('Failed to load data:', error);
@@ -139,34 +145,55 @@ export default function TasksPage() {
     }
   }, [editingChore, loadData]);
 
-  const handleStatusChange = useCallback(async (taskId: string, status: string) => {
+  const handleStatusChange = useCallback(async (itemId: string, status: string, type?: 'task' | 'chore') => {
     try {
-      await tasksService.updateTask(taskId, { status });
+      if (type === 'chore') {
+        // When marking chore as completed, set completed_at timestamp
+        const updateData: any = { status };
+        if (status === 'completed') {
+          updateData.completed_at = new Date().toISOString();
+        }
+        await choresService.updateChore(itemId, updateData);
+      } else {
+        await tasksService.updateTask(itemId, { status });
+      }
       loadData();
     } catch (error) {
-      console.error('Failed to update task status:', error);
+      console.error('Failed to update item status:', error);
     }
   }, [loadData]);
 
-  const handleDeleteTask = useCallback(async (taskId: string) => {
-    if (!confirm('Are you sure you want to delete this task?')) return;
+  const handleDeleteItem = useCallback(async (itemId: string, type?: 'task' | 'chore') => {
+    const itemType = type === 'chore' ? 'chore' : 'task';
+    if (!confirm(`Are you sure you want to delete this ${itemType}?`)) return;
 
     try {
-      await tasksService.deleteTask(taskId);
+      if (type === 'chore') {
+        await choresService.deleteChore(itemId);
+      } else {
+        await tasksService.deleteTask(itemId);
+      }
       loadData();
     } catch (error) {
-      console.error('Failed to delete task:', error);
+      console.error(`Failed to delete ${itemType}:`, error);
     }
   }, [loadData]);
 
-  const handleEditTask = useCallback((task: Task) => {
-    setEditingTask(task);
+  const handleEditItem = useCallback((item: TaskOrChore) => {
+    if (item.type === 'chore') {
+      setEditingChore(item as Chore);
+      setActiveTab('chore');
+    } else {
+      setEditingTask(item as Task);
+      setActiveTab('task');
+    }
     setIsModalOpen(true);
   }, []);
 
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
     setEditingTask(null);
+    setEditingChore(null);
   }, []);
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -261,26 +288,15 @@ export default function TasksPage() {
           {/* Stats Dashboard - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            {/* Total Tasks & Chores */}
+            {/* Pending */}
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Total Tasks & Chores</h3>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-tasks rounded-xl flex items-center justify-center">
-                  <CheckSquare className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Pending</h3>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 rounded-xl flex items-center justify-center">
+                  <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
-            </div>
-
-            {/* Completed */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Completed</h3>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center">
-                  <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                </div>
-              </div>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.pending}</p>
             </div>
 
             {/* In Progress */}
@@ -294,15 +310,26 @@ export default function TasksPage() {
               <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.inProgress}</p>
             </div>
 
-            {/* Pending */}
+            {/* Completed */}
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Pending</h3>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 rounded-xl flex items-center justify-center">
-                  <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Completed</h3>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                  <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.pending}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
+            </div>
+
+            {/* Total Tasks & Chores */}
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Total Tasks & Chores</h3>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-tasks rounded-xl flex items-center justify-center">
+                  <CheckSquare className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                </div>
+              </div>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
             </div>
           </div>
           )}
@@ -345,9 +372,14 @@ export default function TasksPage() {
           {/* Tasks List - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
-              All Tasks & Chores ({filteredItems.length})
-            </h2>
+            <div className="flex items-center gap-3 mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                All Tasks & Chores ({filteredItems.length})
+              </h2>
+              <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 text-sm font-medium rounded-full">
+                {format(new Date(), 'MMM yyyy')}
+              </span>
+            </div>
 
             {loading ? (
               <div className="text-center py-12">
@@ -391,8 +423,8 @@ export default function TasksPage() {
                     key={item.id}
                     task={item}
                     onStatusChange={handleStatusChange}
-                    onEdit={handleEditTask}
-                    onDelete={handleDeleteTask}
+                    onEdit={handleEditItem}
+                    onDelete={handleDeleteItem}
                   />
                 ))}
               </div>
