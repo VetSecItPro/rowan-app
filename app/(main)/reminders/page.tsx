@@ -217,7 +217,16 @@ export default function RemindersPage() {
             </button>
           </div>
 
-          {/* Stats Cards - Horizontal Row */}
+          {/* Guided Creation - MOVED TO TOP */}
+          {!loading && showGuidedFlow && (
+            <GuidedReminderCreation
+              onComplete={handleGuidedFlowComplete}
+              onSkip={handleGuidedFlowSkip}
+            />
+          )}
+
+          {/* Stats Cards - Horizontal Row - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {/* Total */}
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
@@ -263,8 +272,10 @@ export default function RemindersPage() {
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.overdue}</p>
             </div>
           </div>
+          )}
 
-          {/* Search & Filter Bar */}
+          {/* Search & Filter Bar - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                   {/* Search */}
@@ -295,8 +306,10 @@ export default function RemindersPage() {
                   </div>
                 </div>
               </div>
+          )}
 
-              {/* Reminders List */}
+              {/* Reminders List - Only show when NOT in guided flow */}
+              {!showGuidedFlow && (
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
               All Reminders ({filteredReminders.length})
@@ -307,11 +320,6 @@ export default function RemindersPage() {
                 <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                 <p className="mt-4 text-gray-600 dark:text-gray-400">Loading reminders...</p>
               </div>
-            ) : showGuidedFlow && filteredReminders.length === 0 && !searchQuery && statusFilter === 'all' ? (
-              <GuidedReminderCreation
-                onComplete={handleGuidedFlowComplete}
-                onSkip={handleGuidedFlowSkip}
-              />
             ) : filteredReminders.length === 0 ? (
               <div className="text-center py-12">
                 <Bell className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -357,6 +365,7 @@ export default function RemindersPage() {
               </div>
             )}
           </div>
+          )}
         </div>
       </div>
 
