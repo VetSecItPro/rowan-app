@@ -1,7 +1,6 @@
 'use client';
 
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
-import { Breadcrumb } from '@/components/layout/Breadcrumb';
 import {
   BarChart3,
   CheckSquare,
@@ -166,16 +165,11 @@ const features = [
 export default function AnalyticsPage() {
   return (
     <FeatureLayout
-      title="Analytics"
-      description="Track your productivity and insights across all features"
-      icon={BarChart3}
+      breadcrumbItems={[
+        { label: 'Settings', href: '/settings' },
+        { label: 'Analytics' }
+      ]}
     >
-      <Breadcrumb
-        items={[
-          { label: 'Settings', href: '/settings' },
-          { label: 'Analytics' }
-        ]}
-      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Feature Analytics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -185,7 +179,7 @@ export default function AnalyticsPage() {
               <Link
                 key={feature.id}
                 href={feature.href}
-                className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl ${feature.shadowColor} transition-all duration-300 group`}
+                className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-2 ${feature.shadowColor} transition-all duration-300 group`}
               >
                 {/* Icon and Title */}
                 <div className="flex items-center gap-4 mb-4">

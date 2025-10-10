@@ -3,7 +3,7 @@
 import { Calendar, Clock, MapPin, MoreVertical, Edit, Trash2, Check } from 'lucide-react';
 import { CalendarEvent } from '@/lib/services/calendar-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface EventCardProps {
   event: CalendarEvent;
@@ -14,23 +14,6 @@ interface EventCardProps {
 
 export function EventCard({ event, onEdit, onDelete, onStatusChange }: EventCardProps) {
   const [showMenu, setShowMenu] = useState(false);
-  const [isHiding, setIsHiding] = useState(false);
-  const [isHidden, setIsHidden] = useState(false);
-
-  // Auto-hide when event is marked as completed
-  useEffect(() => {
-    if (event.status === 'completed' && !isHiding) {
-      // Wait 1 second then remove the card
-      const hideTimer = setTimeout(() => {
-        setIsHidden(true);
-      }, 1000);
-
-      return () => clearTimeout(hideTimer);
-    }
-  }, [event.status, isHiding]);
-
-  // Don't render if hidden
-  if (isHidden) return null;
 
   const formatEventTime = () => {
     return formatTimestamp(event.start_time, 'h:mm a');
@@ -84,7 +67,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange }: EventCard
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-all duration-200">
+    <div className="bg-white dark:bg-gray-800 border border-transparent rounded-xl p-6 hover:shadow-lg transition-all duration-200">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
