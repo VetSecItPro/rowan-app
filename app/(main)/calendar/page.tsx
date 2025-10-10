@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, List, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, List, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { EventCard } from '@/components/calendar/EventCard';
 import { NewEventModal } from '@/components/calendar/NewEventModal';
@@ -24,6 +24,7 @@ export default function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'not-started' | 'in-progress' | 'completed'>('all');
 
   // Memoize stats calculations
   const stats = useMemo(() => {
@@ -51,16 +52,26 @@ export default function CalendarPage() {
     };
   }, [events]);
 
-  // Memoize filtered events
+  // Memoize filtered events (exclude completed events in calendar view, apply status filter in list view)
   const filteredEvents = useMemo(() => {
-    if (!searchQuery) return events;
+    let filtered = events;
 
-    return events.filter(e =>
+    // In calendar view, always exclude completed events
+    // In list view, apply status filter
+    if (viewMode === 'calendar') {
+      filtered = events.filter(e => e.status !== 'completed');
+    } else if (viewMode === 'list' && statusFilter !== 'all') {
+      filtered = events.filter(e => e.status === statusFilter);
+    }
+
+    if (!searchQuery) return filtered;
+
+    return filtered.filter(e =>
       e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       e.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       e.location?.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [events, searchQuery]);
+  }, [events, searchQuery, viewMode, statusFilter]);
 
   // Memoize calendar days calculation
   const calendarDays = useMemo(() => {
@@ -212,6 +223,15 @@ export default function CalendarPage() {
     return eventsByDate.get(dateKey) || [];
   }, [eventsByDate]);
 
+  // Helper to cycle event status
+  const handleEventStatusClick = useCallback((e: React.MouseEvent, eventId: string, currentStatus: 'not-started' | 'in-progress' | 'completed') => {
+    e.stopPropagation(); // Prevent opening edit modal
+    const states: Array<'not-started' | 'in-progress' | 'completed'> = ['not-started', 'in-progress', 'completed'];
+    const currentIndex = states.indexOf(currentStatus);
+    const nextIndex = (currentIndex + 1) % states.length;
+    handleStatusChange(eventId, states[nextIndex]);
+  }, [handleStatusChange]);
+
   const handleGuidedFlowComplete = useCallback(() => {
     setShowGuidedFlow(false);
     setHasCompletedGuide(true);
@@ -247,7 +267,7 @@ export default function CalendarPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 flex gap-1">
+              <div className="bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-lg p-1 flex gap-1">
                 <button
                   onClick={handleSetViewCalendar}
                   className={`px-3 sm:px-4 py-2 rounded-md font-medium transition-all flex items-center justify-center gap-2 flex-1 sm:flex-initial ${
@@ -353,9 +373,62 @@ export default function CalendarPage() {
           {/* Events Section - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
-              {viewMode === 'calendar' ? 'Event Calendar' : `Upcoming Events (${filteredEvents.length})`}
-            </h2>
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <div className="flex items-center gap-3">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                  {viewMode === 'calendar' ? 'Event Calendar' : `Upcoming Events (${filteredEvents.length})`}
+                </h2>
+                <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 border border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300 text-sm font-medium rounded-full">
+                  {format(currentMonth, 'MMM yyyy')}
+                </span>
+              </div>
+
+              {/* Status Filter Toggle - Only show in list view */}
+              {viewMode === 'list' && (
+                <div className="bg-white dark:bg-gray-800 border-2 border-purple-200 dark:border-purple-700 rounded-lg p-1 flex gap-1 w-fit">
+                  <button
+                    onClick={() => setStatusFilter('all')}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                      statusFilter === 'all'
+                        ? 'bg-gradient-calendar text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                    }`}
+                  >
+                    All
+                  </button>
+                  <button
+                    onClick={() => setStatusFilter('not-started')}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                      statusFilter === 'not-started'
+                        ? 'bg-gradient-calendar text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                    }`}
+                  >
+                    Pending
+                  </button>
+                  <button
+                    onClick={() => setStatusFilter('in-progress')}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[72px] ${
+                      statusFilter === 'in-progress'
+                        ? 'bg-gradient-calendar text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                    }`}
+                  >
+                    In Progress
+                  </button>
+                  <button
+                    onClick={() => setStatusFilter('completed')}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[72px] ${
+                      statusFilter === 'completed'
+                        ? 'bg-gradient-calendar text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                    }`}
+                  >
+                    Completed
+                  </button>
+                </div>
+              )}
+            </div>
 
             <div className="min-h-[600px]">
               {loading ? (
@@ -423,19 +496,54 @@ export default function CalendarPage() {
                           <div className="space-y-0.5 sm:space-y-1">
                             {dayEvents.slice(0, 2).map((event) => {
                               const categoryColor = getCategoryColor(event.category);
+                              const categoryConfig = {
+                                work: { icon: '💼', label: 'Work' },
+                                personal: { icon: '👤', label: 'Personal' },
+                                family: { icon: '👨‍👩‍👧‍👦', label: 'Family' },
+                                health: { icon: '💪', label: 'Health' },
+                                social: { icon: '🎉', label: 'Social' },
+                              };
+                              const category = categoryConfig[event.category as keyof typeof categoryConfig] || categoryConfig.personal;
+
                               return (
-                                <button
+                                <div
                                   key={event.id}
-                                  onClick={() => handleEditEvent(event)}
-                                  className={`w-full text-left px-1 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs ${categoryColor.bg} border-l-2 ${categoryColor.border} hover:opacity-80 transition-opacity`}
+                                  className={`w-full flex items-center gap-1 px-1 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs ${categoryColor.bg} border-l-2 ${categoryColor.border}`}
                                 >
-                                  <p className={`font-medium ${categoryColor.text} truncate`}>
-                                    {event.title}
-                                  </p>
-                                  <p className="hidden sm:block text-gray-500 dark:text-gray-400 text-[10px]">
-                                    {format(parseISO(event.start_time), 'h:mm a')}
-                                  </p>
-                                </button>
+                                  {/* Status checkbox */}
+                                  <button
+                                    onClick={(e) => handleEventStatusClick(e, event.id, event.status)}
+                                    className={`flex-shrink-0 w-3 h-3 sm:w-4 sm:h-4 rounded border flex items-center justify-center transition-all ${
+                                      event.status === 'completed'
+                                        ? 'bg-green-500 border-green-500'
+                                        : event.status === 'in-progress'
+                                        ? 'bg-amber-500 border-amber-500'
+                                        : 'bg-transparent border-red-500'
+                                    }`}
+                                    aria-label={`Toggle status: ${event.status}`}
+                                  >
+                                    {event.status === 'completed' && <Check className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-white" />}
+                                    {event.status === 'in-progress' && <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-white rounded-full" />}
+                                  </button>
+
+                                  {/* Event details - clickable to edit */}
+                                  <button
+                                    onClick={() => handleEditEvent(event)}
+                                    className="flex-1 text-left hover:opacity-80 transition-opacity min-w-0"
+                                  >
+                                    <p className={`font-medium ${categoryColor.text} truncate`}>
+                                      {event.title}
+                                    </p>
+                                    <div className="hidden sm:flex items-center gap-1 text-[10px]">
+                                      <span className="text-gray-500 dark:text-gray-400">
+                                        {format(parseISO(event.start_time), 'h:mm a')}
+                                      </span>
+                                      <span className={`px-1 py-0.5 rounded text-[9px] font-medium ${categoryColor.bg} ${categoryColor.text}`}>
+                                        {category.icon} {category.label}
+                                      </span>
+                                    </div>
+                                  </button>
+                                </div>
                               );
                             })}
                             {dayEvents.length > 2 && (
@@ -488,7 +596,7 @@ export default function CalendarPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                     {filteredEvents.map((event) => (
                       <EventCard
                         key={event.id}
