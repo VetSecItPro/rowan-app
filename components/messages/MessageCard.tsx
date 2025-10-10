@@ -2,7 +2,7 @@
 
 import { Clock, Check, CheckCheck, MoreVertical } from 'lucide-react';
 import { Message } from '@/lib/services/messages-service';
-import { format } from 'date-fns';
+import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
 
 interface MessageCardProps {
@@ -65,7 +65,7 @@ export function MessageCard({
 
             {/* Timestamp and Read Status */}
             <div className="flex items-center gap-2 mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-              <span>{format(new Date(message.created_at), 'h:mm a')}</span>
+              <span>{formatTimestamp(message.created_at, 'h:mm a')}</span>
               {message.updated_at && message.updated_at !== message.created_at && (
                 <span className="italic">(edited)</span>
               )}

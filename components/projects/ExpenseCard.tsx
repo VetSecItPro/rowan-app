@@ -2,7 +2,7 @@
 
 import { DollarSign, MoreVertical, CheckCircle } from 'lucide-react';
 import { Expense } from '@/lib/services/budgets-service';
-import { format } from 'date-fns';
+import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
 
 interface ExpenseCardProps {
@@ -33,7 +33,7 @@ export function ExpenseCard({ expense, onEdit, onDelete, onStatusChange }: Expen
             <p className="text-2xl font-bold text-gray-900 dark:text-white">${expense.amount.toFixed(2)}</p>
             <div className="flex items-center gap-3 mt-2 text-xs text-gray-600 dark:text-gray-400">
               {expense.category && <span>{expense.category}</span>}
-              {expense.due_date && <span>Due {format(new Date(expense.due_date), 'MMM d')}</span>}
+              {expense.due_date && <span>Due {formatTimestamp(expense.due_date, 'MMM d')}</span>}
             </div>
           </div>
         </div>

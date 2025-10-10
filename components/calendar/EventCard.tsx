@@ -2,7 +2,7 @@
 
 import { Calendar, Clock, MapPin, MoreVertical, Edit, Trash2, Check } from 'lucide-react';
 import { CalendarEvent } from '@/lib/services/calendar-service';
-import { format } from 'date-fns';
+import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState, useEffect } from 'react';
 
 interface EventCardProps {
@@ -33,11 +33,11 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange }: EventCard
   if (isHidden) return null;
 
   const formatEventTime = () => {
-    return format(new Date(event.start_time), 'h:mm a');
+    return formatTimestamp(event.start_time, 'h:mm a');
   };
 
   const formatEventDate = () => {
-    return format(new Date(event.start_time), 'MMM d, yyyy');
+    return formatTimestamp(event.start_time, 'MMM d, yyyy');
   };
 
   const getCategoryConfig = () => {
