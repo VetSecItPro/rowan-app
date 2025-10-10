@@ -2,7 +2,7 @@
 
 import { Clock, Flag, MoreVertical, Timer, Check, Edit, Trash2 } from 'lucide-react';
 import { Reminder } from '@/lib/services/reminders-service';
-import { format } from 'date-fns';
+import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
 
 interface ReminderCardProps {
@@ -153,7 +153,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
         {reminder.reminder_time && (
           <div className={`flex items-center gap-1 ${isOverdue ? 'text-red-500' : 'text-gray-600 dark:text-gray-400'}`}>
             <Clock className="w-3 h-3" />
-            <span>{format(new Date(reminder.reminder_time), 'MMM d, h:mm a')}</span>
+            <span>{formatTimestamp(reminder.reminder_time, 'MMM d, h:mm a')}</span>
             {isOverdue && <span className="font-semibold ml-1">Overdue</span>}
           </div>
         )}
@@ -204,7 +204,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
       {/* Snoozed Until */}
       {reminder.status === 'snoozed' && reminder.snooze_until && (
         <div className="mt-2 text-xs text-purple-600 dark:text-purple-400">
-          Snoozed until {format(new Date(reminder.snooze_until), 'MMM d, h:mm a')}
+          Snoozed until {formatTimestamp(reminder.snooze_until, 'MMM d, h:mm a')}
         </div>
       )}
     </div>
