@@ -2,7 +2,7 @@
 
 import { UtensilsCrossed, Clock, MoreVertical } from 'lucide-react';
 import { Meal } from '@/lib/services/meals-service';
-import { format } from 'date-fns';
+import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
 
 interface MealCardProps {
@@ -35,7 +35,7 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
                 {meal.recipe?.name || 'Custom Meal'}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">
-                {meal.meal_type} • {format(new Date(meal.scheduled_date), 'MMM d, yyyy')}
+                {meal.meal_type} • {formatTimestamp(meal.scheduled_date, 'MMM d, yyyy')}
               </p>
             </div>
           </div>

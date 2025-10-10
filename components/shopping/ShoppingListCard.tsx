@@ -2,7 +2,7 @@
 
 import { ShoppingCart, MoreVertical, Check, Plus } from 'lucide-react';
 import { ShoppingList } from '@/lib/services/shopping-service';
-import { format } from 'date-fns';
+import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
 
 interface ShoppingListCardProps {
@@ -138,7 +138,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem }: Shopp
           {list.status}
         </span>
         <span className="text-xs text-gray-500 dark:text-gray-400">
-          {format(new Date(list.created_at), 'MMM d, yyyy')}
+          {formatTimestamp(list.created_at, 'MMM d, yyyy')}
         </span>
       </div>
     </div>

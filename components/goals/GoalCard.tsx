@@ -2,7 +2,7 @@
 
 import { Target, MoreVertical, Check } from 'lucide-react';
 import { Goal } from '@/lib/services/goals-service';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils/date-utils';
 import { useState } from 'react';
 
 interface GoalCardProps {
@@ -116,7 +116,7 @@ export function GoalCard({ goal, onEdit, onDelete, onStatusChange }: GoalCardPro
             goal.status === 'active' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' :
             'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300'
           }`}>{goal.status}</span>
-          {goal.target_date && <span className="text-xs text-gray-500">{format(new Date(goal.target_date), 'MMM d, yyyy')}</span>}
+          {goal.target_date && <span className="text-xs text-gray-500">{formatDate(goal.target_date, 'MMM d, yyyy')}</span>}
         </div>
       </div>
     </div>

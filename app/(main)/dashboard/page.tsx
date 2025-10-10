@@ -38,7 +38,9 @@ import {
   ChevronRight,
   Zap,
   Users,
-  DollarSign
+  DollarSign,
+  List,
+  ChevronLeft
 } from 'lucide-react';
 import { SpaceSelector } from '@/components/spaces/SpaceSelector';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
@@ -46,6 +48,7 @@ import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { format, isToday, isThisWeek, isPast, parseISO, startOfWeek, subWeeks } from 'date-fns';
+import { formatDate, formatTimestamp, getCurrentDateString } from '@/lib/utils/date-utils';
 
 // Enhanced stats interface with detailed metrics
 interface EnhancedDashboardStats {
@@ -302,10 +305,17 @@ export default function DashboardPage() {
   });
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [checkInNote, setCheckInNote] = useState('');
+  const [checkInHighlights, setCheckInHighlights] = useState('');
+  const [checkInChallenges, setCheckInChallenges] = useState('');
+  const [checkInGratitude, setCheckInGratitude] = useState('');
   const [recentCheckIns, setRecentCheckIns] = useState<DailyCheckIn[]>([]);
   const [checkInStats, setCheckInStats] = useState<CheckInStats | null>(null);
   const [todayCheckIn, setTodayCheckIn] = useState<DailyCheckIn | null>(null);
   const [checkInSaving, setCheckInSaving] = useState(false);
+  const [checkInExpanded, setCheckInExpanded] = useState(false);
+  const [viewMode, setViewMode] = useState<'checkin' | 'journal'>('checkin');
+  const [journalView, setJournalView] = useState<'list' | 'calendar'>('list');
+  const [calendarMonth, setCalendarMonth] = useState(new Date());
 
   // Auth protection - redirect to login if not authenticated
   useEffect(() => {
@@ -369,7 +379,7 @@ export default function DashboardPage() {
       ]);
 
       const now = new Date();
-      const today = format(now, 'yyyy-MM-dd');
+      const today = getCurrentDateString();
       const weekAgo = subWeeks(now, 1);
 
       // Calculate detailed task stats
@@ -758,6 +768,10 @@ export default function DashboardPage() {
         if (today) {
           setSelectedMood(today.mood);
           setCheckInNote(today.note || '');
+          setCheckInHighlights(today.highlights || '');
+          setCheckInChallenges(today.challenges || '');
+          setCheckInGratitude(today.gratitude || '');
+          setCheckInExpanded(true);
         }
       } catch (error) {
         console.error('Failed to load check-ins:', error);
@@ -785,6 +799,13 @@ export default function DashboardPage() {
     { emoji: '😫', label: 'Rough', value: 'rough' },
   ], []);
 
+  // Handle mood selection with smart expansion
+  const handleMoodSelect = useCallback((mood: string) => {
+    setSelectedMood(mood);
+    // Expand UI to show conditional prompts
+    setCheckInExpanded(true);
+  }, []);
+
   // Stable callback with useCallback
   const handleCheckIn = useCallback(async () => {
     if (!selectedMood || !user || !currentSpace) return;
@@ -795,11 +816,18 @@ export default function DashboardPage() {
         space_id: currentSpace.id,
         mood: selectedMood,
         note: checkInNote || undefined,
+        highlights: checkInHighlights || undefined,
+        challenges: checkInChallenges || undefined,
+        gratitude: checkInGratitude || undefined,
       });
 
       setTodayCheckIn(checkIn);
       setSelectedMood(null);
       setCheckInNote('');
+      setCheckInHighlights('');
+      setCheckInChallenges('');
+      setCheckInGratitude('');
+      setCheckInExpanded(false);
 
       // Reload stats
       const stats = await checkInsService.getCheckInStats(currentSpace.id, user.id);
@@ -813,7 +841,7 @@ export default function DashboardPage() {
     } finally {
       setCheckInSaving(false);
     }
-  }, [selectedMood, checkInNote, user, currentSpace]);
+  }, [selectedMood, checkInNote, checkInHighlights, checkInChallenges, checkInGratitude, user, currentSpace]);
 
   // Greeting function - Memoized
   const greetingText = useMemo(() => {
@@ -824,7 +852,7 @@ export default function DashboardPage() {
   }, []);
 
   // Memoize current date string
-  const currentDate = useMemo(() => format(new Date(), 'EEEE, MMMM d, yyyy'), []);
+  const currentDate = useMemo(() => formatDate(getCurrentDateString(), 'EEEE, MMMM d, yyyy'), []);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard' }]}>
@@ -988,7 +1016,7 @@ export default function DashboardPage() {
                         {stats.events.nextEvent.title}
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {format(parseISO(stats.events.nextEvent.start_time), 'MMM d, h:mm a')}
+                        {formatTimestamp(stats.events.nextEvent.start_time, 'MMM d, h:mm a')}
                       </p>
                     </div>
                   )}
@@ -1044,7 +1072,7 @@ export default function DashboardPage() {
                         {stats.reminders.nextDue.title}
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {format(parseISO(stats.reminders.nextDue.reminder_time), 'MMM d, h:mm a')}
+                        {formatTimestamp(stats.reminders.nextDue.reminder_time, 'MMM d, h:mm a')}
                       </p>
                     </div>
                   )}
@@ -1097,7 +1125,7 @@ export default function DashboardPage() {
                         "{stats.messages.lastMessage.content}"
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                        {format(parseISO(stats.messages.lastMessage.created_at), 'h:mm a')}
+                        {formatTimestamp(stats.messages.lastMessage.created_at, 'h:mm a')}
                       </p>
                     </div>
                   )}
@@ -1194,7 +1222,7 @@ export default function DashboardPage() {
                         {stats.meals.nextMeal.title}
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {format(parseISO(stats.meals.nextMeal.scheduled_date), 'MMM d, h:mm a')}
+                        {formatTimestamp(stats.meals.nextMeal.scheduled_date, 'MMM d, h:mm a')}
                       </p>
                     </div>
                   )}
@@ -1325,178 +1353,424 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Daily Check-In Section */}
-          <div className="bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-blue-50/50 dark:from-pink-900/10 dark:via-purple-900/10 dark:to-blue-900/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-lg border border-pink-200/20 dark:border-pink-500/20">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <Heart className="w-6 h-6 text-pink-500 fill-pink-500 animate-pulse" />
-                  <Sparkles className="w-3 h-3 text-yellow-400 absolute -top-1 -right-1" />
+          {/* Daily Check-In Section - Compact Design */}
+          <div className="bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-blue-50/50 dark:from-pink-900/10 dark:via-purple-900/10 dark:to-blue-900/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-pink-200/20 dark:border-pink-500/20 transition-all duration-300">
+            {/* Compact Header with Date, Toggle, and Streak Badge */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <Heart className="w-5 h-5 text-pink-500 fill-pink-500" />
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Daily Check-In</h2>
                 </div>
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Daily Check-In</h2>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Take a moment for yourself</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 ml-7">{formatDate(getCurrentDateString(), 'EEEE, MMMM d, yyyy')}</p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* Mode Toggle - Matches Tasks Page Pattern */}
+                <div className="flex items-center gap-1 sm:gap-2 p-1 sm:p-1.5 bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 rounded-lg sm:rounded-xl border border-pink-200 dark:border-pink-700">
+                  <button
+                    onClick={() => setViewMode('checkin')}
+                    className={`px-2 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 sm:gap-2 transition-all font-medium ${
+                      viewMode === 'checkin'
+                        ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                    }`}
+                  >
+                    <Heart className="w-4 h-4" />
+                    <span className="text-xs sm:text-sm">Check In</span>
+                  </button>
+                  <button
+                    onClick={() => setViewMode('journal')}
+                    className={`px-2 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 sm:gap-2 transition-all font-medium ${
+                      viewMode === 'journal'
+                        ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                    }`}
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span className="text-xs sm:text-sm">Journal</span>
+                  </button>
                 </div>
+
+                {/* Streak Badge */}
+                {checkInStats && checkInStats.currentStreak > 0 && (
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-100 to-yellow-100 dark:from-orange-900/30 dark:to-yellow-900/30 rounded-full">
+                    <Zap className="w-3.5 h-3.5 text-orange-500" />
+                    <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{checkInStats.currentStreak}</span>
+                    <span className="text-xs text-gray-600 dark:text-gray-400 hidden sm:inline">day streak</span>
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Your Check-In */}
-              <div className="space-y-4">
-                <div className="text-center sm:text-left">
-                  <p className="text-base font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                    How are you feeling today?
-                    <Sparkles className="w-4 h-4 text-yellow-400" />
-                  </p>
-                  <p className="text-sm text-pink-600 dark:text-pink-400 italic">
-                    "Every feeling is valid. You're doing great!"
-                  </p>
-                </div>
+            {/* Check-In Mode */}
+            {viewMode === 'checkin' && (
+              <>
+                {/* Partner Moods - Side by Side */}
+                {recentCheckIns.length > 0 && (
+                  <div className="flex items-center gap-3 mb-4 px-2">
+                    {(() => {
+                      const today = getCurrentDateString();
+                      const userToday = recentCheckIns.find(c => c.user_id === user?.id && c.date === today);
+                      const partnerToday = recentCheckIns.find(c => c.user_id !== user?.id && c.date === today);
+                      const userEmoji = userToday ? moodOptions.find(m => m.value === userToday.mood)?.emoji : null;
+                      const partnerEmoji = partnerToday ? moodOptions.find(m => m.value === partnerToday.mood)?.emoji : null;
 
-                <div className="flex gap-2 sm:gap-3">
-                  {moodOptions.map((mood) => (
-                    <button
-                      key={mood.value}
-                      onClick={() => setSelectedMood(mood.value)}
-                      className={`flex-1 p-4 rounded-2xl border-2 transition-all transform hover:scale-110 ${
-                        selectedMood === mood.value
-                          ? 'border-pink-500 bg-pink-100 dark:bg-pink-900/30 scale-110 shadow-lg shadow-pink-500/20'
-                          : 'border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-600 bg-white/50 dark:bg-gray-800/50'
-                      }`}
-                      title={mood.label}
-                    >
-                      <div className="text-3xl sm:text-4xl">{mood.emoji}</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400 mt-1 font-medium">{mood.label}</div>
-                    </button>
-                  ))}
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                    What's on your mind? (Optional)
-                  </label>
-                  <textarea
-                    placeholder="Share your thoughts, gratitude, or what made you smile today..."
-                    value={checkInNote}
-                    onChange={(e) => setCheckInNote(e.target.value)}
-                    maxLength={200}
-                    className="w-full px-4 py-3 bg-white dark:bg-gray-900 border-2 border-pink-200 dark:border-pink-800 rounded-2xl resize-none focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 dark:text-white text-sm transition-all"
-                    rows={3}
-                  />
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">{checkInNote.length}/200</span>
-                    <button
-                      onClick={handleCheckIn}
-                      disabled={!selectedMood || checkInSaving}
-                      className={`px-6 py-2 rounded-full text-white text-sm font-semibold transition-all transform flex items-center gap-2 ${
-                        selectedMood && !checkInSaving
-                          ? 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 hover:scale-105 shadow-lg hover:shadow-pink-500/50'
-                          : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed opacity-50'
-                      }`}
-                    >
-                      {checkInSaving ? (
+                      return (
                         <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          <span>Saving...</span>
+                          {userEmoji && (
+                            <div className="flex items-center gap-2 px-3 py-2 bg-white/60 dark:bg-gray-800/60 rounded-full border border-pink-200/50 dark:border-pink-700/50">
+                              <span className="text-xl">{userEmoji}</span>
+                              <span className="text-xs font-medium text-gray-700 dark:text-gray-300">You</span>
+                            </div>
+                          )}
+                          {partnerEmoji && (
+                            <div className="flex items-center gap-2 px-3 py-2 bg-white/60 dark:bg-gray-800/60 rounded-full border border-purple-200/50 dark:border-purple-700/50">
+                              <span className="text-xl">{partnerEmoji}</span>
+                              <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Partner</span>
+                            </div>
+                          )}
                         </>
-                      ) : (
-                        <>
-                          <Heart className="w-4 h-4" />
-                          <span>Check In</span>
-                        </>
-                      )}
-                    </button>
+                      );
+                    })()}
                   </div>
-                </div>
-              </div>
+                )}
 
-              {/* Check-In Stats & History */}
-              <div className="space-y-4">
-                {/* Streak & Stats */}
-                {checkInStats && (
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-4 bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 rounded-2xl border border-orange-200/30 dark:border-orange-500/20">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Zap className="w-4 h-4 text-orange-500" />
-                        <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Current Streak</p>
-                      </div>
-                      <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">
-                        {checkInStats.currentStreak}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">days in a row</p>
+                {/* Compact Mood Selector - Horizontal Row */}
+                <div className="flex items-center gap-2 mb-3">
+              {moodOptions.map((mood) => (
+                <button
+                  key={mood.value}
+                  onClick={() => handleMoodSelect(mood.value)}
+                  className={`flex-1 p-2 sm:p-3 rounded-xl border-2 transition-all transform hover:scale-105 ${
+                    selectedMood === mood.value
+                      ? 'border-pink-500 bg-pink-100 dark:bg-pink-900/30 scale-105 shadow-md'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-600 bg-white/50 dark:bg-gray-800/50'
+                  }`}
+                  title={mood.label}
+                >
+                  <div className="text-2xl sm:text-3xl">{mood.emoji}</div>
+                </button>
+              ))}
+            </div>
+
+            {/* Smart Conditional Expansion */}
+            {checkInExpanded && selectedMood && (
+              <div className="space-y-3 mt-4 animate-fadeIn">
+                {/* Positive moods: Great/Good → Gratitude/Highlights prompt */}
+                {(selectedMood === 'great' || selectedMood === 'good') && (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
+                        What went well today? (Optional)
+                      </label>
+                      <textarea
+                        placeholder="Share a win, big or small..."
+                        value={checkInHighlights}
+                        onChange={(e) => setCheckInHighlights(e.target.value)}
+                        maxLength={150}
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-green-200 dark:border-green-800 rounded-xl resize-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-gray-900 dark:text-white text-sm transition-all"
+                        rows={2}
+                      />
                     </div>
-
-                    <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl border border-purple-200/30 dark:border-purple-500/20">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Heart className="w-4 h-4 text-purple-500" />
-                        <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Total Check-Ins</p>
-                      </div>
-                      <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-                        {checkInStats.totalCheckIns}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">all time</p>
+                    <div>
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block flex items-center gap-1.5">
+                        <Heart className="w-3.5 h-3.5 text-pink-500" />
+                        What are you grateful for? (Optional)
+                      </label>
+                      <textarea
+                        placeholder="One thing you appreciate today..."
+                        value={checkInGratitude}
+                        onChange={(e) => setCheckInGratitude(e.target.value)}
+                        maxLength={150}
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-pink-200 dark:border-pink-800 rounded-xl resize-none focus:ring-2 focus:ring-pink-400 focus:border-transparent text-gray-900 dark:text-white text-sm transition-all"
+                        rows={2}
+                      />
                     </div>
                   </div>
                 )}
 
-                {/* Recent Check-Ins */}
-                <div>
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-pink-500" />
-                    Recent Check-Ins
-                  </p>
+                {/* Negative moods: Meh/Rough → Support/Challenges prompt */}
+                {(selectedMood === 'meh' || selectedMood === 'rough') && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block flex items-center gap-1.5">
+                      <Heart className="w-3.5 h-3.5 text-blue-500" />
+                      What's been challenging? (Optional)
+                    </label>
+                    <p className="text-xs text-blue-600 dark:text-blue-400 mb-2 italic">
+                      It's okay to not be okay. You're not alone.
+                    </p>
+                    <textarea
+                      placeholder="Share what's on your mind..."
+                      value={checkInChallenges}
+                      onChange={(e) => setCheckInChallenges(e.target.value)}
+                      maxLength={150}
+                      className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-xl resize-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-gray-900 dark:text-white text-sm transition-all"
+                      rows={2}
+                    />
+                  </div>
+                )}
 
-                  {recentCheckIns.length === 0 ? (
-                    <div className="p-6 bg-white/50 dark:bg-gray-800/50 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 text-center">
-                      <Heart className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        No check-ins yet. Be the first to share how you're feeling!
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2 max-h-64 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-pink-300 dark:scrollbar-thumb-pink-700 scrollbar-track-transparent">
-                      {recentCheckIns.map((checkIn, index) => {
-                        const moodEmoji = moodOptions.find(m => m.value === checkIn.mood)?.emoji || '😊';
-                        const isToday = checkIn.date === format(new Date(), 'yyyy-MM-dd');
-                        const isCurrentUser = checkIn.user_id === user?.id;
+                {/* Neutral mood: Okay → Optional note */}
+                {selectedMood === 'okay' && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
+                      Anything on your mind? (Optional)
+                    </label>
+                    <textarea
+                      placeholder="Share your thoughts..."
+                      value={checkInNote}
+                      onChange={(e) => setCheckInNote(e.target.value)}
+                      maxLength={150}
+                      className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl resize-none focus:ring-2 focus:ring-gray-400 focus:border-transparent text-gray-900 dark:text-white text-sm transition-all"
+                      rows={2}
+                    />
+                  </div>
+                )}
 
-                        return (
-                          <div
-                            key={checkIn.id}
-                            style={{ animationDelay: `${index * 50}ms` }}
-                            className="p-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-pink-300 dark:hover:border-pink-600 transition-all duration-300 transform hover:scale-[1.02] animate-fadeIn opacity-0"
-                          >
-                            <div className="flex items-start gap-3">
-                              <div className="text-2xl transform transition-transform hover:scale-125">{moodEmoji}</div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                                    {isCurrentUser ? 'You' : 'Your Partner'}
-                                  </p>
-                                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                                    {isToday ? 'Today' : format(new Date(checkIn.date), 'MMM d')}
-                                  </span>
-                                  {isToday && (
-                                    <span className="px-2 py-0.5 bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 text-pink-600 dark:text-pink-400 text-xs rounded-full font-medium animate-pulse">
-                                      New
-                                    </span>
-                                  )}
-                                </div>
-                                {checkIn.note && (
-                                  <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 italic">
-                                    "{checkIn.note}"
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                {/* Submit Button */}
+                <div className="flex justify-end">
+                  <button
+                    onClick={handleCheckIn}
+                    disabled={checkInSaving}
+                    className={`px-5 py-2 rounded-full text-white text-sm font-semibold transition-all transform flex items-center gap-2 ${
+                      !checkInSaving
+                        ? 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 hover:scale-105 shadow-md'
+                        : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed opacity-50'
+                    }`}
+                  >
+                    {checkInSaving ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Heart className="w-4 h-4" />
+                        <span>Check In</span>
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
-            </div>
+            )}
+              </>
+            )}
+
+            {/* Journal Mode */}
+            {viewMode === 'journal' && (
+              <div className="space-y-4">
+                {/* Journal View Toggle - Calendar on Left, List on Right */}
+                <div className="inline-flex items-center gap-1 p-1 bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 rounded-lg border border-pink-200 dark:border-pink-700">
+                  <button
+                    onClick={() => setJournalView('calendar')}
+                    className={`px-2 sm:px-3 py-1.5 rounded-md flex items-center justify-center gap-1 transition-all font-medium ${
+                      journalView === 'calendar'
+                        ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                    }`}
+                  >
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span className="text-xs">Calendar</span>
+                  </button>
+                  <button
+                    onClick={() => setJournalView('list')}
+                    className={`px-2 sm:px-3 py-1.5 rounded-md flex items-center justify-center gap-1 transition-all font-medium ${
+                      journalView === 'list'
+                        ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                    }`}
+                  >
+                    <List className="w-3.5 h-3.5" />
+                    <span className="text-xs">List</span>
+                  </button>
+                </div>
+
+                {/* Calendar View */}
+                {journalView === 'calendar' && (
+                  <div className="space-y-3">
+                    {/* Month Navigation */}
+                    <div className="flex items-center justify-between px-2">
+                      <button
+                        onClick={() => setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
+                        className="p-2 hover:bg-pink-100 dark:hover:bg-pink-900/30 rounded-lg transition-colors"
+                      >
+                        <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                      </button>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {format(calendarMonth, 'MMMM yyyy')}
+                      </h3>
+                      <button
+                        onClick={() => setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
+                        className="p-2 hover:bg-pink-100 dark:hover:bg-pink-900/30 rounded-lg transition-colors"
+                      >
+                        <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                      </button>
+                    </div>
+
+                    {/* Calendar Grid */}
+                    <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
+                      {/* Day Headers */}
+                      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
+                        <div key={day} className="text-center text-xs font-semibold text-gray-500 dark:text-gray-400 py-1 sm:py-2">
+                          <span className="hidden sm:inline">{day}</span>
+                          <span className="sm:hidden">{day.charAt(0)}</span>
+                        </div>
+                      ))}
+
+                      {/* Calendar Days */}
+                      {(() => {
+                        const year = calendarMonth.getFullYear();
+                        const month = calendarMonth.getMonth();
+                        const firstDay = new Date(year, month, 1).getDay();
+                        const daysInMonth = new Date(year, month + 1, 0).getDate();
+                        const days = [];
+
+                        // Empty cells for days before month starts
+                        for (let i = 0; i < firstDay; i++) {
+                          days.push(<div key={`empty-${i}`} className="aspect-square" />);
+                        }
+
+                        // Days of the month
+                        for (let day = 1; day <= daysInMonth; day++) {
+                          const dateStr = new Date(year, month, day).toISOString().split('T')[0];
+                          const dayCheckIns = recentCheckIns.filter(c => c.date === dateStr);
+                          const isToday = getCurrentDateString() === dateStr;
+
+                          days.push(
+                            <div
+                              key={day}
+                              className={`aspect-square p-0.5 sm:p-1 rounded border sm:rounded-lg transition-all ${
+                                isToday
+                                  ? 'border-pink-500 bg-pink-50 dark:bg-pink-900/20'
+                                  : 'border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-600'
+                              }`}
+                            >
+                              <div className="text-[10px] sm:text-xs text-gray-700 dark:text-gray-300 font-medium mb-0.5">
+                                {day}
+                              </div>
+                              <div className="flex flex-col gap-0.5">
+                                {dayCheckIns.map((checkIn, idx) => {
+                                  const moodEmoji = moodOptions.find(m => m.value === checkIn.mood)?.emoji;
+                                  const isUser = checkIn.user_id === user?.id;
+                                  return (
+                                    <div
+                                      key={idx}
+                                      className={`flex items-center gap-0.5 sm:gap-1 px-1 py-0.5 rounded text-[9px] sm:text-[10px] ${
+                                        isUser
+                                          ? 'bg-pink-100 dark:bg-pink-900/40 border border-pink-200 dark:border-pink-700/50'
+                                          : 'bg-purple-100 dark:bg-purple-900/40 border border-purple-200 dark:border-purple-700/50'
+                                      }`}
+                                      title={isUser ? 'You' : 'Partner'}
+                                    >
+                                      <span className="text-[10px] sm:text-xs leading-none">{moodEmoji}</span>
+                                      <span className="text-[8px] sm:text-[9px] text-gray-700 dark:text-gray-300 truncate">
+                                        {isUser ? 'You' : 'Partner'}
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        return days;
+                      })()}
+                    </div>
+                  </div>
+                )}
+
+                {/* List View - Grouped by Day */}
+                {journalView === 'list' && (
+                  <div className="max-h-96 overflow-y-auto space-y-4 pr-2">
+                    {recentCheckIns.length === 0 ? (
+                      <div className="text-center py-12">
+                        <Heart className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                        <p className="text-sm text-gray-500 dark:text-gray-400">No check-ins yet</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Start checking in to build your journal</p>
+                      </div>
+                    ) : (
+                      (() => {
+                        // Group check-ins by date
+                        const groupedByDate = recentCheckIns.reduce((acc, checkIn) => {
+                          const date = checkIn.date;
+                          if (!acc[date]) acc[date] = [];
+                          acc[date].push(checkIn);
+                          return acc;
+                        }, {} as Record<string, DailyCheckIn[]>);
+
+                        // Sort dates in descending order (most recent first)
+                        const sortedDates = Object.keys(groupedByDate).sort((a, b) => b.localeCompare(a));
+
+                        return sortedDates.map(date => (
+                          <div key={date} className="space-y-2">
+                            {/* Date Header */}
+                            <div className="sticky top-0 bg-gradient-to-r from-pink-100/80 to-purple-100/80 dark:from-pink-900/20 dark:to-purple-900/20 backdrop-blur-sm px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-pink-200/50 dark:border-pink-700/50">
+                              <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
+                                {formatDate(date, 'EEEE, MMMM d, yyyy')}
+                              </p>
+                            </div>
+
+                            {/* Check-ins for this date */}
+                            {groupedByDate[date].map((checkIn) => {
+                              const moodEmoji = moodOptions.find(m => m.value === checkIn.mood)?.emoji;
+                              const isUser = checkIn.user_id === user?.id;
+                              return (
+                                <div key={checkIn.id} className="bg-white/60 dark:bg-gray-800/60 rounded-lg p-4 border border-gray-200 dark:border-gray-700 ml-2">
+                                  <div className="flex items-start justify-between mb-2">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-2xl">{moodEmoji}</span>
+                                      <p className="text-xs font-semibold text-gray-900 dark:text-white">
+                                        {isUser ? 'You' : 'Partner'}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  {checkIn.highlights && (
+                                    <div className="mt-3">
+                                      <div className="flex items-center gap-1.5 mb-1">
+                                        <Sparkles className="w-3 h-3 text-yellow-500" />
+                                        <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">Highlights</p>
+                                      </div>
+                                      <p className="text-sm text-gray-600 dark:text-gray-400 ml-5">{checkIn.highlights}</p>
+                                    </div>
+                                  )}
+                                  {checkIn.challenges && (
+                                    <div className="mt-3">
+                                      <div className="flex items-center gap-1.5 mb-1">
+                                        <Heart className="w-3 h-3 text-blue-500" />
+                                        <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">Challenges</p>
+                                      </div>
+                                      <p className="text-sm text-gray-600 dark:text-gray-400 ml-5">{checkIn.challenges}</p>
+                                    </div>
+                                  )}
+                                  {checkIn.gratitude && (
+                                    <div className="mt-3">
+                                      <div className="flex items-center gap-1.5 mb-1">
+                                        <Heart className="w-3 h-3 text-pink-500" />
+                                        <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">Grateful For</p>
+                                      </div>
+                                      <p className="text-sm text-gray-600 dark:text-gray-400 ml-5">{checkIn.gratitude}</p>
+                                    </div>
+                                  )}
+                                  {checkIn.note && (
+                                    <div className="mt-3">
+                                      <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Note</p>
+                                      <p className="text-sm text-gray-600 dark:text-gray-400">{checkIn.note}</p>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ));
+                      })()
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

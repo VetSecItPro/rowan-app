@@ -2,7 +2,7 @@
 
 import { Home, Check, MoreVertical } from 'lucide-react';
 import { Chore } from '@/lib/services/chores-service';
-import { format } from 'date-fns';
+import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
 
 interface ChoreCardProps {
@@ -55,7 +55,7 @@ export function ChoreCard({ chore, onStatusChange, onEdit, onDelete, onUpdatePro
 
             <div className="flex items-center gap-3 mt-2 text-xs text-gray-600 dark:text-gray-400">
               <span className="capitalize">{chore.frequency}</span>
-              {chore.due_date && <span>{format(new Date(chore.due_date), 'MMM d')}</span>}
+              {chore.due_date && <span>{formatTimestamp(chore.due_date, 'MMM d')}</span>}
             </div>
           </div>
         </div>

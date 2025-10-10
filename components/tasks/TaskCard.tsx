@@ -2,7 +2,7 @@
 
 import { CheckSquare, Clock, Flag, User, Calendar as CalendarIcon, MoreVertical } from 'lucide-react';
 import { Task } from '@/lib/types';
-import { format } from 'date-fns';
+import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
 import { TASK_CATEGORIES } from './NewTaskModal';
 
@@ -185,7 +185,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete }: TaskCardPro
         {task.due_date && (
           <div className={`flex items-center gap-1 ${isOverdue ? 'text-red-500' : 'text-gray-600 dark:text-gray-400'}`}>
             <CalendarIcon className="w-3 h-3" />
-            <span>{format(new Date(task.due_date), 'MMM d, yyyy')}</span>
+            <span>{formatTimestamp(task.due_date, 'MMM d, yyyy')}</span>
             {isOverdue && <span className="font-semibold">Overdue</span>}
           </div>
         )}

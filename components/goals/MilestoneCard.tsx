@@ -2,7 +2,7 @@
 
 import { Milestone } from '@/lib/services/goals-service';
 import { MoreVertical, Check, DollarSign, Percent, Hash, Calendar, CheckCircle2 } from 'lucide-react';
-import { format } from 'date-fns';
+import { formatDate, formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
 
 interface MilestoneCardProps {
@@ -204,7 +204,7 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-600 dark:text-gray-400">Target Date</span>
           <span className="font-semibold text-gray-900 dark:text-white">
-            {format(new Date(milestone.target_date), 'MMM d, yyyy')}
+            {formatDate(milestone.target_date, 'MMM d, yyyy')}
           </span>
         </div>
       )}
@@ -214,7 +214,7 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
         <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
             <CheckCircle2 className="w-4 h-4" />
-            <span>Completed on {format(new Date(milestone.completed_at), 'MMM d, yyyy')}</span>
+            <span>Completed on {formatTimestamp(milestone.completed_at, 'MMM d, yyyy')}</span>
           </div>
         </div>
       )}

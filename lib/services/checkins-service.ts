@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
+import { getCurrentDateString } from '@/lib/utils/date-utils';
 
 export interface DailyCheckIn {
   id: string;
@@ -62,7 +63,7 @@ export const checkInsService = {
    */
   async getTodayCheckIn(spaceId: string, userId: string): Promise<DailyCheckIn | null> {
     const supabase = createClient();
-    const today = format(new Date(), 'yyyy-MM-dd');
+    const today = getCurrentDateString();
 
     const { data, error } = await supabase
       .from('daily_checkins')
@@ -120,7 +121,7 @@ export const checkInsService = {
    */
   async createCheckIn(userId: string, input: CreateCheckInInput): Promise<DailyCheckIn> {
     const supabase = createClient();
-    const date = input.date || format(new Date(), 'yyyy-MM-dd');
+    const date = input.date || getCurrentDateString();
 
     // Use upsert to create or update
     const { data, error } = await supabase
