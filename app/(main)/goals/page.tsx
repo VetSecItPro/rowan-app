@@ -10,7 +10,7 @@ import { NewMilestoneModal } from '@/components/goals/NewMilestoneModal';
 import GuidedGoalCreation from '@/components/guided/GuidedGoalCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput } from '@/lib/services/goals-service';
-import { getUserProgress } from '@/lib/services/user-progress-service';
+import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 
 type ViewMode = 'goals' | 'milestones';
 
@@ -89,8 +89,12 @@ export default function GoalsPage() {
         setHasCompletedGuide(userProgress.first_goal_set);
       }
 
-      // Show guided flow if no goals exist and user hasn't completed the guide
-      if (goalsData.length === 0 && !userProgress?.first_goal_set) {
+      // Show guided flow if no goals exist, user hasn't completed the guide, AND user hasn't skipped it
+      if (
+        goalsData.length === 0 &&
+        !userProgress?.first_goal_set &&
+        !userProgress?.skipped_goal_guide
+      ) {
         setShowGuidedFlow(true);
       }
     } catch (error) {
@@ -230,9 +234,18 @@ export default function GoalsPage() {
     loadData(); // Reload to show newly created goal
   }, [loadData]);
 
-  const handleGuidedFlowSkip = useCallback(() => {
+  const handleGuidedFlowSkip = useCallback(async () => {
     setShowGuidedFlow(false);
-  }, []);
+
+    // Mark the guide as skipped in user progress
+    if (user) {
+      try {
+        await markFlowSkipped(user.id, 'goal_guide');
+      } catch (error) {
+        console.error('Failed to mark goal guide as skipped:', error);
+      }
+    }
+  }, [user]);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
