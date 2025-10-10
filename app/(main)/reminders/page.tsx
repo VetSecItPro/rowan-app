@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown } from 'lucide-react';
+import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ReminderCard } from '@/components/reminders/ReminderCard';
 import { NewReminderModal } from '@/components/reminders/NewReminderModal';
@@ -198,13 +199,18 @@ export default function RemindersPage() {
               <div className="w-12 h-12 rounded-xl bg-gradient-reminders flex items-center justify-center">
                 <Bell className="w-6 h-6 text-white" />
               </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-reminders bg-clip-text text-transparent">
-                  Reminders
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">
-                  Never forget important moments
-                </p>
+              <div className="flex items-center gap-3">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-reminders bg-clip-text text-transparent">
+                    Reminders
+                  </h1>
+                  <p className="text-gray-600 dark:text-gray-400 mt-1">
+                    Never forget important moments
+                  </p>
+                </div>
+                <span className="px-3 py-1 bg-pink-100 dark:bg-pink-900/30 border border-pink-300 dark:border-pink-700 text-pink-700 dark:text-pink-300 text-sm font-medium rounded-full hidden sm:inline-block">
+                  {format(new Date(), 'MMM yyyy')}
+                </span>
               </div>
             </div>
 
@@ -290,19 +296,48 @@ export default function RemindersPage() {
                     />
                   </div>
 
-                  {/* Status Filter */}
-                  <div className="relative">
-                    <select
-                      value={statusFilter}
-                      onChange={handleStatusFilterChange}
-                      className="pl-4 pr-10 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none w-full"
+                  {/* Status Filter - Segmented Buttons */}
+                  <div className="bg-white dark:bg-gray-800 border-2 border-pink-200 dark:border-pink-700 rounded-lg p-1 flex gap-1 w-fit">
+                    <button
+                      onClick={() => setStatusFilter('all')}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                        statusFilter === 'all'
+                          ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
+                      }`}
                     >
-                      <option value="all">All Status</option>
-                      <option value="active">Active</option>
-                      <option value="completed">Completed</option>
-                      <option value="snoozed">Snoozed</option>
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                      All
+                    </button>
+                    <button
+                      onClick={() => setStatusFilter('active')}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                        statusFilter === 'active'
+                          ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
+                      }`}
+                    >
+                      Active
+                    </button>
+                    <button
+                      onClick={() => setStatusFilter('snoozed')}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[70px] ${
+                        statusFilter === 'snoozed'
+                          ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
+                      }`}
+                    >
+                      Snoozed
+                    </button>
+                    <button
+                      onClick={() => setStatusFilter('completed')}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
+                        statusFilter === 'completed'
+                          ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
+                      }`}
+                    >
+                      Completed
+                    </button>
                   </div>
                 </div>
               </div>
@@ -351,7 +386,7 @@ export default function RemindersPage() {
                 )}
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                 {filteredReminders.map((reminder) => (
                   <ReminderCard
                     key={reminder.id}
