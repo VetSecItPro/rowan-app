@@ -7,8 +7,10 @@ import { MealCard } from '@/components/meals/MealCard';
 import { NewMealModal } from '@/components/meals/NewMealModal';
 import { NewRecipeModal } from '@/components/meals/NewRecipeModal';
 import { RecipeCard } from '@/components/meals/RecipeCard';
+import GuidedMealCreation from '@/components/guided/GuidedMealCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { mealsService, Meal, CreateMealInput, Recipe, CreateRecipeInput } from '@/lib/services/meals-service';
+import { getUserProgress } from '@/lib/services/user-progress-service';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth } from 'date-fns';
 
 type ViewMode = 'calendar' | 'list' | 'recipes';
@@ -131,7 +133,7 @@ const CalendarDayCell = memo(({
 CalendarDayCell.displayName = 'CalendarDayCell';
 
 export default function MealsPage() {
-  const { currentSpace } = useAuth();
+  const { currentSpace, user } = useAuth();
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -143,6 +145,8 @@ export default function MealsPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
+  const [showGuidedFlow, setShowGuidedFlow] = useState(false);
+  const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
 
   // Memoized user color mapping
   const getUserColor = useCallback((userId: string) => {
@@ -214,25 +218,37 @@ export default function MealsPage() {
   // Load meals callback
   const loadMeals = useCallback(async () => {
     // Don't load data if user doesn't have a space yet
-    if (!currentSpace) {
+    if (!currentSpace || !user) {
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
-      const [mealsData, statsData] = await Promise.all([
+      const [mealsData, statsData, userProgressResult] = await Promise.all([
         mealsService.getMeals(currentSpace.id),
-        mealsService.getMealStats(currentSpace.id)
+        mealsService.getMealStats(currentSpace.id),
+        getUserProgress(user.id),
       ]);
       setMeals(mealsData);
       setStats(statsData);
+
+      // Check if user has completed the guided meal flow
+      const userProgress = userProgressResult.success ? userProgressResult.data : null;
+      if (userProgress) {
+        setHasCompletedGuide(userProgress.first_meal_planned);
+      }
+
+      // Show guided flow if no meals exist and user hasn't completed the guide
+      if (mealsData.length === 0 && !userProgress?.first_meal_planned) {
+        setShowGuidedFlow(true);
+      }
     } catch (error) {
       console.error('Failed to load meals:', error);
     } finally {
       setLoading(false);
     }
-  }, [currentSpace]);
+  }, [currentSpace, user]);
 
   // Load recipes callback
   const loadRecipes = useCallback(async () => {
@@ -362,6 +378,16 @@ export default function MealsPage() {
     setIsModalOpen(true);
   }, []);
 
+  const handleGuidedFlowComplete = useCallback(() => {
+    setShowGuidedFlow(false);
+    setHasCompletedGuide(true);
+    loadMeals(); // Reload to show newly created meal
+  }, [loadMeals]);
+
+  const handleGuidedFlowSkip = useCallback(() => {
+    setShowGuidedFlow(false);
+  }, []);
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Meal Planning' }]}>
       <div className="p-4 sm:p-8">
@@ -473,6 +499,11 @@ export default function MealsPage() {
                   <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                   <p className="mt-4 text-gray-600 dark:text-gray-400">Loading meals...</p>
                 </div>
+              ) : showGuidedFlow && filteredMeals.length === 0 && !searchQuery && viewMode === 'list' ? (
+                <GuidedMealCreation
+                  onComplete={handleGuidedFlowComplete}
+                  onSkip={handleGuidedFlowSkip}
+                />
               ) : viewMode === 'recipes' ? (
               /* Recipes View */
               filteredRecipes.length === 0 ? (
@@ -564,13 +595,24 @@ export default function MealsPage() {
                     {searchQuery ? 'Try adjusting your search' : 'Start planning your meals!'}
                   </p>
                   {!searchQuery && (
-                    <button
-                      onClick={handleOpenMealModal}
-                      className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
-                    >
-                      <Plus className="w-5 h-5" />
-                      Plan Meal
-                    </button>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                      <button
+                        onClick={handleOpenMealModal}
+                        className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                      >
+                        <Plus className="w-5 h-5" />
+                        Plan Meal
+                      </button>
+                      {!hasCompletedGuide && (
+                        <button
+                          onClick={() => setShowGuidedFlow(true)}
+                          className="px-6 py-3 bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
+                        >
+                          <UtensilsCrossed className="w-5 h-5" />
+                          Try Guided Creation
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
               ) : (

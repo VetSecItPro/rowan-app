@@ -5,8 +5,10 @@ import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as Imag
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { MessageCard } from '@/components/messages/MessageCard';
 import { NewMessageModal } from '@/components/messages/NewMessageModal';
+import GuidedMessageCreation from '@/components/guided/GuidedMessageCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { messagesService, Message, CreateMessageInput } from '@/lib/services/messages-service';
+import { getUserProgress } from '@/lib/services/user-progress-service';
 import { format, isSameDay, isToday, isYesterday } from 'date-fns';
 
 // Family-friendly universal emojis (30 total) - organized by theme
@@ -40,6 +42,8 @@ export default function MessagesPage() {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [showGuidedFlow, setShowGuidedFlow] = useState(false);
+  const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
 
   const [stats, setStats] = useState({
     thisWeek: 0,
@@ -108,12 +112,24 @@ export default function MessagesPage() {
 
       setConversationId(defaultConversation.id);
 
-      const [messagesData, statsData] = await Promise.all([
+      const [messagesData, statsData, userProgressResult] = await Promise.all([
         messagesService.getMessages(defaultConversation.id),
         messagesService.getMessageStats(currentSpace.id),
+        getUserProgress(user.id),
       ]);
       setMessages(messagesData);
       setStats(statsData);
+
+      // Check if user has completed the guided message flow
+      const userProgress = userProgressResult.success ? userProgressResult.data : null;
+      if (userProgress) {
+        setHasCompletedGuide(userProgress.first_message_sent);
+      }
+
+      // Show guided flow if no messages exist and user hasn't completed the guide
+      if (messagesData.length === 0 && !userProgress?.first_message_sent) {
+        setShowGuidedFlow(true);
+      }
     } catch (error) {
       console.error('Failed to load messages:', error);
     } finally {
@@ -254,6 +270,16 @@ export default function MessagesPage() {
     };
   }, [searchQuery]);
 
+  const handleGuidedFlowComplete = useCallback(() => {
+    setShowGuidedFlow(false);
+    setHasCompletedGuide(true);
+    loadMessages(); // Reload to show newly created message
+  }, [loadMessages]);
+
+  const handleGuidedFlowSkip = useCallback(() => {
+    setShowGuidedFlow(false);
+  }, []);
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Messages' }]}>
       <div className="p-4 sm:p-8">
@@ -345,15 +371,29 @@ export default function MessagesPage() {
                 <div className="flex items-center justify-center h-full">
                   <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                 </div>
+              ) : showGuidedFlow && filteredMessages.length === 0 && !searchQuery ? (
+                <GuidedMessageCreation
+                  onComplete={handleGuidedFlowComplete}
+                  onSkip={handleGuidedFlowSkip}
+                />
               ) : filteredMessages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
                   <MessageCircle className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">
+                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">
                     {emptyStateMessage.primary}
                   </p>
-                  <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">
+                  <p className="text-gray-400 dark:text-gray-500 text-sm mb-4">
                     {emptyStateMessage.secondary}
                   </p>
+                  {!searchQuery && !hasCompletedGuide && (
+                    <button
+                      onClick={() => setShowGuidedFlow(true)}
+                      className="px-4 py-2 bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      Try Guided Creation
+                    </button>
+                  )}
                 </div>
               ) : (
                 <>

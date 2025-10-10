@@ -7,13 +7,15 @@ import { GoalCard } from '@/components/goals/GoalCard';
 import { MilestoneCard } from '@/components/goals/MilestoneCard';
 import { NewGoalModal } from '@/components/goals/NewGoalModal';
 import { NewMilestoneModal } from '@/components/goals/NewMilestoneModal';
+import GuidedGoalCreation from '@/components/guided/GuidedGoalCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput } from '@/lib/services/goals-service';
+import { getUserProgress } from '@/lib/services/user-progress-service';
 
 type ViewMode = 'goals' | 'milestones';
 
 export default function GoalsPage() {
-  const { currentSpace } = useAuth();
+  const { currentSpace, user } = useAuth();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,6 +25,8 @@ export default function GoalsPage() {
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showGuidedFlow, setShowGuidedFlow] = useState(false);
+  const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
 
   // Memoized filtered goals with search
   const filteredGoals = useMemo(() => {
@@ -63,52 +67,38 @@ export default function GoalsPage() {
 
   const loadData = useCallback(async () => {
     // Don't load data if user doesn't have a space yet
-    if (!currentSpace) {
+    if (!currentSpace || !user) {
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
-      let [goalsData, milestonesData] = await Promise.all([
+      const [goalsData, milestonesData, userProgressResult] = await Promise.all([
         goalsService.getGoals(currentSpace.id),
-        goalsService.getAllMilestones(currentSpace.id)
+        goalsService.getAllMilestones(currentSpace.id),
+        getUserProgress(user.id),
       ]);
-
-      // Create sample goal in database if none exist
-      if (goalsData.length === 0) {
-        const newGoal = await goalsService.createGoal({
-          space_id: currentSpace.id,
-          title: 'Example Goal',
-          description: 'This is a sample goal to demonstrate the Goals & Milestones feature',
-          category: 'Personal Development',
-          status: 'active',
-          progress: 45,
-        });
-        goalsData = [newGoal];
-      }
-
-      // Create sample milestone in database if none exist and we have a goal
-      if (milestonesData.length === 0 && goalsData.length > 0) {
-        const newMilestone = await goalsService.createMilestone({
-          goal_id: goalsData[0].id,
-          title: 'Save $2,500 by March',
-          description: 'Track your progress toward this milestone',
-          type: 'money',
-          target_value: 2500,
-          current_value: 1125,
-        });
-        milestonesData = [newMilestone];
-      }
 
       setGoals(goalsData);
       setMilestones(milestonesData);
+
+      // Check if user has completed the guided goal flow
+      const userProgress = userProgressResult.success ? userProgressResult.data : null;
+      if (userProgress) {
+        setHasCompletedGuide(userProgress.first_goal_set);
+      }
+
+      // Show guided flow if no goals exist and user hasn't completed the guide
+      if (goalsData.length === 0 && !userProgress?.first_goal_set) {
+        setShowGuidedFlow(true);
+      }
     } catch (error) {
       console.error('Failed to load data:', error);
     } finally {
       setLoading(false);
     }
-  }, [currentSpace]);
+  }, [currentSpace, user]);
 
   const handleCreateGoal = useCallback(async (goalData: CreateGoalInput) => {
     try {
@@ -234,6 +224,16 @@ export default function GoalsPage() {
     }
   }, [viewMode, handleOpenGoalModal, handleOpenMilestoneModal]);
 
+  const handleGuidedFlowComplete = useCallback(() => {
+    setShowGuidedFlow(false);
+    setHasCompletedGuide(true);
+    loadData(); // Reload to show newly created goal
+  }, [loadData]);
+
+  const handleGuidedFlowSkip = useCallback(() => {
+    setShowGuidedFlow(false);
+  }, []);
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
       <div className="p-4 sm:p-8">
@@ -331,13 +331,40 @@ export default function GoalsPage() {
                 <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                 <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
               </div>
+            ) : showGuidedFlow && filteredGoals.length === 0 && !searchQuery && viewMode === 'goals' ? (
+              <GuidedGoalCreation
+                onComplete={handleGuidedFlowComplete}
+                onSkip={handleGuidedFlowSkip}
+              />
             ) : viewMode === 'goals' ? (
               /* Goals View */
               filteredGoals.length === 0 ? (
                 <div className="text-center py-12">
                   <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No goals found</p>
-                  <p className="text-gray-500 dark:text-gray-500">Try adjusting your search</p>
+                  <p className="text-gray-500 dark:text-gray-500 mb-6">
+                    {searchQuery ? 'Try adjusting your search' : 'Set your first goal to get started!'}
+                  </p>
+                  {!searchQuery && (
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                      <button
+                        onClick={handleOpenGoalModal}
+                        className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                      >
+                        <Plus className="w-5 h-5" />
+                        Create Goal
+                      </button>
+                      {!hasCompletedGuide && (
+                        <button
+                          onClick={() => setShowGuidedFlow(true)}
+                          className="px-6 py-3 bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
+                        >
+                          <Target className="w-5 h-5" />
+                          Try Guided Creation
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-4">
