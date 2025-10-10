@@ -250,7 +250,16 @@ export default function TasksPage() {
             </div>
           </div>
 
-          {/* Stats Dashboard */}
+          {/* Guided Creation - MOVED TO TOP */}
+          {!loading && showGuidedFlow && (
+            <GuidedTaskCreation
+              onComplete={handleGuidedFlowComplete}
+              onSkip={handleGuidedFlowSkip}
+            />
+          )}
+
+          {/* Stats Dashboard - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {/* Total Tasks & Chores */}
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
@@ -296,8 +305,10 @@ export default function TasksPage() {
               <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.pending}</p>
             </div>
           </div>
+          )}
 
-          {/* Search & Filter Bar */}
+          {/* Search & Filter Bar - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
               {/* Search */}
@@ -329,8 +340,10 @@ export default function TasksPage() {
               </div>
             </div>
           </div>
+          )}
 
-          {/* Tasks List */}
+          {/* Tasks List - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
               All Tasks & Chores ({filteredItems.length})
@@ -341,11 +354,6 @@ export default function TasksPage() {
                 <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                 <p className="mt-4 text-gray-600 dark:text-gray-400">Loading tasks...</p>
               </div>
-            ) : showGuidedFlow && filteredItems.length === 0 && !searchQuery && statusFilter === 'all' ? (
-              <GuidedTaskCreation
-                onComplete={handleGuidedFlowComplete}
-                onSkip={handleGuidedFlowSkip}
-              />
             ) : filteredItems.length === 0 ? (
               <div className="text-center py-12">
                 <CheckSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -390,6 +398,7 @@ export default function TasksPage() {
               </div>
             )}
           </div>
+          )}
         </div>
       </div>
 

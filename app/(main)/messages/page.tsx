@@ -299,7 +299,16 @@ export default function MessagesPage() {
             </div>
           </div>
 
-          {/* Stats Dashboard */}
+          {/* Guided Creation - MOVED TO TOP */}
+          {!loading && showGuidedFlow && (
+            <GuidedMessageCreation
+              onComplete={handleGuidedFlowComplete}
+              onSkip={handleGuidedFlowSkip}
+            />
+          )}
+
+          {/* Stats Dashboard - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
               <div className="flex items-center justify-between mb-2 sm:mb-4">
@@ -341,8 +350,10 @@ export default function MessagesPage() {
               <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
             </div>
           </div>
+          )}
 
-          {/* Search Bar */}
+          {/* Search Bar - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 sm:p-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
@@ -355,8 +366,10 @@ export default function MessagesPage() {
               />
             </div>
           </div>
+          )}
 
-          {/* Chat Interface */}
+          {/* Chat Interface - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden flex flex-col h-[400px] sm:h-[500px] md:h-[600px]">
             {/* Chat Header */}
             <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
@@ -371,11 +384,6 @@ export default function MessagesPage() {
                 <div className="flex items-center justify-center h-full">
                   <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                 </div>
-              ) : showGuidedFlow && filteredMessages.length === 0 && !searchQuery ? (
-                <GuidedMessageCreation
-                  onComplete={handleGuidedFlowComplete}
-                  onSkip={handleGuidedFlowSkip}
-                />
               ) : filteredMessages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
                   <MessageCircle className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
@@ -558,6 +566,7 @@ export default function MessagesPage() {
               />
             </div>
           </div>
+          )}
         </div>
       </div>
 
