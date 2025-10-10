@@ -6,16 +6,18 @@ import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { TaskCard } from '@/components/tasks/TaskCard';
 import { NewTaskModal } from '@/components/tasks/NewTaskModal';
 import { NewChoreModal } from '@/components/projects/NewChoreModal';
+import GuidedTaskCreation from '@/components/guided/GuidedTaskCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { tasksService } from '@/lib/services/tasks-service';
 import { choresService, Chore, CreateChoreInput } from '@/lib/services/chores-service';
 import { Task, CreateTaskInput } from '@/lib/types';
+import { getUserProgress } from '@/lib/services/user-progress-service';
 
 type TaskType = 'task' | 'chore';
 type TaskOrChore = (Task & { type: 'task' }) | (Chore & { type: 'chore' });
 
 export default function TasksPage() {
-  const { currentSpace } = useAuth();
+  const { currentSpace, user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [chores, setChores] = useState<Chore[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,6 +27,8 @@ export default function TasksPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [activeTab, setActiveTab] = useState<TaskType>('task');
+  const [showGuidedFlow, setShowGuidedFlow] = useState(false);
+  const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
 
   // Combine tasks and chores for unified display
   const allItems = useMemo((): TaskOrChore[] => {
@@ -65,7 +69,7 @@ export default function TasksPage() {
   // Memoized loadData function to fetch both tasks and chores
   const loadData = useCallback(async () => {
     // Don't load data if user doesn't have a space yet
-    if (!currentSpace) {
+    if (!currentSpace || !user) {
       setLoading(false);
       return;
     }
@@ -73,18 +77,29 @@ export default function TasksPage() {
     try {
       setLoading(true);
       // Fetch both tasks and chores in parallel
-      const [tasksData, choresData] = await Promise.all([
+      const [tasksData, choresData, userProgress] = await Promise.all([
         tasksService.getTasks(currentSpace.id),
         choresService.getChores(currentSpace.id),
+        getUserProgress(user.id),
       ]);
       setTasks(tasksData);
       setChores(choresData);
+
+      // Check if user has completed the guided task flow
+      if (userProgress) {
+        setHasCompletedGuide(userProgress.first_task_created);
+      }
+
+      // Show guided flow if no tasks exist and user hasn't completed the guide
+      if (tasksData.length === 0 && choresData.length === 0 && !userProgress?.first_task_created) {
+        setShowGuidedFlow(true);
+      }
     } catch (error) {
       console.error('Failed to load data:', error);
     } finally {
       setLoading(false);
     }
-  }, [currentSpace]);
+  }, [currentSpace, user]);
 
   // Load tasks when currentSpace.id changes
   useEffect(() => {
@@ -168,6 +183,16 @@ export default function TasksPage() {
 
   const handleOpenModal = useCallback(() => {
     setIsModalOpen(true);
+  }, []);
+
+  const handleGuidedFlowComplete = useCallback(() => {
+    setShowGuidedFlow(false);
+    setHasCompletedGuide(true);
+    loadData(); // Reload to show the newly created task
+  }, [loadData]);
+
+  const handleGuidedFlowSkip = useCallback(() => {
+    setShowGuidedFlow(false);
   }, []);
 
   return (
@@ -316,6 +341,11 @@ export default function TasksPage() {
                 <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                 <p className="mt-4 text-gray-600 dark:text-gray-400">Loading tasks...</p>
               </div>
+            ) : showGuidedFlow && filteredItems.length === 0 && !searchQuery && statusFilter === 'all' ? (
+              <GuidedTaskCreation
+                onComplete={handleGuidedFlowComplete}
+                onSkip={handleGuidedFlowSkip}
+              />
             ) : filteredItems.length === 0 ? (
               <div className="text-center py-12">
                 <CheckSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -326,13 +356,24 @@ export default function TasksPage() {
                     : 'Create your first task or chore to get started!'}
                 </p>
                 {!searchQuery && statusFilter === 'all' && (
-                  <button
-                    onClick={handleOpenModal}
-                    className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
-                  >
-                    <Plus className="w-5 h-5" />
-                    Create {activeTab === 'task' ? 'Task' : 'Chore'}
-                  </button>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button
+                      onClick={handleOpenModal}
+                      className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                    >
+                      <Plus className="w-5 h-5" />
+                      Create {activeTab === 'task' ? 'Task' : 'Chore'}
+                    </button>
+                    {!hasCompletedGuide && (
+                      <button
+                        onClick={() => setShowGuidedFlow(true)}
+                        className="px-6 py-3 bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
+                      >
+                        <CheckSquare className="w-5 h-5" />
+                        Try Guided Creation
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             ) : (
