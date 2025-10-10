@@ -5,17 +5,21 @@ import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package, Chevron
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
 import { NewShoppingListModal } from '@/components/shopping/NewShoppingListModal';
+import GuidedShoppingCreation from '@/components/guided/GuidedShoppingCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { shoppingService, ShoppingList, CreateListInput } from '@/lib/services/shopping-service';
+import { getUserProgress } from '@/lib/services/user-progress-service';
 
 export default function ShoppingPage() {
-  const { currentSpace } = useAuth();
+  const { currentSpace, user } = useAuth();
   const [lists, setLists] = useState<ShoppingList[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingList, setEditingList] = useState<ShoppingList | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed'>('active');
+  const [showGuidedFlow, setShowGuidedFlow] = useState(false);
+  const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
 
   const [stats, setStats] = useState({
     totalLists: 0,
@@ -51,19 +55,31 @@ export default function ShoppingPage() {
   // Load lists function (stable reference not needed as it's called in useEffect)
   async function loadLists() {
     // Don't load data if user doesn't have a space yet
-    if (!currentSpace) {
+    if (!currentSpace || !user) {
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
-      const [listsData, statsData] = await Promise.all([
+      const [listsData, statsData, userProgressResult] = await Promise.all([
         shoppingService.getLists(currentSpace.id),
         shoppingService.getShoppingStats(currentSpace.id),
+        getUserProgress(user.id),
       ]);
       setLists(listsData);
       setStats(statsData);
+
+      // Check if user has completed the guided shopping flow
+      const userProgress = userProgressResult.success ? userProgressResult.data : null;
+      if (userProgress) {
+        setHasCompletedGuide(userProgress.first_shopping_item_added);
+      }
+
+      // Show guided flow if no lists exist and user hasn't completed the guide
+      if (listsData.length === 0 && !userProgress?.first_shopping_item_added) {
+        setShowGuidedFlow(true);
+      }
     } catch (error) {
       console.error('Failed to load shopping lists:', error);
     } finally {
@@ -74,7 +90,7 @@ export default function ShoppingPage() {
   useEffect(() => {
     loadLists();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSpace]);
+  }, [currentSpace, user]);
 
   // Memoized callback for creating/updating lists
   const handleCreateList = useCallback(async (listData: CreateListInput & { store?: string; items?: { id?: string; name: string; quantity: number }[] }) => {
@@ -221,6 +237,16 @@ export default function ShoppingPage() {
     setStatusFilter(e.target.value as 'all' | 'active' | 'completed');
   }, []);
 
+  const handleGuidedFlowComplete = useCallback(() => {
+    setShowGuidedFlow(false);
+    setHasCompletedGuide(true);
+    loadLists(); // Reload to show newly created list
+  }, []);
+
+  const handleGuidedFlowSkip = useCallback(() => {
+    setShowGuidedFlow(false);
+  }, []);
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Shopping Lists' }]}>
       <div className="p-4 sm:p-8">
@@ -302,16 +328,32 @@ export default function ShoppingPage() {
                 <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                 <p className="mt-4 text-gray-600 dark:text-gray-400">Loading lists...</p>
               </div>
+            ) : showGuidedFlow && filteredLists.length === 0 && !searchQuery && statusFilter === 'active' ? (
+              <GuidedShoppingCreation
+                onComplete={handleGuidedFlowComplete}
+                onSkip={handleGuidedFlowSkip}
+              />
             ) : filteredLists.length === 0 ? (
               <div className="text-center py-12">
                 <ShoppingCart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No lists found</p>
-                <p className="text-gray-500 dark:text-gray-500 mb-6">{searchQuery ? 'Try adjusting your search' : 'Create your first shopping list!'}</p>
-                {!searchQuery && (
-                  <button onClick={handleOpenNewListModal} className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
-                    <Plus className="w-5 h-5" />
-                    Create List
-                  </button>
+                <p className="text-gray-500 dark:text-gray-500 mb-6">{searchQuery || statusFilter !== 'active' ? 'Try adjusting your filters' : 'Create your first shopping list!'}</p>
+                {!searchQuery && statusFilter === 'active' && (
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button onClick={handleOpenNewListModal} className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                      <Plus className="w-5 h-5" />
+                      Create List
+                    </button>
+                    {!hasCompletedGuide && (
+                      <button
+                        onClick={() => setShowGuidedFlow(true)}
+                        className="px-6 py-3 bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
+                      >
+                        <ShoppingCart className="w-5 h-5" />
+                        Try Guided Creation
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             ) : (

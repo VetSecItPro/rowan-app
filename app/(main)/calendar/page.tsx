@@ -5,14 +5,16 @@ import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, Ca
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { EventCard } from '@/components/calendar/EventCard';
 import { NewEventModal } from '@/components/calendar/NewEventModal';
+import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { calendarService, CalendarEvent, CreateEventInput } from '@/lib/services/calendar-service';
+import { getUserProgress } from '@/lib/services/user-progress-service';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, parseISO } from 'date-fns';
 
 type ViewMode = 'calendar' | 'list';
 
 export default function CalendarPage() {
-  const { currentSpace } = useAuth();
+  const { currentSpace, user } = useAuth();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,6 +22,8 @@ export default function CalendarPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('calendar');
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [showGuidedFlow, setShowGuidedFlow] = useState(false);
+  const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
 
   // Memoize stats calculations
   const stats = useMemo(() => {
@@ -100,47 +104,36 @@ export default function CalendarPage() {
   // Stable callback for loading events
   const loadEvents = useCallback(async () => {
     // Don't load data if user doesn't have a space yet
-    if (!currentSpace) {
+    if (!currentSpace || !user) {
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
-      let eventsData = await calendarService.getEvents(currentSpace.id);
-
-      // Create sample event if none exist
-      if (eventsData.length === 0) {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(14, 0, 0, 0);
-        const endTime = new Date(tomorrow);
-        endTime.setHours(15, 0, 0, 0);
-
-        try {
-          const newEvent = await calendarService.createEvent({
-            space_id: currentSpace.id,
-            title: 'Team Meeting',
-            description: 'Weekly sync with the team',
-            start_time: tomorrow.toISOString(),
-            end_time: endTime.toISOString(),
-            is_recurring: false,
-            location: 'Conference Room A',
-          });
-          eventsData = [newEvent];
-        } catch (createError) {
-          console.error('Failed to create sample event:', createError);
-          // Continue without sample event if creation fails
-        }
-      }
+      const [eventsData, userProgressResult] = await Promise.all([
+        calendarService.getEvents(currentSpace.id),
+        getUserProgress(user.id),
+      ]);
 
       setEvents(eventsData);
+
+      // Check if user has completed the guided event flow
+      const userProgress = userProgressResult.success ? userProgressResult.data : null;
+      if (userProgress) {
+        setHasCompletedGuide(userProgress.first_event_created);
+      }
+
+      // Show guided flow if no events exist and user hasn't completed the guide
+      if (eventsData.length === 0 && !userProgress?.first_event_created) {
+        setShowGuidedFlow(true);
+      }
     } catch (error) {
       console.error('Failed to load events:', error);
     } finally {
       setLoading(false);
     }
-  }, [currentSpace]);
+  }, [currentSpace, user]);
 
   // Stable callback for creating/updating events
   const handleCreateEvent = useCallback(async (eventData: CreateEventInput) => {
@@ -218,6 +211,16 @@ export default function CalendarPage() {
     const dateKey = format(date, 'yyyy-MM-dd');
     return eventsByDate.get(dateKey) || [];
   }, [eventsByDate]);
+
+  const handleGuidedFlowComplete = useCallback(() => {
+    setShowGuidedFlow(false);
+    setHasCompletedGuide(true);
+    loadEvents(); // Reload to show newly created event
+  }, [loadEvents]);
+
+  const handleGuidedFlowSkip = useCallback(() => {
+    setShowGuidedFlow(false);
+  }, []);
 
   useEffect(() => {
     loadEvents();
@@ -347,6 +350,11 @@ export default function CalendarPage() {
                   <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                   <p className="mt-4 text-gray-600 dark:text-gray-400">Loading events...</p>
                 </div>
+              ) : showGuidedFlow && filteredEvents.length === 0 && !searchQuery && viewMode === 'list' ? (
+                <GuidedEventCreation
+                  onComplete={handleGuidedFlowComplete}
+                  onSkip={handleGuidedFlowSkip}
+                />
               ) : viewMode === 'calendar' ? (
                 /* Calendar View */
                 <div>
@@ -447,9 +455,29 @@ export default function CalendarPage() {
                   <div className="text-center py-12">
                     <CalendarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No events found</p>
-                    <p className="text-gray-500 dark:text-gray-500">
+                    <p className="text-gray-500 dark:text-gray-500 mb-6">
                       {searchQuery ? 'Try adjusting your search' : 'Create your first event to get started!'}
                     </p>
+                    {!searchQuery && (
+                      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                        <button
+                          onClick={() => setIsModalOpen(true)}
+                          className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                        >
+                          <Plus className="w-5 h-5" />
+                          Create Event
+                        </button>
+                        {!hasCompletedGuide && (
+                          <button
+                            onClick={() => setShowGuidedFlow(true)}
+                            className="px-6 py-3 bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
+                          >
+                            <CalendarIcon className="w-5 h-5" />
+                            Try Guided Creation
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-4">

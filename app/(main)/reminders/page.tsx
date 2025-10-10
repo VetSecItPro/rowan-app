@@ -5,17 +5,21 @@ import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown } fro
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ReminderCard } from '@/components/reminders/ReminderCard';
 import { NewReminderModal } from '@/components/reminders/NewReminderModal';
+import GuidedReminderCreation from '@/components/guided/GuidedReminderCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { remindersService, Reminder, CreateReminderInput } from '@/lib/services/reminders-service';
+import { getUserProgress } from '@/lib/services/user-progress-service';
 
 export default function RemindersPage() {
-  const { currentSpace } = useAuth();
+  const { currentSpace, user } = useAuth();
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [showGuidedFlow, setShowGuidedFlow] = useState(false);
+  const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
 
   // Memoized filtered reminders - expensive filtering operation
   const filteredReminders = useMemo(() => {
@@ -58,52 +62,37 @@ export default function RemindersPage() {
   // Stable reference to loadReminders
   const loadReminders = useCallback(async () => {
     // Don't load data if user doesn't have a space yet
-    if (!currentSpace) {
+    if (!currentSpace || !user) {
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
-      const [remindersData, statsData] = await Promise.all([
+      const [remindersData, statsData, userProgressResult] = await Promise.all([
         remindersService.getReminders(currentSpace.id),
         remindersService.getReminderStats(currentSpace.id),
+        getUserProgress(user.id),
       ]);
 
-      // Create sample reminder if none exist
-      if (remindersData.length === 0) {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(9, 0, 0, 0);
+      setReminders(remindersData);
 
-        await remindersService.createReminder({
-          space_id: currentSpace.id,
-          title: 'Team Meeting',
-          description: 'Weekly team sync-up to discuss project progress and upcoming tasks',
-          emoji: '📅',
-          category: 'work',
-          reminder_time: tomorrow.toISOString(),
-          priority: 'medium',
-          status: 'active',
-          repeat_pattern: 'weekly',
-          repeat_days: [1], // Monday
-        });
+      // Check if user has completed the guided reminder flow
+      const userProgress = userProgressResult.success ? userProgressResult.data : null;
+      if (userProgress) {
+        setHasCompletedGuide(userProgress.first_reminder_created);
+      }
 
-        // Reload to include the sample
-        const [updatedData, updatedStats] = await Promise.all([
-          remindersService.getReminders(currentSpace.id),
-          remindersService.getReminderStats(currentSpace.id),
-        ]);
-        setReminders(updatedData);
-      } else {
-        setReminders(remindersData);
+      // Show guided flow if no reminders exist and user hasn't completed the guide
+      if (remindersData.length === 0 && !userProgress?.first_reminder_created) {
+        setShowGuidedFlow(true);
       }
     } catch (error) {
       console.error('Failed to load reminders:', error);
     } finally {
       setLoading(false);
     }
-  }, [currentSpace]);
+  }, [currentSpace, user]);
 
   useEffect(() => {
     loadReminders();
@@ -187,6 +176,16 @@ export default function RemindersPage() {
   // Memoized callback for status filter changes
   const handleStatusFilterChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     setStatusFilter(e.target.value);
+  }, []);
+
+  const handleGuidedFlowComplete = useCallback(() => {
+    setShowGuidedFlow(false);
+    setHasCompletedGuide(true);
+    loadReminders(); // Reload to show newly created reminder
+  }, [loadReminders]);
+
+  const handleGuidedFlowSkip = useCallback(() => {
+    setShowGuidedFlow(false);
   }, []);
 
   return (
@@ -308,6 +307,11 @@ export default function RemindersPage() {
                 <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                 <p className="mt-4 text-gray-600 dark:text-gray-400">Loading reminders...</p>
               </div>
+            ) : showGuidedFlow && filteredReminders.length === 0 && !searchQuery && statusFilter === 'all' ? (
+              <GuidedReminderCreation
+                onComplete={handleGuidedFlowComplete}
+                onSkip={handleGuidedFlowSkip}
+              />
             ) : filteredReminders.length === 0 ? (
               <div className="text-center py-12">
                 <Bell className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -318,13 +322,24 @@ export default function RemindersPage() {
                     : 'Create your first reminder to get started!'}
                 </p>
                 {!searchQuery && statusFilter === 'all' && (
-                  <button
-                    onClick={handleOpenModal}
-                    className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
-                  >
-                    <Plus className="w-5 h-5" />
-                    Create Reminder
-                  </button>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button
+                      onClick={handleOpenModal}
+                      className="px-6 py-3 shimmer-bg text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                    >
+                      <Plus className="w-5 h-5" />
+                      Create Reminder
+                    </button>
+                    {!hasCompletedGuide && (
+                      <button
+                        onClick={() => setShowGuidedFlow(true)}
+                        className="px-6 py-3 bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
+                      >
+                        <Bell className="w-5 h-5" />
+                        Try Guided Creation
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             ) : (
