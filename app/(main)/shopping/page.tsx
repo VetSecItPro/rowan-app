@@ -8,7 +8,7 @@ import { NewShoppingListModal } from '@/components/shopping/NewShoppingListModal
 import GuidedShoppingCreation from '@/components/guided/GuidedShoppingCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { shoppingService, ShoppingList, CreateListInput } from '@/lib/services/shopping-service';
-import { getUserProgress } from '@/lib/services/user-progress-service';
+import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 
 export default function ShoppingPage() {
   const { currentSpace, user } = useAuth();
@@ -76,8 +76,12 @@ export default function ShoppingPage() {
         setHasCompletedGuide(userProgress.first_shopping_item_added);
       }
 
-      // Show guided flow if no lists exist and user hasn't completed the guide
-      if (listsData.length === 0 && !userProgress?.first_shopping_item_added) {
+      // Show guided flow if no lists exist, user hasn't completed the guide, AND user hasn't skipped it
+      if (
+        listsData.length === 0 &&
+        !userProgress?.first_shopping_item_added &&
+        !userProgress?.skipped_shopping_guide
+      ) {
         setShowGuidedFlow(true);
       }
     } catch (error) {
@@ -243,9 +247,18 @@ export default function ShoppingPage() {
     loadLists(); // Reload to show newly created list
   }, []);
 
-  const handleGuidedFlowSkip = useCallback(() => {
+  const handleGuidedFlowSkip = useCallback(async () => {
     setShowGuidedFlow(false);
-  }, []);
+
+    // Mark the guide as skipped in user progress
+    if (user) {
+      try {
+        await markFlowSkipped(user.id, 'shopping_guide');
+      } catch (error) {
+        console.error('Failed to mark shopping guide as skipped:', error);
+      }
+    }
+  }, [user]);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Shopping Lists' }]}>

@@ -12,7 +12,7 @@ import { useAuth } from '@/lib/contexts/auth-context';
 import { tasksService } from '@/lib/services/tasks-service';
 import { choresService, Chore, CreateChoreInput } from '@/lib/services/chores-service';
 import { Task, CreateTaskInput } from '@/lib/types';
-import { getUserProgress } from '@/lib/services/user-progress-service';
+import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 
 type TaskType = 'task' | 'chore';
 type TaskOrChore = (Task & { type: 'task' }) | (Chore & { type: 'chore' });
@@ -92,8 +92,13 @@ export default function TasksPage() {
         if (userProgressResult.success && userProgressResult.data) {
           setHasCompletedGuide(userProgressResult.data.first_task_created);
 
-          // Show guided flow if no tasks exist and user hasn't completed the guide
-          if (tasksData.length === 0 && choresData.length === 0 && !userProgressResult.data.first_task_created) {
+          // Show guided flow if no tasks exist, user hasn't completed the guide, AND user hasn't skipped it
+          if (
+            tasksData.length === 0 &&
+            choresData.length === 0 &&
+            !userProgressResult.data.first_task_created &&
+            !userProgressResult.data.skipped_task_guide
+          ) {
             setShowGuidedFlow(true);
           }
         }
@@ -218,9 +223,18 @@ export default function TasksPage() {
     loadData(); // Reload to show the newly created task
   }, [loadData]);
 
-  const handleGuidedFlowSkip = useCallback(() => {
+  const handleGuidedFlowSkip = useCallback(async () => {
     setShowGuidedFlow(false);
-  }, []);
+
+    // Mark the guide as skipped in user progress
+    if (user) {
+      try {
+        await markFlowSkipped(user.id, 'task_guide');
+      } catch (error) {
+        console.error('Failed to mark task guide as skipped:', error);
+      }
+    }
+  }, [user]);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Tasks & Chores' }]}>

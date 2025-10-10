@@ -8,7 +8,7 @@ import { NewMessageModal } from '@/components/messages/NewMessageModal';
 import GuidedMessageCreation from '@/components/guided/GuidedMessageCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { messagesService, Message, CreateMessageInput } from '@/lib/services/messages-service';
-import { getUserProgress } from '@/lib/services/user-progress-service';
+import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { format, isSameDay, isToday, isYesterday } from 'date-fns';
 
 // Family-friendly universal emojis (30 total) - organized by theme
@@ -126,8 +126,12 @@ export default function MessagesPage() {
         setHasCompletedGuide(userProgress.first_message_sent);
       }
 
-      // Show guided flow if no messages exist and user hasn't completed the guide
-      if (messagesData.length === 0 && !userProgress?.first_message_sent) {
+      // Show guided flow if no messages exist, user hasn't completed the guide, AND user hasn't skipped it
+      if (
+        messagesData.length === 0 &&
+        !userProgress?.first_message_sent &&
+        !userProgress?.skipped_message_guide
+      ) {
         setShowGuidedFlow(true);
       }
     } catch (error) {
@@ -276,9 +280,18 @@ export default function MessagesPage() {
     loadMessages(); // Reload to show newly created message
   }, [loadMessages]);
 
-  const handleGuidedFlowSkip = useCallback(() => {
+  const handleGuidedFlowSkip = useCallback(async () => {
     setShowGuidedFlow(false);
-  }, []);
+
+    // Mark the guide as skipped in user progress
+    if (user) {
+      try {
+        await markFlowSkipped(user.id, 'message_guide');
+      } catch (error) {
+        console.error('Failed to mark message guide as skipped:', error);
+      }
+    }
+  }, [user]);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Messages' }]}>
