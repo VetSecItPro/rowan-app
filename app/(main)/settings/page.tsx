@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
@@ -40,7 +41,13 @@ import {
   ArrowRight,
   CheckCircle2,
   TrendingUp,
-  Calendar
+  Calendar,
+  CheckSquare,
+  ShoppingCart,
+  UtensilsCrossed,
+  MessageSquare,
+  DollarSign,
+  Target
 } from 'lucide-react';
 
 type SettingsTab = 'profile' | 'security' | 'notifications' | 'appearance' | 'privacy' | 'spaces' | 'analytics' | 'data' | 'help';
@@ -99,9 +106,21 @@ const mockPendingInvitations = [
 
 export default function SettingsPage() {
   const { user, currentSpace, spaces, switchSpace, refreshSpaces } = useAuth();
-  const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Get initial tab from URL or default to 'profile'
+  const initialTab = (searchParams.get('tab') as SettingsTab) || 'profile';
+  const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const profileImageInputRef = useRef<HTMLInputElement>(null);
+
+  // Update URL when tab changes and persist tab selection
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    params.set('tab', activeTab);
+    router.replace(`?${params.toString()}`, { scroll: false });
+  }, [activeTab, router]);
 
   // Profile state
   const [profileData, setProfileData] = useState({
@@ -1064,51 +1083,116 @@ export default function SettingsPage() {
                   <div className="space-y-6 sm:space-y-8">
                     <div>
                       <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Analytics & Insights</h2>
-                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">View your productivity trends and completion rates</p>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">View your productivity trends and completion rates across all features</p>
                     </div>
 
-                    <Link href="/settings/analytics" className="block">
-                      <div className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 rounded-xl hover:shadow-lg transition-all group">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center">
-                              <BarChart3 className="w-6 h-6 text-white" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                      {[
+                        {
+                          id: 'tasks',
+                          name: 'Tasks & Chores',
+                          icon: CheckSquare,
+                          href: '/settings/analytics/tasks',
+                          gradient: 'from-blue-500 to-blue-600',
+                          textColor: 'text-blue-600 dark:text-blue-400',
+                          shadowColor: 'hover:shadow-blue-200 dark:hover:shadow-blue-900/50',
+                          description: 'Track task completion and productivity'
+                        },
+                        {
+                          id: 'calendar',
+                          name: 'Calendar & Events',
+                          icon: Calendar,
+                          href: '/settings/analytics/calendar',
+                          gradient: 'from-purple-500 to-purple-600',
+                          textColor: 'text-purple-600 dark:text-purple-400',
+                          shadowColor: 'hover:shadow-purple-200 dark:hover:shadow-purple-900/50',
+                          description: 'Monitor event attendance and planning'
+                        },
+                        {
+                          id: 'reminders',
+                          name: 'Reminders',
+                          icon: Bell,
+                          href: '/settings/analytics/reminders',
+                          gradient: 'from-pink-500 to-pink-600',
+                          textColor: 'text-pink-600 dark:text-pink-400',
+                          shadowColor: 'hover:shadow-pink-200 dark:hover:shadow-pink-900/50',
+                          description: 'Analyze reminder effectiveness'
+                        },
+                        {
+                          id: 'messages',
+                          name: 'Messages',
+                          icon: MessageSquare,
+                          href: '/settings/analytics/messages',
+                          gradient: 'from-green-500 to-green-600',
+                          textColor: 'text-green-600 dark:text-green-400',
+                          shadowColor: 'hover:shadow-green-200 dark:hover:shadow-green-900/50',
+                          description: 'View messaging trends and activity'
+                        },
+                        {
+                          id: 'shopping',
+                          name: 'Shopping Lists',
+                          icon: ShoppingCart,
+                          href: '/settings/analytics/shopping',
+                          gradient: 'from-emerald-500 to-emerald-600',
+                          textColor: 'text-emerald-600 dark:text-emerald-400',
+                          shadowColor: 'hover:shadow-emerald-200 dark:hover:shadow-emerald-900/50',
+                          description: 'Track shopping habits and savings'
+                        },
+                        {
+                          id: 'meals',
+                          name: 'Meal Planning',
+                          icon: UtensilsCrossed,
+                          href: '/settings/analytics/meals',
+                          gradient: 'from-orange-500 to-orange-600',
+                          textColor: 'text-orange-600 dark:text-orange-400',
+                          shadowColor: 'hover:shadow-orange-200 dark:hover:shadow-orange-900/50',
+                          description: 'Review meal planning patterns'
+                        },
+                        {
+                          id: 'budget',
+                          name: 'Budget Tracking',
+                          icon: DollarSign,
+                          href: '/settings/analytics/budget',
+                          gradient: 'from-amber-500 to-amber-600',
+                          textColor: 'text-amber-600 dark:text-amber-400',
+                          shadowColor: 'hover:shadow-amber-200 dark:hover:shadow-amber-900/50',
+                          description: 'Monitor spending and budgets'
+                        },
+                        {
+                          id: 'goals',
+                          name: 'Goals & Milestones',
+                          icon: Target,
+                          href: '/settings/analytics/goals',
+                          gradient: 'from-indigo-500 to-indigo-600',
+                          textColor: 'text-indigo-600 dark:text-indigo-400',
+                          shadowColor: 'hover:shadow-indigo-200 dark:hover:shadow-indigo-900/50',
+                          description: 'Track goal progress and achievements'
+                        },
+                      ].map((feature) => {
+                        const Icon = feature.icon;
+                        return (
+                          <Link
+                            key={feature.id}
+                            href={feature.href}
+                            className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-2 ${feature.shadowColor} transition-all duration-300 group`}
+                          >
+                            <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 shadow-lg`}>
+                              <Icon className="w-7 h-7 text-white" />
                             </div>
-                            <div>
-                              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">View Full Analytics Dashboard</h3>
-                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Track tasks, chores, and productivity metrics</p>
+                            <h3 className={`text-lg font-semibold ${feature.textColor} mb-2 transition-all`}>
+                              {feature.name}
+                            </h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                              {feature.description}
+                            </p>
+                            <div className={`flex items-center text-sm font-medium ${feature.textColor}`}>
+                              View Analytics
+                              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                             </div>
-                          </div>
-                          <ArrowRight className="w-6 h-6 text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform" />
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm mb-1">
-                              <CheckCircle2 className="w-4 h-4" />
-                              <span>Completion Rates</span>
-                            </div>
-                            <p className="text-xs text-gray-500 dark:text-gray-500">Track monthly progress</p>
-                          </div>
-
-                          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm mb-1">
-                              <TrendingUp className="w-4 h-4" />
-                              <span>Productivity Trends</span>
-                            </div>
-                            <p className="text-xs text-gray-500 dark:text-gray-500">View historical data</p>
-                          </div>
-
-                          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm mb-1">
-                              <Calendar className="w-4 h-4" />
-                              <span>Time Range Views</span>
-                            </div>
-                            <p className="text-xs text-gray-500 dark:text-gray-500">1, 3, 6, or 12 months</p>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
+                          </Link>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
 
