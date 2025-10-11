@@ -15,6 +15,7 @@ interface NewMealModalProps {
 export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId }: NewMealModalProps) {
   const [formData, setFormData] = useState<CreateMealInput>({
     space_id: spaceId,
+    name: '',
     meal_type: 'dinner',
     scheduled_date: '',
     notes: '',
@@ -30,16 +31,21 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId }: New
 
   useEffect(() => {
     if (editMeal) {
+      // Convert ISO timestamp to yyyy-MM-dd format for date input
+      const dateValue = editMeal.scheduled_date ? editMeal.scheduled_date.split('T')[0] : '';
+
       setFormData({
         space_id: spaceId,
         recipe_id: editMeal.recipe_id,
+        name: editMeal.name || '',
         meal_type: editMeal.meal_type,
-        scheduled_date: editMeal.scheduled_date,
+        scheduled_date: dateValue,
         notes: editMeal.notes || '',
       });
     } else {
       setFormData({
         space_id: spaceId,
+        name: '',
         meal_type: 'dinner',
         scheduled_date: '',
         notes: '',
@@ -110,7 +116,17 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId }: New
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Date *</label>
+            <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Meal Name</label>
+            <input
+              type="text"
+              placeholder="e.g., Family Dinner, Quick Lunch"
+              value={formData.name || ''}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Date *</label>
             <input type="date" required value={formData.scheduled_date} onChange={(e) => setFormData({ ...formData, scheduled_date: e.target.value })} className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white" />
           </div>
           <div>
