@@ -66,9 +66,11 @@ export async function middleware(req: NextRequest) {
     '/reminders',
     '/shopping',
     '/meals',
-    '/budget',
+    '/projects',
+    '/recipes',
     '/goals',
     '/settings',
+    '/invitations',
   ];
 
   const isProtectedPath = protectedPaths.some(path =>
@@ -102,9 +104,11 @@ export const config = {
     '/reminders/:path*',
     '/shopping/:path*',
     '/meals/:path*',
-    '/budget/:path*',
+    '/projects/:path*',
+    '/recipes/:path*',
     '/goals/:path*',
     '/settings/:path*',
+    '/invitations/:path*',
     '/login',
     '/signup',
   ],
