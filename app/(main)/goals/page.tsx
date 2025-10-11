@@ -254,51 +254,51 @@ export default function GoalsPage() {
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 flex-shrink-0">
-              <div className="w-12 h-12 rounded-xl bg-gradient-goals flex items-center justify-center flex-shrink-0">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-goals flex items-center justify-center">
                 <Target className="w-6 h-6 text-white" />
               </div>
-              <div className="flex-shrink-0">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-goals bg-clip-text text-transparent whitespace-nowrap">
+              <div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-goals bg-clip-text text-transparent">
                   Goals & Milestones
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1 whitespace-nowrap">
+                <p className="text-gray-600 dark:text-gray-400 mt-1">
                   Achieve your dreams together
                 </p>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-[464px] flex-shrink-0">
-              <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-indigo-100 to-indigo-200 dark:from-indigo-900/30 dark:to-indigo-800/30 rounded-xl border border-indigo-200 dark:border-indigo-700 sm:w-[244px]">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-indigo-100 to-indigo-200 dark:from-indigo-900/30 dark:to-indigo-800/30 rounded-xl border border-indigo-200 dark:border-indigo-700">
                 <button
                   onClick={() => handleViewModeChange('goals')}
-                  className={`w-[110px] py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium ${
+                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
                     viewMode === 'goals'
                       ? 'bg-gradient-goals text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                   }`}
                 >
-                  <LayoutGrid className="w-4 h-4 flex-shrink-0" />
+                  <LayoutGrid className="w-4 h-4" />
                   <span className="text-sm">Goals</span>
                 </button>
                 <button
                   onClick={() => handleViewModeChange('milestones')}
-                  className={`w-[110px] py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium ${
+                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
                     viewMode === 'milestones'
                       ? 'bg-gradient-goals text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                   }`}
                 >
-                  <List className="w-4 h-4 flex-shrink-0" />
+                  <List className="w-4 h-4" />
                   <span className="text-sm">Milestones</span>
                 </button>
               </div>
               <button
                 onClick={handleNewButtonClick}
-                className="w-full sm:w-[208px] py-2 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
-                <Plus className="w-5 h-5 flex-shrink-0" />
-                <span className="whitespace-nowrap">New {viewMode === 'goals' ? 'Goal' : 'Milestone'}</span>
+                <Plus className="w-5 h-5" />
+                <span>New {viewMode === 'goals' ? 'Goal' : 'Milestone'}</span>
               </button>
             </div>
           </div>
