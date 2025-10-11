@@ -384,27 +384,25 @@ export default function GoalsPage() {
                 </span>
               </div>
 
-              {/* Status Filter - Segmented Buttons - Only for goals view */}
-              {viewMode === 'goals' && (
-                <div className="bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 w-fit">
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md"
-                  >
-                    All
-                  </button>
-                  <button
-                    className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
-                  >
-                    Active
-                  </button>
-                  <button
-                    className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
-                  >
-                    Completed
-                  </button>
-                </div>
-              )}
+              {/* Status Filter - Segmented Buttons - Hidden for milestones but space reserved */}
+              <div className={`bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 w-fit ${viewMode === 'milestones' ? 'invisible' : ''}`}>
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md"
+                >
+                  All
+                </button>
+                <button
+                  className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                >
+                  Active
+                </button>
+                <button
+                  className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                >
+                  Completed
+                </button>
+              </div>
             </div>
 
             {loading ? (
