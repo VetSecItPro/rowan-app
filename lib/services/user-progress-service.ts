@@ -18,10 +18,9 @@ export async function getUserProgress(userId: string): Promise<{
       .from('user_progress')
       .select('*')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') {
-      // PGRST116 is "not found" - that's okay
+    if (error) {
       throw error;
     }
 
@@ -89,9 +88,28 @@ export async function updateUserProgress(
       .update(updates)
       .eq('user_id', userId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+
+    // If no row was updated, try to create one
+    if (!data) {
+      const createResult = await createUserProgress(userId);
+      if (!createResult.success || !createResult.data) {
+        return { success: false, error: 'User progress record not found and could not be created' };
+      }
+
+      // Now update the newly created record
+      const { data: updatedData, error: updateError } = await supabase
+        .from('user_progress')
+        .update(updates)
+        .eq('user_id', userId)
+        .select()
+        .maybeSingle();
+
+      if (updateError) throw updateError;
+      return { success: true, data: updatedData || undefined };
+    }
 
     return { success: true, data };
   } catch (error) {
