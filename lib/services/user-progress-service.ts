@@ -34,12 +34,12 @@ export async function getUserProgress(userId: string): Promise<{
 /**
  * Create initial user progress record
  * @param userId - User UUID
- * @param partnershipId - Partnership UUID (optional)
+ * @param spaceId - Space UUID (optional)
  * @returns Created user progress record
  */
 export async function createUserProgress(
   userId: string,
-  partnershipId?: string | null
+  spaceId?: string | null
 ): Promise<{
   success: boolean;
   data?: UserProgress;
@@ -52,7 +52,7 @@ export async function createUserProgress(
       .from('user_progress')
       .insert({
         user_id: userId,
-        partnership_id: partnershipId || null,
+        space_id: spaceId || null,
       })
       .select()
       .single();
@@ -122,12 +122,12 @@ export async function updateUserProgress(
  * Get or create user progress
  * Ensures a user progress record exists for the given user
  * @param userId - User UUID
- * @param partnershipId - Partnership UUID (optional)
+ * @param spaceId - Space UUID (optional)
  * @returns User progress record
  */
 export async function getOrCreateUserProgress(
   userId: string,
-  partnershipId?: string | null
+  spaceId?: string | null
 ): Promise<{
   success: boolean;
   data?: UserProgress;
@@ -142,7 +142,7 @@ export async function getOrCreateUserProgress(
     }
 
     // Create new progress if doesn't exist
-    return await createUserProgress(userId, partnershipId);
+    return await createUserProgress(userId, spaceId);
   } catch (error) {
     console.error('[userProgressService] getOrCreateUserProgress error:', error);
     return { success: false, error: 'Failed to get or create user progress' };
