@@ -13,7 +13,7 @@ import { useAuth } from '@/lib/contexts/auth-context';
 import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput } from '@/lib/services/goals-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 
-type ViewMode = 'goals' | 'milestones';
+type ViewMode = 'goals' | 'steps';
 
 export default function GoalsPage() {
   const { currentSpace, user } = useAuth();
@@ -249,7 +249,7 @@ export default function GoalsPage() {
   }, [user]);
 
   return (
-    <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
+    <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Steps' }]}>
       <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
@@ -260,7 +260,7 @@ export default function GoalsPage() {
               </div>
               <div>
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-goals bg-clip-text text-transparent">
-                  Goals & Milestones
+                  Goals & Steps
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">
                   Achieve your dreams together
@@ -282,23 +282,23 @@ export default function GoalsPage() {
                   <span className="text-sm">Goals</span>
                 </button>
                 <button
-                  onClick={() => handleViewModeChange('milestones')}
+                  onClick={() => handleViewModeChange('steps')}
                   className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
-                    viewMode === 'milestones'
+                    viewMode === 'steps'
                       ? 'bg-gradient-goals text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                   }`}
                 >
                   <List className="w-4 h-4" />
-                  <span className="text-sm">Milestones</span>
+                  <span className="text-sm">Steps</span>
                 </button>
               </div>
               <button
                 onClick={handleNewButtonClick}
-                className="w-full sm:w-[195px] py-2 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
-                <span>New {viewMode === 'goals' ? 'Goal' : 'Milestone'}</span>
+                <span>New {viewMode === 'goals' ? 'Goal' : 'Step'}</span>
               </button>
             </div>
           </div>
@@ -336,10 +336,10 @@ export default function GoalsPage() {
               <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.inProgress}</p>
             </div>
 
-            {/* Milestones */}
+            {/* Steps */}
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Milestones</h3>
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Steps</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-500 rounded-xl flex items-center justify-center">
                   <Award className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
@@ -384,8 +384,8 @@ export default function GoalsPage() {
                 </span>
               </div>
 
-              {/* Status Filter - Segmented Buttons - Hidden for milestones but space reserved */}
-              <div className={`flex-shrink-0 bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 w-[220px] ${viewMode === 'milestones' ? 'invisible' : ''}`}>
+              {/* Status Filter - Segmented Buttons - Hidden for steps but space reserved */}
+              <div className={`flex-shrink-0 bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 w-[220px] ${viewMode === 'steps' ? 'invisible' : ''}`}>
                 <button
                   onClick={() => setSearchQuery('')}
                   className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md"
@@ -454,11 +454,11 @@ export default function GoalsPage() {
                 </div>
               )
             ) : (
-              /* Milestones View */
+              /* Steps View */
               filteredMilestones.length === 0 ? (
                 <div className="text-center py-12">
                   <Award className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No milestones found</p>
+                  <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No steps found</p>
                   <p className="text-gray-500 dark:text-gray-500">Try adjusting your search</p>
                 </div>
               ) : (
