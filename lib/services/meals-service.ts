@@ -135,7 +135,7 @@ export const mealsService = {
 
   async getRecipes(spaceId: string): Promise<Recipe[]> {
     const supabase = createClient();
-    const { data, error } = await supabase
+    const { data, error} = await supabase
       .from('recipes')
       .select('*')
       .eq('space_id', spaceId)
@@ -143,6 +143,18 @@ export const mealsService = {
 
     if (error) throw error;
     return data || [];
+  },
+
+  async getRecipeById(id: string): Promise<Recipe | null> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('recipes')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+    return data;
   },
 
   async createRecipe(input: CreateRecipeInput): Promise<Recipe> {
