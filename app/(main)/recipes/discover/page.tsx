@@ -1,0 +1,373 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { Search, Plus, ExternalLink, Loader2, ChefHat, Clock, Users } from 'lucide-react';
+import { useAuth } from '@/lib/contexts/auth-context';
+import {
+  searchExternalRecipes,
+  getRandomRecipes,
+  searchByCuisine,
+  SUPPORTED_CUISINES,
+  type ExternalRecipe
+} from '@/lib/services/external-recipes-service';
+import { mealsService } from '@/lib/services/meals-service';
+import { useDebouncedCallback } from 'use-debounce';
+
+export default function DiscoverRecipesPage() {
+  const { user } = useAuth();
+  const [currentSpaceId, setCurrentSpaceId] = useState<string | null>(null);
+
+  // Load user's current space
+  useEffect(() => {
+    const loadSpace = async () => {
+      if (user) {
+        // Get the user's spaces and use the first one for now
+        // In a production app, this would come from user preferences or context
+        const spaces = await fetch('/api/spaces').then(r => r.json());
+        if (spaces && spaces.length > 0) {
+          setCurrentSpaceId(spaces[0].id);
+        }
+      }
+    };
+    loadSpace();
+  }, [user]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null);
+  const [recipes, setRecipes] = useState<ExternalRecipe[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [addingRecipeIds, setAddingRecipeIds] = useState<Set<string>>(new Set());
+
+  // Load random recipes on mount
+  useEffect(() => {
+    loadRandomRecipes();
+  }, []);
+
+  const loadRandomRecipes = async () => {
+    setLoading(true);
+    try {
+      const randomRecipes = await getRandomRecipes(12);
+      setRecipes(randomRecipes);
+    } catch (error) {
+      console.error('Failed to load random recipes:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Debounced search
+  const performSearch = useDebouncedCallback(async (query: string) => {
+    if (!query || query.trim().length < 2) {
+      loadRandomRecipes();
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const results = await searchExternalRecipes(query);
+      setRecipes(results);
+    } catch (error) {
+      console.error('Search failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, 500);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    setSelectedCuisine(null); // Clear cuisine filter when searching
+    performSearch(value);
+  };
+
+  const handleCuisineClick = async (cuisine: string) => {
+    setSearchQuery(''); // Clear search when filtering by cuisine
+    setSelectedCuisine(cuisine);
+    setLoading(true);
+    try {
+      const results = await searchByCuisine(cuisine);
+      setRecipes(results);
+    } catch (error) {
+      console.error('Cuisine search failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setSelectedCuisine(null);
+    loadRandomRecipes();
+  };
+
+  const handleAddToLibrary = useCallback(async (externalRecipe: ExternalRecipe) => {
+    if (!currentSpaceId) {
+      alert('Please wait while loading your space...');
+      return;
+    }
+
+    setAddingRecipeIds(prev => new Set(prev).add(externalRecipe.id));
+
+    try {
+      // Convert external recipe to our format
+      await mealsService.createRecipe({
+        space_id: currentSpaceId,
+        name: externalRecipe.name,
+        description: externalRecipe.description || '',
+        prep_time: externalRecipe.prep_time,
+        cook_time: externalRecipe.cook_time,
+        servings: externalRecipe.servings,
+        difficulty: externalRecipe.difficulty as any,
+        cuisine_type: externalRecipe.cuisine,
+        image_url: externalRecipe.image_url,
+        instructions: externalRecipe.instructions,
+        source_url: externalRecipe.source_url,
+        ingredients: externalRecipe.ingredients.map(ing => ({
+          name: ing.name,
+          amount: ing.amount || '',
+          unit: ing.unit || '',
+        })),
+        tags: [externalRecipe.source, externalRecipe.cuisine].filter(Boolean) as string[],
+      });
+
+      alert('✓ Recipe added to your library!');
+    } catch (error) {
+      console.error('Failed to add recipe:', error);
+      alert('Failed to add recipe. Please try again.');
+    } finally {
+      setAddingRecipeIds(prev => {
+        const next = new Set(prev);
+        next.delete(externalRecipe.id);
+        return next;
+      });
+    }
+  }, [currentSpaceId]);
+
+  const getSourceBadgeColor = (source: string) => {
+    switch (source) {
+      case 'themealdb':
+        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
+      case 'edamam':
+        return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300';
+      case 'recipepuppy':
+        return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300';
+      default:
+        return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+    }
+  };
+
+  const getSourceLabel = (source: string) => {
+    switch (source) {
+      case 'themealdb':
+        return 'TheMealDB';
+      case 'edamam':
+        return 'Edamam';
+      case 'recipepuppy':
+        return 'Recipe Puppy';
+      default:
+        return source;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex items-center gap-3 mb-4">
+            <ChefHat className="w-10 h-10" />
+            <div>
+              <h1 className="text-3xl font-bold">Discover Recipes</h1>
+              <p className="text-orange-100 mt-1">Search thousands of recipes from multiple sources</p>
+            </div>
+          </div>
+
+          {/* Search Bar */}
+          <div className="relative max-w-2xl">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              placeholder="Search for pasta, chicken, desserts..."
+              className="w-full pl-12 pr-4 py-3 bg-white dark:bg-gray-800 border-0 rounded-lg shadow-lg focus:ring-2 focus:ring-orange-300 text-gray-900 dark:text-white placeholder-gray-500"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Cuisine Filters */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by cuisine:</span>
+            {selectedCuisine && (
+              <button
+                onClick={handleClearFilters}
+                className="text-sm px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              >
+                ✕ Clear filter
+              </button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {SUPPORTED_CUISINES.map((cuisine) => (
+              <button
+                key={cuisine.value}
+                onClick={() => handleCuisineClick(cuisine.value)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  selectedCuisine === cuisine.value
+                    ? 'bg-orange-500 text-white shadow-md scale-105'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-gray-600 hover:scale-105'
+                }`}
+              >
+                <span className="mr-1">{cuisine.flag}</span>
+                {cuisine.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Results */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+            <span className="ml-3 text-gray-600 dark:text-gray-400">Searching recipes...</span>
+          </div>
+        )}
+
+        {/* Results Grid */}
+        {!loading && recipes.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {recipes.map((recipe) => (
+              <div
+                key={recipe.id}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
+              >
+                {/* Recipe Image */}
+                {recipe.image_url && (
+                  <div className="h-48 overflow-hidden bg-gray-200 dark:bg-gray-700">
+                    <img
+                      src={recipe.image_url}
+                      alt={recipe.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+
+                <div className="p-5">
+                  {/* Source Badge */}
+                  <div className="flex items-center justify-between mb-3">
+                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${getSourceBadgeColor(recipe.source)}`}>
+                      {getSourceLabel(recipe.source)}
+                    </span>
+                    {recipe.source_url && (
+                      <a
+                        href={recipe.source_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-400 hover:text-orange-500 transition-colors"
+                        title="View original recipe"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    )}
+                  </div>
+
+                  {/* Recipe Name */}
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                    {recipe.name}
+                  </h3>
+
+                  {/* Description */}
+                  {recipe.description && (
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                      {recipe.description}
+                    </p>
+                  )}
+
+                  {/* Meta Info */}
+                  <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    {recipe.prep_time && (
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        <span>{recipe.prep_time}m</span>
+                      </div>
+                    )}
+                    {recipe.servings && (
+                      <div className="flex items-center gap-1">
+                        <Users className="w-4 h-4" />
+                        <span>{recipe.servings}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Ingredients Preview */}
+                  {recipe.ingredients && recipe.ingredients.length > 0 && (
+                    <div className="mb-4">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        {recipe.ingredients.length} ingredients
+                      </p>
+                      <div className="flex flex-wrap gap-1">
+                        {recipe.ingredients.slice(0, 3).map((ing, idx) => (
+                          <span
+                            key={idx}
+                            className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded"
+                          >
+                            {ing.name}
+                          </span>
+                        ))}
+                        {recipe.ingredients.length > 3 && (
+                          <span className="text-xs px-2 py-1 text-gray-500 dark:text-gray-400">
+                            +{recipe.ingredients.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Add Button */}
+                  <button
+                    onClick={() => handleAddToLibrary(recipe)}
+                    disabled={addingRecipeIds.has(recipe.id)}
+                    className="w-full py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {addingRecipeIds.has(recipe.id) ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Adding...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4" />
+                        Add to Library
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && recipes.length === 0 && searchQuery && (
+          <div className="text-center py-12">
+            <ChefHat className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              No recipes found
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Try searching for something else
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

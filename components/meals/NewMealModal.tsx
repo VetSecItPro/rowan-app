@@ -69,10 +69,12 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{editMeal ? 'Edit Meal' : 'New Meal'}</h2>
-          <button onClick={onClose} aria-label="Close modal" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"><X className="w-5 h-5" /></button>
+      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+        <div className="flex items-center justify-between p-6 bg-gradient-to-r from-orange-500 to-orange-600">
+          <h2 className="text-2xl font-bold text-white">{editMeal ? 'Edit Meal' : 'Plan New Meal'}</h2>
+          <button onClick={onClose} aria-label="Close modal" className="p-2 rounded-lg hover:bg-orange-700 transition-colors">
+            <X className="w-5 h-5 text-white" />
+          </button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="relative">
@@ -167,8 +169,19 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                   </button>
                 ))}
                 {recipes.length === 0 && (
-                  <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 italic text-center">
-                    No recipes available
+                  <div className="px-4 py-3 text-center">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 italic mb-2">
+                      No recipes in your library
+                    </p>
+                    <a
+                      href="/recipes/discover"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-orange-600 dark:text-orange-400 hover:underline inline-flex items-center gap-1"
+                    >
+                      <ChefHat className="w-3 h-3" />
+                      Discover recipes to add
+                    </a>
                   </div>
                 )}
               </div>
