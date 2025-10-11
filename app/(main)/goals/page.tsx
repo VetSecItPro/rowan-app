@@ -385,7 +385,7 @@ export default function GoalsPage() {
               </div>
 
               {/* Status Filter - Segmented Buttons - Hidden for milestones but space reserved */}
-              <div className={`bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 w-fit ${viewMode === 'milestones' ? 'invisible' : ''}`}>
+              <div className={`flex-shrink-0 bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 min-w-[220px] ${viewMode === 'milestones' ? 'invisible' : ''}`}>
                 <button
                   onClick={() => setSearchQuery('')}
                   className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md"
