@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package, ChevronDown } from 'lucide-react';
+import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package } from 'lucide-react';
+import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
 import { NewShoppingListModal } from '@/components/shopping/NewShoppingListModal';
@@ -322,26 +323,12 @@ export default function ShoppingPage() {
           </div>
           )}
 
-          {/* Search & Filter Bar - Only show when NOT in guided flow */}
+          {/* Search Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input type="text" placeholder="Search lists..." value={searchQuery} onChange={handleSearchChange} className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white" />
-              </div>
-              <div className="relative">
-                <select
-                  value={statusFilter}
-                  onChange={handleStatusFilterChange}
-                  className="pl-4 pr-10 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none w-full"
-                >
-                  <option value="all">All Lists</option>
-                  <option value="active">Active</option>
-                  <option value="completed">Completed</option>
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-              </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input type="text" placeholder="Search lists..." value={searchQuery} onChange={handleSearchChange} className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white" />
             </div>
           </div>
           )}
@@ -349,9 +336,51 @@ export default function ShoppingPage() {
           {/* Shopping Lists - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              {statusFilter === 'active' ? 'Active Lists' : statusFilter === 'completed' ? 'Completed Lists' : 'All Lists'} ({filteredLists.length})
-            </h2>
+            {/* Header with Month Badge and Status Filter */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  All Shopping Lists ({filteredLists.length})
+                </h2>
+                <span className="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 text-sm font-medium rounded-full">
+                  {format(new Date(), 'MMM yyyy')}
+                </span>
+              </div>
+
+              {/* Status Filter - Segmented Buttons */}
+              <div className="bg-gray-50 dark:bg-gray-900 border-2 border-emerald-200 dark:border-emerald-700 rounded-lg p-1 flex gap-1 w-fit">
+                <button
+                  onClick={() => setStatusFilter('all')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                    statusFilter === 'all'
+                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setStatusFilter('active')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                    statusFilter === 'active'
+                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
+                  }`}
+                >
+                  Active
+                </button>
+                <button
+                  onClick={() => setStatusFilter('completed')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
+                    statusFilter === 'completed'
+                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
+                  }`}
+                >
+                  Completed
+                </button>
+              </div>
+            </div>
             {loading ? (
               <div className="text-center py-12">
                 <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
@@ -381,7 +410,7 @@ export default function ShoppingPage() {
                 )}
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                 {filteredLists.map((list) => (
                   <ShoppingListCard key={list.id} list={list} onEdit={handleEditList} onDelete={handleDeleteList} onToggleItem={handleToggleItem} />
                 ))}
