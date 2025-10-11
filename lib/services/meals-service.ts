@@ -21,6 +21,7 @@ export interface Meal {
   space_id: string;
   recipe_id?: string;
   recipe?: Recipe;
+  name?: string;
   meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
   scheduled_date: string;
   notes?: string;
@@ -32,6 +33,7 @@ export interface Meal {
 export interface CreateMealInput {
   space_id: string;
   recipe_id?: string;
+  name?: string;
   meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
   scheduled_date: string;
   notes?: string;

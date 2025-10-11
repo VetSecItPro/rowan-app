@@ -32,7 +32,7 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {meal.recipe?.name || 'Custom Meal'}
+                {meal.name || meal.recipe?.name || 'Untitled Meal'}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">
                 {meal.meal_type} • {formatTimestamp(meal.scheduled_date, 'MMM d, yyyy')}
