@@ -102,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [supabase]);
 
   async function loadUserSpace(userId: string) {
     // Validate userId before making the query
