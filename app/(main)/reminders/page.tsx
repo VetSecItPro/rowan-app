@@ -421,13 +421,15 @@ export default function RemindersPage() {
       </div>
 
       {/* New/Edit Reminder Modal */}
-      <NewReminderModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSave={handleCreateReminder}
-        editReminder={editingReminder}
-        spaceId={currentSpace.id}
-      />
+      {currentSpace && (
+        <NewReminderModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onSave={handleCreateReminder}
+          editReminder={editingReminder}
+          spaceId={currentSpace.id}
+        />
+      )}
     </FeatureLayout>
   );
 }
