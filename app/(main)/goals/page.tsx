@@ -26,19 +26,34 @@ export default function GoalsPage() {
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
 
-  // Memoized filtered goals with search
+  // Memoized filtered goals with search and status
   const filteredGoals = useMemo(() => {
-    if (!searchQuery) return goals;
+    let filtered = goals;
 
-    const lowerQuery = searchQuery.toLowerCase();
-    return goals.filter(g =>
-      g.title.toLowerCase().includes(lowerQuery) ||
-      g.description?.toLowerCase().includes(lowerQuery)
-    );
-  }, [goals, searchQuery]);
+    // Apply status filter
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(g => {
+        if (statusFilter === 'active') return g.status === 'active';
+        if (statusFilter === 'completed') return g.status === 'completed';
+        return true;
+      });
+    }
+
+    // Apply search filter
+    if (searchQuery) {
+      const lowerQuery = searchQuery.toLowerCase();
+      filtered = filtered.filter(g =>
+        g.title.toLowerCase().includes(lowerQuery) ||
+        g.description?.toLowerCase().includes(lowerQuery)
+      );
+    }
+
+    return filtered;
+  }, [goals, searchQuery, statusFilter]);
 
   // Memoized filtered milestones with search
   const filteredMilestones = useMemo(() => {
@@ -374,8 +389,8 @@ export default function GoalsPage() {
           {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
             {/* Header with Month Badge and Status Filter */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
-              <div className="flex items-center gap-3 flex-1">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <div className="flex items-center gap-3">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                   {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` : `Achievement Wall (${filteredMilestones.length})`}
                 </h2>
@@ -385,20 +400,34 @@ export default function GoalsPage() {
               </div>
 
               {/* Status Filter - Segmented Buttons - Hidden for steps but space reserved */}
-              <div className={`flex-shrink-0 bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 w-[220px] ${viewMode === 'steps' ? 'invisible' : ''}`}>
+              <div className={`bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 w-fit ${viewMode === 'steps' ? 'invisible' : ''}`}>
                 <button
-                  onClick={() => setSearchQuery('')}
-                  className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md"
+                  onClick={() => setStatusFilter('all')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                    statusFilter === 'all'
+                      ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                  }`}
                 >
                   All
                 </button>
                 <button
-                  className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                  onClick={() => setStatusFilter('active')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                    statusFilter === 'active'
+                      ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                  }`}
                 >
                   Active
                 </button>
                 <button
-                  className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                  onClick={() => setStatusFilter('completed')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
+                    statusFilter === 'completed'
+                      ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                  }`}
                 >
                   Completed
                 </button>
