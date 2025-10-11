@@ -629,13 +629,15 @@ export default function CalendarPage() {
       </div>
 
       {/* New/Edit Event Modal */}
-      <NewEventModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSave={handleCreateEvent}
-        editEvent={editingEvent}
-        spaceId={currentSpace.id}
-      />
+      {currentSpace && (
+        <NewEventModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onSave={handleCreateEvent}
+          editEvent={editingEvent}
+          spaceId={currentSpace.id}
+        />
+      )}
     </FeatureLayout>
   );
 }
