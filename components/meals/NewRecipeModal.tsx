@@ -219,46 +219,50 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 bg-white dark:bg-gray-800 flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 z-10">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
-            {editRecipe ? 'Edit Recipe' : 'Create New Recipe'}
-          </h2>
-          <button onClick={onClose} aria-label="Close modal" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400">
-            <X className="w-5 h-5" />
-          </button>
+        <div className="sticky top-0 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 p-6 border-b border-orange-200 dark:border-orange-800 z-10">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
+              {editRecipe ? 'Edit Recipe' : 'Create New Recipe'}
+            </h2>
+            <button onClick={onClose} aria-label="Close modal" className="p-2 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-900/30 text-orange-600 dark:text-orange-400">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Toggle Buttons */}
+          {!editRecipe && (
+            <div className="flex items-center gap-1 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700">
+              <button
+                onClick={() => setActiveTab('manual')}
+                className={`flex-1 px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium ${
+                  activeTab === 'manual'
+                    ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                }`}
+              >
+                <FileText className="w-4 h-4" />
+                <span className="text-sm">Manual Entry</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('ai')}
+                className={`flex-1 px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium ${
+                  activeTab === 'ai'
+                    ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                }`}
+              >
+                <Sparkles className="w-4 h-4" />
+                <span className="text-sm">AI Import</span>
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Toggle Switch */}
-        {!editRecipe && (
-          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-            <div className="flex items-center justify-center gap-3">
-              <span className={`text-sm font-medium transition-colors ${activeTab === 'manual' ? 'text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                Manual Entry
-              </span>
-              <button
-                onClick={() => setActiveTab(activeTab === 'manual' ? 'ai' : 'manual')}
-                className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 dark:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-                role="switch"
-                aria-checked={activeTab === 'ai'}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    activeTab === 'ai' ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-              <span className={`text-sm font-medium transition-colors ${activeTab === 'ai' ? 'text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                AI Import
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Content - scrollable */}
+        {/* Content - scrollable with fixed min-height */}
         <div className="flex-1 overflow-y-auto">
           {/* AI Import Tab */}
           {activeTab === 'ai' && !editRecipe && (
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6 min-h-[600px]">
               <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                 <div className="text-sm text-blue-900 dark:text-blue-200">
@@ -366,7 +370,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
 
           {/* Manual Entry Tab */}
           {activeTab === 'manual' && (
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-6 space-y-4 min-h-[600px]">
               <div>
                 <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Recipe Name *</label>
                 <input
