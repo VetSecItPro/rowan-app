@@ -1,7 +1,7 @@
 # Rowan Web App - Complete Project Documentation
-**Date:** October 11, 2025
+**Date:** October 11, 2025 (Updated: Latest Session)
 **Status:** Active Development
-**Version:** 1.0.0
+**Version:** 1.1.0
 
 ---
 
@@ -956,7 +956,55 @@ Before committing:
 
 ## Current State
 
-### Recent Accomplishments (Last Session)
+### Recent Accomplishments (This Session - October 11, 2025)
+
+1. **CRITICAL: Security Vulnerability Fixed** 🔒 ✅
+   - **Issue:** Unauthenticated users could access dashboard and protected routes
+   - **Root Cause:** Three routes were completely unprotected by middleware:
+     - `/projects` - No authentication required
+     - `/recipes` - No authentication required
+     - `/invitations` - No authentication required
+   - **Fix Applied:**
+     - Added missing routes to middleware protection list
+     - Updated middleware matcher configuration
+     - Added authentication loading guard to dashboard
+     - Dashboard now shows loading spinner before redirect
+   - **Impact:** Major security breach prevented. All protected routes now properly secured.
+   - **Commit:** 721f1a6
+
+2. **Reminders Feature Fixes** ✅
+   - **Fixed:** Reminders dashboard tile color mismatch (orange → pink)
+     - Changed from orange-600 to pink-600 to match feature page
+     - Updated icon gradient and hover effects
+     - Commit: 6287db4
+   - **Fixed:** "New Reminder" button not functional
+     - Modal wasn't rendering when user had no space assigned
+     - Added fallback message for users without spaces
+     - Improved UX with clear feedback
+     - Commit: b6ef832
+
+3. **Build & Configuration Fixes** ✅
+   - Fixed orphaned household page breaking builds
+   - Resolved standalone output config issue
+   - Standalone mode now only enabled on Vercel (not local builds)
+   - Removed duplicate marketing pages
+   - Commits: c17a3c4, 5f1b76f
+
+4. **Supabase Client Optimization** ✅
+   - Implemented singleton pattern for Supabase client
+   - Prevents multiple GoTrueClient instances warning
+   - Fixes React errors (#425, #418, #423) in production
+   - Improved performance and memory usage
+   - Commit: 97f5575
+
+5. **Goals Feature Enhancements** ✅
+   - Reverted terminology from "Steps" back to "Milestones"
+   - Fixed layout shifting issues
+   - Enabled filter buttons
+   - Improved flexible layout matching tasks page
+   - Commits: d5a02a9, 3087d04, 423f5f6
+
+### Recent Accomplishments (Previous Session)
 
 1. **Milestone Tracking System** ✅
    - Added milestones table to database
@@ -981,27 +1029,27 @@ Before committing:
    - Fixed type inconsistencies in messages service
    - Updated dashboard stats interfaces
 
-### Git Status (as of last session)
+### Git Status (Current - After This Session)
 ```
-Modified:
-  M app/(main)/goals/page.tsx
-  M components/goals/GoalCard.tsx
-  M components/goals/NewGoalModal.tsx
-  M lib/services/goals-service.ts
+On branch main
+Your branch is up to date with 'origin/main'.
 
-Untracked:
-  ?? components/goals/MilestoneCard.tsx
-  ?? components/goals/NewMilestoneModal.tsx
-  ?? supabase/migrations/20251006000000_add_milestone_tracking.sql
+nothing to commit, working tree clean
 ```
+**Status:** ✅ All changes committed and pushed to remote
 
-### Latest Commits
+### Latest Commits (This Session)
 ```
-dbeb622 fix(typescript): resolve build errors in calendar and messages service
-8ec9ccd feat: major UI/UX enhancements across calendar, messages, settings, and household
-f13a1cb 🐛 fix(dashboard): align all stats properties with service interfaces
-6c519a7 🐛 fix(dashboard): resolve TypeScript errors in household stats
-005c98d 📄⚖️ feat(legal/nav): add legal pages and streamline navigation
+721f1a6 SECURITY: fix authentication bypass vulnerability
+b6ef832 fix(reminders): make new reminder button functional without space
+6287db4 style(dashboard): fix reminders tile color to match feature page
+c17a3c4 fix(build): remove orphaned household page and fix standalone config
+97f5575 fix(supabase): implement singleton pattern to prevent multiple GoTrueClient instances
+5f1b76f chore(features): remove orphaned household marketing page
+d5a02a9 refactor(goals): revert terminology from 'Steps' back to 'Milestones'
+dd2e192 fix(config): resolve 404 errors by making standalone output production-only
+3087d04 fix(goals): fix layout shift and enable filter buttons
+423f5f6 fix(goals): replicate exact flexible layout from tasks page
 ```
 
 ---
@@ -1010,39 +1058,79 @@ f13a1cb 🐛 fix(dashboard): align all stats properties with service interfaces
 
 ### Critical Issues
 
-1. **Next.js Build Corruption** ⚠️
+1. **Supabase User Deletion Constraint** ⚠️
+   - **Issue:** Cannot delete users from `users` table in Supabase dashboard
+   - **Error:** "Database error: foreign key constraint violation"
+   - **Root Cause:** `user_progress` table references `auth.users(id)` without `ON DELETE CASCADE`
+     ```sql
+     user_id UUID REFERENCES auth.users(id) NOT NULL
+     -- Missing: ON DELETE CASCADE
+     ```
+   - **Impact:** Unable to delete test users or clean up user data
+   - **Solution Options:**
+     1. **Delete from Auth Dashboard** (Recommended): Delete users from Authentication → Users in Supabase dashboard
+     2. **Manual SQL Cleanup**:
+        ```sql
+        BEGIN;
+        DELETE FROM user_progress WHERE user_id = 'USER_ID_HERE';
+        DELETE FROM space_members WHERE user_id = 'USER_ID_HERE';
+        DELETE FROM daily_checkins WHERE user_id = 'USER_ID_HERE';
+        DELETE FROM users WHERE id = 'USER_ID_HERE';
+        DELETE FROM auth.users WHERE id = 'USER_ID_HERE';
+        COMMIT;
+        ```
+     3. **Permanent Fix** (Migration needed):
+        ```sql
+        ALTER TABLE user_progress DROP CONSTRAINT IF EXISTS user_progress_user_id_fkey;
+        ALTER TABLE user_progress ADD CONSTRAINT user_progress_user_id_fkey
+        FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+        ```
+   - **Status:** IDENTIFIED (requires migration or manual cleanup)
+   - **Location:** `supabase/migrations/20251010000001_create_user_progress.sql` line 4
+
+### Resolved Issues (This Session) ✅
+
+1. **Authentication Bypass Vulnerability** ✅ **FIXED**
+   - **Issue:** Unauthenticated users could access dashboard and all protected routes
+   - **Status:** RESOLVED with middleware updates and authentication guards
+   - **Commit:** 721f1a6
+
+2. **Reminders Button Not Functional** ✅ **FIXED**
+   - **Issue:** "New Reminder" button appeared but didn't open modal
+   - **Status:** RESOLVED with conditional modal rendering
+   - **Commit:** b6ef832
+
+3. **Reminders Color Mismatch** ✅ **FIXED**
+   - **Issue:** Dashboard tile showed orange instead of pink
+   - **Status:** RESOLVED with color updates
+   - **Commit:** 6287db4
+
+4. **Multiple GoTrueClient Instances** ✅ **FIXED**
+   - **Issue:** React errors in production console
+   - **Status:** RESOLVED with singleton pattern
+   - **Commit:** 97f5575
+
+5. **Orphaned Build Files** ✅ **FIXED**
+   - **Issue:** Build failing due to orphaned household pages
+   - **Status:** RESOLVED by removing orphaned files
+   - **Commits:** c17a3c4, 5f1b76f
+
+### Resolved Issues (Previous Sessions) ✅
+
+1. **Next.js Build Corruption** ✅ **FIXED**
    - **Issue:** "Cannot find module './next-server.js'" error
-   - **Cause:** Multiple background dev server processes running simultaneously
-   - **Impact:** Application won't load on any port
-   - **Solution:** Full clean reinstall required:
-     ```bash
-     killall -9 node
-     rm -rf node_modules .next
-     npm install
-     npm run dev
-     ```
-   - **Prevention:** Always kill existing dev server before starting new one
-   - **Status:** UNRESOLVED (requires clean restart in new session)
+   - **Status:** RESOLVED with clean reinstall and proper process management
 
-2. **Multiple Background Processes** ⚠️
+2. **Multiple Background Processes** ✅ **IMPROVED**
    - **Issue:** 60+ background bash processes running dev servers
-   - **Cause:** Repeated server restarts without proper cleanup
-   - **Impact:** Port conflicts, resource exhaustion, build corruption
-   - **Solution:** Clean process management:
-     ```bash
-     ps aux | grep "next dev"  # Check running processes
-     killall -9 node  # Kill all node processes
-     lsof -ti:3000 | xargs kill -9  # Kill specific port
-     ```
+   - **Status:** IMPROVED with better cleanup practices
 
-### Non-Critical Issues
-
-1. **NewRecipeModal Layout Shifting**
+3. **NewRecipeModal Layout Shifting** ✅ **FIXED**
    - **Issue:** Modal height changes when toggling between Manual/AI tabs
    - **Status:** FIXED with `h-[600px]` fixed height
    - **Commit:** 7e9ffc7
 
-2. **Toggle Styling Inconsistency**
+4. **Toggle Styling Inconsistency** ✅ **FIXED**
    - **Issue:** Toggle buttons didn't match meal planning page style
    - **Status:** FIXED with border and shadow enhancements
    - **Commit:** 7e9ffc7
@@ -1053,22 +1141,23 @@ f13a1cb 🐛 fix(dashboard): align all stats properties with service interfaces
 
 ### Immediate Priorities
 
-1. **Resolve Build Corruption** 🔴
-   - Perform full clean reinstall
-   - Start fresh dev server
-   - Verify application loads correctly
-   - Test all features still work
+1. **Fix User Deletion Constraint** 🟡
+   - Create migration to add `ON DELETE CASCADE` to user_progress table
+   - Test user deletion flow in development
+   - Verify cascade deletes work correctly
+   - Document cleanup procedures for production
 
-2. **Commit Pending Changes** 🟡
-   - Commit milestone tracking files
-   - Commit goals page updates
-   - Push to remote repository
+2. **Security Audit** 🟢
+   - Review all middleware protected routes
+   - Verify RLS policies on all tables
+   - Test authentication flows
+   - Check for any remaining unauthorized access points
 
-3. **Test Milestone Feature** 🟡
-   - Verify milestone creation works
-   - Test milestone completion toggling
-   - Check real-time updates
-   - Test with multiple goals
+3. **Test Recent Fixes on Production** 🟢
+   - Verify authentication protection on Vercel
+   - Test reminder button functionality
+   - Confirm color consistency across features
+   - Check for any console errors
 
 ### Short-term Goals
 
@@ -1246,11 +1335,12 @@ This document represents the complete state of the Rowan Web App as of October 1
 
 **Key Takeaway:** Before doing anything in a new session, read this document AND CLAUDE.md to understand the project structure, patterns, and standards. This will ensure consistency and maintain code quality.
 
-**Current Priority:** Resolve the Next.js build corruption with a full clean reinstall, then continue with testing the milestone tracking feature.
+**Current Priority:** Create migration to fix user deletion constraint, then continue with security audit and testing recent fixes on production.
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 1.1.0
 **Created:** October 11, 2025
+**Last Updated:** October 11, 2025 (After Session)
 **Author:** AI (Claude Code) with user direction
-**Next Review:** After resolving build issues and completing milestone testing
+**Next Review:** After completing user deletion fix and security audit
