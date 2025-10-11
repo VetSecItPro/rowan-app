@@ -5,11 +5,14 @@ export interface Recipe {
   space_id: string;
   name: string;
   description?: string;
-  ingredients: string[];
+  ingredients: any[]; // JSONB array - can be strings or objects
   instructions?: string;
   prep_time?: number;
   cook_time?: number;
   servings?: number;
+  difficulty?: string;
+  cuisine_type?: string;
+  source_url?: string;
   image_url?: string;
   tags?: string[];
   created_at: string;
@@ -43,11 +46,14 @@ export interface CreateRecipeInput {
   space_id: string;
   name: string;
   description?: string;
-  ingredients: string[];
+  ingredients: any[]; // JSONB array - can be strings or objects with {name, amount, unit}
   instructions?: string;
   prep_time?: number;
   cook_time?: number;
   servings?: number;
+  difficulty?: string;
+  cuisine_type?: string;
+  source_url?: string;
   image_url?: string;
   tags?: string[];
 }
