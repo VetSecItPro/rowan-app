@@ -157,17 +157,28 @@ export default function MealsPage() {
     return userColors[userId] || userColors['user-1'];
   }, []);
 
-  // Memoized filtered meals based on search query
+  // Memoized filtered meals based on search query and date (for list view)
   const filteredMeals = useMemo(() => {
     if (viewMode === 'recipes') return [];
 
     let filtered = meals;
+
+    // List view: Filter out past meals (scheduled_date < today at midnight)
+    if (viewMode === 'list') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Set to midnight local time
+      filtered = filtered.filter(m => new Date(m.scheduled_date) >= today);
+    }
+
+    // Apply search filter
     if (searchQuery) {
       filtered = filtered.filter(m =>
+        m.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         m.recipe?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         m.notes?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
+
     return filtered;
   }, [meals, searchQuery, viewMode]);
 
