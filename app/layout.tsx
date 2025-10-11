@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="antialiased bg-white dark:bg-black text-gray-900 dark:text-white">
+      <body className="antialiased bg-white dark:bg-black text-gray-900 dark:text-white" style={{ scrollbarGutter: 'stable' }}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
