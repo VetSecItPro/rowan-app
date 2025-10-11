@@ -1095,12 +1095,12 @@ export default function DashboardPage() {
                 {/* Reminders Card */}
                 <Link
                   href="/reminders"
-                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(251,146,60,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
+                  className="group bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-base sm:text-lg font-bold text-orange-600 dark:text-orange-400">Reminders</h3>
+                        <h3 className="text-base sm:text-lg font-bold text-pink-600 dark:text-pink-400">Reminders</h3>
                         {stats.reminders.trend !== 0 && <TrendIndicator value={stats.reminders.trend} label="this week" />}
                       </div>
                       <div className="flex items-baseline gap-2">
@@ -1110,7 +1110,7 @@ export default function DashboardPage() {
                         <p className="text-sm text-gray-500 dark:text-gray-400">active</p>
                       </div>
                     </div>
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
                       <Bell className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                     </div>
                   </div>
@@ -1123,7 +1123,7 @@ export default function DashboardPage() {
                       </p>
                     )}
                     {stats.reminders.dueToday > 0 && (
-                      <p className="text-sm text-orange-600 dark:text-orange-400 flex items-center gap-1 font-medium">
+                      <p className="text-sm text-pink-600 dark:text-pink-400 flex items-center gap-1 font-medium">
                         <Clock className="w-3 h-3" />
                         {stats.reminders.dueToday} due today
                       </p>
