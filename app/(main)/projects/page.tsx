@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Folder, Plus, Search, Wallet, Receipt, DollarSign, CheckCircle, Clock, FileText } from 'lucide-react';
+import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ProjectCard } from '@/components/projects/ProjectCard';
 import { NewProjectModal } from '@/components/projects/NewProjectModal';
@@ -252,16 +253,37 @@ export default function ProjectsPage() {
           </div>
 
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                {activeTab === 'projects' && `All Projects (${filteredProjects.length})`}
-                {activeTab === 'budgets' && 'Budget Overview'}
-                {activeTab === 'expenses' && `All Expenses (${filteredExpenses.length})`}
-              </h2>
-              {activeTab === 'budgets' && (
-                <span className="px-3 py-1.5 bg-gradient-to-r from-amber-100 to-amber-200 dark:from-amber-900/40 dark:to-amber-800/40 border border-amber-300 dark:border-amber-600 text-amber-700 dark:text-amber-300 rounded-lg text-sm font-medium">
-                  {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {activeTab === 'projects' && `All Projects (${filteredProjects.length})`}
+                  {activeTab === 'budgets' && 'Budget Overview'}
+                  {activeTab === 'expenses' && `All Expenses (${filteredExpenses.length})`}
+                </h2>
+                <span className="px-3 py-1 bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 text-sm font-medium rounded-full">
+                  {format(new Date(), 'MMM yyyy')}
                 </span>
+              </div>
+
+              {/* Category Filter for Projects - Segmented Buttons */}
+              {activeTab === 'projects' && filteredProjects.length > 0 && (
+                <div className="bg-gray-50 dark:bg-gray-900 border-2 border-amber-200 dark:border-amber-700 rounded-lg p-1 flex gap-1 w-fit">
+                  <button
+                    className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md"
+                  >
+                    All
+                  </button>
+                  <button
+                    className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                  >
+                    Active
+                  </button>
+                  <button
+                    className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                  >
+                    Completed
+                  </button>
+                </div>
               )}
             </div>
 
@@ -281,10 +303,12 @@ export default function ProjectsPage() {
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                  {filteredProjects.map((project) => (
-                    <ProjectCard key={project.id} project={project} onEdit={(p) => { setEditingProject(p); setIsProjectModalOpen(true); }} onDelete={handleDeleteProject} />
-                  ))}
+                <div className="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    {filteredProjects.map((project) => (
+                      <ProjectCard key={project.id} project={project} onEdit={(p) => { setEditingProject(p); setIsProjectModalOpen(true); }} onDelete={handleDeleteProject} />
+                    ))}
+                  </div>
                 </div>
               )
             ) : activeTab === 'budgets' ? (
@@ -390,10 +414,12 @@ export default function ProjectsPage() {
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                  {filteredExpenses.map((expense) => (
-                    <ExpenseCard key={expense.id} expense={expense} onEdit={(e) => { setEditingExpense(e); setIsExpenseModalOpen(true); }} onDelete={handleDeleteExpense} onStatusChange={handleStatusChange} />
-                  ))}
+                <div className="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    {filteredExpenses.map((expense) => (
+                      <ExpenseCard key={expense.id} expense={expense} onEdit={(e) => { setEditingExpense(e); setIsExpenseModalOpen(true); }} onDelete={handleDeleteExpense} onStatusChange={handleStatusChange} />
+                    ))}
+                  </div>
                 </div>
               )
             )}

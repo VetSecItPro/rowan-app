@@ -386,9 +386,14 @@ export default function MessagesPage() {
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden flex flex-col h-[400px] sm:h-[500px] md:h-[600px]">
             {/* Chat Header */}
             <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-              <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-                Conversation
-              </h2>
+              <div className="flex items-center gap-3">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                  Conversation
+                </h2>
+                <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-300 text-sm font-medium rounded-full">
+                  {format(new Date(), 'MMM yyyy')}
+                </span>
+              </div>
             </div>
 
             {/* Messages Area */}

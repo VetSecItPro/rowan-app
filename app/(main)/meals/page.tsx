@@ -524,8 +524,18 @@ export default function MealsPage() {
           {/* Meals/Recipes Section - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            {viewMode !== 'calendar' && (
+              <div className="flex items-center gap-3 mb-6">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {viewMode === 'recipes' ? `Saved Recipes (${filteredRecipes.length})` : `Planned Meals (${filteredMeals.length})`}
+                </h2>
+                <span className="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 text-sm font-medium rounded-full">
+                  {format(new Date(), 'MMM yyyy')}
+                </span>
+              </div>
+            )}
 
-            <div className="h-[600px] overflow-y-auto">
+            <div className={viewMode === 'calendar' ? 'h-[600px] overflow-y-auto' : 'max-h-[600px] overflow-y-auto'}>
               {loading ? (
                 <div className="text-center py-12">
                   <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List } from 'lucide-react';
+import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { GoalCard } from '@/components/goals/GoalCard';
 import { MilestoneCard } from '@/components/goals/MilestoneCard';
@@ -353,9 +354,39 @@ export default function GoalsPage() {
           {/* Goals/Milestones List - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` : `Achievement Wall (${filteredMilestones.length})`}
-            </h2>
+            {/* Header with Month Badge and Status Filter */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` : `Achievement Wall (${filteredMilestones.length})`}
+                </h2>
+                <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 text-sm font-medium rounded-full">
+                  {format(new Date(), 'MMM yyyy')}
+                </span>
+              </div>
+
+              {/* Status Filter - Segmented Buttons - Only for goals view */}
+              {viewMode === 'goals' && (
+                <div className="bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 w-fit">
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md"
+                  >
+                    All
+                  </button>
+                  <button
+                    className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                  >
+                    Active
+                  </button>
+                  <button
+                    className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                  >
+                    Completed
+                  </button>
+                </div>
+              )}
+            </div>
 
             {loading ? (
               <div className="text-center py-12">
@@ -393,7 +424,7 @@ export default function GoalsPage() {
                   )}
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                   {filteredGoals.map((goal) => (
                     <GoalCard
                       key={goal.id}
@@ -414,7 +445,7 @@ export default function GoalsPage() {
                   <p className="text-gray-500 dark:text-gray-500">Try adjusting your search</p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                   {filteredMilestones.map((milestone) => {
                     const relatedGoal = goals.find(g => g.id === milestone.goal_id);
                     return (
