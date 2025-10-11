@@ -84,9 +84,17 @@ export const mealsService = {
 
   async createMeal(input: CreateMealInput): Promise<Meal> {
     const supabase = createClient();
+
+    // Get the current user
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     const { data, error } = await supabase
       .from('meals')
-      .insert([input])
+      .insert([{
+        ...input,
+        created_by: user.id,
+      }])
       .select()
       .single();
 
