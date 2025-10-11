@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChefHat, Plus, X, ArrowLeft, Loader2 } from 'lucide-react';
+import { ChefHat, Plus, X, ArrowLeft, Loader2, Sparkles, Image as ImageIcon, FileText, Info } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { mealsService } from '@/lib/services/meals-service';
 import Link from 'next/link';
@@ -13,11 +13,14 @@ interface Ingredient {
   unit: string;
 }
 
+type TabType = 'manual' | 'ai';
+
 export default function NewRecipePage() {
   const router = useRouter();
   const { user } = useAuth();
   const [currentSpaceId, setCurrentSpaceId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>('manual');
 
   // Form fields
   const [name, setName] = useState('');
@@ -31,6 +34,13 @@ export default function NewRecipePage() {
   const [cuisineType, setCuisineType] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [tags, setTags] = useState('');
+
+  // AI Import fields
+  const [recipeText, setRecipeText] = useState('');
+  const [recipeImage, setRecipeImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [parsing, setParsing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load user's current space
   useEffect(() => {
@@ -66,6 +76,84 @@ export default function NewRecipePage() {
     const updated = [...ingredients];
     updated[index][field] = value;
     setIngredients(updated);
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setRecipeImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleParseRecipe = async () => {
+    if (!recipeText && !recipeImage) {
+      alert('Please provide either recipe text or an image');
+      return;
+    }
+
+    setParsing(true);
+
+    try {
+      let imageBase64 = null;
+
+      if (recipeImage) {
+        const reader = new FileReader();
+        imageBase64 = await new Promise<string>((resolve) => {
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(recipeImage);
+        });
+      }
+
+      const response = await fetch('/api/recipes/parse', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: recipeText,
+          imageBase64,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to parse recipe');
+      }
+
+      const recipe = data.recipe;
+
+      // Pre-fill the form with parsed data
+      setName(recipe.name || '');
+      setDescription(recipe.description || '');
+      setInstructions(recipe.instructions || '');
+      setPrepTime(recipe.prep_time?.toString() || '');
+      setCookTime(recipe.cook_time?.toString() || '');
+      setServings(recipe.servings?.toString() || '');
+      setDifficulty(recipe.difficulty || '');
+      setCuisineType(recipe.cuisine_type || '');
+      setTags(recipe.tags?.join(', ') || '');
+
+      // Set ingredients
+      if (recipe.ingredients && recipe.ingredients.length > 0) {
+        setIngredients(recipe.ingredients);
+      }
+
+      // Switch to manual tab so user can review and edit
+      setActiveTab('manual');
+
+      alert('✓ Recipe parsed successfully! Please review and edit as needed before saving.');
+    } catch (error) {
+      console.error('Parse error:', error);
+      alert(error instanceof Error ? error.message : 'Failed to parse recipe. Please try again.');
+    } finally {
+      setParsing(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -126,263 +214,426 @@ export default function NewRecipePage() {
             <Link
               href="/recipes"
               className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              title="Back to recipes"
             >
               <ArrowLeft className="w-6 h-6" />
             </Link>
             <ChefHat className="w-8 h-8" />
             <div>
               <h1 className="text-2xl font-bold">Create New Recipe</h1>
-              <p className="text-orange-100 text-sm">Add your own recipe to the library</p>
+              <p className="text-orange-100 text-sm">Add your own recipe or use AI to import from anywhere</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Form */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 space-y-6">
-          {/* Basic Information */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Basic Information</h2>
+      {/* Tabs */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex gap-1">
+            <button
+              onClick={() => setActiveTab('manual')}
+              className={`px-6 py-3 font-medium transition-all border-b-2 ${
+                activeTab === 'manual'
+                  ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              }`}
+              title="Enter recipe details manually"
+            >
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Manual Entry
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveTab('ai')}
+              className={`px-6 py-3 font-medium transition-all border-b-2 ${
+                activeTab === 'ai'
+                  ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              }`}
+              title="Use AI to parse recipe from text or image"
+            >
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5" />
+                AI Import
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
 
-            {/* Recipe Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Recipe Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g., Grandma's Apple Pie"
-                required
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
-              />
+      {/* Content */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* AI Import Tab */}
+        {activeTab === 'ai' && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 space-y-6">
+            <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-blue-900 dark:text-blue-200">
+                <p className="font-semibold mb-1">How AI Import Works</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Paste recipe text from a website, blog, or document</li>
+                  <li>Or upload a screenshot/photo of a recipe</li>
+                  <li>AI will extract ingredients, instructions, and cooking details</li>
+                  <li>Review and edit the parsed data before saving</li>
+                </ul>
+              </div>
             </div>
 
-            {/* Description */}
+            {/* Text Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Description
+                Paste Recipe Text
               </label>
               <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Brief description of the recipe..."
-                rows={3}
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                value={recipeText}
+                onChange={(e) => setRecipeText(e.target.value)}
+                placeholder="Paste your recipe here... Include ingredients, instructions, prep time, etc."
+                rows={10}
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white placeholder-gray-500"
               />
             </div>
 
-            {/* Image URL */}
+            {/* Divider */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">OR</span>
+              </div>
+            </div>
+
+            {/* Image Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Image URL
+                Upload Recipe Image
               </label>
-              <input
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
-              />
-            </div>
-          </div>
+              <div className="space-y-3">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageSelect}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full px-4 py-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-orange-500 dark:hover:border-orange-400 transition-colors"
+                  title="Click to upload an image"
+                >
+                  <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400">
+                    <ImageIcon className="w-10 h-10" />
+                    <span className="font-medium">Click to upload image</span>
+                    <span className="text-sm">PNG, JPG, or JPEG</span>
+                  </div>
+                </button>
 
-          {/* Ingredients */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Ingredients <span className="text-red-500">*</span>
-              </h2>
-              <button
-                type="button"
-                onClick={addIngredient}
-                className="px-3 py-1 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center gap-2 text-sm"
-              >
-                <Plus className="w-4 h-4" />
-                Add Ingredient
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              {ingredients.map((ingredient, index) => (
-                <div key={index} className="flex gap-3">
-                  <input
-                    type="text"
-                    value={ingredient.name}
-                    onChange={(e) => updateIngredient(index, 'name', e.target.value)}
-                    placeholder="Ingredient name"
-                    className="flex-1 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
-                  />
-                  <input
-                    type="text"
-                    value={ingredient.amount}
-                    onChange={(e) => updateIngredient(index, 'amount', e.target.value)}
-                    placeholder="Amount"
-                    className="w-24 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
-                  />
-                  <input
-                    type="text"
-                    value={ingredient.unit}
-                    onChange={(e) => updateIngredient(index, 'unit', e.target.value)}
-                    placeholder="Unit"
-                    className="w-24 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
-                  />
-                  {ingredients.length > 1 && (
+                {imagePreview && (
+                  <div className="relative">
+                    <img
+                      src={imagePreview}
+                      alt="Recipe preview"
+                      className="w-full h-64 object-cover rounded-lg"
+                    />
                     <button
-                      type="button"
-                      onClick={() => removeIngredient(index)}
-                      className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                      onClick={() => {
+                        setRecipeImage(null);
+                        setImagePreview(null);
+                        if (fileInputRef.current) fileInputRef.current.value = '';
+                      }}
+                      className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                      title="Remove image"
                     >
                       <X className="w-5 h-5" />
                     </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Instructions */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Instructions
-            </label>
-            <textarea
-              value={instructions}
-              onChange={(e) => setInstructions(e.target.value)}
-              placeholder="Step-by-step cooking instructions..."
-              rows={8}
-              className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
-            />
-          </div>
-
-          {/* Recipe Details */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recipe Details</h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Prep Time */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Prep Time (minutes)
-                </label>
-                <input
-                  type="number"
-                  value={prepTime}
-                  onChange={(e) => setPrepTime(e.target.value)}
-                  placeholder="30"
-                  min="0"
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
-                />
-              </div>
-
-              {/* Cook Time */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Cook Time (minutes)
-                </label>
-                <input
-                  type="number"
-                  value={cookTime}
-                  onChange={(e) => setCookTime(e.target.value)}
-                  placeholder="45"
-                  min="0"
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
-                />
-              </div>
-
-              {/* Servings */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Servings
-                </label>
-                <input
-                  type="number"
-                  value={servings}
-                  onChange={(e) => setServings(e.target.value)}
-                  placeholder="4"
-                  min="1"
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
-                />
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Difficulty */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Difficulty
-                </label>
-                <select
-                  value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
-                >
-                  <option value="">Select difficulty...</option>
-                  <option value="easy">Easy</option>
-                  <option value="medium">Medium</option>
-                  <option value="hard">Hard</option>
-                </select>
-              </div>
-
-              {/* Cuisine Type */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Cuisine Type
-                </label>
-                <input
-                  type="text"
-                  value={cuisineType}
-                  onChange={(e) => setCuisineType(e.target.value)}
-                  placeholder="e.g., Italian, Mexican, Asian"
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
-                />
-              </div>
-            </div>
-
-            {/* Tags */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Tags (comma-separated)
-              </label>
-              <input
-                type="text"
-                value={tags}
-                onChange={(e) => setTags(e.target.value)}
-                placeholder="dessert, holiday, vegetarian"
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
-              />
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <Link
-              href="/recipes"
-              className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-            >
-              Cancel
-            </Link>
+            {/* Parse Button */}
             <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              onClick={handleParseRecipe}
+              disabled={parsing || (!recipeText && !recipeImage)}
+              className="w-full py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              title={parsing ? 'Parsing recipe...' : 'Parse recipe with AI'}
             >
-              {loading ? (
+              {parsing ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Creating...
+                  Parsing Recipe...
                 </>
               ) : (
                 <>
-                  <Plus className="w-5 h-5" />
-                  Create Recipe
+                  <Sparkles className="w-5 h-5" />
+                  Parse Recipe with AI
                 </>
               )}
             </button>
           </div>
-        </form>
+        )}
+
+        {/* Manual Entry Tab */}
+        {activeTab === 'manual' && (
+          <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 space-y-6">
+            {/* Basic Information */}
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Basic Information</h2>
+
+              {/* Recipe Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Recipe Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g., Grandma's Apple Pie"
+                  required
+                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Description
+                </label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Brief description of the recipe..."
+                  rows={3}
+                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                />
+              </div>
+
+              {/* Image URL */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Image URL
+                </label>
+                <input
+                  type="url"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="https://example.com/image.jpg"
+                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                  title="Optional: Add a URL to an image for this recipe"
+                />
+              </div>
+            </div>
+
+            {/* Ingredients */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Ingredients <span className="text-red-500">*</span>
+                </h2>
+                <button
+                  type="button"
+                  onClick={addIngredient}
+                  className="px-3 py-1 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center gap-2 text-sm"
+                  title="Add another ingredient"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Ingredient
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {ingredients.map((ingredient, index) => (
+                  <div key={index} className="flex gap-3">
+                    <input
+                      type="text"
+                      value={ingredient.name}
+                      onChange={(e) => updateIngredient(index, 'name', e.target.value)}
+                      placeholder="Ingredient name"
+                      className="flex-1 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    />
+                    <input
+                      type="text"
+                      value={ingredient.amount}
+                      onChange={(e) => updateIngredient(index, 'amount', e.target.value)}
+                      placeholder="Amount"
+                      className="w-24 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                      title="e.g., 2, 1/2, 3.5"
+                    />
+                    <input
+                      type="text"
+                      value={ingredient.unit}
+                      onChange={(e) => updateIngredient(index, 'unit', e.target.value)}
+                      placeholder="Unit"
+                      className="w-24 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                      title="e.g., cups, tsp, oz"
+                    />
+                    {ingredients.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeIngredient(index)}
+                        className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                        title="Remove this ingredient"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Instructions */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Instructions
+              </label>
+              <textarea
+                value={instructions}
+                onChange={(e) => setInstructions(e.target.value)}
+                placeholder="Step-by-step cooking instructions..."
+                rows={8}
+                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+              />
+            </div>
+
+            {/* Recipe Details */}
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recipe Details</h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Prep Time */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Prep Time (minutes)
+                  </label>
+                  <input
+                    type="number"
+                    value={prepTime}
+                    onChange={(e) => setPrepTime(e.target.value)}
+                    placeholder="30"
+                    min="0"
+                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    title="Time to prepare ingredients"
+                  />
+                </div>
+
+                {/* Cook Time */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Cook Time (minutes)
+                  </label>
+                  <input
+                    type="number"
+                    value={cookTime}
+                    onChange={(e) => setCookTime(e.target.value)}
+                    placeholder="45"
+                    min="0"
+                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    title="Time to cook the recipe"
+                  />
+                </div>
+
+                {/* Servings */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Servings
+                  </label>
+                  <input
+                    type="number"
+                    value={servings}
+                    onChange={(e) => setServings(e.target.value)}
+                    placeholder="4"
+                    min="1"
+                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    title="Number of servings"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Difficulty */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Difficulty
+                  </label>
+                  <select
+                    value={difficulty}
+                    onChange={(e) => setDifficulty(e.target.value)}
+                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    title="Recipe difficulty level"
+                  >
+                    <option value="">Select difficulty...</option>
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                  </select>
+                </div>
+
+                {/* Cuisine Type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Cuisine Type
+                  </label>
+                  <input
+                    type="text"
+                    value={cuisineType}
+                    onChange={(e) => setCuisineType(e.target.value)}
+                    placeholder="e.g., Italian, Mexican, Asian"
+                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    title="Type of cuisine"
+                  />
+                </div>
+              </div>
+
+              {/* Tags */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Tags (comma-separated)
+                </label>
+                <input
+                  type="text"
+                  value={tags}
+                  onChange={(e) => setTags(e.target.value)}
+                  placeholder="dessert, holiday, vegetarian"
+                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                  title="Add tags to categorize this recipe"
+                />
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <Link
+                href="/recipes"
+                className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              >
+                Cancel
+              </Link>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-6 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                title={loading ? 'Creating recipe...' : 'Create recipe'}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-5 h-5" />
+                    Create Recipe
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );
