@@ -253,48 +253,52 @@ export default function GoalsPage() {
       <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-gradient-goals flex items-center justify-center">
                 <Target className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-goals bg-clip-text text-transparent">Goals & Milestones</h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">Achieve your dreams together</p>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-goals bg-clip-text text-transparent">
+                  Goals & Milestones
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                  Achieve your dreams together
+                </p>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 flex gap-1">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-indigo-100 to-indigo-200 dark:from-indigo-900/30 dark:to-indigo-800/30 rounded-xl border border-indigo-200 dark:border-indigo-700">
                 <button
                   onClick={() => handleViewModeChange('goals')}
-                  className={`min-w-[90px] sm:min-w-[110px] px-3 sm:px-4 py-2 rounded-md font-medium transition-all flex items-center justify-center gap-2 ${
+                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
                     viewMode === 'goals'
-                      ? 'bg-gradient-goals text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      ? 'bg-gradient-goals text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                   }`}
                 >
                   <LayoutGrid className="w-4 h-4" />
-                  Goals
+                  <span className="text-sm">Goals</span>
                 </button>
                 <button
                   onClick={() => handleViewModeChange('milestones')}
-                  className={`min-w-[90px] sm:min-w-[110px] px-3 sm:px-4 py-2 rounded-md font-medium transition-all flex items-center justify-center gap-2 ${
+                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
                     viewMode === 'milestones'
-                      ? 'bg-gradient-goals text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      ? 'bg-gradient-goals text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                   }`}
                 >
                   <List className="w-4 h-4" />
-                  Milestones
+                  <span className="text-sm">Milestones</span>
                 </button>
               </div>
               <button
                 onClick={handleNewButtonClick}
-                className="flex-1 sm:flex-none px-4 py-2 sm:px-6 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
-                New {viewMode === 'goals' ? 'Goal' : 'Milestone'}
+                <span>New {viewMode === 'goals' ? 'Goal' : 'Milestone'}</span>
               </button>
             </div>
           </div>
@@ -310,33 +314,48 @@ export default function GoalsPage() {
           {/* Stats Dashboard - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Active Goals</h3>
-                <div className="w-12 h-12 bg-gradient-goals rounded-xl flex items-center justify-center"><Target className="w-6 h-6 text-white" /></div>
+            {/* Active Goals */}
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Active Goals</h3>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-goals rounded-xl flex items-center justify-center">
+                  <Target className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.active}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.active}</p>
             </div>
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">In Progress</h3>
-                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center"><TrendingUp className="w-6 h-6 text-white" /></div>
+
+            {/* In Progress */}
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">In Progress</h3>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.inProgress}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.inProgress}</p>
             </div>
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Milestones</h3>
-                <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center"><Award className="w-6 h-6 text-white" /></div>
+
+            {/* Milestones */}
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Milestones</h3>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-500 rounded-xl flex items-center justify-center">
+                  <Award className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.milestonesReached}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.milestonesReached}</p>
             </div>
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completed</h3>
-                <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"><CheckCircle2 className="w-6 h-6 text-white" /></div>
+
+            {/* Completed */}
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Completed</h3>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                  <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
             </div>
           </div>
           )}
@@ -353,11 +372,11 @@ export default function GoalsPage() {
 
           {/* Goals/Milestones List - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
             {/* Header with Month Badge and Status Filter */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                   {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` : `Achievement Wall (${filteredMilestones.length})`}
                 </h2>
                 <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 text-sm font-medium rounded-full">
