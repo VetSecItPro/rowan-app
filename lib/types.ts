@@ -600,7 +600,7 @@ export interface CreateInvitationInput {
 export interface UserProgress {
   id: string;
   user_id: string;
-  partnership_id: string | null;
+  space_id: string | null;
 
   // Guided flow completion tracking
   first_task_created: boolean;
@@ -624,7 +624,7 @@ export interface UserProgress {
 
   // Onboarding status
   onboarding_completed: boolean;
-  partnership_setup_completed: boolean;
+  space_setup_completed: boolean;
 
   created_at: string;
   updated_at: string;
@@ -648,5 +648,5 @@ export interface UpdateUserProgressInput {
   skipped_household_guide?: boolean;
   skipped_goal_guide?: boolean;
   onboarding_completed?: boolean;
-  partnership_setup_completed?: boolean;
+  space_setup_completed?: boolean;
 }
