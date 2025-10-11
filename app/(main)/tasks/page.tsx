@@ -242,51 +242,51 @@ export default function TasksPage() {
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-tasks flex items-center justify-center">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 flex-shrink-0">
+              <div className="w-12 h-12 rounded-xl bg-gradient-tasks flex items-center justify-center flex-shrink-0">
                 <CheckSquare className="w-6 h-6 text-white" />
               </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-tasks bg-clip-text text-transparent">
+              <div className="flex-shrink-0">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-tasks bg-clip-text text-transparent whitespace-nowrap">
                   Tasks & Chores
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                <p className="text-gray-600 dark:text-gray-400 mt-1 whitespace-nowrap">
                   Organize daily tasks and household chores together
                 </p>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 rounded-xl border border-blue-200 dark:border-blue-700">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-[464px] flex-shrink-0">
+              <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 rounded-xl border border-blue-200 dark:border-blue-700 sm:w-[244px]">
                 <button
                   onClick={() => handleTabChange('task')}
-                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
+                  className={`w-[110px] py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium ${
                     activeTab === 'task'
                       ? 'bg-gradient-tasks text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                   }`}
                 >
-                  <CheckSquare className="w-4 h-4" />
+                  <CheckSquare className="w-4 h-4 flex-shrink-0" />
                   <span className="text-sm">Tasks</span>
                 </button>
                 <button
                   onClick={() => handleTabChange('chore')}
-                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
+                  className={`w-[110px] py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium ${
                     activeTab === 'chore'
                       ? 'bg-gradient-tasks text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                   }`}
                 >
-                  <Home className="w-4 h-4" />
+                  <Home className="w-4 h-4 flex-shrink-0" />
                   <span className="text-sm">Chores</span>
                 </button>
               </div>
               <button
                 onClick={handleOpenModal}
-                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-tasks text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                className="w-full sm:w-[208px] py-2 sm:py-3 shimmer-tasks text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
-                <Plus className="w-5 h-5" />
-                <span>New {activeTab === 'task' ? 'Task' : 'Chore'}</span>
+                <Plus className="w-5 h-5 flex-shrink-0" />
+                <span className="whitespace-nowrap">New {activeTab === 'task' ? 'Task' : 'Chore'}</span>
               </button>
             </div>
           </div>
