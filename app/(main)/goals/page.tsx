@@ -295,7 +295,7 @@ export default function GoalsPage() {
               </div>
               <button
                 onClick={handleNewButtonClick}
-                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 sm:min-w-[180px]"
+                className="px-3 sm:px-4 py-2 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 sm:min-w-[180px]"
               >
                 <Plus className="w-5 h-5" />
                 <span>New {viewMode === 'goals' ? 'Goal' : 'Milestone'}</span>
