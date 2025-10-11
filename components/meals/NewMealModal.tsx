@@ -1,18 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Sunrise, Sun, Moon, Cookie } from 'lucide-react';
-import { CreateMealInput, Meal } from '@/lib/services/meals-service';
+import { X, Sunrise, Sun, Moon, Cookie, ChefHat, ShoppingCart } from 'lucide-react';
+import { CreateMealInput, Meal, Recipe } from '@/lib/services/meals-service';
 
 interface NewMealModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (meal: CreateMealInput) => void;
+  onSave: (meal: CreateMealInput, createShoppingList?: boolean) => void;
   editMeal?: Meal | null;
   spaceId: string;
+  recipes?: Recipe[];
 }
 
-export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId }: NewMealModalProps) {
+export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recipes = [] }: NewMealModalProps) {
   const [formData, setFormData] = useState<CreateMealInput>({
     space_id: spaceId,
     name: '',
@@ -21,6 +22,10 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId }: New
     notes: '',
   });
   const [isMealTypeOpen, setIsMealTypeOpen] = useState(false);
+  const [isRecipeSelectorOpen, setIsRecipeSelectorOpen] = useState(false);
+  const [createShoppingList, setCreateShoppingList] = useState(true);
+
+  const selectedRecipe = recipes.find(r => r.id === formData.recipe_id);
 
   const mealTypeOptions = [
     { value: 'breakfast', label: 'Breakfast', icon: Sunrise, color: 'text-orange-500' },
@@ -55,7 +60,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId }: New
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    onSave(formData, createShoppingList && !!formData.recipe_id);
     onClose();
   };
 
@@ -115,8 +120,77 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId }: New
               </div>
             )}
           </div>
+          <div className="relative">
+            <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Recipe (Optional)</label>
+            <button
+              type="button"
+              onClick={() => setIsRecipeSelectorOpen(!isRecipeSelectorOpen)}
+              className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <ChefHat className="w-4 h-4 text-orange-500" />
+                <span>{selectedRecipe ? selectedRecipe.name : 'No recipe selected'}</span>
+              </div>
+              <svg className="w-4 h-4 text-gray-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {isRecipeSelectorOpen && (
+              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData({ ...formData, recipe_id: undefined });
+                    setIsRecipeSelectorOpen(false);
+                  }}
+                  className="w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+                >
+                  <span className="text-gray-500 dark:text-gray-400 italic">No recipe</span>
+                </button>
+                {recipes.map((recipe) => (
+                  <button
+                    key={recipe.id}
+                    type="button"
+                    onClick={() => {
+                      setFormData({ ...formData, recipe_id: recipe.id });
+                      setIsRecipeSelectorOpen(false);
+                    }}
+                    className="w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left border-t border-gray-200 dark:border-gray-700"
+                  >
+                    <ChefHat className="w-4 h-4 text-orange-500" />
+                    <div className="flex-1">
+                      <span className="text-gray-900 dark:text-white">{recipe.name}</span>
+                      {recipe.description && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{recipe.description}</p>
+                      )}
+                    </div>
+                  </button>
+                ))}
+                {recipes.length === 0 && (
+                  <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 italic text-center">
+                    No recipes available
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          {formData.recipe_id && (
+            <div className="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
+              <input
+                type="checkbox"
+                id="createShoppingList"
+                checked={createShoppingList}
+                onChange={(e) => setCreateShoppingList(e.target.checked)}
+                className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 dark:focus:ring-emerald-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <label htmlFor="createShoppingList" className="flex items-center gap-2 text-sm text-gray-900 dark:text-white cursor-pointer">
+                <ShoppingCart className="w-4 h-4 text-emerald-600" />
+                <span>Add ingredients to Shopping List</span>
+              </label>
+            </div>
+          )}
           <div>
-            <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Meal Name</label>
+            <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Meal Name (Optional)</label>
             <input
               type="text"
               placeholder="e.g., Family Dinner, Quick Lunch"
