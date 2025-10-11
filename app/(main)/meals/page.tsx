@@ -7,11 +7,12 @@ import { MealCard } from '@/components/meals/MealCard';
 import { NewMealModal } from '@/components/meals/NewMealModal';
 import { NewRecipeModal } from '@/components/meals/NewRecipeModal';
 import { RecipeCard } from '@/components/meals/RecipeCard';
+import { IngredientReviewModal } from '@/components/meals/IngredientReviewModal';
 import GuidedMealCreation from '@/components/guided/GuidedMealCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { mealsService, Meal, CreateMealInput, Recipe, CreateRecipeInput } from '@/lib/services/meals-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
-import { createShoppingListFromRecipe } from '@/lib/utils/shopping-list-helpers';
+import { shoppingService } from '@/lib/services/shopping-service';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth } from 'date-fns';
 
 type ViewMode = 'calendar' | 'list' | 'recipes';
@@ -148,6 +149,11 @@ export default function MealsPage() {
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
+
+  // Ingredient review modal state
+  const [isIngredientReviewOpen, setIsIngredientReviewOpen] = useState(false);
+  const [pendingMealData, setPendingMealData] = useState<CreateMealInput | null>(null);
+  const [selectedRecipeForReview, setSelectedRecipeForReview] = useState<Recipe | null>(null);
 
   // Memoized user color mapping
   const getUserColor = useCallback((userId: string) => {
@@ -289,28 +295,23 @@ export default function MealsPage() {
   // Memoized handlers
   const handleCreateMeal = useCallback(async (mealData: CreateMealInput, createShoppingList?: boolean) => {
     try {
-      let createdMeal;
+      // If creating shopping list and recipe has ingredients, show review modal
+      if (createShoppingList && mealData.recipe_id && currentSpace && !editingMeal) {
+        const recipe = recipes.find(r => r.id === mealData.recipe_id);
+        if (recipe && recipe.ingredients && recipe.ingredients.length > 0) {
+          // Store the meal data and recipe, then show ingredient review modal
+          setPendingMealData(mealData);
+          setSelectedRecipeForReview(recipe);
+          setIsIngredientReviewOpen(true);
+          return; // Don't create the meal yet
+        }
+      }
+
+      // Otherwise, create/update meal directly (no shopping list or editing mode)
       if (editingMeal) {
         await mealsService.updateMeal(editingMeal.id, mealData);
       } else {
-        createdMeal = await mealsService.createMeal(mealData);
-      }
-
-      // Create shopping list if requested and recipe is selected
-      if (createShoppingList && mealData.recipe_id && currentSpace) {
-        try {
-          const recipe = recipes.find(r => r.id === mealData.recipe_id);
-          if (recipe && recipe.ingredients && recipe.ingredients.length > 0) {
-            await createShoppingListFromRecipe(
-              recipe,
-              currentSpace.id,
-              mealData.scheduled_date
-            );
-          }
-        } catch (shoppingListError) {
-          console.error('Failed to create shopping list:', shoppingListError);
-          // Don't fail the whole operation if shopping list creation fails
-        }
+        await mealsService.createMeal(mealData);
       }
 
       loadMeals();
@@ -431,6 +432,46 @@ export default function MealsPage() {
       }
     }
   }, [user]);
+
+  // Handle ingredient selection confirmation from modal
+  const handleIngredientConfirm = useCallback(async (selectedIngredients: string[]) => {
+    if (!pendingMealData || !selectedRecipeForReview || !currentSpace) return;
+
+    try {
+      // Create the meal
+      await mealsService.createMeal(pendingMealData);
+
+      // Create shopping list with meal name and date
+      const formattedDate = format(new Date(pendingMealData.scheduled_date), 'MM/dd/yyyy');
+      const listTitle = `${pendingMealData.name || selectedRecipeForReview.name} - ${formattedDate}`;
+
+      const list = await shoppingService.createList({
+        space_id: currentSpace.id,
+        title: listTitle,
+        description: `Ingredients for ${selectedRecipeForReview.name}`,
+        status: 'active',
+      });
+
+      // Add only selected ingredients to shopping list
+      await Promise.all(
+        selectedIngredients.map((ingredient) =>
+          shoppingService.createItem({
+            list_id: list.id,
+            name: ingredient,
+            quantity: 1,
+          })
+        )
+      );
+
+      // Close modal and reload meals
+      setIsIngredientReviewOpen(false);
+      setPendingMealData(null);
+      setSelectedRecipeForReview(null);
+      loadMeals();
+    } catch (error) {
+      console.error('Failed to create meal with shopping list:', error);
+    }
+  }, [pendingMealData, selectedRecipeForReview, currentSpace, loadMeals]);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Meal Planning' }]}>
@@ -709,6 +750,19 @@ export default function MealsPage() {
         <>
           <NewMealModal isOpen={isModalOpen} onClose={handleCloseMealModal} onSave={handleCreateMeal} editMeal={editingMeal} spaceId={currentSpace.id} recipes={recipes} />
           <NewRecipeModal isOpen={isRecipeModalOpen} onClose={handleCloseRecipeModal} onSave={handleCreateRecipe} editRecipe={editingRecipe} spaceId={currentSpace.id} />
+          {selectedRecipeForReview && (
+            <IngredientReviewModal
+              isOpen={isIngredientReviewOpen}
+              onClose={() => {
+                setIsIngredientReviewOpen(false);
+                setPendingMealData(null);
+                setSelectedRecipeForReview(null);
+              }}
+              onConfirm={handleIngredientConfirm}
+              ingredients={selectedRecipeForReview.ingredients}
+              recipeName={selectedRecipeForReview.name}
+            />
+          )}
         </>
       )}
     </FeatureLayout>
