@@ -16,19 +16,42 @@ import { useDebouncedCallback } from 'use-debounce';
 export default function DiscoverRecipesPage() {
   const { user } = useAuth();
   const [currentSpaceId, setCurrentSpaceId] = useState<string | null>(null);
+  const [spaceLoading, setSpaceLoading] = useState(true);
+  const [spaceError, setSpaceError] = useState<string | null>(null);
 
   // Load user's current space
   useEffect(() => {
     const loadSpace = async () => {
-      if (user) {
-        // Get the user's spaces and use the first one for now
-        // In a production app, this would come from user preferences or context
-        const spaces = await fetch('/api/spaces').then(r => r.json());
-        if (spaces && spaces.length > 0) {
-          setCurrentSpaceId(spaces[0].id);
+      if (!user) {
+        setSpaceLoading(false);
+        return;
+      }
+
+      try {
+        setSpaceLoading(true);
+        setSpaceError(null);
+
+        const response = await fetch('/api/spaces');
+
+        if (!response.ok) {
+          throw new Error('Failed to load spaces');
         }
+
+        const spaces = await response.json();
+
+        if (spaces && Array.isArray(spaces) && spaces.length > 0) {
+          setCurrentSpaceId(spaces[0].id);
+        } else {
+          setSpaceError('No space found. Please create a space first.');
+        }
+      } catch (error) {
+        console.error('Failed to load space:', error);
+        setSpaceError('Failed to load your space. Please try again.');
+      } finally {
+        setSpaceLoading(false);
       }
     };
+
     loadSpace();
   }, [user]);
   const [searchQuery, setSearchQuery] = useState('');
