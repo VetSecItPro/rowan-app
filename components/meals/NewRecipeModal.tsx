@@ -231,12 +231,12 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
 
           {/* Toggle Buttons */}
           {!editRecipe && (
-            <div className="flex items-center gap-1 p-1 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-lg border border-orange-200 dark:border-orange-700">
+            <div className="flex items-center gap-1 p-1 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-lg border-2 border-orange-300 dark:border-orange-600">
               <button
                 onClick={() => setActiveTab('manual')}
-                className={`flex-1 px-2 py-1.5 rounded-md flex items-center justify-center gap-1.5 transition-all font-medium text-xs ${
+                className={`flex-1 px-3 py-1.5 rounded-md flex items-center justify-center gap-1.5 transition-all font-medium text-xs ${
                   activeTab === 'manual'
-                    ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
+                    ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-sm'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                 }`}
               >
@@ -245,9 +245,9 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
               </button>
               <button
                 onClick={() => setActiveTab('ai')}
-                className={`flex-1 px-2 py-1.5 rounded-md flex items-center justify-center gap-1.5 transition-all font-medium text-xs ${
+                className={`flex-1 px-3 py-1.5 rounded-md flex items-center justify-center gap-1.5 transition-all font-medium text-xs ${
                   activeTab === 'ai'
-                    ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
+                    ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-sm'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                 }`}
               >
