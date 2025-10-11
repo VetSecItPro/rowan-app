@@ -1,6 +1,6 @@
 -- Fix user deletion constraint issue
 -- This migration adds ON DELETE CASCADE to foreign key constraints that reference auth.users
--- This allows proper cleanup when users are deleted from the system
+-- First cleans up orphaned data, then adds CASCADE constraints
 
 -- ============================================================================
 -- 1. Fix user_progress table
@@ -10,16 +10,24 @@
 ALTER TABLE user_progress
 DROP CONSTRAINT IF EXISTS user_progress_user_id_fkey;
 
--- Add it back with CASCADE
+-- Clean up orphaned records in user_progress (users that don't exist)
+DELETE FROM user_progress
+WHERE user_id NOT IN (SELECT id FROM auth.users);
+
+-- Add constraint back with CASCADE
 ALTER TABLE user_progress
 ADD CONSTRAINT user_progress_user_id_fkey
 FOREIGN KEY (user_id)
 REFERENCES auth.users(id)
 ON DELETE CASCADE;
 
--- Also fix space_id constraint in user_progress (for consistency)
+-- Also fix space_id constraint in user_progress
 ALTER TABLE user_progress
 DROP CONSTRAINT IF EXISTS user_progress_space_id_fkey;
+
+-- Clean up orphaned space references
+DELETE FROM user_progress
+WHERE space_id IS NOT NULL AND space_id NOT IN (SELECT id FROM spaces);
 
 ALTER TABLE user_progress
 ADD CONSTRAINT user_progress_space_id_fkey
@@ -33,21 +41,29 @@ ON DELETE CASCADE;
 
 DO $$
 BEGIN
-  -- Check if space_members table exists and fix its constraints
   IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'space_members') THEN
-    -- Drop and recreate user_id constraint
+    -- Drop existing constraints
     ALTER TABLE space_members
     DROP CONSTRAINT IF EXISTS space_members_user_id_fkey;
 
+    -- Clean up orphaned user references
+    DELETE FROM space_members
+    WHERE user_id NOT IN (SELECT id FROM auth.users);
+
+    -- Add constraint back with CASCADE
     ALTER TABLE space_members
     ADD CONSTRAINT space_members_user_id_fkey
     FOREIGN KEY (user_id)
     REFERENCES auth.users(id)
     ON DELETE CASCADE;
 
-    -- Also fix space_id constraint for consistency
+    -- Fix space_id constraint
     ALTER TABLE space_members
     DROP CONSTRAINT IF EXISTS space_members_space_id_fkey;
+
+    -- Clean up orphaned space references
+    DELETE FROM space_members
+    WHERE space_id NOT IN (SELECT id FROM spaces);
 
     ALTER TABLE space_members
     ADD CONSTRAINT space_members_space_id_fkey
@@ -67,6 +83,10 @@ BEGIN
     ALTER TABLE daily_checkins
     DROP CONSTRAINT IF EXISTS daily_checkins_user_id_fkey;
 
+    -- Clean up orphaned records
+    DELETE FROM daily_checkins
+    WHERE user_id NOT IN (SELECT id FROM auth.users);
+
     ALTER TABLE daily_checkins
     ADD CONSTRAINT daily_checkins_user_id_fkey
     FOREIGN KEY (user_id)
@@ -84,6 +104,10 @@ BEGIN
   IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'partnership_members') THEN
     ALTER TABLE partnership_members
     DROP CONSTRAINT IF EXISTS partnership_members_user_id_fkey;
+
+    -- Clean up orphaned records
+    DELETE FROM partnership_members
+    WHERE user_id NOT IN (SELECT id FROM auth.users);
 
     ALTER TABLE partnership_members
     ADD CONSTRAINT partnership_members_user_id_fkey
