@@ -231,38 +231,38 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
 
           {/* Toggle Buttons */}
           {!editRecipe && (
-            <div className="flex items-center gap-1 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700">
+            <div className="flex items-center gap-1 p-1 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-lg border border-orange-200 dark:border-orange-700">
               <button
                 onClick={() => setActiveTab('manual')}
-                className={`flex-1 px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium ${
+                className={`flex-1 px-2 py-1.5 rounded-md flex items-center justify-center gap-1.5 transition-all font-medium text-xs ${
                   activeTab === 'manual'
                     ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                 }`}
               >
-                <FileText className="w-4 h-4" />
-                <span className="text-sm">Manual Entry</span>
+                <FileText className="w-3.5 h-3.5" />
+                <span>Manual Entry</span>
               </button>
               <button
                 onClick={() => setActiveTab('ai')}
-                className={`flex-1 px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium ${
+                className={`flex-1 px-2 py-1.5 rounded-md flex items-center justify-center gap-1.5 transition-all font-medium text-xs ${
                   activeTab === 'ai'
                     ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                 }`}
               >
-                <Sparkles className="w-4 h-4" />
-                <span className="text-sm">AI Import</span>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>AI Import</span>
               </button>
             </div>
           )}
         </div>
 
-        {/* Content - scrollable with fixed min-height */}
-        <div className="flex-1 overflow-y-auto">
+        {/* Content - scrollable with fixed height */}
+        <div className="flex-1 overflow-y-auto h-[600px]">
           {/* AI Import Tab */}
           {activeTab === 'ai' && !editRecipe && (
-            <div className="p-6 space-y-6 min-h-[600px]">
+            <div className="p-6 space-y-6 h-full">
               <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                 <div className="text-sm text-blue-900 dark:text-blue-200">
@@ -370,7 +370,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
 
           {/* Manual Entry Tab */}
           {activeTab === 'manual' && (
-            <form onSubmit={handleSubmit} className="p-6 space-y-4 min-h-[600px]">
+            <form onSubmit={handleSubmit} className="p-6 space-y-4 h-full">
               <div>
                 <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Recipe Name *</label>
                 <input
