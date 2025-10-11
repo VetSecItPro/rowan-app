@@ -11,6 +11,7 @@ import GuidedMealCreation from '@/components/guided/GuidedMealCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { mealsService, Meal, CreateMealInput, Recipe, CreateRecipeInput } from '@/lib/services/meals-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
+import { createShoppingListFromRecipe } from '@/lib/utils/shopping-list-helpers';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth } from 'date-fns';
 
 type ViewMode = 'calendar' | 'list' | 'recipes';
@@ -286,19 +287,38 @@ export default function MealsPage() {
   }, [loadMeals, loadRecipes]);
 
   // Memoized handlers
-  const handleCreateMeal = useCallback(async (mealData: CreateMealInput) => {
+  const handleCreateMeal = useCallback(async (mealData: CreateMealInput, createShoppingList?: boolean) => {
     try {
+      let createdMeal;
       if (editingMeal) {
         await mealsService.updateMeal(editingMeal.id, mealData);
       } else {
-        await mealsService.createMeal(mealData);
+        createdMeal = await mealsService.createMeal(mealData);
       }
+
+      // Create shopping list if requested and recipe is selected
+      if (createShoppingList && mealData.recipe_id && currentSpace) {
+        try {
+          const recipe = recipes.find(r => r.id === mealData.recipe_id);
+          if (recipe && recipe.ingredients && recipe.ingredients.length > 0) {
+            await createShoppingListFromRecipe(
+              recipe,
+              currentSpace.id,
+              mealData.scheduled_date
+            );
+          }
+        } catch (shoppingListError) {
+          console.error('Failed to create shopping list:', shoppingListError);
+          // Don't fail the whole operation if shopping list creation fails
+        }
+      }
+
       loadMeals();
       setEditingMeal(null);
     } catch (error) {
       console.error('Failed to save meal:', error);
     }
-  }, [editingMeal, loadMeals]);
+  }, [editingMeal, loadMeals, currentSpace, recipes]);
 
   const handleDeleteMeal = useCallback(async (mealId: string) => {
     if (!confirm('Are you sure you want to delete this meal?')) return;
@@ -687,7 +707,7 @@ export default function MealsPage() {
       </div>
       {currentSpace && (
         <>
-          <NewMealModal isOpen={isModalOpen} onClose={handleCloseMealModal} onSave={handleCreateMeal} editMeal={editingMeal} spaceId={currentSpace.id} />
+          <NewMealModal isOpen={isModalOpen} onClose={handleCloseMealModal} onSave={handleCreateMeal} editMeal={editingMeal} spaceId={currentSpace.id} recipes={recipes} />
           <NewRecipeModal isOpen={isRecipeModalOpen} onClose={handleCloseRecipeModal} onSave={handleCreateRecipe} editRecipe={editingRecipe} spaceId={currentSpace.id} />
         </>
       )}
