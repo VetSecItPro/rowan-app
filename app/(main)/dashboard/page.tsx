@@ -913,6 +913,18 @@ export default function DashboardPage() {
   // Memoize current date string
   const currentDate = useMemo(() => formatDate(getCurrentDateString(), 'EEEE, MMMM d, yyyy'), []);
 
+  // Show loading state while checking authentication
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white via-purple-100/30 to-purple-200 dark:from-black dark:via-purple-900/30 dark:to-purple-900">
+        <div className="text-center">
+          <div className="inline-block w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard' }]}>
       <div className="min-h-screen bg-gradient-to-b from-white via-purple-100/30 via-40% to-purple-200 dark:from-black dark:via-purple-900/30 dark:via-40% dark:to-purple-900 p-4 sm:p-6 md:p-8">
