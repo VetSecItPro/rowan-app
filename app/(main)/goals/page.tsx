@@ -374,8 +374,8 @@ export default function GoalsPage() {
           {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
             {/* Header with Month Badge and Status Filter */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
+              <div className="flex items-center gap-3 flex-1">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                   {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` : `Achievement Wall (${filteredMilestones.length})`}
                 </h2>
@@ -385,7 +385,7 @@ export default function GoalsPage() {
               </div>
 
               {/* Status Filter - Segmented Buttons - Hidden for milestones but space reserved */}
-              <div className={`flex-shrink-0 bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 min-w-[220px] ${viewMode === 'milestones' ? 'invisible' : ''}`}>
+              <div className={`flex-shrink-0 bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 w-[220px] ${viewMode === 'milestones' ? 'invisible' : ''}`}>
                 <button
                   onClick={() => setSearchQuery('')}
                   className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md"
