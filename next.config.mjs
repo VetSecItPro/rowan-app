@@ -13,8 +13,8 @@ const nextConfig = {
   // Workaround for Next.js 15.x Html import bug
   skipTrailingSlashRedirect: true,
   skipMiddlewareUrlNormalize: true,
-  // Use standalone output for Vercel deployment (production only)
-  ...(process.env.NODE_ENV === 'production' && { output: 'standalone' }),
+  // Use standalone output only on Vercel (not local builds)
+  ...(process.env.VERCEL === '1' && { output: 'standalone' }),
 };
 
 export default nextConfig;
