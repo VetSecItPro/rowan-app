@@ -221,43 +221,35 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
         {/* Header */}
         <div className="sticky top-0 bg-white dark:bg-gray-800 flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 z-10">
           <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
-            {editRecipe ? 'Edit Recipe' : 'New Recipe'}
+            {editRecipe ? 'Edit Recipe' : 'Create New Recipe'}
           </h2>
           <button onClick={onClose} aria-label="Close modal" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Tabs */}
+        {/* Toggle Switch */}
         {!editRecipe && (
-          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex gap-1 px-6">
+          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+            <div className="flex items-center justify-center gap-3">
+              <span className={`text-sm font-medium transition-colors ${activeTab === 'manual' ? 'text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                Manual Entry
+              </span>
               <button
-                onClick={() => setActiveTab('manual')}
-                className={`px-4 py-3 font-medium transition-all border-b-2 ${
-                  activeTab === 'manual'
-                    ? 'border-orange-500 text-orange-600 dark:text-orange-400'
-                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                }`}
+                onClick={() => setActiveTab(activeTab === 'manual' ? 'ai' : 'manual')}
+                className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 dark:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                role="switch"
+                aria-checked={activeTab === 'ai'}
               >
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  Manual Entry
-                </div>
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    activeTab === 'ai' ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
               </button>
-              <button
-                onClick={() => setActiveTab('ai')}
-                className={`px-4 py-3 font-medium transition-all border-b-2 ${
-                  activeTab === 'ai'
-                    ? 'border-orange-500 text-orange-600 dark:text-orange-400'
-                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4" />
-                  AI Import
-                </div>
-              </button>
+              <span className={`text-sm font-medium transition-colors ${activeTab === 'ai' ? 'text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                AI Import
+              </span>
             </div>
           </div>
         )}
