@@ -141,7 +141,7 @@ export default function MealsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMeal, setEditingMeal] = useState<Meal | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [stats, setStats] = useState({ thisWeek: 0, savedRecipes: 0, upcoming: 0, shoppingItems: 0 });
+  const [stats, setStats] = useState({ thisWeek: 0, nextWeek: 0, savedRecipes: 0, shoppingItems: 0 });
   const [viewMode, setViewMode] = useState<ViewMode>('calendar');
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -555,17 +555,17 @@ export default function MealsPage() {
             </div>
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Next Week</h3>
+                <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"><TrendingUp className="w-6 h-6 text-white" /></div>
+              </div>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.nextWeek}</p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Saved Recipes</h3>
                 <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center"><BookOpen className="w-6 h-6 text-white" /></div>
               </div>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.savedRecipes}</p>
-            </div>
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Upcoming</h3>
-                <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"><TrendingUp className="w-6 h-6 text-white" /></div>
-              </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.upcoming}</p>
             </div>
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">

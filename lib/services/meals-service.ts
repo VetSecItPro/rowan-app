@@ -60,8 +60,8 @@ export interface CreateRecipeInput {
 
 export interface MealStats {
   thisWeek: number;
+  nextWeek: number;
   savedRecipes: number;
-  upcoming: number;
   shoppingItems: number;
 }
 
@@ -209,9 +209,14 @@ export const mealsService = {
       return mealDate >= weekStart && mealDate < weekEnd;
     }).length;
 
-    const upcoming = meals.filter(m =>
-      new Date(m.scheduled_date) >= now
-    ).length;
+    // Calculate next week (next 7 days from today)
+    const nextWeekEnd = new Date(now);
+    nextWeekEnd.setDate(now.getDate() + 7);
+
+    const nextWeek = meals.filter(m => {
+      const mealDate = new Date(m.scheduled_date);
+      return mealDate >= now && mealDate < nextWeekEnd;
+    }).length;
 
     // Calculate shopping items from upcoming meals
     let shoppingItems = 0;
@@ -223,8 +228,8 @@ export const mealsService = {
 
     return {
       thisWeek,
+      nextWeek,
       savedRecipes: recipes.length,
-      upcoming,
       shoppingItems,
     };
   },
