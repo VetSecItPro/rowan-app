@@ -584,7 +584,7 @@ export default function MessagesPage() {
       </div>
 
       {/* Edit Message Modal (only for editing) */}
-      {editingMessage && (
+      {currentSpace && editingMessage && (
         <NewMessageModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}

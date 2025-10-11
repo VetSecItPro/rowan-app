@@ -391,7 +391,9 @@ export default function ShoppingPage() {
           )}
         </div>
       </div>
-      <NewShoppingListModal isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleCreateList} editList={editingList} spaceId={currentSpace.id} />
+      {currentSpace && (
+        <NewShoppingListModal isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleCreateList} editList={editingList} spaceId={currentSpace.id} />
+      )}
     </FeatureLayout>
   );
 }
