@@ -268,37 +268,37 @@ export default function GoalsPage() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-[464px] flex-shrink-0">
-              <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-indigo-100 to-indigo-200 dark:from-indigo-900/30 dark:to-indigo-800/30 rounded-xl border border-indigo-200 dark:border-indigo-700 w-[244px] flex-shrink-0">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-indigo-100 to-indigo-200 dark:from-indigo-900/30 dark:to-indigo-800/30 rounded-xl border border-indigo-200 dark:border-indigo-700">
                 <button
                   onClick={() => handleViewModeChange('goals')}
-                  className={`py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium w-[110px] flex-shrink-0 ${
+                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
                     viewMode === 'goals'
                       ? 'bg-gradient-goals text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                   }`}
                 >
-                  <LayoutGrid className="w-4 h-4 flex-shrink-0" />
-                  <span className="text-sm whitespace-nowrap">Goals</span>
+                  <LayoutGrid className="w-4 h-4" />
+                  <span className="text-sm">Goals</span>
                 </button>
                 <button
                   onClick={() => handleViewModeChange('steps')}
-                  className={`py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium w-[110px] flex-shrink-0 ${
+                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
                     viewMode === 'steps'
                       ? 'bg-gradient-goals text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                   }`}
                 >
-                  <List className="w-4 h-4 flex-shrink-0" />
-                  <span className="text-sm whitespace-nowrap">Steps</span>
+                  <List className="w-4 h-4" />
+                  <span className="text-sm">Steps</span>
                 </button>
               </div>
               <button
                 onClick={handleNewButtonClick}
-                className="py-2 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 w-[208px] flex-shrink-0"
+                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
-                <Plus className="w-5 h-5 flex-shrink-0" />
-                <span className="whitespace-nowrap">New {viewMode === 'goals' ? 'Goal' : 'Step'}</span>
+                <Plus className="w-5 h-5" />
+                <span>New {viewMode === 'goals' ? 'Goal' : 'Step'}</span>
               </button>
             </div>
           </div>
