@@ -15,6 +15,7 @@ import { useAuth } from '@/lib/contexts/auth-context';
 import { mealsService, Meal, CreateMealInput, Recipe, CreateRecipeInput } from '@/lib/services/meals-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { shoppingService } from '@/lib/services/shopping-service';
+import { createClient } from '@/lib/supabase/client';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth } from 'date-fns';
 
 type ViewMode = 'calendar' | 'list' | 'recipes';
@@ -300,6 +301,56 @@ export default function MealsPage() {
     loadMeals();
     loadRecipes();
   }, [loadMeals, loadRecipes]);
+
+  // Real-time subscriptions for collaborative editing
+  useEffect(() => {
+    if (!currentSpace) return;
+
+    const supabase = createClient();
+
+    // Subscribe to meal changes
+    const mealsChannel = mealsService.subscribeToMeals(currentSpace.id, (payload) => {
+      console.log('[Real-time] Meal change:', payload.eventType, payload.new || payload.old);
+
+      if (payload.eventType === 'INSERT' && payload.new) {
+        // Add new meal to state
+        setMeals(prev => {
+          // Check if meal already exists (avoid duplicates from optimistic updates)
+          if (prev.find(m => m.id === payload.new!.id)) return prev;
+          return [...prev, payload.new!];
+        });
+      } else if (payload.eventType === 'UPDATE' && payload.new) {
+        // Update existing meal in state
+        setMeals(prev => prev.map(m => m.id === payload.new!.id ? payload.new! : m));
+      } else if (payload.eventType === 'DELETE' && payload.old) {
+        // Remove meal from state
+        setMeals(prev => prev.filter(m => m.id !== payload.old!.id));
+      }
+    });
+
+    // Subscribe to recipe changes
+    const recipesChannel = mealsService.subscribeToRecipes(currentSpace.id, (payload) => {
+      console.log('[Real-time] Recipe change:', payload.eventType, payload.new || payload.old);
+
+      if (payload.eventType === 'INSERT' && payload.new) {
+        setRecipes(prev => {
+          if (prev.find(r => r.id === payload.new!.id)) return prev;
+          return [...prev, payload.new!];
+        });
+      } else if (payload.eventType === 'UPDATE' && payload.new) {
+        setRecipes(prev => prev.map(r => r.id === payload.new!.id ? payload.new! : r));
+      } else if (payload.eventType === 'DELETE' && payload.old) {
+        setRecipes(prev => prev.filter(r => r.id !== payload.old!.id));
+      }
+    });
+
+    // Cleanup on unmount
+    return () => {
+      console.log('[Real-time] Unsubscribing from channels');
+      supabase.removeChannel(mealsChannel);
+      supabase.removeChannel(recipesChannel);
+    };
+  }, [currentSpace]);
 
   // Memoized handlers
   const handleCreateMeal = useCallback(async (mealData: CreateMealInput, createShoppingList?: boolean) => {

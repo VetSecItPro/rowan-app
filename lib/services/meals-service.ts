@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 export interface Recipe {
   id: string;
@@ -232,5 +233,92 @@ export const mealsService = {
       savedRecipes: recipes.length,
       shoppingItems,
     };
+  },
+
+  /**
+   * Subscribe to real-time meal changes for a space
+   * Enables multi-user collaboration by syncing meals instantly
+   *
+   * @param spaceId - The space ID to subscribe to
+   * @param callback - Function called when meals change (INSERT/UPDATE/DELETE)
+   * @returns RealtimeChannel - Channel object to unsubscribe later
+   *
+   * @example
+   * ```typescript
+   * const channel = mealsService.subscribeToMeals(spaceId, (payload) => {
+   *   if (payload.eventType === 'INSERT') {
+   *     setMeals(prev => [...prev, payload.new]);
+   *   }
+   * });
+   * // Later: cleanup
+   * supabase.removeChannel(channel);
+   * ```
+   */
+  subscribeToMeals(
+    spaceId: string,
+    callback: (payload: {
+      eventType: 'INSERT' | 'UPDATE' | 'DELETE';
+      new: Meal | null;
+      old: Meal | null;
+    }) => void
+  ): RealtimeChannel {
+    const supabase = createClient();
+    return supabase
+      .channel(`meals:${spaceId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'meals',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        (payload) => {
+          callback({
+            eventType: payload.eventType as 'INSERT' | 'UPDATE' | 'DELETE',
+            new: payload.new as Meal | null,
+            old: payload.old as Meal | null,
+          });
+        }
+      )
+      .subscribe();
+  },
+
+  /**
+   * Subscribe to real-time recipe changes for a space
+   * Enables multi-user collaboration on recipe library
+   *
+   * @param spaceId - The space ID to subscribe to
+   * @param callback - Function called when recipes change (INSERT/UPDATE/DELETE)
+   * @returns RealtimeChannel - Channel object to unsubscribe later
+   */
+  subscribeToRecipes(
+    spaceId: string,
+    callback: (payload: {
+      eventType: 'INSERT' | 'UPDATE' | 'DELETE';
+      new: Recipe | null;
+      old: Recipe | null;
+    }) => void
+  ): RealtimeChannel {
+    const supabase = createClient();
+    return supabase
+      .channel(`recipes:${spaceId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'recipes',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        (payload) => {
+          callback({
+            eventType: payload.eventType as 'INSERT' | 'UPDATE' | 'DELETE',
+            new: payload.new as Recipe | null,
+            old: payload.old as Recipe | null,
+          });
+        }
+      )
+      .subscribe();
   },
 };
