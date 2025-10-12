@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Plus, Trash2, Sparkles, FileText, Info, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { X, Plus, Trash2, Sparkles, FileText, Info, Image as ImageIcon, Loader2, Search, Globe } from 'lucide-react';
 import { CreateRecipeInput, Recipe } from '@/lib/services/meals-service';
 import ImageUpload from '@/components/shared/ImageUpload';
+import { searchExternalRecipes, searchByCuisine, getRandomRecipes, SUPPORTED_CUISINES, ExternalRecipe } from '@/lib/services/external-recipes-service';
+import { RecipePreviewModal } from '@/components/meals/RecipePreviewModal';
 
 interface NewRecipeModalProps {
   isOpen: boolean;
@@ -13,7 +15,7 @@ interface NewRecipeModalProps {
   spaceId: string;
 }
 
-type TabType = 'manual' | 'ai';
+type TabType = 'manual' | 'ai' | 'discover';
 
 export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }: NewRecipeModalProps) {
   const [activeTab, setActiveTab] = useState<TabType>('manual');
@@ -37,6 +39,13 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [parsing, setParsing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Discover Recipes state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [externalRecipes, setExternalRecipes] = useState<ExternalRecipe[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedRecipe, setSelectedRecipe] = useState<ExternalRecipe | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     if (editRecipe) {
@@ -213,6 +222,73 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
     setFormData({ ...formData, tags: formData.tags?.filter(t => t !== tag) });
   };
 
+  // Discover Recipes handlers
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+
+    setLoading(true);
+    try {
+      const results = await searchExternalRecipes(searchQuery);
+      setExternalRecipes(results);
+    } catch (error) {
+      console.error('Search error:', error);
+      setExternalRecipes([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBrowseCuisine = async (cuisine: string) => {
+    setLoading(true);
+    try {
+      const results = await searchByCuisine(cuisine);
+      setExternalRecipes(results);
+      setSearchQuery(cuisine); // Show the cuisine in search box
+    } catch (error) {
+      console.error('Cuisine browse error:', error);
+      setExternalRecipes([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLoadRandom = async () => {
+    setLoading(true);
+    try {
+      const results = await getRandomRecipes(12);
+      setExternalRecipes(results);
+      setSearchQuery(''); // Clear search when loading random
+    } catch (error) {
+      console.error('Random recipes error:', error);
+      setExternalRecipes([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddToLibrary = (recipe: ExternalRecipe) => {
+    // Convert external recipe to our format
+    const recipeData: CreateRecipeInput = {
+      space_id: spaceId,
+      name: recipe.name,
+      description: recipe.description || '',
+      ingredients: recipe.ingredients.map(ing =>
+        [ing.amount, ing.unit, ing.name].filter(Boolean).join(' ')
+      ),
+      instructions: recipe.instructions || '',
+      prep_time: recipe.prep_time,
+      cook_time: recipe.cook_time,
+      servings: recipe.servings,
+      difficulty: recipe.difficulty,
+      cuisine_type: recipe.cuisine,
+      image_url: recipe.image_url || '',
+      tags: recipe.cuisine ? [recipe.cuisine] : [],
+    };
+
+    onSave(recipeData);
+    onClose();
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -258,6 +334,20 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>AI Import</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveTab('discover');
+                    if (externalRecipes.length === 0) handleLoadRandom();
+                  }}
+                  className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all font-medium text-sm min-w-[130px] ${
+                    activeTab === 'discover'
+                      ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                  }`}
+                >
+                  <Globe className="w-4 h-4" />
+                  <span>Discover</span>
                 </button>
               </div>
             </div>
@@ -368,6 +458,130 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
                   </>
                 )}
               </button>
+            </div>
+          )}
+
+          {/* Discover Recipes Tab */}
+          {activeTab === 'discover' && !editRecipe && (
+            <div className="p-6 pt-4 space-y-6 h-full">
+              {/* Search Bar */}
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                      placeholder="Search recipes (e.g., 'pasta', 'chicken curry', 'chocolate cake')..."
+                      className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                  <button
+                    onClick={handleSearch}
+                    disabled={loading || !searchQuery.trim()}
+                    className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
+                  >
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                    Search
+                  </button>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    onClick={handleLoadRandom}
+                    disabled={loading}
+                    className="px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors disabled:opacity-50 text-sm font-medium"
+                  >
+                    🎲 Random Recipes
+                  </button>
+                  <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" />
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {['Italian', 'Chinese', 'Mexican', 'Indian', 'Japanese'].map((cuisine) => (
+                      <button
+                        key={cuisine}
+                        onClick={() => handleBrowseCuisine(cuisine)}
+                        disabled={loading}
+                        className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 text-sm"
+                      >
+                        {cuisine}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Loading State */}
+              {loading && (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <Loader2 className="w-12 h-12 text-orange-500 animate-spin mb-4" />
+                  <p className="text-gray-600 dark:text-gray-400">Searching recipes...</p>
+                </div>
+              )}
+
+              {/* Results */}
+              {!loading && externalRecipes.length > 0 && (
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Found {externalRecipes.length} recipe{externalRecipes.length > 1 ? 's' : ''}
+                  </p>
+                  <div className="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto">
+                    {externalRecipes.map((recipe) => (
+                      <button
+                        key={recipe.id}
+                        onClick={() => {
+                          setSelectedRecipe(recipe);
+                          setShowPreview(true);
+                        }}
+                        className="text-left p-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md hover:border-orange-500 dark:hover:border-orange-400 transition-all group"
+                      >
+                        {recipe.image_url && (
+                          <div className="w-full h-24 mb-2 rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700">
+                            <img
+                              src={recipe.image_url}
+                              alt={recipe.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                            />
+                          </div>
+                        )}
+                        <h4 className="font-medium text-sm text-gray-900 dark:text-white line-clamp-2 mb-1">
+                          {recipe.name}
+                        </h4>
+                        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                          <span className="px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded">
+                            {recipe.source}
+                          </span>
+                          {recipe.cuisine && (
+                            <span>{recipe.cuisine}</span>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Empty State */}
+              {!loading && externalRecipes.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <Globe className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    Discover Recipes
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4 max-w-sm">
+                    Search for recipes or browse by cuisine to find inspiration from multiple recipe APIs.
+                  </p>
+                  <button
+                    onClick={handleLoadRandom}
+                    className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg transition-all flex items-center gap-2 font-medium"
+                  >
+                    🎲 Load Random Recipes
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -551,6 +765,21 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
           )}
         </div>
       </div>
+
+      {/* Recipe Preview Modal */}
+      <RecipePreviewModal
+        isOpen={showPreview}
+        onClose={() => {
+          setShowPreview(false);
+          setSelectedRecipe(null);
+        }}
+        recipe={selectedRecipe}
+        onPlanMeal={(recipe) => {
+          // This would need to be handled by the parent, for now just add to library
+          handleAddToLibrary(recipe);
+        }}
+        onAddToLibrary={handleAddToLibrary}
+      />
     </div>
   );
 }
