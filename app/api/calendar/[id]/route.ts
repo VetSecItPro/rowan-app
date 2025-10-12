@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { calendarService } from '@/lib/services/calendar-service';
 import { ratelimit } from '@/lib/ratelimit';
 import { verifyResourceAccess } from '@/lib/services/authorization-service';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
 
 /**
  * GET /api/calendar/[id]
@@ -39,6 +41,9 @@ export async function GET(
       );
     }
 
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get event
     const event = await calendarService.getEventById(params.id);
 
@@ -64,6 +69,15 @@ export async function GET(
       data: event,
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/calendar/[id]',
+        method: 'GET',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/calendar/[id] GET error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -107,6 +121,9 @@ export async function PATCH(
       );
     }
 
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get existing event first
     const existingEvent = await calendarService.getEventById(params.id);
 
@@ -138,6 +155,15 @@ export async function PATCH(
       data: updatedEvent,
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/calendar/[id]',
+        method: 'PATCH',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/calendar/[id] PATCH error:', error);
     return NextResponse.json(
       { error: 'Failed to update calendar event' },
@@ -181,6 +207,9 @@ export async function DELETE(
       );
     }
 
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get existing event first
     const existingEvent = await calendarService.getEventById(params.id);
 
@@ -209,6 +238,15 @@ export async function DELETE(
       message: 'Calendar event deleted successfully',
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/calendar/[id]',
+        method: 'DELETE',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/calendar/[id] DELETE error:', error);
     return NextResponse.json(
       { error: 'Failed to delete calendar event' },

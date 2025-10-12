@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { remindersService } from '@/lib/services/reminders-service';
 import { ratelimit } from '@/lib/ratelimit';
 import { verifySpaceAccess } from '@/lib/services/authorization-service';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
 
 /**
  * GET /api/reminders
@@ -36,6 +38,10 @@ export async function GET(req: NextRequest) {
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get space_id from query params
     const { searchParams } = new URL(req.url);
     const spaceId = searchParams.get('space_id');
@@ -46,6 +52,10 @@ export async function GET(req: NextRequest) {
         { status: 400 }
       );
     }
+
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
 
     // Verify user has access to this space
     try {
@@ -65,6 +75,15 @@ export async function GET(req: NextRequest) {
       data: reminders,
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/reminders',
+        method: 'GET',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/reminders GET error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -105,6 +124,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Parse request body
     const body = await req.json();
     const { space_id, title } = body;
@@ -135,6 +158,15 @@ export async function POST(req: NextRequest) {
       data: reminder,
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/reminders',
+        method: 'POST',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/reminders POST error:', error);
     return NextResponse.json(
       { error: 'Failed to create reminder' },

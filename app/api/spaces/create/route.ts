@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createSpace } from '@/lib/services/spaces-service';
 import { ratelimit } from '@/lib/ratelimit';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
 
 /**
  * POST /api/spaces/create
@@ -35,6 +37,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Parse request body
     const body = await req.json();
     const { name } = body;
@@ -45,6 +51,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
 
     // Create space using service
     const result = await createSpace(name.trim(), session.user.id);
@@ -61,6 +68,15 @@ export async function POST(req: NextRequest) {
       data: result.data,
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/spaces/create',
+        method: 'POST',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/spaces/create error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

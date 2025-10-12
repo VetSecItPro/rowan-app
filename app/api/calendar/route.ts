@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { calendarService } from '@/lib/services/calendar-service';
 import { ratelimit } from '@/lib/ratelimit';
 import { verifySpaceAccess } from '@/lib/services/authorization-service';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
 
 /**
  * GET /api/calendar
@@ -36,6 +38,9 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get space_id from query params
     const { searchParams } = new URL(req.url);
     const spaceId = searchParams.get('space_id');
@@ -65,6 +70,15 @@ export async function GET(req: NextRequest) {
       data: events,
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/calendar',
+        method: 'GET',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/calendar GET error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -105,6 +119,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Parse request body
     const body = await req.json();
     const { space_id, title, start_time } = body;
@@ -135,6 +152,15 @@ export async function POST(req: NextRequest) {
       data: event,
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/calendar',
+        method: 'POST',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/calendar POST error:', error);
     return NextResponse.json(
       { error: 'Failed to create calendar event' },

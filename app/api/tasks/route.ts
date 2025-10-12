@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { tasksService } from '@/lib/services/tasks-service';
 import { ratelimit } from '@/lib/ratelimit';
 import { verifySpaceAccess } from '@/lib/services/authorization-service';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
 
 /**
  * GET /api/tasks
@@ -35,6 +37,9 @@ export async function GET(req: NextRequest) {
         { status: 401 }
       );
     }
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
 
     // Get space_id from query params
     const { searchParams } = new URL(req.url);
@@ -80,6 +85,15 @@ export async function GET(req: NextRequest) {
       data: tasks,
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/tasks',
+        method: 'GET',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/tasks GET error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -120,6 +134,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Parse request body
     const body = await req.json();
     const { space_id, title } = body;
@@ -153,6 +170,15 @@ export async function POST(req: NextRequest) {
       data: task,
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/tasks',
+        method: 'POST',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/tasks POST error:', error);
     return NextResponse.json(
       { error: 'Failed to create task' },

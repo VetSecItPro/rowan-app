@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { goalsService } from '@/lib/services/goals-service';
 import { ratelimit } from '@/lib/ratelimit';
 import { verifySpaceAccess } from '@/lib/services/authorization-service';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
 
 /**
  * GET /api/goals
@@ -36,6 +38,10 @@ export async function GET(req: NextRequest) {
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get space_id from query params
     const { searchParams } = new URL(req.url);
     const spaceId = searchParams.get('space_id');
@@ -47,10 +53,21 @@ export async function GET(req: NextRequest) {
       );
     }
 
+
     // Verify user has access to this space
     try {
       await verifySpaceAccess(session.user.id, spaceId);
     } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/goals',
+        method: 'GET',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+
       return NextResponse.json(
         { error: 'You do not have access to this space' },
         { status: 403 }
@@ -105,6 +122,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Parse request body
     const body = await req.json();
     const { space_id, title } = body;
@@ -121,6 +142,16 @@ export async function POST(req: NextRequest) {
     try {
       await verifySpaceAccess(session.user.id, space_id);
     } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/goals',
+        method: 'POST',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+
       return NextResponse.json(
         { error: 'You do not have access to this space' },
         { status: 403 }

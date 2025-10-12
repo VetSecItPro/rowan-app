@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { createInvitation } from '@/lib/services/invitations-service';
 import { ratelimit } from '@/lib/ratelimit';
 import { verifySpaceAccess } from '@/lib/services/authorization-service';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
 
 /**
  * POST /api/spaces/invite
@@ -31,6 +33,10 @@ export async function POST(req: NextRequest) {
         { status: 401 }
       );
     }
+
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
 
     // Parse request body
     const body = await req.json();
@@ -102,6 +108,15 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/spaces/invite',
+        method: 'POST',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/spaces/invite error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

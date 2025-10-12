@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { projectsService } from '@/lib/services/budgets-service';
 import { ratelimit } from '@/lib/ratelimit';
 import { verifyResourceAccess } from '@/lib/services/authorization-service';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
 
 /**
  * GET /api/expenses/[id]
@@ -38,6 +40,10 @@ export async function GET(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     const expense = await projectsService.getExpenseById(params.id);
 
     if (!expense) {
@@ -47,10 +53,24 @@ export async function GET(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Verify user has access to expense's space
     try {
       await verifyResourceAccess(session.user.id, expense);
     } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/expenses/[id]',
+        method: 'GET',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+
       return NextResponse.json(
         { error: 'You do not have access to this expense' },
         { status: 403 }
@@ -104,6 +124,10 @@ export async function PATCH(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Parse request body
     const body = await req.json();
     const {
@@ -144,6 +168,16 @@ export async function PATCH(
     try {
       await verifyResourceAccess(session.user.id, existingExpense);
     } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/expenses/[id]',
+        method: 'PATCH',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+
       return NextResponse.json(
         { error: 'You do not have access to this expense' },
         { status: 403 }
@@ -200,6 +234,10 @@ export async function DELETE(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get expense first to verify access
     const existingExpense = await projectsService.getExpenseById(params.id);
 
@@ -207,6 +245,16 @@ export async function DELETE(
     try {
       await verifyResourceAccess(session.user.id, existingExpense);
     } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/expenses/[id]',
+        method: 'DELETE',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+
       return NextResponse.json(
         { error: 'You do not have access to this expense' },
         { status: 403 }
