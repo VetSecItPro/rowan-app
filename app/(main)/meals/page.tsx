@@ -18,7 +18,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMont
 
 type ViewMode = 'calendar' | 'list' | 'recipes';
 
-// Memoized meal card component with user colors
+// Memoized meal card component with meal planning orange color
 const MemoizedMealCardWithColors = memo(({
   meal,
   onEdit,
@@ -30,7 +30,7 @@ const MemoizedMealCardWithColors = memo(({
   onDelete: (id: string) => void;
   colors: { border: string; bg: string; text: string };
 }) => (
-  <div className={`border-l-4 ${colors.border}`}>
+  <div className="border-l-4 border-orange-500">
     <MealCard
       meal={meal}
       onEdit={onEdit}
@@ -104,17 +104,16 @@ const CalendarDayCell = memo(({
 
       <div className="space-y-1">
         {dayMeals.map((meal) => {
-          const colors = getUserColor(meal.created_by);
           return (
             <button
               key={meal.id}
               onClick={() => onMealClick(meal)}
-              className={`w-full text-left px-2 py-1 rounded text-xs ${colors.bg} border-l-2 ${colors.border} hover:opacity-80 transition-opacity`}
+              className="w-full text-left px-2 py-1 rounded text-xs bg-orange-50 dark:bg-orange-900/20 border-l-2 border-orange-500 hover:opacity-80 transition-opacity"
             >
-              <p className={`font-medium ${colors.text} truncate`}>
-                {meal.recipe?.name || 'Untitled'}
+              <p className="font-medium text-orange-700 dark:text-orange-300 truncate">
+                {meal.recipe?.name || meal.name || 'Untitled'}
               </p>
-              <p className="text-gray-500 dark:text-gray-400 text-[10px]">
+              <p className="text-gray-500 dark:text-gray-400 text-[10px] capitalize">
                 {meal.meal_type}
               </p>
             </button>
@@ -178,7 +177,12 @@ export default function MealsPage() {
     if (viewMode === 'list') {
       const today = new Date();
       today.setHours(0, 0, 0, 0); // Set to midnight local time
-      filtered = filtered.filter(m => new Date(m.scheduled_date) >= today);
+      filtered = filtered.filter(m => {
+        const mealDate = new Date(m.scheduled_date);
+        // Reset meal date to midnight for fair comparison
+        mealDate.setHours(0, 0, 0, 0);
+        return mealDate >= today;
+      });
     }
 
     // Apply search filter
