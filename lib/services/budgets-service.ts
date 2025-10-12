@@ -144,10 +144,9 @@ export const projectsService = {
         .from('budgets')
         .select('*')
         .eq('space_id', spaceId)
-        .single();
+        .maybeSingle();
 
-      // PGRST116 = no rows returned (not an error)
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('getBudget error:', error);
         return null;
       }
