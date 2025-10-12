@@ -847,33 +847,33 @@ export default function MealsPage() {
                   <div className="inline-flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700">
                     <button
                       onClick={() => setCalendarViewMode('week')}
-                      className={`px-3 sm:px-4 py-2 rounded-lg transition-all font-medium text-sm min-w-[70px] sm:min-w-[80px] ${
+                      className={`px-3 sm:px-4 py-2 rounded-lg transition-all font-medium text-sm min-w-[100px] sm:min-w-[120px] ${
                         calendarViewMode === 'week'
                           ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
                           : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                       }`}
                     >
-                      Week
+                      Current Week
                     </button>
                     <button
                       onClick={() => setCalendarViewMode('2weeks')}
-                      className={`px-3 sm:px-4 py-2 rounded-lg transition-all font-medium text-sm min-w-[70px] sm:min-w-[90px] ${
+                      className={`px-3 sm:px-4 py-2 rounded-lg transition-all font-medium text-sm min-w-[100px] sm:min-w-[130px] ${
                         calendarViewMode === '2weeks'
                           ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
                           : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                       }`}
                     >
-                      2 Weeks
+                      Next Two Weeks
                     </button>
                     <button
                       onClick={() => setCalendarViewMode('month')}
-                      className={`px-3 sm:px-4 py-2 rounded-lg transition-all font-medium text-sm min-w-[70px] sm:min-w-[80px] ${
+                      className={`px-3 sm:px-4 py-2 rounded-lg transition-all font-medium text-sm min-w-[100px] sm:min-w-[130px] ${
                         calendarViewMode === 'month'
                           ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
                           : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                       }`}
                     >
-                      Month
+                      Current Month
                     </button>
                   </div>
                 </div>
