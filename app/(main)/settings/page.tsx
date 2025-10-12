@@ -7,7 +7,7 @@ import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
 import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import {
   Settings,
   User,
@@ -482,6 +482,8 @@ export default function SettingsPage() {
   const handleRequestPasswordReset = async () => {
     if (!user?.email) return;
     setIsRequestingReset(true);
+
+    const supabase = createClient();
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(user.email, {

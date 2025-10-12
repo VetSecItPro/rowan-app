@@ -14,7 +14,7 @@ import { projectsService } from '@/lib/services/budgets-service';
 import { projectsOnlyService } from '@/lib/services/projects-service';
 import { goalsService } from '@/lib/services/goals-service';
 import { checkInsService, type DailyCheckIn, type CheckInStats } from '@/lib/services/checkins-service';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import {
   CheckSquare,
   Calendar,
@@ -654,6 +654,7 @@ export default function DashboardPage() {
   useEffect(() => {
     loadAllStats();
 
+    const supabase = createClient();
     const channels: any[] = [];
 
     // Only subscribe if we have a space
@@ -808,6 +809,8 @@ export default function DashboardPage() {
   // Load check-ins data and subscribe to updates
   useEffect(() => {
     if (!currentSpace || !user) return;
+
+    const supabase = createClient();
 
     const loadCheckIns = async () => {
       try {
