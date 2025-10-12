@@ -5,7 +5,7 @@
 
 export interface ExternalRecipe {
   id: string;
-  source: 'themealdb' | 'edamam' | 'recipepuppy';
+  source: 'themealdb' | 'edamam' | 'spoonacular' | 'tasty' | 'apininjas';
   name: string;
   description?: string;
   image_url?: string;
@@ -43,51 +43,59 @@ async function searchTheMealDB(query: string): Promise<ExternalRecipe[]> {
 }
 
 /**
- * Search Recipe Puppy API (completely free, no key required)
- * Note: Recipe Puppy API is often unreliable and may not work
+ * Search Spoonacular API via Next.js API proxy
+ * Free tier: 150 requests/day
  */
-async function searchRecipePuppy(query: string): Promise<ExternalRecipe[]> {
+async function searchSpoonacular(query: string): Promise<ExternalRecipe[]> {
   try {
-    // Recipe Puppy API is deprecated and unreliable - skip for now
-    // Using HTTPS causes CORS issues, using HTTP causes mixed content blocking
-    console.log('Recipe Puppy API skipped - API is deprecated');
-    return [];
-
-    /* Commented out due to API issues
     const response = await fetch(
-      `https://www.recipepuppy.com/api/?q=${encodeURIComponent(query)}`,
-      {
-        // Add timeout
-        signal: AbortSignal.timeout(5000),
-      }
+      `/api/recipes/external/spoonacular/search?q=${encodeURIComponent(query)}`
     );
 
     if (!response.ok) return [];
 
     const data = await response.json();
-
-    if (!data.results) return [];
-
-    return data.results.map((recipe: any) => {
-      const ingredients = recipe.ingredients
-        .split(',')
-        .map((ing: string) => ({
-          name: ing.trim(),
-        }))
-        .filter((ing: any) => ing.name);
-
-      return {
-        id: `recipepuppy-${recipe.href}`,
-        source: 'recipepuppy' as const,
-        name: recipe.title,
-        image_url: recipe.thumbnail || undefined,
-        ingredients,
-        source_url: recipe.href,
-      };
-    });
-    */
+    return data;
   } catch (error) {
-    console.error('Recipe Puppy API error:', error);
+    console.error('Spoonacular API error:', error);
+    return [];
+  }
+}
+
+/**
+ * Search Tasty API via Next.js API proxy (RapidAPI)
+ */
+async function searchTasty(query: string): Promise<ExternalRecipe[]> {
+  try {
+    const response = await fetch(
+      `/api/recipes/external/tasty/search?q=${encodeURIComponent(query)}`
+    );
+
+    if (!response.ok) return [];
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Tasty API error:', error);
+    return [];
+  }
+}
+
+/**
+ * Search API Ninjas Recipe API via Next.js API proxy
+ */
+async function searchApiNinjas(query: string): Promise<ExternalRecipe[]> {
+  try {
+    const response = await fetch(
+      `/api/recipes/external/apininjas/search?q=${encodeURIComponent(query)}`
+    );
+
+    if (!response.ok) return [];
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('API Ninjas error:', error);
     return [];
   }
 }
@@ -155,24 +163,36 @@ export async function searchExternalRecipes(query: string): Promise<ExternalReci
   const trimmedQuery = query.trim();
 
   // Search all APIs in parallel
-  const [themealdbResults, recipepuppyResults, edamamResults] = await Promise.all([
+  const [
+    themealdbResults,
+    spoonacularResults,
+    edamamResults,
+    tastyResults,
+    apininjasResults,
+  ] = await Promise.all([
     searchTheMealDB(trimmedQuery),
-    searchRecipePuppy(trimmedQuery),
+    searchSpoonacular(trimmedQuery),
     searchEdamam(trimmedQuery),
+    searchTasty(trimmedQuery),
+    searchApiNinjas(trimmedQuery),
   ]);
 
-  // Combine and deduplicate results
+  // Combine all results
   const allResults = [
     ...themealdbResults,
-    ...recipepuppyResults,
+    ...spoonacularResults,
     ...edamamResults,
+    ...tastyResults,
+    ...apininjasResults,
   ];
 
-  // Sort by source priority (TheMealDB first, then Edamam, then Recipe Puppy)
+  // Sort by source priority (TheMealDB, Spoonacular, Edamam, Tasty, API Ninjas)
   const sourcePriority: Record<string, number> = {
     themealdb: 1,
-    edamam: 2,
-    recipepuppy: 3,
+    spoonacular: 2,
+    edamam: 3,
+    tasty: 4,
+    apininjas: 5,
   };
 
   return allResults.sort((a, b) => {
@@ -200,18 +220,23 @@ export async function searchByCuisine(cuisine: string): Promise<ExternalRecipe[]
 }
 
 /**
- * List of supported cuisines
+ * List of supported cuisines (aggregated from all APIs)
+ * Includes cuisines from TheMealDB, Spoonacular, Edamam, Tasty, and API Ninjas
  */
 export const SUPPORTED_CUISINES = [
+  { value: 'African', label: 'African', flag: '🌍' },
   { value: 'American', label: 'American', flag: '🇺🇸' },
   { value: 'British', label: 'British', flag: '🇬🇧' },
+  { value: 'Cajun', label: 'Cajun', flag: '🦞' },
   { value: 'Canadian', label: 'Canadian', flag: '🇨🇦' },
+  { value: 'Caribbean', label: 'Caribbean', flag: '🏝️' },
   { value: 'Chinese', label: 'Chinese', flag: '🇨🇳' },
   { value: 'Croatian', label: 'Croatian', flag: '🇭🇷' },
   { value: 'Dutch', label: 'Dutch', flag: '🇳🇱' },
   { value: 'Egyptian', label: 'Egyptian', flag: '🇪🇬' },
   { value: 'Filipino', label: 'Filipino', flag: '🇵🇭' },
   { value: 'French', label: 'French', flag: '🇫🇷' },
+  { value: 'German', label: 'German', flag: '🇩🇪' },
   { value: 'Greek', label: 'Greek', flag: '🇬🇷' },
   { value: 'Indian', label: 'Indian', flag: '🇮🇳' },
   { value: 'Irish', label: 'Irish', flag: '🇮🇪' },
@@ -219,12 +244,18 @@ export const SUPPORTED_CUISINES = [
   { value: 'Jamaican', label: 'Jamaican', flag: '🇯🇲' },
   { value: 'Japanese', label: 'Japanese', flag: '🇯🇵' },
   { value: 'Kenyan', label: 'Kenyan', flag: '🇰🇪' },
+  { value: 'Korean', label: 'Korean', flag: '🇰🇷' },
+  { value: 'Latin American', label: 'Latin American', flag: '🌎' },
   { value: 'Malaysian', label: 'Malaysian', flag: '🇲🇾' },
+  { value: 'Mediterranean', label: 'Mediterranean', flag: '🫒' },
   { value: 'Mexican', label: 'Mexican', flag: '🇲🇽' },
+  { value: 'Middle Eastern', label: 'Middle Eastern', flag: '🕌' },
   { value: 'Moroccan', label: 'Moroccan', flag: '🇲🇦' },
+  { value: 'Nordic', label: 'Nordic', flag: '❄️' },
   { value: 'Polish', label: 'Polish', flag: '🇵🇱' },
   { value: 'Portuguese', label: 'Portuguese', flag: '🇵🇹' },
   { value: 'Russian', label: 'Russian', flag: '🇷🇺' },
+  { value: 'South American', label: 'South American', flag: '🌎' },
   { value: 'Spanish', label: 'Spanish', flag: '🇪🇸' },
   { value: 'Thai', label: 'Thai', flag: '🇹🇭' },
   { value: 'Tunisian', label: 'Tunisian', flag: '🇹🇳' },

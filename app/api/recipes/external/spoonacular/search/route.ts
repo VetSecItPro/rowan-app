@@ -1,0 +1,79 @@
+/**
+ * API Route: Search Spoonacular Recipes
+ * Proxies Spoonacular API to keep API key secure
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function GET(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const query = searchParams.get('q');
+    const apiKey = process.env.SPOONACULAR_API_KEY;
+
+    if (!query || query.trim().length < 2) {
+      return NextResponse.json([]);
+    }
+
+    if (!apiKey) {
+      console.error('Spoonacular API key not configured');
+      return NextResponse.json([]);
+    }
+
+    // Search for recipes
+    const searchResponse = await fetch(
+      `https://api.spoonacular.com/recipes/complexSearch?query=${encodeURIComponent(query)}&number=10&addRecipeInformation=true&fillIngredients=true&apiKey=${apiKey}`
+    );
+
+    if (!searchResponse.ok) {
+      console.error('Spoonacular search failed:', searchResponse.statusText);
+      return NextResponse.json([]);
+    }
+
+    const searchData = await searchResponse.json();
+
+    if (!searchData.results || searchData.results.length === 0) {
+      return NextResponse.json([]);
+    }
+
+    const recipes = searchData.results.map((recipe: any) => {
+      // Parse ingredients
+      const ingredients = recipe.extendedIngredients?.map((ing: any) => ({
+        name: ing.name || ing.original,
+        amount: ing.amount ? ing.amount.toString() : undefined,
+        unit: ing.unit || undefined,
+      })) || [];
+
+      // Parse instructions
+      let instructions = '';
+      if (recipe.analyzedInstructions && recipe.analyzedInstructions.length > 0) {
+        instructions = recipe.analyzedInstructions[0].steps
+          .map((step: any) => `${step.number}. ${step.step}`)
+          .join('\n\n');
+      }
+
+      return {
+        id: `spoonacular-${recipe.id}`,
+        source: 'spoonacular',
+        name: recipe.title,
+        description: recipe.summary?.replace(/<[^>]*>/g, ''), // Strip HTML tags
+        image_url: recipe.image,
+        prep_time: recipe.preparationMinutes,
+        cook_time: recipe.cookingMinutes,
+        servings: recipe.servings,
+        cuisine: recipe.cuisines?.[0],
+        ingredients,
+        instructions,
+        source_url: recipe.sourceUrl || recipe.spoonacularSourceUrl,
+      };
+    });
+
+    return NextResponse.json(recipes);
+  } catch (error) {
+    console.error('Spoonacular search API error:', error);
+    return NextResponse.json(
+      { error: 'Failed to search recipes' },
+      { status: 500 }
+    );
+  }
+}
