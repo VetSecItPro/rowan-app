@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, memo, useRef } from 'react';
-import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, TrendingUp, ShoppingBag, ChevronLeft, ChevronRight, LayoutGrid, List, ChefHat, ExternalLink } from 'lucide-react';
+import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, TrendingUp, ShoppingBag, ChevronLeft, ChevronRight, LayoutGrid, List, ChefHat, ExternalLink, X } from 'lucide-react';
 import Link from 'next/link';
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -237,7 +237,7 @@ export default function MealsPage() {
   // Memoized meals grouped by date for calendar view
   const mealsByDate = useMemo(() => {
     const grouped = new Map<string, Meal[]>();
-    meals.forEach(meal => {
+    filteredMeals.forEach(meal => {
       const dateKey = format(new Date(meal.scheduled_date), 'yyyy-MM-dd');
       if (!grouped.has(dateKey)) {
         grouped.set(dateKey, []);
@@ -245,7 +245,7 @@ export default function MealsPage() {
       grouped.get(dateKey)!.push(meal);
     });
     return grouped;
-  }, [meals]);
+  }, [filteredMeals]);
 
   // Optimized function to get meals for a specific date
   const getMealsForDate = useCallback((date: Date) => {
@@ -875,8 +875,17 @@ export default function MealsPage() {
                 placeholder={viewMode === 'recipes' ? 'Search recipes... (Press / to focus)' : 'Search meals... (Press / to focus)'}
                 value={searchQuery}
                 onChange={handleSearchChange}
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full pl-10 pr-10 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
+                  title="Clear search"
+                >
+                  <X className="w-4 h-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+                </button>
+              )}
             </div>
           </div>
           )}
@@ -976,7 +985,7 @@ export default function MealsPage() {
                   /* Week Calendar View */
                   <WeekCalendarView
                     currentWeek={currentWeek}
-                    meals={meals}
+                    meals={filteredMeals}
                     onWeekChange={handleWeekChange}
                     onMealClick={handleMealClick}
                     onAddMeal={handleAddMealForDate}
@@ -987,7 +996,7 @@ export default function MealsPage() {
                   /* Two Week Calendar View */
                   <TwoWeekCalendarView
                     currentWeek={currentWeek}
-                    meals={meals}
+                    meals={filteredMeals}
                     onWeekChange={handleWeekChange}
                     onMealClick={handleMealClick}
                     onAddMeal={handleAddMealForDate}
