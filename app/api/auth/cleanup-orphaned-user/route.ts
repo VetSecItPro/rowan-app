@@ -1,14 +1,63 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { createClient as createServerClient } from '@/lib/supabase/server';
+import { ratelimit } from '@/lib/ratelimit';
 
 export async function POST(req: Request) {
   try {
+    // SECURITY: Rate limiting to prevent abuse
+    try {
+      const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
+      const { success: rateLimitSuccess } = await ratelimit.limit(ip);
+
+      if (!rateLimitSuccess) {
+        return NextResponse.json(
+          { error: 'Too many requests. Please try again later.' },
+          { status: 429 }
+        );
+      }
+    } catch (rateLimitError) {
+      console.warn('[SECURITY] Rate limiting failed:', rateLimitError);
+    }
+
+    // SECURITY: Verify authentication
+    const supabase = createServerClient();
+    const { data: { session }, error: authError } = await supabase.auth.getSession();
+
+    if (authError || !session) {
+      console.warn('[SECURITY] Unauthorized cleanup attempt');
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const { userId } = await req.json();
 
-    if (!userId) {
+    // SECURITY: Input validation
+    if (!userId || typeof userId !== 'string') {
       return NextResponse.json(
-        { error: 'User ID is required' },
+        { error: 'Valid User ID is required' },
         { status: 400 }
+      );
+    }
+
+    // SECURITY: UUID validation
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(userId)) {
+      return NextResponse.json(
+        { error: 'Invalid User ID format' },
+        { status: 400 }
+      );
+    }
+
+    // SECURITY: Only allow users to delete their own orphaned user
+    // (This endpoint should only be called during signup errors)
+    if (userId !== session.user.id) {
+      console.warn(`[SECURITY] User ${session.user.id} attempted to delete user ${userId}`);
+      return NextResponse.json(
+        { error: 'Unauthorized to delete this user' },
+        { status: 403 }
       );
     }
 
@@ -36,12 +85,15 @@ export async function POST(req: Request) {
     const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
 
     if (error) {
-      console.error('Error deleting orphaned user:', error);
+      console.error('[SECURITY] Error deleting orphaned user:', error);
       return NextResponse.json(
         { error: 'Failed to delete orphaned user' },
         { status: 500 }
       );
     }
+
+    // SECURITY: Audit log for user deletion
+    console.info(`[AUDIT] User ${session.user.id} successfully deleted orphaned user ${userId}`);
 
     return NextResponse.json({ success: true });
   } catch (error) {
