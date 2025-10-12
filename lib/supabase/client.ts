@@ -1,15 +1,6 @@
 import { createBrowserClient } from '@supabase/ssr';
-import type { SupabaseClient } from '@supabase/supabase-js';
-
-// Singleton instance to prevent multiple GoTrueClient instances
-let client: SupabaseClient | null = null;
 
 export const createClient = () => {
-  // Return existing client if already created (singleton pattern)
-  if (client) {
-    return client;
-  }
-
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
@@ -17,11 +8,12 @@ export const createClient = () => {
     throw new Error('Missing Supabase environment variables');
   }
 
-  // Create and store the client with proper cookie handling for SSR
-  client = createBrowserClient(supabaseUrl, supabaseAnonKey, {
+  // Create a new client each time to ensure fresh session state
+  // This allows the client to pick up authentication changes
+  return createBrowserClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       get(name: string) {
-        // Get cookie from document
+        // Get cookie from document (reads current session)
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
         if (parts.length === 2) return parts.pop()?.split(';').shift();
@@ -56,6 +48,4 @@ export const createClient = () => {
       },
     },
   });
-
-  return client;
 };
