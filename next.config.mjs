@@ -28,7 +28,7 @@ const nextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://vercel.com",
               "style-src 'self' 'unsafe-inline'",
-              "font-src 'self' data: https://vercel.live https://vercel.com https://assets.vercel.com",
+              "font-src 'self' data: https:",
               "img-src 'self' data: https: blob:",
               "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live https://api.gemini.google.com",
               "frame-src 'self' https://vercel.live",
