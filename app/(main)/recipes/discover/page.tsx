@@ -23,6 +23,7 @@ export default function DiscoverRecipesPage() {
   useEffect(() => {
     const loadSpace = async () => {
       if (!user) {
+        console.log('No user found, skipping space load');
         setSpaceLoading(false);
         return;
       }
@@ -31,22 +32,26 @@ export default function DiscoverRecipesPage() {
         setSpaceLoading(true);
         setSpaceError(null);
 
+        console.log('Loading spaces for user:', user.id);
         const response = await fetch('/api/spaces');
 
         if (!response.ok) {
-          throw new Error('Failed to load spaces');
+          throw new Error(`Failed to load spaces: ${response.statusText}`);
         }
 
         const spaces = await response.json();
+        console.log('Loaded spaces:', spaces);
 
         if (spaces && Array.isArray(spaces) && spaces.length > 0) {
           setCurrentSpaceId(spaces[0].id);
+          console.log('Current space ID set to:', spaces[0].id);
         } else {
           setSpaceError('No space found. Please create a space first.');
+          console.error('No spaces found for user');
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to load space:', error);
-        setSpaceError('Failed to load your space. Please try again.');
+        setSpaceError(error?.message || 'Failed to load your space. Please try again.');
       } finally {
         setSpaceLoading(false);
       }
@@ -131,31 +136,41 @@ export default function DiscoverRecipesPage() {
     setAddingRecipeIds(prev => new Set(prev).add(externalRecipe.id));
 
     try {
-      // Convert external recipe to our format
-      await mealsService.createRecipe({
+      // Prepare recipe data
+      const recipeData = {
         space_id: currentSpaceId,
         name: externalRecipe.name,
         description: externalRecipe.description || '',
         prep_time: externalRecipe.prep_time,
         cook_time: externalRecipe.cook_time,
         servings: externalRecipe.servings,
-        difficulty: externalRecipe.difficulty as any,
-        cuisine_type: externalRecipe.cuisine,
-        image_url: externalRecipe.image_url,
-        instructions: externalRecipe.instructions,
-        source_url: externalRecipe.source_url,
+        difficulty: externalRecipe.difficulty || undefined,
+        cuisine_type: externalRecipe.cuisine || undefined,
+        image_url: externalRecipe.image_url || undefined,
+        instructions: externalRecipe.instructions || undefined,
+        source_url: externalRecipe.source_url || undefined,
         ingredients: externalRecipe.ingredients.map(ing => ({
           name: ing.name,
           amount: ing.amount || '',
           unit: ing.unit || '',
         })),
         tags: [externalRecipe.source, externalRecipe.cuisine].filter(Boolean) as string[],
-      });
+      };
 
+      console.log('Adding recipe to library:', recipeData);
+
+      // Convert external recipe to our format
+      const result = await mealsService.createRecipe(recipeData);
+
+      console.log('Recipe added successfully:', result);
       alert('✓ Recipe added to your library!');
-    } catch (error) {
-      console.error('Failed to add recipe:', error);
-      alert('Failed to add recipe. Please try again.');
+    } catch (error: any) {
+      console.error('Failed to add recipe - Full error:', error);
+      console.error('Error message:', error?.message);
+      console.error('Error details:', error?.details || error?.hint);
+
+      const errorMsg = error?.message || 'Unknown error occurred';
+      alert(`Failed to add recipe: ${errorMsg}\nCheck console for details.`);
     } finally {
       setAddingRecipeIds(prev => {
         const next = new Set(prev);
