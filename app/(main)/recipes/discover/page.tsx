@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Search, Plus, ExternalLink, Loader2, ChefHat, Clock, Users, Calendar } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { QuickPlanModal } from '@/components/meals/QuickPlanModal';
+import { RecipePreviewModal } from '@/components/meals/RecipePreviewModal';
 import {
   searchExternalRecipes,
   getRandomRecipes,
@@ -68,6 +69,8 @@ export default function DiscoverRecipesPage() {
   const [addingRecipeIds, setAddingRecipeIds] = useState<Set<string>>(new Set());
   const [planningRecipe, setPlanningRecipe] = useState<ExternalRecipe | null>(null);
   const [isQuickPlanOpen, setIsQuickPlanOpen] = useState(false);
+  const [previewRecipe, setPreviewRecipe] = useState<ExternalRecipe | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   // Load random recipes on mount
   useEffect(() => {
@@ -398,18 +401,24 @@ export default function DiscoverRecipesPage() {
                 key={recipe.id}
                 className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
               >
-                {/* Recipe Image */}
+                {/* Recipe Image - Clickable */}
                 {recipe.image_url && (
-                  <div className="h-48 overflow-hidden bg-gray-200 dark:bg-gray-700">
+                  <button
+                    onClick={() => {
+                      setPreviewRecipe(recipe);
+                      setIsPreviewOpen(true);
+                    }}
+                    className="w-full h-48 overflow-hidden bg-gray-200 dark:bg-gray-700 cursor-pointer group"
+                  >
                     <img
                       src={recipe.image_url}
                       alt={recipe.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
                       }}
                     />
-                  </div>
+                  </button>
                 )}
 
                 <div className="p-5">
@@ -431,10 +440,18 @@ export default function DiscoverRecipesPage() {
                     )}
                   </div>
 
-                  {/* Recipe Name */}
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
-                    {recipe.name}
-                  </h3>
+                  {/* Recipe Name - Clickable */}
+                  <button
+                    onClick={() => {
+                      setPreviewRecipe(recipe);
+                      setIsPreviewOpen(true);
+                    }}
+                    className="text-left w-full group"
+                  >
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                      {recipe.name}
+                    </h3>
+                  </button>
 
                   {/* Description */}
                   {recipe.description && (
@@ -540,6 +557,26 @@ export default function DiscoverRecipesPage() {
           recipeName={planningRecipe.name}
         />
       )}
+
+      {/* Recipe Preview Modal */}
+      <RecipePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => {
+          setIsPreviewOpen(false);
+          setPreviewRecipe(null);
+        }}
+        recipe={previewRecipe}
+        onPlanMeal={(recipe) => {
+          setPreviewRecipe(null);
+          setIsPreviewOpen(false);
+          handlePlanMeal(recipe);
+        }}
+        onAddToLibrary={(recipe) => {
+          setPreviewRecipe(null);
+          setIsPreviewOpen(false);
+          handleAddToLibrary(recipe);
+        }}
+      />
     </div>
   );
 }
