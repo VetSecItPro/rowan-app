@@ -220,50 +220,52 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 p-6 border-b border-orange-200 dark:border-orange-800 z-10">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
+        <div className="sticky top-0 bg-gradient-to-r from-orange-500 to-orange-600 p-6 z-10">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-white">
               {editRecipe ? 'Edit Recipe' : 'Create New Recipe'}
             </h2>
-            <button onClick={onClose} aria-label="Close modal" className="p-2 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-900/30 text-orange-600 dark:text-orange-400">
-              <X className="w-5 h-5" />
+            <button onClick={onClose} aria-label="Close modal" className="p-2 rounded-lg hover:bg-orange-700 transition-colors">
+              <X className="w-5 h-5 text-white" />
             </button>
           </div>
-
-          {/* Toggle Buttons */}
-          {!editRecipe && (
-            <div className="flex items-center gap-1 p-1 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-lg border-2 border-orange-300 dark:border-orange-600">
-              <button
-                onClick={() => setActiveTab('manual')}
-                className={`flex-1 px-3 py-1.5 rounded-md flex items-center justify-center gap-1.5 transition-all font-medium text-xs ${
-                  activeTab === 'manual'
-                    ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-sm'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                }`}
-              >
-                <FileText className="w-3.5 h-3.5" />
-                <span>Manual Entry</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('ai')}
-                className={`flex-1 px-3 py-1.5 rounded-md flex items-center justify-center gap-1.5 transition-all font-medium text-xs ${
-                  activeTab === 'ai'
-                    ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-sm'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                }`}
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>AI Import</span>
-              </button>
-            </div>
-          )}
         </div>
 
         {/* Content - scrollable with fixed height */}
         <div className="flex-1 overflow-y-auto h-[600px]">
+          {/* Toggle Buttons - In Content Area */}
+          {!editRecipe && (
+            <div className="p-6 pb-0">
+              <div className="inline-flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700">
+                <button
+                  onClick={() => setActiveTab('manual')}
+                  className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all font-medium text-sm min-w-[130px] ${
+                    activeTab === 'manual'
+                      ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                  }`}
+                >
+                  <FileText className="w-4 h-4" />
+                  <span>Manual Entry</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('ai')}
+                  className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all font-medium text-sm min-w-[130px] ${
+                    activeTab === 'ai'
+                      ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                  }`}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>AI Import</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* AI Import Tab */}
           {activeTab === 'ai' && !editRecipe && (
-            <div className="p-6 space-y-6 h-full">
+            <div className="p-6 pt-4 space-y-6 h-full">
               <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                 <div className="text-sm text-blue-900 dark:text-blue-200">
@@ -306,7 +308,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Upload Recipe Image
                 </label>
-                <div className="space-y-3">
+                <div className="space-y-3 max-w-md">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -317,12 +319,12 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full px-4 py-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-orange-500 dark:hover:border-orange-400 transition-colors"
+                    className="w-full px-4 py-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-orange-500 dark:hover:border-orange-400 transition-colors"
                   >
                     <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400">
-                      <ImageIcon className="w-10 h-10" />
-                      <span className="font-medium">Click to upload image</span>
-                      <span className="text-sm">PNG, JPG, or JPEG</span>
+                      <ImageIcon className="w-8 h-8" />
+                      <span className="font-medium text-sm">Click to upload</span>
+                      <span className="text-xs">PNG, JPG, or JPEG</span>
                     </div>
                   </button>
 
@@ -331,7 +333,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
                       <img
                         src={imagePreview}
                         alt="Recipe preview"
-                        className="w-full h-48 object-cover rounded-lg"
+                        className="w-full h-32 object-cover rounded-lg"
                       />
                       <button
                         onClick={() => {
@@ -339,9 +341,9 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
                           setImagePreview(null);
                           if (fileInputRef.current) fileInputRef.current.value = '';
                         }}
-                        className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                        className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-3 h-3" />
                       </button>
                     </div>
                   )}
@@ -371,7 +373,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
 
           {/* Manual Entry Tab */}
           {activeTab === 'manual' && (
-            <form onSubmit={handleSubmit} className="p-6 space-y-4 h-full">
+            <form onSubmit={handleSubmit} className={`p-6 space-y-4 h-full ${!editRecipe ? 'pt-4' : ''}`}>
               <div>
                 <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Recipe Name *</label>
                 <input
@@ -479,15 +481,18 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
               </div>
 
               <div>
-                <ImageUpload
-                  label="Recipe Image"
-                  description="Upload a photo of your recipe"
-                  currentImageUrl={formData.image_url}
-                  onUploadSuccess={(url) => setFormData({ ...formData, image_url: url })}
-                  uploadEndpoint="/api/upload/recipe"
-                  maxSizeMB={10}
-                  aspectRatio="landscape"
-                />
+                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Recipe Image</label>
+                <div className="w-full max-w-sm">
+                  <ImageUpload
+                    label=""
+                    description="Upload a photo"
+                    currentImageUrl={formData.image_url}
+                    onUploadSuccess={(url) => setFormData({ ...formData, image_url: url })}
+                    uploadEndpoint="/api/upload/recipe"
+                    maxSizeMB={10}
+                    aspectRatio="landscape"
+                  />
+                </div>
               </div>
 
               <div>
