@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { X, ShoppingBag, Check, Loader2 } from 'lucide-react';
 import { Meal } from '@/lib/services/meals-service';
 import { format } from 'date-fns';
+import { showSuccess } from '@/lib/utils/toast';
 
 interface GenerateListModalProps {
   isOpen: boolean;
@@ -84,13 +85,13 @@ export function GenerateListModal({
         onClose();
 
         // Show success message with redirect option
-        const viewList = confirm(
-          `✅ Success! Shopping list generated with ${data.data.itemCount} item${data.data.itemCount > 1 ? 's' : ''} from ${data.data.recipeCount} recipe${data.data.recipeCount > 1 ? 's' : ''}.\n\nWould you like to view your shopping lists now?`
+        showSuccess(
+          `Shopping list generated with ${data.data.itemCount} item${data.data.itemCount > 1 ? 's' : ''} from ${data.data.recipeCount} recipe${data.data.recipeCount > 1 ? 's' : ''}!`,
+          {
+            label: 'View Shopping Lists',
+            onClick: () => window.location.href = '/shopping'
+          }
         );
-
-        if (viewList) {
-          window.location.href = '/shopping';
-        }
       }
     } catch (err) {
       console.error('Generate shopping list error:', err);
