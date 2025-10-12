@@ -22,7 +22,6 @@ export async function GET(req: NextRequest) {
         );
       }
     } catch (rateLimitError) {
-      console.warn('[API] Rate limiting failed, continuing without rate limit:', rateLimitError);
     }
 
     // Verify authentication
@@ -91,7 +90,6 @@ export async function POST(req: NextRequest) {
         );
       }
     } catch (rateLimitError) {
-      console.warn('[API] Rate limiting failed, continuing without rate limit:', rateLimitError);
     }
 
     // Verify authentication

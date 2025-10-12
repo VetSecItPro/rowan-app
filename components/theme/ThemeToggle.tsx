@@ -11,7 +11,6 @@ export function ThemeToggle() {
 
   useEffect(() => {
     setMounted(true);
-    console.log('ThemeToggle mounted, current theme:', theme);
   }, [theme]);
 
   if (!mounted) {
@@ -22,7 +21,6 @@ export function ThemeToggle() {
 
   const handleToggle = () => {
     const newTheme = isDark ? 'light' : 'dark';
-    console.log('Toggling theme from', theme, 'to', newTheme);
     setTheme(newTheme);
   };
 

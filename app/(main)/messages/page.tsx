@@ -252,12 +252,10 @@ export default function MessagesPage() {
 
   // Memoize handleImageChange callback
   const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('Image files selected:', e.target.files);
   }, []);
 
   // Memoize handleFileChange callback
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('Files selected:', e.target.files);
   }, []);
 
   // Memoize empty state message

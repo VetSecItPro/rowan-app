@@ -17,7 +17,6 @@ export async function POST(req: Request) {
         );
       }
     } catch (rateLimitError) {
-      console.warn('[SECURITY] Rate limiting failed:', rateLimitError);
     }
 
     // SECURITY: Verify authentication
@@ -25,7 +24,6 @@ export async function POST(req: Request) {
     const { data: { session }, error: authError } = await supabase.auth.getSession();
 
     if (authError || !session) {
-      console.warn('[SECURITY] Unauthorized cleanup attempt');
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -54,7 +52,6 @@ export async function POST(req: Request) {
     // SECURITY: Only allow users to delete their own orphaned user
     // (This endpoint should only be called during signup errors)
     if (userId !== session.user.id) {
-      console.warn(`[SECURITY] User ${session.user.id} attempted to delete user ${userId}`);
       return NextResponse.json(
         { error: 'Unauthorized to delete this user' },
         { status: 403 }
