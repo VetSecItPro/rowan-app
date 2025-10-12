@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { projectsService } from '@/lib/services/budgets-service';
 import { ratelimit } from '@/lib/ratelimit';
+import { verifySpaceAccess } from '@/lib/services/authorization-service';
 
 /**
  * GET /api/expenses
@@ -43,6 +44,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(
         { error: 'space_id is required' },
         { status: 400 }
+      );
+    }
+
+    // Verify user has access to this space
+    try {
+      await verifySpaceAccess(session.user.id, spaceId);
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'You do not have access to this space' },
+        { status: 403 }
       );
     }
 
@@ -121,6 +132,24 @@ export async function POST(req: NextRequest) {
     if (isNaN(expenseAmount)) {
       return NextResponse.json(
         { error: 'amount must be a valid number' },
+        { status: 400 }
+      );
+    }
+
+    // Verify user has access to this space
+    try {
+      await verifySpaceAccess(session.user.id, space_id);
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'You do not have access to this space' },
+        { status: 403 }
+      );
+    }
+
+    // Validate title length
+    if (title && title.trim().length > 200) {
+      return NextResponse.json(
+        { error: 'title must be 200 characters or less' },
         { status: 400 }
       );
     }
