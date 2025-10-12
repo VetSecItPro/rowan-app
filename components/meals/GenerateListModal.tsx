@@ -83,10 +83,14 @@ export function GenerateListModal({
         // Close modal
         onClose();
 
-        // Show success message
-        alert(
-          `Shopping list generated! ${data.data.itemCount} items added from ${data.data.recipeCount} recipe${data.data.recipeCount > 1 ? 's' : ''}.`
+        // Show success message with redirect option
+        const viewList = confirm(
+          `✅ Success! Shopping list generated with ${data.data.itemCount} item${data.data.itemCount > 1 ? 's' : ''} from ${data.data.recipeCount} recipe${data.data.recipeCount > 1 ? 's' : ''}.\n\nWould you like to view your shopping lists now?`
         );
+
+        if (viewList) {
+          window.location.href = '/shopping';
+        }
       }
     } catch (err) {
       console.error('Generate shopping list error:', err);
