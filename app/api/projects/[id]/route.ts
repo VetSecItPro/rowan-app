@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { projectsOnlyService } from '@/lib/services/projects-service';
 import { ratelimit } from '@/lib/ratelimit';
+import { verifyResourceAccess } from '@/lib/services/authorization-service';
 
 /**
  * GET /api/projects/[id]
@@ -24,7 +25,6 @@ export async function GET(
         );
       }
     } catch (rateLimitError) {
-      console.warn('[API] Rate limiting failed, continuing without rate limit:', rateLimitError);
     }
 
     // Verify authentication
@@ -44,6 +44,16 @@ export async function GET(
       return NextResponse.json(
         { error: 'Project not found' },
         { status: 404 }
+      );
+    }
+
+    // Verify user has access to project's space
+    try {
+      await verifyResourceAccess(session.user.id, project);
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'You do not have access to this project' },
+        { status: 403 }
       );
     }
 
@@ -81,7 +91,6 @@ export async function PATCH(
         );
       }
     } catch (rateLimitError) {
-      console.warn('[API] Rate limiting failed, continuing without rate limit:', rateLimitError);
     }
 
     // Verify authentication
@@ -98,6 +107,19 @@ export async function PATCH(
     // Parse request body
     const body = await req.json();
     const { name, description, status, start_date, target_date, budget_amount } = body;
+
+    // Get project first to verify access
+    const existingProject = await projectsOnlyService.getProjectById(params.id);
+
+    // Verify user has access to project's space
+    try {
+      await verifyResourceAccess(session.user.id, existingProject);
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'You do not have access to this project' },
+        { status: 403 }
+      );
+    }
 
     // Update project using service
     const project = await projectsOnlyService.updateProject(params.id, {
@@ -143,7 +165,6 @@ export async function DELETE(
         );
       }
     } catch (rateLimitError) {
-      console.warn('[API] Rate limiting failed, continuing without rate limit:', rateLimitError);
     }
 
     // Verify authentication
@@ -154,6 +175,19 @@ export async function DELETE(
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
+      );
+    }
+
+    // Get project first to verify access
+    const existingProject = await projectsOnlyService.getProjectById(params.id);
+
+    // Verify user has access to project's space
+    try {
+      await verifyResourceAccess(session.user.id, existingProject);
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'You do not have access to this project' },
+        { status: 403 }
       );
     }
 

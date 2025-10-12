@@ -23,7 +23,6 @@ export async function POST(req: NextRequest) {
         );
       }
     } catch (rateLimitError) {
-      console.warn('[SECURITY] Rate limiting failed:', rateLimitError);
     }
 
     // SECURITY: Verify authentication
@@ -31,7 +30,6 @@ export async function POST(req: NextRequest) {
     const { data: { session }, error: authError } = await supabase.auth.getSession();
 
     if (authError || !session) {
-      console.warn('[SECURITY] Unauthorized recipe parse attempt');
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }

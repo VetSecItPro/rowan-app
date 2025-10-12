@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { projectsService } from '@/lib/services/budgets-service';
 import { ratelimit } from '@/lib/ratelimit';
+import { verifyResourceAccess } from '@/lib/services/authorization-service';
 
 /**
  * GET /api/expenses/[id]
@@ -24,7 +25,6 @@ export async function GET(
         );
       }
     } catch (rateLimitError) {
-      console.warn('[API] Rate limiting failed, continuing without rate limit:', rateLimitError);
     }
 
     // Verify authentication
@@ -44,6 +44,16 @@ export async function GET(
       return NextResponse.json(
         { error: 'Expense not found' },
         { status: 404 }
+      );
+    }
+
+    // Verify user has access to expense's space
+    try {
+      await verifyResourceAccess(session.user.id, expense);
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'You do not have access to this expense' },
+        { status: 403 }
       );
     }
 
@@ -81,7 +91,6 @@ export async function PATCH(
         );
       }
     } catch (rateLimitError) {
-      console.warn('[API] Rate limiting failed, continuing without rate limit:', rateLimitError);
     }
 
     // Verify authentication
@@ -128,6 +137,19 @@ export async function PATCH(
     if (due_date !== undefined) updates.due_date = due_date;
     if (recurring !== undefined) updates.recurring = recurring;
 
+    // Get expense first to verify access
+    const existingExpense = await projectsService.getExpenseById(params.id);
+
+    // Verify user has access to expense's space
+    try {
+      await verifyResourceAccess(session.user.id, existingExpense);
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'You do not have access to this expense' },
+        { status: 403 }
+      );
+    }
+
     // Update expense using service
     const expense = await projectsService.updateExpense(params.id, updates);
 
@@ -165,7 +187,6 @@ export async function DELETE(
         );
       }
     } catch (rateLimitError) {
-      console.warn('[API] Rate limiting failed, continuing without rate limit:', rateLimitError);
     }
 
     // Verify authentication
@@ -176,6 +197,19 @@ export async function DELETE(
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
+      );
+    }
+
+    // Get expense first to verify access
+    const existingExpense = await projectsService.getExpenseById(params.id);
+
+    // Verify user has access to expense's space
+    try {
+      await verifyResourceAccess(session.user.id, existingExpense);
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'You do not have access to this expense' },
+        { status: 403 }
       );
     }
 

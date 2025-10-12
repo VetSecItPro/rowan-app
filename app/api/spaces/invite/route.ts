@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createInvitation } from '@/lib/services/invitations-service';
 import { ratelimit } from '@/lib/ratelimit';
+import { verifySpaceAccess } from '@/lib/services/authorization-service';
 
 /**
  * POST /api/spaces/invite
@@ -61,6 +62,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // SECURITY: Verify user is member of space before creating invitation
+    try {
+      await verifySpaceAccess(session.user.id, space_id);
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'You do not have permission to invite users to this space' },
+        { status: 403 }
+      );
+    }
+
     // Create invitation using service
     const result = await createInvitation(
       space_id,
@@ -80,7 +91,6 @@ export async function POST(req: NextRequest) {
     const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/invitations/accept?token=${result.data.token}`;
 
     // SECURITY: Do not log sensitive tokens
-    console.log('[API] Invitation created for email:', email.toLowerCase().trim());
     // For now, just return the invitation data
     // Later, we'll integrate Resend to send the email
 

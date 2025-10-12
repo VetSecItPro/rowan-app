@@ -283,7 +283,6 @@ export default function SettingsPage() {
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(profileData.email)) {
-      console.log('Error: Invalid email format');
       alert('Please enter a valid email address');
       setIsSavingProfile(false);
       return;
@@ -292,8 +291,6 @@ export default function SettingsPage() {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    console.log('Profile saved:', profileData);
-    console.log('Toast: Settings saved successfully');
     setIsSavingProfile(false);
   };
 
@@ -312,9 +309,7 @@ export default function SettingsPage() {
     setIsSendingInvite(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    console.log('Sending invite to:', inviteEmail, 'with role:', inviteRole);
     setPendingInvitations([...pendingInvitations, { email: inviteEmail, role: inviteRole, sentAt: 'Just now' }]);
-    console.log('Toast: Invitation sent successfully');
 
     setInviteEmail('');
     setInviteRole('Member');
@@ -323,11 +318,9 @@ export default function SettingsPage() {
   };
 
   const handleUpdateMemberRole = async (memberId: string, newRole: UserRole) => {
-    console.log('Updating member role:', memberId, 'to', newRole);
     setSpaceMembers(spaceMembers.map(member =>
       member.id === memberId ? { ...member, role: newRole } : member
     ));
-    console.log('Toast: Member role updated');
   };
 
   const handleRemoveMember = async (memberId: string) => {
@@ -349,9 +342,7 @@ export default function SettingsPage() {
       return;
     }
 
-    console.log('Removing member:', memberId);
     setSpaceMembers(spaceMembers.filter(m => m.id !== memberId));
-    console.log('Toast: Member removed successfully');
   };
 
   const handleLeaveSpace = async () => {
@@ -363,8 +354,6 @@ export default function SettingsPage() {
       return;
     }
 
-    console.log('User leaving space');
-    console.log('Toast: You have left the space');
     setShowLeaveSpaceModal(false);
   };
 
@@ -377,8 +366,6 @@ export default function SettingsPage() {
     setIsCreatingSpace(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    console.log('Creating new space:', newSpaceName);
-    console.log('Toast: Space created successfully');
 
     setNewSpaceName('');
     setIsCreatingSpace(false);
@@ -386,26 +373,20 @@ export default function SettingsPage() {
   };
 
   const handleRequestExport = async () => {
-    console.log('Requesting data export');
     setExportStatus('pending');
     setShowExportModal(false);
-    console.log('Toast: Export request submitted. We will email you when ready.');
 
     // Simulate processing
     setTimeout(() => {
       setExportStatus('processing');
-      console.log('Toast: Your export is being processed...');
     }, 2000);
 
     setTimeout(() => {
       setExportStatus('ready');
-      console.log('Toast: Your export is ready for download!');
     }, 5000);
   };
 
   const handleDownloadExport = () => {
-    console.log('Downloading data export');
-    console.log('Toast: Download started');
     setExportStatus('idle');
   };
 
@@ -428,8 +409,6 @@ export default function SettingsPage() {
     setIsDeletingAccount(true);
     await new Promise(resolve => setTimeout(resolve, 1500));
 
-    console.log('Deleting account - password verified');
-    console.log('Toast: Account deleted. You will be redirected to the login page.');
 
     setIsDeletingAccount(false);
     setShowDeleteAccountModal(false);
@@ -444,8 +423,6 @@ export default function SettingsPage() {
     setIsEnabling2FA(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    console.log('Enabling 2FA with code:', twoFactorCode);
-    console.log('Toast: Two-factor authentication enabled successfully');
 
     setTwoFactorCode('');
     setIsEnabling2FA(false);
@@ -453,16 +430,13 @@ export default function SettingsPage() {
   };
 
   const handleRevokeSession = async (sessionId: string) => {
-    console.log('Revoking session:', sessionId);
     setActiveSessions(activeSessions.filter(s => s.id !== sessionId));
-    console.log('Toast: Session revoked successfully');
     setShowRevokeSessionModal(false);
     setSessionToRevoke(null);
   };
 
   const copyBackupCode = (code: string) => {
     navigator.clipboard.writeText(code);
-    console.log('Toast: Backup code copied to clipboard');
   };
 
   const handleNotificationToggle = (category: 'email' | 'push', key: string) => {
@@ -471,12 +445,10 @@ export default function SettingsPage() {
     } else {
       setPushNotifications(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
     }
-    console.log('Toast: Settings saved');
   };
 
   const handlePrivacyToggle = (key: string) => {
     setPrivacySettings(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
-    console.log('Toast: Settings saved');
   };
 
   const handleRequestPasswordReset = async () => {
@@ -495,7 +467,6 @@ export default function SettingsPage() {
         alert('Failed to send password reset email. Please try again.');
       } else {
         setResetEmailSent(true);
-        console.log('Toast: Password reset email sent! Check your inbox.');
       }
     } catch (error) {
       console.error('Password reset error:', error);
