@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { Lock, Eye, EyeOff, Check, AlertCircle } from 'lucide-react';
 
@@ -20,6 +20,7 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     // Check if user has a valid recovery session
     const checkSession = async () => {
+      const supabase = createClient();
       const { data, error } = await supabase.auth.getSession();
       if (data.session) {
         setIsValidToken(true);
@@ -47,6 +48,8 @@ export default function ResetPasswordPage() {
     }
 
     setIsResetting(true);
+
+    const supabase = createClient();
 
     try {
       const { error } = await supabase.auth.updateUser({
