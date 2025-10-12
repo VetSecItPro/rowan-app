@@ -153,6 +153,7 @@ export default function MealsPage() {
   const [stats, setStats] = useState({ thisWeek: 0, nextWeek: 0, savedRecipes: 0, shoppingItems: 0 });
   const [viewMode, setViewMode] = useState<ViewMode>('calendar');
   const [calendarViewMode, setCalendarViewMode] = useState<CalendarViewMode>('week');
+  const [pendingDeletions, setPendingDeletions] = useState<Map<string, { type: 'meal' | 'recipe', data: Meal | Recipe, timeoutId: NodeJS.Timeout }>>(new Map());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -360,8 +361,11 @@ export default function MealsPage() {
       console.log('[Real-time] Unsubscribing from channels');
       supabase.removeChannel(mealsChannel);
       supabase.removeChannel(recipesChannel);
+
+      // Clear all pending deletion timeouts
+      pendingDeletions.forEach(({ timeoutId }) => clearTimeout(timeoutId));
     };
-  }, [currentSpace]);
+  }, [currentSpace, pendingDeletions]);
 
   // Memoized handlers
   const handleCreateMeal = useCallback(async (mealData: CreateMealInput, createShoppingList?: boolean) => {
@@ -411,33 +415,52 @@ export default function MealsPage() {
   }, [editingMeal, loadMeals, currentSpace, recipes]);
 
   const handleDeleteMeal = useCallback(async (mealId: string) => {
-    // Show confirmation toast with action button
-    toast('Delete this meal?', {
-      description: 'This action cannot be undone.',
+    const mealToDelete = meals.find(m => m.id === mealId);
+    if (!mealToDelete) return;
+
+    // Optimistically remove from UI
+    setMeals(prev => prev.filter(m => m.id !== mealId));
+
+    // Schedule actual deletion after 5 seconds
+    const timeoutId = setTimeout(async () => {
+      try {
+        await mealsService.deleteMeal(mealId);
+        setPendingDeletions(prev => {
+          const newMap = new Map(prev);
+          newMap.delete(mealId);
+          return newMap;
+        });
+      } catch (error) {
+        console.error('Failed to delete meal:', error);
+        showError('Failed to delete meal');
+        // Restore the meal if deletion failed
+        setMeals(prev => [...prev, mealToDelete]);
+      }
+    }, 5000);
+
+    // Store pending deletion
+    setPendingDeletions(prev => new Map(prev).set(mealId, { type: 'meal', data: mealToDelete, timeoutId }));
+
+    // Show toast with undo option
+    toast('Meal deleted', {
+      description: 'You have 5 seconds to undo this action.',
       action: {
-        label: 'Delete',
-        onClick: async () => {
-          try {
-            await showPromise(
-              mealsService.deleteMeal(mealId),
-              {
-                loading: 'Deleting meal...',
-                success: 'Meal deleted successfully!',
-                error: 'Failed to delete meal'
-              }
-            );
-            loadMeals();
-          } catch (error) {
-            console.error('Failed to delete meal:', error);
-          }
+        label: 'Undo',
+        onClick: () => {
+          // Cancel the deletion
+          clearTimeout(timeoutId);
+          setPendingDeletions(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(mealId);
+            return newMap;
+          });
+          // Restore the meal
+          setMeals(prev => [...prev, mealToDelete]);
+          showSuccess('Meal restored!');
         }
-      },
-      cancel: {
-        label: 'Cancel',
-        onClick: () => {}
       }
     });
-  }, [loadMeals]);
+  }, [meals]);
 
   const handleCreateRecipe = useCallback(async (recipeData: CreateRecipeInput) => {
     try {
@@ -454,32 +477,52 @@ export default function MealsPage() {
   }, [editingRecipe, loadRecipes]);
 
   const handleDeleteRecipe = useCallback(async (recipeId: string) => {
-    toast('Delete this recipe?', {
-      description: 'This action cannot be undone.',
+    const recipeToDelete = recipes.find(r => r.id === recipeId);
+    if (!recipeToDelete) return;
+
+    // Optimistically remove from UI
+    setRecipes(prev => prev.filter(r => r.id !== recipeId));
+
+    // Schedule actual deletion after 5 seconds
+    const timeoutId = setTimeout(async () => {
+      try {
+        await mealsService.deleteRecipe(recipeId);
+        setPendingDeletions(prev => {
+          const newMap = new Map(prev);
+          newMap.delete(recipeId);
+          return newMap;
+        });
+      } catch (error) {
+        console.error('Failed to delete recipe:', error);
+        showError('Failed to delete recipe');
+        // Restore the recipe if deletion failed
+        setRecipes(prev => [...prev, recipeToDelete]);
+      }
+    }, 5000);
+
+    // Store pending deletion
+    setPendingDeletions(prev => new Map(prev).set(recipeId, { type: 'recipe', data: recipeToDelete, timeoutId }));
+
+    // Show toast with undo option
+    toast('Recipe deleted', {
+      description: 'You have 5 seconds to undo this action.',
       action: {
-        label: 'Delete',
-        onClick: async () => {
-          try {
-            await showPromise(
-              mealsService.deleteRecipe(recipeId),
-              {
-                loading: 'Deleting recipe...',
-                success: 'Recipe deleted successfully!',
-                error: 'Failed to delete recipe'
-              }
-            );
-            loadRecipes();
-          } catch (error) {
-            console.error('Failed to delete recipe:', error);
-          }
+        label: 'Undo',
+        onClick: () => {
+          // Cancel the deletion
+          clearTimeout(timeoutId);
+          setPendingDeletions(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(recipeId);
+            return newMap;
+          });
+          // Restore the recipe
+          setRecipes(prev => [...prev, recipeToDelete]);
+          showSuccess('Recipe restored!');
         }
-      },
-      cancel: {
-        label: 'Cancel',
-        onClick: () => {}
       }
     });
-  }, [loadRecipes]);
+  }, [recipes]);
 
   // Search handler
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
