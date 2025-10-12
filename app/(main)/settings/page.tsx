@@ -47,7 +47,8 @@ import {
   UtensilsCrossed,
   MessageSquare,
   DollarSign,
-  Target
+  Target,
+  Clock
 } from 'lucide-react';
 
 type SettingsTab = 'profile' | 'security' | 'notifications' | 'appearance' | 'privacy' | 'spaces' | 'analytics' | 'data' | 'help';
@@ -184,19 +185,30 @@ export default function SettingsPage() {
   const [activeSessions, setActiveSessions] = useState<ActiveSession[]>(mockSessions);
   const [sessionToRevoke, setSessionToRevoke] = useState<string | null>(null);
 
-  // Notification toggles state
-  const [emailNotifications, setEmailNotifications] = useState({
-    taskAssignments: true,
-    eventReminders: true,
-    messages: true,
-    weeklyDigest: true,
+  // Notification preferences state
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    email_enabled: true,
+    email_task_assignments: true,
+    email_events: true,
+    email_messages: true,
+    email_reminders: true,
+    email_shopping_lists: true,
+    email_meal_reminders: true,
+    email_digest_frequency: 'daily' as 'realtime' | 'daily' | 'weekly' | 'never',
+    push_enabled: false,
+    push_tasks: true,
+    push_reminders: true,
+    push_messages: true,
+    push_shopping_updates: true,
+    push_events: true,
+    quiet_hours_enabled: false,
+    quiet_hours_start: '22:00',
+    quiet_hours_end: '08:00',
+    timezone: 'UTC',
   });
 
-  const [pushNotifications, setPushNotifications] = useState({
-    desktop: true,
-    mobile: true,
-    sound: true,
-  });
+  const [isLoadingPrefs, setIsLoadingPrefs] = useState(true);
+  const [isSavingPrefs, setIsSavingPrefs] = useState(false);
 
   // Privacy toggles state
   const [privacySettings, setPrivacySettings] = useState({
@@ -439,11 +451,52 @@ export default function SettingsPage() {
     navigator.clipboard.writeText(code);
   };
 
-  const handleNotificationToggle = (category: 'email' | 'push', key: string) => {
-    if (category === 'email') {
-      setEmailNotifications(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
-    } else {
-      setPushNotifications(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
+  // Load notification preferences on mount
+  useEffect(() => {
+    const loadPreferences = async () => {
+      try {
+        const response = await fetch('/api/notifications/preferences');
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            setNotificationPrefs(prev => ({ ...prev, ...result.data }));
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load notification preferences:', error);
+      } finally {
+        setIsLoadingPrefs(false);
+      }
+    };
+
+    loadPreferences();
+  }, []);
+
+  const handleNotificationToggle = async (key: string) => {
+    const newValue = !notificationPrefs[key as keyof typeof notificationPrefs];
+
+    // Optimistically update UI
+    setNotificationPrefs(prev => ({ ...prev, [key]: newValue }));
+    setIsSavingPrefs(true);
+
+    try {
+      const response = await fetch('/api/notifications/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [key]: newValue }),
+      });
+
+      if (!response.ok) {
+        // Revert on error
+        setNotificationPrefs(prev => ({ ...prev, [key]: !newValue }));
+        alert('Failed to update notification preferences');
+      }
+    } catch (error) {
+      // Revert on error
+      setNotificationPrefs(prev => ({ ...prev, [key]: !newValue }));
+      console.error('Failed to update notification preferences:', error);
+    } finally {
+      setIsSavingPrefs(false);
     }
   };
 
@@ -817,73 +870,191 @@ export default function SettingsPage() {
                 {/* Notifications Tab */}
                 {activeTab === 'notifications' && (
                   <div className="space-y-6 sm:space-y-8">
-                    <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Notification Preferences</h2>
-                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Choose how you want to be notified about updates</p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Notification Preferences</h2>
+                        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Choose how you want to be notified about updates</p>
+                      </div>
+                      {isSavingPrefs && (
+                        <div className="flex items-center gap-2 text-sm text-purple-600 dark:text-purple-400">
+                          <div className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+                          Saving...
+                        </div>
+                      )}
                     </div>
 
-                    {/* Email Notifications */}
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <Mail className="w-5 h-5" />
-                        Email Notifications
-                      </h3>
-                      <div className="space-y-4">
-                        {[
-                          { key: 'taskAssignments', label: 'Task assignments', desc: 'Get notified when someone assigns you a task' },
-                          { key: 'eventReminders', label: 'Event reminders', desc: 'Receive email reminders for upcoming events' },
-                          { key: 'messages', label: 'Messages', desc: 'Get notified about new messages' },
-                          { key: 'weeklyDigest', label: 'Weekly digest', desc: 'Receive a weekly summary of your activity' },
-                        ].map((item) => (
-                          <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
-                            <div>
-                              <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
-                              <p className="text-xs text-gray-600 dark:text-gray-400">{item.desc}</p>
-                            </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={emailNotifications[item.key as keyof typeof emailNotifications]}
-                                onChange={() => handleNotificationToggle('email', item.key)}
-                                className="sr-only peer"
-                              />
-                              <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
-                            </label>
-                          </div>
-                        ))}
+                    {isLoadingPrefs ? (
+                      <div className="flex items-center justify-center p-12">
+                        <div className="w-8 h-8 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
                       </div>
-                    </div>
+                    ) : (
+                      <>
+                        {/* Email Notifications */}
+                        <div>
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                            <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
+                            Email Notifications
+                          </h3>
+                          <div className="space-y-3 sm:space-y-4">
+                            {[
+                              { key: 'email_task_assignments', label: 'Task assignments', desc: 'Get notified when someone assigns you a task' },
+                              { key: 'email_events', label: 'Event reminders', desc: 'Receive email reminders for upcoming events' },
+                              { key: 'email_messages', label: 'New messages', desc: 'Get notified about new messages' },
+                              { key: 'email_shopping_lists', label: 'Shopping lists', desc: 'Notifications when shopping lists are ready' },
+                              { key: 'email_meal_reminders', label: 'Meal reminders', desc: 'Reminders for meal prep and cooking' },
+                              { key: 'email_reminders', label: 'General reminders', desc: 'All other reminder notifications' },
+                            ].map((item) => (
+                              <div key={item.key} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl gap-2 sm:gap-0">
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
+                                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">{item.desc}</p>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0">
+                                  <input
+                                    type="checkbox"
+                                    checked={notificationPrefs[item.key as keyof typeof notificationPrefs] as boolean}
+                                    onChange={() => handleNotificationToggle(item.key)}
+                                    className="sr-only peer"
+                                  />
+                                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
 
-                    {/* Push Notifications */}
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <Bell className="w-5 h-5" />
-                        Push Notifications
-                      </h3>
-                      <div className="space-y-4">
-                        {[
-                          { key: 'desktop', label: 'Desktop notifications', desc: 'Show notifications on your desktop' },
-                          { key: 'mobile', label: 'Mobile push', desc: 'Receive push notifications on your mobile device' },
-                          { key: 'sound', label: 'Sound alerts', desc: 'Play a sound when you receive a notification' },
-                        ].map((item) => (
-                          <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
-                            <div>
-                              <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
-                              <p className="text-xs text-gray-600 dark:text-gray-400">{item.desc}</p>
+                        {/* Push Notifications */}
+                        <div>
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                            <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
+                            Push Notifications
+                          </h3>
+                          <div className="space-y-3 sm:space-y-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg sm:rounded-xl gap-2 sm:gap-0">
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">Enable push notifications</p>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Allow browser notifications for real-time alerts</p>
+                              </div>
+                              <label className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0">
+                                <input
+                                  type="checkbox"
+                                  checked={notificationPrefs.push_enabled}
+                                  onChange={() => handleNotificationToggle('push_enabled')}
+                                  className="sr-only peer"
+                                />
+                                <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                              </label>
                             </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={pushNotifications[item.key as keyof typeof pushNotifications]}
-                                onChange={() => handleNotificationToggle('push', item.key)}
-                                className="sr-only peer"
-                              />
-                              <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
-                            </label>
+                            {[
+                              { key: 'push_tasks', label: 'Task updates', desc: 'Task assignments and status changes' },
+                              { key: 'push_reminders', label: 'Reminders', desc: 'Upcoming reminders and deadlines' },
+                              { key: 'push_messages', label: 'Messages', desc: 'New message notifications' },
+                              { key: 'push_shopping_updates', label: 'Shopping updates', desc: 'Shopping list changes and completions' },
+                              { key: 'push_events', label: 'Event alerts', desc: 'Upcoming events and calendar updates' },
+                            ].map((item) => (
+                              <div key={item.key} className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl gap-2 sm:gap-0 transition-opacity ${!notificationPrefs.push_enabled ? 'opacity-50' : ''}`}>
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
+                                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">{item.desc}</p>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0">
+                                  <input
+                                    type="checkbox"
+                                    checked={notificationPrefs[item.key as keyof typeof notificationPrefs] as boolean}
+                                    onChange={() => handleNotificationToggle(item.key)}
+                                    disabled={!notificationPrefs.push_enabled}
+                                    className="sr-only peer"
+                                  />
+                                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600 peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                                </label>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    </div>
+                        </div>
+
+                        {/* Quiet Hours */}
+                        <div>
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                            <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
+                            Quiet Hours
+                          </h3>
+                          <div className="space-y-3 sm:space-y-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg sm:rounded-xl gap-2 sm:gap-0">
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">Enable quiet hours</p>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Pause notifications during specific hours</p>
+                              </div>
+                              <label className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0">
+                                <input
+                                  type="checkbox"
+                                  checked={notificationPrefs.quiet_hours_enabled}
+                                  onChange={() => handleNotificationToggle('quiet_hours_enabled')}
+                                  className="sr-only peer"
+                                />
+                                <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                              </label>
+                            </div>
+
+                            {notificationPrefs.quiet_hours_enabled && (
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl">
+                                <div>
+                                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Start Time
+                                  </label>
+                                  <input
+                                    type="time"
+                                    value={notificationPrefs.quiet_hours_start}
+                                    onChange={async (e) => {
+                                      const newValue = e.target.value;
+                                      setNotificationPrefs(prev => ({ ...prev, quiet_hours_start: newValue }));
+                                      setIsSavingPrefs(true);
+                                      try {
+                                        await fetch('/api/notifications/preferences', {
+                                          method: 'PATCH',
+                                          headers: { 'Content-Type': 'application/json' },
+                                          body: JSON.stringify({ quiet_hours_start: newValue }),
+                                        });
+                                      } catch (error) {
+                                        console.error('Failed to update quiet hours:', error);
+                                      } finally {
+                                        setIsSavingPrefs(false);
+                                      }
+                                    }}
+                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    End Time
+                                  </label>
+                                  <input
+                                    type="time"
+                                    value={notificationPrefs.quiet_hours_end}
+                                    onChange={async (e) => {
+                                      const newValue = e.target.value;
+                                      setNotificationPrefs(prev => ({ ...prev, quiet_hours_end: newValue }));
+                                      setIsSavingPrefs(true);
+                                      try {
+                                        await fetch('/api/notifications/preferences', {
+                                          method: 'PATCH',
+                                          headers: { 'Content-Type': 'application/json' },
+                                          body: JSON.stringify({ quiet_hours_end: newValue }),
+                                        });
+                                      } catch (error) {
+                                        console.error('Failed to update quiet hours:', error);
+                                      } finally {
+                                        setIsSavingPrefs(false);
+                                      }
+                                    }}
+                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
 
