@@ -17,12 +17,43 @@ export const createClient = () => {
     throw new Error('Missing Supabase environment variables');
   }
 
-  // Create and store the client
+  // Create and store the client with proper cookie handling for SSR
   client = createBrowserClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true,
-      detectSessionInUrl: true,
-      storageKey: 'rowan-auth',
+    cookies: {
+      get(name: string) {
+        // Get cookie from document
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(';').shift();
+      },
+      set(name: string, value: string, options: any) {
+        // Set cookie in document
+        let cookie = `${name}=${value}`;
+        if (options?.maxAge) {
+          cookie += `; max-age=${options.maxAge}`;
+        }
+        if (options?.path) {
+          cookie += `; path=${options.path}`;
+        }
+        if (options?.domain) {
+          cookie += `; domain=${options.domain}`;
+        }
+        if (options?.sameSite) {
+          cookie += `; samesite=${options.sameSite}`;
+        }
+        if (options?.secure) {
+          cookie += '; secure';
+        }
+        document.cookie = cookie;
+      },
+      remove(name: string, options: any) {
+        // Remove cookie by setting expired date
+        let cookie = `${name}=; max-age=0`;
+        if (options?.path) {
+          cookie += `; path=${options.path}`;
+        }
+        document.cookie = cookie;
+      },
     },
   });
 
