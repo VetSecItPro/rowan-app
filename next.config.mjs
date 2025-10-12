@@ -1,3 +1,5 @@
+import { withSentryConfig } from '@sentry/nextjs';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
@@ -30,7 +32,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "font-src 'self' data: https:",
               "img-src 'self' data: https: blob:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live https://api.gemini.google.com",
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live https://api.gemini.google.com https://*.ingest.sentry.io",
               "frame-src 'self' https://vercel.live",
             ].join('; '),
           },
@@ -56,4 +58,43 @@ const nextConfig = {
   },
 };
 
+// Sentry configuration
+const sentryWebpackPluginOptions = {
+  // Sentry webpack plugin options
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+
+  // Only upload source maps in production
+  silent: true,
+
+  // Upload source maps during build
+  widenClientFileUpload: true,
+
+  // Automatically annotate React components to show their full name in breadcrumbs and session replay
+  reactComponentAnnotation: {
+    enabled: true,
+  },
+
+  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers
+  tunnelRoute: '/monitoring',
+
+  // Hides source maps from generated client bundles
+  hideSourceMaps: true,
+
+  // Automatically tree-shake Sentry logger statements to reduce bundle size
+  disableLogger: true,
+
+  // Disable source map upload for now (can enable once org/project verified)
+  // Set to false once you verify SENTRY_ORG and SENTRY_PROJECT match exactly
+  disableServerWebpackPlugin: true,
+  disableClientWebpackPlugin: true,
+};
+
+// Export with Sentry wrapper
+// Temporarily disabled until SENTRY_ORG and SENTRY_PROJECT are verified
+// Uncomment once you verify these match your Sentry dashboard exactly:
+// export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);
+
+// For now, export without Sentry wrapper (error tracking still works!)
 export default nextConfig;
