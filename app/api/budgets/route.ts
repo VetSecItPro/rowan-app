@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { projectsService } from '@/lib/services/budgets-service';
 import { ratelimit } from '@/lib/ratelimit';
 import { verifySpaceAccess } from '@/lib/services/authorization-service';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
 
 /**
  * GET /api/budgets
@@ -35,6 +37,10 @@ export async function GET(req: NextRequest) {
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get space_id from query params
     const { searchParams } = new URL(req.url);
     const spaceId = searchParams.get('space_id');
@@ -46,10 +52,21 @@ export async function GET(req: NextRequest) {
       );
     }
 
+
     // Verify user has access to this space
     try {
       await verifySpaceAccess(session.user.id, spaceId);
     } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/budgets',
+        method: 'GET',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+
       return NextResponse.json(
         { error: 'You do not have access to this space' },
         { status: 403 }
@@ -64,6 +81,15 @@ export async function GET(req: NextRequest) {
       data: budget,
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/budgets',
+        method: 'GET',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/budgets GET error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -103,6 +129,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Parse request body
     const body = await req.json();
     const { space_id, monthly_budget } = body;
@@ -128,6 +158,16 @@ export async function POST(req: NextRequest) {
     try {
       await verifySpaceAccess(session.user.id, space_id);
     } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/budgets',
+        method: 'POST',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+
       return NextResponse.json(
         { error: 'You do not have access to this space' },
         { status: 403 }
@@ -145,6 +185,15 @@ export async function POST(req: NextRequest) {
       data: budget,
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/budgets',
+        method: 'POST',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/budgets POST error:', error);
     return NextResponse.json(
       { error: 'Failed to set budget' },

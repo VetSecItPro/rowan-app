@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { SignUpSchema } from '@/lib/schemas/auth';
 import { ratelimit } from '@/lib/ratelimit';
+import * as Sentry from '@sentry/nextjs';
 
 /**
  * POST /api/auth/signup
@@ -80,6 +81,15 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/auth/signup',
+        method: 'POST',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

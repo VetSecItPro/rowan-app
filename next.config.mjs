@@ -85,16 +85,8 @@ const sentryWebpackPluginOptions = {
   // Automatically tree-shake Sentry logger statements to reduce bundle size
   disableLogger: true,
 
-  // Disable source map upload for now (can enable once org/project verified)
-  // Set to false once you verify SENTRY_ORG and SENTRY_PROJECT match exactly
-  disableServerWebpackPlugin: true,
-  disableClientWebpackPlugin: true,
+  // Source map upload enabled (org/project names verified)
 };
 
 // Export with Sentry wrapper
-// Temporarily disabled until SENTRY_ORG and SENTRY_PROJECT are verified
-// Uncomment once you verify these match your Sentry dashboard exactly:
-// export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);
-
-// For now, export without Sentry wrapper (error tracking still works!)
-export default nextConfig;
+export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);

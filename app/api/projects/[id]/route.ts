@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { projectsOnlyService } from '@/lib/services/projects-service';
 import { ratelimit } from '@/lib/ratelimit';
 import { verifyResourceAccess } from '@/lib/services/authorization-service';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
 
 /**
  * GET /api/projects/[id]
@@ -38,6 +40,10 @@ export async function GET(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     const project = await projectsOnlyService.getProjectById(params.id);
 
     if (!project) {
@@ -47,10 +53,24 @@ export async function GET(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Verify user has access to project's space
     try {
       await verifyResourceAccess(session.user.id, project);
     } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/projects/[id]',
+        method: 'GET',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+
       return NextResponse.json(
         { error: 'You do not have access to this project' },
         { status: 403 }
@@ -104,6 +124,10 @@ export async function PATCH(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Parse request body
     const body = await req.json();
     const { name, description, status, start_date, target_date, budget_amount } = body;
@@ -115,6 +139,16 @@ export async function PATCH(
     try {
       await verifyResourceAccess(session.user.id, existingProject);
     } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/projects/[id]',
+        method: 'PATCH',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+
       return NextResponse.json(
         { error: 'You do not have access to this project' },
         { status: 403 }
@@ -178,6 +212,10 @@ export async function DELETE(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get project first to verify access
     const existingProject = await projectsOnlyService.getProjectById(params.id);
 
@@ -185,6 +223,16 @@ export async function DELETE(
     try {
       await verifyResourceAccess(session.user.id, existingProject);
     } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/projects/[id]',
+        method: 'DELETE',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+
       return NextResponse.json(
         { error: 'You do not have access to this project' },
         { status: 403 }

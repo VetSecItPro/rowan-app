@@ -2,6 +2,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { ratelimit } from '@/lib/ratelimit';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '');
 
@@ -36,6 +38,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     const body = await req.json();
     const { text, imageBase64 } = body;
 
@@ -46,6 +52,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
 
     // SECURITY: Validate input types
     if (text && typeof text !== 'string') {
@@ -163,6 +170,15 @@ ${text ? `Recipe content:\n${text}` : 'See the image for recipe content.'}`;
     });
 
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/recipes/parse',
+        method: 'POST',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('Recipe parsing error:', error);
 
     if (error instanceof SyntaxError) {

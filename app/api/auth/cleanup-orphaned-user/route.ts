@@ -2,6 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { ratelimit } from '@/lib/ratelimit';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
 
 export async function POST(req: Request) {
   try {
@@ -30,6 +32,10 @@ export async function POST(req: Request) {
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     const { userId } = await req.json();
 
     // SECURITY: Input validation
@@ -39,6 +45,7 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
 
     // SECURITY: UUID validation
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -94,6 +101,15 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/auth/cleanup-orphaned-user',
+        method: 'POST',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('Cleanup error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

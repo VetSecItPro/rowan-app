@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { acceptInvitation } from '@/lib/services/invitations-service';
 import { ratelimit } from '@/lib/ratelimit';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
 
 /**
  * POST /api/invitations/accept
@@ -31,6 +33,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Parse request body
     const body = await req.json();
     const { token } = body;
@@ -41,6 +47,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
 
     // Accept invitation using service
     const result = await acceptInvitation(token, session.user.id);
@@ -57,6 +64,15 @@ export async function POST(req: NextRequest) {
       data: result.data,
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/invitations/accept',
+        method: 'POST',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/invitations/accept error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
