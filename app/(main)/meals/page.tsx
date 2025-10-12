@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback, memo } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo, useRef } from 'react';
 import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, TrendingUp, ShoppingBag, ChevronLeft, ChevronRight, LayoutGrid, List, ChefHat, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
+import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { MealCard } from '@/components/meals/MealCard';
 import { NewMealModal } from '@/components/meals/NewMealModal';
@@ -158,6 +159,8 @@ export default function MealsPage() {
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
+
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Ingredient review modal state
   const [isIngredientReviewOpen, setIsIngredientReviewOpen] = useState(false);
@@ -628,6 +631,60 @@ export default function MealsPage() {
     setIsGenerateListOpen(true);
   }, [meals]);
 
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    {
+      key: 'n',
+      handler: handleOpenMealModal,
+      description: 'Create new meal'
+    },
+    {
+      key: 'r',
+      handler: handleOpenRecipeModal,
+      description: 'Create new recipe'
+    },
+    {
+      key: '/',
+      handler: () => searchInputRef.current?.focus(),
+      description: 'Focus search'
+    },
+    {
+      key: 'k',
+      ctrl: true,
+      handler: () => searchInputRef.current?.focus(),
+      description: 'Focus search (Ctrl+K)'
+    },
+    {
+      key: '1',
+      handler: handleSetCalendarView,
+      description: 'Switch to calendar view'
+    },
+    {
+      key: '2',
+      handler: handleSetListView,
+      description: 'Switch to list view'
+    },
+    {
+      key: '3',
+      handler: handleSetRecipesView,
+      description: 'Switch to recipes view'
+    },
+    {
+      key: 'Escape',
+      handler: () => {
+        if (isModalOpen) handleCloseMealModal();
+        if (isRecipeModalOpen) handleCloseRecipeModal();
+        if (isGenerateListOpen) setIsGenerateListOpen(false);
+        if (isIngredientReviewOpen) {
+          setIsIngredientReviewOpen(false);
+          setPendingMealData(null);
+          setSelectedRecipeForReview(null);
+        }
+      },
+      description: 'Close modals'
+    }
+  ], !showGuidedFlow); // Disable shortcuts during guided flow
+
   const handleIngredientConfirm = useCallback(async (selectedIngredients: string[]) => {
     if (!pendingMealData || !selectedRecipeForReview || !currentSpace) return;
 
@@ -813,8 +870,9 @@ export default function MealsPage() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
+                ref={searchInputRef}
                 type="text"
-                placeholder={viewMode === 'recipes' ? 'Search recipes...' : 'Search meals...'}
+                placeholder={viewMode === 'recipes' ? 'Search recipes... (Press / to focus)' : 'Search meals... (Press / to focus)'}
                 value={searchQuery}
                 onChange={handleSearchChange}
                 className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
