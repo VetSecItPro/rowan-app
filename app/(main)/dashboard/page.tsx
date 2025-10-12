@@ -954,6 +954,7 @@ export default function DashboardPage() {
                       onSpaceChange={switchSpace}
                       onCreateSpace={() => setShowCreateSpaceModal(true)}
                       onInvitePartner={() => setShowInviteModal(true)}
+                      userColorTheme={user?.color_theme}
                     />
                   </>
                 ) : (
