@@ -24,47 +24,18 @@ export interface ExternalRecipe {
 }
 
 /**
- * Search TheMealDB API (completely free, no key required)
+ * Search TheMealDB API via Next.js API proxy (avoids CSP issues)
  */
 async function searchTheMealDB(query: string): Promise<ExternalRecipe[]> {
   try {
     const response = await fetch(
-      `https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(query)}`
+      `/api/recipes/external/search?q=${encodeURIComponent(query)}`
     );
 
     if (!response.ok) return [];
 
     const data = await response.json();
-
-    if (!data.meals) return [];
-
-    return data.meals.map((meal: any) => {
-      // Parse ingredients from the weird TheMealDB format
-      const ingredients: Array<{ name: string; amount?: string; unit?: string }> = [];
-      for (let i = 1; i <= 20; i++) {
-        const ingredient = meal[`strIngredient${i}`];
-        const measure = meal[`strMeasure${i}`];
-
-        if (ingredient && ingredient.trim()) {
-          ingredients.push({
-            name: ingredient.trim(),
-            amount: measure?.trim() || undefined,
-          });
-        }
-      }
-
-      return {
-        id: `themealdb-${meal.idMeal}`,
-        source: 'themealdb' as const,
-        name: meal.strMeal,
-        description: `${meal.strCategory} - ${meal.strArea} cuisine`,
-        image_url: meal.strMealThumb,
-        cuisine: meal.strArea,
-        ingredients,
-        instructions: meal.strInstructions,
-        source_url: meal.strSource || meal.strYoutube,
-      };
-    });
+    return data;
   } catch (error) {
     console.error('TheMealDB API error:', error);
     return [];
@@ -210,57 +181,18 @@ export async function searchExternalRecipes(query: string): Promise<ExternalReci
 }
 
 /**
- * Search recipes by cuisine type
+ * Search recipes by cuisine type via Next.js API proxy
  */
 export async function searchByCuisine(cuisine: string): Promise<ExternalRecipe[]> {
   try {
     const response = await fetch(
-      `https://www.themealdb.com/api/json/v1/1/filter.php?a=${encodeURIComponent(cuisine)}`
+      `/api/recipes/external/cuisine?cuisine=${encodeURIComponent(cuisine)}`
     );
 
     if (!response.ok) return [];
 
     const data = await response.json();
-
-    if (!data.meals) return [];
-
-    // Need to fetch full details for each meal
-    const detailPromises = data.meals.slice(0, 12).map(async (meal: any) => {
-      const detailResponse = await fetch(
-        `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal.idMeal}`
-      );
-      const detailData = await detailResponse.json();
-      return detailData.meals?.[0];
-    });
-
-    const meals = await Promise.all(detailPromises);
-
-    return meals.filter(Boolean).map((meal: any) => {
-      const ingredients: Array<{ name: string; amount?: string; unit?: string }> = [];
-      for (let i = 1; i <= 20; i++) {
-        const ingredient = meal[`strIngredient${i}`];
-        const measure = meal[`strMeasure${i}`];
-
-        if (ingredient && ingredient.trim()) {
-          ingredients.push({
-            name: ingredient.trim(),
-            amount: measure?.trim() || undefined,
-          });
-        }
-      }
-
-      return {
-        id: `themealdb-${meal.idMeal}`,
-        source: 'themealdb' as const,
-        name: meal.strMeal,
-        description: `${meal.strCategory} - ${meal.strArea} cuisine`,
-        image_url: meal.strMealThumb,
-        cuisine: meal.strArea,
-        ingredients,
-        instructions: meal.strInstructions,
-        source_url: meal.strSource || meal.strYoutube,
-      };
-    });
+    return data;
   } catch (error) {
     console.error('Cuisine search error:', error);
     return [];
@@ -301,54 +233,16 @@ export const SUPPORTED_CUISINES = [
 ];
 
 /**
- * Get random recipes for inspiration (uses TheMealDB)
+ * Get random recipes for inspiration via Next.js API proxy
  */
 export async function getRandomRecipes(count: number = 10): Promise<ExternalRecipe[]> {
   try {
-    const recipes: ExternalRecipe[] = [];
+    const response = await fetch(`/api/recipes/external/random?count=${count}`);
 
-    // TheMealDB random endpoint returns 1 recipe at a time
-    const promises = Array(count)
-      .fill(null)
-      .map(() =>
-        fetch('https://www.themealdb.com/api/json/v1/1/random.php')
-          .then((res) => res.json())
-      );
+    if (!response.ok) return [];
 
-    const results = await Promise.all(promises);
-
-    for (const data of results) {
-      if (data.meals && data.meals[0]) {
-        const meal = data.meals[0];
-
-        const ingredients: Array<{ name: string; amount?: string; unit?: string }> = [];
-        for (let i = 1; i <= 20; i++) {
-          const ingredient = meal[`strIngredient${i}`];
-          const measure = meal[`strMeasure${i}`];
-
-          if (ingredient && ingredient.trim()) {
-            ingredients.push({
-              name: ingredient.trim(),
-              amount: measure?.trim() || undefined,
-            });
-          }
-        }
-
-        recipes.push({
-          id: `themealdb-${meal.idMeal}`,
-          source: 'themealdb',
-          name: meal.strMeal,
-          description: `${meal.strCategory} - ${meal.strArea} cuisine`,
-          image_url: meal.strMealThumb,
-          cuisine: meal.strArea,
-          ingredients,
-          instructions: meal.strInstructions,
-          source_url: meal.strSource || meal.strYoutube,
-        });
-      }
-    }
-
-    return recipes;
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error('Random recipes error:', error);
     return [];
