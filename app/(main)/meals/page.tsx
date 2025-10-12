@@ -17,6 +17,8 @@ import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-s
 import { shoppingService } from '@/lib/services/shopping-service';
 import { createClient } from '@/lib/supabase/client';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth } from 'date-fns';
+import { showSuccess, showError, showPromise } from '@/lib/utils/toast';
+import { toast } from 'sonner';
 
 type ViewMode = 'calendar' | 'list' | 'recipes';
 
@@ -400,13 +402,32 @@ export default function MealsPage() {
   }, [editingMeal, loadMeals, currentSpace, recipes]);
 
   const handleDeleteMeal = useCallback(async (mealId: string) => {
-    if (!confirm('Are you sure you want to delete this meal?')) return;
-    try {
-      await mealsService.deleteMeal(mealId);
-      loadMeals();
-    } catch (error) {
-      console.error('Failed to delete meal:', error);
-    }
+    // Show confirmation toast with action button
+    toast('Delete this meal?', {
+      description: 'This action cannot be undone.',
+      action: {
+        label: 'Delete',
+        onClick: async () => {
+          try {
+            await showPromise(
+              mealsService.deleteMeal(mealId),
+              {
+                loading: 'Deleting meal...',
+                success: 'Meal deleted successfully!',
+                error: 'Failed to delete meal'
+              }
+            );
+            loadMeals();
+          } catch (error) {
+            console.error('Failed to delete meal:', error);
+          }
+        }
+      },
+      cancel: {
+        label: 'Cancel',
+        onClick: () => {}
+      }
+    });
   }, [loadMeals]);
 
   const handleCreateRecipe = useCallback(async (recipeData: CreateRecipeInput) => {
@@ -424,13 +445,31 @@ export default function MealsPage() {
   }, [editingRecipe, loadRecipes]);
 
   const handleDeleteRecipe = useCallback(async (recipeId: string) => {
-    if (!confirm('Are you sure you want to delete this recipe?')) return;
-    try {
-      await mealsService.deleteRecipe(recipeId);
-      loadRecipes();
-    } catch (error) {
-      console.error('Failed to delete recipe:', error);
-    }
+    toast('Delete this recipe?', {
+      description: 'This action cannot be undone.',
+      action: {
+        label: 'Delete',
+        onClick: async () => {
+          try {
+            await showPromise(
+              mealsService.deleteRecipe(recipeId),
+              {
+                loading: 'Deleting recipe...',
+                success: 'Recipe deleted successfully!',
+                error: 'Failed to delete recipe'
+              }
+            );
+            loadRecipes();
+          } catch (error) {
+            console.error('Failed to delete recipe:', error);
+          }
+        }
+      },
+      cancel: {
+        label: 'Cancel',
+        onClick: () => {}
+      }
+    });
   }, [loadRecipes]);
 
   // Search handler
@@ -561,16 +600,13 @@ export default function MealsPage() {
       loadMeals();
 
       // Show success notification with option to view
-      const viewList = confirm(
-        `✅ Success! Shopping list "${listTitle}" created with ${selectedIngredients.length} ingredient${selectedIngredients.length > 1 ? 's' : ''}.\n\nWould you like to view your shopping lists now?`
-      );
-
-      if (viewList) {
-        window.location.href = '/shopping';
-      }
+      showSuccess(`Shopping list "${listTitle}" created with ${selectedIngredients.length} ingredient${selectedIngredients.length > 1 ? 's' : ''}!`, {
+        label: 'View Shopping Lists',
+        onClick: () => window.location.href = '/shopping'
+      });
     } catch (error) {
       console.error('Failed to create meal with shopping list:', error);
-      alert('❌ Failed to create shopping list. Please try again.');
+      showError('Failed to create shopping list. Please try again.');
     }
   }, [pendingMealData, selectedRecipeForReview, currentSpace, loadMeals]);
 
