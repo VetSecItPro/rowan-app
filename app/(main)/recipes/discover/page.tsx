@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Search, Plus, ExternalLink, Loader2, ChefHat, Clock, Users } from 'lucide-react';
+import { Search, Plus, ExternalLink, Loader2, ChefHat, Clock, Users, Calendar } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { QuickPlanModal } from '@/components/meals/QuickPlanModal';
 import {
   searchExternalRecipes,
   getRandomRecipes,
@@ -65,6 +66,8 @@ export default function DiscoverRecipesPage() {
   const [recipes, setRecipes] = useState<ExternalRecipe[]>([]);
   const [loading, setLoading] = useState(false);
   const [addingRecipeIds, setAddingRecipeIds] = useState<Set<string>>(new Set());
+  const [planningRecipe, setPlanningRecipe] = useState<ExternalRecipe | null>(null);
+  const [isQuickPlanOpen, setIsQuickPlanOpen] = useState(false);
 
   // Load random recipes on mount
   useEffect(() => {
@@ -127,6 +130,105 @@ export default function DiscoverRecipesPage() {
     setSelectedCuisine(null);
     loadRandomRecipes();
   };
+
+  const handlePlanMeal = useCallback(async (externalRecipe: ExternalRecipe) => {
+    if (!currentSpaceId) {
+      showInfo('Please wait while loading your space...');
+      return;
+    }
+
+    setPlanningRecipe(externalRecipe);
+    setIsQuickPlanOpen(true);
+  }, [currentSpaceId]);
+
+  const handleQuickPlan = useCallback(async (date: string, mealType: string, createShoppingList: boolean) => {
+    if (!currentSpaceId || !planningRecipe) return;
+
+    try {
+      // First, save recipe to library
+      const recipeData = {
+        space_id: currentSpaceId,
+        name: planningRecipe.name,
+        description: planningRecipe.description || '',
+        prep_time: planningRecipe.prep_time,
+        cook_time: planningRecipe.cook_time,
+        servings: planningRecipe.servings,
+        difficulty: planningRecipe.difficulty || undefined,
+        cuisine_type: planningRecipe.cuisine || undefined,
+        image_url: planningRecipe.image_url || undefined,
+        instructions: planningRecipe.instructions || undefined,
+        source_url: planningRecipe.source_url || undefined,
+        ingredients: planningRecipe.ingredients.map(ing => ({
+          name: ing.name,
+          amount: ing.amount || '',
+          unit: ing.unit || '',
+        })),
+        tags: [planningRecipe.source, planningRecipe.cuisine].filter(Boolean) as string[],
+      };
+
+      const savedRecipe = await mealsService.createRecipe(recipeData);
+
+      // Then create meal with the saved recipe
+      const mealData = {
+        space_id: currentSpaceId,
+        recipe_id: savedRecipe.id,
+        name: planningRecipe.name,
+        meal_type: mealType as 'breakfast' | 'lunch' | 'dinner' | 'snack',
+        scheduled_date: date,
+        notes: '',
+      };
+
+      const meal = await mealsService.createMeal(mealData);
+
+      // Create shopping list if requested
+      if (createShoppingList && planningRecipe.ingredients.length > 0) {
+        const { shoppingService } = await import('@/lib/services/shopping-service');
+        const { format } = await import('date-fns');
+
+        const formattedDate = format(new Date(date), 'MM/dd/yyyy');
+        const listTitle = `${planningRecipe.name} - ${formattedDate}`;
+
+        const list = await shoppingService.createList({
+          space_id: currentSpaceId,
+          title: listTitle,
+          description: `Ingredients for ${planningRecipe.name}`,
+          status: 'active',
+        });
+
+        // Add ingredients
+        await Promise.all(
+          planningRecipe.ingredients.map((ing) => {
+            const ingredientText = [ing.amount, ing.unit, ing.name].filter(Boolean).join(' ');
+            return shoppingService.createItem({
+              list_id: list.id,
+              name: ingredientText,
+              quantity: 1,
+            });
+          })
+        );
+
+        showSuccess(
+          `Meal planned and shopping list created with ${planningRecipe.ingredients.length} ingredients!`,
+          {
+            label: 'View Meals',
+            onClick: () => window.location.href = '/meals'
+          }
+        );
+      } else {
+        showSuccess('Meal planned successfully!', {
+          label: 'View Meals',
+          onClick: () => window.location.href = '/meals'
+        });
+      }
+
+      // Close modal and reset
+      setIsQuickPlanOpen(false);
+      setPlanningRecipe(null);
+    } catch (error: any) {
+      console.error('Failed to plan meal:', error);
+      showError(`Failed to plan meal: ${error?.message || 'Unknown error'}`);
+    }
+  }, [currentSpaceId, planningRecipe]);
 
   const handleAddToLibrary = useCallback(async (externalRecipe: ExternalRecipe) => {
     if (!currentSpaceId) {
@@ -381,24 +483,31 @@ export default function DiscoverRecipesPage() {
                     </div>
                   )}
 
-                  {/* Add Button */}
-                  <button
-                    onClick={() => handleAddToLibrary(recipe)}
-                    disabled={addingRecipeIds.has(recipe.id)}
-                    className="w-full py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {addingRecipeIds.has(recipe.id) ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Adding...
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="w-4 h-4" />
-                        Add to Library
-                      </>
-                    )}
-                  </button>
+                  {/* Action Buttons */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => handlePlanMeal(recipe)}
+                      className="py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg font-medium transition-all flex items-center justify-center gap-2"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Plan Meal
+                    </button>
+                    <button
+                      onClick={() => handleAddToLibrary(recipe)}
+                      disabled={addingRecipeIds.has(recipe.id)}
+                      className="py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {addingRecipeIds.has(recipe.id) ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-4 h-4" />
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -418,6 +527,19 @@ export default function DiscoverRecipesPage() {
           </div>
         )}
       </div>
+
+      {/* Quick Plan Modal */}
+      {planningRecipe && (
+        <QuickPlanModal
+          isOpen={isQuickPlanOpen}
+          onClose={() => {
+            setIsQuickPlanOpen(false);
+            setPlanningRecipe(null);
+          }}
+          onPlan={handleQuickPlan}
+          recipeName={planningRecipe.name}
+        />
+      )}
     </div>
   );
 }
