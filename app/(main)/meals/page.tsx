@@ -592,6 +592,42 @@ export default function MealsPage() {
   }, [user]);
 
   // Handle ingredient selection confirmation from modal
+  // Bulk operations handlers
+  const handleBulkDelete = useCallback(async (mealIds: string[]) => {
+    toast('Delete selected meals?', {
+      description: `This will delete ${mealIds.length} meal${mealIds.length > 1 ? 's' : ''}. This action cannot be undone.`,
+      action: {
+        label: 'Delete All',
+        onClick: async () => {
+          try {
+            await Promise.all(mealIds.map(id => mealsService.deleteMeal(id)));
+            showSuccess(`${mealIds.length} meal${mealIds.length > 1 ? 's' : ''} deleted successfully!`);
+            loadMeals();
+          } catch (error) {
+            console.error('Failed to delete meals:', error);
+            showError('Failed to delete some meals. Please try again.');
+          }
+        }
+      },
+      cancel: {
+        label: 'Cancel',
+        onClick: () => {}
+      }
+    });
+  }, [loadMeals]);
+
+  const handleBulkGenerateList = useCallback(async (mealIds: string[]) => {
+    const selectedMeals = meals.filter(m => mealIds.includes(m.id));
+    const mealsWithRecipes = selectedMeals.filter(m => m.recipes && m.recipes.ingredients);
+
+    if (mealsWithRecipes.length === 0) {
+      showError('Selected meals must have recipes with ingredients.');
+      return;
+    }
+
+    setIsGenerateListOpen(true);
+  }, [meals]);
+
   const handleIngredientConfirm = useCallback(async (selectedIngredients: string[]) => {
     if (!pendingMealData || !selectedRecipeForReview || !currentSpace) return;
 
@@ -886,6 +922,8 @@ export default function MealsPage() {
                     onWeekChange={handleWeekChange}
                     onMealClick={handleMealClick}
                     onAddMeal={handleAddMealForDate}
+                    onBulkDelete={handleBulkDelete}
+                    onBulkGenerateList={handleBulkGenerateList}
                   />
                 ) : calendarViewMode === '2weeks' ? (
                   /* Two Week Calendar View */
