@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Plus, Trash2, Sparkles, FileText, Info, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { CreateRecipeInput, Recipe } from '@/lib/services/meals-service';
+import ImageUpload from '@/components/shared/ImageUpload';
 
 interface NewRecipeModalProps {
   isOpen: boolean;
@@ -478,13 +479,14 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Image URL</label>
-                <input
-                  type="url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  placeholder="https://example.com/image.jpg"
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                <ImageUpload
+                  label="Recipe Image"
+                  description="Upload a photo of your recipe"
+                  currentImageUrl={formData.image_url}
+                  onUploadSuccess={(url) => setFormData({ ...formData, image_url: url })}
+                  uploadEndpoint="/api/upload/recipe"
+                  maxSizeMB={10}
+                  aspectRatio="landscape"
                 />
               </div>
 

@@ -8,6 +8,7 @@ import { NewMealModal } from '@/components/meals/NewMealModal';
 import { NewRecipeModal } from '@/components/meals/NewRecipeModal';
 import { RecipeCard } from '@/components/meals/RecipeCard';
 import { IngredientReviewModal } from '@/components/meals/IngredientReviewModal';
+import { GenerateListModal } from '@/components/meals/GenerateListModal';
 import GuidedMealCreation from '@/components/guided/GuidedMealCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { mealsService, Meal, CreateMealInput, Recipe, CreateRecipeInput } from '@/lib/services/meals-service';
@@ -154,6 +155,9 @@ export default function MealsPage() {
   const [isIngredientReviewOpen, setIsIngredientReviewOpen] = useState(false);
   const [pendingMealData, setPendingMealData] = useState<CreateMealInput | null>(null);
   const [selectedRecipeForReview, setSelectedRecipeForReview] = useState<Recipe | null>(null);
+
+  // Generate shopping list modal state
+  const [isGenerateListOpen, setIsGenerateListOpen] = useState(false);
 
   // Memoized user color mapping
   const getUserColor = useCallback((userId: string) => {
@@ -522,6 +526,16 @@ export default function MealsPage() {
                   <span className="text-sm">Recipes</span>
                 </button>
               </div>
+              <button
+                onClick={() => setIsGenerateListOpen(true)}
+                disabled={meals.length === 0}
+                className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                title={meals.length === 0 ? 'Plan some meals first' : 'Generate shopping list from meals'}
+              >
+                <ShoppingBag className="w-5 h-5" />
+                <span className="hidden sm:inline">Generate List</span>
+                <span className="sm:hidden">List</span>
+              </button>
               <button onClick={handleOpenRecipeModal} className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
                 <ChefHat className="w-5 h-5" />
                 <span className="hidden sm:inline">New Recipe</span>
@@ -763,6 +777,13 @@ export default function MealsPage() {
               recipeName={selectedRecipeForReview.name}
             />
           )}
+          <GenerateListModal
+            isOpen={isGenerateListOpen}
+            onClose={() => setIsGenerateListOpen(false)}
+            meals={meals}
+            spaceId={currentSpace.id}
+            onSuccess={() => loadMeals()}
+          />
         </>
       )}
     </FeatureLayout>
