@@ -29,12 +29,29 @@ export default function SignUpPage() {
   }, []);
 
   const colorThemes = [
-    { value: 'emerald', label: 'Emerald', colors: 'from-emerald-400 to-teal-500' },
-    { value: 'purple', label: 'Purple', colors: 'from-purple-400 to-pink-500' },
-    { value: 'blue', label: 'Blue', colors: 'from-blue-400 to-cyan-500' },
-    { value: 'orange', label: 'Orange', colors: 'from-orange-400 to-red-500' },
-    { value: 'pink', label: 'Pink', colors: 'from-pink-400 to-rose-500' },
+    { value: 'emerald', label: 'Emerald' },
+    { value: 'purple', label: 'Purple' },
+    { value: 'blue', label: 'Blue' },
+    { value: 'orange', label: 'Orange' },
+    { value: 'pink', label: 'Pink' },
   ];
+
+  const getColorClasses = (theme: string) => {
+    switch (theme) {
+      case 'emerald':
+        return 'bg-gradient-to-br from-emerald-400 to-teal-500';
+      case 'purple':
+        return 'bg-gradient-to-br from-purple-400 to-pink-500';
+      case 'blue':
+        return 'bg-gradient-to-br from-blue-400 to-cyan-500';
+      case 'orange':
+        return 'bg-gradient-to-br from-orange-400 to-red-500';
+      case 'pink':
+        return 'bg-gradient-to-br from-pink-400 to-rose-500';
+      default:
+        return 'bg-gradient-to-br from-emerald-400 to-teal-500';
+    }
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -300,7 +317,7 @@ export default function SignUpPage() {
                     }`}
                     disabled={isLoading}
                   >
-                    <div className={`w-full h-10 bg-gradient-to-br ${theme.colors} rounded-lg shadow-lg`} />
+                    <div className={`w-full h-10 rounded-lg shadow-lg ${getColorClasses(theme.value)}`} />
                     <p className="mt-1.5 text-xs text-center text-gray-600 dark:text-gray-400 font-medium">
                       {theme.label}
                     </p>
