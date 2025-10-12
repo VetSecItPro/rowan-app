@@ -991,6 +991,8 @@ export default function MealsPage() {
                     onWeekChange={handleWeekChange}
                     onMealClick={handleMealClick}
                     onAddMeal={handleAddMealForDate}
+                    onBulkDelete={handleBulkDelete}
+                    onBulkGenerateList={handleBulkGenerateList}
                   />
                 ) : (
                   /* Month Calendar View */

@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useState, useCallback } from 'react';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, addWeeks, subWeeks } from 'date-fns';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Sunrise, Sun, Moon, Cookie } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Sunrise, Sun, Moon, Cookie, CheckSquare, Square, Trash2, ShoppingBag } from 'lucide-react';
 import { Meal } from '@/lib/services/meals-service';
 
 interface TwoWeekCalendarViewProps {
@@ -11,6 +11,8 @@ interface TwoWeekCalendarViewProps {
   onWeekChange: (newWeek: Date) => void;
   onMealClick: (meal: Meal) => void;
   onAddMeal: (date: Date, mealType?: string) => void;
+  onBulkDelete?: (mealIds: string[]) => void;
+  onBulkGenerateList?: (mealIds: string[]) => void;
 }
 
 const MEAL_TYPE_CONFIG = {
@@ -25,8 +27,12 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
   meals,
   onWeekChange,
   onMealClick,
-  onAddMeal
+  onAddMeal,
+  onBulkDelete,
+  onBulkGenerateList
 }: TwoWeekCalendarViewProps) {
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedMealIds, setSelectedMealIds] = useState<Set<string>>(new Set());
   // Calculate first week start and second week end
   const firstWeekStart = useMemo(() => startOfWeek(currentWeek), [currentWeek]);
   const secondWeekEnd = useMemo(() => endOfWeek(addWeeks(currentWeek, 1)), [currentWeek]);
@@ -65,6 +71,40 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
 
   const isCurrentWeek = isSameDay(firstWeekStart, startOfWeek(new Date()));
 
+  // Selection handlers
+  const toggleSelectionMode = useCallback(() => {
+    setSelectionMode(prev => !prev);
+    setSelectedMealIds(new Set());
+  }, []);
+
+  const toggleMealSelection = useCallback((mealId: string) => {
+    setSelectedMealIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(mealId)) {
+        newSet.delete(mealId);
+      } else {
+        newSet.add(mealId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const handleBulkDelete = useCallback(() => {
+    if (selectedMealIds.size > 0 && onBulkDelete) {
+      onBulkDelete(Array.from(selectedMealIds));
+      setSelectedMealIds(new Set());
+      setSelectionMode(false);
+    }
+  }, [selectedMealIds, onBulkDelete]);
+
+  const handleBulkGenerateList = useCallback(() => {
+    if (selectedMealIds.size > 0 && onBulkGenerateList) {
+      onBulkGenerateList(Array.from(selectedMealIds));
+      setSelectedMealIds(new Set());
+      setSelectionMode(false);
+    }
+  }, [selectedMealIds, onBulkGenerateList]);
+
   return (
     <div className="space-y-4">
       {/* Week Navigation Header */}
@@ -89,16 +129,55 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
           </button>
         </div>
 
-        {!isCurrentWeek && (
+        <div className="flex items-center gap-2">
           <button
-            onClick={handleToday}
-            className="px-4 py-2 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded-lg hover:bg-orange-200 dark:hover:bg-orange-900/50 transition-colors flex items-center gap-2 text-sm font-medium"
+            onClick={toggleSelectionMode}
+            className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium ${
+              selectionMode
+                ? 'bg-orange-600 text-white hover:bg-orange-700'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
           >
-            <CalendarIcon className="w-4 h-4" />
-            Jump to Today
+            {selectionMode ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
+            {selectionMode ? 'Cancel' : 'Select'}
           </button>
-        )}
+
+          {!isCurrentWeek && !selectionMode && (
+            <button
+              onClick={handleToday}
+              className="px-4 py-2 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded-lg hover:bg-orange-200 dark:hover:bg-orange-900/50 transition-colors flex items-center gap-2 text-sm font-medium"
+            >
+              <CalendarIcon className="w-4 h-4" />
+              Jump to Today
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Bulk Action Bar */}
+      {selectionMode && selectedMealIds.size > 0 && (
+        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 border border-orange-200 dark:border-orange-700 rounded-lg">
+          <span className="text-sm font-medium text-gray-900 dark:text-white">
+            {selectedMealIds.size} meal{selectedMealIds.size > 1 ? 's' : ''} selected
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleBulkGenerateList}
+              className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-2 text-sm font-medium"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              Generate List
+            </button>
+            <button
+              onClick={handleBulkDelete}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 text-sm font-medium"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Two Week Grid - 14 columns */}
       <div className="grid grid-cols-7 gap-2 lg:gap-3">
@@ -135,14 +214,26 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
                   dayMeals.map((meal) => {
                     const config = MEAL_TYPE_CONFIG[meal.meal_type];
                     const Icon = config.icon;
+                    const isSelected = selectedMealIds.has(meal.id);
 
                     return (
                       <button
                         key={meal.id}
-                        onClick={() => onMealClick(meal)}
-                        className={`w-full text-left p-1.5 rounded-lg border-l-4 ${config.bg} ${config.border} hover:shadow-md transition-all`}
+                        onClick={() => selectionMode ? toggleMealSelection(meal.id) : onMealClick(meal)}
+                        className={`w-full text-left p-1.5 rounded-lg border-l-4 ${config.bg} ${config.border} hover:shadow-md transition-all ${
+                          isSelected ? 'ring-2 ring-orange-500' : ''
+                        }`}
                       >
                         <div className="flex items-start gap-1.5">
+                          {selectionMode && (
+                            <div className="flex-shrink-0 mt-0.5">
+                              {isSelected ? (
+                                <CheckSquare className="w-3.5 h-3.5 text-orange-600" />
+                              ) : (
+                                <Square className="w-3.5 h-3.5 text-gray-400" />
+                              )}
+                            </div>
+                          )}
                           <Icon className={`w-3.5 h-3.5 mt-0.5 ${config.color}`} />
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-gray-900 dark:text-white text-xs truncate">
