@@ -73,11 +73,22 @@ async function searchTheMealDB(query: string): Promise<ExternalRecipe[]> {
 
 /**
  * Search Recipe Puppy API (completely free, no key required)
+ * Note: Recipe Puppy API is often unreliable and may not work
  */
 async function searchRecipePuppy(query: string): Promise<ExternalRecipe[]> {
   try {
+    // Recipe Puppy API is deprecated and unreliable - skip for now
+    // Using HTTPS causes CORS issues, using HTTP causes mixed content blocking
+    console.log('Recipe Puppy API skipped - API is deprecated');
+    return [];
+
+    /* Commented out due to API issues
     const response = await fetch(
-      `http://www.recipepuppy.com/api/?q=${encodeURIComponent(query)}`
+      `https://www.recipepuppy.com/api/?q=${encodeURIComponent(query)}`,
+      {
+        // Add timeout
+        signal: AbortSignal.timeout(5000),
+      }
     );
 
     if (!response.ok) return [];
@@ -103,6 +114,7 @@ async function searchRecipePuppy(query: string): Promise<ExternalRecipe[]> {
         source_url: recipe.href,
       };
     });
+    */
   } catch (error) {
     console.error('Recipe Puppy API error:', error);
     return [];
