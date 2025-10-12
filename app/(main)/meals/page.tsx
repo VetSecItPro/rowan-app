@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { MealCard } from '@/components/meals/MealCard';
+import { MealCardSkeleton, CalendarDaySkeleton, RecipeCardSkeleton } from '@/components/ui/Skeleton';
 import { NewMealModal } from '@/components/meals/NewMealModal';
 import { NewRecipeModal } from '@/components/meals/NewRecipeModal';
 import { RecipeCard } from '@/components/meals/RecipeCard';
@@ -906,10 +907,33 @@ export default function MealsPage() {
 
             <div className={viewMode === 'calendar' ? 'h-[600px] overflow-y-auto' : 'max-h-[600px] overflow-y-auto'}>
               {loading ? (
-                <div className="text-center py-12">
-                  <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-                  <p className="mt-4 text-gray-600 dark:text-gray-400">Loading meals...</p>
-                </div>
+                viewMode === 'recipes' ? (
+                  /* Loading Skeletons for Recipes */
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    {[...Array(6)].map((_, i) => (
+                      <RecipeCardSkeleton key={i} />
+                    ))}
+                  </div>
+                ) : viewMode === 'calendar' ? (
+                  /* Loading Skeletons for Calendar */
+                  <div>
+                    <div className="flex items-center justify-center mb-6">
+                      <div className="h-12 w-[500px] bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
+                    </div>
+                    <div className="grid grid-cols-7 gap-3">
+                      {[...Array(7)].map((_, i) => (
+                        <CalendarDaySkeleton key={i} />
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  /* Loading Skeletons for List */
+                  <div className="space-y-4">
+                    {[...Array(4)].map((_, i) => (
+                      <MealCardSkeleton key={i} />
+                    ))}
+                  </div>
+                )
               ) : viewMode === 'recipes' ? (
               /* Recipes View */
               filteredRecipes.length === 0 ? (
