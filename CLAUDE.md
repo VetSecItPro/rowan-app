@@ -114,6 +114,10 @@ USING (partnership_id IN (
 - Database migrations (`npx supabase db push`)
 - Vercel deployments and monitoring
 - Deployment troubleshooting and fixes
+- **Complete security audits and code reviews**
+- **Implementing security fixes and optimizations**
+- **Running any commands (cd, npm, npx, bash, git, etc.) during audits**
+- **Systematic codebase review without approval requests**
 
 Format: `type(scope): description`
 - feat, fix, docs, style, refactor, test, chore
