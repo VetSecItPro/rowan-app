@@ -303,9 +303,23 @@ export default function MealsPage() {
       if (createShoppingList && mealData.recipe_id && currentSpace && !editingMeal) {
         const recipe = recipes.find(r => r.id === mealData.recipe_id);
         if (recipe && recipe.ingredients && recipe.ingredients.length > 0) {
-          // Store the meal data and recipe, then show ingredient review modal
+          // Convert ingredients to strings if they're objects
+          const ingredientsAsStrings = recipe.ingredients.map((ing: any) => {
+            if (typeof ing === 'string') return ing;
+            if (typeof ing === 'object' && ing.name) {
+              // Format: "amount unit name" or just "name" if no amount/unit
+              const parts = [];
+              if (ing.amount) parts.push(ing.amount);
+              if (ing.unit) parts.push(ing.unit);
+              parts.push(ing.name);
+              return parts.join(' ');
+            }
+            return JSON.stringify(ing); // Fallback
+          });
+
+          // Store the meal data and recipe with formatted ingredients
           setPendingMealData(mealData);
-          setSelectedRecipeForReview(recipe);
+          setSelectedRecipeForReview({ ...recipe, ingredients: ingredientsAsStrings as any });
           setIsIngredientReviewOpen(true);
           return; // Don't create the meal yet
         }
