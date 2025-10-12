@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, memo } from 'react';
-import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, TrendingUp, ShoppingBag, ChevronLeft, ChevronRight, LayoutGrid, List, ChefHat } from 'lucide-react';
+import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, TrendingUp, ShoppingBag, ChevronLeft, ChevronRight, LayoutGrid, List, ChefHat, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { MealCard } from '@/components/meals/MealCard';
 import { NewMealModal } from '@/components/meals/NewMealModal';
@@ -304,7 +305,10 @@ export default function MealsPage() {
   const handleCreateMeal = useCallback(async (mealData: CreateMealInput, createShoppingList?: boolean) => {
     try {
       // If creating shopping list and recipe has ingredients, show review modal
-      if (createShoppingList && mealData.recipe_id && currentSpace && !editingMeal) {
+      // Check if this is a new meal (no editingMeal OR editingMeal has empty ID)
+      const isNewMeal = !editingMeal || !editingMeal.id;
+
+      if (createShoppingList && mealData.recipe_id && currentSpace && isNewMeal) {
         const recipe = recipes.find(r => r.id === mealData.recipe_id);
         if (recipe && recipe.ingredients && recipe.ingredients.length > 0) {
           // Convert ingredients to strings if they're objects
@@ -504,8 +508,18 @@ export default function MealsPage() {
       setPendingMealData(null);
       setSelectedRecipeForReview(null);
       loadMeals();
+
+      // Show success notification with option to view
+      const viewList = confirm(
+        `✅ Success! Shopping list "${listTitle}" created with ${selectedIngredients.length} ingredient${selectedIngredients.length > 1 ? 's' : ''}.\n\nWould you like to view your shopping lists now?`
+      );
+
+      if (viewList) {
+        window.location.href = '/shopping';
+      }
     } catch (error) {
       console.error('Failed to create meal with shopping list:', error);
+      alert('❌ Failed to create shopping list. Please try again.');
     }
   }, [pendingMealData, selectedRecipeForReview, currentSpace, loadMeals]);
 
@@ -558,16 +572,34 @@ export default function MealsPage() {
                   <span className="text-sm">Recipes</span>
                 </button>
               </div>
-              <button
-                onClick={() => setIsGenerateListOpen(true)}
-                disabled={meals.length === 0}
-                className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                title={meals.length === 0 ? 'Plan some meals first' : 'Generate shopping list from meals'}
-              >
-                <ShoppingBag className="w-5 h-5" />
-                <span className="hidden sm:inline">Generate List</span>
-                <span className="sm:hidden">List</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/shopping"
+                  className="px-4 py-2 sm:px-6 sm:py-3 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-2 border-emerald-500 rounded-lg hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-all shadow-lg flex items-center justify-center gap-2"
+                  title="View your shopping lists"
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  <span className="hidden sm:inline">View Lists</span>
+                  <ExternalLink className="w-4 h-4" />
+                </Link>
+                <button
+                  onClick={() => setIsGenerateListOpen(true)}
+                  disabled={meals.length === 0}
+                  className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed relative group"
+                  title={meals.length === 0 ? 'Plan some meals first' : 'Select multiple meals to combine all recipe ingredients into one shopping list'}
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  <span className="hidden sm:inline">Generate List</span>
+                  <span className="sm:hidden">List</span>
+                  {/* Tooltip */}
+                  {meals.length > 0 && (
+                    <span className="invisible group-hover:visible absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap z-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                      Select multiple meals to combine ingredients into one list
+                      <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></span>
+                    </span>
+                  )}
+                </button>
+              </div>
               <button onClick={handleOpenRecipeModal} className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
                 <ChefHat className="w-5 h-5" />
                 <span className="hidden sm:inline">New Recipe</span>
