@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { X, Sunrise, Sun, Moon, Cookie, ChefHat, ShoppingCart } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { X, Sunrise, Sun, Moon, Cookie, ChefHat, ShoppingCart, Search } from 'lucide-react';
 import { CreateMealInput, Meal, Recipe } from '@/lib/services/meals-service';
 
 interface NewMealModalProps {
@@ -24,9 +24,41 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
   const [isMealTypeOpen, setIsMealTypeOpen] = useState(false);
   const [isRecipeSelectorOpen, setIsRecipeSelectorOpen] = useState(false);
   const [createShoppingList, setCreateShoppingList] = useState(true);
+  const [recipeSearch, setRecipeSearch] = useState('');
+  const [cuisineFilter, setCuisineFilter] = useState<string | null>(null);
+  const [difficultyFilter, setDifficultyFilter] = useState<string | null>(null);
 
   const selectedRecipe = recipes.find(r => r.id === formData.recipe_id);
   const isEditing = editMeal && editMeal.id; // Only true if editing an existing meal
+
+  // Get unique cuisines and difficulties from recipes
+  const uniqueCuisines = useMemo(() => {
+    const cuisines = new Set(recipes.map(r => r.cuisine_type).filter(Boolean));
+    return Array.from(cuisines).sort();
+  }, [recipes]);
+
+  const uniqueDifficulties = useMemo(() => {
+    const difficulties = new Set(recipes.map(r => r.difficulty).filter(Boolean));
+    return Array.from(difficulties).sort();
+  }, [recipes]);
+
+  // Filter recipes based on search and filters
+  const filteredRecipes = useMemo(() => {
+    return recipes.filter(r => {
+      const matchesSearch = !recipeSearch || r.name.toLowerCase().includes(recipeSearch.toLowerCase());
+      const matchesCuisine = !cuisineFilter || r.cuisine_type === cuisineFilter;
+      const matchesDifficulty = !difficultyFilter || r.difficulty === difficultyFilter;
+      return matchesSearch && matchesCuisine && matchesDifficulty;
+    });
+  }, [recipes, recipeSearch, cuisineFilter, difficultyFilter]);
+
+  const hasActiveFilters = recipeSearch || cuisineFilter || difficultyFilter;
+
+  const clearFilters = () => {
+    setRecipeSearch('');
+    setCuisineFilter(null);
+    setDifficultyFilter(null);
+  };
 
   const mealTypeOptions = [
     { value: 'breakfast', label: 'Breakfast', icon: Sunrise, color: 'text-orange-500' },
@@ -139,52 +171,135 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
               </svg>
             </button>
             {isRecipeSelectorOpen && (
-              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setFormData({ ...formData, recipe_id: undefined });
-                    setIsRecipeSelectorOpen(false);
-                  }}
-                  className="w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
-                >
-                  <span className="text-gray-500 dark:text-gray-400 italic">No recipe</span>
-                </button>
-                {recipes.map((recipe) => (
-                  <button
-                    key={recipe.id}
-                    type="button"
-                    onClick={() => {
-                      setFormData({ ...formData, recipe_id: recipe.id });
-                      setIsRecipeSelectorOpen(false);
-                    }}
-                    className="w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left border-t border-gray-200 dark:border-gray-700"
-                  >
-                    <ChefHat className="w-4 h-4 text-orange-500" />
-                    <div className="flex-1">
-                      <span className="text-gray-900 dark:text-white">{recipe.name}</span>
-                      {recipe.description && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{recipe.description}</p>
+              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg overflow-hidden">
+                {/* Search Input */}
+                <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-3 z-10">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search recipes..."
+                      value={recipeSearch}
+                      onChange={(e) => setRecipeSearch(e.target.value)}
+                      className="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-orange-500"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+
+                  {/* Filter Chips */}
+                  {(uniqueCuisines.length > 0 || uniqueDifficulties.length > 0) && (
+                    <div className="mt-2 space-y-2">
+                      {/* Cuisine Filters */}
+                      {uniqueCuisines.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {uniqueCuisines.slice(0, 4).map((cuisine) => (
+                            <button
+                              key={cuisine}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setCuisineFilter(cuisine === cuisineFilter ? null : cuisine);
+                              }}
+                              className={`px-2 py-1 text-xs rounded-full transition-colors ${
+                                cuisineFilter === cuisine
+                                  ? 'bg-orange-500 text-white'
+                                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900/30'
+                              }`}
+                            >
+                              {cuisine}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Clear Filters */}
+                      {hasActiveFilters && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            clearFilters();
+                          }}
+                          className="text-xs text-orange-600 dark:text-orange-400 hover:underline"
+                        >
+                          Clear filters
+                        </button>
                       )}
                     </div>
-                  </button>
-                ))}
-                {recipes.length === 0 && (
-                  <div className="px-4 py-3 text-center">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 italic mb-2">
-                      No recipes in your library
-                    </p>
-                    <a
-                      href="/recipes/discover"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-orange-600 dark:text-orange-400 hover:underline inline-flex items-center gap-1"
-                    >
-                      <ChefHat className="w-3 h-3" />
-                      Discover recipes to add
-                    </a>
+                  )}
+
+                  {/* Recipe Count */}
+                  <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    {filteredRecipes.length} of {recipes.length} recipes
                   </div>
-                )}
+                </div>
+
+                {/* Recipe List */}
+                <div className="max-h-64 overflow-y-auto">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData({ ...formData, recipe_id: undefined });
+                      setIsRecipeSelectorOpen(false);
+                    }}
+                    className="w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+                  >
+                    <span className="text-gray-500 dark:text-gray-400 italic">No recipe</span>
+                  </button>
+                  {filteredRecipes.map((recipe) => (
+                    <button
+                      key={recipe.id}
+                      type="button"
+                      onClick={() => {
+                        setFormData({ ...formData, recipe_id: recipe.id });
+                        setIsRecipeSelectorOpen(false);
+                        clearFilters();
+                      }}
+                      className="w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left border-t border-gray-200 dark:border-gray-700"
+                    >
+                      <ChefHat className="w-4 h-4 text-orange-500" />
+                      <div className="flex-1">
+                        <span className="text-gray-900 dark:text-white">{recipe.name}</span>
+                        {recipe.description && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{recipe.description}</p>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                  {filteredRecipes.length === 0 && recipes.length > 0 && (
+                    <div className="px-4 py-6 text-center">
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                        No recipes found
+                      </p>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          clearFilters();
+                        }}
+                        className="text-sm text-orange-600 dark:text-orange-400 hover:underline"
+                      >
+                        Clear filters
+                      </button>
+                    </div>
+                  )}
+                  {recipes.length === 0 && (
+                    <div className="px-4 py-6 text-center">
+                      <p className="text-sm text-gray-500 dark:text-gray-400 italic mb-2">
+                        No recipes in your library
+                      </p>
+                      <a
+                        href="/recipes/discover"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-orange-600 dark:text-orange-400 hover:underline inline-flex items-center gap-1"
+                      >
+                        <ChefHat className="w-3 h-3" />
+                        Discover recipes to add
+                      </a>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
