@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS budgets (
 ALTER TABLE budgets ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for budgets
+DROP POLICY IF EXISTS "Users can view space budgets" ON budgets;
 CREATE POLICY "Users can view space budgets"
   ON budgets FOR SELECT
   USING (
@@ -29,6 +30,7 @@ CREATE POLICY "Users can view space budgets"
     )
   );
 
+DROP POLICY IF EXISTS "Users can insert space budgets" ON budgets;
 CREATE POLICY "Users can insert space budgets"
   ON budgets FOR INSERT
   WITH CHECK (
@@ -37,6 +39,7 @@ CREATE POLICY "Users can insert space budgets"
     )
   );
 
+DROP POLICY IF EXISTS "Users can update space budgets" ON budgets;
 CREATE POLICY "Users can update space budgets"
   ON budgets FOR UPDATE
   USING (
@@ -45,6 +48,7 @@ CREATE POLICY "Users can update space budgets"
     )
   );
 
+DROP POLICY IF EXISTS "Users can delete space budgets" ON budgets;
 CREATE POLICY "Users can delete space budgets"
   ON budgets FOR DELETE
   USING (
@@ -77,6 +81,7 @@ CREATE TABLE IF NOT EXISTS expenses (
 ALTER TABLE expenses ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for expenses
+DROP POLICY IF EXISTS "Users can view space expenses" ON expenses;
 CREATE POLICY "Users can view space expenses"
   ON expenses FOR SELECT
   USING (
@@ -85,6 +90,7 @@ CREATE POLICY "Users can view space expenses"
     )
   );
 
+DROP POLICY IF EXISTS "Users can insert space expenses" ON expenses;
 CREATE POLICY "Users can insert space expenses"
   ON expenses FOR INSERT
   WITH CHECK (
@@ -93,6 +99,7 @@ CREATE POLICY "Users can insert space expenses"
     )
   );
 
+DROP POLICY IF EXISTS "Users can update space expenses" ON expenses;
 CREATE POLICY "Users can update space expenses"
   ON expenses FOR UPDATE
   USING (
@@ -101,6 +108,7 @@ CREATE POLICY "Users can update space expenses"
     )
   );
 
+DROP POLICY IF EXISTS "Users can delete space expenses" ON expenses;
 CREATE POLICY "Users can delete space expenses"
   ON expenses FOR DELETE
   USING (
@@ -110,7 +118,7 @@ CREATE POLICY "Users can delete space expenses"
   );
 
 -- Create index for due_date ordering
-CREATE INDEX idx_expenses_due_date ON expenses(due_date);
+CREATE INDEX IF NOT EXISTS idx_expenses_due_date ON expenses(due_date);
 
 -- ==========================================
 -- 3. PROJECTS TABLE
@@ -132,6 +140,7 @@ CREATE TABLE IF NOT EXISTS projects (
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for projects
+DROP POLICY IF EXISTS "Users can view space projects" ON projects;
 CREATE POLICY "Users can view space projects"
   ON projects FOR SELECT
   USING (
@@ -140,6 +149,7 @@ CREATE POLICY "Users can view space projects"
     )
   );
 
+DROP POLICY IF EXISTS "Users can insert space projects" ON projects;
 CREATE POLICY "Users can insert space projects"
   ON projects FOR INSERT
   WITH CHECK (
@@ -148,6 +158,7 @@ CREATE POLICY "Users can insert space projects"
     )
   );
 
+DROP POLICY IF EXISTS "Users can update space projects" ON projects;
 CREATE POLICY "Users can update space projects"
   ON projects FOR UPDATE
   USING (
@@ -156,6 +167,7 @@ CREATE POLICY "Users can update space projects"
     )
   );
 
+DROP POLICY IF EXISTS "Users can delete space projects" ON projects;
 CREATE POLICY "Users can delete space projects"
   ON projects FOR DELETE
   USING (
@@ -188,6 +200,7 @@ CREATE TABLE IF NOT EXISTS chores (
 ALTER TABLE chores ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for chores
+DROP POLICY IF EXISTS "Users can view space chores" ON chores;
 CREATE POLICY "Users can view space chores"
   ON chores FOR SELECT
   USING (
@@ -196,6 +209,7 @@ CREATE POLICY "Users can view space chores"
     )
   );
 
+DROP POLICY IF EXISTS "Users can insert space chores" ON chores;
 CREATE POLICY "Users can insert space chores"
   ON chores FOR INSERT
   WITH CHECK (
@@ -204,6 +218,7 @@ CREATE POLICY "Users can insert space chores"
     )
   );
 
+DROP POLICY IF EXISTS "Users can update space chores" ON chores;
 CREATE POLICY "Users can update space chores"
   ON chores FOR UPDATE
   USING (
@@ -212,6 +227,7 @@ CREATE POLICY "Users can update space chores"
     )
   );
 
+DROP POLICY IF EXISTS "Users can delete space chores" ON chores;
 CREATE POLICY "Users can delete space chores"
   ON chores FOR DELETE
   USING (
@@ -244,6 +260,7 @@ CREATE TABLE IF NOT EXISTS daily_checkins (
 ALTER TABLE daily_checkins ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for daily_checkins
+DROP POLICY IF EXISTS "Users can view space check-ins" ON daily_checkins;
 CREATE POLICY "Users can view space check-ins"
   ON daily_checkins FOR SELECT
   USING (
@@ -252,6 +269,7 @@ CREATE POLICY "Users can view space check-ins"
     )
   );
 
+DROP POLICY IF EXISTS "Users can insert own check-ins" ON daily_checkins;
 CREATE POLICY "Users can insert own check-ins"
   ON daily_checkins FOR INSERT
   WITH CHECK (
@@ -261,6 +279,7 @@ CREATE POLICY "Users can insert own check-ins"
     )
   );
 
+DROP POLICY IF EXISTS "Users can update own check-ins" ON daily_checkins;
 CREATE POLICY "Users can update own check-ins"
   ON daily_checkins FOR UPDATE
   USING (
@@ -270,6 +289,7 @@ CREATE POLICY "Users can update own check-ins"
     )
   );
 
+DROP POLICY IF EXISTS "Users can delete own check-ins" ON daily_checkins;
 CREATE POLICY "Users can delete own check-ins"
   ON daily_checkins FOR DELETE
   USING (
@@ -280,8 +300,8 @@ CREATE POLICY "Users can delete own check-ins"
   );
 
 -- Create index for date ordering
-CREATE INDEX idx_daily_checkins_date ON daily_checkins(date DESC);
-CREATE INDEX idx_daily_checkins_user_date ON daily_checkins(user_id, date DESC);
+CREATE INDEX IF NOT EXISTS idx_daily_checkins_date ON daily_checkins(date DESC);
+CREATE INDEX IF NOT EXISTS idx_daily_checkins_user_date ON daily_checkins(user_id, date DESC);
 
 -- ==========================================
 -- TRIGGERS FOR UPDATED_AT
@@ -296,6 +316,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS set_budgets_updated_at ON budgets;
 CREATE TRIGGER set_budgets_updated_at
   BEFORE UPDATE ON budgets
   FOR EACH ROW
@@ -310,6 +331,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS set_expenses_updated_at ON expenses;
 CREATE TRIGGER set_expenses_updated_at
   BEFORE UPDATE ON expenses
   FOR EACH ROW
@@ -324,6 +346,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS set_projects_updated_at ON projects;
 CREATE TRIGGER set_projects_updated_at
   BEFORE UPDATE ON projects
   FOR EACH ROW
@@ -338,6 +361,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS set_chores_updated_at ON chores;
 CREATE TRIGGER set_chores_updated_at
   BEFORE UPDATE ON chores
   FOR EACH ROW
@@ -352,6 +376,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS set_daily_checkins_updated_at ON daily_checkins;
 CREATE TRIGGER set_daily_checkins_updated_at
   BEFORE UPDATE ON daily_checkins
   FOR EACH ROW
