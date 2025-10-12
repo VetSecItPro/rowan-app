@@ -201,9 +201,9 @@ export async function searchExternalRecipes(query: string): Promise<ExternalReci
 }
 
 /**
- * Search recipes by cuisine type via Next.js API proxy
+ * Search TheMealDB by cuisine
  */
-export async function searchByCuisine(cuisine: string): Promise<ExternalRecipe[]> {
+async function searchTheMealDBByCuisine(cuisine: string): Promise<ExternalRecipe[]> {
   try {
     const response = await fetch(
       `/api/recipes/external/cuisine?cuisine=${encodeURIComponent(cuisine)}`
@@ -213,6 +213,62 @@ export async function searchByCuisine(cuisine: string): Promise<ExternalRecipe[]
 
     const data = await response.json();
     return data;
+  } catch (error) {
+    console.error('TheMealDB cuisine search error:', error);
+    return [];
+  }
+}
+
+/**
+ * Search recipes by cuisine type across all APIs
+ * Note: Some APIs use cuisine as a search term since they don't have dedicated cuisine filters
+ */
+export async function searchByCuisine(cuisine: string): Promise<ExternalRecipe[]> {
+  try {
+    // Search all APIs in parallel
+    // For APIs without cuisine filters, we use the cuisine name as a search query
+    const [
+      themealdbResults,
+      spoonacularResults,
+      edamamResults,
+      tastyResults,
+      apininjasResults,
+    ] = await Promise.all([
+      searchTheMealDBByCuisine(cuisine),
+      searchSpoonacular(cuisine), // Uses cuisine name as search query
+      searchEdamam(cuisine), // Uses cuisine name as search query
+      searchTasty(cuisine), // Uses cuisine name as search query
+      searchApiNinjas(cuisine), // Uses cuisine name as search query
+    ]);
+
+    // Combine all results
+    const allResults = [
+      ...themealdbResults,
+      ...spoonacularResults,
+      ...edamamResults,
+      ...tastyResults,
+      ...apininjasResults,
+    ];
+
+    // Filter to only include recipes that actually match the cuisine
+    const filteredResults = allResults.filter(recipe => {
+      if (!recipe.cuisine) return true; // Include recipes without cuisine info
+      return recipe.cuisine.toLowerCase().includes(cuisine.toLowerCase()) ||
+             cuisine.toLowerCase().includes(recipe.cuisine.toLowerCase());
+    });
+
+    // Sort by source priority
+    const sourcePriority: Record<string, number> = {
+      themealdb: 1,
+      spoonacular: 2,
+      edamam: 3,
+      tasty: 4,
+      apininjas: 5,
+    };
+
+    return filteredResults.sort((a, b) => {
+      return sourcePriority[a.source] - sourcePriority[b.source];
+    });
   } catch (error) {
     console.error('Cuisine search error:', error);
     return [];
