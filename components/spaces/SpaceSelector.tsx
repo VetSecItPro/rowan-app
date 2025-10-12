@@ -41,6 +41,36 @@ export function SpaceSelector({
         return 'bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent';
       case 'pink':
         return 'bg-gradient-to-r from-pink-500 to-rose-600 bg-clip-text text-transparent';
+      case 'indigo':
+        return 'bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent';
+      case 'teal':
+        return 'bg-gradient-to-r from-teal-500 to-cyan-600 bg-clip-text text-transparent';
+      case 'red':
+        return 'bg-gradient-to-r from-red-500 to-rose-600 bg-clip-text text-transparent';
+      case 'amber':
+        return 'bg-gradient-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent';
+      case 'lime':
+        return 'bg-gradient-to-r from-lime-500 to-green-600 bg-clip-text text-transparent';
+      case 'cyan':
+        return 'bg-gradient-to-r from-cyan-500 to-blue-600 bg-clip-text text-transparent';
+      case 'fuchsia':
+        return 'bg-gradient-to-r from-fuchsia-500 to-pink-600 bg-clip-text text-transparent';
+      case 'violet':
+        return 'bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent';
+      case 'sky':
+        return 'bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent';
+      case 'rose':
+        return 'bg-gradient-to-r from-rose-500 to-pink-600 bg-clip-text text-transparent';
+      case 'mint':
+        return 'bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent';
+      case 'coral':
+        return 'bg-gradient-to-r from-orange-400 to-rose-500 bg-clip-text text-transparent';
+      case 'lavender':
+        return 'bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent';
+      case 'sage':
+        return 'bg-gradient-to-r from-gray-500 to-green-500 bg-clip-text text-transparent';
+      case 'slate':
+        return 'bg-gradient-to-r from-slate-500 to-gray-600 bg-clip-text text-transparent';
       default:
         return 'bg-gradient-to-r from-emerald-500 to-teal-600 bg-clip-text text-transparent';
     }
