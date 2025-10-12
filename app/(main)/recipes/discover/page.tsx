@@ -12,6 +12,7 @@ import {
 } from '@/lib/services/external-recipes-service';
 import { mealsService } from '@/lib/services/meals-service';
 import { useDebouncedCallback } from 'use-debounce';
+import { showSuccess, showError, showInfo } from '@/lib/utils/toast';
 
 export default function DiscoverRecipesPage() {
   const { user } = useAuth();
@@ -129,7 +130,7 @@ export default function DiscoverRecipesPage() {
 
   const handleAddToLibrary = useCallback(async (externalRecipe: ExternalRecipe) => {
     if (!currentSpaceId) {
-      alert('Please wait while loading your space...');
+      showInfo('Please wait while loading your space...');
       return;
     }
 
@@ -163,14 +164,17 @@ export default function DiscoverRecipesPage() {
       const result = await mealsService.createRecipe(recipeData);
 
       console.log('Recipe added successfully:', result);
-      alert('✓ Recipe added to your library!');
+      showSuccess('Recipe added to your library!', {
+        label: 'View Library',
+        onClick: () => window.location.href = '/recipes'
+      });
     } catch (error: any) {
       console.error('Failed to add recipe - Full error:', error);
       console.error('Error message:', error?.message);
       console.error('Error details:', error?.details || error?.hint);
 
       const errorMsg = error?.message || 'Unknown error occurred';
-      alert(`Failed to add recipe: ${errorMsg}\nCheck console for details.`);
+      showError(`Failed to add recipe: ${errorMsg}`);
     } finally {
       setAddingRecipeIds(prev => {
         const next = new Set(prev);

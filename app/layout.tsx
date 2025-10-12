@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthProvider } from "@/lib/contexts/auth-context";
+import { Toaster } from 'sonner';
 
 // Force dynamic rendering for all pages (needed for auth context)
 export const dynamic = 'force-dynamic';
@@ -28,6 +29,13 @@ export default function RootLayout({
         >
           <AuthProvider>
             {children}
+            <Toaster
+              position="bottom-right"
+              duration={4000}
+              closeButton
+              richColors
+              theme="system"
+            />
           </AuthProvider>
         </ThemeProvider>
       </body>
