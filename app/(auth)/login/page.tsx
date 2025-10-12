@@ -34,39 +34,30 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('handleSubmit called', { email, password: '***' });
     setError('');
     setIsLoading(true);
 
     // Basic client-side validation
     if (!email || !password) {
-      console.log('Validation failed: missing email or password');
       setError('Please enter both email and password');
       setIsLoading(false);
       return;
     }
 
     try {
-      console.log('Calling signIn...');
       const { error: signInError } = await signIn(email, password);
-      console.log('signIn returned:', { error: signInError });
 
       if (signInError) {
-        console.error('Sign in error:', signInError);
         setError('Invalid email or password. Please try again.');
         setIsLoading(false);
       } else {
         // Login successful - wait for cookies to be written, then full page reload
-        console.log('Login successful, waiting for session cookies...');
-
         // Give Supabase time to write session cookies before redirecting
         setTimeout(() => {
-          console.log('Redirecting to dashboard...');
           window.location.href = '/dashboard';
         }, 500);
       }
     } catch (error) {
-      console.error('Unexpected error during sign in:', error);
       setError('An unexpected error occurred. Please try again.');
       setIsLoading(false);
     }
