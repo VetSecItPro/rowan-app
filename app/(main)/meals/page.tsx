@@ -946,6 +946,7 @@ export default function MealsPage() {
                     </div>
                   </div>
                 )}
+              </div>
             ) : (
               /* List View */
               filteredMeals.length === 0 ? (
