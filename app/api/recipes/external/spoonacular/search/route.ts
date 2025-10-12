@@ -11,26 +11,33 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get('q');
     const apiKey = process.env.SPOONACULAR_API_KEY;
 
+    console.log('[Spoonacular] API called with query:', query);
+    console.log('[Spoonacular] API key configured:', !!apiKey);
+
     if (!query || query.trim().length < 2) {
+      console.log('[Spoonacular] Query too short, returning empty');
       return NextResponse.json([]);
     }
 
     if (!apiKey) {
-      console.error('Spoonacular API key not configured');
+      console.error('[Spoonacular] API key not configured - check SPOONACULAR_API_KEY environment variable');
       return NextResponse.json([]);
     }
 
     // Search for recipes
-    const searchResponse = await fetch(
-      `https://api.spoonacular.com/recipes/complexSearch?query=${encodeURIComponent(query)}&number=10&addRecipeInformation=true&fillIngredients=true&apiKey=${apiKey}`
-    );
+    const url = `https://api.spoonacular.com/recipes/complexSearch?query=${encodeURIComponent(query)}&number=10&addRecipeInformation=true&fillIngredients=true&apiKey=${apiKey}`;
+    console.log('[Spoonacular] Calling API:', url.replace(apiKey, 'API_KEY_HIDDEN'));
+
+    const searchResponse = await fetch(url);
 
     if (!searchResponse.ok) {
-      console.error('Spoonacular search failed:', searchResponse.statusText);
+      const errorText = await searchResponse.text();
+      console.error('[Spoonacular] API failed:', searchResponse.status, searchResponse.statusText, errorText);
       return NextResponse.json([]);
     }
 
     const searchData = await searchResponse.json();
+    console.log('[Spoonacular] Got', searchData.results?.length || 0, 'recipes');
 
     if (!searchData.results || searchData.results.length === 0) {
       return NextResponse.json([]);
