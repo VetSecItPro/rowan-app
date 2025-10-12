@@ -48,25 +48,25 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
         <div className="flex flex-col items-center justify-center gap-4 mb-8">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 sm:gap-6">
             <Image
               src="/rowan-logo.png"
               alt="Rowan Logo"
               width={160}
               height={160}
-              className="w-32 h-32 md:w-40 md:h-40 drop-shadow-2xl"
+              className="w-20 h-20 sm:w-32 sm:h-32 md:w-40 md:h-40 drop-shadow-2xl"
               priority
             />
-            <h1 className="text-8xl md:text-9xl font-bold text-gray-900 dark:text-white">Rowan</h1>
+            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold text-gray-900 dark:text-white">Rowan</h1>
           </div>
 
-          <h2 className="text-2xl md:text-3xl font-medium">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-medium">
             <span className="text-gray-900 dark:text-white">Your Life, </span>
             <span className="shimmer font-bold">Organized</span>
           </h2>
         </div>
 
-        <p className="text-gray-600 dark:text-gray-400 text-xl mb-12 max-w-2xl mx-auto">
+        <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg md:text-xl mb-12 max-w-2xl mx-auto px-4">
           Collaborative life management for couples and families
         </p>
 
@@ -83,7 +83,7 @@ export default function HomePage() {
       {/* Features Section */}
       <section className="relative bg-gradient-to-t from-purple-200 via-purple-100/50 to-white dark:from-purple-900 dark:via-purple-900/50 dark:to-black pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white text-center mb-16">What You Can Do</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white text-center mb-16">What You Can Do</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <FeatureCard
@@ -164,14 +164,14 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="bg-gray-100 dark:bg-black border-t border-gray-300 dark:border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between py-4 gap-4">
             {/* Copyright */}
-            <div className="text-gray-600 dark:text-gray-400">
+            <div className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
               Rowan © 2025
             </div>
 
-            {/* Links */}
-            <div className="hidden md:flex items-center gap-8">
+            {/* Links - Now visible on mobile with smaller text */}
+            <div className="flex items-center gap-4 sm:gap-8 text-sm sm:text-base">
               <Link href="/privacy" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Privacy</Link>
               <Link href="/terms" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Terms</Link>
               <Link href="/security" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Security</Link>
