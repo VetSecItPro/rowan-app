@@ -687,44 +687,45 @@ export default function MealsPage() {
                   <span className="text-sm">Recipes</span>
                 </button>
               </div>
-              <div className="flex items-center gap-2">
+
+              {/* Shopping Actions Toggle */}
+              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl border border-emerald-200 dark:border-emerald-700 w-full sm:w-auto">
                 <Link
                   href="/shopping"
-                  className="px-4 py-2 sm:px-6 sm:py-3 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-2 border-emerald-500 rounded-lg hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-all shadow-lg flex items-center justify-center gap-2"
+                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50"
                   title="View your shopping lists"
                 >
-                  <ShoppingBag className="w-5 h-5" />
-                  <span className="hidden sm:inline">View Lists</span>
-                  <ExternalLink className="w-4 h-4" />
+                  <ShoppingBag className="w-4 h-4" />
+                  <span className="text-sm">View Lists</span>
                 </Link>
                 <button
                   onClick={() => setIsGenerateListOpen(true)}
                   disabled={meals.length === 0}
-                  className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed relative group"
+                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[120px] text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 disabled:opacity-50 disabled:cursor-not-allowed"
                   title={meals.length === 0 ? 'Plan some meals first' : 'Select multiple meals to combine all recipe ingredients into one shopping list'}
                 >
-                  <ShoppingBag className="w-5 h-5" />
-                  <span className="hidden sm:inline">Generate List</span>
-                  <span className="sm:hidden">List</span>
-                  {/* Tooltip */}
-                  {meals.length > 0 && (
-                    <span className="invisible group-hover:visible absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap z-50 opacity-0 group-hover:opacity-100 transition-opacity">
-                      Select multiple meals to combine ingredients into one list
-                      <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></span>
-                    </span>
-                  )}
+                  <Plus className="w-4 h-4" />
+                  <span className="text-sm">Generate</span>
                 </button>
               </div>
-              <button onClick={handleOpenRecipeModal} className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
-                <ChefHat className="w-5 h-5" />
-                <span className="hidden sm:inline">New Recipe</span>
-                <span className="sm:hidden">Recipe</span>
-              </button>
-              <button onClick={handleOpenMealModal} className="px-4 py-2 sm:px-6 sm:py-3 shimmer-meals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
-                <Plus className="w-5 h-5" />
-                <span className="hidden sm:inline">New Meal</span>
-                <span className="sm:hidden">Meal</span>
-              </button>
+
+              {/* Meal Actions Toggle */}
+              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700 w-full sm:w-auto">
+                <button
+                  onClick={handleOpenRecipeModal}
+                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50"
+                >
+                  <ChefHat className="w-4 h-4" />
+                  <span className="text-sm">Recipe</span>
+                </button>
+                <button
+                  onClick={handleOpenMealModal}
+                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] bg-gradient-to-r from-orange-600 to-red-600 text-white"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="text-sm">Meal</span>
+                </button>
+              </div>
             </div>
           </div>
 
