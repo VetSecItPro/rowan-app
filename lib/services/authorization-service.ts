@@ -51,3 +51,20 @@ export async function verifySpaceAccess(
     throw new Error('Unauthorized: You do not have access to this space');
   }
 }
+
+/**
+ * Verify user has access to a resource's space
+ * @param userId - The user's ID
+ * @param resource - Resource with space_id property
+ * @throws Error if user doesn't have access
+ */
+export async function verifyResourceAccess(
+  userId: string,
+  resource: { space_id: string } | null
+): Promise<void> {
+  if (!resource) {
+    throw new Error('Resource not found');
+  }
+
+  await verifySpaceAccess(userId, resource.space_id);
+}

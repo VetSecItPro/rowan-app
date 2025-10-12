@@ -103,7 +103,6 @@ export default function TasksPage() {
           }
         }
       } catch (progressError) {
-        console.warn('Failed to load user progress (non-critical):', progressError);
       }
     } catch (error) {
       console.error('Failed to load data:', error);

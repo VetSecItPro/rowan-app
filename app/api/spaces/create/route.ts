@@ -22,7 +22,6 @@ export async function POST(req: NextRequest) {
       }
     } catch (rateLimitError) {
       // Log rate limit error but continue with request
-      console.warn('[API] Rate limiting failed, continuing without rate limit:', rateLimitError);
     }
 
     // Verify authentication
