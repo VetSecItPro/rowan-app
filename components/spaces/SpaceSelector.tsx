@@ -195,6 +195,19 @@ export function SpaceSelector({
     </div>
   );
 
+  // If only one space, just show the name without dropdown
+  if (spaces.length === 1 && currentSpace) {
+    return (
+      <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
+        <Home className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+        <span className={`text-sm font-bold ${getThemeColorClass(userColorTheme)}`}>
+          {currentSpace.name}
+        </span>
+      </div>
+    );
+  }
+
+  // If 2+ spaces, show dropdown selector
   return (
     <>
       <button
