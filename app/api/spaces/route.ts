@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getUserSpaces } from '@/lib/services/spaces-service';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
 
 /**
  * GET /api/spaces
@@ -18,6 +20,10 @@ export async function GET() {
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     const result = await getUserSpaces(session.user.id);
 
     if (!result.success) {
@@ -27,8 +33,18 @@ export async function GET() {
       );
     }
 
+
     return NextResponse.json(result.data);
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/spaces',
+        method: 'GET',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/spaces error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

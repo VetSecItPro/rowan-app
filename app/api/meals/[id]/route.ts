@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { mealsService } from '@/lib/services/meals-service';
 import { ratelimit } from '@/lib/ratelimit';
 import { verifyResourceAccess } from '@/lib/services/authorization-service';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
 
 /**
  * GET /api/meals/[id]
@@ -39,6 +41,10 @@ export async function GET(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get meal
     const meal = await mealsService.getMealById(params.id);
 
@@ -49,10 +55,24 @@ export async function GET(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Verify user has access to meal's space
     try {
       await verifyResourceAccess(session.user.id, meal);
     } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/meals/[id]',
+        method: 'GET',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+
       return NextResponse.json(
         { error: 'You do not have access to this meal' },
         { status: 403 }
@@ -107,6 +127,10 @@ export async function PATCH(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get existing meal first
     const existingMeal = await mealsService.getMealById(params.id);
 
@@ -117,10 +141,24 @@ export async function PATCH(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Verify user has access to meal's space
     try {
       await verifyResourceAccess(session.user.id, existingMeal);
     } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/meals/[id]',
+        method: 'PATCH',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+
       return NextResponse.json(
         { error: 'You do not have access to this meal' },
         { status: 403 }
@@ -181,6 +219,10 @@ export async function DELETE(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get existing meal first
     const existingMeal = await mealsService.getMealById(params.id);
 
@@ -191,10 +233,24 @@ export async function DELETE(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Verify user has access to meal's space
     try {
       await verifyResourceAccess(session.user.id, existingMeal);
     } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/meals/[id]',
+        method: 'DELETE',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+
       return NextResponse.json(
         { error: 'You do not have access to this meal' },
         { status: 403 }

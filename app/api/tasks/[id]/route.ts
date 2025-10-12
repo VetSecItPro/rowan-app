@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { tasksService } from '@/lib/services/tasks-service';
 import { ratelimit } from '@/lib/ratelimit';
 import { verifyResourceAccess } from '@/lib/services/authorization-service';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
 
 /**
  * GET /api/tasks/[id]
@@ -39,6 +41,9 @@ export async function GET(
       );
     }
 
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get task
     const task = await tasksService.getTaskById(params.id);
 
@@ -64,6 +69,15 @@ export async function GET(
       data: task,
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/tasks/[id]',
+        method: 'GET',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/tasks/[id] GET error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -107,6 +121,9 @@ export async function PATCH(
       );
     }
 
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get existing task first
     const existingTask = await tasksService.getTaskById(params.id);
 
@@ -138,6 +155,15 @@ export async function PATCH(
       data: updatedTask,
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/tasks/[id]',
+        method: 'PATCH',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/tasks/[id] PATCH error:', error);
     return NextResponse.json(
       { error: 'Failed to update task' },
@@ -181,6 +207,9 @@ export async function DELETE(
       );
     }
 
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get existing task first
     const existingTask = await tasksService.getTaskById(params.id);
 
@@ -209,6 +238,15 @@ export async function DELETE(
       message: 'Task deleted successfully',
     });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/tasks/[id]',
+        method: 'DELETE',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
     console.error('[API] /api/tasks/[id] DELETE error:', error);
     return NextResponse.json(
       { error: 'Failed to delete task' },

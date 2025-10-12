@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { shoppingService } from '@/lib/services/shopping-service';
 import { ratelimit } from '@/lib/ratelimit';
 import { verifyResourceAccess } from '@/lib/services/authorization-service';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
 
 /**
  * GET /api/shopping/[id]
@@ -39,6 +41,10 @@ export async function GET(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get shopping list
     const list = await shoppingService.getListById(params.id);
 
@@ -49,10 +55,24 @@ export async function GET(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Verify user has access to list's space
     try {
       await verifyResourceAccess(session.user.id, list);
     } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/shopping/[id]',
+        method: 'GET',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+
       return NextResponse.json(
         { error: 'You do not have access to this shopping list' },
         { status: 403 }
@@ -107,6 +127,10 @@ export async function PATCH(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get existing list first
     const existingList = await shoppingService.getListById(params.id);
 
@@ -117,10 +141,24 @@ export async function PATCH(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Verify user has access to list's space
     try {
       await verifyResourceAccess(session.user.id, existingList);
     } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/shopping/[id]',
+        method: 'PATCH',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+
       return NextResponse.json(
         { error: 'You do not have access to this shopping list' },
         { status: 403 }
@@ -181,6 +219,10 @@ export async function DELETE(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Get existing list first
     const existingList = await shoppingService.getListById(params.id);
 
@@ -191,10 +233,24 @@ export async function DELETE(
       );
     }
 
+
+    // Set user context for Sentry error tracking
+    setSentryUser(session.user);
+
     // Verify user has access to list's space
     try {
       await verifyResourceAccess(session.user.id, existingList);
     } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/shopping/[id]',
+        method: 'DELETE',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+
       return NextResponse.json(
         { error: 'You do not have access to this shopping list' },
         { status: 403 }

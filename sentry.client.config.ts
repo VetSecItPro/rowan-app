@@ -30,12 +30,11 @@ Sentry.init({
   ],
 
   // Custom integrations
-  integrations: [
-    new Sentry.Replay({
-      maskAllText: false,
-      blockAllMedia: false,
-    }),
-  ],
+  // Session Replay integration
+  integrations: function(integrations) {
+    // Remove default Replay if exists and add our configured one
+    return integrations.filter(integration => integration.name !== 'Replay');
+  },
 
   // Set user context
   beforeSend(event, hint) {
