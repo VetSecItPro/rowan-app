@@ -250,12 +250,9 @@ export async function searchByCuisine(cuisine: string): Promise<ExternalRecipe[]
       ...apininjasResults,
     ];
 
-    // Filter to only include recipes that actually match the cuisine
-    const filteredResults = allResults.filter(recipe => {
-      if (!recipe.cuisine) return true; // Include recipes without cuisine info
-      return recipe.cuisine.toLowerCase().includes(cuisine.toLowerCase()) ||
-             cuisine.toLowerCase().includes(recipe.cuisine.toLowerCase());
-    });
+    // More lenient filtering - if we got results from the search, assume they're relevant
+    // Don't over-filter since the search query itself targets the cuisine
+    const filteredResults = allResults;
 
     // Sort by source priority
     const sourcePriority: Record<string, number> = {
