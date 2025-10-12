@@ -102,11 +102,11 @@ export default function SignUpPage() {
               height={120}
               className="w-28 h-28 drop-shadow-2xl transform hover:scale-110 transition-transform duration-300"
             />
-            <h1 className="text-8xl font-bold text-white drop-shadow-lg">
+            <h1 className="text-6xl xl:text-7xl font-bold text-white drop-shadow-lg">
               Rowan
             </h1>
           </div>
-          <p className="text-xl text-purple-100 dark:text-purple-200 mb-8 whitespace-nowrap">
+          <p className="text-lg xl:text-xl text-purple-100 dark:text-purple-200 mb-8 text-center px-4">
             Collaborative life management for couples and families
           </p>
           <div className="space-y-4 text-lg text-purple-100 dark:text-purple-200 max-w-md mx-auto">
