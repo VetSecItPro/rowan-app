@@ -35,9 +35,28 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { space_id, email } = body;
 
-    if (!space_id || !email) {
+    // SECURITY: Input validation
+    if (!space_id || !email || typeof space_id !== 'string' || typeof email !== 'string') {
       return NextResponse.json(
         { error: 'Space ID and email are required' },
+        { status: 400 }
+      );
+    }
+
+    // SECURITY: Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: 'Invalid email format' },
+        { status: 400 }
+      );
+    }
+
+    // SECURITY: UUID validation for space_id
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(space_id)) {
+      return NextResponse.json(
+        { error: 'Invalid Space ID format' },
         { status: 400 }
       );
     }
@@ -60,7 +79,8 @@ export async function POST(req: NextRequest) {
     // This will be implemented when email integration is ready
     const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/invitations/accept?token=${result.data.token}`;
 
-    console.log('[API] Invitation created. URL:', invitationUrl);
+    // SECURITY: Do not log sensitive tokens
+    console.log('[API] Invitation created for email:', email.toLowerCase().trim());
     // For now, just return the invitation data
     // Later, we'll integrate Resend to send the email
 
