@@ -74,12 +74,12 @@ export function RecipeCard({ recipe, onEdit, onDelete, onPlanMeal }: RecipeCardP
 
         {recipe.tags && recipe.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4">
-            {recipe.tags.slice(0, 3).map((tag) => (
+            {recipe.tags.slice(0, 3).map((tag, idx) => (
               <span
-                key={tag}
+                key={idx}
                 className="px-2 py-1 bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 rounded-full text-xs font-medium"
               >
-                {tag}
+                {typeof tag === 'string' ? tag : JSON.stringify(tag)}
               </span>
             ))}
             {recipe.tags.length > 3 && (
