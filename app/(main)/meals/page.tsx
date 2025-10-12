@@ -11,6 +11,7 @@ import { RecipeCard } from '@/components/meals/RecipeCard';
 import { IngredientReviewModal } from '@/components/meals/IngredientReviewModal';
 import { GenerateListModal } from '@/components/meals/GenerateListModal';
 import { WeekCalendarView } from '@/components/meals/WeekCalendarView';
+import { TwoWeekCalendarView } from '@/components/meals/TwoWeekCalendarView';
 import GuidedMealCreation from '@/components/guided/GuidedMealCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { mealsService, Meal, CreateMealInput, Recipe, CreateRecipeInput } from '@/lib/services/meals-service';
@@ -22,7 +23,7 @@ import { showSuccess, showError, showPromise } from '@/lib/utils/toast';
 import { toast } from 'sonner';
 
 type ViewMode = 'calendar' | 'list' | 'recipes';
-type CalendarViewMode = 'week' | 'month';
+type CalendarViewMode = 'week' | '2weeks' | 'month';
 
 // Memoized meal card component with meal planning orange color
 const MemoizedMealCardWithColors = memo(({
@@ -854,6 +855,16 @@ export default function MealsPage() {
                       Week
                     </button>
                     <button
+                      onClick={() => setCalendarViewMode('2weeks')}
+                      className={`px-4 py-2 rounded-md transition-all font-medium ${
+                        calendarViewMode === '2weeks'
+                          ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-md'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
+                    >
+                      2 Weeks
+                    </button>
+                    <button
                       onClick={() => setCalendarViewMode('month')}
                       className={`px-4 py-2 rounded-md transition-all font-medium ${
                         calendarViewMode === 'month'
@@ -869,6 +880,15 @@ export default function MealsPage() {
                 {calendarViewMode === 'week' ? (
                   /* Week Calendar View */
                   <WeekCalendarView
+                    currentWeek={currentWeek}
+                    meals={meals}
+                    onWeekChange={handleWeekChange}
+                    onMealClick={handleMealClick}
+                    onAddMeal={handleAddMealForDate}
+                  />
+                ) : calendarViewMode === '2weeks' ? (
+                  /* Two Week Calendar View */
+                  <TwoWeekCalendarView
                     currentWeek={currentWeek}
                     meals={meals}
                     onWeekChange={handleWeekChange}
