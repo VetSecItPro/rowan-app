@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { UserPlus, Mail, Lock, User, Heart, Home, Eye, EyeOff } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, Heart, Home, Eye, EyeOff, ChevronDown, Check } from 'lucide-react';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
@@ -19,6 +19,7 @@ export default function SignUpPage() {
   const [mounted, setMounted] = useState(false);
   const [accountCreated, setAccountCreated] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showColorDropdown, setShowColorDropdown] = useState(false);
   const { signUp, signOut } = useAuth();
   const router = useRouter();
 
@@ -34,6 +35,21 @@ export default function SignUpPage() {
     { value: 'blue', label: 'Blue' },
     { value: 'orange', label: 'Orange' },
     { value: 'pink', label: 'Pink' },
+    { value: 'indigo', label: 'Indigo' },
+    { value: 'teal', label: 'Teal' },
+    { value: 'red', label: 'Red' },
+    { value: 'amber', label: 'Amber' },
+    { value: 'lime', label: 'Lime' },
+    { value: 'cyan', label: 'Cyan' },
+    { value: 'fuchsia', label: 'Fuchsia' },
+    { value: 'violet', label: 'Violet' },
+    { value: 'sky', label: 'Sky' },
+    { value: 'rose', label: 'Rose' },
+    { value: 'mint', label: 'Mint' },
+    { value: 'coral', label: 'Coral' },
+    { value: 'lavender', label: 'Lavender' },
+    { value: 'sage', label: 'Sage' },
+    { value: 'slate', label: 'Slate' },
   ];
 
   const getColorClasses = (theme: string) => {
@@ -48,6 +64,36 @@ export default function SignUpPage() {
         return 'bg-gradient-to-br from-orange-400 to-red-500';
       case 'pink':
         return 'bg-gradient-to-br from-pink-400 to-rose-500';
+      case 'indigo':
+        return 'bg-gradient-to-br from-indigo-400 to-purple-500';
+      case 'teal':
+        return 'bg-gradient-to-br from-teal-400 to-cyan-500';
+      case 'red':
+        return 'bg-gradient-to-br from-red-400 to-rose-500';
+      case 'amber':
+        return 'bg-gradient-to-br from-amber-400 to-orange-500';
+      case 'lime':
+        return 'bg-gradient-to-br from-lime-400 to-green-500';
+      case 'cyan':
+        return 'bg-gradient-to-br from-cyan-400 to-blue-500';
+      case 'fuchsia':
+        return 'bg-gradient-to-br from-fuchsia-400 to-pink-500';
+      case 'violet':
+        return 'bg-gradient-to-br from-violet-400 to-purple-500';
+      case 'sky':
+        return 'bg-gradient-to-br from-sky-400 to-blue-500';
+      case 'rose':
+        return 'bg-gradient-to-br from-rose-400 to-pink-500';
+      case 'mint':
+        return 'bg-gradient-to-br from-green-300 to-emerald-400';
+      case 'coral':
+        return 'bg-gradient-to-br from-orange-300 to-rose-400';
+      case 'lavender':
+        return 'bg-gradient-to-br from-purple-300 to-indigo-400';
+      case 'sage':
+        return 'bg-gradient-to-br from-gray-400 to-green-400';
+      case 'slate':
+        return 'bg-gradient-to-br from-slate-400 to-gray-500';
       default:
         return 'bg-gradient-to-br from-emerald-400 to-teal-500';
     }
@@ -301,28 +347,54 @@ export default function SignUpPage() {
 
             {/* Color Theme Selector */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label htmlFor="colorTheme" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Choose your color theme
               </label>
-              <div className="grid grid-cols-5 gap-3">
-                {colorThemes.map((theme) => (
-                  <button
-                    key={theme.value}
-                    type="button"
-                    onClick={() => setColorTheme(theme.value)}
-                    className={`relative rounded-xl p-3 transition-all ${
-                      colorTheme === theme.value
-                        ? 'ring-2 ring-purple-500 ring-offset-2 dark:ring-offset-gray-900'
-                        : 'hover:scale-105'
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowColorDropdown(!showColorDropdown)}
+                  disabled={isLoading}
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-lg shadow-lg ${getColorClasses(colorTheme)}`} />
+                    <span className="font-medium">
+                      {colorThemes.find((t) => t.value === colorTheme)?.label || 'Select a color'}
+                    </span>
+                  </div>
+                  <ChevronDown
+                    className={`w-5 h-5 text-gray-400 transition-transform ${
+                      showColorDropdown ? 'rotate-180' : ''
                     }`}
-                    disabled={isLoading}
-                  >
-                    <div className={`w-full h-10 rounded-lg shadow-lg ${getColorClasses(theme.value)}`} />
-                    <p className="mt-1.5 text-xs text-center text-gray-600 dark:text-gray-400 font-medium">
-                      {theme.label}
-                    </p>
-                  </button>
-                ))}
+                  />
+                </button>
+
+                {/* Dropdown Menu */}
+                {showColorDropdown && (
+                  <div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-64 overflow-y-auto">
+                    {colorThemes.map((theme) => (
+                      <button
+                        key={theme.value}
+                        type="button"
+                        onClick={() => {
+                          setColorTheme(theme.value);
+                          setShowColorDropdown(false);
+                        }}
+                        disabled={isLoading}
+                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left"
+                      >
+                        <div className={`w-8 h-8 rounded-lg shadow-lg flex-shrink-0 ${getColorClasses(theme.value)}`} />
+                        <span className="flex-1 font-medium text-gray-900 dark:text-white">
+                          {theme.label}
+                        </span>
+                        {colorTheme === theme.value && (
+                          <Check className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
