@@ -51,13 +51,13 @@ const MemoizedRecipeCard = memo(({
   recipe: Recipe;
   onEdit: (recipe: Recipe) => void;
   onDelete: (id: string) => void;
-  onPlanMeal: () => void;
+  onPlanMeal: (recipe: Recipe) => void;
 }) => (
   <RecipeCard
     recipe={recipe}
     onEdit={onEdit}
     onDelete={onDelete}
-    onPlanMeal={onPlanMeal}
+    onPlanMeal={() => onPlanMeal(recipe)}
   />
 ));
 
@@ -326,7 +326,8 @@ export default function MealsPage() {
       }
 
       // Otherwise, create/update meal directly (no shopping list or editing mode)
-      if (editingMeal) {
+      // Check if editingMeal has an actual ID (editing) or empty ID (new meal with pre-selected recipe)
+      if (editingMeal && editingMeal.id) {
         await mealsService.updateMeal(editingMeal.id, mealData);
       } else {
         await mealsService.createMeal(mealData);
@@ -421,10 +422,23 @@ export default function MealsPage() {
     setIsRecipeModalOpen(true);
   }, []);
 
-  const handlePlanMealFromRecipe = useCallback(() => {
-    setEditingMeal(null);
+  const handlePlanMealFromRecipe = useCallback((recipe: Recipe) => {
+    // Create a new meal state with pre-selected recipe
+    setEditingMeal({
+      id: '', // Empty ID indicates this is a new meal
+      space_id: currentSpace?.id || '',
+      recipe_id: recipe.id,
+      recipe: recipe,
+      name: '',
+      meal_type: 'dinner',
+      scheduled_date: new Date().toISOString(),
+      notes: '',
+      created_by: '',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as Meal);
     setIsModalOpen(true);
-  }, []);
+  }, [currentSpace]);
 
   // Meal card handlers
   const handleEditMeal = useCallback((meal: Meal) => {
