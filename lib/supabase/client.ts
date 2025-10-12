@@ -47,5 +47,11 @@ export const createClient = () => {
         document.cookie = cookie;
       },
     },
+    global: {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    },
   });
 };
