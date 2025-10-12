@@ -10,6 +10,7 @@ import { NewRecipeModal } from '@/components/meals/NewRecipeModal';
 import { RecipeCard } from '@/components/meals/RecipeCard';
 import { IngredientReviewModal } from '@/components/meals/IngredientReviewModal';
 import { GenerateListModal } from '@/components/meals/GenerateListModal';
+import { WeekCalendarView } from '@/components/meals/WeekCalendarView';
 import GuidedMealCreation from '@/components/guided/GuidedMealCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { mealsService, Meal, CreateMealInput, Recipe, CreateRecipeInput } from '@/lib/services/meals-service';
@@ -21,6 +22,7 @@ import { showSuccess, showError, showPromise } from '@/lib/utils/toast';
 import { toast } from 'sonner';
 
 type ViewMode = 'calendar' | 'list' | 'recipes';
+type CalendarViewMode = 'week' | 'month';
 
 // Memoized meal card component with meal planning orange color
 const MemoizedMealCardWithColors = memo(({
@@ -147,7 +149,9 @@ export default function MealsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [stats, setStats] = useState({ thisWeek: 0, nextWeek: 0, savedRecipes: 0, shoppingItems: 0 });
   const [viewMode, setViewMode] = useState<ViewMode>('calendar');
+  const [calendarViewMode, setCalendarViewMode] = useState<CalendarViewMode>('week');
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [currentWeek, setCurrentWeek] = useState(new Date());
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
@@ -491,6 +495,29 @@ export default function MealsPage() {
     setCurrentMonth(prev => addMonths(prev, 1));
   }, []);
 
+  // Week navigation handlers
+  const handleWeekChange = useCallback((newWeek: Date) => {
+    setCurrentWeek(newWeek);
+  }, []);
+
+  const handleAddMealForDate = useCallback((date: Date, mealType?: string) => {
+    // Pre-populate meal modal with selected date and meal type
+    setEditingMeal({
+      id: '',
+      space_id: currentSpace?.id || '',
+      recipe_id: null,
+      recipe: null,
+      name: '',
+      meal_type: (mealType as 'breakfast' | 'lunch' | 'dinner' | 'snack') || 'dinner',
+      scheduled_date: date.toISOString(),
+      notes: '',
+      created_by: '',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as Meal);
+    setIsModalOpen(true);
+  }, [currentSpace]);
+
   // Modal handlers
   const handleOpenMealModal = useCallback(() => setIsModalOpen(true), []);
   const handleCloseMealModal = useCallback(() => {
@@ -813,52 +840,91 @@ export default function MealsPage() {
             ) : viewMode === 'calendar' ? (
               /* Calendar View */
               <div>
-                {/* Month Navigation */}
-                <div className="flex items-center justify-between mb-6">
-                  <button
-                    onClick={handlePreviousMonth}
-                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                  >
-                    <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                  </button>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {format(currentMonth, 'MMMM yyyy')}
-                  </h3>
-                  <button
-                    onClick={handleNextMonth}
-                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                  >
-                    <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                  </button>
+                {/* Calendar View Mode Selector */}
+                <div className="flex items-center justify-center mb-6">
+                  <div className="inline-flex items-center gap-1 p-1 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                    <button
+                      onClick={() => setCalendarViewMode('week')}
+                      className={`px-4 py-2 rounded-md transition-all font-medium ${
+                        calendarViewMode === 'week'
+                          ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-md'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
+                    >
+                      Week
+                    </button>
+                    <button
+                      onClick={() => setCalendarViewMode('month')}
+                      className={`px-4 py-2 rounded-md transition-all font-medium ${
+                        calendarViewMode === 'month'
+                          ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-md'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
+                    >
+                      Month
+                    </button>
+                  </div>
                 </div>
 
-                {/* Calendar Grid */}
-                <div className="grid grid-cols-7 gap-2">
-                  {/* Day headers */}
-                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                    <div key={day} className="text-center text-sm font-medium text-gray-600 dark:text-gray-400 py-2">
-                      {day}
+                {calendarViewMode === 'week' ? (
+                  /* Week Calendar View */
+                  <WeekCalendarView
+                    currentWeek={currentWeek}
+                    meals={meals}
+                    onWeekChange={handleWeekChange}
+                    onMealClick={handleMealClick}
+                    onAddMeal={handleAddMealForDate}
+                  />
+                ) : (
+                  /* Month Calendar View */
+                  <div>
+                    {/* Month Navigation */}
+                    <div className="flex items-center justify-between mb-6">
+                      <button
+                        onClick={handlePreviousMonth}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                      >
+                        <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      </button>
+                      <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {format(currentMonth, 'MMMM yyyy')}
+                      </h3>
+                      <button
+                        onClick={handleNextMonth}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                      >
+                        <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      </button>
                     </div>
-                  ))}
 
-                  {/* Calendar days */}
-                  {calendarDays.map((day, index) => {
-                    const dayMeals = getMealsForDate(day);
-                    return (
-                      <CalendarDayCell
-                        key={index}
-                        day={day}
-                        index={index}
-                        currentMonth={currentMonth}
-                        dayMeals={dayMeals}
-                        getUserColor={getUserColor}
-                        onMealClick={handleMealClick}
-                        onAddClick={handleAddMealClick}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
+                    {/* Calendar Grid */}
+                    <div className="grid grid-cols-7 gap-2">
+                      {/* Day headers */}
+                      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                        <div key={day} className="text-center text-sm font-medium text-gray-600 dark:text-gray-400 py-2">
+                          {day}
+                        </div>
+                      ))}
+
+                      {/* Calendar days */}
+                      {calendarDays.map((day, index) => {
+                        const dayMeals = getMealsForDate(day);
+                        return (
+                          <CalendarDayCell
+                            key={index}
+                            day={day}
+                            index={index}
+                            currentMonth={currentMonth}
+                            dayMeals={dayMeals}
+                            getUserColor={getUserColor}
+                            onMealClick={handleMealClick}
+                            onAddClick={handleAddMealClick}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
             ) : (
               /* List View */
               filteredMeals.length === 0 ? (
