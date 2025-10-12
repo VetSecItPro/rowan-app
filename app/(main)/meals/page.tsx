@@ -937,20 +937,32 @@ export default function MealsPage() {
               ) : viewMode === 'recipes' ? (
               /* Recipes View */
               filteredRecipes.length === 0 ? (
-                <div className="text-center py-12">
-                  <ChefHat className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No recipes saved</p>
-                  <p className="text-gray-500 dark:text-gray-500 mb-6">
-                    {searchQuery ? 'Try adjusting your search' : 'Create your first recipe!'}
+                <div className="text-center py-12 max-w-lg mx-auto">
+                  <div className="bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-900/20 dark:to-red-900/20 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <ChefHat className="w-12 h-12 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                    {searchQuery ? 'No recipes found' : 'Your recipe collection awaits'}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-2">
+                    {searchQuery
+                      ? `No recipes match "${searchQuery}". Try adjusting your search or browse all recipes.`
+                      : 'Save your favorite recipes to quickly plan meals and generate shopping lists.'
+                    }
                   </p>
                   {!searchQuery && (
-                    <button
-                      onClick={handleOpenRecipeModal}
-                      className="px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
-                    >
-                      <ChefHat className="w-5 h-5" />
-                      Create Recipe
-                    </button>
+                    <>
+                      <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
+                        💡 Tip: You can add recipes manually or import them from a URL!
+                      </p>
+                      <button
+                        onClick={handleOpenRecipeModal}
+                        className="px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                      >
+                        <ChefHat className="w-5 h-5" />
+                        Create Your First Recipe
+                      </button>
+                    </>
                   )}
                 </div>
               ) : (
@@ -1081,31 +1093,43 @@ export default function MealsPage() {
             ) : (
               /* List View */
               filteredMeals.length === 0 ? (
-                <div className="text-center py-12">
-                  <UtensilsCrossed className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No meals planned</p>
-                  <p className="text-gray-500 dark:text-gray-500 mb-6">
-                    {searchQuery ? 'Try adjusting your search' : 'Start planning your meals!'}
+                <div className="text-center py-12 max-w-lg mx-auto">
+                  <div className="bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-900/20 dark:to-red-900/20 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <UtensilsCrossed className="w-12 h-12 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                    {searchQuery ? 'No meals found' : 'Your meal planning journey begins'}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-2">
+                    {searchQuery
+                      ? `No meals match "${searchQuery}". Try adjusting your search or browse all meals.`
+                      : 'Plan your meals ahead of time to save time, reduce stress, and eat healthier.'
+                    }
                   </p>
                   {!searchQuery && (
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                      <button
-                        onClick={handleOpenMealModal}
-                        className="px-6 py-3 shimmer-meals text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
-                      >
-                        <Plus className="w-5 h-5" />
-                        Plan Meal
-                      </button>
-                      {!hasCompletedGuide && (
+                    <>
+                      <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
+                        💡 Tip: Link meals to recipes for automatic ingredient tracking and shopping list generation!
+                      </p>
+                      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                         <button
-                          onClick={() => setShowGuidedFlow(true)}
-                          className="px-6 py-3 bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
+                          onClick={handleOpenMealModal}
+                          className="px-6 py-3 shimmer-meals text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
                         >
-                          <UtensilsCrossed className="w-5 h-5" />
-                          Try Guided Creation
+                          <Plus className="w-5 h-5" />
+                          Plan Your First Meal
                         </button>
-                      )}
-                    </div>
+                        {!hasCompletedGuide && (
+                          <button
+                            onClick={() => setShowGuidedFlow(true)}
+                            className="px-6 py-3 bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
+                          >
+                            <UtensilsCrossed className="w-5 h-5" />
+                            Try Guided Creation
+                          </button>
+                        )}
+                      </div>
+                    </>
                   )}
                 </div>
               ) : (
