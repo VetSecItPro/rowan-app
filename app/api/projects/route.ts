@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { projectsOnlyService } from '@/lib/services/projects-service';
 import { ratelimit } from '@/lib/ratelimit';
+import { verifySpaceAccess } from '@/lib/services/authorization-service';
 
 /**
  * GET /api/projects
@@ -43,6 +44,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(
         { error: 'space_id is required' },
         { status: 400 }
+      );
+    }
+
+    // Verify user has access to this space
+    try {
+      await verifySpaceAccess(session.user.id, spaceId);
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'You do not have access to this space' },
+        { status: 403 }
       );
     }
 
@@ -102,6 +113,32 @@ export async function POST(req: NextRequest) {
     if (!space_id || !name) {
       return NextResponse.json(
         { error: 'space_id and name are required' },
+        { status: 400 }
+      );
+    }
+
+    // Verify user has access to this space
+    try {
+      await verifySpaceAccess(session.user.id, space_id);
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'You do not have access to this space' },
+        { status: 403 }
+      );
+    }
+
+    // Validate name length
+    if (name && name.trim().length > 200) {
+      return NextResponse.json(
+        { error: 'name must be 200 characters or less' },
+        { status: 400 }
+      );
+    }
+
+    // Validate description length
+    if (description && description.trim().length > 2000) {
+      return NextResponse.json(
+        { error: 'description must be 2000 characters or less' },
         { status: 400 }
       );
     }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { projectsService } from '@/lib/services/budgets-service';
 import { ratelimit } from '@/lib/ratelimit';
+import { verifySpaceAccess } from '@/lib/services/authorization-service';
 
 /**
  * GET /api/budgets
@@ -43,6 +44,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(
         { error: 'space_id is required' },
         { status: 400 }
+      );
+    }
+
+    // Verify user has access to this space
+    try {
+      await verifySpaceAccess(session.user.id, spaceId);
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'You do not have access to this space' },
+        { status: 403 }
       );
     }
 
@@ -112,6 +123,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: 'monthly_budget must be a positive number' },
         { status: 400 }
+      );
+    }
+
+    // Verify user has access to this space
+    try {
+      await verifySpaceAccess(session.user.id, space_id);
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'You do not have access to this space' },
+        { status: 403 }
       );
     }
 
