@@ -58,12 +58,18 @@ export function RecipeCard({ recipe, onEdit, onDelete, onPlanMeal }: RecipeCardP
         )}
 
         <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
-          {recipe.prep_time !== undefined && recipe.cook_time !== undefined && (
-            <div className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              <span>{recipe.prep_time + recipe.cook_time} min</span>
-            </div>
-          )}
+          {(() => {
+            const totalTime = (recipe.prep_time || 0) + (recipe.cook_time || 0);
+            if (totalTime > 0) {
+              return (
+                <div className="flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  <span>{totalTime} min</span>
+                </div>
+              );
+            }
+            return null;
+          })()}
           {recipe.servings && (
             <div className="flex items-center gap-1">
               <Users className="w-4 h-4" />
