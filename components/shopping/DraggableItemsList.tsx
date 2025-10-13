@@ -90,13 +90,6 @@ function SortableItem({ item, onToggle }: SortableItemProps) {
           <p className="text-xs text-gray-500 dark:text-gray-400">Qty: {item.quantity}</p>
         )}
       </div>
-
-      {/* Price */}
-      {item.estimated_price && (
-        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-          ${item.estimated_price.toFixed(2)}
-        </span>
-      )}
     </div>
   );
 }
