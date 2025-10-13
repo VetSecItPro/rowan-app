@@ -478,7 +478,7 @@ export default function ShoppingDocumentation() {
               </ol>
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-4">
                 <p className="text-blue-700 dark:text-blue-300 text-sm">
-                  <strong>💰 Budget Tip:</strong> Set realistic budgets based on historical shopping trips. You can view your spending patterns in Settings > Analytics > Shopping.
+                  <strong>💰 Budget Tip:</strong> Set realistic budgets based on historical shopping trips. You can view your spending patterns in Settings {'>'}  Analytics {'>'} Shopping.
                 </p>
               </div>
             </div>
