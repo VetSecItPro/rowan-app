@@ -140,8 +140,8 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                           <div className="flex items-center gap-0.5">
                             <Tooltip content="Decrease quantity" delay={0}>
                               <button
-                                onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                                disabled={item.quantity <= 1}
+                                onClick={() => onUpdateQuantity(item.id, Math.max(1, Number(item.quantity) - 1))}
+                                disabled={Number(item.quantity) <= 1}
                                 className="w-5 h-5 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                                 aria-label="Decrease quantity"
                               >
@@ -153,7 +153,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                             </span>
                             <Tooltip content="Increase quantity" delay={0}>
                               <button
-                                onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                                onClick={() => onUpdateQuantity(item.id, Number(item.quantity) + 1)}
                                 className="w-5 h-5 rounded bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-800/50 flex items-center justify-center transition-colors"
                                 aria-label="Increase quantity"
                               >
@@ -163,13 +163,6 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                           </div>
                         )}
                       </div>
-
-                      {/* Price pushed to the right */}
-                      {item.estimated_price && (
-                        <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto">
-                          ${item.estimated_price.toFixed(2)}
-                        </span>
-                      )}
                     </div>
                   ))}
                 </div>
