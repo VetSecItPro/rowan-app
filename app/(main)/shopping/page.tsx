@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package } from 'lucide-react';
+import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
@@ -237,6 +237,24 @@ export default function ShoppingPage() {
     setSearchQuery(e.target.value);
   }, []);
 
+  // Memoized callback for clearing search
+  const handleClearSearch = useCallback(() => {
+    setSearchQuery('');
+  }, []);
+
+  // Memoized callbacks for stat card clicks
+  const handleTotalListsClick = useCallback(() => {
+    setStatusFilter('all');
+  }, []);
+
+  const handleActiveListsClick = useCallback(() => {
+    setStatusFilter('active');
+  }, []);
+
+  const handleCompletedListsClick = useCallback(() => {
+    setStatusFilter('completed');
+  }, []);
+
   // Memoized callback for status filter change
   const handleStatusFilterChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     setStatusFilter(e.target.value as 'all' | 'active' | 'completed');
@@ -292,34 +310,43 @@ export default function ShoppingPage() {
           {/* Stats Dashboard - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <button
+              onClick={handleTotalListsClick}
+              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
+            >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Lists</h3>
                 <div className="w-12 h-12 bg-gradient-shopping rounded-xl flex items-center justify-center"><List className="w-6 h-6 text-white" /></div>
               </div>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.totalLists}</p>
-            </div>
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            </button>
+            <button
+              onClick={handleActiveListsClick}
+              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
+            >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Active Lists</h3>
                 <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center"><Clock className="w-6 h-6 text-white" /></div>
               </div>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.activeLists}</p>
-            </div>
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            </button>
+            <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Items This Week</h3>
                 <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center"><Package className="w-6 h-6 text-white" /></div>
               </div>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.itemsThisWeek}</p>
             </div>
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <button
+              onClick={handleCompletedListsClick}
+              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
+            >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completed Lists</h3>
                 <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"><CheckCircle2 className="w-6 h-6 text-white" /></div>
               </div>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.completedLists}</p>
-            </div>
+            </button>
           </div>
           )}
 
@@ -328,7 +355,16 @@ export default function ShoppingPage() {
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input type="text" placeholder="Search lists..." value={searchQuery} onChange={handleSearchChange} className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white" />
+              <input type="text" placeholder="Search lists..." value={searchQuery} onChange={handleSearchChange} className="w-full pl-10 pr-10 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 dark:text-white" />
+              {searchQuery && (
+                <button
+                  onClick={handleClearSearch}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
+                  aria-label="Clear search"
+                >
+                  <X className="w-4 h-4 text-gray-400" />
+                </button>
+              )}
             </div>
           </div>
           )}
