@@ -98,7 +98,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
 
           {list.description && (
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 ml-[76px]">
-              {list.description}
+              <span className="font-medium">Note:</span> {list.description}
             </p>
           )}
 
