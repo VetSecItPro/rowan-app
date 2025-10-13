@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { getCategoryForItem } from '@/lib/constants/shopping-categories';
 
 export interface ShoppingItem {
   id: string;
@@ -7,6 +8,12 @@ export interface ShoppingItem {
   quantity: number;
   unit?: string;
   category?: string;
+  sort_order?: number;
+  assigned_to?: string;
+  estimated_price?: number;
+  actual_price?: number;
+  recipe_source_id?: string;
+  notes?: string;
   checked: boolean;
   created_at: string;
   updated_at: string;
@@ -18,6 +25,12 @@ export interface ShoppingList {
   title: string;
   description?: string;
   status: 'active' | 'completed' | 'archived';
+  store_name?: string;
+  estimated_total?: number;
+  actual_total?: number;
+  budget?: number;
+  last_modified_by?: string;
+  last_modified_at?: string;
   items?: ShoppingItem[];
   created_by: string;
   created_at: string;
@@ -127,11 +140,16 @@ export const shoppingService = {
 
   async createItem(input: CreateItemInput): Promise<ShoppingItem> {
     const supabase = createClient();
+
+    // Auto-categorize if no category provided
+    const category = input.category || getCategoryForItem(input.name);
+
     const { data, error } = await supabase
       .from('shopping_items')
       .insert([{
         ...input,
         quantity: input.quantity || 1,
+        category,
         checked: false,
       }])
       .select()
@@ -190,5 +208,120 @@ export const shoppingService = {
       itemsThisWeek,
       completedLists: lists.filter(l => l.status === 'completed').length,
     };
+  },
+
+  // Real-time subscription for shopping lists
+  subscribeToLists(spaceId: string, callback: (payload: any) => void) {
+    const supabase = createClient();
+
+    const channel = supabase
+      .channel(`shopping_lists:${spaceId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'shopping_lists',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        callback
+      )
+      .subscribe();
+
+    return channel;
+  },
+
+  // Real-time subscription for shopping items
+  subscribeToItems(listId: string, callback: (payload: any) => void) {
+    const supabase = createClient();
+
+    const channel = supabase
+      .channel(`shopping_items:${listId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'shopping_items',
+          filter: `list_id=eq.${listId}`,
+        },
+        callback
+      )
+      .subscribe();
+
+    return channel;
+  },
+
+  // Template management
+  async getTemplates(spaceId: string) {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('shopping_templates')
+      .select('*')
+      .eq('space_id', spaceId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async createTemplate(spaceId: string, name: string, description: string, items: any[]) {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('shopping_templates')
+      .insert([{
+        space_id: spaceId,
+        name,
+        description,
+        items: JSON.stringify(items),
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteTemplate(id: string) {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('shopping_templates')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  },
+
+  async createListFromTemplate(templateId: string, spaceId: string) {
+    const supabase = createClient();
+
+    // Get template
+    const { data: template, error: templateError } = await supabase
+      .from('shopping_templates')
+      .select('*')
+      .eq('id', templateId)
+      .single();
+
+    if (templateError) throw templateError;
+
+    // Create list
+    const list = await this.createList({
+      space_id: spaceId,
+      title: template.name,
+      description: template.description,
+    });
+
+    // Add items
+    const items = typeof template.items === 'string' ? JSON.parse(template.items) : template.items;
+    for (const item of items) {
+      await this.createItem({
+        list_id: list.id,
+        name: item.name,
+        quantity: item.quantity || 1,
+        category: item.category,
+      });
+    }
+
+    return list;
   },
 };

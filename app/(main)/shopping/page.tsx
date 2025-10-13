@@ -115,6 +115,22 @@ export default function ShoppingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSpace, user]);
 
+  // Real-time subscription for shopping lists
+  useEffect(() => {
+    if (!currentSpace) return;
+
+    const channel = shoppingService.subscribeToLists(currentSpace.id, (payload) => {
+      // Reload lists when any change occurs
+      loadLists();
+    });
+
+    // Cleanup subscription on unmount
+    return () => {
+      channel.unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSpace]);
+
   // Memoized callback for creating/updating lists
   const handleCreateList = useCallback(async (listData: CreateListInput & { store?: string; items?: { id?: string; name: string; quantity: number }[] }) => {
     try {
