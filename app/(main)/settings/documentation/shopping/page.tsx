@@ -209,8 +209,56 @@ export default function ShoppingDocumentation() {
             <div>
               <h1 className="text-4xl font-bold mb-2">Shopping Lists Guide</h1>
               <p className="text-white/90 text-lg">
-                Master collaborative shopping with smart categories, templates, and integrations
+                Complete guide to managing household shopping with smart features
               </p>
+            </div>
+          </div>
+
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
+            <div className="flex items-start gap-3">
+              <Lightbulb className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                  Welcome to Shopping Lists
+                </h3>
+                <p className="text-blue-800 dark:text-blue-200 mb-3">
+                  Rowan helps you organize household shopping with powerful collaboration features:
+                </p>
+                <div className="grid sm:grid-cols-2 gap-2 text-sm text-blue-700 dark:text-blue-300">
+                  <div className="flex items-start gap-2">
+                    <Tags className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Smart Categories</strong> - 11 auto-categorized sections</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <FileText className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Templates</strong> - Reusable lists for recurring shopping</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Real-time sync</strong> - Instant updates for all members</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <BookOpen className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Budget tracking</strong> - Set limits and track spending</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Grid3x3 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Drag & drop</strong> - Reorder items to match store layout</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckSquare className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Progress rings</strong> - Beautiful visual completion indicators</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Calendar className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Calendar sync</strong> - Schedule shopping trips with reminders</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <List className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Task integration</strong> - Convert lists to trackable tasks</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

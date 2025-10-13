@@ -952,7 +952,15 @@ export default function MealsPage() {
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">This Week</h3>
                 <div className="w-12 h-12 bg-gradient-meals rounded-xl flex items-center justify-center"><CalendarIcon className="w-6 h-6 text-white" /></div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.thisWeek}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.thisWeek}</p>
+                {stats.thisWeek > 0 && (
+                  <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
+                    <CalendarIcon className="w-3 h-3" />
+                    <span className="text-xs font-medium">Planned</span>
+                  </div>
+                )}
+              </div>
             </button>
 
             {/* Next Two Weeks Card */}
@@ -964,7 +972,15 @@ export default function MealsPage() {
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Next Two Weeks</h3>
                 <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"><TrendingUp className="w-6 h-6 text-white" /></div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.nextWeek}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.nextWeek}</p>
+                {stats.nextWeek > 0 && (
+                  <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                    <TrendingUp className="w-3 h-3" />
+                    <span className="text-xs font-medium">Upcoming</span>
+                  </div>
+                )}
+              </div>
             </button>
 
             {/* Saved Recipes Card */}
@@ -976,7 +992,15 @@ export default function MealsPage() {
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Saved Recipes</h3>
                 <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center"><BookOpen className="w-6 h-6 text-white" /></div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.savedRecipes}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.savedRecipes}</p>
+                {stats.savedRecipes > 0 && (
+                  <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                    <BookOpen className="w-3 h-3" />
+                    <span className="text-xs font-medium">In library</span>
+                  </div>
+                )}
+              </div>
             </button>
 
             {/* Shopping Items Card */}
@@ -988,7 +1012,15 @@ export default function MealsPage() {
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Shopping Items</h3>
                 <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center"><ShoppingBag className="w-6 h-6 text-white" /></div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.shoppingItems}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.shoppingItems}</p>
+                {stats.shoppingItems > 0 && (
+                  <div className="flex items-center gap-1 text-purple-600 dark:text-purple-400">
+                    <ShoppingBag className="w-3 h-3" />
+                    <span className="text-xs font-medium">From recipes</span>
+                  </div>
+                )}
+              </div>
             </Link>
           </div>
           )}
