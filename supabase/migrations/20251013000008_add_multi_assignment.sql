@@ -61,7 +61,6 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER task_assignments_sync_primary_trigger
   AFTER INSERT OR UPDATE OR DELETE ON task_assignments
   FOR EACH ROW
-  WHEN (NEW.is_primary = TRUE OR (OLD.is_primary = TRUE AND TG_OP = 'DELETE'))
   EXECUTE FUNCTION sync_task_primary_assignment();
 
 -- Migrate existing assigned_to data to task_assignments
