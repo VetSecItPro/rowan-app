@@ -409,6 +409,35 @@ export default function ShoppingPage() {
         location: listToSchedule.store_name || undefined,
       });
 
+      // Create a reminder if reminderMinutes is specified
+      if (eventData.reminderMinutes && eventData.reminderMinutes > 0) {
+        const { remindersService } = await import('@/lib/services/reminders-service');
+
+        // Calculate reminder time (event start time minus reminder minutes)
+        const reminderTime = new Date(startDateTime.getTime() - eventData.reminderMinutes * 60000);
+
+        const reminder = await remindersService.createReminder({
+          space_id: currentSpace.id,
+          title: `Shopping Trip: ${listToSchedule.title}`,
+          description: `Reminder for shopping trip${listToSchedule.store_name ? ` at ${listToSchedule.store_name}` : ''}`,
+          emoji: '🛒',
+          category: 'personal',
+          reminder_type: 'time',
+          reminder_time: reminderTime.toISOString(),
+          location: listToSchedule.store_name || undefined,
+          priority: 'medium',
+          status: 'active',
+        });
+
+        // Link the reminder to the shopping list
+        await shoppingIntegrationService.linkToReminder(
+          reminder.id,
+          listToSchedule.id,
+          undefined,
+          'time'
+        );
+      }
+
       // Link the shopping list to the calendar event
       await shoppingIntegrationService.linkToCalendar(
         listToSchedule.id,

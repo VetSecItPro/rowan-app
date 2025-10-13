@@ -256,6 +256,9 @@ export default function ShoppingDocumentation() {
                 <li><strong>Progress Indicators:</strong> Visual progress bars show completion status</li>
               </ul>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
 
           <section id="first-list" className="scroll-mt-24">
@@ -295,6 +298,9 @@ export default function ShoppingDocumentation() {
                 </li>
               </ol>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
 
           <section id="categories" className="scroll-mt-24">
@@ -329,6 +335,9 @@ export default function ShoppingDocumentation() {
                 <strong>Auto-detection covers 100+ common items</strong> including milk, bread, chicken, tomatoes, and more. If the category isn't detected correctly, you can manually change it when adding or editing items.
               </p>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
 
           <section id="add-items" className="scroll-mt-24">
@@ -351,6 +360,9 @@ export default function ShoppingDocumentation() {
                 </p>
               </div>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
 
           <section id="organize-categories" className="scroll-mt-24">
@@ -376,6 +388,9 @@ export default function ShoppingDocumentation() {
                 When viewing a list, items are displayed grouped by category with section headers, making it easy to navigate the store efficiently.
               </p>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
 
           <section id="budgets" className="scroll-mt-24">
@@ -396,6 +411,9 @@ export default function ShoppingDocumentation() {
                 </p>
               </div>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
 
           <section id="check-items" className="scroll-mt-24">
@@ -416,6 +434,9 @@ export default function ShoppingDocumentation() {
                 </p>
               </div>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
 
           <section id="create-templates" className="scroll-mt-24">
@@ -436,6 +457,9 @@ export default function ShoppingDocumentation() {
                 Your template will save all items with their categories and quantities, making it perfect for recurring shopping trips.
               </p>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
 
           <section id="use-templates" className="scroll-mt-24">
@@ -458,6 +482,9 @@ export default function ShoppingDocumentation() {
                 </p>
               </div>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
 
           <section id="manage-templates" className="scroll-mt-24">
@@ -475,6 +502,9 @@ export default function ShoppingDocumentation() {
                 Templates are shared within your space, so all household members can use them!
               </p>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
 
           <section id="schedule-trips" className="scroll-mt-24">
@@ -505,6 +535,9 @@ export default function ShoppingDocumentation() {
                 </p>
               </div>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
 
           <section id="create-tasks" className="scroll-mt-24">
@@ -535,6 +568,9 @@ export default function ShoppingDocumentation() {
                 </p>
               </div>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
 
           <section id="view-integrations" className="scroll-mt-24">
@@ -558,6 +594,9 @@ export default function ShoppingDocumentation() {
                 <li>Mark the task complete when shopping is done</li>
               </ul>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
 
           <section id="collaboration" className="scroll-mt-24">
@@ -578,6 +617,9 @@ export default function ShoppingDocumentation() {
                 </p>
               </div>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
 
           <section id="store-locations" className="scroll-mt-24">
@@ -596,6 +638,9 @@ export default function ShoppingDocumentation() {
                 Examples: "Whole Foods", "Costco", "Target", "Trader Joe's"
               </p>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
 
           <section id="tips-organization" className="scroll-mt-24">
@@ -612,6 +657,9 @@ export default function ShoppingDocumentation() {
                 <li><strong>Review before shopping:</strong> Check the list one more time before leaving</li>
               </ul>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
 
           <section id="filters-search" className="scroll-mt-24">
@@ -632,6 +680,9 @@ export default function ShoppingDocumentation() {
                 Use the search box to find lists by title, description, or store name. Search is instant and works with partial matches.
               </p>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
 
           <section id="tips-templates" className="scroll-mt-24">
@@ -653,6 +704,9 @@ export default function ShoppingDocumentation() {
                 </p>
               </div>
             </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
           </section>
         </div>
 
