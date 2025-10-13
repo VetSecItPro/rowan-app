@@ -7,17 +7,17 @@ import { CreateListInput, ShoppingList } from '@/lib/services/shopping-service';
 interface NewShoppingListModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (list: CreateListInput & { store?: string; items?: { id?: string; name: string; quantity: number }[] }) => void;
+  onSave: (list: CreateListInput & { store_name?: string; items?: { id?: string; name: string; quantity: number }[] }) => void;
   editList?: ShoppingList | null;
   spaceId: string;
 }
 
 export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceId }: NewShoppingListModalProps) {
-  const [formData, setFormData] = useState<CreateListInput & { store?: string }>({
+  const [formData, setFormData] = useState<CreateListInput & { store_name?: string }>({
     space_id: spaceId,
     title: '',
     description: '',
-    store: '',
+    store_name: '',
     status: 'active',
   });
 
@@ -30,7 +30,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
         space_id: spaceId,
         title: editList.title,
         description: editList.description || '',
-        store: (editList as any).store || '',
+        store_name: editList.store_name || '',
         status: editList.status,
       });
       setItems((editList.items || []).map(item => ({
@@ -44,7 +44,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
         space_id: spaceId,
         title: '',
         description: '',
-        store: '',
+        store_name: '',
         status: 'active',
       });
       setItems([]);
@@ -113,8 +113,8 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Store</label>
             <input
               type="text"
-              value={formData.store || ''}
-              onChange={(e) => setFormData({ ...formData, store: e.target.value })}
+              value={formData.store_name || ''}
+              onChange={(e) => setFormData({ ...formData, store_name: e.target.value })}
               placeholder="Type your store"
               className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
             />

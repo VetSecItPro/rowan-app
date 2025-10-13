@@ -142,7 +142,7 @@ export default function ShoppingPage() {
   }, [currentSpace]);
 
   // Memoized callback for creating/updating lists
-  const handleCreateList = useCallback(async (listData: CreateListInput & { store?: string; items?: { id?: string; name: string; quantity: number }[] }) => {
+  const handleCreateList = useCallback(async (listData: CreateListInput & { store_name?: string; items?: { id?: string; name: string; quantity: number }[] }) => {
     try {
       if (editingList) {
         // Extract items before updating the list
