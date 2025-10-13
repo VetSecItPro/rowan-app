@@ -405,7 +405,8 @@ export default function ShoppingPage() {
         start_time: startDateTime.toISOString(),
         end_time: endDateTime.toISOString(),
         description: `Shopping trip for list: ${listToSchedule.title}`,
-        color: 'emerald',
+        category: 'personal',
+        location: listToSchedule.store_name || undefined,
       });
 
       // Link the shopping list to the calendar event
