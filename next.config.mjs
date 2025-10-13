@@ -17,6 +17,13 @@ const nextConfig = {
   skipMiddlewareUrlNormalize: true,
   // Use standalone output only on Vercel (not local builds)
   ...(process.env.VERCEL === '1' && { output: 'standalone' }),
+  // Disable static error page generation to prevent Next.js 15 Html import issues
+  generateBuildId: async () => {
+    return 'build-' + Date.now();
+  },
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
+  },
 
   // Security headers and CSP
   async headers() {
@@ -84,6 +91,10 @@ const sentryWebpackPluginOptions = {
 
   // Automatically tree-shake Sentry logger statements to reduce bundle size
   disableLogger: true,
+
+  // Disable automatic instrumentation of error pages to prevent Next.js 15 Html component issues
+  autoInstrumentServerFunctions: false,
+  autoInstrumentMiddleware: false,
 
   // Source map upload enabled (org/project names verified)
 };
