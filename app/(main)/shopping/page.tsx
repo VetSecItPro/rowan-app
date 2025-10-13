@@ -9,6 +9,7 @@ import { NewShoppingListModal } from '@/components/shopping/NewShoppingListModal
 import { SaveTemplateModal } from '@/components/shopping/SaveTemplateModal';
 import { TemplatePickerModal } from '@/components/shopping/TemplatePickerModal';
 import { ScheduleTripModal } from '@/components/shopping/ScheduleTripModal';
+import { FrequentItemsPanel } from '@/components/shopping/FrequentItemsPanel';
 import GuidedShoppingCreation from '@/components/guided/GuidedShoppingCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { shoppingService, ShoppingList, CreateListInput } from '@/lib/services/shopping-service';
@@ -481,6 +482,38 @@ export default function ShoppingPage() {
     }
   }, [currentSpace]);
 
+  // Handler for adding frequent items
+  const handleAddFrequentItem = useCallback(async (itemName: string, category: string) => {
+    if (!currentSpace) return;
+
+    try {
+      // Find the first active list or create a "Quick Add" list
+      let targetList = lists.find(l => l.status === 'active');
+
+      if (!targetList) {
+        // Create a new "Quick Add" list
+        targetList = await shoppingService.createList({
+          space_id: currentSpace.id,
+          title: 'Quick Add List',
+          description: 'Items added from frequent suggestions',
+        });
+      }
+
+      // Add the item to the list
+      await shoppingService.createItem({
+        list_id: targetList.id,
+        name: itemName,
+        quantity: 1,
+        category,
+      });
+
+      // Reload lists to show the update
+      await loadLists();
+    } catch (error) {
+      console.error('Failed to add frequent item:', error);
+    }
+  }, [currentSpace, lists]);
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Shopping Lists' }]}>
       <div className="p-4 sm:p-8">
@@ -553,6 +586,14 @@ export default function ShoppingPage() {
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.totalLists}</p>
             </button>
           </div>
+          )}
+
+          {/* Frequent Items Panel - Only show when NOT in guided flow and when there are active lists */}
+          {!showGuidedFlow && currentSpace && lists.length > 0 && (
+            <FrequentItemsPanel
+              spaceId={currentSpace.id}
+              onAddItem={handleAddFrequentItem}
+            />
           )}
 
           {/* Search Bar - Only show when NOT in guided flow */}

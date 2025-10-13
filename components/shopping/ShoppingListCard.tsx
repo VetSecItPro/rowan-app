@@ -6,6 +6,9 @@ import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState, useMemo } from 'react';
 import { getCategoryIcon, getCategoryLabel } from '@/lib/constants/shopping-categories';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { CircularProgress } from '@/components/ui/CircularProgress';
+import { UserAvatar } from '@/components/ui/UserAvatar';
+import { useAuth } from '@/lib/contexts/auth-context';
 
 interface ShoppingListCardProps {
   list: ShoppingList;
@@ -21,6 +24,7 @@ interface ShoppingListCardProps {
 export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompleteList, onSaveAsTemplate, onScheduleTrip, onCreateTask }: ShoppingListCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const { user } = useAuth();
 
   const totalItems = list.items?.length || 0;
   const checkedItems = list.items?.filter(item => item.checked).length || 0;
@@ -49,50 +53,53 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
   }, [list.items]);
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-all duration-200">
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-all duration-200 group">
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <button
-              onClick={() => onCompleteList?.(list.id)}
-              disabled={list.status === 'completed'}
-              aria-label={`Mark entire shopping list as ${list.status === 'completed' ? 'completed' : 'complete'}`}
-              className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-                list.status === 'completed'
-                  ? 'bg-green-500 border-green-500 cursor-not-allowed'
-                  : 'border-emerald-400 dark:border-emerald-500 hover:border-emerald-600 dark:hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 cursor-pointer'
-              }`}
-            >
-              {list.status === 'completed' && <Check className="w-4 h-4 text-white" />}
-            </button>
-            <div className="w-10 h-10 bg-gradient-shopping rounded-lg flex items-center justify-center">
-              <ShoppingCart className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <div className="flex items-center gap-4 mb-2">
+            <Tooltip content={list.status === 'completed' ? 'List completed' : 'Mark entire list as complete'} delay={0}>
+              <button
+                onClick={() => onCompleteList?.(list.id)}
+                disabled={list.status === 'completed'}
+                aria-label={`Mark entire shopping list as ${list.status === 'completed' ? 'completed' : 'complete'}`}
+                className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                  list.status === 'completed'
+                    ? 'bg-green-500 border-green-500 cursor-not-allowed'
+                    : 'border-emerald-400 dark:border-emerald-500 hover:border-emerald-600 dark:hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 cursor-pointer'
+                }`}
+              >
+                {list.status === 'completed' && <Check className="w-4 h-4 text-white" />}
+              </button>
+            </Tooltip>
+
+            {/* Circular Progress Ring */}
+            <Tooltip content={`${checkedItems} of ${totalItems} items checked`} delay={0}>
+              <div className="flex-shrink-0">
+                <CircularProgress
+                  progress={progress}
+                  size={56}
+                  strokeWidth={5}
+                  color="emerald"
+                  showPercentage={true}
+                />
+              </div>
+            </Tooltip>
+
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                 {list.title}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {checkedItems} of {totalItems} items
+                {checkedItems} of {totalItems} items • {list.store_name || 'No store set'}
               </p>
             </div>
           </div>
 
           {list.description && (
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 ml-[76px]">
               {list.description}
             </p>
           )}
-
-          {/* Progress Bar */}
-          <div className="mb-4">
-            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-shopping transition-all duration-300"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </div>
 
           {/* Items Preview - Grouped by Category */}
           {list.items && list.items.length > 0 && (
