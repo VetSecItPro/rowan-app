@@ -337,14 +337,14 @@ export default function ShoppingPage() {
           {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <button
-              onClick={handleTotalListsClick}
+              onClick={handleItemsThisWeekClick}
               className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Lists</h3>
-                <div className="w-12 h-12 bg-gradient-shopping rounded-xl flex items-center justify-center"><List className="w-6 h-6 text-white" /></div>
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Items This Week</h3>
+                <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center"><Package className="w-6 h-6 text-white" /></div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.totalLists}</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.itemsThisWeek}</p>
             </button>
             <button
               onClick={handleActiveListsClick}
@@ -357,16 +357,6 @@ export default function ShoppingPage() {
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.activeLists}</p>
             </button>
             <button
-              onClick={handleItemsThisWeekClick}
-              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Items This Week</h3>
-                <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center"><Package className="w-6 h-6 text-white" /></div>
-              </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.itemsThisWeek}</p>
-            </button>
-            <button
               onClick={handleCompletedListsClick}
               className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
             >
@@ -375,6 +365,16 @@ export default function ShoppingPage() {
                 <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"><CheckCircle2 className="w-6 h-6 text-white" /></div>
               </div>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.completedLists}</p>
+            </button>
+            <button
+              onClick={handleTotalListsClick}
+              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Lists</h3>
+                <div className="w-12 h-12 bg-gradient-shopping rounded-xl flex items-center justify-center"><List className="w-6 h-6 text-white" /></div>
+              </div>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.totalLists}</p>
             </button>
           </div>
           )}
