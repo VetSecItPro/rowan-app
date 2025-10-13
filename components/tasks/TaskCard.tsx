@@ -18,6 +18,7 @@ interface TaskCardProps {
   onStatusChange: (taskId: string, status: string, type?: 'task' | 'chore') => void;
   onEdit: (task: Task & { type?: 'task' | 'chore' }) => void;
   onDelete: (taskId: string, type?: 'task' | 'chore') => void;
+  onViewDetails?: (task: Task & { type?: 'task' | 'chore' }) => void;
   linkedShoppingList?: LinkedShoppingList;
 }
 
@@ -35,7 +36,7 @@ const statusColors = {
   cancelled: 'bg-red-500',
 };
 
-export function TaskCard({ task, onStatusChange, onEdit, onDelete, linkedShoppingList }: TaskCardProps) {
+export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails, linkedShoppingList }: TaskCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'completed';
@@ -173,13 +174,24 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, linkedShoppin
                 className="fixed inset-0 z-10"
                 onClick={() => setShowMenu(false)}
               />
-              <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+              <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+                {onViewDetails && task.type === 'task' && (
+                  <button
+                    onClick={() => {
+                      onViewDetails(task);
+                      setShowMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
+                  >
+                    View Details
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     onEdit(task);
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
+                  className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 ${!onViewDetails || task.type !== 'task' ? 'rounded-t-lg' : ''}`}
                 >
                   Edit
                 </button>
