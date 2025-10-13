@@ -128,40 +128,45 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                           {item.checked && <Check className="w-3 h-3 text-white" />}
                         </button>
                       </Tooltip>
-                      <span className={`text-sm flex-1 ${item.checked ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-300'}`}>
-                        {item.name}
-                      </span>
 
-                      {/* Quantity Controls */}
-                      {onUpdateQuantity && (
-                        <div className="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity">
-                          <Tooltip content="Decrease quantity" delay={0}>
-                            <button
-                              onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                              disabled={item.quantity <= 1}
-                              className="w-5 h-5 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                              aria-label="Decrease quantity"
-                            >
-                              <span className="text-xs font-bold text-gray-600 dark:text-gray-300">−</span>
-                            </button>
-                          </Tooltip>
-                          <span className="text-xs font-medium text-gray-600 dark:text-gray-400 min-w-[1.5rem] text-center">
-                            {item.quantity}
-                          </span>
-                          <Tooltip content="Increase quantity" delay={0}>
-                            <button
-                              onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                              className="w-5 h-5 rounded bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-800/50 flex items-center justify-center transition-colors"
-                              aria-label="Increase quantity"
-                            >
-                              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">+</span>
-                            </button>
-                          </Tooltip>
-                        </div>
-                      )}
+                      {/* Item name and quantity controls grouped together */}
+                      <div className="flex items-center gap-1.5 flex-1">
+                        <span className={`text-sm ${item.checked ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                          {item.name}
+                        </span>
 
+                        {/* Quantity Controls - right next to item name */}
+                        {onUpdateQuantity && (
+                          <div className="flex items-center gap-0.5 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                            <Tooltip content="Decrease quantity" delay={0}>
+                              <button
+                                onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                                disabled={item.quantity <= 1}
+                                className="w-5 h-5 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                aria-label="Decrease quantity"
+                              >
+                                <span className="text-xs font-bold text-gray-600 dark:text-gray-300">−</span>
+                              </button>
+                            </Tooltip>
+                            <span className="text-xs font-medium text-gray-600 dark:text-gray-400 min-w-[1.25rem] text-center px-0.5">
+                              {item.quantity}
+                            </span>
+                            <Tooltip content="Increase quantity" delay={0}>
+                              <button
+                                onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                                className="w-5 h-5 rounded bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-800/50 flex items-center justify-center transition-colors"
+                                aria-label="Increase quantity"
+                              >
+                                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">+</span>
+                              </button>
+                            </Tooltip>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Price pushed to the right */}
                       {item.estimated_price && (
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto">
                           ${item.estimated_price.toFixed(2)}
                         </span>
                       )}
