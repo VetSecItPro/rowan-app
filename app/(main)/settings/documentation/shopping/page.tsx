@@ -70,6 +70,24 @@ const guideSections: GuideSection[] = [
         readTime: '2 min read',
         href: '#check-items',
       },
+      {
+        title: 'Visual Progress Tracking',
+        description: 'Beautiful circular progress rings show completion status at a glance',
+        readTime: '2 min read',
+        href: '#progress-tracking',
+      },
+      {
+        title: 'Drag & Drop Reordering',
+        description: 'Rearrange items by dragging to match your store layout or priorities',
+        readTime: '3 min read',
+        href: '#drag-drop',
+      },
+      {
+        title: 'Quick Add with Frequent Items',
+        description: 'One-click add your most frequently purchased items to save time',
+        readTime: '4 min read',
+        href: '#frequent-items',
+      },
     ],
   },
   {
@@ -431,6 +449,103 @@ export default function ShoppingDocumentation() {
               <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4 mt-4">
                 <p className="text-emerald-700 dark:text-emerald-300 text-sm">
                   <strong>🛒 Shopping Tip:</strong> Use real-time collaboration! When shopping with your partner, you can each check off items as you go through different aisles.
+                </p>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="progress-tracking" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Visual Progress Tracking</h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                Every shopping list features a beautiful circular progress ring that shows your completion status at a glance:
+              </p>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Progress Ring Features</h3>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+                <li><strong>Real-Time Updates:</strong> The ring animates smoothly as you check off items</li>
+                <li><strong>Percentage Display:</strong> Shows exact completion % inside the ring</li>
+                <li><strong>Color-Coded:</strong> Emerald green matches your shopping list theme</li>
+                <li><strong>Hover for Details:</strong> Tooltip shows "X of Y items checked"</li>
+                <li><strong>Apple-Style Design:</strong> Smooth animations with perfect timing</li>
+              </ul>
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-4">
+                <p className="text-blue-700 dark:text-blue-300 text-sm">
+                  <strong>💡 Pro Tip:</strong> The progress ring makes it easy to see which lists need attention. An empty ring (0%) means you haven't started, while a full ring (100%) means you're done!
+                </p>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="drag-drop" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Drag & Drop Reordering</h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                Rearrange your shopping list items by dragging them to match your store's layout or your personal priorities:
+              </p>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">How to Reorder Items</h3>
+              <ol className="space-y-3 text-gray-700 dark:text-gray-300">
+                <li><strong>Look for the Grip Icon:</strong> Each item has a vertical grip icon (⋮⋮) on the left</li>
+                <li><strong>Click and Hold:</strong> Click and hold the grip icon to start dragging</li>
+                <li><strong>Drag to New Position:</strong> Move the item up or down to your desired position</li>
+                <li><strong>Release to Drop:</strong> Let go to place the item in its new spot</li>
+                <li><strong>Auto-Saves:</strong> Your new order is saved automatically</li>
+              </ol>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Why Reorder?</h3>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+                <li><strong>Match Store Layout:</strong> Arrange items in the order you encounter them in your store</li>
+                <li><strong>Priority Items First:</strong> Put must-have items at the top so you don't forget them</li>
+                <li><strong>Group Related Items:</strong> Keep similar items together even across categories</li>
+                <li><strong>Personal Preference:</strong> Organize however makes sense for you!</li>
+              </ul>
+              <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 mt-4">
+                <p className="text-purple-700 dark:text-purple-300 text-sm">
+                  <strong>✨ Design Note:</strong> Dragging provides smooth visual feedback with shadows and scale effects, making reordering feel natural and responsive—just like Apple's interfaces.
+                </p>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="frequent-items" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Quick Add with Frequent Items</h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                Save time with the Quick Add panel that shows your most frequently purchased items based on your shopping history:
+              </p>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">How It Works</h3>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+                <li><strong>Analyzes Last 90 Days:</strong> Looks at your shopping history from the past 3 months</li>
+                <li><strong>Shows Top 12 Items:</strong> Displays your most frequently added items</li>
+                <li><strong>Purchase Count Badges:</strong> Small badges show how many times you've bought each item</li>
+                <li><strong>One-Click Add:</strong> Click any item to instantly add it to your active list</li>
+                <li><strong>Auto-Categorized:</strong> Items maintain their category for proper organization</li>
+              </ul>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Smart Behavior</h3>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+                <li><strong>Updates Dynamically:</strong> Your frequent items change as your shopping habits evolve</li>
+                <li><strong>Fades Out Old Items:</strong> Items you stop buying gradually disappear after 90 days</li>
+                <li><strong>Promotes New Habits:</strong> Items you start buying frequently will appear in the panel</li>
+                <li><strong>Creates List if Needed:</strong> If you have no active lists, clicking an item creates a "Quick Add List"</li>
+                <li><strong>Adds to Active List:</strong> If you have active lists, items are added to the first one</li>
+              </ul>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Panel Features</h3>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+                <li><strong>Collapsible:</strong> Click the ✕ button to collapse and save screen space</li>
+                <li><strong>Category Icons:</strong> Each item shows its category icon for quick identification</li>
+                <li><strong>Hover Effects:</strong> Items scale up slightly on hover with smooth animations</li>
+                <li><strong>Responsive Grid:</strong> Adapts from 2 columns on mobile to 6 columns on wide screens</li>
+              </ul>
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4 mt-4">
+                <p className="text-emerald-700 dark:text-emerald-300 text-sm">
+                  <strong>⚡ Time Saver:</strong> The Quick Add panel is like having your shopping assistant remember what you buy regularly. It learns your habits and makes list creation effortless!
                 </p>
               </div>
             </div>
