@@ -25,6 +25,7 @@ interface ShoppingListCardProps {
 export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompleteList, onSaveAsTemplate, onScheduleTrip, onCreateTask, onUpdateQuantity }: ShoppingListCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [editingQuantities, setEditingQuantities] = useState<Record<string, string>>({});
   const { user } = useAuth();
 
   const totalItems = list.items?.length || 0;
@@ -52,6 +53,36 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
         return acc;
       }, {} as Record<string, typeof list.items>);
   }, [list.items]);
+
+  // Handlers for editable quantity input
+  const handleQuantityChange = (itemId: string, value: string) => {
+    // Allow only numbers and empty string (for clearing)
+    if (value === '' || /^\d+$/.test(value)) {
+      setEditingQuantities(prev => ({ ...prev, [itemId]: value }));
+    }
+  };
+
+  const handleQuantityBlur = (itemId: string, currentQuantity: number) => {
+    const editedValue = editingQuantities[itemId];
+    if (editedValue !== undefined) {
+      const numValue = parseInt(editedValue, 10);
+      if (!isNaN(numValue) && numValue >= 1 && numValue <= 200) {
+        onUpdateQuantity?.(itemId, numValue);
+      }
+      // Clear editing state
+      setEditingQuantities(prev => {
+        const newState = { ...prev };
+        delete newState[itemId];
+        return newState;
+      });
+    }
+  };
+
+  const handleQuantityKeyPress = (e: React.KeyboardEvent<HTMLInputElement>, itemId: string) => {
+    if (e.key === 'Enter') {
+      e.currentTarget.blur(); // Trigger blur to save
+    }
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-all duration-200 group">
@@ -142,19 +173,27 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                               <button
                                 onClick={() => onUpdateQuantity(item.id, Math.max(1, Number(item.quantity) - 1))}
                                 disabled={Number(item.quantity) <= 1}
-                                className="w-5 h-5 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="w-5 h-5 flex-shrink-0 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                                 aria-label="Decrease quantity"
                               >
                                 <span className="text-xs font-bold text-gray-600 dark:text-gray-300">−</span>
                               </button>
                             </Tooltip>
-                            <span className="text-xs font-medium text-gray-600 dark:text-gray-400 min-w-[1.25rem] text-center px-0.5">
-                              {item.quantity}
-                            </span>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              value={editingQuantities[item.id] ?? item.quantity}
+                              onChange={(e) => handleQuantityChange(item.id, e.target.value)}
+                              onBlur={() => handleQuantityBlur(item.id, item.quantity)}
+                              onKeyPress={(e) => handleQuantityKeyPress(e, item.id)}
+                              className="w-10 sm:w-12 text-xs font-medium text-gray-700 dark:text-gray-300 text-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              aria-label="Edit quantity"
+                            />
                             <Tooltip content="Increase quantity" delay={0}>
                               <button
-                                onClick={() => onUpdateQuantity(item.id, Number(item.quantity) + 1)}
-                                className="w-5 h-5 rounded bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-800/50 flex items-center justify-center transition-colors"
+                                onClick={() => onUpdateQuantity(item.id, Math.min(200, Number(item.quantity) + 1))}
+                                disabled={Number(item.quantity) >= 200}
+                                className="w-5 h-5 flex-shrink-0 rounded bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-800/50 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                                 aria-label="Increase quantity"
                               >
                                 <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">+</span>
