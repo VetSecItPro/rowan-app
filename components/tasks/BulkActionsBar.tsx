@@ -109,7 +109,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg">
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -165,7 +165,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
                       className="fixed inset-0 z-10"
                       onClick={() => setShowMoreActions(false)}
                     />
-                    <div className="absolute bottom-full mb-2 left-0 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
+                    <div className="absolute bottom-full mb-2 left-0 w-56 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
                       {/* Status Options */}
                       <div className="p-2 border-b border-gray-200 dark:border-gray-700">
                         <p className="text-xs font-medium text-gray-500 dark:text-gray-400 px-2 py-1">

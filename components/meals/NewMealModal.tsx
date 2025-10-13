@@ -103,7 +103,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+      <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
         <div className="flex items-center justify-between p-6 bg-gradient-to-r from-orange-500 to-orange-600">
           <h2 className="text-2xl font-bold text-white">{isEditing ? 'Edit Meal' : 'Plan New Meal'}</h2>
           <button onClick={onClose} aria-label="Close modal" className="p-2 rounded-lg hover:bg-orange-700 transition-colors">
@@ -135,7 +135,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
               </svg>
             </button>
             {isMealTypeOpen && (
-              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg overflow-hidden">
+              <div className="absolute z-10 w-full mt-1 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg overflow-hidden">
                 {mealTypeOptions.map((option) => {
                   const Icon = option.icon;
                   return (
@@ -172,9 +172,9 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
               </svg>
             </button>
             {isRecipeSelectorOpen && (
-              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg overflow-hidden">
+              <div className="absolute z-10 w-full mt-1 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg overflow-hidden">
                 {/* Search Input */}
-                <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-3 z-10">
+                <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-3 z-10">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input

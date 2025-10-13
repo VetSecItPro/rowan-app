@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Header } from '@/components/layout/Header';
 import {
   ArrowLeft,
   CheckSquare,
@@ -424,8 +425,10 @@ const guideSections: GuideSection[] = [
 
 export default function TasksChoresDocumentationPage() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-8">
-      <div className="max-w-7xl mx-auto">
+    <>
+      <Header />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-8">
+        <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <Link
@@ -502,7 +505,7 @@ export default function TasksChoresDocumentationPage() {
         {/* Guide Sections */}
         <div className="space-y-8">
           {guideSections.map((section, index) => (
-            <div key={index} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div key={index} className="bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className={`bg-gradient-to-r ${section.color} p-6`}>
                 <div className="flex items-center gap-3">
                   <section.icon className="w-8 h-8 text-white" />
@@ -584,5 +587,6 @@ export default function TasksChoresDocumentationPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

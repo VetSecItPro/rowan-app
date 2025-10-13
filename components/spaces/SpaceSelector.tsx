@@ -119,7 +119,7 @@ export function SpaceSelector({
   const dropdownContent = (
     <div
       ref={dropdownRef}
-      className="fixed bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-[9999]"
+      className="fixed bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-[9999]"
       style={{
         top: `${dropdownPosition.top}px`,
         left: `${dropdownPosition.left}px`,
@@ -198,7 +198,7 @@ export function SpaceSelector({
   // If only one space, just show the name without dropdown
   if (spaces.length === 1 && currentSpace) {
     return (
-      <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
+      <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
         <Home className="w-4 h-4 text-gray-600 dark:text-gray-400" />
         <span className={`text-sm font-bold ${getThemeColorClass(userColorTheme)}`}>
           {currentSpace.name}
@@ -213,7 +213,7 @@ export function SpaceSelector({
       <button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+        className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
       >
         <Home className="w-4 h-4 text-gray-600 dark:text-gray-400" />
         <span className={`text-sm font-bold ${currentSpace ? getThemeColorClass(userColorTheme) : 'text-gray-900 dark:text-white'}`}>

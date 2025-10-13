@@ -25,7 +25,7 @@ export default function MessagesFeaturePage() {
 
         {/* Key Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
             <div className="w-14 h-14 bg-green-500 rounded-2xl flex items-center justify-center mb-6">
               <Send className="w-7 h-7 text-white" />
             </div>
@@ -35,7 +35,7 @@ export default function MessagesFeaturePage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
             <div className="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center mb-6">
               <ImageIcon className="w-7 h-7 text-white" />
             </div>
@@ -45,7 +45,7 @@ export default function MessagesFeaturePage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
             <div className="w-14 h-14 bg-purple-500 rounded-2xl flex items-center justify-center mb-6">
               <MessageCircle className="w-7 h-7 text-white" />
             </div>
@@ -80,7 +80,7 @@ export default function MessagesFeaturePage() {
               'Edit and delete your own messages',
               'Clean, chat-style interface with smooth animations',
             ].map((feature, index) => (
-              <div key={index} className="flex items-start gap-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+              <div key={index} className="flex items-start gap-4 bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                 <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mt-1">
                   <Check className="w-4 h-4 text-white" />
                 </div>

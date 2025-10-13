@@ -82,7 +82,7 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
       case 'on-hold':
         return 'border-l-amber-500 bg-amber-50 dark:bg-amber-900/10';
       default:
-        return 'border-l-gray-300 dark:border-l-gray-600 bg-white dark:bg-gray-800';
+        return 'border-l-gray-300 dark:border-l-gray-600 bg-gray-50 dark:bg-gray-800';
     }
   }
 
@@ -204,7 +204,7 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
               className="fixed inset-0 z-10"
               onClick={() => setShowMenu(false)}
             />
-            <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+            <div className="absolute right-0 mt-1 w-40 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
               {onViewDetails && (
                 <button
                   onClick={(e) => {
@@ -361,7 +361,7 @@ export function DraggableTaskList({
       {/* Drag Overlay */}
       <DragOverlay>
         {activeTask ? (
-          <div className="flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-2xl opacity-90">
+          <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-2xl opacity-90">
             <GripVertical className="w-5 h-5 text-gray-400" />
             <div className="flex-1 min-w-0">
               <h3 className="font-medium text-gray-900 dark:text-white truncate">

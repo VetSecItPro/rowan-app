@@ -200,7 +200,7 @@ export const WeekCalendarView = memo(function WeekCalendarView({
               className={`min-h-[300px] rounded-lg border-2 p-3 transition-all ${
                 isToday
                   ? 'border-orange-500 bg-orange-50/50 dark:bg-orange-900/10'
-                  : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+                  : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
               }`}
             >
               {/* Day Header */}

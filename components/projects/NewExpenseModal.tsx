@@ -67,7 +67,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg mx-4">
+      <div className="relative bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg mx-4">
         {/* Header with amber gradient */}
         <div className="sticky top-0 bg-gradient-to-r from-amber-500 to-amber-600 text-white p-6 rounded-t-2xl">
           <div className="flex items-center justify-between">
@@ -264,7 +264,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
       {/* Emoji Picker Portal */}
       {showEmojiPicker && emojiButtonRect && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 grid grid-cols-5 gap-2 z-[9999] min-w-[240px]"
+          className="fixed bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 grid grid-cols-5 gap-2 z-[9999] min-w-[240px]"
           style={{
             top: `${emojiButtonRect.bottom + 8}px`,
             left: `${emojiButtonRect.right - 240}px`,

@@ -6,7 +6,7 @@ export function Skeleton({ className = '' }: { className?: string }) {
 
 export function MealCardSkeleton() {
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+    <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
       <div className="flex items-start gap-4">
         <Skeleton className="w-24 h-24 flex-shrink-0" />
         <div className="flex-1 space-y-3">
@@ -25,7 +25,7 @@ export function MealCardSkeleton() {
 
 export function CalendarDaySkeleton() {
   return (
-    <div className="min-h-[300px] rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3">
+    <div className="min-h-[300px] rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3">
       <div className="mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">
         <Skeleton className="h-4 w-12 mb-1" />
         <Skeleton className="h-8 w-8" />
@@ -41,7 +41,7 @@ export function CalendarDaySkeleton() {
 
 export function RecipeCardSkeleton() {
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+    <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
       <Skeleton className="w-full h-48" />
       <div className="p-4 space-y-3">
         <Skeleton className="h-6 w-3/4" />

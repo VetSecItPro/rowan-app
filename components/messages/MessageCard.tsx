@@ -49,8 +49,8 @@ export function MessageCard({
           <div
             className={`rounded-2xl px-4 py-3 ${
               isOwn
-                ? 'rounded-tr-sm bg-white dark:bg-gray-800'
-                : 'rounded-tl-sm bg-white dark:bg-gray-800'
+                ? 'rounded-tr-sm bg-gray-50 dark:bg-gray-800'
+                : 'rounded-tl-sm bg-gray-50 dark:bg-gray-800'
             }`}
             style={{
               borderWidth: '2px',
@@ -98,7 +98,7 @@ export function MessageCard({
                       className="fixed inset-0 z-10"
                       onClick={() => setShowMenu(false)}
                     />
-                    <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+                    <div className="absolute right-0 mt-1 w-32 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
                       <button
                         onClick={() => {
                           onEdit(message);

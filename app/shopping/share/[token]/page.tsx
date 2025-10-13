@@ -150,7 +150,7 @@ export default function PublicShoppingListPage() {
   if (error || !data) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-900 dark:to-emerald-950 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 text-center">
+        <div className="max-w-md w-full bg-gray-50 dark:bg-gray-800 rounded-xl shadow-lg p-8 text-center">
           <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
           </div>
@@ -173,7 +173,7 @@ export default function PublicShoppingListPage() {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-900 dark:to-emerald-950">
       <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 sm:p-8 mb-6">
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-lg p-6 sm:p-8 mb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
             <div className="w-14 h-14 bg-gradient-to-r from-emerald-500 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
               <ShoppingBag className="w-7 h-7 text-white" />
@@ -221,7 +221,7 @@ export default function PublicShoppingListPage() {
             return (
               <div
                 key={category}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"
+                className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"
               >
                 {/* Category Header */}
                 <button
@@ -253,7 +253,7 @@ export default function PublicShoppingListPage() {
                         className={`w-full flex items-start gap-3 p-3 rounded-lg transition-all border-2 ${
                           item.is_purchased
                             ? 'bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700'
-                            : 'bg-white dark:bg-gray-800 border-emerald-200 dark:border-emerald-800 hover:border-emerald-300 dark:hover:border-emerald-700'
+                            : 'bg-gray-50 dark:bg-gray-800 border-emerald-200 dark:border-emerald-800 hover:border-emerald-300 dark:hover:border-emerald-700'
                         }`}
                       >
                         {/* Checkbox */}

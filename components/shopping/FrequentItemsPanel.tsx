@@ -86,7 +86,7 @@ export function FrequentItemsPanel({ spaceId, onAddItem }: FrequentItemsPanelPro
             <Tooltip key={`${item.name}-${index}`} content={`Added ${item.count}x recently`} delay={0}>
               <button
                 onClick={() => onAddItem(item.name, item.category)}
-                className="group relative flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-emerald-200 dark:border-emerald-700 rounded-lg hover:border-emerald-400 dark:hover:border-emerald-500 hover:shadow-md transition-all duration-200 hover:scale-105"
+                className="group relative flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-emerald-200 dark:border-emerald-700 rounded-lg hover:border-emerald-400 dark:hover:border-emerald-500 hover:shadow-md transition-all duration-200 hover:scale-105"
               >
                 <span className="text-lg flex-shrink-0">{getCategoryIcon(item.category as any)}</span>
                 <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate flex-1 text-left">

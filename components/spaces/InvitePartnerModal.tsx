@@ -99,7 +99,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
       onClick={handleClose}
     >
       <div
-        className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl"
+        className="bg-gray-50 dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -139,7 +139,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="partner@example.com"
-                  className="w-full pl-11 pr-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                   disabled={loading}
                 />
               </div>

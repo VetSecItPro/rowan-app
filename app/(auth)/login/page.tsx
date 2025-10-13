@@ -116,7 +116,7 @@ export default function LoginPage() {
 
       {/* Right side - Login form */}
       <div
-        className={`w-full lg:w-1/2 bg-white dark:bg-gray-900 flex items-center justify-center p-4 sm:p-8 transform transition-all duration-700 ${
+        className={`w-full lg:w-1/2 bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4 sm:p-8 transform transition-all duration-700 ${
           mounted ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
         }`}
       >

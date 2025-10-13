@@ -71,7 +71,7 @@ export default function DailyCheckIn({ onComplete, onSkip }: DailyCheckInProps) 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50 dark:from-gray-900 dark:via-gray-800 dark:to-pink-900 flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
+      <div className="max-w-2xl w-full bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
         <StepIndicator currentStep={currentStep} totalSteps={3} stepTitles={stepTitles} />
 
         {/* Step 1: Welcome */}
@@ -178,7 +178,7 @@ export default function DailyCheckIn({ onComplete, onSkip }: DailyCheckInProps) 
                 onChange={(e) => setGratitude(e.target.value)}
                 placeholder="Something that made you smile or feel thankful..."
                 rows={2}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
               />
             </div>
 
@@ -192,7 +192,7 @@ export default function DailyCheckIn({ onComplete, onSkip }: DailyCheckInProps) 
                 onChange={(e) => setGoals(e.target.value)}
                 placeholder="What do you want to accomplish today?"
                 rows={2}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
               />
             </div>
 

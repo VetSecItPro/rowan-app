@@ -226,7 +226,7 @@ export default function RecipeDetailPage() {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Ingredients */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md p-6">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Ingredients
             </h3>
@@ -250,7 +250,7 @@ export default function RecipeDetailPage() {
           </div>
 
           {/* Instructions */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md p-6">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Instructions
             </h3>

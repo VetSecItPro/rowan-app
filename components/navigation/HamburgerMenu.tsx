@@ -56,7 +56,7 @@ export function HamburgerMenu() {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden animate-slide-down">
+        <div className="absolute top-full right-0 mt-2 w-72 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden animate-slide-down">
           <div className="py-2">
             <div className="px-4 py-2">
               <p className="text-sm font-semibold text-gray-900 dark:text-white">Features</p>
