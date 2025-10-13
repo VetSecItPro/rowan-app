@@ -26,9 +26,6 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-gradient-shopping rounded-lg flex items-center justify-center">
-              <ShoppingCart className="w-5 h-5 text-white" />
-            </div>
             <button
               onClick={() => onCompleteList?.(list.id)}
               disabled={list.status === 'completed'}
@@ -41,6 +38,9 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
             >
               {list.status === 'completed' && <Check className="w-4 h-4 text-white" />}
             </button>
+            <div className="w-10 h-10 bg-gradient-shopping rounded-lg flex items-center justify-center">
+              <ShoppingCart className="w-5 h-5 text-white" />
+            </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {list.title}
