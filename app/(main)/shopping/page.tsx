@@ -428,8 +428,8 @@ export default function ShoppingPage() {
                   onClick={() => { setTimeFilter('week'); }}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
                     timeFilter === 'week'
-                      ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
                   }`}
                 >
                   This Week
