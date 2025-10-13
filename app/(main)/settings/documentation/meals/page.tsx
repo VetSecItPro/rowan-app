@@ -226,17 +226,17 @@ export default function MealPlanningDocumentation() {
             </div>
           </div>
 
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
+          <div className="bg-white/10 dark:bg-black/10 backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-xl p-6">
             <div className="flex items-start gap-3">
-              <Lightbulb className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <Lightbulb className="w-6 h-6 text-white/90 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                <h3 className="text-lg font-semibold text-white mb-2">
                   Welcome to Meal Planning
                 </h3>
-                <p className="text-blue-800 dark:text-blue-200 mb-3">
+                <p className="text-white/90 mb-3">
                   Rowan helps you plan meals efficiently with powerful recipe and shopping integration:
                 </p>
-                <div className="grid sm:grid-cols-2 gap-2 text-sm text-blue-700 dark:text-blue-300">
+                <div className="grid sm:grid-cols-2 gap-2 text-sm text-white/80">
                   <div className="flex items-start gap-2">
                     <LayoutGrid className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <span><strong>Three views</strong> - Calendar, List, and Recipe views</span>
