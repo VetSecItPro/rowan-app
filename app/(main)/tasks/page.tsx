@@ -11,6 +11,7 @@ import GuidedTaskCreation from '@/components/guided/GuidedTaskCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { tasksService } from '@/lib/services/tasks-service';
 import { choresService, Chore, CreateChoreInput } from '@/lib/services/chores-service';
+import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { Task, CreateTaskInput } from '@/lib/types';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 
@@ -30,6 +31,7 @@ export default function TasksPage() {
   const [activeTab, setActiveTab] = useState<TaskType>('task');
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
+  const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, any>>({});
 
   // Combine tasks and chores for unified display
   const allItems = useMemo((): TaskOrChore[] => {
@@ -85,6 +87,22 @@ export default function TasksPage() {
       ]);
       setTasks(tasksData);
       setChores(choresData);
+
+      // Load linked shopping lists for tasks
+      const linkedListsMap: Record<string, any> = {};
+      await Promise.all(
+        tasksData.map(async (task) => {
+          try {
+            const linkedLists = await shoppingIntegrationService.getShoppingListsForTask(task.id);
+            if (linkedLists && linkedLists.length > 0) {
+              linkedListsMap[task.id] = linkedLists[0]; // For now, just take the first linked list
+            }
+          } catch (error) {
+            console.error(`Failed to load shopping list for task ${task.id}:`, error);
+          }
+        })
+      );
+      setLinkedShoppingLists(linkedListsMap);
 
       // Try to fetch user progress (non-blocking)
       try {
@@ -466,6 +484,7 @@ export default function TasksPage() {
                     onStatusChange={handleStatusChange}
                     onEdit={handleEditItem}
                     onDelete={handleDeleteItem}
+                    linkedShoppingList={item.type === 'task' ? linkedShoppingLists[item.id] : undefined}
                   />
                 ))}
               </div>
