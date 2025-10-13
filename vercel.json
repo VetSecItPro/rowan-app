@@ -12,5 +12,27 @@
   "github": {
     "silent": false,
     "autoAlias": true
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/task-jobs?job=reminders",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/task-jobs?job=recurring",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/task-jobs?job=rotation",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/task-jobs?job=cleanup",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/task-jobs?job=refresh-views",
+      "schedule": "0 */6 * * *"
+    }
+  ]
 }
