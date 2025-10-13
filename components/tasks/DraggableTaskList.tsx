@@ -41,6 +41,7 @@ interface DraggableTaskListProps {
   onStatusChange?: (taskId: string, status: string, type?: 'task' | 'chore') => void;
   onEdit?: (task: Task) => void;
   onDelete?: (taskId: string, type?: 'task' | 'chore') => void;
+  onViewDetails?: (task: Task) => void;
 }
 
 interface SortableTaskItemProps {
@@ -49,9 +50,10 @@ interface SortableTaskItemProps {
   onStatusChange?: (taskId: string, status: string, type?: 'task' | 'chore') => void;
   onEdit?: (task: Task) => void;
   onDelete?: (taskId: string, type?: 'task' | 'chore') => void;
+  onViewDetails?: (task: Task) => void;
 }
 
-function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete }: SortableTaskItemProps) {
+function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete, onViewDetails }: SortableTaskItemProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const {
@@ -156,10 +158,7 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete 
       </button>
 
       {/* Task Content */}
-      <div
-        className="flex-1 min-w-0 cursor-pointer"
-        onClick={() => onTaskClick?.(task)}
-      >
+      <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <h3 className={`font-medium text-gray-900 dark:text-white truncate ${
             task.status === 'completed' ? 'line-through opacity-60' : ''
@@ -205,14 +204,26 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete 
               className="fixed inset-0 z-10"
               onClick={() => setShowMenu(false)}
             />
-            <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+            <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+              {onViewDetails && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onViewDetails(task);
+                    setShowMenu(false);
+                  }}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
+                >
+                  View Details
+                </button>
+              )}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onEdit?.(task);
                   setShowMenu(false);
                 }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
+                className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 ${!onViewDetails ? 'rounded-t-lg' : ''}`}
               >
                 Edit
               </button>
@@ -242,6 +253,7 @@ export function DraggableTaskList({
   onStatusChange,
   onEdit,
   onDelete,
+  onViewDetails,
 }: DraggableTaskListProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -339,6 +351,7 @@ export function DraggableTaskList({
                 onStatusChange={onStatusChange}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                onViewDetails={onViewDetails}
               />
             ))
           )}

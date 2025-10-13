@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, Home, Filter, Download, Repeat, FileText, Zap } from 'lucide-react';
+import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, Home, Filter, Download, Repeat, FileText, Zap, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { TaskCard } from '@/components/tasks/TaskCard';
@@ -301,7 +301,7 @@ export default function TasksPage() {
   }, [user]);
 
   // Advanced feature handlers
-  const handleTaskClick = useCallback((task: any) => {
+  const handleViewDetails = useCallback((task: any) => {
     setSelectedTaskId(task.id);
     setActiveDetailModal('details');
   }, []);
@@ -379,40 +379,6 @@ export default function TasksPage() {
                 </button>
               </div>
 
-              {/* Advanced Feature Buttons */}
-              {activeTab === 'task' && (
-                <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    onClick={() => setShowFilters(!showFilters)}
-                    className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center gap-2"
-                  >
-                    <Filter className="w-4 h-4" />
-                    <span className="hidden sm:inline">Filters</span>
-                  </button>
-                  <button
-                    onClick={() => setIsTemplatePickerOpen(true)}
-                    className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center gap-2"
-                  >
-                    <FileText className="w-4 h-4" />
-                    <span className="hidden sm:inline">Template</span>
-                  </button>
-                  <button
-                    onClick={() => setIsRecurringModalOpen(true)}
-                    className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center gap-2"
-                  >
-                    <Repeat className="w-4 h-4" />
-                    <span className="hidden sm:inline">Recurring</span>
-                  </button>
-                  <button
-                    onClick={() => setIsExportModalOpen(true)}
-                    className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center gap-2"
-                  >
-                    <Download className="w-4 h-4" />
-                    <span className="hidden sm:inline">Export</span>
-                  </button>
-                </div>
-              )}
-
               <button
                 onClick={handleOpenModal}
                 className="px-4 sm:px-6 py-2 sm:py-3 shimmer-tasks text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
@@ -435,47 +401,79 @@ export default function TasksPage() {
           {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {/* Pending */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Pending</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 rounded-xl flex items-center justify-center">
                   <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.pending}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.pending}</p>
+                {stats.pending > 0 && (
+                  <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400">
+                    <AlertCircle className="w-3 h-3" />
+                    <span className="text-xs font-medium">Needs attention</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* In Progress */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">In Progress</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-xl flex items-center justify-center">
                   <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.inProgress}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.inProgress}</p>
+                {stats.inProgress > 0 && (
+                  <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                    <TrendingUp className="w-3 h-3" />
+                    <span className="text-xs font-medium">Active</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Completed */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Completed</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center">
                   <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
+                {stats.completed > 0 && (
+                  <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                    <TrendingUp className="w-3 h-3" />
+                    <span className="text-xs font-medium">{Math.round((stats.completed / stats.total) * 100)}%</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Total Tasks & Chores */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Total Tasks & Chores</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-tasks rounded-xl flex items-center justify-center">
                   <CheckSquare className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+                {stats.total > 0 && (
+                  <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                    <Minus className="w-3 h-3" />
+                    <span className="text-xs font-medium">Overall</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           )}
@@ -605,10 +603,10 @@ export default function TasksPage() {
                   <DraggableTaskList
                     spaceId={currentSpace.id}
                     initialTasks={filteredItems.filter(item => item.type === 'task') as Task[]}
-                    onTaskClick={handleTaskClick}
                     onStatusChange={handleStatusChange}
                     onEdit={handleEditItem}
                     onDelete={handleDeleteItem}
+                    onViewDetails={handleViewDetails}
                   />
                 ) : (
                   /* Regular list for chores or when drag-drop disabled */
@@ -620,6 +618,7 @@ export default function TasksPage() {
                         onStatusChange={handleStatusChange}
                         onEdit={handleEditItem}
                         onDelete={handleDeleteItem}
+                        onViewDetails={handleViewDetails}
                         linkedShoppingList={item.type === 'task' ? linkedShoppingLists[item.id] : undefined}
                       />
                     ))}
