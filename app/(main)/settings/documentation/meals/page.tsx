@@ -279,7 +279,7 @@ export default function MealPlanningDocumentation() {
       </div>
 
       {/* Guide Sections */}
-      <div className="max-w-6xl mx-auto px-6 py-12">
+      <div className="max-w-6xl mx-auto px-6 pb-12">
         <div className="space-y-8">
           {guideSections.map((section, sectionIndex) => {
             const Icon = section.icon;
