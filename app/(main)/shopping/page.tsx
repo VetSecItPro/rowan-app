@@ -415,9 +415,9 @@ export default function ShoppingPage() {
               {/* Status Filter - Segmented Buttons */}
               <div className="bg-gray-50 dark:bg-gray-900 border-2 border-emerald-200 dark:border-emerald-700 rounded-lg p-1 flex gap-1 w-fit">
                 <button
-                  onClick={() => setStatusFilter('all')}
+                  onClick={() => { setStatusFilter('all'); setTimeFilter('all'); }}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
-                    statusFilter === 'all'
+                    statusFilter === 'all' && timeFilter === 'all'
                       ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
                   }`}
@@ -425,9 +425,19 @@ export default function ShoppingPage() {
                   All
                 </button>
                 <button
-                  onClick={() => setStatusFilter('active')}
+                  onClick={() => { setTimeFilter('week'); }}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
+                    timeFilter === 'week'
+                      ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                  }`}
+                >
+                  This Week
+                </button>
+                <button
+                  onClick={() => { setStatusFilter('active'); setTimeFilter('all'); }}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
-                    statusFilter === 'active'
+                    statusFilter === 'active' && timeFilter === 'all'
                       ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
                   }`}
@@ -435,9 +445,9 @@ export default function ShoppingPage() {
                   Active
                 </button>
                 <button
-                  onClick={() => setStatusFilter('completed')}
+                  onClick={() => { setStatusFilter('completed'); setTimeFilter('all'); }}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
-                    statusFilter === 'completed'
+                    statusFilter === 'completed' && timeFilter === 'all'
                       ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
                   }`}
