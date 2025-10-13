@@ -628,6 +628,23 @@ export default function MealsPage() {
     }
   }, [currentSpace, loadRecipes]);
 
+  // Stat card click handlers
+  const handleThisWeekClick = useCallback(() => {
+    setViewMode('calendar');
+    setCalendarViewMode('week');
+    setCurrentWeek(new Date());
+  }, []);
+
+  const handleNextTwoWeeksClick = useCallback(() => {
+    setViewMode('calendar');
+    setCalendarViewMode('2weeks');
+    setCurrentWeek(new Date());
+  }, []);
+
+  const handleSavedRecipesClick = useCallback(() => {
+    setViewMode('recipes');
+  }, []);
+
   // Calendar day click handlers
   const handleMealClick = useCallback((meal: Meal) => {
     setEditingMeal(meal);
@@ -926,34 +943,53 @@ export default function MealsPage() {
           {/* Stats Dashboard - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            {/* This Week Card */}
+            <button
+              onClick={handleThisWeekClick}
+              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
+            >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">This Week</h3>
                 <div className="w-12 h-12 bg-gradient-meals rounded-xl flex items-center justify-center"><CalendarIcon className="w-6 h-6 text-white" /></div>
               </div>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.thisWeek}</p>
-            </div>
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            </button>
+
+            {/* Next Two Weeks Card */}
+            <button
+              onClick={handleNextTwoWeeksClick}
+              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
+            >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Next Week</h3>
+                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Next Two Weeks</h3>
                 <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"><TrendingUp className="w-6 h-6 text-white" /></div>
               </div>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.nextWeek}</p>
-            </div>
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            </button>
+
+            {/* Saved Recipes Card */}
+            <button
+              onClick={handleSavedRecipesClick}
+              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
+            >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Saved Recipes</h3>
                 <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center"><BookOpen className="w-6 h-6 text-white" /></div>
               </div>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.savedRecipes}</p>
-            </div>
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            </button>
+
+            {/* Shopping Items Card */}
+            <Link
+              href="/shopping"
+              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer block"
+            >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Shopping Items</h3>
                 <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center"><ShoppingBag className="w-6 h-6 text-white" /></div>
               </div>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.shoppingItems}</p>
-            </div>
+            </Link>
           </div>
           )}
 
