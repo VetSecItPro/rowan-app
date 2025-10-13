@@ -14,9 +14,11 @@ interface ShoppingListCardProps {
   onToggleItem?: (itemId: string, checked: boolean) => void;
   onCompleteList?: (listId: string) => void;
   onSaveAsTemplate?: (list: ShoppingList) => void;
+  onScheduleTrip?: (list: ShoppingList) => void;
+  onCreateTask?: (list: ShoppingList) => void;
 }
 
-export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompleteList, onSaveAsTemplate }: ShoppingListCardProps) {
+export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompleteList, onSaveAsTemplate, onScheduleTrip, onCreateTask }: ShoppingListCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -158,7 +160,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                 className="fixed inset-0 z-10"
                 onClick={() => setShowMenu(false)}
               />
-              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
+              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
                 <button
                   onClick={() => {
                     onEdit(list);
@@ -168,6 +170,28 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                 >
                   Edit List
                 </button>
+                {onScheduleTrip && (
+                  <button
+                    onClick={() => {
+                      onScheduleTrip(list);
+                      setShowMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-purple-600 dark:text-purple-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    📅 Schedule Shopping Trip
+                  </button>
+                )}
+                {onCreateTask && (
+                  <button
+                    onClick={() => {
+                      onCreateTask(list);
+                      setShowMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    ✓ Create Task
+                  </button>
+                )}
                 {onSaveAsTemplate && list.items && list.items.length > 0 && (
                   <button
                     onClick={() => {
