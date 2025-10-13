@@ -142,7 +142,7 @@ export default function ShoppingPage() {
   }, [currentSpace]);
 
   // Memoized callback for creating/updating lists
-  const handleCreateList = useCallback(async (listData: CreateListInput & { store_name?: string; items?: { id?: string; name: string; quantity: number }[] }) => {
+  const handleCreateList = useCallback(async (listData: CreateListInput & { store_name?: string; items?: { id?: string; name: string; quantity: number; assigned_to?: string }[] }) => {
     try {
       if (editingList) {
         // Extract items before updating the list
@@ -154,11 +154,16 @@ export default function ShoppingPage() {
         if (items && items.length > 0) {
           const newItems = items.filter(item => !item.id);
           for (const item of newItems) {
-            await shoppingService.createItem({
+            const createdItem = await shoppingService.createItem({
               list_id: editingList.id,
               name: item.name,
               quantity: item.quantity || 1,
-            });
+            } as any);
+
+            // Update assigned_to if provided
+            if (item.assigned_to) {
+              await shoppingService.updateItem(createdItem.id, { assigned_to: item.assigned_to } as any);
+            }
           }
         }
       } else {
@@ -170,11 +175,16 @@ export default function ShoppingPage() {
         // Add items if provided
         if (items && items.length > 0) {
           for (const item of items) {
-            await shoppingService.createItem({
+            const createdItem = await shoppingService.createItem({
               list_id: newList.id,
               name: item.name,
               quantity: item.quantity || 1,
-            });
+            } as any);
+
+            // Update assigned_to if provided
+            if (item.assigned_to) {
+              await shoppingService.updateItem(createdItem.id, { assigned_to: item.assigned_to } as any);
+            }
           }
         }
       }

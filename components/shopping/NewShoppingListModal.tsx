@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Check } from 'lucide-react';
-import { CreateListInput, ShoppingList } from '@/lib/services/shopping-service';
+import { X, Plus, Trash2, Check, GripVertical, UserPlus } from 'lucide-react';
+import { CreateListInput, ShoppingList, shoppingService } from '@/lib/services/shopping-service';
+import { UserAvatar } from '@/components/ui/UserAvatar';
+import { createClient } from '@/lib/supabase/client';
 
 interface NewShoppingListModalProps {
   isOpen: boolean;
@@ -21,8 +23,10 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
     status: 'active',
   });
 
-  const [items, setItems] = useState<{ id?: string; name: string; quantity: number; checked: boolean }[]>([]);
+  const [items, setItems] = useState<{ id?: string; name: string; quantity: number; checked: boolean; assigned_to?: string }[]>([]);
   const [newItemName, setNewItemName] = useState('');
+  const [isReorderMode, setIsReorderMode] = useState(false);
+  const [spaceMembers, setSpaceMembers] = useState<any[]>([]);
 
   useEffect(() => {
     if (editList) {
@@ -38,6 +42,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
         name: item.name,
         quantity: item.quantity,
         checked: item.checked,
+        assigned_to: item.assigned_to,
       })));
     } else {
       setFormData({
@@ -51,16 +56,50 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
     }
   }, [editList, spaceId]);
 
+  // Fetch space members
+  useEffect(() => {
+    const loadMembers = async () => {
+      if (spaceId) {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from('space_members')
+          .select(`
+            user_id,
+            role,
+            joined_at,
+            users:user_id (
+              id,
+              email,
+              display_name
+            )
+          `)
+          .eq('space_id', spaceId)
+          .order('joined_at', { ascending: true });
+
+        if (!error && data) {
+          setSpaceMembers(data.map((member: any) => ({
+            user_id: member.user_id,
+            display_name: member.users?.display_name,
+            email: member.users?.email,
+            role: member.role,
+          })));
+        }
+      }
+    };
+    loadMembers();
+  }, [spaceId]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave({
       ...formData,
-      items: items.map(item => ({ id: item.id, name: item.name, quantity: item.quantity })),
+      items: items.map(item => ({ id: item.id, name: item.name, quantity: item.quantity, assigned_to: item.assigned_to })),
     });
     onClose();
     // Reset form
     setItems([]);
     setNewItemName('');
+    setIsReorderMode(false);
   };
 
   const handleAddItem = () => {
@@ -77,6 +116,16 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
   const handleToggleItem = (index: number) => {
     setItems(items.map((item, i) =>
       i === index ? { ...item, checked: !item.checked } : item
+    ));
+  };
+
+  const handleReorderItems = (reorderedItems: typeof items) => {
+    setItems(reorderedItems);
+  };
+
+  const handleAssignItem = (index: number, userId: string | undefined) => {
+    setItems(items.map((item, i) =>
+      i === index ? { ...item, assigned_to: userId } : item
     ));
   };
 
@@ -134,7 +183,19 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
 
           {/* Items */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Items</label>
+            <div className="flex items-center justify-between mb-3">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Items</label>
+              {items.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => setIsReorderMode(!isReorderMode)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded-lg transition-colors"
+                >
+                  <GripVertical className="w-3.5 h-3.5" />
+                  {isReorderMode ? 'Done Reordering' : 'Reorder Items'}
+                </button>
+              )}
+            </div>
 
             {/* Add Item Input */}
             <div className="flex gap-2 mb-4">
@@ -159,31 +220,95 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
             {/* Items List */}
             {items.length > 0 && (
               <div className="space-y-2 max-h-64 overflow-y-auto bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-                {items.map((item, index) => (
-                  <div key={index} className="flex items-center gap-3 p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <button
-                      type="button"
-                      onClick={() => handleToggleItem(index)}
-                      className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-                        item.checked
-                          ? 'bg-green-500 border-green-500'
-                          : 'border-gray-300 dark:border-gray-600'
-                      }`}
-                    >
-                      {item.checked && <Check className="w-3 h-3 text-white" />}
-                    </button>
-                    <span className={`flex-1 text-sm ${item.checked ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-300'}`}>
-                      {item.name}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveItem(index)}
-                      className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
+                {isReorderMode ? (
+                  /* Reorder Mode with Drag Handles */
+                  items.map((item, index) => (
+                    <div key={index} className="flex items-center gap-3 p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                      <button
+                        type="button"
+                        className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                        onMouseDown={(e) => {
+                          const startY = e.clientY;
+                          const startIndex = index;
+                          const onMouseMove = (e: MouseEvent) => {
+                            const deltaY = e.clientY - startY;
+                            const newIndex = Math.round(startIndex + deltaY / 40);
+                            if (newIndex >= 0 && newIndex < items.length && newIndex !== startIndex) {
+                              const newItems = [...items];
+                              const [removed] = newItems.splice(startIndex, 1);
+                              newItems.splice(newIndex, 0, removed);
+                              handleReorderItems(newItems);
+                            }
+                          };
+                          const onMouseUp = () => {
+                            document.removeEventListener('mousemove', onMouseMove);
+                            document.removeEventListener('mouseup', onMouseUp);
+                          };
+                          document.addEventListener('mousemove', onMouseMove);
+                          document.addEventListener('mouseup', onMouseUp);
+                        }}
+                      >
+                        <GripVertical className="w-4 h-4 text-gray-400" />
+                      </button>
+                      <span className="flex-1 text-sm text-gray-700 dark:text-gray-300">
+                        {item.name}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  /* Normal Mode with Assignment */
+                  items.map((item, index) => (
+                    <div key={index} className="flex items-center gap-3 p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleItem(index)}
+                        className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                          item.checked
+                            ? 'bg-green-500 border-green-500'
+                            : 'border-gray-300 dark:border-gray-600'
+                        }`}
+                      >
+                        {item.checked && <Check className="w-3 h-3 text-white" />}
+                      </button>
+                      <span className={`flex-1 text-sm ${item.checked ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                        {item.name}
+                      </span>
+
+                      {/* Assignment Dropdown */}
+                      {spaceMembers.length > 0 && (
+                        <div className="flex items-center gap-2">
+                          {item.assigned_to && (
+                            <UserAvatar
+                              name={spaceMembers.find(m => m.user_id === item.assigned_to)?.display_name || 'User'}
+                              size="sm"
+                              colorTheme="emerald"
+                            />
+                          )}
+                          <select
+                            value={item.assigned_to || ''}
+                            onChange={(e) => handleAssignItem(index, e.target.value || undefined)}
+                            className="text-xs bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-gray-700 dark:text-gray-300 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+                          >
+                            <option value="">Unassigned</option>
+                            {spaceMembers.map((member) => (
+                              <option key={member.user_id} value={member.user_id}>
+                                {member.display_name || member.email}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveItem(index)}
+                        className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))
+                )}
               </div>
             )}
           </div>
