@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, ChevronDown, Home } from 'lucide-react';
+import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, Home, Filter, Download, Repeat, FileText, Zap } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { TaskCard } from '@/components/tasks/TaskCard';
+import { DraggableTaskList } from '@/components/tasks/DraggableTaskList';
 import { NewTaskModal } from '@/components/tasks/NewTaskModal';
 import { NewChoreModal } from '@/components/projects/NewChoreModal';
 import GuidedTaskCreation from '@/components/guided/GuidedTaskCreation';
@@ -14,13 +15,30 @@ import { choresService, Chore, CreateChoreInput } from '@/lib/services/chores-se
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { Task, CreateTaskInput } from '@/lib/types';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
+import { useTaskRealtime } from '@/hooks/useTaskRealtime';
+import { TaskFilterPanel, TaskFilters } from '@/components/tasks/TaskFilterPanel';
+import { BulkActionsBar } from '@/components/tasks/BulkActionsBar';
+import { RecurringTaskModal } from '@/components/tasks/RecurringTaskModal';
+import { TemplatePickerModal } from '@/components/tasks/TemplatePickerModal';
+import { ExportModal } from '@/components/tasks/ExportModal';
+import { AttachmentsModal } from '@/components/tasks/AttachmentsModal';
+import { DependenciesModal } from '@/components/tasks/DependenciesModal';
+import { ApprovalModal } from '@/components/tasks/ApprovalModal';
+import { SnoozeModal } from '@/components/tasks/SnoozeModal';
+import { SubtasksList } from '@/components/tasks/SubtasksList';
+import { TimeTracker } from '@/components/tasks/TimeTracker';
+import { TaskComments } from '@/components/tasks/TaskComments';
+import { TaskQuickActions } from '@/components/tasks/TaskQuickActions';
+import { CalendarSyncToggle } from '@/components/tasks/CalendarSyncToggle';
+import { ChoreRotationConfig } from '@/components/tasks/ChoreRotationConfig';
 
 type TaskType = 'task' | 'chore';
 type TaskOrChore = (Task & { type: 'task' }) | (Chore & { type: 'chore' });
 
 export default function TasksPage() {
   const { currentSpace, user } = useAuth();
-  const [tasks, setTasks] = useState<Task[]>([]);
+
+  // Basic state
   const [chores, setChores] = useState<Chore[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,6 +50,33 @@ export default function TasksPage() {
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, any>>({});
+
+  // Advanced features state
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<TaskFilters>({});
+  const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
+  const [enableDragDrop, setEnableDragDrop] = useState(true);
+
+  // Modal states for advanced features
+  const [isRecurringModalOpen, setIsRecurringModalOpen] = useState(false);
+  const [isTemplatePickerOpen, setIsTemplatePickerOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [activeDetailModal, setActiveDetailModal] = useState<
+    'attachments' | 'dependencies' | 'approval' | 'snooze' | 'details' | null
+  >(null);
+
+  // Real-time tasks with filters (only for task tab, not chores)
+  const { tasks: realtimeTasks, loading: realtimeLoading, refreshTasks } = useTaskRealtime({
+    spaceId: currentSpace?.id || '',
+    filters: activeTab === 'task' ? filters : {},
+    onTaskAdded: (task) => console.log('Task added:', task.title),
+    onTaskUpdated: (task) => console.log('Task updated:', task.title),
+    onTaskDeleted: (taskId) => console.log('Task deleted:', taskId),
+  });
+
+  // Use realtime tasks when on task tab, otherwise use local state
+  const tasks = activeTab === 'task' ? realtimeTasks : [];
 
   // Combine tasks and chores for unified display
   const allItems = useMemo((): TaskOrChore[] => {
@@ -83,13 +128,12 @@ export default function TasksPage() {
 
     try {
       setLoading(true);
-      // Fetch both tasks and chores in parallel
-      const [tasksData, choresData] = await Promise.all([
-        tasksService.getTasks(currentSpace.id),
-        choresService.getChores(currentSpace.id),
-      ]);
-      setTasks(tasksData);
+      // Fetch chores (tasks are handled by useTaskRealtime hook)
+      const choresData = await choresService.getChores(currentSpace.id);
       setChores(choresData);
+
+      // Get tasks from realtime hook for shopping list integration
+      const tasksData = realtimeTasks;
 
       // Load linked shopping lists for tasks
       const linkedListsMap: Record<string, any> = {};
@@ -256,6 +300,39 @@ export default function TasksPage() {
     }
   }, [user]);
 
+  // Advanced feature handlers
+  const handleTaskClick = useCallback((task: any) => {
+    setSelectedTaskId(task.id);
+    setActiveDetailModal('details');
+  }, []);
+
+  const handleQuickAction = useCallback((action: string) => {
+    switch (action) {
+      case 'attach':
+        setActiveDetailModal('attachments');
+        break;
+      case 'snooze':
+        setActiveDetailModal('snooze');
+        break;
+      case 'repeat':
+        setIsRecurringModalOpen(true);
+        break;
+      default:
+        break;
+    }
+  }, []);
+
+  const closeDetailModals = useCallback(() => {
+    setActiveDetailModal(null);
+    setSelectedTaskId(null);
+  }, []);
+
+  const handleBulkActionComplete = useCallback(() => {
+    setSelectedTaskIds([]);
+    refreshTasks();
+    loadData();
+  }, [refreshTasks, loadData]);
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Tasks & Chores' }]}>
       <div className="p-4 sm:p-8">
@@ -301,6 +378,41 @@ export default function TasksPage() {
                   <span className="text-sm">Chores</span>
                 </button>
               </div>
+
+              {/* Advanced Feature Buttons */}
+              {activeTab === 'task' && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    <Filter className="w-4 h-4" />
+                    <span className="hidden sm:inline">Filters</span>
+                  </button>
+                  <button
+                    onClick={() => setIsTemplatePickerOpen(true)}
+                    className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    <FileText className="w-4 h-4" />
+                    <span className="hidden sm:inline">Template</span>
+                  </button>
+                  <button
+                    onClick={() => setIsRecurringModalOpen(true)}
+                    className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    <Repeat className="w-4 h-4" />
+                    <span className="hidden sm:inline">Recurring</span>
+                  </button>
+                  <button
+                    onClick={() => setIsExportModalOpen(true)}
+                    className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span className="hidden sm:inline">Export</span>
+                  </button>
+                </div>
+              )}
+
               <button
                 onClick={handleOpenModal}
                 className="px-4 sm:px-6 py-2 sm:py-3 shimmer-tasks text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
@@ -386,119 +498,143 @@ export default function TasksPage() {
 
           {/* Tasks List - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
-            {/* Header with Month Badge and Status Filter */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-              <div className="flex items-center gap-3">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                  All Tasks & Chores ({filteredItems.length})
-                </h2>
-                <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 text-sm font-medium rounded-full">
-                  {format(new Date(), 'MMM yyyy')}
-                </span>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Filters Sidebar - Only show when filters are enabled */}
+            {showFilters && activeTab === 'task' && currentSpace && (
+              <div className="lg:col-span-1">
+                <TaskFilterPanel spaceId={currentSpace.id} onFilterChange={setFilters} />
               </div>
+            )}
 
-              {/* Status Filter - Segmented Buttons */}
-              <div className="bg-gray-50 dark:bg-gray-900 border-2 border-blue-200 dark:border-blue-700 rounded-lg p-1 flex gap-1 w-fit">
-                <button
-                  onClick={() => setStatusFilter('all')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
-                    statusFilter === 'all'
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
-                  }`}
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => setStatusFilter('pending')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[70px] ${
-                    statusFilter === 'pending'
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
-                  }`}
-                >
-                  Pending
-                </button>
-                <button
-                  onClick={() => setStatusFilter('in_progress')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[85px] ${
-                    statusFilter === 'in_progress'
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
-                  }`}
-                >
-                  In Progress
-                </button>
-                <button
-                  onClick={() => setStatusFilter('completed')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
-                    statusFilter === 'completed'
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
-                  }`}
-                >
-                  Completed
-                </button>
-              </div>
-            </div>
+            {/* Main Content */}
+            <div className={showFilters && activeTab === 'task' ? 'lg:col-span-3' : 'lg:col-span-4'}>
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+                {/* Header with Month Badge and Status Filter */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                      All Tasks & Chores ({filteredItems.length})
+                    </h2>
+                    <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 text-sm font-medium rounded-full">
+                      {format(new Date(), 'MMM yyyy')}
+                    </span>
+                  </div>
 
-            {loading ? (
-              <div className="text-center py-12">
-                <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-                <p className="mt-4 text-gray-600 dark:text-gray-400">Loading tasks...</p>
-              </div>
-            ) : filteredItems.length === 0 ? (
-              <div className="text-center py-12">
-                <CheckSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No tasks or chores found</p>
-                <p className="text-gray-500 dark:text-gray-500 mb-6">
-                  {searchQuery || statusFilter !== 'all'
-                    ? 'Try adjusting your filters'
-                    : 'Create your first task or chore to get started!'}
-                </p>
-                {!searchQuery && statusFilter === 'all' && (
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                  {/* Status Filter - Segmented Buttons */}
+                  <div className="bg-gray-50 dark:bg-gray-900 border-2 border-blue-200 dark:border-blue-700 rounded-lg p-1 flex gap-1 w-fit">
                     <button
-                      onClick={handleOpenModal}
-                      className="px-6 py-3 shimmer-tasks text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                      onClick={() => setStatusFilter('all')}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                        statusFilter === 'all'
+                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                      }`}
                     >
-                      <Plus className="w-5 h-5" />
-                      Create {activeTab === 'task' ? 'Task' : 'Chore'}
+                      All
                     </button>
-                    {!hasCompletedGuide && (
-                      <button
-                        onClick={() => setShowGuidedFlow(true)}
-                        className="px-6 py-3 bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
-                      >
-                        <CheckSquare className="w-5 h-5" />
-                        Try Guided Creation
-                      </button>
+                    <button
+                      onClick={() => setStatusFilter('pending')}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[70px] ${
+                        statusFilter === 'pending'
+                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                      }`}
+                    >
+                      Pending
+                    </button>
+                    <button
+                      onClick={() => setStatusFilter('in_progress')}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[85px] ${
+                        statusFilter === 'in_progress'
+                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                      }`}
+                    >
+                      In Progress
+                    </button>
+                    <button
+                      onClick={() => setStatusFilter('completed')}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
+                        statusFilter === 'completed'
+                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                      }`}
+                    >
+                      Completed
+                    </button>
+                  </div>
+                </div>
+
+                {loading || (activeTab === 'task' && realtimeLoading) ? (
+                  <div className="text-center py-12">
+                    <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                    <p className="mt-4 text-gray-600 dark:text-gray-400">Loading tasks...</p>
+                  </div>
+                ) : filteredItems.length === 0 ? (
+                  <div className="text-center py-12">
+                    <CheckSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No tasks or chores found</p>
+                    <p className="text-gray-500 dark:text-gray-500 mb-6">
+                      {searchQuery || statusFilter !== 'all'
+                        ? 'Try adjusting your filters'
+                        : 'Create your first task or chore to get started!'}
+                    </p>
+                    {!searchQuery && statusFilter === 'all' && (
+                      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                        <button
+                          onClick={handleOpenModal}
+                          className="px-6 py-3 shimmer-tasks text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                        >
+                          <Plus className="w-5 h-5" />
+                          Create {activeTab === 'task' ? 'Task' : 'Chore'}
+                        </button>
+                        {!hasCompletedGuide && (
+                          <button
+                            onClick={() => setShowGuidedFlow(true)}
+                            className="px-6 py-3 bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
+                          >
+                            <CheckSquare className="w-5 h-5" />
+                            Try Guided Creation
+                          </button>
+                        )}
+                      </div>
                     )}
+                  </div>
+                ) : activeTab === 'task' && enableDragDrop && currentSpace ? (
+                  /* Drag-and-drop for tasks */
+                  <DraggableTaskList
+                    spaceId={currentSpace.id}
+                    initialTasks={filteredItems.filter(item => item.type === 'task') as Task[]}
+                    onTaskClick={handleTaskClick}
+                    onTasksReorder={() => {
+                      refreshTasks();
+                      loadData();
+                    }}
+                  />
+                ) : (
+                  /* Regular list for chores or when drag-drop disabled */
+                  <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+                    {filteredItems.map((item) => (
+                      <TaskCard
+                        key={item.id}
+                        task={item}
+                        onStatusChange={handleStatusChange}
+                        onEdit={handleEditItem}
+                        onDelete={handleDeleteItem}
+                        linkedShoppingList={item.type === 'task' ? linkedShoppingLists[item.id] : undefined}
+                      />
+                    ))}
                   </div>
                 )}
               </div>
-            ) : (
-              <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-                {filteredItems.map((item) => (
-                  <TaskCard
-                    key={item.id}
-                    task={item}
-                    onStatusChange={handleStatusChange}
-                    onEdit={handleEditItem}
-                    onDelete={handleDeleteItem}
-                    linkedShoppingList={item.type === 'task' ? linkedShoppingLists[item.id] : undefined}
-                  />
-                ))}
-              </div>
-            )}
+            </div>
           </div>
           )}
         </div>
       </div>
 
       {/* New/Edit Modal - conditionally render based on activeTab */}
-      {currentSpace && (
+      {currentSpace && user && (
         <>
           {activeTab === 'task' ? (
             <NewTaskModal
@@ -517,7 +653,137 @@ export default function TasksPage() {
               spaceId={currentSpace.id}
             />
           )}
+
+          {/* Advanced Feature Modals */}
+          <RecurringTaskModal
+            isOpen={isRecurringModalOpen}
+            onClose={() => setIsRecurringModalOpen(false)}
+            onSave={() => {
+              setIsRecurringModalOpen(false);
+              refreshTasks();
+              loadData();
+            }}
+            spaceId={currentSpace.id}
+            userId={user.id}
+          />
+
+          <TemplatePickerModal
+            isOpen={isTemplatePickerOpen}
+            onClose={() => setIsTemplatePickerOpen(false)}
+            onSelect={(templateId) => {
+              console.log('Selected template:', templateId);
+              setIsTemplatePickerOpen(false);
+              // TODO: Create task from template
+            }}
+            spaceId={currentSpace.id}
+          />
+
+          <ExportModal
+            isOpen={isExportModalOpen}
+            onClose={() => setIsExportModalOpen(false)}
+            spaceId={currentSpace.id}
+            currentFilters={filters}
+          />
+
+          {/* Task Detail Modals */}
+          {selectedTaskId && (
+            <>
+              {activeDetailModal === 'attachments' && (
+                <AttachmentsModal
+                  isOpen={true}
+                  onClose={closeDetailModals}
+                  taskId={selectedTaskId}
+                  userId={user.id}
+                />
+              )}
+
+              {activeDetailModal === 'dependencies' && (
+                <DependenciesModal
+                  isOpen={true}
+                  onClose={closeDetailModals}
+                  taskId={selectedTaskId}
+                  spaceId={currentSpace.id}
+                />
+              )}
+
+              {activeDetailModal === 'approval' && (
+                <ApprovalModal
+                  isOpen={true}
+                  onClose={closeDetailModals}
+                  taskId={selectedTaskId}
+                  currentUserId={user.id}
+                  spaceId={currentSpace.id}
+                />
+              )}
+
+              {activeDetailModal === 'snooze' && (
+                <SnoozeModal
+                  isOpen={true}
+                  onClose={closeDetailModals}
+                  taskId={selectedTaskId}
+                  userId={user.id}
+                  onSnooze={() => {
+                    closeDetailModals();
+                    refreshTasks();
+                    loadData();
+                  }}
+                />
+              )}
+
+              {/* Task Details Panel */}
+              {activeDetailModal === 'details' && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                  <div className="absolute inset-0 bg-black/50" onClick={closeDetailModals} />
+                  <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <div className="p-6 space-y-6">
+                      <div className="flex items-center justify-between">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Task Details</h2>
+                        <button
+                          onClick={closeDetailModals}
+                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                        >
+                          ✕
+                        </button>
+                      </div>
+
+                      {/* Quick Actions */}
+                      <TaskQuickActions
+                        taskId={selectedTaskId}
+                        spaceId={currentSpace.id}
+                        userId={user.id}
+                        onAction={handleQuickAction}
+                      />
+
+                      {/* Time Tracker */}
+                      <TimeTracker taskId={selectedTaskId} userId={user.id} />
+
+                      {/* Calendar Sync */}
+                      <CalendarSyncToggle taskId={selectedTaskId} userId={user.id} />
+
+                      {/* Chore Rotation */}
+                      <ChoreRotationConfig taskId={selectedTaskId} spaceId={currentSpace.id} />
+
+                      {/* Subtasks */}
+                      <SubtasksList taskId={selectedTaskId} userId={user.id} />
+
+                      {/* Comments */}
+                      <TaskComments taskId={selectedTaskId} userId={user.id} />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </>
+      )}
+
+      {/* Bulk Actions Bar */}
+      {currentSpace && activeTab === 'task' && (
+        <BulkActionsBar
+          selectedTaskIds={selectedTaskIds}
+          onClearSelection={() => setSelectedTaskIds([])}
+          onActionComplete={handleBulkActionComplete}
+        />
       )}
     </FeatureLayout>
   );
