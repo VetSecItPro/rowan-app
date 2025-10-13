@@ -1,0 +1,278 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  closestCenter,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { GripVertical, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+
+interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  status: string;
+  priority: string;
+  sort_order: number;
+  due_date?: string;
+  assigned_to?: string;
+}
+
+interface DraggableTaskListProps {
+  spaceId: string;
+  initialTasks: Task[];
+  onTaskClick?: (task: Task) => void;
+  onTasksReorder?: (tasks: Task[]) => void;
+}
+
+interface SortableTaskItemProps {
+  task: Task;
+  onTaskClick?: (task: Task) => void;
+}
+
+function SortableTaskItem({ task, onTaskClick }: SortableTaskItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: task.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  function getStatusColor(status: string) {
+    switch (status) {
+      case 'completed':
+        return 'border-l-green-500 bg-green-50 dark:bg-green-900/10';
+      case 'in-progress':
+        return 'border-l-blue-500 bg-blue-50 dark:bg-blue-900/10';
+      case 'blocked':
+        return 'border-l-red-500 bg-red-50 dark:bg-red-900/10';
+      case 'on-hold':
+        return 'border-l-amber-500 bg-amber-50 dark:bg-amber-900/10';
+      default:
+        return 'border-l-gray-300 dark:border-l-gray-600 bg-white dark:bg-gray-800';
+    }
+  }
+
+  function getPriorityIcon(priority: string) {
+    switch (priority) {
+      case 'urgent':
+        return <AlertCircle className="w-4 h-4 text-red-600" />;
+      case 'high':
+        return <AlertCircle className="w-4 h-4 text-orange-600" />;
+      case 'medium':
+        return <AlertCircle className="w-4 h-4 text-yellow-600" />;
+      case 'low':
+        return <AlertCircle className="w-4 h-4 text-green-600" />;
+      default:
+        return null;
+    }
+  }
+
+  function getStatusIcon(status: string) {
+    switch (status) {
+      case 'completed':
+        return <CheckCircle className="w-4 h-4 text-green-600" />;
+      case 'in-progress':
+        return <Clock className="w-4 h-4 text-blue-600" />;
+      default:
+        return null;
+    }
+  }
+
+  const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'completed';
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-3 p-4 rounded-lg border-l-4 ${getStatusColor(task.status)} border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-md transition-shadow`}
+      onClick={() => onTaskClick?.(task)}
+    >
+      {/* Drag Handle */}
+      <button
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded touch-none"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <GripVertical className="w-5 h-5 text-gray-400" />
+      </button>
+
+      {/* Task Content */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1">
+          {getStatusIcon(task.status)}
+          <h3 className="font-medium text-gray-900 dark:text-white truncate">
+            {task.title}
+          </h3>
+          {isOverdue && (
+            <span className="px-2 py-0.5 text-xs bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded">
+              Overdue
+            </span>
+          )}
+        </div>
+        {task.description && (
+          <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+            {task.description}
+          </p>
+        )}
+        <div className="flex items-center gap-3 mt-2">
+          {getPriorityIcon(task.priority)}
+          {task.due_date && (
+            <span className="text-xs text-gray-500">
+              Due: {new Date(task.due_date).toLocaleDateString()}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function DraggableTaskList({
+  spaceId,
+  initialTasks,
+  onTaskClick,
+  onTasksReorder,
+}: DraggableTaskListProps) {
+  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px movement required before drag starts
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  useEffect(() => {
+    setTasks(initialTasks);
+  }, [initialTasks]);
+
+  async function updateTaskOrder(taskId: string, newSortOrder: number) {
+    const supabase = createClient();
+    await supabase
+      .from('tasks')
+      .update({ sort_order: newSortOrder, updated_at: new Date().toISOString() })
+      .eq('id', taskId);
+  }
+
+  function handleDragStart(event: DragStartEvent) {
+    setActiveId(event.active.id as string);
+  }
+
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      setActiveId(null);
+      return;
+    }
+
+    const oldIndex = tasks.findIndex((task) => task.id === active.id);
+    const newIndex = tasks.findIndex((task) => task.id === over.id);
+
+    if (oldIndex === -1 || newIndex === -1) {
+      setActiveId(null);
+      return;
+    }
+
+    // Create new array with reordered tasks
+    const reorderedTasks = [...tasks];
+    const [movedTask] = reorderedTasks.splice(oldIndex, 1);
+    reorderedTasks.splice(newIndex, 0, movedTask);
+
+    // Update sort_order for all affected tasks
+    const updatedTasks = reorderedTasks.map((task, index) => ({
+      ...task,
+      sort_order: index,
+    }));
+
+    setTasks(updatedTasks);
+    onTasksReorder?.(updatedTasks);
+
+    // Update all affected tasks in database (batch update)
+    try {
+      const supabase = createClient();
+      const updates = updatedTasks.map((task, index) =>
+        supabase
+          .from('tasks')
+          .update({ sort_order: index, updated_at: new Date().toISOString() })
+          .eq('id', task.id)
+      );
+      await Promise.all(updates);
+    } catch (error) {
+      console.error('Error updating task order:', error);
+      // Revert on error
+      setTasks(initialTasks);
+    }
+
+    setActiveId(null);
+  }
+
+  const activeTask = activeId ? tasks.find((task) => task.id === activeId) : null;
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext items={tasks.map((task) => task.id)} strategy={verticalListSortingStrategy}>
+        <div className="space-y-2">
+          {tasks.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              <p>No tasks yet. Create your first task to get started!</p>
+            </div>
+          ) : (
+            tasks.map((task) => (
+              <SortableTaskItem key={task.id} task={task} onTaskClick={onTaskClick} />
+            ))
+          )}
+        </div>
+      </SortableContext>
+
+      {/* Drag Overlay */}
+      <DragOverlay>
+        {activeTask ? (
+          <div className="flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-2xl opacity-90">
+            <GripVertical className="w-5 h-5 text-gray-400" />
+            <div className="flex-1 min-w-0">
+              <h3 className="font-medium text-gray-900 dark:text-white truncate">
+                {activeTask.title}
+              </h3>
+            </div>
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
+  );
+}
