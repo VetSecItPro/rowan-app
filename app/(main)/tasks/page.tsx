@@ -50,8 +50,11 @@ export default function TasksPage() {
 
   // Memoized filtered items - filter combined tasks and chores
   const filteredItems = useMemo(() => {
+    // Filter by active tab first
+    let filtered = allItems.filter(item => item.type === activeTab);
+
     // Hide completed items by default
-    let filtered = allItems.filter(item => item.status !== 'completed');
+    filtered = filtered.filter(item => item.status !== 'completed');
 
     // Status filter
     if (statusFilter !== 'all') {
@@ -68,7 +71,7 @@ export default function TasksPage() {
     }
 
     return filtered;
-  }, [allItems, statusFilter, searchQuery]);
+  }, [allItems, statusFilter, searchQuery, activeTab]);
 
   // Memoized loadData function to fetch both tasks and chores
   const loadData = useCallback(async () => {
