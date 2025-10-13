@@ -43,14 +43,15 @@ ALTER TABLE tasks
   ADD COLUMN IF NOT EXISTS color TEXT; -- Override category color if needed
 
 -- Insert default categories for existing spaces
-INSERT INTO task_categories (space_id, name, color, icon, description, sort_order)
+INSERT INTO task_categories (space_id, name, color, icon, description, sort_order, created_by)
 SELECT
   s.id,
   category_data.name,
   category_data.color,
   category_data.icon,
   category_data.description,
-  category_data.sort_order
+  category_data.sort_order,
+  (SELECT user_id FROM space_members WHERE space_id = s.id ORDER BY joined_at ASC LIMIT 1) as created_by
 FROM spaces s
 CROSS JOIN (
   VALUES
@@ -63,6 +64,7 @@ CROSS JOIN (
     ('Shopping', 'green', '🛒', 'Shopping and errands', 6),
     ('Other', 'gray', '📝', 'Miscellaneous tasks', 7)
 ) AS category_data(name, color, icon, description, sort_order)
+WHERE EXISTS (SELECT 1 FROM space_members WHERE space_id = s.id) -- Only insert if space has members
 ON CONFLICT (space_id, name) DO NOTHING;
 
 -- Add comments
