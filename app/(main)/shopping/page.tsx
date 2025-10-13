@@ -8,9 +8,11 @@ import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
 import { NewShoppingListModal } from '@/components/shopping/NewShoppingListModal';
 import { SaveTemplateModal } from '@/components/shopping/SaveTemplateModal';
 import { TemplatePickerModal } from '@/components/shopping/TemplatePickerModal';
+import { ScheduleTripModal } from '@/components/shopping/ScheduleTripModal';
 import GuidedShoppingCreation from '@/components/guided/GuidedShoppingCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { shoppingService, ShoppingList, CreateListInput } from '@/lib/services/shopping-service';
+import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 
 export default function ShoppingPage() {
@@ -27,6 +29,8 @@ export default function ShoppingPage() {
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [listForTemplate, setListForTemplate] = useState<ShoppingList | null>(null);
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
+  const [showScheduleTripModal, setShowScheduleTripModal] = useState(false);
+  const [listToSchedule, setListToSchedule] = useState<ShoppingList | null>(null);
 
   const [stats, setStats] = useState({
     totalLists: 0,
@@ -373,6 +377,80 @@ export default function ShoppingPage() {
     }
   }, [currentSpace, listForTemplate]);
 
+  const handleScheduleTrip = useCallback((list: ShoppingList) => {
+    setListToSchedule(list);
+    setShowScheduleTripModal(true);
+  }, []);
+
+  const handleScheduleTripSubmit = useCallback(async (eventData: {
+    title: string;
+    date: string;
+    time: string;
+    duration: number;
+    reminderMinutes?: number;
+  }) => {
+    if (!currentSpace || !listToSchedule) return;
+
+    try {
+      // First, create the calendar event
+      const { calendarService } = await import('@/lib/services/calendar-service');
+
+      // Combine date and time into a proper datetime
+      const startDateTime = new Date(`${eventData.date}T${eventData.time}`);
+      const endDateTime = new Date(startDateTime.getTime() + eventData.duration * 60000);
+
+      const calendarEvent = await calendarService.createEvent({
+        space_id: currentSpace.id,
+        title: eventData.title,
+        start_time: startDateTime.toISOString(),
+        end_time: endDateTime.toISOString(),
+        description: `Shopping trip for list: ${listToSchedule.title}`,
+        color: 'emerald',
+      });
+
+      // Link the shopping list to the calendar event
+      await shoppingIntegrationService.linkToCalendar(
+        listToSchedule.id,
+        calendarEvent.id,
+        eventData.reminderMinutes
+      );
+
+      // Show success message
+      alert(`Shopping trip scheduled for ${eventData.date} at ${eventData.time}!`);
+      setShowScheduleTripModal(false);
+      setListToSchedule(null);
+    } catch (error) {
+      console.error('Failed to schedule trip:', error);
+      throw error;
+    }
+  }, [currentSpace, listToSchedule]);
+
+  const handleCreateTask = useCallback(async (list: ShoppingList) => {
+    if (!currentSpace) return;
+
+    try {
+      // Create a task linked to the shopping list
+      const { tasksService } = await import('@/lib/services/tasks-service');
+
+      const task = await tasksService.createTask({
+        space_id: currentSpace.id,
+        title: `Complete shopping: ${list.title}`,
+        description: `Shopping list with ${list.items?.length || 0} items${list.store_name ? ` at ${list.store_name}` : ''}`,
+        priority: 'medium',
+        status: 'todo',
+      });
+
+      // Link the task to the shopping list
+      await shoppingIntegrationService.linkToTask(list.id, task.id);
+
+      // Show success message
+      alert(`Task created: ${task.title}`);
+    } catch (error) {
+      console.error('Failed to create task:', error);
+      alert('Failed to create task. Please try again.');
+    }
+  }, [currentSpace]);
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Shopping Lists' }]}>
       <div className="p-4 sm:p-8">
@@ -563,6 +641,8 @@ export default function ShoppingPage() {
                     onToggleItem={handleToggleItem}
                     onCompleteList={handleCompleteList}
                     onSaveAsTemplate={handleSaveAsTemplate}
+                    onScheduleTrip={handleScheduleTrip}
+                    onCreateTask={handleCreateTask}
                   />
                 ))}
               </div>
@@ -590,6 +670,17 @@ export default function ShoppingPage() {
               }}
               onSave={handleSaveTemplate}
               list={listForTemplate}
+            />
+          )}
+          {listToSchedule && (
+            <ScheduleTripModal
+              isOpen={showScheduleTripModal}
+              onClose={() => {
+                setShowScheduleTripModal(false);
+                setListToSchedule(null);
+              }}
+              onSchedule={handleScheduleTripSubmit}
+              list={listToSchedule}
             />
           )}
         </>
