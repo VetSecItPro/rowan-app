@@ -13,9 +13,10 @@ interface ShoppingListCardProps {
   onDelete: (listId: string) => void;
   onToggleItem?: (itemId: string, checked: boolean) => void;
   onCompleteList?: (listId: string) => void;
+  onSaveAsTemplate?: (list: ShoppingList) => void;
 }
 
-export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompleteList }: ShoppingListCardProps) {
+export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompleteList, onSaveAsTemplate }: ShoppingListCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -167,6 +168,17 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                 >
                   Edit List
                 </button>
+                {onSaveAsTemplate && list.items && list.items.length > 0 && (
+                  <button
+                    onClick={() => {
+                      onSaveAsTemplate(list);
+                      setShowMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-emerald-600 dark:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    Save as Template
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     onDelete(list.id);

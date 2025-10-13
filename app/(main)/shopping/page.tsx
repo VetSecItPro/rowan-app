@@ -6,6 +6,8 @@ import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
 import { NewShoppingListModal } from '@/components/shopping/NewShoppingListModal';
+import { SaveTemplateModal } from '@/components/shopping/SaveTemplateModal';
+import { TemplatePickerModal } from '@/components/shopping/TemplatePickerModal';
 import GuidedShoppingCreation from '@/components/guided/GuidedShoppingCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { shoppingService, ShoppingList, CreateListInput } from '@/lib/services/shopping-service';
@@ -22,6 +24,9 @@ export default function ShoppingPage() {
   const [timeFilter, setTimeFilter] = useState<'all' | 'week'>('all');
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [listForTemplate, setListForTemplate] = useState<ShoppingList | null>(null);
+  const [showTemplatePicker, setShowTemplatePicker] = useState(false);
 
   const [stats, setStats] = useState({
     totalLists: 0,
@@ -263,6 +268,23 @@ export default function ShoppingPage() {
 
   // Memoized callback for opening new list modal
   const handleOpenNewListModal = useCallback(() => {
+    setShowTemplatePicker(true);
+  }, []);
+
+  // Handle template selection
+  const handleSelectTemplate = useCallback(async (templateId: string) => {
+    if (!currentSpace) return;
+    try {
+      await shoppingService.createListFromTemplate(templateId, currentSpace.id);
+      loadLists();
+    } catch (error) {
+      console.error('Failed to create list from template:', error);
+      throw error;
+    }
+  }, [currentSpace]);
+
+  // Handle start fresh (open modal)
+  const handleStartFresh = useCallback(() => {
     setIsModalOpen(true);
   }, []);
 
@@ -320,6 +342,36 @@ export default function ShoppingPage() {
       }
     }
   }, [user]);
+
+  const handleSaveAsTemplate = useCallback((list: ShoppingList) => {
+    setListForTemplate(list);
+    setShowTemplateModal(true);
+  }, []);
+
+  const handleSaveTemplate = useCallback(async (name: string, description: string) => {
+    if (!currentSpace || !listForTemplate || !listForTemplate.items) return;
+
+    try {
+      await shoppingService.createTemplate(
+        currentSpace.id,
+        name,
+        description,
+        listForTemplate.items.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          category: item.category,
+        }))
+      );
+
+      // Show success message
+      alert('Template saved successfully!');
+      setShowTemplateModal(false);
+      setListForTemplate(null);
+    } catch (error) {
+      console.error('Failed to save template:', error);
+      throw error;
+    }
+  }, [currentSpace, listForTemplate]);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Shopping Lists' }]}>
@@ -503,7 +555,15 @@ export default function ShoppingPage() {
             ) : (
               <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                 {filteredLists.map((list) => (
-                  <ShoppingListCard key={list.id} list={list} onEdit={handleEditList} onDelete={handleDeleteList} onToggleItem={handleToggleItem} onCompleteList={handleCompleteList} />
+                  <ShoppingListCard
+                    key={list.id}
+                    list={list}
+                    onEdit={handleEditList}
+                    onDelete={handleDeleteList}
+                    onToggleItem={handleToggleItem}
+                    onCompleteList={handleCompleteList}
+                    onSaveAsTemplate={handleSaveAsTemplate}
+                  />
                 ))}
               </div>
             )}
@@ -512,7 +572,27 @@ export default function ShoppingPage() {
         </div>
       </div>
       {currentSpace && (
-        <NewShoppingListModal isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleCreateList} editList={editingList} spaceId={currentSpace.id} />
+        <>
+          <TemplatePickerModal
+            isOpen={showTemplatePicker}
+            onClose={() => setShowTemplatePicker(false)}
+            onSelectTemplate={handleSelectTemplate}
+            onStartFresh={handleStartFresh}
+            spaceId={currentSpace.id}
+          />
+          <NewShoppingListModal isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleCreateList} editList={editingList} spaceId={currentSpace.id} />
+          {listForTemplate && (
+            <SaveTemplateModal
+              isOpen={showTemplateModal}
+              onClose={() => {
+                setShowTemplateModal(false);
+                setListForTemplate(null);
+              }}
+              onSave={handleSaveTemplate}
+              list={listForTemplate}
+            />
+          )}
+        </>
       )}
     </FeatureLayout>
   );
