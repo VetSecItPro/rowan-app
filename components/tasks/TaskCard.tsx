@@ -110,22 +110,17 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, linkedShoppin
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-start gap-3 flex-1">
-          {/* Checkbox with Status Label */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleStatusClick}
-              title={getStatusTooltip()}
-              aria-label={`Toggle task status: ${statusLabel.text}`}
-              className={`mt-1 flex-shrink-0 w-5 h-5 rounded flex items-center justify-center transition-all ${getCheckboxStyle()}`}
-            >
-              {task.status === 'completed' && (
-                <CheckSquare className="w-3 h-3 text-white" />
-              )}
-            </button>
-            <span className={`text-xs font-medium ${statusLabel.color}`}>
-              {statusLabel.text}
-            </span>
-          </div>
+          {/* Checkbox */}
+          <button
+            onClick={handleStatusClick}
+            title={getStatusTooltip()}
+            aria-label={`Toggle task status: ${statusLabel.text}`}
+            className={`mt-1 flex-shrink-0 w-5 h-5 rounded flex items-center justify-center transition-all ${getCheckboxStyle()}`}
+          >
+            {task.status === 'completed' && (
+              <CheckSquare className="w-3 h-3 text-white" />
+            )}
+          </button>
 
           {/* Title & Description */}
           <div className="flex-1 min-w-0">
