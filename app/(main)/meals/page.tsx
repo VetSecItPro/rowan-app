@@ -161,6 +161,7 @@ export default function MealsPage() {
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
+  const [recipeModalInitialTab, setRecipeModalInitialTab] = useState<'manual' | 'ai' | 'discover'>('manual');
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -573,11 +574,58 @@ export default function MealsPage() {
     setEditingMeal(null);
   }, []);
 
-  const handleOpenRecipeModal = useCallback(() => setIsRecipeModalOpen(true), []);
+  const handleOpenRecipeModal = useCallback(() => {
+    setRecipeModalInitialTab('manual');
+    setIsRecipeModalOpen(true);
+  }, []);
+
   const handleCloseRecipeModal = useCallback(() => {
     setIsRecipeModalOpen(false);
     setEditingRecipe(null);
+    setRecipeModalInitialTab('manual');
   }, []);
+
+  const handleOpenRecipeDiscover = useCallback(() => {
+    setRecipeModalInitialTab('discover');
+    setIsRecipeModalOpen(true);
+  }, []);
+
+  const handleRecipeAddedFromDiscover = useCallback(async (recipeData: CreateRecipeInput) => {
+    try {
+      // Save the recipe to library
+      const savedRecipe = await mealsService.createRecipe(recipeData);
+
+      // Reload recipes to get the new one
+      await loadRecipes();
+
+      // Close recipe modal
+      setIsRecipeModalOpen(false);
+      setRecipeModalInitialTab('manual');
+
+      // Pre-populate the meal modal with the newly added recipe
+      setEditingMeal({
+        id: '', // Empty ID indicates this is a new meal
+        space_id: currentSpace?.id || '',
+        recipe_id: savedRecipe.id,
+        recipe: savedRecipe,
+        name: '',
+        meal_type: 'dinner',
+        scheduled_date: new Date().toISOString(),
+        notes: '',
+        created_by: '',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      } as Meal);
+
+      // Keep meal modal open (it should already be open)
+      setIsModalOpen(true);
+
+      showSuccess('Recipe added to library and selected for your meal!');
+    } catch (error) {
+      console.error('Failed to save discovered recipe:', error);
+      showError('Failed to save recipe. Please try again.');
+    }
+  }, [currentSpace, loadRecipes]);
 
   // Calendar day click handlers
   const handleMealClick = useCallback((meal: Meal) => {
@@ -916,7 +964,7 @@ export default function MealsPage() {
               <input
                 ref={searchInputRef}
                 type="text"
-                placeholder={viewMode === 'recipes' ? 'Search recipes... (Press / to focus)' : 'Search meals... (Press / to focus)'}
+                placeholder={viewMode === 'recipes' ? 'Search recipes... (Press / to type)' : 'Search meals... (Press / to type)'}
                 value={searchQuery}
                 onChange={handleSearchChange}
                 className="w-full pl-10 pr-10 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
@@ -1199,8 +1247,24 @@ export default function MealsPage() {
       </div>
       {currentSpace && (
         <>
-          <NewMealModal isOpen={isModalOpen} onClose={handleCloseMealModal} onSave={handleCreateMeal} editMeal={editingMeal} spaceId={currentSpace.id} recipes={recipes} />
-          <NewRecipeModal isOpen={isRecipeModalOpen} onClose={handleCloseRecipeModal} onSave={handleCreateRecipe} editRecipe={editingRecipe} spaceId={currentSpace.id} />
+          <NewMealModal
+            isOpen={isModalOpen}
+            onClose={handleCloseMealModal}
+            onSave={handleCreateMeal}
+            editMeal={editingMeal}
+            spaceId={currentSpace.id}
+            recipes={recipes}
+            onOpenRecipeDiscover={handleOpenRecipeDiscover}
+          />
+          <NewRecipeModal
+            isOpen={isRecipeModalOpen}
+            onClose={handleCloseRecipeModal}
+            onSave={handleCreateRecipe}
+            editRecipe={editingRecipe}
+            spaceId={currentSpace.id}
+            initialTab={recipeModalInitialTab}
+            onRecipeAdded={handleRecipeAddedFromDiscover}
+          />
           {selectedRecipeForReview && (
             <IngredientReviewModal
               isOpen={isIngredientReviewOpen}
