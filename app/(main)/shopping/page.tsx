@@ -188,11 +188,17 @@ export default function ShoppingPage() {
   // Memoized callback for deleting lists
   const handleDeleteList = useCallback(async (listId: string) => {
     if (!confirm('Are you sure you want to delete this list?')) return;
+
+    // Optimistic update - remove from UI immediately
+    setLists(prevLists => prevLists.filter(list => list.id !== listId));
+
     try {
       await shoppingService.deleteList(listId);
-      loadLists();
+      // Success - already removed from UI
     } catch (error) {
       console.error('Failed to delete list:', error);
+      // Revert on error - reload lists to restore deleted item
+      loadLists();
     }
   }, []);
 
