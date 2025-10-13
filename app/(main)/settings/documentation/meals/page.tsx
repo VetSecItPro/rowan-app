@@ -203,49 +203,81 @@ export default function MealPlanningDocumentation() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-        <div className="max-w-7xl mx-auto p-4 sm:p-8">
-        {/* Header */}
-        <div className="mb-8">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-orange-500 to-red-600 text-white">
+        <div className="max-w-6xl mx-auto px-6 py-12">
           <Link
             href="/settings/documentation"
-            className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-4"
+            className="inline-flex items-center gap-2 text-white/90 hover:text-white transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Documentation
           </Link>
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center">
-              <UtensilsCrossed className="w-8 h-8 text-white" />
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+              <UtensilsCrossed className="w-8 h-8" />
             </div>
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">Meal Planning Guide</h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">Everything you need to master meal planning in Rowan</p>
+              <h1 className="text-4xl font-bold mb-2">Meal Planning Guide</h1>
+              <p className="text-white/90 text-lg">
+                Complete guide to planning meals with recipes, shopping, and collaboration
+              </p>
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
-            <div className="p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">27</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Guides</div>
-            </div>
-            <div className="p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <div className="text-2xl font-bold text-green-600 dark:text-green-400">~2h</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Total Reading</div>
-            </div>
-            <div className="p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">6</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Topics</div>
-            </div>
-            <div className="p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">All</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Skill Levels</div>
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
+            <div className="flex items-start gap-3">
+              <Lightbulb className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                  Welcome to Meal Planning
+                </h3>
+                <p className="text-blue-800 dark:text-blue-200 mb-3">
+                  Rowan helps you plan meals efficiently with powerful recipe and shopping integration:
+                </p>
+                <div className="grid sm:grid-cols-2 gap-2 text-sm text-blue-700 dark:text-blue-300">
+                  <div className="flex items-start gap-2">
+                    <LayoutGrid className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Three views</strong> - Calendar, List, and Recipe views</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>AI import</strong> - Extract recipes from text or images</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <ShoppingBag className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Auto shopping</strong> - Generate lists from meal plans</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Globe className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>37+ cuisines</strong> - Discover recipes from multiple APIs</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Keyboard className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Shortcuts</strong> - Fast keyboard navigation (N, R, /)</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <ChefHat className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Recipe library</strong> - Save and organize your favorites</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Meal history</strong> - Track past meals with completion status</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Eye className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Collaboration</strong> - Plan meals together in real-time</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Guide Sections */}
+      {/* Guide Sections */}
+      <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="space-y-8">
           {guideSections.map((section, sectionIndex) => {
             const Icon = section.icon;

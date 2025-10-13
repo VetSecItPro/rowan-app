@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown } from 'lucide-react';
+import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ReminderCard } from '@/components/reminders/ReminderCard';
@@ -243,47 +243,86 @@ export default function RemindersPage() {
           {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {/* Active */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Active</h3>
                 <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
                   <Clock className="w-6 h-6 text-white" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.active}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.active}</p>
+                {stats.active > 0 && (
+                  <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                    <Clock className="w-3 h-3" />
+                    <span className="text-xs font-medium">Pending</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Overdue */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Overdue</h3>
                 <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center">
                   <AlertCircle className="w-6 h-6 text-white" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.overdue}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.overdue}</p>
+                {stats.overdue > 0 && (
+                  <div className="flex items-center gap-1 text-red-600 dark:text-red-400">
+                    <AlertCircle className="w-3 h-3" />
+                    <span className="text-xs font-medium">Urgent!</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Completed */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completed</h3>
                 <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
                   <CheckCircle2 className="w-6 h-6 text-white" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
+                {stats.total > 0 && (
+                  <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                    <TrendingUp className="w-3 h-3" />
+                    <span className="text-xs font-medium">
+                      {(() => {
+                        const percentage = Math.round((stats.completed / stats.total) * 100);
+                        if (percentage >= 67) return `${percentage}% 🎉`;
+                        if (percentage >= 34) return `${percentage}%`;
+                        return percentage > 0 ? `${percentage}%` : 'Start';
+                      })()}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Total */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total</h3>
                 <div className="w-12 h-12 bg-gradient-reminders rounded-xl flex items-center justify-center">
                   <Bell className="w-6 h-6 text-white" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+                {stats.total > 0 && (
+                  <div className="flex items-center gap-1 text-pink-600 dark:text-pink-400">
+                    <Bell className="w-3 h-3" />
+                    <span className="text-xs font-medium">Overall</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           )}

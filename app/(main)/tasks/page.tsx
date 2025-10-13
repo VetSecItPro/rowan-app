@@ -448,10 +448,17 @@ export default function TasksPage() {
               </div>
               <div className="flex items-end justify-between">
                 <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
-                {stats.completed > 0 && (
+                {stats.total > 0 && (
                   <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
                     <TrendingUp className="w-3 h-3" />
-                    <span className="text-xs font-medium">{Math.round((stats.completed / stats.total) * 100)}%</span>
+                    <span className="text-xs font-medium">
+                      {(() => {
+                        const percentage = Math.round((stats.completed / stats.total) * 100);
+                        if (percentage >= 67) return `${percentage}% 🎉`;
+                        if (percentage >= 34) return `${percentage}%`;
+                        return percentage > 0 ? `${percentage}%` : 'Start';
+                      })()}
+                    </span>
                   </div>
                 )}
               </div>
