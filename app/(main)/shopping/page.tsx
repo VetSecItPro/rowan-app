@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package, X } from 'lucide-react';
+import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package, X, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
@@ -590,7 +590,15 @@ export default function ShoppingPage() {
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Items This Week</h3>
                 <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center"><Package className="w-6 h-6 text-white" /></div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.itemsThisWeek}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.itemsThisWeek}</p>
+                {memoizedStats.itemsThisWeek > 0 && (
+                  <div className="flex items-center gap-1 text-purple-600 dark:text-purple-400">
+                    <Package className="w-3 h-3" />
+                    <span className="text-xs font-medium">New items</span>
+                  </div>
+                )}
+              </div>
             </button>
             <button
               onClick={handleActiveListsClick}
@@ -600,7 +608,15 @@ export default function ShoppingPage() {
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Active Lists</h3>
                 <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center"><Clock className="w-6 h-6 text-white" /></div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.activeLists}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.activeLists}</p>
+                {memoizedStats.activeLists > 0 && (
+                  <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                    <Clock className="w-3 h-3" />
+                    <span className="text-xs font-medium">In progress</span>
+                  </div>
+                )}
+              </div>
             </button>
             <button
               onClick={handleCompletedListsClick}
@@ -610,7 +626,22 @@ export default function ShoppingPage() {
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completed Lists</h3>
                 <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"><CheckCircle2 className="w-6 h-6 text-white" /></div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.completedLists}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.completedLists}</p>
+                {memoizedStats.totalLists > 0 && (
+                  <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                    <TrendingUp className="w-3 h-3" />
+                    <span className="text-xs font-medium">
+                      {(() => {
+                        const percentage = Math.round((memoizedStats.completedLists / memoizedStats.totalLists) * 100);
+                        if (percentage >= 67) return `${percentage}% 🎉`;
+                        if (percentage >= 34) return `${percentage}%`;
+                        return percentage > 0 ? `${percentage}%` : 'Start';
+                      })()}
+                    </span>
+                  </div>
+                )}
+              </div>
             </button>
             <button
               onClick={handleTotalListsClick}
@@ -620,7 +651,15 @@ export default function ShoppingPage() {
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Lists</h3>
                 <div className="w-12 h-12 bg-gradient-shopping rounded-xl flex items-center justify-center"><List className="w-6 h-6 text-white" /></div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.totalLists}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.totalLists}</p>
+                {memoizedStats.totalLists > 0 && (
+                  <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                    <List className="w-3 h-3" />
+                    <span className="text-xs font-medium">Overall</span>
+                  </div>
+                )}
+              </div>
             </button>
           </div>
           )}

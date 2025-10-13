@@ -343,44 +343,76 @@ export default function CalendarPage() {
           {/* Stats Dashboard - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Today</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-xl flex items-center justify-center">
                   <CalendarDays className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.today}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.today}</p>
+                {stats.today > 0 && (
+                  <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                    <CalendarDays className="w-3 h-3" />
+                    <span className="text-xs font-medium">Happening</span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">This Week</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center">
                   <CalendarRange className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.thisWeek}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.thisWeek}</p>
+                {stats.thisWeek > 0 && (
+                  <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                    <CalendarRange className="w-3 h-3" />
+                    <span className="text-xs font-medium">Upcoming</span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">This Month</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-500 rounded-xl flex items-center justify-center">
                   <CalendarClock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.thisMonth}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.thisMonth}</p>
+                {stats.thisMonth > 0 && (
+                  <div className="flex items-center gap-1 text-purple-600 dark:text-purple-400">
+                    <CalendarClock className="w-3 h-3" />
+                    <span className="text-xs font-medium">Planned</span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Total Events</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-calendar rounded-xl flex items-center justify-center">
                   <CalendarIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+                {stats.total > 0 && (
+                  <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                    <Minus className="w-3 h-3" />
+                    <span className="text-xs font-medium">Overall</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           )}

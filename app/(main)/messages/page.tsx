@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as ImageIcon, Paperclip } from 'lucide-react';
+import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as ImageIcon, Paperclip, TrendingUp } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { MessageCard } from '@/components/messages/MessageCard';
 import { NewMessageModal } from '@/components/messages/NewMessageModal';
@@ -321,44 +321,76 @@ export default function MessagesPage() {
           {/* Stats Dashboard - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-2 sm:mb-4">
                 <h3 className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">Today</h3>
                 <div className="w-8 h-8 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center">
                   <MessageSquare className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.today}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.today}</p>
+                {stats.today > 0 && (
+                  <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                    <MessageSquare className="w-3 h-3" />
+                    <span className="text-xs font-medium">Active</span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-2 sm:mb-4">
                 <h3 className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">This Week</h3>
                 <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-messages rounded-xl flex items-center justify-center">
                   <Clock className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.thisWeek}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.thisWeek}</p>
+                {stats.thisWeek > 0 && (
+                  <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                    <TrendingUp className="w-3 h-3" />
+                    <span className="text-xs font-medium">Recent</span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-2 sm:mb-4">
                 <h3 className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">Unread</h3>
                 <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-500 rounded-xl flex items-center justify-center">
                   <Mail className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.unread}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.unread}</p>
+                {stats.unread > 0 && (
+                  <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                    <Mail className="w-3 h-3" />
+                    <span className="text-xs font-medium">New!</span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-2 sm:mb-4">
                 <h3 className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">All Time</h3>
                 <div className="w-8 h-8 sm:w-12 sm:h-12 bg-purple-500 rounded-xl flex items-center justify-center">
                   <MessageCircle className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+                {stats.total > 0 && (
+                  <div className="flex items-center gap-1 text-purple-600 dark:text-purple-400">
+                    <MessageCircle className="w-3 h-3" />
+                    <span className="text-xs font-medium">Overall</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           )}
