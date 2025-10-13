@@ -408,7 +408,7 @@ export default function CalendarPage() {
                 <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
                 {stats.total > 0 && (
                   <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
-                    <Minus className="w-3 h-3" />
+                    <CalendarIcon className="w-3 h-3" />
                     <span className="text-xs font-medium">Overall</span>
                   </div>
                 )}
