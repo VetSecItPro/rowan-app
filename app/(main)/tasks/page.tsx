@@ -606,10 +606,9 @@ export default function TasksPage() {
                     spaceId={currentSpace.id}
                     initialTasks={filteredItems.filter(item => item.type === 'task') as Task[]}
                     onTaskClick={handleTaskClick}
-                    onTasksReorder={() => {
-                      refreshTasks();
-                      loadData();
-                    }}
+                    onStatusChange={handleStatusChange}
+                    onEdit={handleEditItem}
+                    onDelete={handleDeleteItem}
                   />
                 ) : (
                   /* Regular list for chores or when drag-drop disabled */

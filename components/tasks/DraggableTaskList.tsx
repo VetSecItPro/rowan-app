@@ -19,7 +19,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { GripVertical, CheckCircle, Clock, AlertCircle, MoreVertical, CheckSquare } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 interface Task {
@@ -38,14 +38,22 @@ interface DraggableTaskListProps {
   initialTasks: Task[];
   onTaskClick?: (task: Task) => void;
   onTasksReorder?: (tasks: Task[]) => void;
+  onStatusChange?: (taskId: string, status: string, type?: 'task' | 'chore') => void;
+  onEdit?: (task: Task) => void;
+  onDelete?: (taskId: string, type?: 'task' | 'chore') => void;
 }
 
 interface SortableTaskItemProps {
   task: Task;
   onTaskClick?: (task: Task) => void;
+  onStatusChange?: (taskId: string, status: string, type?: 'task' | 'chore') => void;
+  onEdit?: (task: Task) => void;
+  onDelete?: (taskId: string, type?: 'task' | 'chore') => void;
 }
 
-function SortableTaskItem({ task, onTaskClick }: SortableTaskItemProps) {
+function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete }: SortableTaskItemProps) {
+  const [showMenu, setShowMenu] = useState(false);
+
   const {
     attributes,
     listeners,
@@ -65,7 +73,7 @@ function SortableTaskItem({ task, onTaskClick }: SortableTaskItemProps) {
     switch (status) {
       case 'completed':
         return 'border-l-green-500 bg-green-50 dark:bg-green-900/10';
-      case 'in-progress':
+      case 'in_progress':
         return 'border-l-blue-500 bg-blue-50 dark:bg-blue-900/10';
       case 'blocked':
         return 'border-l-red-500 bg-red-50 dark:bg-red-900/10';
@@ -91,16 +99,33 @@ function SortableTaskItem({ task, onTaskClick }: SortableTaskItemProps) {
     }
   }
 
-  function getStatusIcon(status: string) {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle className="w-4 h-4 text-green-600" />;
-      case 'in-progress':
-        return <Clock className="w-4 h-4 text-blue-600" />;
-      default:
-        return null;
+  // Handle status rotation: pending → in_progress → completed → pending
+  const handleStatusClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Don't trigger task click
+    if (!onStatusChange) return;
+
+    let newStatus = 'pending';
+    if (task.status === 'pending') {
+      newStatus = 'in_progress';
+    } else if (task.status === 'in_progress') {
+      newStatus = 'completed';
+    } else if (task.status === 'completed') {
+      newStatus = 'pending';
     }
-  }
+
+    onStatusChange(task.id, newStatus, 'task');
+  };
+
+  // Get checkbox styling based on status
+  const getCheckboxStyle = () => {
+    if (task.status === 'completed') {
+      return 'bg-green-500 border-green-500';
+    } else if (task.status === 'in_progress') {
+      return 'bg-amber-500 border-amber-500';
+    } else {
+      return 'border-2 border-red-500 bg-transparent';
+    }
+  };
 
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'completed';
 
@@ -108,8 +133,7 @@ function SortableTaskItem({ task, onTaskClick }: SortableTaskItemProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-3 p-4 rounded-lg border-l-4 ${getStatusColor(task.status)} border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-md transition-shadow`}
-      onClick={() => onTaskClick?.(task)}
+      className={`flex items-center gap-3 p-4 rounded-lg border-l-4 ${getStatusColor(task.status)} border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow`}
     >
       {/* Drag Handle */}
       <button
@@ -121,11 +145,25 @@ function SortableTaskItem({ task, onTaskClick }: SortableTaskItemProps) {
         <GripVertical className="w-5 h-5 text-gray-400" />
       </button>
 
+      {/* Status Checkbox */}
+      <button
+        onClick={handleStatusClick}
+        className={`flex-shrink-0 w-5 h-5 rounded flex items-center justify-center transition-all ${getCheckboxStyle()}`}
+      >
+        {task.status === 'completed' && (
+          <CheckSquare className="w-3 h-3 text-white" />
+        )}
+      </button>
+
       {/* Task Content */}
-      <div className="flex-1 min-w-0">
+      <div
+        className="flex-1 min-w-0 cursor-pointer"
+        onClick={() => onTaskClick?.(task)}
+      >
         <div className="flex items-center gap-2 mb-1">
-          {getStatusIcon(task.status)}
-          <h3 className="font-medium text-gray-900 dark:text-white truncate">
+          <h3 className={`font-medium text-gray-900 dark:text-white truncate ${
+            task.status === 'completed' ? 'line-through opacity-60' : ''
+          }`}>
             {task.title}
           </h3>
           {isOverdue && (
@@ -148,6 +186,50 @@ function SortableTaskItem({ task, onTaskClick }: SortableTaskItemProps) {
           )}
         </div>
       </div>
+
+      {/* More Menu */}
+      <div className="relative">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowMenu(!showMenu);
+          }}
+          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+        >
+          <MoreVertical className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+        </button>
+
+        {showMenu && (
+          <>
+            <div
+              className="fixed inset-0 z-10"
+              onClick={() => setShowMenu(false)}
+            />
+            <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit?.(task);
+                  setShowMenu(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
+              >
+                Edit
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete?.(task.id, 'task');
+                  setShowMenu(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg"
+              >
+                Delete
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -157,6 +239,9 @@ export function DraggableTaskList({
   initialTasks,
   onTaskClick,
   onTasksReorder,
+  onStatusChange,
+  onEdit,
+  onDelete,
 }: DraggableTaskListProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -175,14 +260,6 @@ export function DraggableTaskList({
   useEffect(() => {
     setTasks(initialTasks);
   }, [initialTasks]);
-
-  async function updateTaskOrder(taskId: string, newSortOrder: number) {
-    const supabase = createClient();
-    await supabase
-      .from('tasks')
-      .update({ sort_order: newSortOrder, updated_at: new Date().toISOString() })
-      .eq('id', taskId);
-  }
 
   function handleDragStart(event: DragStartEvent) {
     setActiveId(event.active.id as string);
@@ -215,10 +292,11 @@ export function DraggableTaskList({
       sort_order: index,
     }));
 
+    // Update local state immediately for smooth UX
     setTasks(updatedTasks);
-    onTasksReorder?.(updatedTasks);
 
     // Update all affected tasks in database (batch update)
+    // Don't call onTasksReorder to avoid infinite loop - let real-time handle updates
     try {
       const supabase = createClient();
       const updates = updatedTasks.map((task, index) =>
@@ -254,7 +332,14 @@ export function DraggableTaskList({
             </div>
           ) : (
             tasks.map((task) => (
-              <SortableTaskItem key={task.id} task={task} onTaskClick={onTaskClick} />
+              <SortableTaskItem
+                key={task.id}
+                task={task}
+                onTaskClick={onTaskClick}
+                onStatusChange={onStatusChange}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
             ))
           )}
         </div>
