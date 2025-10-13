@@ -47,7 +47,7 @@ const features = [
     icon: ShoppingBag,
     color: 'from-emerald-500 to-emerald-600',
     href: '/settings/documentation/shopping',
-    available: false,
+    available: true,
   },
   {
     id: 'meals',
