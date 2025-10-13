@@ -6,12 +6,12 @@ import { CheckSquare, Calendar, Bell, MessageSquare, ShoppingBag, UtensilsCrosse
 const features = [
   {
     id: 'tasks',
-    name: 'Task Management',
-    description: 'Learn how to create, organize, and track your tasks',
+    name: 'Tasks & Chores',
+    description: 'Manage daily tasks and household chores with smart features',
     icon: CheckSquare,
     color: 'from-blue-500 to-blue-600',
-    href: '/settings/documentation/tasks',
-    available: false,
+    href: '/settings/documentation/tasks-chores',
+    available: true,
   },
   {
     id: 'calendar',
