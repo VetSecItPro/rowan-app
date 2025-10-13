@@ -14,7 +14,7 @@ interface FeatureLayoutProps {
 
 export function FeatureLayout({ children, breadcrumbItems }: FeatureLayoutProps) {
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen bg-gray-50 dark:bg-black">
       <Header />
       <Breadcrumb items={breadcrumbItems} />
       <main>{children}</main>

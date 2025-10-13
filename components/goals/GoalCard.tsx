@@ -34,7 +34,7 @@ export function GoalCard({ goal, onEdit, onDelete, onStatusChange }: GoalCardPro
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:border-purple-300 dark:hover:border-purple-600 transition-all">
+    <div className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:border-purple-300 dark:hover:border-purple-600 transition-all">
       <div className="flex items-start gap-3 mb-4">
         {/* Three-state checkbox */}
         <div className="relative group">
@@ -84,7 +84,7 @@ export function GoalCard({ goal, onEdit, onDelete, onStatusChange }: GoalCardPro
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20 overflow-hidden">
+              <div className="absolute right-0 mt-2 w-40 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20 overflow-hidden">
                 <button
                   onClick={() => { onEdit(goal); setShowMenu(false); }}
                   className="w-full px-4 py-2.5 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"

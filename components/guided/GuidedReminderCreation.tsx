@@ -64,7 +64,7 @@ export default function GuidedReminderCreation({ onComplete, onSkip }: GuidedRem
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50 dark:from-gray-900 dark:via-gray-800 dark:to-pink-900 flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
+      <div className="max-w-2xl w-full bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
         <StepIndicator currentStep={currentStep} totalSteps={3} stepTitles={stepTitles} />
 
         {/* Step 1: Welcome */}
@@ -128,7 +128,7 @@ export default function GuidedReminderCreation({ onComplete, onSkip }: GuidedRem
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g., Pay electricity bill"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all min-h-[44px]"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all min-h-[44px]"
                 autoFocus
               />
             </div>
@@ -143,7 +143,7 @@ export default function GuidedReminderCreation({ onComplete, onSkip }: GuidedRem
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Add details about this reminder..."
                 rows={2}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
               />
             </div>
 
@@ -156,7 +156,7 @@ export default function GuidedReminderCreation({ onComplete, onSkip }: GuidedRem
                 type="datetime-local"
                 value={reminderTime}
                 onChange={(e) => setReminderTime(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all min-h-[44px]"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all min-h-[44px]"
               />
             </div>
 

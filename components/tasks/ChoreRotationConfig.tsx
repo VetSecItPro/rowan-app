@@ -282,12 +282,12 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
                 min="1"
                 value={formData.interval_value}
                 onChange={(e) => setFormData(prev => ({ ...prev, interval_value: parseInt(e.target.value) }))}
-                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900"
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
               />
               <select
                 value={formData.interval_type}
                 onChange={(e) => setFormData(prev => ({ ...prev, interval_type: e.target.value as any }))}
-                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900"
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
               >
                 <option value="daily">Day(s)</option>
                 <option value="weekly">Week(s)</option>

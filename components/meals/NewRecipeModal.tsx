@@ -305,7 +305,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-orange-500 to-orange-600 p-6 z-10">
           <div className="flex items-center justify-between">
@@ -400,7 +400,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">OR</span>
+                  <span className="px-4 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400">OR</span>
                 </div>
               </div>
 
@@ -530,7 +530,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                         />
 
                         {/* Dropdown Menu */}
-                        <div className="absolute top-full left-0 mt-2 w-64 max-h-96 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-2xl z-20">
+                        <div className="absolute top-full left-0 mt-2 w-64 max-h-96 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-2xl z-20">
                           <div className="p-2 space-y-1">
                             {SUPPORTED_CUISINES.map((cuisine) => (
                               <button

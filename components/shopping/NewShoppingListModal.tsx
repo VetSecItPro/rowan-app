@@ -134,8 +134,8 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white dark:bg-gray-800 flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 z-10">
+      <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 z-10">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             {editList ? 'Edit Shopping List' : 'New Shopping List'}
           </h2>
@@ -223,7 +223,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
                 {isReorderMode ? (
                   /* Reorder Mode with Drag Handles */
                   items.map((item, index) => (
-                    <div key={index} className="flex items-center gap-3 p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                       <button
                         type="button"
                         className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
@@ -258,7 +258,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
                 ) : (
                   /* Normal Mode with Assignment */
                   items.map((item, index) => (
-                    <div key={index} className="flex items-center gap-3 p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                       <button
                         type="button"
                         onClick={() => handleToggleItem(index)}

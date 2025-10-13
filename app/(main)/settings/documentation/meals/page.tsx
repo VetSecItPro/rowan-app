@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Header } from '@/components/layout/Header';
 import { ArrowLeft, UtensilsCrossed, BookOpen, Play, Eye, Plus, ChefHat, Globe, Sparkles, ShoppingBag, CheckSquare, Keyboard, Clock, Lightbulb, Search, Calendar, List as ListIcon, LayoutGrid } from 'lucide-react';
 
 interface GuideSection {
@@ -200,8 +201,10 @@ const guideSections: GuideSection[] = [
 
 export default function MealPlanningDocumentation() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <div className="max-w-7xl mx-auto p-4 sm:p-8">
+    <>
+      <Header />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+        <div className="max-w-7xl mx-auto p-4 sm:p-8">
         {/* Header */}
         <div className="mb-8">
           <Link
@@ -223,19 +226,19 @@ export default function MealPlanningDocumentation() {
 
           {/* Stats */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
-            <div className="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <div className="p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
               <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">27</div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Guides</div>
             </div>
-            <div className="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <div className="p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
               <div className="text-2xl font-bold text-green-600 dark:text-green-400">~2h</div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Total Reading</div>
             </div>
-            <div className="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <div className="p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
               <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">6</div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Topics</div>
             </div>
-            <div className="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <div className="p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
               <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">All</div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Skill Levels</div>
             </div>
@@ -247,7 +250,7 @@ export default function MealPlanningDocumentation() {
           {guideSections.map((section, sectionIndex) => {
             const Icon = section.icon;
             return (
-              <div key={sectionIndex} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+              <div key={sectionIndex} className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
                 {/* Section Header */}
                 <div className={`p-6 bg-gradient-to-r ${section.color}`}>
                   <div className="flex items-center gap-3">
@@ -302,7 +305,7 @@ export default function MealPlanningDocumentation() {
         {/* Detailed Guide Content */}
         <div className="mt-12 space-y-12 scroll-smooth">
           {/* Getting Started Section */}
-          <section id="intro" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="intro" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Introduction to Meal Planning</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -330,7 +333,7 @@ export default function MealPlanningDocumentation() {
             </div>
           </section>
 
-          <section id="views" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="views" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Understanding the Three Views</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -369,7 +372,7 @@ export default function MealPlanningDocumentation() {
             </div>
           </section>
 
-          <section id="quick-start" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="quick-start" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Quick Start Guide</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -412,7 +415,7 @@ export default function MealPlanningDocumentation() {
           </section>
 
           {/* Creating & Managing Meals Section */}
-          <section id="create-meal" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="create-meal" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">How to Create a New Meal</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -462,7 +465,7 @@ export default function MealPlanningDocumentation() {
             </div>
           </section>
 
-          <section id="link-recipes" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="link-recipes" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Linking Recipes to Meals</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -512,7 +515,7 @@ export default function MealPlanningDocumentation() {
             </div>
           </section>
 
-          <section id="edit-meals" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="edit-meals" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Editing and Deleting Meals</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -564,7 +567,7 @@ export default function MealPlanningDocumentation() {
             </div>
           </section>
 
-          <section id="past-meals" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="past-meals" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Managing Past Meals</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -612,7 +615,7 @@ export default function MealPlanningDocumentation() {
           </section>
 
           {/* Recipe Management Section */}
-          <section id="add-recipe" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="add-recipe" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Adding Recipes Manually</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -670,7 +673,7 @@ export default function MealPlanningDocumentation() {
             </div>
           </section>
 
-          <section id="discover-recipes" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="discover-recipes" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Discovering Recipes from APIs</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -727,7 +730,7 @@ export default function MealPlanningDocumentation() {
             </div>
           </section>
 
-          <section id="ai-import" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="ai-import" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Using AI Recipe Import</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -784,7 +787,7 @@ export default function MealPlanningDocumentation() {
             </div>
           </section>
 
-          <section id="organize-recipes" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="organize-recipes" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Organizing Your Recipe Library</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -841,7 +844,7 @@ export default function MealPlanningDocumentation() {
             </div>
           </section>
 
-          <section id="plan-from-recipe" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="plan-from-recipe" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Quick Meal Planning from Recipes</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -885,7 +888,7 @@ export default function MealPlanningDocumentation() {
           </section>
 
           {/* Shopping Lists Section */}
-          <section id="generate-list" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="generate-list" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Generating Shopping Lists from Meals</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -922,7 +925,7 @@ export default function MealPlanningDocumentation() {
             </div>
           </section>
 
-          <section id="review-ingredients" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="review-ingredients" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Reviewing and Customizing Ingredients</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -967,7 +970,7 @@ export default function MealPlanningDocumentation() {
             </div>
           </section>
 
-          <section id="bulk-shopping" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="bulk-shopping" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Bulk Shopping List Generation</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -1022,7 +1025,7 @@ export default function MealPlanningDocumentation() {
           </section>
 
           {/* Advanced Features Section */}
-          <section id="keyboard" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="keyboard" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Using Keyboard Shortcuts</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -1076,7 +1079,7 @@ export default function MealPlanningDocumentation() {
             </div>
           </section>
 
-          <section id="bulk-ops" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="bulk-ops" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Bulk Operations with Select Mode</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -1141,7 +1144,7 @@ export default function MealPlanningDocumentation() {
             </div>
           </section>
 
-          <section id="search" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="search" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Searching Meals and Recipes</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -1196,7 +1199,7 @@ export default function MealPlanningDocumentation() {
             </div>
           </section>
 
-          <section id="calendar-nav" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="calendar-nav" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Calendar Navigation</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -1255,7 +1258,7 @@ export default function MealPlanningDocumentation() {
           </section>
 
           {/* Tips & Best Practices Section */}
-          <section id="weekly-strategy" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="weekly-strategy" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Weekly Meal Planning Strategy</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -1315,7 +1318,7 @@ export default function MealPlanningDocumentation() {
             </div>
           </section>
 
-          <section id="build-collection" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="build-collection" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Building a Recipe Collection</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -1380,7 +1383,7 @@ export default function MealPlanningDocumentation() {
             </div>
           </section>
 
-          <section id="meal-prep" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="meal-prep" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Meal Prep and Batch Cooking</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -1446,7 +1449,7 @@ export default function MealPlanningDocumentation() {
             </div>
           </section>
 
-          <section id="collaborative" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+          <section id="collaborative" className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Collaborative Meal Planning</h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -1521,27 +1524,27 @@ export default function MealPlanningDocumentation() {
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="flex items-center gap-3">
-              <kbd className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-mono text-gray-900 dark:text-white shadow-sm">N</kbd>
+              <kbd className="px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-mono text-gray-900 dark:text-white shadow-sm">N</kbd>
               <span className="text-sm text-gray-600 dark:text-gray-400">Create new meal</span>
             </div>
             <div className="flex items-center gap-3">
-              <kbd className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-mono text-gray-900 dark:text-white shadow-sm">R</kbd>
+              <kbd className="px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-mono text-gray-900 dark:text-white shadow-sm">R</kbd>
               <span className="text-sm text-gray-600 dark:text-gray-400">Create new recipe</span>
             </div>
             <div className="flex items-center gap-3">
-              <kbd className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-mono text-gray-900 dark:text-white shadow-sm">/</kbd>
+              <kbd className="px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-mono text-gray-900 dark:text-white shadow-sm">/</kbd>
               <span className="text-sm text-gray-600 dark:text-gray-400">Focus search</span>
             </div>
             <div className="flex items-center gap-3">
-              <kbd className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-mono text-gray-900 dark:text-white shadow-sm">1</kbd>
+              <kbd className="px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-mono text-gray-900 dark:text-white shadow-sm">1</kbd>
               <span className="text-sm text-gray-600 dark:text-gray-400">Calendar view</span>
             </div>
             <div className="flex items-center gap-3">
-              <kbd className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-mono text-gray-900 dark:text-white shadow-sm">2</kbd>
+              <kbd className="px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-mono text-gray-900 dark:text-white shadow-sm">2</kbd>
               <span className="text-sm text-gray-600 dark:text-gray-400">List view</span>
             </div>
             <div className="flex items-center gap-3">
-              <kbd className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-mono text-gray-900 dark:text-white shadow-sm">3</kbd>
+              <kbd className="px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-mono text-gray-900 dark:text-white shadow-sm">3</kbd>
               <span className="text-sm text-gray-600 dark:text-gray-400">Recipes view</span>
             </div>
           </div>
@@ -1562,7 +1565,7 @@ export default function MealPlanningDocumentation() {
             </Link>
             <Link
               href="/meals"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg transition-colors text-sm font-medium"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg transition-colors text-sm font-medium"
             >
               <UtensilsCrossed className="w-4 h-4" />
               Go to Meal Planning
@@ -1571,5 +1574,6 @@ export default function MealPlanningDocumentation() {
         </div>
       </div>
     </div>
+    </>
   );
 }

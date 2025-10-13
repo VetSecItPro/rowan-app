@@ -123,7 +123,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
       />
 
       {/* Modal */}
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -169,7 +169,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                     className="fixed inset-0 z-20"
                     onClick={() => setShowEmojiPicker(false)}
                   />
-                  <div className="absolute right-0 mt-2 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-30 w-80">
+                  <div className="absolute right-0 mt-2 p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-30 w-80">
                     <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Select an emoji</h4>
                     <div className="grid grid-cols-5 gap-2">
                       {['🔔', '⏰', '📅', '⚡', '💡', '📌', '✅', '🎯', '⭐', '💊', '🏃', '💰', '🏠', '📝', '📧', '☎️', '🎉', '🎂', '❤️', '🔥'].map((emoji) => (
@@ -226,7 +226,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                   className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all ${
                     formData.category === category.value
                       ? `${category.color} border-transparent text-white shadow-lg`
-                      : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                      : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
                   }`}
                 >
                   <span className="text-2xl mb-1">{category.icon}</span>

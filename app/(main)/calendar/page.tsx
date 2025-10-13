@@ -298,7 +298,7 @@ export default function CalendarPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <div className="bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-lg p-1 flex gap-1">
+              <div className="bg-gray-50 dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-lg p-1 flex gap-1">
                 <button
                   onClick={handleSetViewCalendar}
                   className={`px-3 sm:px-4 py-2 rounded-md font-medium transition-all flex items-center justify-center gap-2 flex-1 sm:flex-initial ${
@@ -343,7 +343,7 @@ export default function CalendarPage() {
           {/* Stats Dashboard - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Today</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-xl flex items-center justify-center">
@@ -353,7 +353,7 @@ export default function CalendarPage() {
               <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.today}</p>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">This Week</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center">
@@ -363,7 +363,7 @@ export default function CalendarPage() {
               <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.thisWeek}</p>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">This Month</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-500 rounded-xl flex items-center justify-center">
@@ -373,7 +373,7 @@ export default function CalendarPage() {
               <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.thisMonth}</p>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Total Events</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-calendar rounded-xl flex items-center justify-center">
@@ -387,7 +387,7 @@ export default function CalendarPage() {
 
           {/* Search Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -403,7 +403,7 @@ export default function CalendarPage() {
 
           {/* Events Section - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
@@ -416,7 +416,7 @@ export default function CalendarPage() {
 
               {/* Status Filter Toggle - Only show in list view */}
               {viewMode === 'list' && (
-                <div className="bg-white dark:bg-gray-800 border-2 border-purple-200 dark:border-purple-700 rounded-lg p-1 flex gap-1 w-fit">
+                <div className="bg-gray-50 dark:bg-gray-800 border-2 border-purple-200 dark:border-purple-700 rounded-lg p-1 flex gap-1 w-fit">
                   <button
                     onClick={() => setStatusFilter('all')}
                     className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
@@ -510,7 +510,7 @@ export default function CalendarPage() {
                           key={index}
                           className={`min-h-[80px] sm:min-h-[120px] p-1 sm:p-2 rounded-lg border transition-all ${
                             isCurrentMonth
-                              ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+                              ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
                               : 'border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50'
                           } ${isToday ? 'ring-1 sm:ring-2 ring-purple-500' : ''}`}
                         >
@@ -617,7 +617,7 @@ export default function CalendarPage() {
                         {!hasCompletedGuide && (
                           <button
                             onClick={() => setShowGuidedFlow(true)}
-                            className="px-6 py-3 bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
+                            className="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
                           >
                             <CalendarIcon className="w-5 h-5" />
                             Try Guided Creation

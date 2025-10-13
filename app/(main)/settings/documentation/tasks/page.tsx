@@ -385,7 +385,7 @@ export default function TasksDocumentationPage() {
         {/* Guide Sections */}
         <div className="space-y-8">
           {guideSections.map((section, index) => (
-            <div key={index} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div key={index} className="bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className={`bg-gradient-to-r ${section.color} p-6`}>
                 <div className="flex items-center gap-3">
                   <section.icon className="w-8 h-8 text-white" />

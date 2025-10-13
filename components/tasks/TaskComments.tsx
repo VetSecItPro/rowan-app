@@ -114,7 +114,7 @@ export function TaskComments({ taskId, userId }: TaskCommentsProps) {
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Add a comment..."
           title="Type your comment here and press Send"
-          className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900"
+          className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
         />
         <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
           <Send className="w-4 h-4" />

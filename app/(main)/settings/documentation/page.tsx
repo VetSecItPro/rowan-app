@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Header } from '@/components/layout/Header';
 import { CheckSquare, Calendar, Bell, MessageSquare, ShoppingBag, UtensilsCrossed, Home, Target, BookOpen, ArrowLeft } from 'lucide-react';
 
 const features = [
@@ -80,8 +81,10 @@ const features = [
 
 export default function DocumentationPage() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <div className="max-w-7xl mx-auto p-4 sm:p-8">
+    <>
+      <Header />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+        <div className="max-w-7xl mx-auto p-4 sm:p-8">
         {/* Header */}
         <div className="mb-8">
           <Link
@@ -113,7 +116,7 @@ export default function DocumentationPage() {
                 <Link
                   key={feature.id}
                   href={feature.href}
-                  className="group relative p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-xl transition-all duration-200"
+                  className="group relative p-6 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-xl transition-all duration-200"
                 >
                   <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4`}>
                     <Icon className="w-6 h-6 text-white" />
@@ -171,5 +174,6 @@ export default function DocumentationPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

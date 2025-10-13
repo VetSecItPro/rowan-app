@@ -74,7 +74,7 @@ function AcceptInvitationContent() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
           <Loader2 className="w-16 h-16 text-purple-600 dark:text-purple-400 animate-spin mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             Processing Invitation
@@ -90,7 +90,7 @@ function AcceptInvitationContent() {
   if (success) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
           <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
             <Check className="w-12 h-12 text-green-600 dark:text-green-400" />
           </div>
@@ -115,7 +115,7 @@ function AcceptInvitationContent() {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
           <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
             <X className="w-12 h-12 text-red-600 dark:text-red-400" />
           </div>
@@ -144,7 +144,7 @@ export default function AcceptInvitationPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
           <Loader2 className="w-16 h-16 text-purple-600 dark:text-purple-400 animate-spin mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             Loading...

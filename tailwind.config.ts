@@ -8,6 +8,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        // Custom off-white for light mode backgrounds
+        'off-white': '#fafafa', // gray-50 equivalent for softer light mode
+      },
       // Feature color gradients
       backgroundImage: {
         'gradient-tasks': 'linear-gradient(to right, rgb(59 130 246), rgb(37 99 235))', // blue-500 to blue-600

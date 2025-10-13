@@ -95,7 +95,7 @@ export default function ShoppingAnalyticsPage() {
             return (
               <div
                 key={index}
-                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6"
+                className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-3 rounded-lg bg-gradient-to-br ${stat.gradient} shadow-lg`}>
@@ -117,7 +117,7 @@ export default function ShoppingAnalyticsPage() {
         {/* Metrics Breakdown */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Item Categories */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Item Categories
@@ -153,7 +153,7 @@ export default function ShoppingAnalyticsPage() {
           </div>
 
           {/* Shopping Trends */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Shopping Trends

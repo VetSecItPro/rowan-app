@@ -65,7 +65,7 @@ export function CreateSpaceModal({ isOpen, onClose, onSpaceCreated }: CreateSpac
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl"
+        className="bg-gray-50 dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -99,7 +99,7 @@ export function CreateSpaceModal({ isOpen, onClose, onSpaceCreated }: CreateSpac
               value={spaceName}
               onChange={(e) => setSpaceName(e.target.value)}
               placeholder="e.g., Our Family, The Johnsons, Home Sweet Home"
-              className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               disabled={loading}
               maxLength={100}
             />

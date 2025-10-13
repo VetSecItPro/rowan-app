@@ -97,7 +97,7 @@ const CalendarDayCell = memo(({
     <div
       className={`min-h-[120px] p-2 rounded-lg border-2 transition-all ${
         isCurrentMonth
-          ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+          ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
           : 'border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50'
       } ${isToday ? 'ring-2 ring-purple-500' : ''}`}
     >
@@ -946,7 +946,7 @@ export default function MealsPage() {
             {/* This Week Card */}
             <button
               onClick={handleThisWeekClick}
-              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">This Week</h3>
@@ -958,7 +958,7 @@ export default function MealsPage() {
             {/* Next Two Weeks Card */}
             <button
               onClick={handleNextTwoWeeksClick}
-              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Next Two Weeks</h3>
@@ -970,7 +970,7 @@ export default function MealsPage() {
             {/* Saved Recipes Card */}
             <button
               onClick={handleSavedRecipesClick}
-              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Saved Recipes</h3>
@@ -982,7 +982,7 @@ export default function MealsPage() {
             {/* Shopping Items Card */}
             <Link
               href="/shopping"
-              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer block"
+              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer block"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Shopping Items</h3>
@@ -995,7 +995,7 @@ export default function MealsPage() {
 
           {/* Search Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -1021,7 +1021,7 @@ export default function MealsPage() {
 
           {/* Meals/Recipes Section - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             {viewMode !== 'calendar' && (
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
@@ -1268,7 +1268,7 @@ export default function MealsPage() {
                         {!hasCompletedGuide && (
                           <button
                             onClick={() => setShowGuidedFlow(true)}
-                            className="px-6 py-3 bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
+                            className="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
                           >
                             <UtensilsCrossed className="w-5 h-5" />
                             Try Guided Creation

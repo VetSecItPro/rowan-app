@@ -95,7 +95,7 @@ export default function MessagesAnalyticsPage() {
             return (
               <div
                 key={index}
-                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6"
+                className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-3 rounded-lg bg-gradient-to-br ${stat.gradient} shadow-lg`}>
@@ -117,7 +117,7 @@ export default function MessagesAnalyticsPage() {
         {/* Metrics Breakdown */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Message Volume */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Message Volume
@@ -153,7 +153,7 @@ export default function MessagesAnalyticsPage() {
           </div>
 
           {/* Peak Activity Hours */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Peak Activity Hours

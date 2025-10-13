@@ -50,7 +50,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-transparent rounded-lg p-4 hover:shadow-lg transition-all duration-200 group">
+    <div className="bg-gray-50 dark:bg-gray-800 border border-transparent rounded-lg p-4 hover:shadow-lg transition-all duration-200 group">
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-start gap-3 flex-1">
@@ -120,7 +120,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                 className="fixed inset-0 z-10"
                 onClick={() => setShowMenu(false)}
               />
-              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
+              <div className="absolute right-0 mt-2 w-48 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
                 <button
                   onClick={() => {
                     onEdit(reminder);
@@ -183,7 +183,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                   className="fixed inset-0 z-10"
                   onClick={() => setShowSnoozeMenu(false)}
                 />
-                <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+                <div className="absolute right-0 mt-1 w-32 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
                   {[15, 30, 60, 120].map((minutes) => (
                     <button
                       key={minutes}

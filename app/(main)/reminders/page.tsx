@@ -243,7 +243,7 @@ export default function RemindersPage() {
           {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {/* Active */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Active</h3>
                 <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
@@ -254,7 +254,7 @@ export default function RemindersPage() {
             </div>
 
             {/* Overdue */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Overdue</h3>
                 <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center">
@@ -265,7 +265,7 @@ export default function RemindersPage() {
             </div>
 
             {/* Completed */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completed</h3>
                 <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
@@ -276,7 +276,7 @@ export default function RemindersPage() {
             </div>
 
             {/* Total */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total</h3>
                 <div className="w-12 h-12 bg-gradient-reminders rounded-xl flex items-center justify-center">
@@ -290,7 +290,7 @@ export default function RemindersPage() {
 
           {/* Search & Filter Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                   {/* Search */}
                   <div className="flex-1 relative">
@@ -309,7 +309,7 @@ export default function RemindersPage() {
 
               {/* Reminders List - Only show when NOT in guided flow */}
               {!showGuidedFlow && (
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             {/* Header with Month Badge and Status Filter */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
@@ -392,7 +392,7 @@ export default function RemindersPage() {
                     {!hasCompletedGuide && (
                       <button
                         onClick={() => setShowGuidedFlow(true)}
-                        className="px-6 py-3 bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
+                        className="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
                       >
                         <Bell className="w-5 h-5" />
                         Try Guided Creation
@@ -434,7 +434,7 @@ export default function RemindersPage() {
         isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleCloseModal} />
-            <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
+            <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">No Space Available</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
                 You need to create or join a space before creating reminders.

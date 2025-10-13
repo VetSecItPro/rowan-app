@@ -151,14 +151,14 @@ export default function RecipesPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search recipes..."
-              className="w-full pl-12 pr-4 py-3 bg-white dark:bg-gray-800 border-0 rounded-lg shadow-lg focus:ring-2 focus:ring-orange-300 text-gray-900 dark:text-white placeholder-gray-500"
+              className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border-0 rounded-lg shadow-lg focus:ring-2 focus:ring-orange-300 text-gray-900 dark:text-white placeholder-gray-500"
             />
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-4 mb-3">
             <Filter className="w-5 h-5 text-gray-500 dark:text-gray-400" />
@@ -259,7 +259,7 @@ export default function RecipesPage() {
               </Link>
               <Link
                 href="/recipes/new"
-                className="px-6 py-3 bg-white dark:bg-gray-800 text-orange-600 dark:text-orange-400 border-2 border-orange-600 dark:border-orange-400 rounded-lg font-medium hover:bg-orange-50 dark:hover:bg-gray-700 transition-all"
+                className="px-6 py-3 bg-gray-50 dark:bg-gray-800 text-orange-600 dark:text-orange-400 border-2 border-orange-600 dark:border-orange-400 rounded-lg font-medium hover:bg-orange-50 dark:hover:bg-gray-700 transition-all"
               >
                 Create Recipe
               </Link>
@@ -292,7 +292,7 @@ export default function RecipesPage() {
             {filteredRecipes.map((recipe) => (
               <div
                 key={recipe.id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
+                className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
               >
                 {/* Recipe Image */}
                 {recipe.image_url ? (
