@@ -193,38 +193,40 @@ export default function ShoppingDocumentation() {
       <Header />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
-      <div className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
+      <div className="mb-8">
         <div className="max-w-6xl mx-auto px-6 py-12">
           <Link
             href="/settings/documentation"
-            className="inline-flex items-center gap-2 text-white/90 hover:text-white transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Documentation
           </Link>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-              <ShoppingCart className="w-8 h-8" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg">
+              <ShoppingCart className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold mb-2">Shopping Lists Guide</h1>
-              <p className="text-white/90 text-lg">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+                Shopping Lists Guide
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
                 Complete guide to managing household shopping with smart features
               </p>
             </div>
           </div>
 
-          <div className="bg-white/10 dark:bg-black/10 backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-xl p-6">
+          <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-6">
             <div className="flex items-start gap-3">
-              <Lightbulb className="w-6 h-6 text-white/90 flex-shrink-0 mt-0.5" />
+              <Lightbulb className="w-6 h-6 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="text-lg font-semibold text-white mb-2">
+                <h3 className="text-lg font-semibold text-emerald-900 dark:text-emerald-100 mb-2">
                   Welcome to Shopping Lists
                 </h3>
-                <p className="text-white/90 mb-3">
+                <p className="text-emerald-800 dark:text-emerald-200 mb-3">
                   Rowan helps you organize household shopping with powerful collaboration features:
                 </p>
-                <div className="grid sm:grid-cols-2 gap-2 text-sm text-white/80">
+                <div className="grid sm:grid-cols-2 gap-2 text-sm text-emerald-700 dark:text-emerald-300">
                   <div className="flex items-start gap-2">
                     <Tags className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <span><strong>Smart Categories</strong> - 11 auto-categorized sections</span>
