@@ -133,14 +133,22 @@ export const WeekCalendarView = memo(function WeekCalendarView({
         <div className="flex items-center gap-2">
           <button
             onClick={toggleSelectionMode}
-            className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium ${
+            className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium relative group ${
               selectionMode
-                ? 'bg-orange-600 text-white hover:bg-orange-700'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                ? 'bg-red-600 text-white hover:bg-red-700'
+                : 'bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-sm'
             }`}
+            title={selectionMode ? 'Cancel selection' : 'Select multiple meals to generate shopping list or bulk delete'}
           >
             {selectionMode ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
-            {selectionMode ? 'Cancel' : 'Select'}
+            {selectionMode ? 'Cancel Selection' : 'Select Meals'}
+            {/* Tooltip */}
+            {!selectionMode && (
+              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-lg">
+                Select multiple meals to generate shopping list or bulk delete
+                <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></span>
+              </span>
+            )}
           </button>
 
           {!isCurrentWeek && !selectionMode && (
@@ -216,6 +224,9 @@ export const WeekCalendarView = memo(function WeekCalendarView({
                     const config = MEAL_TYPE_CONFIG[meal.meal_type];
                     const Icon = config.icon;
                     const isSelected = selectedMealIds.has(meal.id);
+                    const mealDate = new Date(meal.scheduled_date);
+                    const now = new Date();
+                    const isPastMeal = mealDate < now;
 
                     return (
                       <button
@@ -223,7 +234,8 @@ export const WeekCalendarView = memo(function WeekCalendarView({
                         onClick={() => selectionMode ? toggleMealSelection(meal.id) : onMealClick(meal)}
                         className={`w-full text-left p-2 rounded-lg border-l-4 ${config.bg} ${config.border} hover:shadow-md transition-all ${
                           isSelected ? 'ring-2 ring-orange-500' : ''
-                        }`}
+                        } ${isPastMeal ? 'opacity-60' : ''}`}
+                        title={isPastMeal ? 'Past meal' : ''}
                       >
                         <div className="flex items-start gap-2">
                           {selectionMode && (
@@ -235,11 +247,16 @@ export const WeekCalendarView = memo(function WeekCalendarView({
                               )}
                             </div>
                           )}
-                          <Icon className={`w-4 h-4 mt-0.5 ${config.color}`} />
+                          <Icon className={`w-4 h-4 mt-0.5 ${config.color} ${isPastMeal ? 'opacity-70' : ''}`} />
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium text-gray-900 dark:text-white text-sm truncate">
-                              {meal.recipe?.name || meal.name || 'Untitled Meal'}
-                            </p>
+                            <div className="flex items-center gap-1">
+                              <p className={`font-medium text-gray-900 dark:text-white text-sm truncate ${isPastMeal ? 'line-through' : ''}`}>
+                                {meal.recipe?.name || meal.name || 'Untitled Meal'}
+                              </p>
+                              {isPastMeal && (
+                                <CheckSquare className="w-3 h-3 text-green-600 dark:text-green-400 flex-shrink-0" />
+                              )}
+                            </div>
                             {meal.notes && (
                               <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
                                 {meal.notes}
