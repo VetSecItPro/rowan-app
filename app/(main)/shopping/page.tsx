@@ -19,6 +19,7 @@ export default function ShoppingPage() {
   const [editingList, setEditingList] = useState<ShoppingList | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed'>('active');
+  const [timeFilter, setTimeFilter] = useState<'all' | 'week'>('all');
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
 
@@ -38,6 +39,23 @@ export default function ShoppingPage() {
       filtered = filtered.filter(l => l.status === statusFilter);
     }
 
+    // Filter by time (this week)
+    if (timeFilter === 'week') {
+      const now = new Date();
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
+      startOfWeek.setHours(0, 0, 0, 0);
+
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 7);
+      endOfWeek.setHours(23, 59, 59, 999);
+
+      filtered = filtered.filter(l => {
+        const createdDate = new Date(l.created_at);
+        return createdDate >= startOfWeek && createdDate <= endOfWeek;
+      });
+    }
+
     // Filter by search
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -48,7 +66,7 @@ export default function ShoppingPage() {
     }
 
     return filtered;
-  }, [lists, searchQuery, statusFilter]);
+  }, [lists, searchQuery, statusFilter, timeFilter]);
 
   // Memoized stats calculations
   const memoizedStats = useMemo(() => stats, [stats]);
@@ -245,14 +263,22 @@ export default function ShoppingPage() {
   // Memoized callbacks for stat card clicks
   const handleTotalListsClick = useCallback(() => {
     setStatusFilter('all');
+    setTimeFilter('all');
   }, []);
 
   const handleActiveListsClick = useCallback(() => {
     setStatusFilter('active');
+    setTimeFilter('all');
+  }, []);
+
+  const handleItemsThisWeekClick = useCallback(() => {
+    setStatusFilter('all');
+    setTimeFilter('week');
   }, []);
 
   const handleCompletedListsClick = useCallback(() => {
     setStatusFilter('completed');
+    setTimeFilter('all');
   }, []);
 
   // Memoized callback for status filter change
@@ -330,13 +356,16 @@ export default function ShoppingPage() {
               </div>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.activeLists}</p>
             </button>
-            <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <button
+              onClick={handleItemsThisWeekClick}
+              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
+            >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Items This Week</h3>
                 <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center"><Package className="w-6 h-6 text-white" /></div>
               </div>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.itemsThisWeek}</p>
-            </div>
+            </button>
             <button
               onClick={handleCompletedListsClick}
               className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
@@ -376,10 +405,10 @@ export default function ShoppingPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                  All Shopping Lists ({filteredLists.length})
+                  {timeFilter === 'week' ? 'This Week\'s Lists' : 'All Shopping Lists'} ({filteredLists.length})
                 </h2>
                 <span className="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 text-sm font-medium rounded-full">
-                  {format(new Date(), 'MMM yyyy')}
+                  {timeFilter === 'week' ? 'This Week' : format(new Date(), 'MMM yyyy')}
                 </span>
               </div>
 
