@@ -53,5 +53,5 @@ $$ LANGUAGE plpgsql;
 
 -- Add comments
 COMMENT ON TABLE quick_action_usage IS 'Tracks usage of quick actions for analytics';
-COMMENT ON VIEW quick_action_stats IS 'Aggregated quick action usage stats (last 30 days)';
+COMMENT ON MATERIALIZED VIEW quick_action_stats IS 'Aggregated quick action usage stats (last 30 days)';
 COMMENT ON COLUMN quick_action_usage.action_type IS 'Type of quick action (mark_complete, assign_to_me, snooze_1_day, etc.)';
