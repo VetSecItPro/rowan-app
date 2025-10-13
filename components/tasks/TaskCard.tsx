@@ -1,16 +1,24 @@
 'use client';
 
-import { CheckSquare, Clock, Flag, User, Calendar as CalendarIcon, MoreVertical } from 'lucide-react';
+import { CheckSquare, Clock, Flag, User, Calendar as CalendarIcon, MoreVertical, ShoppingCart } from 'lucide-react';
 import { Task } from '@/lib/types';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
 import { TASK_CATEGORIES } from './NewTaskModal';
+import Link from 'next/link';
+
+interface LinkedShoppingList {
+  id: string;
+  title: string;
+  items_count?: number;
+}
 
 interface TaskCardProps {
   task: Task & { type?: 'task' | 'chore' };
   onStatusChange: (taskId: string, status: string, type?: 'task' | 'chore') => void;
   onEdit: (task: Task & { type?: 'task' | 'chore' }) => void;
   onDelete: (taskId: string, type?: 'task' | 'chore') => void;
+  linkedShoppingList?: LinkedShoppingList;
 }
 
 const priorityColors = {
@@ -27,7 +35,7 @@ const statusColors = {
   cancelled: 'bg-red-500',
 };
 
-export function TaskCard({ task, onStatusChange, onEdit, onDelete }: TaskCardProps) {
+export function TaskCard({ task, onStatusChange, onEdit, onDelete, linkedShoppingList }: TaskCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'completed';
@@ -224,6 +232,20 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete }: TaskCardPro
           <User className="w-3 h-3" />
           <span>Assigned</span>
         </div>
+      )}
+
+      {/* Linked Shopping List */}
+      {linkedShoppingList && (
+        <Link
+          href="/shopping"
+          className="mt-3 flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors text-sm"
+        >
+          <ShoppingCart className="w-4 h-4" />
+          <span className="font-medium">
+            {linkedShoppingList.title}
+            {linkedShoppingList.items_count !== undefined && ` (${linkedShoppingList.items_count} items)`}
+          </span>
+        </Link>
       )}
     </div>
   );
