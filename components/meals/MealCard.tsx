@@ -1,6 +1,6 @@
 'use client';
 
-import { UtensilsCrossed, Clock, MoreVertical } from 'lucide-react';
+import { UtensilsCrossed, Clock, MoreVertical, CheckSquare } from 'lucide-react';
 import { Meal } from '@/lib/services/meals-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
@@ -22,20 +22,31 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const typeColor = mealTypeColors[meal.meal_type] || 'bg-gray-500';
 
+  // Check if meal is in the past
+  const mealDate = new Date(meal.scheduled_date);
+  const now = new Date();
+  const isPastMeal = mealDate < now;
+
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-all duration-200">
+    <div className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-all duration-200 ${isPastMeal ? 'opacity-70' : ''}`}>
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-3">
-            <div className={`w-10 h-10 ${typeColor} rounded-lg flex items-center justify-center`}>
+            <div className={`w-10 h-10 ${typeColor} rounded-lg flex items-center justify-center ${isPastMeal ? 'opacity-70' : ''}`}>
               <UtensilsCrossed className="w-5 h-5 text-white" />
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {meal.name || meal.recipe?.name || 'Untitled Meal'}
-              </h3>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h3 className={`text-lg font-semibold text-gray-900 dark:text-white ${isPastMeal ? 'line-through' : ''}`}>
+                  {meal.name || meal.recipe?.name || 'Untitled Meal'}
+                </h3>
+                {isPastMeal && (
+                  <CheckSquare className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                )}
+              </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">
                 {meal.meal_type} • {formatTimestamp(meal.scheduled_date, 'MMM d, yyyy')}
+                {isPastMeal && <span className="ml-2 text-green-600 dark:text-green-400 text-xs font-medium">• Completed</span>}
               </p>
             </div>
           </div>
