@@ -40,6 +40,23 @@ export const shoppingIntegrationService = {
     if (error) throw error;
   },
 
+  async getShoppingListsForEvent(eventId: string) {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('shopping_calendar_events')
+      .select('list_id, list:shopping_lists(id, title, items:shopping_items(id))')
+      .eq('event_id', eventId);
+
+    if (error) throw error;
+
+    // Transform the data to include items_count
+    return (data || []).map((item: any) => ({
+      id: item.list?.id,
+      title: item.list?.title,
+      items_count: item.list?.items?.length || 0,
+    }));
+  },
+
   // Tasks Integration
   async linkToTask(listId: string, taskId: string, syncCompletion = true) {
     const supabase = createClient();
@@ -71,12 +88,29 @@ export const shoppingIntegrationService = {
 
   async unlinkFromTask(listId: string) {
     const supabase = createClient();
-    const { error } = await supabase
+    const { error} = await supabase
       .from('shopping_tasks')
       .delete()
       .eq('list_id', listId);
 
     if (error) throw error;
+  },
+
+  async getShoppingListsForTask(taskId: string) {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('shopping_tasks')
+      .select('list_id, list:shopping_lists(id, title, items:shopping_items(id))')
+      .eq('task_id', taskId);
+
+    if (error) throw error;
+
+    // Transform the data to include items_count
+    return (data || []).map((item: any) => ({
+      id: item.list?.id,
+      title: item.list?.title,
+      items_count: item.list?.items?.length || 0,
+    }));
   },
 
   // Reminders Integration

@@ -1,18 +1,26 @@
 'use client';
 
-import { Calendar, Clock, MapPin, MoreVertical, Edit, Trash2, Check } from 'lucide-react';
+import { Calendar, Clock, MapPin, MoreVertical, Edit, Trash2, Check, ShoppingCart } from 'lucide-react';
 import { CalendarEvent } from '@/lib/services/calendar-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
+import Link from 'next/link';
+
+interface LinkedShoppingList {
+  id: string;
+  title: string;
+  items_count?: number;
+}
 
 interface EventCardProps {
   event: CalendarEvent;
   onEdit: (event: CalendarEvent) => void;
   onDelete: (id: string) => void;
   onStatusChange: (id: string, status: 'not-started' | 'in-progress' | 'completed') => void;
+  linkedShoppingList?: LinkedShoppingList;
 }
 
-export function EventCard({ event, onEdit, onDelete, onStatusChange }: EventCardProps) {
+export function EventCard({ event, onEdit, onDelete, onStatusChange, linkedShoppingList }: EventCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const formatEventTime = () => {
@@ -138,6 +146,21 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange }: EventCard
               <MapPin className="w-4 h-4" />
               <span className="text-sm">{event.location}</span>
             </div>
+          )}
+
+          {linkedShoppingList && (
+            <Link
+              href="/shopping"
+              className={`flex items-center gap-2 mt-3 ml-4 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors ${
+                event.status === 'completed' ? 'opacity-60' : ''
+              }`}
+            >
+              <ShoppingCart className="w-4 h-4" />
+              <span className="text-sm font-medium">
+                {linkedShoppingList.title}
+                {linkedShoppingList.items_count !== undefined && ` (${linkedShoppingList.items_count} items)`}
+              </span>
+            </Link>
           )}
         </div>
 

@@ -8,6 +8,7 @@ import { NewEventModal } from '@/components/calendar/NewEventModal';
 import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { calendarService, CalendarEvent, CreateEventInput } from '@/lib/services/calendar-service';
+import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, parseISO } from 'date-fns';
 
@@ -25,6 +26,7 @@ export default function CalendarPage() {
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [statusFilter, setStatusFilter] = useState<'all' | 'not-started' | 'in-progress' | 'completed'>('all');
+  const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, any>>({});
 
   // Memoize stats calculations
   const stats = useMemo(() => {
@@ -128,6 +130,22 @@ export default function CalendarPage() {
       ]);
 
       setEvents(eventsData);
+
+      // Load linked shopping lists for all events
+      const linkedListsMap: Record<string, any> = {};
+      await Promise.all(
+        eventsData.map(async (event) => {
+          try {
+            const linkedLists = await shoppingIntegrationService.getShoppingListsForEvent(event.id);
+            if (linkedLists && linkedLists.length > 0) {
+              linkedListsMap[event.id] = linkedLists[0]; // For now, just take the first linked list
+            }
+          } catch (error) {
+            console.error(`Failed to load shopping list for event ${event.id}:`, error);
+          }
+        })
+      );
+      setLinkedShoppingLists(linkedListsMap);
 
       // Check if user has completed the guided event flow
       const userProgress = userProgressResult.success ? userProgressResult.data : null;
@@ -617,6 +635,7 @@ export default function CalendarPage() {
                         onEdit={handleEditEvent}
                         onDelete={handleDeleteEvent}
                         onStatusChange={handleStatusChange}
+                        linkedShoppingList={linkedShoppingLists[event.id]}
                       />
                     ))}
                   </div>
