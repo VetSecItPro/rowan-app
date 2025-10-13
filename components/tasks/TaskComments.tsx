@@ -64,6 +64,18 @@ export function TaskComments({ taskId, userId }: TaskCommentsProps) {
         <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Comments ({comments.length})
         </h4>
+        <div className="group relative">
+          <button
+            type="button"
+            className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            aria-label="Comments help"
+          >
+            ⓘ
+          </button>
+          <div className="absolute left-0 top-6 hidden group-hover:block z-50 w-64 p-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg">
+            Add comments to collaborate with your team. React with emojis to show support or acknowledgment.
+          </div>
+        </div>
       </div>
 
       <div className="space-y-3">
@@ -74,12 +86,16 @@ export function TaskComments({ taskId, userId }: TaskCommentsProps) {
               <button
                 onClick={() => addReaction(comment.id, '👍')}
                 className="text-xs text-gray-500 hover:text-gray-700"
+                title="React with thumbs up"
+                aria-label="React with thumbs up"
               >
                 👍
               </button>
               <button
                 onClick={() => addReaction(comment.id, '❤️')}
                 className="text-xs text-gray-500 hover:text-gray-700"
+                title="React with heart"
+                aria-label="React with heart"
               >
                 ❤️
               </button>
@@ -97,6 +113,7 @@ export function TaskComments({ taskId, userId }: TaskCommentsProps) {
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Add a comment..."
+          title="Type your comment here and press Send"
           className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900"
         />
         <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
