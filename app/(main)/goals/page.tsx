@@ -330,47 +330,86 @@ export default function GoalsPage() {
           {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {/* Active Goals */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Active Goals</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-goals rounded-xl flex items-center justify-center">
                   <Target className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.active}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.active}</p>
+                {stats.active > 0 && (
+                  <div className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400">
+                    <Target className="w-3 h-3" />
+                    <span className="text-xs font-medium">Ongoing</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* In Progress */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">In Progress</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-xl flex items-center justify-center">
                   <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.inProgress}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.inProgress}</p>
+                {stats.inProgress > 0 && (
+                  <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                    <TrendingUp className="w-3 h-3" />
+                    <span className="text-xs font-medium">Working on it</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Milestones */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Milestones</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-500 rounded-xl flex items-center justify-center">
                   <Award className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.milestonesReached}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.milestonesReached}</p>
+                {stats.milestonesReached > 0 && (
+                  <div className="flex items-center gap-1 text-purple-600 dark:text-purple-400">
+                    <Award className="w-3 h-3" />
+                    <span className="text-xs font-medium">Reached!</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Completed */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Completed</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center">
                   <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
+              <div className="flex items-end justify-between">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
+                {(stats.active + stats.completed) > 0 && (
+                  <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                    <TrendingUp className="w-3 h-3" />
+                    <span className="text-xs font-medium">
+                      {(() => {
+                        const percentage = Math.round((stats.completed / (stats.active + stats.completed)) * 100);
+                        if (percentage >= 67) return `${percentage}% 🎉`;
+                        if (percentage >= 34) return `${percentage}%`;
+                        return percentage > 0 ? `${percentage}%` : 'Start';
+                      })()}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           )}
