@@ -3,7 +3,9 @@
 import { ShoppingCart, MoreVertical, Check, Plus } from 'lucide-react';
 import { ShoppingList } from '@/lib/services/shopping-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { getCategoryIcon, getCategoryLabel } from '@/lib/constants/shopping-categories';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 interface ShoppingListCardProps {
   list: ShoppingList;
@@ -20,6 +22,28 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
   const totalItems = list.items?.length || 0;
   const checkedItems = list.items?.filter(item => item.checked).length || 0;
   const progress = totalItems > 0 ? (checkedItems / totalItems) * 100 : 0;
+
+  // Group items by category
+  const itemsByCategory = useMemo(() => {
+    if (!list.items) return {};
+
+    const grouped: Record<string, typeof list.items> = {};
+    list.items.forEach(item => {
+      const category = item.category || 'other';
+      if (!grouped[category]) {
+        grouped[category] = [];
+      }
+      grouped[category].push(item);
+    });
+
+    // Sort categories
+    return Object.keys(grouped)
+      .sort()
+      .reduce((acc, key) => {
+        acc[key] = grouped[key].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+        return acc;
+      }, {} as Record<string, typeof list.items>);
+  }, [list.items]);
 
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-all duration-200">
@@ -67,33 +91,50 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
             </div>
           </div>
 
-          {/* Items Preview */}
+          {/* Items Preview - Grouped by Category */}
           {list.items && list.items.length > 0 && (
-            <div className="space-y-2">
-              {(isExpanded ? list.items : list.items.slice(0, 3)).map((item) => (
-                <div key={item.id} className="flex items-center gap-2">
-                  <button
-                    onClick={() => onToggleItem?.(item.id, !item.checked)}
-                    aria-label={`Toggle item: ${item.name}`}
-                    className={`flex-shrink-0 w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${
-                      item.checked
-                        ? 'bg-green-500 border-green-500'
-                        : 'border-gray-300 dark:border-gray-600'
-                    }`}
-                  >
-                    {item.checked && <Check className="w-3 h-3 text-white" />}
-                  </button>
-                  <span className={`text-sm ${item.checked ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-300'}`}>
-                    {item.name} {item.quantity > 1 && `(${item.quantity})`}
-                  </span>
+            <div className="space-y-3">
+              {Object.entries(itemsByCategory).slice(0, isExpanded ? undefined : 2).map(([category, items]) => (
+                <div key={category} className="space-y-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-lg">{getCategoryIcon(category as any)}</span>
+                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      {getCategoryLabel(category as any)}
+                    </span>
+                  </div>
+                  {items?.slice(0, isExpanded ? undefined : 3).map((item) => (
+                    <div key={item.id} className="flex items-center gap-2 ml-7">
+                      <Tooltip content={item.checked ? 'Mark as not purchased' : 'Mark as purchased'}>
+                        <button
+                          onClick={() => onToggleItem?.(item.id, !item.checked)}
+                          aria-label={`Toggle item: ${item.name}`}
+                          className={`flex-shrink-0 w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${
+                            item.checked
+                              ? 'bg-green-500 border-green-500'
+                              : 'border-gray-300 dark:border-gray-600 hover:border-emerald-500'
+                          }`}
+                        >
+                          {item.checked && <Check className="w-3 h-3 text-white" />}
+                        </button>
+                      </Tooltip>
+                      <span className={`text-sm flex-1 ${item.checked ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                        {item.name} {item.quantity > 1 && `(${item.quantity})`}
+                      </span>
+                      {item.estimated_price && (
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          ${item.estimated_price.toFixed(2)}
+                        </span>
+                      )}
+                    </div>
+                  ))}
                 </div>
               ))}
-              {list.items.length > 3 && (
+              {(Object.keys(itemsByCategory).length > 2 || list.items.length > 6) && (
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="text-xs text-emerald-600 dark:text-emerald-400 pl-6 hover:underline"
+                  className="text-xs text-emerald-600 dark:text-emerald-400 ml-7 hover:underline"
                 >
-                  {isExpanded ? 'Show less' : `+${list.items.length - 3} more items`}
+                  {isExpanded ? 'Show less' : `+${list.items.length - 6} more items`}
                 </button>
               )}
             </div>
@@ -141,20 +182,38 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
         </div>
       </div>
 
-      {/* Status Badge */}
-      <div className="flex items-center justify-between">
-        <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-          list.status === 'completed'
-            ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-            : list.status === 'active'
-            ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-            : 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300'
-        }`}>
-          {list.status}
-        </span>
-        <span className="text-xs text-gray-500 dark:text-gray-400">
-          {formatTimestamp(list.created_at, 'MMM d, yyyy')}
-        </span>
+      {/* Footer: Status, Store, Budget */}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-2">
+          <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+            list.status === 'completed'
+              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+              : list.status === 'active'
+              ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+              : 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300'
+          }`}>
+            {list.status}
+          </span>
+          {list.store_name && (
+            <Tooltip content={`Shopping at ${list.store_name}`}>
+              <span className="px-2 py-1 text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full">
+                🏪 {list.store_name}
+              </span>
+            </Tooltip>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          {list.budget && (
+            <Tooltip content={`Budget: $${list.budget.toFixed(2)}`}>
+              <span className="text-xs text-gray-600 dark:text-gray-400">
+                💰 ${list.estimated_total?.toFixed(2) || '0.00'} / ${list.budget.toFixed(2)}
+              </span>
+            </Tooltip>
+          )}
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {formatTimestamp(list.created_at, 'MMM d, yyyy')}
+          </span>
+        </div>
       </div>
     </div>
   );
