@@ -1,0 +1,111 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Check, Plus, X, GripVertical } from 'lucide-react';
+import { taskSubtasksService, Subtask } from '@/lib/services/task-subtasks-service';
+
+interface SubtasksListProps {
+  taskId: string;
+  userId: string;
+}
+
+export function SubtasksList({ taskId, userId }: SubtasksListProps) {
+  const [subtasks, setSubtasks] = useState<Subtask[]>([]);
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadSubtasks();
+  }, [taskId]);
+
+  async function loadSubtasks() {
+    try {
+      const data = await taskSubtasksService.getSubtasks(taskId);
+      setSubtasks(data);
+    } catch (error) {
+      console.error('Error loading subtasks:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleAddSubtask(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newSubtaskTitle.trim()) return;
+
+    try {
+      await taskSubtasksService.createSubtask({
+        parent_task_id: taskId,
+        title: newSubtaskTitle,
+        created_by: userId,
+        sort_order: subtasks.length,
+      });
+      setNewSubtaskTitle('');
+      loadSubtasks();
+    } catch (error) {
+      console.error('Error creating subtask:', error);
+    }
+  }
+
+  async function toggleSubtask(subtaskId: string, currentStatus: string) {
+    const newStatus = currentStatus === 'completed' ? 'pending' : 'completed';
+    try {
+      await taskSubtasksService.updateSubtask(subtaskId, { status: newStatus });
+      loadSubtasks();
+    } catch (error) {
+      console.error('Error updating subtask:', error);
+    }
+  }
+
+  const completionPercentage = subtasks.length > 0
+    ? Math.round((subtasks.filter(s => s.status === 'completed').length / subtasks.length) * 100)
+    : 0;
+
+  if (loading) return <div className="text-sm text-gray-500">Loading subtasks...</div>;
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          Subtasks {subtasks.length > 0 && `(${completionPercentage}% complete)`}
+        </h4>
+      </div>
+
+      <form onSubmit={handleAddSubtask} className="flex gap-2">
+        <input
+          type="text"
+          value={newSubtaskTitle}
+          onChange={(e) => setNewSubtaskTitle(e.target.value)}
+          placeholder="Add a subtask..."
+          className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900"
+        />
+        <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+          <Plus className="w-4 h-4" />
+        </button>
+      </form>
+
+      {subtasks.length > 0 && (
+        <div className="space-y-2">
+          {subtasks.map((subtask) => (
+            <div
+              key={subtask.id}
+              className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg"
+            >
+              <button
+                onClick={() => toggleSubtask(subtask.id, subtask.status)}
+                className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center ${
+                  subtask.status === 'completed' ? 'bg-green-500 border-green-500' : 'border-gray-300'
+                }`}
+              >
+                {subtask.status === 'completed' && <Check className="w-3 h-3 text-white" />}
+              </button>
+              <span className={`flex-1 text-sm ${subtask.status === 'completed' ? 'line-through text-gray-400' : ''}`}>
+                {subtask.title}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
