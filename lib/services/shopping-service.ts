@@ -196,9 +196,9 @@ export const shoppingService = {
     let itemsThisWeek = 0;
     lists.forEach(list => {
       if (list.items) {
-        itemsThisWeek += list.items.filter(item =>
-          new Date(item.created_at) >= weekAgo
-        ).length;
+        itemsThisWeek += list.items
+          .filter(item => new Date(item.created_at) >= weekAgo)
+          .reduce((sum, item) => sum + (item.quantity || 1), 0);
       }
     });
 
