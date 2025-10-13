@@ -13,12 +13,14 @@ interface NewRecipeModalProps {
   onSave: (recipe: CreateRecipeInput) => void;
   editRecipe?: Recipe | null;
   spaceId: string;
+  initialTab?: TabType;
+  onRecipeAdded?: (recipeData: CreateRecipeInput) => void;
 }
 
 type TabType = 'manual' | 'ai' | 'discover';
 
-export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }: NewRecipeModalProps) {
-  const [activeTab, setActiveTab] = useState<TabType>('manual');
+export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, initialTab = 'manual', onRecipeAdded }: NewRecipeModalProps) {
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [formData, setFormData] = useState<CreateRecipeInput>({
     space_id: spaceId,
     name: '',
@@ -76,12 +78,12 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
       });
     }
     // Reset AI import fields when modal opens/closes
-    setActiveTab('manual');
+    setActiveTab(initialTab);
     setRecipeText('');
     setRecipeImage(null);
     setImagePreview(null);
     setParsing(false);
-  }, [editRecipe, spaceId, isOpen]);
+  }, [editRecipe, spaceId, isOpen, initialTab]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -285,8 +287,16 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId }:
       tags: recipe.cuisine ? [recipe.cuisine] : [],
     };
 
-    onSave(recipeData);
-    onClose();
+    // If onRecipeAdded is provided, this was opened from meal planning
+    // Pass the recipe data back instead of saving directly
+    if (onRecipeAdded) {
+      onRecipeAdded(recipeData);
+      onClose();
+    } else {
+      // Normal flow - save and close
+      onSave(recipeData);
+      onClose();
+    }
   };
 
   if (!isOpen) return null;

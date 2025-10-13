@@ -11,9 +11,10 @@ interface NewMealModalProps {
   editMeal?: Meal | null;
   spaceId: string;
   recipes?: Recipe[];
+  onOpenRecipeDiscover?: () => void;
 }
 
-export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recipes = [] }: NewMealModalProps) {
+export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recipes = [], onOpenRecipeDiscover }: NewMealModalProps) {
   const [formData, setFormData] = useState<CreateMealInput>({
     space_id: spaceId,
     name: '',
@@ -253,15 +254,16 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                     onClick={(e) => {
                       e.stopPropagation();
                       setIsRecipeSelectorOpen(false);
-                      // Open meals page in new tab, which has the recipe modal with discover tab
-                      window.open('/meals?openRecipeDiscover=true', '_blank');
+                      if (onOpenRecipeDiscover) {
+                        onOpenRecipeDiscover();
+                      }
                     }}
                     className="w-full px-4 py-3 flex items-center justify-between bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-y border-orange-200 dark:border-orange-700 hover:from-orange-100 hover:to-red-100 dark:hover:from-orange-900/30 dark:hover:to-red-900/30 transition-all group"
                   >
                     <div className="flex items-center gap-2">
                       <ChefHat className="w-4 h-4 text-orange-600 dark:text-orange-400" />
                       <span className="text-orange-700 dark:text-orange-300 font-medium text-sm">
-                        Discover Recipes from APIs
+                        Discover Recipes
                       </span>
                     </div>
                     <svg className="w-4 h-4 text-orange-600 dark:text-orange-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
