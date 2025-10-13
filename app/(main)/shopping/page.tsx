@@ -412,7 +412,7 @@ export default function ShoppingPage() {
             ) : (
               <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                 {filteredLists.map((list) => (
-                  <ShoppingListCard key={list.id} list={list} onEdit={handleEditList} onDelete={handleDeleteList} onToggleItem={handleToggleItem} />
+                  <ShoppingListCard key={list.id} list={list} onEdit={handleEditList} onDelete={handleDeleteList} onToggleItem={handleToggleItem} onCompleteList={handleCompleteList} />
                 ))}
               </div>
             )}

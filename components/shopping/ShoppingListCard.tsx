@@ -10,9 +10,10 @@ interface ShoppingListCardProps {
   onEdit: (list: ShoppingList) => void;
   onDelete: (listId: string) => void;
   onToggleItem?: (itemId: string, checked: boolean) => void;
+  onCompleteList?: (listId: string) => void;
 }
 
-export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem }: ShoppingListCardProps) {
+export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompleteList }: ShoppingListCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -28,6 +29,18 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem }: Shopp
             <div className="w-10 h-10 bg-gradient-shopping rounded-lg flex items-center justify-center">
               <ShoppingCart className="w-5 h-5 text-white" />
             </div>
+            <button
+              onClick={() => onCompleteList?.(list.id)}
+              disabled={list.status === 'completed'}
+              aria-label={`Mark entire shopping list as ${list.status === 'completed' ? 'completed' : 'complete'}`}
+              className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                list.status === 'completed'
+                  ? 'bg-green-500 border-green-500 cursor-not-allowed'
+                  : 'border-emerald-400 dark:border-emerald-500 hover:border-emerald-600 dark:hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 cursor-pointer'
+              }`}
+            >
+              {list.status === 'completed' && <Check className="w-4 h-4 text-white" />}
+            </button>
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {list.title}
