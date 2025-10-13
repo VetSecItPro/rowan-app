@@ -252,6 +252,53 @@ export const shoppingService = {
     return channel;
   },
 
+  // Get frequently purchased items
+  async getFrequentItems(spaceId: string, limit = 20): Promise<{ name: string; count: number; category: string }[]> {
+    const supabase = createClient();
+
+    // Get all items from this space's lists (last 90 days)
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+
+    const { data, error } = await supabase
+      .from('shopping_items')
+      .select('name, category, created_at, list:shopping_lists!inner(space_id)')
+      .eq('list.space_id', spaceId)
+      .gte('created_at', ninetyDaysAgo.toISOString());
+
+    if (error) throw error;
+    if (!data) return [];
+
+    // Count occurrences of each item name (case-insensitive)
+    const itemCounts = new Map<string, { count: number; category: string }>();
+
+    data.forEach((item: any) => {
+      const normalizedName = item.name.trim().toLowerCase();
+      const existing = itemCounts.get(normalizedName);
+
+      if (existing) {
+        existing.count++;
+      } else {
+        itemCounts.set(normalizedName, {
+          count: 1,
+          category: item.category || 'other',
+        });
+      }
+    });
+
+    // Convert to array and sort by frequency
+    const frequentItems = Array.from(itemCounts.entries())
+      .map(([name, data]) => ({
+        name: name.charAt(0).toUpperCase() + name.slice(1), // Capitalize first letter
+        count: data.count,
+        category: data.category,
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, limit);
+
+    return frequentItems;
+  },
+
   // Template management
   async getTemplates(spaceId: string) {
     const supabase = createClient();
