@@ -256,15 +256,15 @@ export const shoppingService = {
   async getFrequentItems(spaceId: string, limit = 20): Promise<{ name: string; count: number; category: string }[]> {
     const supabase = createClient();
 
-    // Get all items from this space's lists (last 90 days)
-    const ninetyDaysAgo = new Date();
-    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    // Get all items from this space's lists (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const { data, error } = await supabase
       .from('shopping_items')
       .select('name, category, created_at, list:shopping_lists!inner(space_id)')
       .eq('list.space_id', spaceId)
-      .gte('created_at', ninetyDaysAgo.toISOString());
+      .gte('created_at', thirtyDaysAgo.toISOString());
 
     if (error) throw error;
     if (!data) return [];

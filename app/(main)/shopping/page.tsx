@@ -259,6 +259,27 @@ export default function ShoppingPage() {
     }
   }, [lists, handleCompleteList]);
 
+  // Memoized callback for updating item quantity
+  const handleUpdateQuantity = useCallback(async (itemId: string, newQuantity: number) => {
+    // Optimistic update
+    setLists(prevLists =>
+      prevLists.map(list => ({
+        ...list,
+        items: list.items?.map(item =>
+          item.id === itemId ? { ...item, quantity: newQuantity } : item
+        )
+      }))
+    );
+
+    try {
+      await shoppingService.updateItem(itemId, { quantity: newQuantity } as any);
+    } catch (error) {
+      console.error('Failed to update quantity:', error);
+      // Revert on error
+      loadLists();
+    }
+  }, []);
+
   // Memoized callback for editing lists
   const handleEditList = useCallback((list: ShoppingList) => {
     setEditingList(list);
@@ -714,6 +735,7 @@ export default function ShoppingPage() {
                     onSaveAsTemplate={handleSaveAsTemplate}
                     onScheduleTrip={handleScheduleTrip}
                     onCreateTask={handleCreateTask}
+                    onUpdateQuantity={handleUpdateQuantity}
                   />
                 ))}
               </div>

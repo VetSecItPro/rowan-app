@@ -522,7 +522,7 @@ export default function ShoppingDocumentation() {
               </p>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">How It Works</h3>
               <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-                <li><strong>Analyzes Last 90 Days:</strong> Looks at your shopping history from the past 3 months</li>
+                <li><strong>Analyzes Last 30 Days:</strong> Looks at your most recent shopping history</li>
                 <li><strong>Shows Top 12 Items:</strong> Displays your most frequently added items</li>
                 <li><strong>Purchase Count Badges:</strong> Small badges show how many times you've bought each item</li>
                 <li><strong>One-Click Add:</strong> Click any item to instantly add it to your active list</li>
@@ -531,7 +531,7 @@ export default function ShoppingDocumentation() {
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Smart Behavior</h3>
               <ul className="space-y-2 text-gray-700 dark:text-gray-300">
                 <li><strong>Updates Dynamically:</strong> Your frequent items change as your shopping habits evolve</li>
-                <li><strong>Fades Out Old Items:</strong> Items you stop buying gradually disappear after 90 days</li>
+                <li><strong>Fades Out Old Items:</strong> Items you stop buying gradually disappear after 30 days</li>
                 <li><strong>Promotes New Habits:</strong> Items you start buying frequently will appear in the panel</li>
                 <li><strong>Creates List if Needed:</strong> If you have no active lists, clicking an item creates a "Quick Add List"</li>
                 <li><strong>Adds to Active List:</strong> If you have active lists, items are added to the first one</li>
