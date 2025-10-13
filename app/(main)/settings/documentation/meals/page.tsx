@@ -205,38 +205,40 @@ export default function MealPlanningDocumentation() {
       <Header />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
-      <div className="bg-gradient-to-r from-orange-500 to-red-600 text-white">
+      <div className="mb-8">
         <div className="max-w-6xl mx-auto px-6 py-12">
           <Link
             href="/settings/documentation"
-            className="inline-flex items-center gap-2 text-white/90 hover:text-white transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Documentation
           </Link>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-              <UtensilsCrossed className="w-8 h-8" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+              <UtensilsCrossed className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold mb-2">Meal Planning Guide</h1>
-              <p className="text-white/90 text-lg">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+                Meal Planning Guide
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
                 Complete guide to planning meals with recipes, shopping, and collaboration
               </p>
             </div>
           </div>
 
-          <div className="bg-white/10 dark:bg-black/10 backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-xl p-6">
+          <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl p-6">
             <div className="flex items-start gap-3">
-              <Lightbulb className="w-6 h-6 text-white/90 flex-shrink-0 mt-0.5" />
+              <Lightbulb className="w-6 h-6 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="text-lg font-semibold text-white mb-2">
+                <h3 className="text-lg font-semibold text-orange-900 dark:text-orange-100 mb-2">
                   Welcome to Meal Planning
                 </h3>
-                <p className="text-white/90 mb-3">
+                <p className="text-orange-800 dark:text-orange-200 mb-3">
                   Rowan helps you plan meals efficiently with powerful recipe and shopping integration:
                 </p>
-                <div className="grid sm:grid-cols-2 gap-2 text-sm text-white/80">
+                <div className="grid sm:grid-cols-2 gap-2 text-sm text-orange-700 dark:text-orange-300">
                   <div className="flex items-start gap-2">
                     <LayoutGrid className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <span><strong>Three views</strong> - Calendar, List, and Recipe views</span>
