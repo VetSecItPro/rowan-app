@@ -48,6 +48,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
   const [loading, setLoading] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<ExternalRecipe | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [showCuisineDropdown, setShowCuisineDropdown] = useState(false);
 
   useEffect(() => {
     if (editRecipe) {
@@ -508,17 +509,47 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                     🎲 Random Recipes
                   </button>
                   <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" />
-                  <div className="flex items-center gap-2 flex-wrap">
-                    {['Italian', 'Chinese', 'Mexican', 'Indian', 'Japanese'].map((cuisine) => (
-                      <button
-                        key={cuisine}
-                        onClick={() => handleBrowseCuisine(cuisine)}
-                        disabled={loading}
-                        className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 text-sm"
-                      >
-                        {cuisine}
-                      </button>
-                    ))}
+
+                  {/* Cuisine Dropdown */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowCuisineDropdown(!showCuisineDropdown)}
+                      disabled={loading}
+                      className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg transition-colors disabled:opacity-50 text-sm font-medium flex items-center gap-2"
+                    >
+                      🍽️ Browse by Cuisine
+                      <span className="text-xs">▼</span>
+                    </button>
+
+                    {showCuisineDropdown && (
+                      <>
+                        {/* Backdrop */}
+                        <div
+                          className="fixed inset-0 z-10"
+                          onClick={() => setShowCuisineDropdown(false)}
+                        />
+
+                        {/* Dropdown Menu */}
+                        <div className="absolute top-full left-0 mt-2 w-64 max-h-96 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-2xl z-20">
+                          <div className="p-2 space-y-1">
+                            {SUPPORTED_CUISINES.map((cuisine) => (
+                              <button
+                                key={cuisine.value}
+                                onClick={() => {
+                                  handleBrowseCuisine(cuisine.value);
+                                  setShowCuisineDropdown(false);
+                                }}
+                                disabled={loading}
+                                className="w-full px-3 py-2 text-left text-sm rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors flex items-center gap-2 text-gray-700 dark:text-gray-300 disabled:opacity-50"
+                              >
+                                <span className="text-lg">{cuisine.flag}</span>
+                                <span>{cuisine.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
