@@ -162,6 +162,7 @@ export default function MealsPage() {
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [recipeModalInitialTab, setRecipeModalInitialTab] = useState<'manual' | 'ai' | 'discover'>('manual');
+  const [showPastMeals, setShowPastMeals] = useState(false);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -188,8 +189,8 @@ export default function MealsPage() {
 
     let filtered = meals;
 
-    // List view: Filter out past meals (scheduled_date < today at midnight)
-    if (viewMode === 'list') {
+    // List view: Filter out past meals unless showPastMeals is enabled
+    if (viewMode === 'list' && !showPastMeals) {
       const today = new Date();
       today.setHours(0, 0, 0, 0); // Set to midnight local time
       filtered = filtered.filter(m => {
@@ -210,7 +211,7 @@ export default function MealsPage() {
     }
 
     return filtered;
-  }, [meals, searchQuery, viewMode]);
+  }, [meals, searchQuery, viewMode, showPastMeals]);
 
   // Memoized filtered recipes based on search query
   const filteredRecipes = useMemo(() => {
@@ -986,13 +987,31 @@ export default function MealsPage() {
           {!showGuidedFlow && (
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             {viewMode !== 'calendar' && (
-              <div className="flex items-center gap-3 mb-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                  {viewMode === 'recipes' ? `Saved Recipes (${filteredRecipes.length})` : `Planned Meals (${filteredMeals.length})`}
-                </h2>
-                <span className="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 text-sm font-medium rounded-full">
-                  {format(new Date(), 'MMM yyyy')}
-                </span>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                    {viewMode === 'recipes' ? `Saved Recipes (${filteredRecipes.length})` : `Planned Meals (${filteredMeals.length})`}
+                  </h2>
+                  <span className="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 text-sm font-medium rounded-full">
+                    {format(new Date(), 'MMM yyyy')}
+                  </span>
+                </div>
+
+                {/* Show Past Meals Toggle (only in list view) */}
+                {viewMode === 'list' && (
+                  <button
+                    onClick={() => setShowPastMeals(!showPastMeals)}
+                    className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium ${
+                      showPastMeals
+                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    }`}
+                    title={showPastMeals ? 'Hide past meals' : 'Show past meals'}
+                  >
+                    <CheckSquare className="w-4 h-4" />
+                    {showPastMeals ? 'Hide Past' : 'Show Past'}
+                  </button>
+                )}
               </div>
             )}
 
