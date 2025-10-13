@@ -181,7 +181,7 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
       />
 
       {/* Modal */}
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4">
+      <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -282,7 +282,7 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
 
                 {/* Emoji Picker Popup */}
                 {showEmojiPicker && (
-                  <div className="absolute bottom-full mb-2 left-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 grid grid-cols-5 gap-2 z-10 min-w-[240px]">
+                  <div className="absolute bottom-full mb-2 left-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 grid grid-cols-5 gap-2 z-10 min-w-[240px]">
                     {EMOJIS.map((emoji, idx) => (
                       <button
                         key={idx}

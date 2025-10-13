@@ -75,7 +75,7 @@ export default function ResetPasswordPage() {
   if (!isValidToken && !error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800 p-4">
-        <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8">
+        <div className="w-full max-w-md bg-gray-50 dark:bg-gray-900 rounded-2xl shadow-2xl p-8">
           <div className="flex items-center justify-center mb-6">
             <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
           </div>
@@ -88,7 +88,7 @@ export default function ResetPasswordPage() {
   if (resetComplete) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800 p-4">
-        <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8">
+        <div className="w-full max-w-md bg-gray-50 dark:bg-gray-900 rounded-2xl shadow-2xl p-8">
           <div className="flex items-center justify-center mb-6">
             <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
               <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
@@ -115,7 +115,7 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800 p-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8">
+      <div className="w-full max-w-md bg-gray-50 dark:bg-gray-900 rounded-2xl shadow-2xl p-8">
         {/* Header */}
         <div className="flex items-center justify-center mb-6">
           <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
@@ -164,7 +164,7 @@ export default function ResetPasswordPage() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Enter new password"
-                className="w-full px-4 py-3 pr-12 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                 required
               />
               <button
@@ -195,7 +195,7 @@ export default function ResetPasswordPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm new password"
-                className="w-full px-4 py-3 pr-12 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                 required
               />
               <button

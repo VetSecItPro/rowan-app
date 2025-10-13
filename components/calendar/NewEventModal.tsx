@@ -212,7 +212,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+        className="bg-gray-50 dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -248,7 +248,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Team meeting"
-                className="w-full px-4 py-3 pr-12 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               />
 
               {/* Emoji Picker Button */}
@@ -264,7 +264,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
 
                 {/* Emoji Picker Popup */}
                 {showEmojiPicker && (
-                  <div className="absolute top-full mt-2 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 grid grid-cols-5 gap-2 z-10 min-w-[240px]">
+                  <div className="absolute top-full mt-2 right-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 grid grid-cols-5 gap-2 z-10 min-w-[240px]">
                     {EMOJIS.map((emoji, idx) => (
                       <button
                         key={idx}
@@ -292,7 +292,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Add event details..."
               rows={3}
-              className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
             />
             <div className="flex items-center gap-2 mt-2">
               {/* Image Attachment Button */}
@@ -397,7 +397,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                     }
                   }
                 }}
-                className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
 
@@ -429,7 +429,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                     setDateError('');
                   }
                 }}
-                className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white ${
+                className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white ${
                   dateError ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'
                 }`}
               />
@@ -452,7 +452,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
               placeholder="Add location..."
-              className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
             />
           </div>
 
@@ -480,7 +480,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                   <select
                     value={recurringFrequency}
                     onChange={(e) => setRecurringFrequency(e.target.value as any)}
-                    className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
                     style={{ paddingRight: '2.5rem' }}
                   >
                     <option value="daily">Daily</option>
@@ -512,7 +512,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                         className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                           selectedDaysOfWeek.includes(index)
                             ? 'bg-purple-500 text-white'
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
+                            : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
                         }`}
                       >
                         {day}
@@ -543,7 +543,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                         className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                           selectedDaysOfMonth.includes(day)
                             ? 'bg-purple-500 text-white'
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
+                            : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
                         }`}
                       >
                         {day}

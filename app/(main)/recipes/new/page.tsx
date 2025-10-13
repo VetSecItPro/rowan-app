@@ -228,7 +228,7 @@ export default function NewRecipePage() {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-1">
             <button
@@ -267,7 +267,7 @@ export default function NewRecipePage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* AI Import Tab */}
         {activeTab === 'ai' && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 space-y-6">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md p-6 space-y-6">
             <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
               <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
               <div className="text-sm text-blue-900 dark:text-blue-200">
@@ -301,7 +301,7 @@ export default function NewRecipePage() {
                 <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">OR</span>
+                <span className="px-4 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400">OR</span>
               </div>
             </div>
 
@@ -378,7 +378,7 @@ export default function NewRecipePage() {
 
         {/* Manual Entry Tab */}
         {activeTab === 'manual' && (
-          <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 space-y-6">
+          <form onSubmit={handleSubmit} className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md p-6 space-y-6">
             {/* Basic Information */}
             <div className="space-y-4">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Basic Information</h2>

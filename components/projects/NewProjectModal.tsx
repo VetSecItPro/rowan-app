@@ -76,7 +76,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
 
   return (
     <div onClick={onClose} className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div onClick={(e) => e.stopPropagation()} className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full overflow-hidden">
+      <div onClick={(e) => e.stopPropagation()} className="bg-gray-50 dark:bg-gray-800 rounded-2xl max-w-md w-full overflow-hidden">
         <div className="sticky top-0 bg-gradient-to-r from-amber-500 to-amber-600 text-white p-6 rounded-t-2xl">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">
@@ -98,7 +98,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
             />
           </div>
 
@@ -110,7 +110,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
             />
           </div>
 
@@ -121,7 +121,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
             <select
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-              className="w-full pl-1 pr-1 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              className="w-full pl-1 pr-1 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
             >
               <option value="planning">Planning</option>
               <option value="in_progress">In Progress</option>
@@ -139,7 +139,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
                 type="date"
                 value={formData.start_date}
                 onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
               />
             </div>
             <div>
@@ -150,7 +150,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
                 type="date"
                 value={formData.target_date}
                 onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
               />
             </div>
           </div>
@@ -165,7 +165,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
                 step="0.01"
                 value={formData.budget_amount || ''}
                 onChange={(e) => setFormData({ ...formData, budget_amount: e.target.value ? Number(e.target.value) : undefined })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
               />
             </div>
             <div>
@@ -185,7 +185,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
                     status: value === 100 ? 'completed' : formData.status
                   });
                 }}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
                 placeholder="0-100"
               />
             </div>

@@ -12,7 +12,7 @@ interface RecipeCardProps {
 
 export function RecipeCard({ recipe, onEdit, onDelete, onPlanMeal }: RecipeCardProps) {
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
+    <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
       {recipe.image_url && (
         <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
           <img

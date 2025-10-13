@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Header } from '@/components/layout/Header';
 import { ArrowLeft, ShoppingCart, BookOpen, Play, Plus, List, Calendar, CheckSquare, Lightbulb, FileText, Grid3x3, Tags, Share2, Clock } from 'lucide-react';
 
 interface GuideSection {
@@ -188,7 +189,9 @@ const guideSections: GuideSection[] = [
 
 export default function ShoppingDocumentation() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <>
+      <Header />
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
       <div className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
         <div className="max-w-6xl mx-auto px-6 py-12">
@@ -219,7 +222,7 @@ export default function ShoppingDocumentation() {
           {guideSections.map((section) => (
             <div
               key={section.title}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700"
+              className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700"
             >
               <div className={`bg-gradient-to-r ${section.color} p-6 text-white`}>
                 <div className="flex items-center gap-3 mb-2">
@@ -252,7 +255,7 @@ export default function ShoppingDocumentation() {
         </div>
 
         {/* Detailed Content */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 space-y-12 border border-gray-200 dark:border-gray-700">
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-lg p-8 space-y-12 border border-gray-200 dark:border-gray-700">
           {/* Getting Started */}
           <section id="intro" className="scroll-mt-24">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
@@ -831,5 +834,6 @@ export default function ShoppingDocumentation() {
         </div>
       </div>
     </div>
+    </>
   );
 }

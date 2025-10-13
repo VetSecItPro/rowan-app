@@ -584,7 +584,7 @@ export default function ShoppingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <button
               onClick={handleItemsThisWeekClick}
-              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Items This Week</h3>
@@ -594,7 +594,7 @@ export default function ShoppingPage() {
             </button>
             <button
               onClick={handleActiveListsClick}
-              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Active Lists</h3>
@@ -604,7 +604,7 @@ export default function ShoppingPage() {
             </button>
             <button
               onClick={handleCompletedListsClick}
-              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completed Lists</h3>
@@ -614,7 +614,7 @@ export default function ShoppingPage() {
             </button>
             <button
               onClick={handleTotalListsClick}
-              className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Lists</h3>
@@ -635,7 +635,7 @@ export default function ShoppingPage() {
 
           {/* Search Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input type="text" placeholder="Search lists..." value={searchQuery} onChange={handleSearchChange} className="w-full pl-10 pr-10 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 dark:text-white" />
@@ -654,7 +654,7 @@ export default function ShoppingPage() {
 
           {/* Shopping Lists - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             {/* Header with Month Badge and Status Filter */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
@@ -729,7 +729,7 @@ export default function ShoppingPage() {
                     {!hasCompletedGuide && (
                       <button
                         onClick={() => setShowGuidedFlow(true)}
-                        className="px-6 py-3 bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
+                        className="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
                       >
                         <ShoppingCart className="w-5 h-5" />
                         Try Guided Creation

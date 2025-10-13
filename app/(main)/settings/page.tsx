@@ -652,7 +652,7 @@ export default function SettingsPage() {
                           type="text"
                           value={profileData.name}
                           onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
-                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
                       </div>
 
@@ -664,7 +664,7 @@ export default function SettingsPage() {
                           type="email"
                           value={profileData.email}
                           onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
-                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
                       </div>
 
@@ -678,7 +678,7 @@ export default function SettingsPage() {
                           value={profileData.phone}
                           onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
                           placeholder="+1 (555) 000-0000"
-                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
                       </div>
 
@@ -691,7 +691,7 @@ export default function SettingsPage() {
                           <select
                             value={profileData.timezone}
                             onChange={(e) => setProfileData({ ...profileData, timezone: e.target.value })}
-                            className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-11 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer"
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-11 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer"
                           >
                             <option>Pacific Time (PT)</option>
                             <option>Eastern Time (ET)</option>
@@ -714,7 +714,7 @@ export default function SettingsPage() {
                         value={profileData.bio}
                         onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
                         placeholder="Tell us about yourself..."
-                        className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
                       />
                     </div>
 
@@ -1020,7 +1020,7 @@ export default function SettingsPage() {
                                         setIsSavingPrefs(false);
                                       }
                                     }}
-                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                                   />
                                 </div>
                                 <div>
@@ -1046,7 +1046,7 @@ export default function SettingsPage() {
                                         setIsSavingPrefs(false);
                                       }
                                     }}
-                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                                   />
                                 </div>
                               </div>
@@ -1075,7 +1075,7 @@ export default function SettingsPage() {
                             Language
                           </label>
                           <div className="relative">
-                            <select className="w-full px-4 py-3 pr-11 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer">
+                            <select className="w-full px-4 py-3 pr-11 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer">
                               <option>English (US)</option>
                               <option>Español</option>
                               <option>Français</option>
@@ -1091,7 +1091,7 @@ export default function SettingsPage() {
                             Date Format
                           </label>
                           <div className="relative">
-                            <select className="w-full px-4 py-3 pr-11 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer">
+                            <select className="w-full px-4 py-3 pr-11 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer">
                               <option>MM/DD/YYYY</option>
                               <option>DD/MM/YYYY</option>
                               <option>YYYY-MM-DD</option>
@@ -1318,7 +1318,7 @@ export default function SettingsPage() {
                           <Link
                             key={feature.id}
                             href={feature.href}
-                            className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-2 ${feature.shadowColor} transition-all duration-300 group`}
+                            className={`bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-2 ${feature.shadowColor} transition-all duration-300 group`}
                           >
                             <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 shadow-lg`}>
                               <Icon className="w-7 h-7 text-white" />
@@ -1499,7 +1499,7 @@ export default function SettingsPage() {
       {/* Export Data Modal */}
       {showExportModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">Export Your Data</h3>
               <button onClick={() => setShowExportModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
@@ -1561,7 +1561,7 @@ export default function SettingsPage() {
       {/* Delete Account Modal */}
       {showDeleteAccountModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
@@ -1593,7 +1593,7 @@ export default function SettingsPage() {
                   value={deletePassword}
                   onChange={(e) => setDeletePassword(e.target.value)}
                   placeholder="Your password"
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -1606,7 +1606,7 @@ export default function SettingsPage() {
                   value={deleteConfirmText}
                   onChange={(e) => setDeleteConfirmText(e.target.value)}
                   placeholder="DELETE"
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -1652,7 +1652,7 @@ export default function SettingsPage() {
       {/* 2FA Modal */}
       {show2FAModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">Enable 2FA</h3>
               <button onClick={() => setShow2FAModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
@@ -1666,7 +1666,7 @@ export default function SettingsPage() {
                   Scan this QR code with your authenticator app:
                 </p>
                 <div className="bg-gray-100 dark:bg-gray-900 rounded-xl p-8 flex items-center justify-center">
-                  <div className="w-48 h-48 bg-white dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                  <div className="w-48 h-48 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-center">
                     <div className="text-center text-gray-400 dark:text-gray-500 text-xs">
                       [QR Code Placeholder]
                     </div>
@@ -1704,7 +1704,7 @@ export default function SettingsPage() {
                   onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   placeholder="000000"
                   maxLength={6}
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 dark:text-white text-center text-lg tracking-widest"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 dark:text-white text-center text-lg tracking-widest"
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
                   Enter the 6-digit code from your authenticator app
@@ -1741,7 +1741,7 @@ export default function SettingsPage() {
       {/* Revoke Session Modal */}
       {showRevokeSessionModal && sessionToRevoke && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">

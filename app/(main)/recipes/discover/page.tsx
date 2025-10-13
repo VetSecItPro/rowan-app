@@ -344,14 +344,14 @@ export default function DiscoverRecipesPage() {
               value={searchQuery}
               onChange={handleSearchChange}
               placeholder="Search for pasta, chicken, desserts..."
-              className="w-full pl-12 pr-4 py-3 bg-white dark:bg-gray-800 border-0 rounded-lg shadow-lg focus:ring-2 focus:ring-orange-300 text-gray-900 dark:text-white placeholder-gray-500"
+              className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border-0 rounded-lg shadow-lg focus:ring-2 focus:ring-orange-300 text-gray-900 dark:text-white placeholder-gray-500"
             />
           </div>
         </div>
       </div>
 
       {/* Cuisine Filters */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-3 mb-3">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by cuisine:</span>
@@ -399,7 +399,7 @@ export default function DiscoverRecipesPage() {
             {recipes.map((recipe) => (
               <div
                 key={recipe.id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
+                className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
               >
                 {/* Recipe Image - Clickable */}
                 {recipe.image_url && (

@@ -179,7 +179,7 @@ export default function AnalyticsPage() {
               <Link
                 key={feature.id}
                 href={feature.href}
-                className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-2 ${feature.shadowColor} transition-all duration-300 group`}
+                className={`bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-2 ${feature.shadowColor} transition-all duration-300 group`}
               >
                 {/* Icon and Title */}
                 <div className="flex items-center gap-4 mb-4">

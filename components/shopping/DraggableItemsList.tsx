@@ -47,7 +47,7 @@ function SortableItem({ item, onToggle }: SortableItemProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-3 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg transition-all ${
+      className={`flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg transition-all ${
         isDragging ? 'opacity-50 shadow-2xl scale-105 z-50' : 'hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-600'
       }`}
     >

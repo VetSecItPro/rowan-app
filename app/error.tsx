@@ -19,7 +19,7 @@ export default function Error({
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-500 via-orange-500 to-yellow-500">
-      <div className="text-center p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md">
+      <div className="text-center p-8 bg-gray-50 dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md">
         <h1 className="text-6xl font-bold text-gray-900 dark:text-white mb-4">Oops!</h1>
         <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
           Something went wrong

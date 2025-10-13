@@ -116,7 +116,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
   ];
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
@@ -161,7 +161,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
               value={filters.search || ''}
               onChange={(e) => updateFilter('search', e.target.value || undefined)}
               placeholder="Search tasks..."
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
             />
           </div>
 
@@ -274,13 +274,13 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 type="date"
                 value={filters.dueDateFrom || ''}
                 onChange={(e) => updateFilter('dueDateFrom', e.target.value || undefined)}
-                className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900"
+                className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
               />
               <input
                 type="date"
                 value={filters.dueDateTo || ''}
                 onChange={(e) => updateFilter('dueDateTo', e.target.value || undefined)}
-                className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900"
+                className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
               />
             </div>
           </div>

@@ -1580,7 +1580,7 @@ export default function DashboardPage() {
                         value={checkInHighlights}
                         onChange={(e) => setCheckInHighlights(e.target.value)}
                         maxLength={150}
-                        className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-green-200 dark:border-green-800 rounded-xl resize-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-gray-900 dark:text-white text-sm transition-all"
+                        className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-green-200 dark:border-green-800 rounded-xl resize-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-gray-900 dark:text-white text-sm transition-all"
                         rows={2}
                       />
                     </div>
@@ -1594,7 +1594,7 @@ export default function DashboardPage() {
                         value={checkInGratitude}
                         onChange={(e) => setCheckInGratitude(e.target.value)}
                         maxLength={150}
-                        className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-pink-200 dark:border-pink-800 rounded-xl resize-none focus:ring-2 focus:ring-pink-400 focus:border-transparent text-gray-900 dark:text-white text-sm transition-all"
+                        className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-pink-200 dark:border-pink-800 rounded-xl resize-none focus:ring-2 focus:ring-pink-400 focus:border-transparent text-gray-900 dark:text-white text-sm transition-all"
                         rows={2}
                       />
                     </div>
@@ -1616,7 +1616,7 @@ export default function DashboardPage() {
                       value={checkInChallenges}
                       onChange={(e) => setCheckInChallenges(e.target.value)}
                       maxLength={150}
-                      className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-xl resize-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-gray-900 dark:text-white text-sm transition-all"
+                      className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-xl resize-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-gray-900 dark:text-white text-sm transition-all"
                       rows={2}
                     />
                   </div>
@@ -1633,7 +1633,7 @@ export default function DashboardPage() {
                       value={checkInNote}
                       onChange={(e) => setCheckInNote(e.target.value)}
                       maxLength={150}
-                      className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl resize-none focus:ring-2 focus:ring-gray-400 focus:border-transparent text-gray-900 dark:text-white text-sm transition-all"
+                      className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl resize-none focus:ring-2 focus:ring-gray-400 focus:border-transparent text-gray-900 dark:text-white text-sm transition-all"
                       rows={2}
                     />
                   </div>

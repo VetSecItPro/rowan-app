@@ -105,7 +105,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md">
+      <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md">
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-2">
             <Clock className="w-5 h-5 text-amber-500" />
@@ -150,7 +150,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
                   type="date"
                   value={customDate}
                   onChange={(e) => setCustomDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
                 />
               </div>
               <div>
@@ -161,7 +161,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
                   type="time"
                   value={customTime}
                   onChange={(e) => setCustomTime(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
                 />
               </div>
             </div>
@@ -175,7 +175,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="Why are you snoozing this task?"
-                className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900"
+                className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
               />
             </div>
 

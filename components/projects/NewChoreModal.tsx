@@ -111,7 +111,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+        className="bg-gray-50 dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -147,7 +147,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Clean the kitchen"
-                className="w-full px-4 py-3 pr-12 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
               />
 
               {/* Emoji Picker Button */}
@@ -163,7 +163,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
 
                 {/* Emoji Picker Popup */}
                 {showEmojiPicker && (
-                  <div className="absolute top-full mt-2 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 grid grid-cols-5 gap-2 z-10 min-w-[240px]">
+                  <div className="absolute top-full mt-2 right-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 grid grid-cols-5 gap-2 z-10 min-w-[240px]">
                     {EMOJIS.map((emoji, idx) => (
                       <button
                         key={idx}
@@ -191,7 +191,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Add details about this chore..."
               rows={3}
-              className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
             />
           </div>
 
@@ -206,7 +206,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
                   style={{ paddingRight: '2.5rem' }}
                 >
                   <option value="">Select category...</option>
@@ -234,7 +234,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
                 <select
                   value={formData.frequency}
                   onChange={(e) => setFormData({ ...formData, frequency: e.target.value as any })}
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
                   style={{ paddingRight: '2.5rem' }}
                 >
                   <option value="daily">Daily</option>
@@ -320,7 +320,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value as 'pending' | 'completed' | 'skipped' })}
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
                   style={{ paddingRight: '2.5rem' }}
                 >
                   <option value="pending">Pending</option>
@@ -357,7 +357,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
                     setDateError('');
                   }
                 }}
-                className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white ${
+                className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white ${
                   dateError ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'
                 }`}
               />

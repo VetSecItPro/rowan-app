@@ -17,7 +17,7 @@ export function ChoreCard({ chore, onStatusChange, onEdit, onDelete, onUpdatePro
   const [showMenu, setShowMenu] = useState(false);
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-lg transition-all">
+    <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-lg transition-all">
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-3 flex-1">
           <button onClick={() => onStatusChange(chore.id, chore.status === 'completed' ? 'pending' : 'completed')} aria-label={`Toggle chore status: ${chore.status === 'completed' ? 'Completed' : 'Pending'}`} className={`mt-1 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center ${chore.status === 'completed' ? 'bg-green-500 border-green-500' : 'border-gray-300 dark:border-gray-600'}`}>
@@ -64,7 +64,7 @@ export function ChoreCard({ chore, onStatusChange, onEdit, onDelete, onUpdatePro
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 border rounded-lg shadow-lg z-20">
+              <div className="absolute right-0 mt-1 w-40 bg-gray-50 dark:bg-gray-800 border rounded-lg shadow-lg z-20">
                 <button onClick={() => { onEdit(chore); setShowMenu(false); }} className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg">Edit</button>
                 {onUpdateProgress && (
                   <button onClick={() => { onUpdateProgress(chore); setShowMenu(false); }} className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700">Update Progress</button>
