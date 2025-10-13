@@ -874,6 +874,946 @@ export default function ShoppingDocumentation() {
               ↑ Back to top
             </a>
           </section>
+
+          {/* New Enhanced Sections */}
+          <section id="category-reference" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Complete Category Reference</h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 mb-6">
+                Here's your complete visual guide to all 11 shopping categories with common items in each:
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
+                {/* Produce */}
+                <div className="p-5 bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl border-2 border-emerald-200 dark:border-emerald-800">
+                  <div className="text-4xl mb-3">🥬</div>
+                  <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">Produce</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Fresh fruits, vegetables, and herbs</p>
+                  <div className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                    <div><strong>Vegetables:</strong> tomatoes, lettuce, carrots, broccoli, peppers, onions, garlic, potatoes</div>
+                    <div><strong>Fruits:</strong> apples, bananas, oranges, berries, grapes, melons</div>
+                    <div><strong>Herbs:</strong> basil, cilantro, parsley, mint</div>
+                  </div>
+                </div>
+
+                {/* Dairy */}
+                <div className="p-5 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-xl border-2 border-blue-200 dark:border-blue-800">
+                  <div className="text-4xl mb-3">🥛</div>
+                  <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">Dairy</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Milk products and eggs</p>
+                  <div className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                    <div><strong>Milk:</strong> whole, 2%, skim, almond, oat, soy</div>
+                    <div><strong>Cheese:</strong> cheddar, mozzarella, parmesan, cream cheese</div>
+                    <div><strong>Other:</strong> yogurt, butter, eggs, sour cream, heavy cream</div>
+                  </div>
+                </div>
+
+                {/* Meat & Seafood */}
+                <div className="p-5 bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/30 dark:to-orange-900/30 rounded-xl border-2 border-red-200 dark:border-red-800">
+                  <div className="text-4xl mb-3">🥩</div>
+                  <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">Meat & Seafood</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Fresh and frozen proteins</p>
+                  <div className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                    <div><strong>Poultry:</strong> chicken breast, thighs, wings, ground turkey</div>
+                    <div><strong>Beef:</strong> ground beef, steak, roast</div>
+                    <div><strong>Seafood:</strong> salmon, shrimp, tuna, cod</div>
+                    <div><strong>Pork:</strong> bacon, sausage, pork chops</div>
+                  </div>
+                </div>
+
+                {/* Bakery */}
+                <div className="p-5 bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/30 dark:to-yellow-900/30 rounded-xl border-2 border-amber-200 dark:border-amber-800">
+                  <div className="text-4xl mb-3">🍞</div>
+                  <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">Bakery</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Bread and baked goods</p>
+                  <div className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                    <div><strong>Bread:</strong> whole wheat, white, sourdough, baguette</div>
+                    <div><strong>Other:</strong> bagels, croissants, muffins, rolls, pita, tortillas</div>
+                  </div>
+                </div>
+
+                {/* Pantry */}
+                <div className="p-5 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl border-2 border-purple-200 dark:border-purple-800">
+                  <div className="text-4xl mb-3">🥫</div>
+                  <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">Pantry</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Shelf-stable essentials</p>
+                  <div className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                    <div><strong>Grains:</strong> rice, pasta, quinoa, oats, flour, cereal</div>
+                    <div><strong>Canned:</strong> beans, tomatoes, soup, tuna</div>
+                    <div><strong>Condiments:</strong> ketchup, mustard, mayo, soy sauce</div>
+                    <div><strong>Oils & Spices:</strong> olive oil, vegetable oil, salt, pepper, spices</div>
+                  </div>
+                </div>
+
+                {/* Frozen */}
+                <div className="p-5 bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/30 dark:to-blue-900/30 rounded-xl border-2 border-cyan-200 dark:border-cyan-800">
+                  <div className="text-4xl mb-3">🧊</div>
+                  <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">Frozen</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Frozen foods and treats</p>
+                  <div className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                    <div><strong>Vegetables:</strong> peas, corn, mixed veggies, spinach</div>
+                    <div><strong>Meals:</strong> pizza, burritos, frozen dinners</div>
+                    <div><strong>Treats:</strong> ice cream, popsicles, frozen yogurt</div>
+                  </div>
+                </div>
+
+                {/* Beverages */}
+                <div className="p-5 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-xl border-2 border-indigo-200 dark:border-indigo-800">
+                  <div className="text-4xl mb-3">🥤</div>
+                  <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">Beverages</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Drinks and beverage supplies</p>
+                  <div className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                    <div><strong>Non-Alcoholic:</strong> water, juice, soda, tea, coffee</div>
+                    <div><strong>Alcoholic:</strong> beer, wine, spirits</div>
+                    <div><strong>Supplies:</strong> coffee beans, tea bags</div>
+                  </div>
+                </div>
+
+                {/* Snacks */}
+                <div className="p-5 bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/30 dark:to-rose-900/30 rounded-xl border-2 border-pink-200 dark:border-pink-800">
+                  <div className="text-4xl mb-3">🍿</div>
+                  <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">Snacks</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Snack foods and treats</p>
+                  <div className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                    <div><strong>Salty:</strong> chips, pretzels, popcorn, crackers, nuts</div>
+                    <div><strong>Sweet:</strong> cookies, candy, chocolate, granola bars</div>
+                  </div>
+                </div>
+
+                {/* Personal Care */}
+                <div className="p-5 bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-900/30 dark:to-emerald-900/30 rounded-xl border-2 border-teal-200 dark:border-teal-800">
+                  <div className="text-4xl mb-3">🧴</div>
+                  <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">Personal Care</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Health and hygiene products</p>
+                  <div className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                    <div><strong>Bath:</strong> soap, shampoo, conditioner, body wash</div>
+                    <div><strong>Oral:</strong> toothpaste, toothbrush, mouthwash, floss</div>
+                    <div><strong>Other:</strong> deodorant, lotion, sunscreen, razors</div>
+                  </div>
+                </div>
+
+                {/* Household */}
+                <div className="p-5 bg-gradient-to-br from-gray-100 to-slate-100 dark:from-gray-800 dark:to-slate-800 rounded-xl border-2 border-gray-300 dark:border-gray-700">
+                  <div className="text-4xl mb-3">🧹</div>
+                  <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">Household</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Cleaning and household supplies</p>
+                  <div className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                    <div><strong>Cleaning:</strong> dish soap, laundry detergent, all-purpose cleaner</div>
+                    <div><strong>Paper:</strong> toilet paper, paper towels, tissues</div>
+                    <div><strong>Other:</strong> trash bags, aluminum foil, plastic wrap, light bulbs</div>
+                  </div>
+                </div>
+
+                {/* Other */}
+                <div className="p-5 bg-gradient-to-br from-stone-100 to-zinc-100 dark:from-stone-800 dark:to-zinc-800 rounded-xl border-2 border-stone-300 dark:border-stone-700">
+                  <div className="text-4xl mb-3">📦</div>
+                  <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">Other</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Miscellaneous items</p>
+                  <div className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                    <div>Items that don't fit into other categories</div>
+                    <div><strong>Examples:</strong> pet food, office supplies, batteries, gift wrap</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4 mt-6">
+                <p className="text-emerald-700 dark:text-emerald-300 text-sm">
+                  <strong>🎯 Smart Detection:</strong> Rowan automatically categorizes 100+ common items. If something is miscategorized, you can manually change it when adding or editing the item!
+                </p>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="budget-deep-dive" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Budget Management Deep Dive</h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 mb-6">
+                Understanding budget indicators and how to use them effectively:
+              </p>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Visual Budget Indicators</h3>
+
+              <div className="space-y-4 mb-6">
+                {/* Under Budget */}
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 rounded-r-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-semibold text-green-900 dark:text-green-100">✓ Under Budget</h4>
+                    <span className="text-sm font-mono text-green-700 dark:text-green-300">💰 $45.50 / $100.00</span>
+                  </div>
+                  <p className="text-sm text-green-700 dark:text-green-300">
+                    You're well within budget! The green indicator means you have plenty of room for additional items. This is the ideal state—you're spending wisely.
+                  </p>
+                </div>
+
+                {/* Approaching Budget */}
+                <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 rounded-r-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-semibold text-yellow-900 dark:text-yellow-100">⚠ Approaching Budget (80-100%)</h4>
+                    <span className="text-sm font-mono text-yellow-700 dark:text-yellow-300">💰 $87.25 / $100.00</span>
+                  </div>
+                  <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                    Yellow warning! You're getting close to your limit. Time to review your list and prioritize essential items. Consider removing or postponing nice-to-have items.
+                  </p>
+                </div>
+
+                {/* Over Budget */}
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-r-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-semibold text-red-900 dark:text-red-100">✕ Over Budget</h4>
+                    <span className="text-sm font-mono text-red-700 dark:text-red-300">💰 $124.80 / $100.00</span>
+                  </div>
+                  <p className="text-sm text-red-700 dark:text-red-300">
+                    Red alert! You've exceeded your budget by $24.80. Review your list and either remove items or adjust your budget if the spending is necessary.
+                  </p>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">Budget Strategy Tips</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">📊 Track Your Averages</h4>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                    After 3-4 shopping trips, calculate your average spending. Use this as your baseline budget for future trips. Add 10-15% buffer for flexibility.
+                  </p>
+                </div>
+
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <h4 className="font-semibold text-purple-900 dark:text-purple-100 mb-2">🎯 Separate by Store</h4>
+                  <p className="text-sm text-purple-700 dark:text-purple-300">
+                    Create separate lists with different budgets for different stores. Costco trips typically need higher budgets than quick grocery runs.
+                  </p>
+                </div>
+
+                <div className="p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg border border-pink-200 dark:border-pink-800">
+                  <h4 className="font-semibold text-pink-900 dark:text-pink-100 mb-2">💡 Price It Right</h4>
+                  <p className="text-sm text-pink-700 dark:text-pink-300">
+                    As you shop, update estimated prices with actual costs. Over time, you'll build a personal price database that makes budgeting more accurate.
+                  </p>
+                </div>
+
+                <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                  <h4 className="font-semibold text-indigo-900 dark:text-indigo-100 mb-2">🏷️ Include Sales</h4>
+                  <p className="text-sm text-indigo-700 dark:text-indigo-300">
+                    Review store circulars before shopping. Adjust your budget down if you're planning to take advantage of major sales or coupons.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-5 mt-6">
+                <h4 className="font-semibold text-emerald-900 dark:text-emerald-100 mb-2">🏡 Household Budgeting Tip</h4>
+                <p className="text-emerald-700 dark:text-emerald-300 text-sm mb-3">
+                  For families, try setting weekly or monthly shopping budgets and track them consistently. After 2-3 months, you'll have valuable data to optimize spending:
+                </p>
+                <ul className="text-emerald-700 dark:text-emerald-300 text-sm space-y-1 ml-4">
+                  <li>• Identify expensive patterns (eating out vs. cooking)</li>
+                  <li>• Find cheaper alternatives for frequently purchased items</li>
+                  <li>• Adjust budgets seasonally (holidays, back-to-school, etc.)</li>
+                  <li>• Set spending goals and celebrate when you stay under budget</li>
+                </ul>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="template-gallery" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Template Gallery & Examples</h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 mb-6">
+                Get inspired by these real-world template examples for common shopping scenarios:
+              </p>
+
+              <div className="space-y-6">
+                {/* Weekly Groceries Template */}
+                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-6 border-2 border-emerald-200 dark:border-emerald-800">
+                  <div className="flex items-start gap-4">
+                    <div className="text-4xl">🛒</div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Weekly Groceries</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Your standard weekly shopping run • Budget: $120-150</p>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs text-gray-700 dark:text-gray-300">
+                        <div><strong>Produce:</strong> lettuce, tomatoes, bananas, apples</div>
+                        <div><strong>Dairy:</strong> milk, eggs, yogurt, cheese</div>
+                        <div><strong>Meat:</strong> chicken breast, ground beef</div>
+                        <div><strong>Bakery:</strong> bread, bagels</div>
+                        <div><strong>Pantry:</strong> pasta, rice, cereal</div>
+                        <div><strong>Household:</strong> paper towels, dish soap</div>
+                      </div>
+                      <div className="mt-3 pt-3 border-t border-emerald-200 dark:border-emerald-700">
+                        <p className="text-xs text-emerald-700 dark:text-emerald-300">
+                          <strong>💡 Use Case:</strong> Perfect for families doing regular weekly shopping. Adjust quantities based on household size.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Monthly Bulk Run Template */}
+                <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-6 border-2 border-blue-200 dark:border-blue-800">
+                  <div className="flex items-start gap-4">
+                    <div className="text-4xl">📦</div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Monthly Bulk Run (Costco/Sam's)</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Stock up on bulk items • Budget: $250-350</p>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs text-gray-700 dark:text-gray-300">
+                        <div><strong>Pantry:</strong> 20lb rice, 10lb pasta, olive oil</div>
+                        <div><strong>Frozen:</strong> frozen vegetables, frozen fruit</div>
+                        <div><strong>Household:</strong> toilet paper (36 rolls), paper towels (12 rolls)</div>
+                        <div><strong>Snacks:</strong> chips variety pack, granola bars</div>
+                        <div><strong>Beverages:</strong> water cases, juice boxes</div>
+                        <div><strong>Personal Care:</strong> shampoo 2-pack, body wash 3-pack</div>
+                      </div>
+                      <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-700">
+                        <p className="text-xs text-blue-700 dark:text-blue-300">
+                          <strong>💡 Use Case:</strong> Monthly warehouse club runs to stock up on bulk items. Saves money long-term and reduces shopping frequency.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Party Supplies Template */}
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-6 border-2 border-purple-200 dark:border-purple-800">
+                  <div className="flex items-start gap-4">
+                    <div className="text-4xl">🎉</div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Party Supplies</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Hosting a gathering • Budget: $100-200</p>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs text-gray-700 dark:text-gray-300">
+                        <div><strong>Beverages:</strong> soda 2L (6), beer, wine</div>
+                        <div><strong>Snacks:</strong> chips (3 bags), pretzels, dip</div>
+                        <div><strong>Produce:</strong> veggie tray ingredients, lemons</div>
+                        <div><strong>Meat:</strong> burger patties, hot dogs</div>
+                        <div><strong>Bakery:</strong> buns (2 packs), rolls</div>
+                        <div><strong>Other:</strong> paper plates, cups, napkins, ice</div>
+                      </div>
+                      <div className="mt-3 pt-3 border-t border-purple-200 dark:border-purple-700">
+                        <p className="text-xs text-purple-700 dark:text-purple-300">
+                          <strong>💡 Use Case:</strong> BBQs, game nights, birthday parties. Adjust quantities based on guest count (plan for 20-30% extra).
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Holiday Baking Template */}
+                <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-6 border-2 border-amber-200 dark:border-amber-800">
+                  <div className="flex items-start gap-4">
+                    <div className="text-4xl">🎄</div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Holiday Baking Supplies</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Everything for holiday baking • Budget: $60-80</p>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs text-gray-700 dark:text-gray-300">
+                        <div><strong>Pantry:</strong> flour (10lb), sugar (5lb), brown sugar</div>
+                        <div><strong>Dairy:</strong> butter (4 sticks), eggs (2 dozen), heavy cream</div>
+                        <div><strong>Baking:</strong> vanilla extract, chocolate chips, cocoa powder</div>
+                        <div><strong>Spices:</strong> cinnamon, nutmeg, ginger, cloves</div>
+                        <div><strong>Other:</strong> baking powder, baking soda, powdered sugar</div>
+                        <div><strong>Extras:</strong> sprinkles, food coloring, cookie cutters</div>
+                      </div>
+                      <div className="mt-3 pt-3 border-t border-amber-200 dark:border-amber-700">
+                        <p className="text-xs text-amber-700 dark:text-amber-300">
+                          <strong>💡 Use Case:</strong> Thanksgiving, Christmas, or any baking marathon. Stock up once and bake all season!
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Breakfast Restock Template */}
+                <div className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 rounded-xl p-6 border-2 border-yellow-200 dark:border-yellow-800">
+                  <div className="flex items-start gap-4">
+                    <div className="text-4xl">☕</div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Breakfast Restock</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Weekly breakfast essentials • Budget: $30-45</p>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs text-gray-700 dark:text-gray-300">
+                        <div><strong>Dairy:</strong> milk, eggs, yogurt, butter</div>
+                        <div><strong>Bakery:</strong> bagels, muffins, bread</div>
+                        <div><strong>Pantry:</strong> cereal (2 boxes), oatmeal, coffee</div>
+                        <div><strong>Produce:</strong> bananas, oranges, berries</div>
+                        <div><strong>Frozen:</strong> waffles, breakfast sausage</div>
+                        <div><strong>Other:</strong> orange juice, maple syrup</div>
+                      </div>
+                      <div className="mt-3 pt-3 border-t border-yellow-200 dark:border-yellow-700">
+                        <p className="text-xs text-yellow-700 dark:text-yellow-300">
+                          <strong>💡 Use Case:</strong> Perfect for families with kids. Run this weekly to ensure breakfast is always stocked and mornings are smooth.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Meal Prep Sunday Template */}
+                <div className="bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 rounded-xl p-6 border-2 border-green-200 dark:border-green-800">
+                  <div className="flex items-start gap-4">
+                    <div className="text-4xl">🥗</div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Meal Prep Sunday</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Weekly meal prep ingredients • Budget: $70-90</p>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs text-gray-700 dark:text-gray-300">
+                        <div><strong>Protein:</strong> chicken breast (5lbs), ground turkey (2lbs)</div>
+                        <div><strong>Produce:</strong> broccoli, peppers, onions, spinach, sweet potatoes</div>
+                        <div><strong>Grains:</strong> brown rice (3lbs), quinoa</div>
+                        <div><strong>Prep:</strong> meal prep containers (20-pack)</div>
+                        <div><strong>Pantry:</strong> olive oil, garlic, spices, soy sauce</div>
+                        <div><strong>Snacks:</strong> Greek yogurt, almonds, protein bars</div>
+                      </div>
+                      <div className="mt-3 pt-3 border-t border-green-200 dark:border-green-700">
+                        <p className="text-xs text-green-700 dark:text-green-300">
+                          <strong>💡 Use Case:</strong> For fitness-focused individuals or busy professionals. Prep 5-7 days of healthy meals in one shopping trip.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-5 mt-8">
+                <h4 className="font-semibold text-indigo-900 dark:text-indigo-100 mb-2">✨ Template Pro Tips</h4>
+                <ul className="text-indigo-700 dark:text-indigo-300 text-sm space-y-2">
+                  <li><strong>Start Simple:</strong> Begin with 1-2 templates and refine them based on actual shopping trips</li>
+                  <li><strong>Update Regularly:</strong> Review templates quarterly to add new favorites and remove items you no longer buy</li>
+                  <li><strong>Share with Household:</strong> Templates are shared in your space—create templates for different family members' shopping responsibilities</li>
+                  <li><strong>Combine Templates:</strong> Start with a template, then add items from another. Perfect for "Weekly Groceries + Party Supplies"</li>
+                  <li><strong>Seasonal Templates:</strong> Create specific templates for seasons: "Summer BBQ", "Back to School", "Winter Comfort Foods"</li>
+                </ul>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="mobile-shopping" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Mobile Shopping Experience</h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 mb-6">
+                Rowan is designed for in-store shopping on your mobile device. Here's how to make the most of it:
+              </p>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Before You Leave Home</h3>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <div className="text-2xl">1️⃣</div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Review Your List</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      On desktop or mobile, finalize your shopping list. Make sure all items are added, categories are correct, and nothing is missing.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <div className="text-2xl">2️⃣</div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Reorder by Store Layout</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      Use drag-and-drop to arrange items in the order you'll encounter them at your store. This prevents backtracking and saves time.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <div className="text-2xl">3️⃣</div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Check Your Budget</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      Verify your budget is set correctly. Add estimated prices to items if you want accurate tracking while shopping.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">At the Store</h3>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-start gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
+                  <div className="text-2xl">📱</div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Open Your List</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      Navigate to Shopping Lists and tap on your active list. The mobile view is optimized for one-handed operation with large touch targets.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
+                  <div className="text-2xl">✓</div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Check Off Items as You Shop</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      Tap the checkbox next to each item as you add it to your cart. Checked items show with strikethrough and move to the bottom automatically.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
+                  <div className="text-2xl">👫</div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Shop Together</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      If shopping with a partner, you can split up! One person takes Produce/Dairy, another takes Meat/Frozen. Each person checks off items on their phone in real-time.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
+                  <div className="text-2xl">➕</div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Add Forgotten Items</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      Spotted something you forgot? Tap "Add Item" right from your phone. It syncs instantly to all devices, so your partner sees it too.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
+                  <div className="text-2xl">💰</div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Track Your Spending</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      Glance at the budget indicator at the top of your list. If it turns yellow (80%) or red (100%+), consider which items to skip or postpone.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Mobile-Optimized Features</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <h4 className="font-semibold text-purple-900 dark:text-purple-100 mb-2">👆 Large Touch Targets</h4>
+                  <p className="text-sm text-purple-700 dark:text-purple-300">
+                    Checkboxes, buttons, and interactive elements are sized for easy tapping—even with gloves or in a hurry.
+                  </p>
+                </div>
+
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <h4 className="font-semibold text-purple-900 dark:text-purple-100 mb-2">🔄 Real-Time Sync</h4>
+                  <p className="text-sm text-purple-700 dark:text-purple-300">
+                    Changes sync instantly across all devices. Start on desktop, shop on mobile, review at home—seamlessly.
+                  </p>
+                </div>
+
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <h4 className="font-semibold text-purple-900 dark:text-purple-100 mb-2">🌙 Dark Mode</h4>
+                  <p className="text-sm text-purple-700 dark:text-purple-300">
+                    Automatic dark mode support means comfortable viewing in any lighting condition—bright stores or dim parking lots.
+                  </p>
+                </div>
+
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <h4 className="font-semibold text-purple-900 dark:text-purple-100 mb-2">📶 Offline Tolerance</h4>
+                  <p className="text-sm text-purple-700 dark:text-purple-300">
+                    The app handles spotty store Wi-Fi gracefully. Your checks queue up and sync when connection returns.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-pink-50 dark:bg-pink-900/20 border border-pink-200 dark:border-pink-800 rounded-lg p-5">
+                <h4 className="font-semibold text-pink-900 dark:text-pink-100 mb-2">🏡 Household Shopping Tip</h4>
+                <p className="text-pink-700 dark:text-pink-300 text-sm mb-3">
+                  For families, here's a pro workflow:
+                </p>
+                <ul className="text-pink-700 dark:text-pink-300 text-sm space-y-1 ml-4">
+                  <li><strong>Monday-Thursday:</strong> Anyone in the household adds items to "This Week's Shopping" as they run out</li>
+                  <li><strong>Friday Morning:</strong> Review the list together, add forgotten items, set budget</li>
+                  <li><strong>Saturday:</strong> Shop together or split up. Each person checks off items on their phone</li>
+                  <li><strong>After Shopping:</strong> Update actual prices for better budgeting next time</li>
+                </ul>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="smart-tips" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Smart Tips & Common Mistakes</h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 mb-6">
+                Learn from these common mistakes and time-saving hacks to become a shopping list pro:
+              </p>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">❌ Common Mistakes to Avoid</h3>
+              <div className="space-y-4 mb-8">
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-r-lg">
+                  <h4 className="font-semibold text-red-900 dark:text-red-100 mb-2">Not Being Specific Enough</h4>
+                  <div className="text-sm text-red-700 dark:text-red-300">
+                    <p className="mb-2"><strong>❌ Wrong:</strong> "milk", "cheese", "chips"</p>
+                    <p><strong>✓ Right:</strong> "2% milk - gallon", "sharp cheddar - 8oz block", "Doritos nacho cheese - family size"</p>
+                    <p className="mt-2 italic">Why: Specific descriptions prevent confusion and ensure you get exactly what you need, especially when someone else is shopping.</p>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-r-lg">
+                  <h4 className="font-semibold text-red-900 dark:text-red-100 mb-2">Creating Too Many Small Lists</h4>
+                  <div className="text-sm text-red-700 dark:text-red-300">
+                    <p className="mb-2"><strong>❌ Wrong:</strong> "Tuesday List", "Wednesday Items", "Thursday Shopping" (all for same store)</p>
+                    <p><strong>✓ Right:</strong> One "This Week - Whole Foods" list that you add to throughout the week</p>
+                    <p className="mt-2 italic">Why: Consolidating items into one weekly list gives you a complete picture and prevents multiple trips to the same store.</p>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-r-lg">
+                  <h4 className="font-semibold text-red-900 dark:text-red-100 mb-2">Ignoring Categories</h4>
+                  <div className="text-sm text-red-700 dark:text-red-300">
+                    <p className="mb-2"><strong>❌ Wrong:</strong> Letting everything fall into "Other" category</p>
+                    <p><strong>✓ Right:</strong> Reviewing and correcting miscategorized items before shopping</p>
+                    <p className="mt-2 italic">Why: Proper categories organize your list by store layout, making shopping significantly faster and preventing forgotten items in different sections.</p>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-r-lg">
+                  <h4 className="font-semibold text-red-900 dark:text-red-100 mb-2">Setting Unrealistic Budgets</h4>
+                  <div className="text-sm text-red-700 dark:text-red-300">
+                    <p className="mb-2"><strong>❌ Wrong:</strong> $50 budget for 30 items including meat and produce</p>
+                    <p><strong>✓ Right:</strong> $120-150 budget based on past shopping trips for similar items</p>
+                    <p className="mt-2 italic">Why: Unrealistic budgets cause stress while shopping. After 2-3 trips, you'll know your average spend—use that as your baseline.</p>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-r-lg">
+                  <h4 className="font-semibold text-red-900 dark:text-red-100 mb-2">Not Using Templates for Recurring Shopping</h4>
+                  <div className="text-sm text-red-700 dark:text-red-300">
+                    <p className="mb-2"><strong>❌ Wrong:</strong> Typing the same 25 items every week from memory</p>
+                    <p><strong>✓ Right:</strong> Creating a "Weekly Groceries" template and starting from there</p>
+                    <p className="mt-2 italic">Why: Templates save 10-15 minutes per list. You start with 80% of what you need, then just add unique items for that week.</p>
+                  </div>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">✅ Time-Saving Hacks</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2">⚡ Quick Add Panel</h4>
+                  <p className="text-sm text-green-700 dark:text-green-300 mb-2">
+                    The Quick Add panel shows your 12 most frequently purchased items. Use it to build lists in seconds!
+                  </p>
+                  <p className="text-xs text-green-600 dark:text-green-400 italic">
+                    Time Saved: 5-7 minutes per list
+                  </p>
+                </div>
+
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2">🎯 Store-Specific Lists</h4>
+                  <p className="text-sm text-green-700 dark:text-green-300 mb-2">
+                    Create separate lists for different stores (Whole Foods, Target, Costco). This prevents "Oh, I should have gotten that at Costco" moments.
+                  </p>
+                  <p className="text-xs text-green-600 dark:text-green-400 italic">
+                    Saves money and prevents extra trips
+                  </p>
+                </div>
+
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2">🔄 Reorder Before Shopping</h4>
+                  <p className="text-sm text-green-700 dark:text-green-300 mb-2">
+                    Take 2 minutes to drag items into store order before you leave. You'll shop 30-40% faster by not backtracking through aisles.
+                  </p>
+                  <p className="text-xs text-green-600 dark:text-green-400 italic">
+                    Time Saved: 10-15 minutes at store
+                  </p>
+                </div>
+
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2">📅 Calendar + Task Combo</h4>
+                  <p className="text-sm text-green-700 dark:text-green-300 mb-2">
+                    Schedule shopping trips in your calendar AND create a task. The calendar event reminds you, the task tracks completion.
+                  </p>
+                  <p className="text-xs text-green-600 dark:text-green-400 italic">
+                    Never forget shopping day again
+                  </p>
+                </div>
+
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2">👥 Split Shopping</h4>
+                  <p className="text-sm text-green-700 dark:text-green-300 mb-2">
+                    When shopping with a partner, assign categories: one person does Produce/Dairy/Meat, the other does Pantry/Frozen/Household. Check items off in real-time.
+                  </p>
+                  <p className="text-xs text-green-600 dark:text-green-400 italic">
+                    Time Saved: 50% faster shopping
+                  </p>
+                </div>
+
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2">💾 Update Prices Post-Shop</h4>
+                  <p className="text-sm text-green-700 dark:text-green-300 mb-2">
+                    Spend 3 minutes after shopping to update estimated prices with actual costs. After 3-4 trips, you'll have a personal price database for accurate budgets.
+                  </p>
+                  <p className="text-xs text-green-600 dark:text-green-400 italic">
+                    Better budgeting long-term
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-5">
+                <h4 className="font-semibold text-yellow-900 dark:text-yellow-100 mb-2">💡 Pro Shopper Strategy</h4>
+                <p className="text-yellow-700 dark:text-yellow-300 text-sm mb-3">
+                  Follow this workflow for maximum efficiency:
+                </p>
+                <ol className="text-yellow-700 dark:text-yellow-300 text-sm space-y-2 ml-4">
+                  <li><strong>1. Use templates:</strong> Start with your "Weekly Groceries" template (saves 5-7 min)</li>
+                  <li><strong>2. Add from Quick Add:</strong> Click items from your frequent panel (saves 3-4 min)</li>
+                  <li><strong>3. Add unique items:</strong> Manually add any one-off needs for this week</li>
+                  <li><strong>4. Reorder by store layout:</strong> Drag items to match your store (saves 10-15 min while shopping)</li>
+                  <li><strong>5. Schedule it:</strong> Add to calendar with reminder so you don't forget</li>
+                  <li><strong>6. Shop efficiently:</strong> Use mobile app, check off as you go</li>
+                  <li><strong>7. Update prices:</strong> Quick review after shopping for better budgets next time</li>
+                </ol>
+                <p className="text-yellow-700 dark:text-yellow-300 text-sm mt-3 font-semibold">
+                  Total time saved per week: 20-30 minutes! Plus less stress and fewer forgotten items.
+                </p>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="integration-workflows" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Integration Workflows</h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 mb-6">
+                Shopping Lists seamlessly integrate with Meal Planning, Calendar, and Tasks. Here are powerful workflows that connect everything:
+              </p>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Complete Workflow: Recipe → Meal Plan → Shopping → Task</h3>
+
+              <div className="space-y-4 mb-8">
+                {/* Step 1 */}
+                <div className="relative pl-8 pb-8 border-l-4 border-orange-300 dark:border-orange-700">
+                  <div className="absolute -left-4 top-0 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                    1
+                  </div>
+                  <div className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-lg p-5 border-2 border-orange-200 dark:border-orange-800">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="text-3xl">🍳</div>
+                      <h4 className="text-lg font-bold text-gray-900 dark:text-white">Find & Save Recipes (Meal Planning)</h4>
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                      Start by building your recipe library. Add recipes using:
+                    </p>
+                    <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1 ml-4">
+                      <li>• <strong>AI Import:</strong> Paste recipe URLs from any cooking site</li>
+                      <li>• <strong>API Discovery:</strong> Browse 37+ cuisine types for inspiration</li>
+                      <li>• <strong>Manual Entry:</strong> Type your family recipes</li>
+                    </ul>
+                    <p className="text-xs text-orange-700 dark:text-orange-300 mt-3 italic">
+                      📍 Navigate to: Meal Planning → Recipes → Add New Recipe
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 2 */}
+                <div className="relative pl-8 pb-8 border-l-4 border-purple-300 dark:border-purple-700">
+                  <div className="absolute -left-4 top-0 w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                    2
+                  </div>
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-5 border-2 border-purple-200 dark:border-purple-800">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="text-3xl">📅</div>
+                      <h4 className="text-lg font-bold text-gray-900 dark:text-white">Plan Your Week (Meal Planning)</h4>
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                      Schedule meals for the week:
+                    </p>
+                    <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1 ml-4">
+                      <li>• View calendar and pick dates (Monday dinner, Wednesday lunch, etc.)</li>
+                      <li>• Select recipes from your library or browse API recipes</li>
+                      <li>• Plan 5-7 days ahead for full week coverage</li>
+                      <li>• Each meal links to its recipe with full ingredients</li>
+                    </ul>
+                    <p className="text-xs text-purple-700 dark:text-purple-300 mt-3 italic">
+                      📍 Navigate to: Meal Planning → Calendar View → Click date → Add Meal
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 3 */}
+                <div className="relative pl-8 pb-8 border-l-4 border-emerald-300 dark:border-emerald-700">
+                  <div className="absolute -left-4 top-0 w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                    3
+                  </div>
+                  <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-lg p-5 border-2 border-emerald-200 dark:border-emerald-800">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="text-3xl">🛒</div>
+                      <h4 className="text-lg font-bold text-gray-900 dark:text-white">Generate Shopping List (Meal Planning → Shopping)</h4>
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                      Automatically create shopping list from your meal plan:
+                    </p>
+                    <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1 ml-4">
+                      <li>• Click "Generate Shopping List from Meals"</li>
+                      <li>• Select date range (e.g., Monday-Sunday)</li>
+                      <li>• System extracts ALL ingredients from selected meals</li>
+                      <li>• Items are auto-categorized and quantities are calculated</li>
+                      <li>• Review, adjust, add household items (milk, bread, etc.)</li>
+                    </ul>
+                    <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-3 italic">
+                      📍 Navigate to: Meal Planning → Actions → Generate Shopping List
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 4 */}
+                <div className="relative pl-8 pb-8 border-l-4 border-blue-300 dark:border-blue-700">
+                  <div className="absolute -left-4 top-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                    4
+                  </div>
+                  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg p-5 border-2 border-blue-200 dark:border-blue-800">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="text-3xl">📆</div>
+                      <h4 className="text-lg font-bold text-gray-900 dark:text-white">Schedule Shopping Trip (Shopping → Calendar)</h4>
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                      Add your shopping list to the calendar:
+                    </p>
+                    <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1 ml-4">
+                      <li>• Open shopping list menu (⋮ button)</li>
+                      <li>• Click "📅 Schedule Shopping Trip"</li>
+                      <li>• Pick date/time (e.g., Saturday 10:00 AM)</li>
+                      <li>• Set duration and reminder</li>
+                      <li>• Calendar event is created with shopping list linked</li>
+                    </ul>
+                    <p className="text-xs text-blue-700 dark:text-blue-300 mt-3 italic">
+                      📍 Navigate to: Shopping Lists → List Menu → Schedule Shopping Trip
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 5 */}
+                <div className="relative pl-8 pb-8 border-l-4 border-indigo-300 dark:border-indigo-700">
+                  <div className="absolute -left-4 top-0 w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                    5
+                  </div>
+                  <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg p-5 border-2 border-indigo-200 dark:border-indigo-800">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="text-3xl">✅</div>
+                      <h4 className="text-lg font-bold text-gray-900 dark:text-white">Create Task (Shopping → Tasks)</h4>
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                      Track shopping as a task for accountability:
+                    </p>
+                    <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1 ml-4">
+                      <li>• Open shopping list menu (⋮ button)</li>
+                      <li>• Click "✓ Create Task"</li>
+                      <li>• Task is created: "Complete shopping: [List Name]"</li>
+                      <li>• Includes item count and shopping list link</li>
+                      <li>• Assign to household member and set priority</li>
+                    </ul>
+                    <p className="text-xs text-indigo-700 dark:text-indigo-300 mt-3 italic">
+                      📍 Navigate to: Shopping Lists → List Menu → Create Task
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 6 */}
+                <div className="relative pl-8">
+                  <div className="absolute -left-4 top-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                    6
+                  </div>
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-5 border-2 border-green-200 dark:border-green-800">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="text-3xl">🎯</div>
+                      <h4 className="text-lg font-bold text-gray-900 dark:text-white">Complete Everything</h4>
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                      On shopping day:
+                    </p>
+                    <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1 ml-4">
+                      <li>• <strong>Calendar</strong> sends reminder 30 min before trip</li>
+                      <li>• <strong>Shopping List</strong> on mobile—check off items as you shop</li>
+                      <li>• When done shopping, mark <strong>Task</strong> as completed</li>
+                      <li>• Shopping list automatically marked complete</li>
+                      <li>• Start cooking your planned meals!</li>
+                    </ul>
+                    <p className="text-xs text-green-700 dark:text-green-300 mt-3 italic">
+                      ✨ Everything is connected and tracked—nothing falls through the cracks!
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Other Powerful Integration Patterns</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border-2 border-amber-200 dark:border-amber-800">
+                  <h4 className="font-semibold text-amber-900 dark:text-amber-100 mb-2">🎂 Event Shopping</h4>
+                  <p className="text-sm text-amber-700 dark:text-amber-300 mb-2">
+                    <strong>Scenario:</strong> Planning a birthday party next Saturday
+                  </p>
+                  <ol className="text-xs text-amber-700 dark:text-amber-300 space-y-1 ml-4">
+                    <li>1. Create "Birthday Party Shopping" list</li>
+                    <li>2. Schedule calendar event: "Birthday Party Prep"</li>
+                    <li>3. Link shopping list to calendar event</li>
+                    <li>4. Create task: "Shop for party - due Friday"</li>
+                    <li>5. Get reminders, shop Friday, mark complete</li>
+                  </ol>
+                </div>
+
+                <div className="p-4 bg-teal-50 dark:bg-teal-900/20 rounded-lg border-2 border-teal-200 dark:border-teal-800">
+                  <h4 className="font-semibold text-teal-900 dark:text-teal-100 mb-2">🏠 Household Chore Integration</h4>
+                  <p className="text-sm text-teal-700 dark:text-teal-300 mb-2">
+                    <strong>Scenario:</strong> Regular household restocking
+                  </p>
+                  <ol className="text-xs text-teal-700 dark:text-teal-300 space-y-1 ml-4">
+                    <li>1. Create template: "Household Essentials"</li>
+                    <li>2. Set up recurring task: "Check household supplies - every Sunday"</li>
+                    <li>3. When task pops up, create list from template</li>
+                    <li>4. Schedule shopping trip for Monday</li>
+                    <li>5. Complete task when items are restocked</li>
+                  </ol>
+                </div>
+
+                <div className="p-4 bg-rose-50 dark:bg-rose-900/20 rounded-lg border-2 border-rose-200 dark:border-rose-800">
+                  <h4 className="font-semibold text-rose-900 dark:text-rose-100 mb-2">🎄 Holiday Planning</h4>
+                  <p className="text-sm text-rose-700 dark:text-rose-300 mb-2">
+                    <strong>Scenario:</strong> Thanksgiving dinner preparation
+                  </p>
+                  <ol className="text-xs text-rose-700 dark:text-rose-300 space-y-1 ml-4">
+                    <li>1. Plan Thanksgiving meals in Meal Planning (turkey, sides, desserts)</li>
+                    <li>2. Generate comprehensive shopping list from all meals</li>
+                    <li>3. Split into two lists: "Thanksgiving - 1 week early" and "Thanksgiving - fresh items"</li>
+                    <li>4. Schedule both shopping trips in calendar</li>
+                    <li>5. Create tasks for each trip assigned to different family members</li>
+                  </ol>
+                </div>
+
+                <div className="p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg border-2 border-cyan-200 dark:border-cyan-800">
+                  <h4 className="font-semibold text-cyan-900 dark:text-cyan-100 mb-2">💪 Meal Prep Integration</h4>
+                  <p className="text-sm text-cyan-700 dark:text-cyan-300 mb-2">
+                    <strong>Scenario:</strong> Sunday meal prep for the week
+                  </p>
+                  <ol className="text-xs text-cyan-700 dark:text-cyan-300 space-y-1 ml-4">
+                    <li>1. Plan 5 meal prep recipes in Meal Planning</li>
+                    <li>2. Generate shopping list (includes bulk proteins, veggies)</li>
+                    <li>3. Schedule "Grocery Shopping" Saturday 9 AM</li>
+                    <li>4. Schedule "Meal Prep Session" Sunday 2 PM (3 hours)</li>
+                    <li>5. Create tasks: "Shop for meal prep" and "Complete meal prep"</li>
+                  </ol>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-2 border-purple-200 dark:border-purple-800 rounded-xl p-6">
+                <h4 className="font-semibold text-purple-900 dark:text-purple-100 mb-3 text-lg">✨ Why Integration Matters</h4>
+                <p className="text-purple-700 dark:text-purple-300 text-sm mb-4">
+                  By connecting Shopping Lists with Meal Planning, Calendar, and Tasks, you create a complete household management system:
+                </p>
+                <ul className="text-purple-700 dark:text-purple-300 text-sm space-y-2">
+                  <li><strong>⏱️ Save Time:</strong> Generate shopping lists automatically from meal plans—no manual copying</li>
+                  <li><strong>📅 Never Forget:</strong> Calendar reminders ensure you shop on time</li>
+                  <li><strong>✓ Accountability:</strong> Tasks track who's responsible for shopping</li>
+                  <li><strong>🔄 Real-Time Sync:</strong> Changes anywhere update everywhere instantly</li>
+                  <li><strong>🏡 Family Coordination:</strong> Everyone sees the same info—no miscommunication</li>
+                </ul>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
         </div>
 
         {/* Footer */}
