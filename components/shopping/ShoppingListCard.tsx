@@ -137,7 +137,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
 
                         {/* Quantity Controls - right next to item name */}
                         {onUpdateQuantity && (
-                          <div className="flex items-center gap-0.5 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                          <div className="flex items-center gap-0.5">
                             <Tooltip content="Decrease quantity" delay={0}>
                               <button
                                 onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
