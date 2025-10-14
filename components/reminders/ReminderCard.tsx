@@ -5,6 +5,7 @@ import { Reminder } from '@/lib/services/reminders-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
 import { ActivityTimeline } from './ActivityTimeline';
+import { CommentsSection } from './CommentsSection';
 
 interface ReminderCardProps {
   reminder: Reminder;
@@ -240,6 +241,11 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
       {/* Activity Timeline */}
       <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
         <ActivityTimeline reminderId={reminder.id} />
+      </div>
+
+      {/* Comments Section */}
+      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <CommentsSection reminderId={reminder.id} />
       </div>
     </div>
   );

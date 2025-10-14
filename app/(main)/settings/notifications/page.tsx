@@ -5,12 +5,10 @@ import { Header } from '@/components/layout/Header';
 import { Bell, Mail, Smartphone, Clock, Moon, Save, ArrowLeft } from 'lucide-react';
 import { reminderNotificationsService, NotificationPreferences } from '@/lib/services/reminder-notifications-service';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { useSpace } from '@/lib/contexts/space-context';
 import Link from 'next/link';
 
 export default function NotificationSettingsPage() {
-  const { user } = useAuth();
-  const { currentSpace } = useSpace();
+  const { user, currentSpace } = useAuth();
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
