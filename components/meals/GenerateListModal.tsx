@@ -28,7 +28,7 @@ export function GenerateListModal({
 
   // Only show meals that have recipes with ingredients
   const mealsWithRecipes = meals.filter(
-    (meal) => meal.recipes && meal.recipes.ingredients
+    (meal) => meal.recipe && meal.recipe.ingredients
   );
 
   const handleToggleMeal = (mealId: string) => {
@@ -241,10 +241,10 @@ export function GenerateListModal({
                         <span>
                           {format(new Date(meal.scheduled_date), 'MMM d, yyyy')}
                         </span>
-                        {meal.recipes && (
+                        {meal.recipe && (
                           <>
                             <span>•</span>
-                            <span className="truncate">{meal.recipes.name}</span>
+                            <span className="truncate">{meal.recipe.name}</span>
                           </>
                         )}
                       </div>

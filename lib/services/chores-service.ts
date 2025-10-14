@@ -150,7 +150,7 @@ export const choresService = {
     const supabase = createClient();
     try {
       // Handle completed_at timestamp automatically
-      const finalUpdates = { ...updates };
+      const finalUpdates: any = { ...updates };
 
       // If marking as completed, set completed_at timestamp
       if (updates.status === 'completed' && !finalUpdates.completed_at) {

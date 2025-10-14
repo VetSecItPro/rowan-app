@@ -53,7 +53,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
   async function handleSnooze(snoozeUntil: Date) {
     setLoading(true);
     try {
-      await taskSnoozeService.snoozeTask(taskId, userId, snoozeUntil, reason || undefined);
+      await taskSnoozeService.snoozeTask(taskId, userId, snoozeUntil.toISOString(), reason || undefined);
       onSnooze?.();
       onClose();
     } catch (error) {

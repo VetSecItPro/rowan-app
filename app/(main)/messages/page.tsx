@@ -476,8 +476,8 @@ export default function MessagesPage() {
                           onEdit={handleEditMessage}
                           onDelete={handleDeleteMessage}
                           onMarkRead={handleMarkRead}
-                          isOwn={message.sender_id === currentSpace.id}
-                          currentUserId={currentSpace.id}
+                          isOwn={message.sender_id === currentSpace?.id}
+                          currentUserId={currentSpace?.id || ''}
                         />
                       </div>
                     );

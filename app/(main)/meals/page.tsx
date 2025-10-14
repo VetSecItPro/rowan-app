@@ -555,8 +555,8 @@ export default function MealsPage() {
     setEditingMeal({
       id: '',
       space_id: currentSpace?.id || '',
-      recipe_id: null,
-      recipe: null,
+      recipe_id: undefined,
+      recipe: undefined,
       name: '',
       meal_type: (mealType as 'breakfast' | 'lunch' | 'dinner' | 'snack') || 'dinner',
       scheduled_date: date.toISOString(),
@@ -731,7 +731,7 @@ export default function MealsPage() {
 
   const handleBulkGenerateList = useCallback(async (mealIds: string[]) => {
     const selectedMeals = meals.filter(m => mealIds.includes(m.id));
-    const mealsWithRecipes = selectedMeals.filter(m => m.recipes && m.recipes.ingredients);
+    const mealsWithRecipes = selectedMeals.filter(m => m.recipe && m.recipe.ingredients);
 
     if (mealsWithRecipes.length === 0) {
       showError('Selected meals must have recipes with ingredients.');

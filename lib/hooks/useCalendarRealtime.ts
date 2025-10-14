@@ -106,7 +106,7 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
         const presenceMap: Record<string, PresenceUser> = {};
 
         Object.keys(state).forEach(key => {
-          const presences = state[key] as PresenceUser[];
+          const presences = state[key] as any;
           if (presences.length > 0) {
             presenceMap[key] = presences[0];
           }

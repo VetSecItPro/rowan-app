@@ -27,7 +27,7 @@ export default function LoginPage() {
 
   // Check if user was just registered
   useEffect(() => {
-    if (searchParams.get('registered') === 'true') {
+    if (searchParams?.get('registered') === 'true') {
       setSuccessMessage('Account created successfully! Please log in with your credentials.');
     }
   }, [searchParams]);

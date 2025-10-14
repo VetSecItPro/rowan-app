@@ -16,12 +16,12 @@ import {
   subMonths,
   parseISO
 } from 'date-fns';
-import type { CalendarEvent } from '@/lib/types';
+import type { Event } from '@/lib/types';
 
 interface MiniCalendarProps {
   currentDate: Date;
   onDateSelect: (date: Date) => void;
-  events: CalendarEvent[];
+  events: Event[];
 }
 
 export function MiniCalendar({ currentDate, onDateSelect, events }: MiniCalendarProps) {

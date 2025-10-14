@@ -47,7 +47,7 @@ export function SpaceMembersIndicator() {
         return;
       }
 
-      setMembers(data || []);
+      setMembers((data || []) as any);
     };
 
     loadMembers();

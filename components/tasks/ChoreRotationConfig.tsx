@@ -76,7 +76,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
       `)
       .eq('space_id', spaceId);
 
-    setSpaceMembers(data || []);
+    setSpaceMembers((data || []) as any);
   }
 
   async function handleSave() {
@@ -90,11 +90,13 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
       if (rotation?.id) {
         await choreRotationService.updateRotation(rotation.id, formData);
       } else {
-        await choreRotationService.createRotation({
-          ...formData,
-          task_id: taskId,
-          space_id: spaceId,
-        });
+        await choreRotationService.createRotation(
+          taskId,
+          formData.member_ids as any,
+          (formData as any).rotation_frequency || 'weekly',
+          'sequential',
+          spaceId
+        );
       }
       loadRotation();
       setEditing(false);
