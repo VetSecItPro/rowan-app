@@ -15,6 +15,7 @@ export interface Reminder {
   snooze_until?: string;
   repeat_pattern?: string;
   repeat_days?: number[];
+  assigned_to?: string; // User ID this reminder is assigned to
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -35,6 +36,7 @@ export interface CreateReminderInput {
   snooze_until?: string;
   repeat_pattern?: string;
   repeat_days?: number[];
+  assigned_to?: string; // User ID to assign this reminder to
 }
 
 export interface ReminderStats {
@@ -149,5 +151,45 @@ export const remindersService = {
       status: 'snoozed',
       snooze_until: snoozeUntil.toISOString(),
     });
+  },
+
+  // Assignment filtering functions
+  async getAssignedReminders(userId: string, spaceId: string): Promise<Reminder[]> {
+    const supabase = createClient();
+
+    // Security: Validate user has access to this space
+    const { data: membership, error: memberError } = await supabase
+      .from('space_members')
+      .select('id')
+      .eq('space_id', spaceId)
+      .eq('user_id', userId)
+      .single();
+
+    if (memberError || !membership) {
+      throw new Error('User is not a member of this space');
+    }
+
+    const { data, error } = await supabase
+      .from('reminders')
+      .select('*')
+      .eq('space_id', spaceId)
+      .eq('assigned_to', userId)
+      .order('reminder_time', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getUnassignedReminders(spaceId: string): Promise<Reminder[]> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('reminders')
+      .select('*')
+      .eq('space_id', spaceId)
+      .is('assigned_to', null)
+      .order('reminder_time', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
   },
 };
