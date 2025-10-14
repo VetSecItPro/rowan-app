@@ -33,6 +33,10 @@
     {
       "path": "/api/cron/task-jobs?job=refresh-views",
       "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/reminder-notifications",
+      "schedule": "*/15 * * * *"
     }
   ]
 }
