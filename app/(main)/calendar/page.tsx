@@ -12,6 +12,7 @@ import { MiniCalendar } from '@/components/calendar/MiniCalendar';
 import { QuickAddEvent } from '@/components/calendar/QuickAddEvent';
 import { EnhancedDayView } from '@/components/calendar/EnhancedDayView';
 import { EnhancedWeekView } from '@/components/calendar/EnhancedWeekView';
+import { TemplateLibrary } from '@/components/calendar/TemplateLibrary';
 import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
@@ -39,6 +40,7 @@ export default function CalendarPage() {
   const [detailEvent, setDetailEvent] = useState<CalendarEvent | null>(null);
   const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
+  const [isTemplateLibraryOpen, setIsTemplateLibraryOpen] = useState(false);
 
   // Ref for search input
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -253,6 +255,26 @@ export default function CalendarPage() {
     setEditingEvent(null);
   }, []);
 
+  // Stable callback for template selection
+  const handleSelectTemplate = useCallback(async (template: any) => {
+    try {
+      // Create event from template starting now (or could open modal to choose time)
+      const startTime = new Date().toISOString();
+      const event = await calendarService.createEventFromTemplate(template, startTime);
+
+      // Reload events to show the new one
+      loadEvents();
+
+      // Optionally open the event in edit mode so user can adjust time
+      setTimeout(() => {
+        handleEditEvent(event);
+      }, 100);
+    } catch (error) {
+      console.error('Failed to create event from template:', error);
+      alert('Failed to create event from template');
+    }
+  }, [loadEvents, handleEditEvent]);
+
   // Stable callback for view mode changes
   const handleSetViewCalendar = useCallback(() => setViewMode('month'), []);
   const handleSetViewList = useCallback(() => setViewMode('list'), []);
@@ -418,6 +440,17 @@ export default function CalendarPage() {
                 <span>Quick Add</span>
                 <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                   Quick add with natural language (Q)
+                </span>
+              </button>
+              <button
+                onClick={() => setIsTemplateLibraryOpen(true)}
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 group relative"
+                title="Create from template"
+              >
+                <span className="text-lg">📋</span>
+                <span>Templates</span>
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                  Create from template
                 </span>
               </button>
               <button
@@ -1319,6 +1352,16 @@ export default function CalendarPage() {
         onClose={() => setIsQuickAddOpen(false)}
         onCreateEvent={handleCreateEvent}
       />
+
+      {/* Template Library Modal */}
+      {currentSpace && (
+        <TemplateLibrary
+          isOpen={isTemplateLibraryOpen}
+          onClose={() => setIsTemplateLibraryOpen(false)}
+          spaceId={currentSpace.id}
+          onSelectTemplate={handleSelectTemplate}
+        />
+      )}
     </FeatureLayout>
   );
 }
