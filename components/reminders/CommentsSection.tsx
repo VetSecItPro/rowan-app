@@ -1,0 +1,356 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import { MessageCircle, Send, Edit, Trash2, X } from 'lucide-react';
+import { reminderCommentsService, ReminderComment } from '@/lib/services/reminder-comments-service';
+import { useAuth } from '@/lib/contexts/auth-context';
+import { createClient } from '@/lib/supabase/client';
+
+interface CommentsSectionProps {
+  reminderId: string;
+}
+
+export function CommentsSection({ reminderId }: CommentsSectionProps) {
+  const { user } = useAuth();
+  const [comments, setComments] = useState<ReminderComment[]>([]);
+  const [newCommentContent, setNewCommentContent] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState('');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const supabase = createClient();
+
+  // Fetch comments
+  const fetchComments = async () => {
+    try {
+      setLoading(true);
+      const data = await reminderCommentsService.getComments(reminderId);
+      setComments(data);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initial fetch
+  useEffect(() => {
+    fetchComments();
+  }, [reminderId]);
+
+  // Real-time subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel(`reminder_comments:${reminderId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'reminder_comments',
+          filter: `reminder_id=eq.${reminderId}`,
+        },
+        () => {
+          // Refresh comments when changes occur
+          fetchComments();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [reminderId]);
+
+  // Create comment
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !newCommentContent.trim()) return;
+
+    try {
+      setSubmitting(true);
+      await reminderCommentsService.createComment({
+        reminder_id: reminderId,
+        user_id: user.id,
+        content: newCommentContent.trim(),
+      });
+      setNewCommentContent('');
+      // Comments will update via real-time subscription
+    } catch (error) {
+      console.error('Error creating comment:', error);
+      alert('Failed to post comment. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Start editing
+  const handleStartEdit = (comment: ReminderComment) => {
+    setEditingCommentId(comment.id);
+    setEditContent(comment.content);
+  };
+
+  // Cancel editing
+  const handleCancelEdit = () => {
+    setEditingCommentId(null);
+    setEditContent('');
+  };
+
+  // Update comment
+  const handleUpdate = async (commentId: string) => {
+    if (!user || !editContent.trim()) return;
+
+    try {
+      await reminderCommentsService.updateComment(commentId, user.id, {
+        content: editContent.trim(),
+      });
+      setEditingCommentId(null);
+      setEditContent('');
+      // Comments will update via real-time subscription
+    } catch (error) {
+      console.error('Error updating comment:', error);
+      alert('Failed to update comment. Please try again.');
+    }
+  };
+
+  // Delete comment
+  const handleDelete = async (commentId: string) => {
+    if (!user) return;
+    if (!confirm('Are you sure you want to delete this comment?')) return;
+
+    try {
+      await reminderCommentsService.deleteComment(commentId, user.id);
+      // Comments will update via real-time subscription
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+      alert('Failed to delete comment. Please try again.');
+    }
+  };
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [newCommentContent]);
+
+  if (!user) return null;
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+        <MessageCircle className="w-5 h-5" />
+        <h3 className="font-semibold">
+          Comments {comments.length > 0 && `(${comments.length})`}
+        </h3>
+      </div>
+
+      {/* Comments List */}
+      {loading ? (
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          Loading comments...
+        </div>
+      ) : comments.length === 0 ? (
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          No comments yet. Be the first to comment!
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {comments.map((comment) => (
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              currentUserId={user.id}
+              isEditing={editingCommentId === comment.id}
+              editContent={editContent}
+              onEditContentChange={setEditContent}
+              onStartEdit={() => handleStartEdit(comment)}
+              onCancelEdit={handleCancelEdit}
+              onUpdate={() => handleUpdate(comment.id)}
+              onDelete={() => handleDelete(comment.id)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* New Comment Form */}
+      <form onSubmit={handleSubmit} className="space-y-2">
+        <div className="flex items-start gap-3">
+          {/* User Avatar */}
+          {user.avatar_url ? (
+            <img
+              src={user.avatar_url}
+              alt={user.name}
+              className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+            />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+              {user.name
+                .split(' ')
+                .map((n) => n[0])
+                .join('')
+                .toUpperCase()
+                .slice(0, 2)}
+            </div>
+          )}
+
+          {/* Textarea */}
+          <div className="flex-1">
+            <textarea
+              ref={textareaRef}
+              value={newCommentContent}
+              onChange={(e) => setNewCommentContent(e.target.value)}
+              placeholder="Write a comment..."
+              className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-pink-500 resize-none"
+              rows={1}
+              maxLength={5000}
+              disabled={submitting}
+            />
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center justify-between pl-11">
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {newCommentContent.length}/5000
+          </span>
+          <button
+            type="submit"
+            disabled={!newCommentContent.trim() || submitting}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Send className="w-4 h-4" />
+            {submitting ? 'Posting...' : 'Post'}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+// =============================================
+// COMMENT ITEM COMPONENT
+// =============================================
+
+interface CommentItemProps {
+  comment: ReminderComment;
+  currentUserId: string;
+  isEditing: boolean;
+  editContent: string;
+  onEditContentChange: (content: string) => void;
+  onStartEdit: () => void;
+  onCancelEdit: () => void;
+  onUpdate: () => void;
+  onDelete: () => void;
+}
+
+function CommentItem({
+  comment,
+  currentUserId,
+  isEditing,
+  editContent,
+  onEditContentChange,
+  onStartEdit,
+  onCancelEdit,
+  onUpdate,
+  onDelete,
+}: CommentItemProps) {
+  const isOwner = comment.user_id === currentUserId;
+  const wasEdited = reminderCommentsService.wasEdited(comment);
+  const timeAgo = reminderCommentsService.formatCommentTime(comment.created_at);
+
+  return (
+    <div className="flex items-start gap-3 group">
+      {/* User Avatar */}
+      {comment.user?.avatar_url ? (
+        <img
+          src={comment.user.avatar_url}
+          alt={comment.user.name}
+          className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+        />
+      ) : (
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+          {comment.user?.name
+            .split(' ')
+            .map((n) => n[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 2) || '?'}
+        </div>
+      )}
+
+      {/* Comment Content */}
+      <div className="flex-1 min-w-0">
+        <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-semibold text-gray-900 dark:text-white text-sm">
+                {comment.user?.name || 'Unknown User'}
+              </span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {timeAgo}
+                {wasEdited && ' (edited)'}
+              </span>
+            </div>
+
+            {/* Actions (for comment owner) */}
+            {isOwner && !isEditing && (
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  onClick={onStartEdit}
+                  className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                  aria-label="Edit comment"
+                >
+                  <Edit className="w-3 h-3 text-gray-600 dark:text-gray-400" />
+                </button>
+                <button
+                  onClick={onDelete}
+                  className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors"
+                  aria-label="Delete comment"
+                >
+                  <Trash2 className="w-3 h-3 text-red-600 dark:text-red-400" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Content or Edit Form */}
+          {isEditing ? (
+            <div className="space-y-2">
+              <textarea
+                value={editContent}
+                onChange={(e) => onEditContentChange(e.target.value)}
+                className="w-full px-2 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-900 dark:text-white resize-none"
+                rows={3}
+                maxLength={5000}
+              />
+              <div className="flex items-center justify-end gap-2">
+                <button
+                  onClick={onCancelEdit}
+                  className="px-3 py-1 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={onUpdate}
+                  disabled={!editContent.trim()}
+                  className="px-3 py-1 text-sm bg-pink-600 text-white rounded hover:bg-pink-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words">
+              {comment.content}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
