@@ -16,6 +16,8 @@ import { goalsService } from '@/lib/services/goals-service';
 import { checkInsService, type DailyCheckIn, type CheckInStats } from '@/lib/services/checkins-service';
 import { reactionsService, type CheckInReaction } from '@/lib/services/reactions-service';
 import { WeeklyInsights } from '@/components/checkins/WeeklyInsights';
+import { CheckInSuccess } from '@/components/checkins/CheckInSuccess';
+import { Tooltip } from '@/components/shared/Tooltip';
 import { createClient } from '@/lib/supabase/client';
 import {
   CheckSquare,
@@ -320,6 +322,8 @@ export default function DashboardPage() {
   const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [checkInReactions, setCheckInReactions] = useState<Record<string, CheckInReaction[]>>({});
   const [partnerReactionLoading, setPartnerReactionLoading] = useState(false);
+  const [showCheckInSuccess, setShowCheckInSuccess] = useState(false);
+  const [lastCheckInMood, setLastCheckInMood] = useState<string>('');
 
   // Auth protection - redirect to login if not authenticated
   useEffect(() => {
@@ -905,6 +909,10 @@ export default function DashboardPage() {
       });
 
       setTodayCheckIn(checkIn);
+
+      // Store mood for success modal before clearing
+      setLastCheckInMood(selectedMood);
+
       setSelectedMood(null);
       setCheckInNote('');
       setCheckInHighlights('');
@@ -919,6 +927,9 @@ export default function DashboardPage() {
       // Reload recent check-ins
       const recent = await checkInsService.getCheckIns(currentSpace.id, 7);
       setRecentCheckIns(recent);
+
+      // Show success modal
+      setShowCheckInSuccess(true);
     } catch (error) {
       console.error('Failed to create check-in:', error);
     } finally {
@@ -1525,37 +1536,43 @@ export default function DashboardPage() {
               <div className="flex items-center gap-2">
                 {/* Mode Toggle - Matches Tasks Page Pattern */}
                 <div className="flex items-center gap-1 sm:gap-2 p-1 sm:p-1.5 bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 rounded-lg sm:rounded-xl border border-pink-200 dark:border-pink-700">
-                  <button
-                    onClick={() => setViewMode('checkin')}
-                    className={`px-2 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 sm:gap-2 transition-all font-medium ${
-                      viewMode === 'checkin'
-                        ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                    }`}
-                  >
-                    <Heart className="w-4 h-4" />
-                    <span className="text-xs sm:text-sm">Check In</span>
-                  </button>
-                  <button
-                    onClick={() => setViewMode('journal')}
-                    className={`px-2 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 sm:gap-2 transition-all font-medium ${
-                      viewMode === 'journal'
-                        ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                    }`}
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    <span className="text-xs sm:text-sm">Journal</span>
-                  </button>
+                  <Tooltip content="Record your mood and share highlights">
+                    <button
+                      onClick={() => setViewMode('checkin')}
+                      className={`px-2 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 sm:gap-2 transition-all font-medium ${
+                        viewMode === 'checkin'
+                          ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                      }`}
+                    >
+                      <Heart className="w-4 h-4" />
+                      <span className="text-xs sm:text-sm">Check In</span>
+                    </button>
+                  </Tooltip>
+                  <Tooltip content="View your mood history and insights">
+                    <button
+                      onClick={() => setViewMode('journal')}
+                      className={`px-2 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 sm:gap-2 transition-all font-medium ${
+                        viewMode === 'journal'
+                          ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                      }`}
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      <span className="text-xs sm:text-sm">Journal</span>
+                    </button>
+                  </Tooltip>
                 </div>
 
                 {/* Streak Badge */}
                 {checkInStats && checkInStats.currentStreak > 0 && (
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-100 to-yellow-100 dark:from-orange-900/30 dark:to-yellow-900/30 rounded-full">
-                    <Zap className="w-3.5 h-3.5 text-orange-500" />
-                    <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{checkInStats.currentStreak}</span>
-                    <span className="text-xs text-gray-600 dark:text-gray-400 hidden sm:inline">day streak</span>
-                  </div>
+                  <Tooltip content={`You've checked in ${checkInStats.currentStreak} days in a row! Keep it up!`}>
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-100 to-yellow-100 dark:from-orange-900/30 dark:to-yellow-900/30 rounded-full cursor-help">
+                      <Zap className="w-3.5 h-3.5 text-orange-500" />
+                      <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{checkInStats.currentStreak}</span>
+                      <span className="text-xs text-gray-600 dark:text-gray-400 hidden sm:inline">day streak</span>
+                    </div>
+                  </Tooltip>
                 )}
               </div>
             </div>
@@ -1639,20 +1656,21 @@ export default function DashboardPage() {
                 {/* Compact Mood Selector - Horizontal Row */}
                 <div className="flex items-center gap-2 mb-3">
               {moodOptions.map((mood) => (
-                <button
-                  key={mood.value}
-                  onClick={() => handleMoodSelect(mood.value)}
-                  className={`flex-1 p-2 sm:p-3 rounded-xl border-2 transition-all duration-300 transform hover:scale-110 active:scale-95 ${
-                    selectedMood === mood.value
-                      ? 'border-pink-500 bg-pink-100 dark:bg-pink-900/30 scale-105 mood-selected'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-600 bg-white/50 dark:bg-gray-800/50 hover:shadow-lg'
-                  }`}
-                  title={mood.label}
-                >
-                  <div className={`text-2xl sm:text-3xl transition-transform ${selectedMood === mood.value ? 'scale-110' : ''}`}>
-                    {mood.emoji}
-                  </div>
-                </button>
+                <Tooltip key={mood.value} content={`I'm feeling ${mood.label.toLowerCase()} today`} position="top">
+                  <button
+                    onClick={() => handleMoodSelect(mood.value)}
+                    className={`flex-1 p-2 sm:p-3 rounded-xl border-2 transition-all duration-300 transform hover:scale-110 active:scale-95 ${
+                      selectedMood === mood.value
+                        ? 'border-pink-500 bg-pink-100 dark:bg-pink-900/30 scale-105 mood-selected'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-600 bg-white/50 dark:bg-gray-800/50 hover:shadow-lg'
+                    }`}
+                    title={mood.label}
+                  >
+                    <div className={`text-2xl sm:text-3xl transition-transform ${selectedMood === mood.value ? 'scale-110' : ''}`}>
+                      {mood.emoji}
+                    </div>
+                  </button>
+                </Tooltip>
               ))}
             </div>
 
@@ -1995,6 +2013,14 @@ export default function DashboardPage() {
         onClose={() => setShowInviteModal(false)}
         spaceId={currentSpace?.id || ''}
         spaceName={currentSpace?.name || ''}
+      />
+
+      {/* Check-In Success Modal */}
+      <CheckInSuccess
+        isOpen={showCheckInSuccess}
+        onClose={() => setShowCheckInSuccess(false)}
+        mood={lastCheckInMood}
+        streak={checkInStats?.currentStreak || 0}
       />
     </FeatureLayout>
   );
