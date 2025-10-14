@@ -7,6 +7,7 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { updateTaskSchema } from '@/lib/validations/task-schemas';
 import { ZodError } from 'zod';
+import { fallbackRateLimit, extractIP } from '@/lib/ratelimit-fallback';
 
 /**
  * GET /api/tasks/[id]
@@ -17,9 +18,10 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Rate limiting (with graceful fallback)
+    // Rate limiting with fallback protection
+    const ip = extractIP(req.headers);
+
     try {
-      const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
       const { success: rateLimitSuccess } = await ratelimit.limit(ip);
 
       if (!rateLimitSuccess) {
@@ -29,7 +31,19 @@ export async function GET(
         );
       }
     } catch (rateLimitError) {
-      // Continue if rate limiting fails
+      // Fallback to in-memory rate limiting
+      Sentry.captureMessage('Rate limiting degraded (using fallback)', {
+        level: 'warning',
+        tags: { service: 'rate-limit', endpoint: '/api/tasks/[id]' },
+      });
+
+      const allowed = fallbackRateLimit(ip, 10, 10 * 1000);
+      if (!allowed) {
+        return NextResponse.json(
+          { error: 'Too many requests. Please try again later.' },
+          { status: 429 }
+        );
+      }
     }
 
     // Verify authentication
@@ -97,9 +111,10 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Rate limiting (with graceful fallback)
+    // Rate limiting with fallback protection
+    const ip = extractIP(req.headers);
+
     try {
-      const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
       const { success: rateLimitSuccess } = await ratelimit.limit(ip);
 
       if (!rateLimitSuccess) {
@@ -109,7 +124,19 @@ export async function PATCH(
         );
       }
     } catch (rateLimitError) {
-      // Continue if rate limiting fails
+      // Fallback to in-memory rate limiting
+      Sentry.captureMessage('Rate limiting degraded (using fallback)', {
+        level: 'warning',
+        tags: { service: 'rate-limit', endpoint: '/api/tasks/[id]' },
+      });
+
+      const allowed = fallbackRateLimit(ip, 10, 10 * 1000);
+      if (!allowed) {
+        return NextResponse.json(
+          { error: 'Too many requests. Please try again later.' },
+          { status: 429 }
+        );
+      }
     }
 
     // Verify authentication
@@ -202,9 +229,10 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Rate limiting (with graceful fallback)
+    // Rate limiting with fallback protection
+    const ip = extractIP(req.headers);
+
     try {
-      const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
       const { success: rateLimitSuccess } = await ratelimit.limit(ip);
 
       if (!rateLimitSuccess) {
@@ -214,7 +242,19 @@ export async function DELETE(
         );
       }
     } catch (rateLimitError) {
-      // Continue if rate limiting fails
+      // Fallback to in-memory rate limiting
+      Sentry.captureMessage('Rate limiting degraded (using fallback)', {
+        level: 'warning',
+        tags: { service: 'rate-limit', endpoint: '/api/tasks/[id]' },
+      });
+
+      const allowed = fallbackRateLimit(ip, 10, 10 * 1000);
+      if (!allowed) {
+        return NextResponse.json(
+          { error: 'Too many requests. Please try again later.' },
+          { status: 429 }
+        );
+      }
     }
 
     // Verify authentication
