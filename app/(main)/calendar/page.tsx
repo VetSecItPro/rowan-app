@@ -545,8 +545,8 @@ export default function CalendarPage() {
                 )}
               </div>
 
-              {/* View Mode Toggle and Today Button - Only show in calendar view (not list or proposal) */}
-              {viewMode !== 'list' && viewMode !== 'proposal' && (
+              {/* View Mode Toggle and Today Button - Only show in calendar view (not list) */}
+              {viewMode !== 'list' && (
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handleJumpToToday}
