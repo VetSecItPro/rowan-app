@@ -92,6 +92,29 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
+  // CSRF Protection: Validate Origin header for state-changing requests
+  const method = req.method;
+  const isStateChanging = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
+
+  if (isStateChanging && isProtectedPath) {
+    const origin = req.headers.get('origin');
+    const host = req.headers.get('host');
+
+    // Allow requests from same origin or when origin is not present (same-site)
+    if (origin && host) {
+      const originUrl = new URL(origin);
+      const expectedHost = host.split(':')[0]; // Remove port if present
+
+      // Check if origin matches host (same-origin)
+      if (!originUrl.host.includes(expectedHost)) {
+        return NextResponse.json(
+          { error: 'Invalid origin' },
+          { status: 403 }
+        );
+      }
+    }
+  }
+
   // Add security headers
   response.headers.set(
     'Content-Security-Policy',

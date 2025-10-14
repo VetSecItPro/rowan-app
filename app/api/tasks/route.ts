@@ -7,6 +7,8 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { createTaskSchema } from '@/lib/validations/task-schemas';
 import { ZodError } from 'zod';
+import { fallbackRateLimit, extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/tasks
@@ -14,9 +16,10 @@ import { ZodError } from 'zod';
  */
 export async function GET(req: NextRequest) {
   try {
-    // Rate limiting (with graceful fallback)
+    // Rate limiting with fallback protection
+    const ip = extractIP(req.headers);
+
     try {
-      const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
       const { success: rateLimitSuccess } = await ratelimit.limit(ip);
 
       if (!rateLimitSuccess) {
@@ -26,7 +29,19 @@ export async function GET(req: NextRequest) {
         );
       }
     } catch (rateLimitError) {
-      // Continue if rate limiting fails
+      // Fallback to in-memory rate limiting
+      Sentry.captureMessage('Rate limiting degraded (using fallback)', {
+        level: 'warning',
+        tags: { service: 'rate-limit', endpoint: '/api/tasks', method: 'GET' },
+      });
+
+      const allowed = fallbackRateLimit(ip, 10, 10 * 1000);
+      if (!allowed) {
+        return NextResponse.json(
+          { error: 'Too many requests. Please try again later.' },
+          { status: 429 }
+        );
+      }
     }
 
     // Verify authentication
@@ -96,7 +111,10 @@ export async function GET(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/tasks GET error:', error);
+    logger.error('[API] /api/tasks GET error', error, {
+      component: 'TasksAPI',
+      action: 'GET',
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -110,9 +128,10 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    // Rate limiting (with graceful fallback)
+    // Rate limiting with fallback protection
+    const ip = extractIP(req.headers);
+
     try {
-      const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
       const { success: rateLimitSuccess } = await ratelimit.limit(ip);
 
       if (!rateLimitSuccess) {
@@ -122,7 +141,19 @@ export async function POST(req: NextRequest) {
         );
       }
     } catch (rateLimitError) {
-      // Continue if rate limiting fails
+      // Fallback to in-memory rate limiting
+      Sentry.captureMessage('Rate limiting degraded (using fallback)', {
+        level: 'warning',
+        tags: { service: 'rate-limit', endpoint: '/api/tasks', method: 'POST' },
+      });
+
+      const allowed = fallbackRateLimit(ip, 10, 10 * 1000);
+      if (!allowed) {
+        return NextResponse.json(
+          { error: 'Too many requests. Please try again later.' },
+          { status: 429 }
+        );
+      }
     }
 
     // Verify authentication
@@ -191,7 +222,10 @@ export async function POST(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/tasks POST error:', error);
+    logger.error('[API] /api/tasks POST error', error, {
+      component: 'TasksAPI',
+      action: 'POST',
+    });
     return NextResponse.json(
       { error: 'Failed to create task' },
       { status: 500 }
