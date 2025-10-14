@@ -10,6 +10,7 @@ export interface CalendarShortcutHandlers {
   switchToAgenda: () => void;
   switchToList: () => void;
   newEvent: () => void;
+  quickAdd: () => void;
   focusSearch: () => void;
   closeModals: () => void;
 }
@@ -26,6 +27,7 @@ export interface CalendarShortcutHandlers {
  * - A: Switch to agenda view
  * - L: Switch to list view
  * - N: New event
+ * - Q: Quick add (natural language)
  * - /: Focus search
  * - Esc: Close modals
  */
@@ -81,6 +83,10 @@ export function useCalendarShortcuts(handlers: CalendarShortcutHandlers) {
         case 'n':
           e.preventDefault();
           handlers.newEvent();
+          break;
+        case 'q':
+          e.preventDefault();
+          handlers.quickAdd();
           break;
         case '/':
           e.preventDefault();
