@@ -9,9 +9,10 @@ interface QuickAddEventProps {
   onCreateEvent: (eventData: any) => void;
   isOpen: boolean;
   onClose: () => void;
+  spaceId: string;
 }
 
-export function QuickAddEvent({ onCreateEvent, isOpen, onClose }: QuickAddEventProps) {
+export function QuickAddEvent({ onCreateEvent, isOpen, onClose, spaceId }: QuickAddEventProps) {
   const [input, setInput] = useState('');
   const [parsedPreview, setParsedPreview] = useState<any>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -46,6 +47,7 @@ export function QuickAddEvent({ onCreateEvent, isOpen, onClose }: QuickAddEventP
 
     // Create event with parsed data
     onCreateEvent({
+      space_id: spaceId,
       title: parsed.title,
       start_time: parsed.startTime?.toISOString() || new Date().toISOString(),
       end_time: parsed.endTime?.toISOString(),
