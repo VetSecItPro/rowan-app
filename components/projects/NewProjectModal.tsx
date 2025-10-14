@@ -22,7 +22,6 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
     start_date: '',
     target_date: '',
     budget_amount: undefined,
-    progress_percentage: undefined,
   });
   const [loading, setLoading] = useState(false);
 
@@ -43,7 +42,6 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
         start_date: formatDateForInput(editProject.start_date),
         target_date: formatDateForInput(editProject.target_date),
         budget_amount: editProject.budget_amount || undefined,
-        progress_percentage: editProject.progress_percentage || undefined,
       });
     } else {
       setFormData({
@@ -54,7 +52,6 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
         start_date: '',
         target_date: '',
         budget_amount: undefined,
-        progress_percentage: undefined,
       });
     }
   }, [editProject, spaceId, isOpen]);
@@ -166,27 +163,6 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
                 value={formData.budget_amount || ''}
                 onChange={(e) => setFormData({ ...formData, budget_amount: e.target.value ? Number(e.target.value) : undefined })}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Progress %
-              </label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={formData.progress_percentage || ''}
-                onChange={(e) => {
-                  const value = e.target.value ? Number(e.target.value) : undefined;
-                  setFormData({
-                    ...formData,
-                    progress_percentage: value,
-                    status: value === 100 ? 'completed' : formData.status
-                  });
-                }}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
-                placeholder="0-100"
               />
             </div>
           </div>
