@@ -8,6 +8,7 @@ import { NewEventModal } from '@/components/calendar/NewEventModal';
 import { EventDetailModal } from '@/components/calendar/EventDetailModal';
 import { EventProposalModal } from '@/components/calendar/EventProposalModal';
 import { ProposalsList } from '@/components/calendar/ProposalsList';
+import { MiniCalendar } from '@/components/calendar/MiniCalendar';
 import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
@@ -694,7 +695,24 @@ export default function CalendarPage() {
               )}
             </div>
 
-            <div className="min-h-[600px]">
+            {/* Calendar Content with Sidebar */}
+            <div className="flex gap-6">
+              {/* Mini-Calendar Sidebar - Hidden on mobile, visible on lg+ */}
+              {viewMode !== 'list' && viewMode !== 'proposal' && !loading && (
+                <div className="hidden lg:block w-64 flex-shrink-0">
+                  <MiniCalendar
+                    currentDate={currentMonth}
+                    onDateSelect={(date) => {
+                      setCurrentMonth(date);
+                      setViewMode('day');
+                    }}
+                    events={events}
+                  />
+                </div>
+              )}
+
+              {/* Main Calendar Content */}
+              <div className="flex-1 min-w-0 min-h-[600px]">
               {loading ? (
                 <div className="text-center py-12">
                   <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
@@ -1403,6 +1421,9 @@ export default function CalendarPage() {
                 )
               )}
             </div>
+            {/* End Main Calendar Content */}
+            </div>
+            {/* End Calendar Content with Sidebar */}
           </div>
           )}
         </div>
