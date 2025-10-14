@@ -10,6 +10,7 @@ import { EventProposalModal } from '@/components/calendar/EventProposalModal';
 import { ProposalsList } from '@/components/calendar/ProposalsList';
 import { MiniCalendar } from '@/components/calendar/MiniCalendar';
 import { QuickAddEvent } from '@/components/calendar/QuickAddEvent';
+import { EnhancedDayView } from '@/components/calendar/EnhancedDayView';
 import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
@@ -980,7 +981,7 @@ export default function CalendarPage() {
                   </div>
                 </div>
               ) : viewMode === 'day' ? (
-                /* Day View */
+                /* Enhanced Day View with Hourly Breakdown */
                 <div>
                   {/* Day Navigation */}
                   <div className="flex items-center justify-center mb-4 sm:mb-6">
@@ -1009,112 +1010,15 @@ export default function CalendarPage() {
                     </button>
                   </div>
 
-                  {/* Day Schedule */}
-                  <div className="space-y-2">
-                    {(() => {
-                      const dayEvents = getEventsForDate(currentMonth);
-                      const isToday = isSameDay(currentMonth, new Date());
-
-                      return (
-                        <div className={`p-6 rounded-xl border-2 ${
-                          isToday
-                            ? 'border-purple-300 dark:border-purple-700 bg-purple-50 dark:bg-purple-900/10'
-                            : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
-                        }`}>
-                          {dayEvents.length > 0 ? (
-                            <div className="space-y-4">
-                              {dayEvents.map((event) => {
-                                const categoryColor = getCategoryColor(event.category);
-                                const categoryConfig = {
-                                  work: { icon: '💼', label: 'Work' },
-                                  personal: { icon: '👤', label: 'Personal' },
-                                  family: { icon: '👨‍👩‍👧‍👦', label: 'Family' },
-                                  health: { icon: '💪', label: 'Health' },
-                                  social: { icon: '🎉', label: 'Social' },
-                                };
-                                const category = categoryConfig[event.category as keyof typeof categoryConfig] || categoryConfig.personal;
-
-                                return (
-                                  <div
-                                    key={event.id}
-                                    className={`p-4 rounded-lg border-l-4 ${categoryColor.border} ${categoryColor.bg}`}
-                                  >
-                                    <div className="flex items-start justify-between">
-                                      <div className="flex-1">
-                                        <div className="flex items-center gap-3 mb-2">
-                                          <button
-                                            onClick={(e) => handleEventStatusClick(e, event.id, event.status)}
-                                            className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
-                                              event.status === 'completed'
-                                                ? 'bg-green-500 border-green-500'
-                                                : event.status === 'in-progress'
-                                                ? 'bg-amber-500 border-amber-500'
-                                                : 'bg-transparent border-red-500'
-                                            }`}
-                                          >
-                                            {event.status === 'completed' && <Check className="w-4 h-4 text-white" />}
-                                            {event.status === 'in-progress' && <div className="w-2 h-2 bg-white rounded-full" />}
-                                          </button>
-                                          <div className="text-lg font-bold text-gray-900 dark:text-white">
-                                            {format(parseISO(event.start_time), 'h:mm a')}
-                                          </div>
-                                          <span className={`px-2 py-1 rounded text-xs font-medium ${categoryColor.color}`}>
-                                            {category.icon} {category.label}
-                                          </span>
-                                        </div>
-                                        <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                                          {event.title}
-                                        </h4>
-                                        {event.description && (
-                                          <p className="text-gray-600 dark:text-gray-400 mb-2">
-                                            {event.description}
-                                          </p>
-                                        )}
-                                        {event.location && (
-                                          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                                            <MapPin className="w-4 h-4" />
-                                            <span className="text-sm">{event.location}</span>
-                                          </div>
-                                        )}
-                                      </div>
-                                      <div className="flex gap-2">
-                                        <button
-                                          onClick={() => handleViewDetails(event)}
-                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                                          title="View Details"
-                                        >
-                                          <Eye className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                                        </button>
-                                        <button
-                                          onClick={() => handleEditEvent(event)}
-                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                                          title="Edit Event"
-                                        >
-                                          <Edit className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                                        </button>
-                                      </div>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          ) : (
-                            <div className="text-center py-12">
-                              <CalendarDays className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                              <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No events scheduled</p>
-                              <button
-                                onClick={() => setIsModalOpen(true)}
-                                className="mt-4 px-6 py-3 bg-gradient-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
-                              >
-                                <Plus className="w-5 h-5" />
-                                Create Event
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })()}
-                  </div>
+                  {/* Enhanced Day View Component */}
+                  <EnhancedDayView
+                    date={currentMonth}
+                    events={events}
+                    onEventStatusClick={handleEventStatusClick}
+                    onViewDetails={handleViewDetails}
+                    onEditEvent={handleEditEvent}
+                    getCategoryColor={getCategoryColor}
+                  />
                 </div>
               ) : viewMode === 'agenda' ? (
                 /* Agenda View - Chronological list grouped by date */
