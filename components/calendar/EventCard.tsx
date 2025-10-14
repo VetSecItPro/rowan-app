@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, Clock, MapPin, MoreVertical, Edit, Trash2, Check, ShoppingCart } from 'lucide-react';
+import { Calendar, Clock, MapPin, MoreVertical, Edit, Trash2, Check, ShoppingCart, Eye } from 'lucide-react';
 import { CalendarEvent } from '@/lib/services/calendar-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
@@ -17,10 +17,11 @@ interface EventCardProps {
   onEdit: (event: CalendarEvent) => void;
   onDelete: (id: string) => void;
   onStatusChange: (id: string, status: 'not-started' | 'in-progress' | 'completed') => void;
+  onViewDetails?: (event: CalendarEvent) => void;
   linkedShoppingList?: LinkedShoppingList;
 }
 
-export function EventCard({ event, onEdit, onDelete, onStatusChange, linkedShoppingList }: EventCardProps) {
+export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetails, linkedShoppingList }: EventCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const formatEventTime = () => {
@@ -180,12 +181,26 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, linkedShopp
                 onClick={() => setShowMenu(false)}
               />
               <div className="absolute right-0 mt-2 w-48 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
+                {onViewDetails && (
+                  <button
+                    onClick={() => {
+                      onViewDetails(event);
+                      setShowMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-t-lg"
+                  >
+                    <Eye className="w-4 h-4" />
+                    View Details
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     onEdit(event);
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-t-lg"
+                  className={`w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 ${
+                    !onViewDetails ? 'rounded-t-lg' : ''
+                  }`}
                 >
                   <Edit className="w-4 h-4" />
                   Edit Event

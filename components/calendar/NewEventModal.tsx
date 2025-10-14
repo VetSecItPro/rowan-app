@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Smile, Image as ImageIcon, Paperclip, Calendar, ChevronDown } from 'lucide-react';
+import { X, Smile, Image as ImageIcon, Paperclip, Calendar, ChevronDown, Palette } from 'lucide-react';
 import { CreateEventInput, CalendarEvent } from '@/lib/services/calendar-service';
 
 interface NewEventModalProps {
@@ -62,8 +62,21 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
   const [selectedDaysOfWeek, setSelectedDaysOfWeek] = useState<number[]>([]);
   const [selectedDaysOfMonth, setSelectedDaysOfMonth] = useState<number[]>([]);
   const [dateError, setDateError] = useState<string>('');
+  const [customColor, setCustomColor] = useState<string>('');
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Predefined color palette
+  const colorPalette = [
+    { name: 'Purple', value: '#9333ea' },
+    { name: 'Blue', value: '#3b82f6' },
+    { name: 'Green', value: '#10b981' },
+    { name: 'Yellow', value: '#eab308' },
+    { name: 'Red', value: '#ef4444' },
+    { name: 'Pink', value: '#ec4899' },
+    { name: 'Indigo', value: '#6366f1' },
+    { name: 'Orange', value: '#f97316' },
+  ];
 
   useEffect(() => {
     if (editEvent) {
@@ -77,6 +90,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
         location: editEvent.location || '',
         category: editEvent.category || 'personal',
       });
+      setCustomColor((editEvent as any).custom_color || '');
     } else {
       setFormData({
         space_id: spaceId,
@@ -88,6 +102,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
         location: '',
         category: 'personal',
       });
+      setCustomColor('');
     }
     // Reset attachments when modal opens/closes
     setAttachedImages([]);
@@ -123,6 +138,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
       is_recurring: formData.is_recurring,
       location: formData.location || undefined,
       category: formData.category,
+      custom_color: customColor || undefined,
     };
 
     onSave(cleanedData);
@@ -554,6 +570,72 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
               )}
             </div>
           )}
+
+          {/* Custom Color */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+              <Palette className="w-4 h-4" />
+              Custom Color (Optional)
+            </label>
+            <div className="space-y-3">
+              {/* Predefined colors */}
+              <div className="flex flex-wrap gap-2">
+                {colorPalette.map((color) => (
+                  <button
+                    key={color.value}
+                    type="button"
+                    onClick={() => setCustomColor(color.value)}
+                    className={`w-10 h-10 rounded-lg border-2 transition-all hover:scale-110 ${
+                      customColor === color.value
+                        ? 'border-gray-900 dark:border-white ring-2 ring-offset-2 ring-purple-500'
+                        : 'border-gray-300 dark:border-gray-600'
+                    }`}
+                    style={{ backgroundColor: color.value }}
+                    title={color.name}
+                  />
+                ))}
+                {customColor && !colorPalette.find(c => c.value === customColor) && (
+                  <button
+                    type="button"
+                    onClick={() => setCustomColor('')}
+                    className="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    title="Clear custom color"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Custom color input */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={customColor || '#9333ea'}
+                  onChange={(e) => setCustomColor(e.target.value)}
+                  className="w-12 h-10 rounded-lg border border-gray-300 dark:border-gray-600 cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={customColor}
+                  onChange={(e) => setCustomColor(e.target.value)}
+                  placeholder="Enter hex color (e.g., #9333ea)"
+                  className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white text-sm"
+                />
+                {customColor && (
+                  <button
+                    type="button"
+                    onClick={() => setCustomColor('')}
+                    className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Custom color overrides category color
+              </p>
+            </div>
+          </div>
 
           {/* Category */}
           <div>
