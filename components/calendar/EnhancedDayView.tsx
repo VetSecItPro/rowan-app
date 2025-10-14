@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { format, parseISO, isSameDay, getHours, getMinutes, differenceInMinutes } from 'date-fns';
 import { Check, Eye, Edit, MapPin, Clock } from 'lucide-react';
-import type { CalendarEvent } from '@/lib/types';
+import type { CalendarEvent } from '@/lib/services/calendar-service';
 import { WeatherBadge } from './WeatherBadge';
 
 interface EnhancedDayViewProps {
