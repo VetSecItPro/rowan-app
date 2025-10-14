@@ -1,4 +1,4 @@
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, formatDistanceToNow } from 'date-fns';
 
 /**
  * Format a date-only string (yyyy-MM-dd) without timezone conversion.
@@ -80,4 +80,18 @@ export function getCurrentDateString(): string {
  */
 export function parseDateString(dateString: string): Date {
   return parseISO(dateString);
+}
+
+/**
+ * Format a timestamp as relative time (e.g., "5 minutes ago", "2 hours ago").
+ * Use for: notifications, activity feeds, recent updates, etc.
+ *
+ * @param timestamp - ISO 8601 timestamp string (stored in UTC)
+ * @returns Relative time string (e.g., "5 minutes ago")
+ *
+ * @example
+ * formatRelativeTime('2025-10-09T14:30:00Z') // "5 minutes ago"
+ */
+export function formatRelativeTime(timestamp: string): string {
+  return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
 }
