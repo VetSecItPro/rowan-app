@@ -419,7 +419,7 @@ export default function GoalsPage() {
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input type="text" placeholder="Search goals..." value={searchQuery} onChange={handleSearchChange} className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white" />
+              <input type="text" placeholder="Search goals..." value={searchQuery} onChange={handleSearchChange} className="w-full pl-10 pr-4 input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white" />
             </div>
           </div>
           )}
@@ -442,7 +442,7 @@ export default function GoalsPage() {
               <div className={`bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 w-fit ${viewMode === 'milestones' ? 'invisible' : ''}`}>
                 <button
                   onClick={() => setStatusFilter('all')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                     statusFilter === 'all'
                       ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
@@ -452,7 +452,7 @@ export default function GoalsPage() {
                 </button>
                 <button
                   onClick={() => setStatusFilter('active')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                     statusFilter === 'active'
                       ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
@@ -462,7 +462,7 @@ export default function GoalsPage() {
                 </button>
                 <button
                   onClick={() => setStatusFilter('completed')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
+                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[80px] ${
                     statusFilter === 'completed'
                       ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
@@ -491,7 +491,7 @@ export default function GoalsPage() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                       <button
                         onClick={handleOpenGoalModal}
-                        className="px-6 py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                        className="btn-touch shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
                       >
                         <Plus className="w-5 h-5" />
                         Create Goal

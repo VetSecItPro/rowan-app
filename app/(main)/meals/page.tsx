@@ -1292,7 +1292,7 @@ export default function MealsPage() {
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                         <button
                           onClick={handleOpenMealModal}
-                          className="px-6 py-3 shimmer-meals text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                          className="btn-touch shimmer-meals text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
                         >
                           <Plus className="w-5 h-5" />
                           Plan Your First Meal
