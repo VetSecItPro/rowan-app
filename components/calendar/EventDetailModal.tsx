@@ -5,6 +5,7 @@ import { X, Calendar, Clock, MapPin, MessageCircle, Paperclip, Users } from 'luc
 import { CalendarEvent } from '@/lib/services/calendar-service';
 import { EventCommentThread } from './EventCommentThread';
 import { AttachmentGallery } from './AttachmentGallery';
+import { WeatherBadge } from './WeatherBadge';
 import { format } from 'date-fns';
 
 interface EventDetailModalProps {
@@ -112,6 +113,13 @@ export function EventDetailModal({ isOpen, onClose, event }: EventDetailModalPro
           {event.description && (
             <div className="mt-4 p-4 bg-white/10 backdrop-blur-sm rounded-lg">
               <p className="text-sm text-white/90">{event.description}</p>
+            </div>
+          )}
+
+          {/* Weather Forecast */}
+          {event.location && (
+            <div className="mt-4">
+              <WeatherBadge eventTime={event.start_time} location={event.location} />
             </div>
           )}
         </div>

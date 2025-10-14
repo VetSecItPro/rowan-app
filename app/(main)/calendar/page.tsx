@@ -13,6 +13,7 @@ import { QuickAddEvent } from '@/components/calendar/QuickAddEvent';
 import { EnhancedDayView } from '@/components/calendar/EnhancedDayView';
 import { EnhancedWeekView } from '@/components/calendar/EnhancedWeekView';
 import { TemplateLibrary } from '@/components/calendar/TemplateLibrary';
+import { WeatherBadge } from '@/components/calendar/WeatherBadge';
 import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
@@ -1121,10 +1122,19 @@ export default function CalendarPage() {
                                           </p>
                                         )}
                                         {event.location && (
-                                          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                            <MapPin className="w-4 h-4" />
-                                            {event.location}
-                                          </div>
+                                          <>
+                                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                              <MapPin className="w-4 h-4" />
+                                              {event.location}
+                                            </div>
+                                            <div className="mt-2">
+                                              <WeatherBadge
+                                                eventTime={event.start_time}
+                                                location={event.location}
+                                                compact={true}
+                                              />
+                                            </div>
+                                          </>
                                         )}
                                       </div>
 
