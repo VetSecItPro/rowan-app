@@ -7,6 +7,7 @@ import {
   UtensilsCrossed,
   Home,
   Target,
+  Heart,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -19,6 +20,13 @@ export interface NavItem {
 }
 
 export const NAVIGATION_ITEMS: NavItem[] = [
+  {
+    name: 'Daily Check-In',
+    href: '/dashboard',
+    icon: Heart,
+    gradient: 'bg-gradient-to-r from-pink-500 to-purple-500',
+    description: 'Track your mood',
+  },
   {
     name: 'Tasks & Chores',
     href: '/tasks',
