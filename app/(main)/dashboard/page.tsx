@@ -15,6 +15,7 @@ import { projectsOnlyService } from '@/lib/services/projects-service';
 import { goalsService } from '@/lib/services/goals-service';
 import { checkInsService, type DailyCheckIn, type CheckInStats } from '@/lib/services/checkins-service';
 import { reactionsService, type CheckInReaction } from '@/lib/services/reactions-service';
+import { WeeklyInsights } from '@/components/checkins/WeeklyInsights';
 import { createClient } from '@/lib/supabase/client';
 import {
   CheckSquare,
@@ -1603,7 +1604,7 @@ export default function DashboardPage() {
                                     <button
                                       onClick={() => handleSendReaction(partnerToday.id, 'heart')}
                                       disabled={partnerReactionLoading}
-                                      className="p-2 hover:bg-pink-100 dark:hover:bg-pink-900/30 rounded-full transition-colors disabled:opacity-50"
+                                      className="p-2 hover:bg-pink-100 dark:hover:bg-pink-900/30 rounded-full transition-all duration-200 transform hover:scale-110 active:scale-95 disabled:opacity-50"
                                       title="Send love"
                                     >
                                       <span className="text-lg">❤️</span>
@@ -1611,7 +1612,7 @@ export default function DashboardPage() {
                                     <button
                                       onClick={() => handleSendReaction(partnerToday.id, 'hug')}
                                       disabled={partnerReactionLoading}
-                                      className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-full transition-colors disabled:opacity-50"
+                                      className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-full transition-all duration-200 transform hover:scale-110 active:scale-95 disabled:opacity-50"
                                       title="Send hug"
                                     >
                                       <span className="text-lg">🤗</span>
@@ -1619,7 +1620,7 @@ export default function DashboardPage() {
                                     <button
                                       onClick={() => handleSendReaction(partnerToday.id, 'strength')}
                                       disabled={partnerReactionLoading}
-                                      className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-full transition-colors disabled:opacity-50"
+                                      className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-full transition-all duration-200 transform hover:scale-110 active:scale-95 disabled:opacity-50"
                                       title="Send strength"
                                     >
                                       <span className="text-lg">💪</span>
@@ -1641,21 +1642,23 @@ export default function DashboardPage() {
                 <button
                   key={mood.value}
                   onClick={() => handleMoodSelect(mood.value)}
-                  className={`flex-1 p-2 sm:p-3 rounded-xl border-2 transition-all transform hover:scale-105 ${
+                  className={`flex-1 p-2 sm:p-3 rounded-xl border-2 transition-all duration-300 transform hover:scale-110 active:scale-95 ${
                     selectedMood === mood.value
-                      ? 'border-pink-500 bg-pink-100 dark:bg-pink-900/30 scale-105 shadow-md'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-600 bg-white/50 dark:bg-gray-800/50'
+                      ? 'border-pink-500 bg-pink-100 dark:bg-pink-900/30 scale-105 mood-selected'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-600 bg-white/50 dark:bg-gray-800/50 hover:shadow-lg'
                   }`}
                   title={mood.label}
                 >
-                  <div className="text-2xl sm:text-3xl">{mood.emoji}</div>
+                  <div className={`text-2xl sm:text-3xl transition-transform ${selectedMood === mood.value ? 'scale-110' : ''}`}>
+                    {mood.emoji}
+                  </div>
                 </button>
               ))}
             </div>
 
             {/* Smart Conditional Expansion */}
             {checkInExpanded && selectedMood && (
-              <div className="space-y-3 mt-4 animate-fadeIn">
+              <div className="space-y-3 mt-4 animate-expand overflow-hidden">
                 {/* Positive moods: Great/Good → Gratitude/Highlights prompt */}
                 {(selectedMood === 'great' || selectedMood === 'good') && (
                   <div className="space-y-3">
@@ -1785,6 +1788,9 @@ export default function DashboardPage() {
                     <span className="text-xs">List</span>
                   </button>
                 </div>
+
+                {/* Weekly Insights */}
+                <WeeklyInsights checkIns={recentCheckIns} />
 
                 {/* Calendar View */}
                 {journalView === 'calendar' && (
