@@ -404,12 +404,11 @@ export default function CalendarPage() {
               </div>
               <button
                 onClick={() => setIsProposalModalOpen(true)}
-                className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 group relative"
+                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 group relative"
                 title="Propose event times for collaborative scheduling"
               >
                 <Users className="w-5 h-5" />
-                <span className="hidden sm:inline">Propose Event</span>
-                <span className="sm:hidden">Propose</span>
+                <span>Propose Event</span>
                 <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                   Propose event times for collaborative scheduling
                 </span>
