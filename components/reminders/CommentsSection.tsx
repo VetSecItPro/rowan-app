@@ -5,12 +5,14 @@ import { MessageCircle, Send, Edit, Trash2, X } from 'lucide-react';
 import { reminderCommentsService, ReminderComment } from '@/lib/services/reminder-comments-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { createClient } from '@/lib/supabase/client';
+import { MentionInput } from './MentionInput';
 
 interface CommentsSectionProps {
   reminderId: string;
+  spaceId: string;
 }
 
-export function CommentsSection({ reminderId }: CommentsSectionProps) {
+export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
   const { user } = useAuth();
   const [comments, setComments] = useState<ReminderComment[]>([]);
   const [newCommentContent, setNewCommentContent] = useState('');
@@ -18,7 +20,6 @@ export function CommentsSection({ reminderId }: CommentsSectionProps) {
   const [submitting, setSubmitting] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const supabase = createClient();
 
   // Fetch comments
@@ -128,14 +129,6 @@ export function CommentsSection({ reminderId }: CommentsSectionProps) {
     }
   };
 
-  // Auto-resize textarea
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, [newCommentContent]);
-
   if (!user) return null;
 
   return (
@@ -164,6 +157,7 @@ export function CommentsSection({ reminderId }: CommentsSectionProps) {
               key={comment.id}
               comment={comment}
               currentUserId={user.id}
+              spaceId={spaceId}
               isEditing={editingCommentId === comment.id}
               editContent={editContent}
               onEditContentChange={setEditContent}
@@ -197,15 +191,15 @@ export function CommentsSection({ reminderId }: CommentsSectionProps) {
             </div>
           )}
 
-          {/* Textarea */}
+          {/* Mention Input */}
           <div className="flex-1">
-            <textarea
-              ref={textareaRef}
+            <MentionInput
               value={newCommentContent}
-              onChange={(e) => setNewCommentContent(e.target.value)}
-              placeholder="Write a comment..."
+              onChange={setNewCommentContent}
+              spaceId={spaceId}
+              placeholder="Write a comment... Type @ to mention someone"
               className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-pink-500 resize-none"
-              rows={1}
+              rows={2}
               maxLength={5000}
               disabled={submitting}
             />
@@ -238,6 +232,7 @@ export function CommentsSection({ reminderId }: CommentsSectionProps) {
 interface CommentItemProps {
   comment: ReminderComment;
   currentUserId: string;
+  spaceId: string;
   isEditing: boolean;
   editContent: string;
   onEditContentChange: (content: string) => void;
@@ -250,6 +245,7 @@ interface CommentItemProps {
 function CommentItem({
   comment,
   currentUserId,
+  spaceId,
   isEditing,
   editContent,
   onEditContentChange,
@@ -321,9 +317,11 @@ function CommentItem({
           {/* Content or Edit Form */}
           {isEditing ? (
             <div className="space-y-2">
-              <textarea
+              <MentionInput
                 value={editContent}
-                onChange={(e) => onEditContentChange(e.target.value)}
+                onChange={onEditContentChange}
+                spaceId={spaceId}
+                placeholder="Edit comment... Type @ to mention someone"
                 className="w-full px-2 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-900 dark:text-white resize-none"
                 rows={3}
                 maxLength={5000}
