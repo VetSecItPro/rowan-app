@@ -39,6 +39,11 @@ import {
   Paperclip,
   Smile,
   Info,
+  Smartphone,
+  Command,
+  Hand,
+  Heart,
+  ShoppingBag,
 } from 'lucide-react';
 
 interface GuideSection {
@@ -728,6 +733,1269 @@ export default function CalendarDocumentationPage() {
               ↑ Back to top
             </a>
           </section>
+
+          {/* DETAILED VIEW MODE, EVENT MANAGEMENT, PROPOSALS, MOBILE & TIPS SECTIONS */}
+{/* DETAILED VIEW MODE SECTIONS - Insert after line 730 */}
+
+<section id="day-view" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <CalendarDays className="w-8 h-8 text-blue-500" />
+    Day View - Hourly Timeline
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Day View displays a single day with an hourly timeline from 6 AM to 11 PM. Perfect for detailed daily planning with visual time blocks, weather forecasts, and current time indication.
+    </p>
+
+    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 mb-6">
+      <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-4">Key Features</h4>
+      <ul className="space-y-3 text-gray-700 dark:text-gray-300">
+        <li><strong>📍 Current Time Indicator:</strong> Red line shows current time with live clock (today only)</li>
+        <li><strong>⏰ Hourly Grid:</strong> 18-hour timeline (6am-11pm) with 80px per hour for precise positioning</li>
+        <li><strong>🌦️ Weather Badge:</strong> Displays forecast for first event with location</li>
+        <li><strong>📊 Event Overlap:</strong> Overlapping events display side-by-side in purple shades</li>
+        <li><strong>✅ Status Checkboxes:</strong> Click to cycle: Not Started → In Progress → Completed</li>
+      </ul>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Pro Tip:</strong> Press <kbd>D</kbd> for Day View and <kbd>T</kbd> to jump to today. Hover over events to see edit/view actions!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+<section id="week-view" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <CalendarRange className="w-8 h-8 text-green-500" />
+    Week View - 7-Day Grid
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Week View shows Monday through Sunday in a 7-column grid with hourly timelines. See your entire week at a glance with drag-and-drop support and weather forecasts.
+    </p>
+
+    <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800 mb-6">
+      <h4 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-4">Week View Features</h4>
+      <ul className="space-y-3 text-gray-700 dark:text-gray-300">
+        <li><strong>📅 7-Day Grid:</strong> Monday-Sunday columns with hourly rows (6am-11pm)</li>
+        <li><strong>🎯 Today Highlight:</strong> Current day column highlighted in purple</li>
+        <li><strong>🌦️ Weekly Weather:</strong> Shows weather for first event with location across the week</li>
+        <li><strong>📊 Event Count:</strong> Each day header shows total events for that day</li>
+        <li><strong>🔄 Drag & Drop:</strong> Drag events between days to reschedule (future feature)</li>
+      </ul>
+    </div>
+
+    <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-emerald-900 dark:text-emerald-100">
+          <strong>Household Tip:</strong> Use Week View to balance workload across the week. If Monday looks packed, move flexible events to quieter days!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+<section id="month-view" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Calendar className="w-8 h-8 text-purple-500" />
+    Month View - Calendar Grid
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Month View displays a traditional calendar grid showing the entire month. Color-coded events, today highlighting, and weather forecasts help you plan long-term and spot busy periods.
+    </p>
+
+    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800 mb-6">
+      <h4 className="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-4">Month View Organization</h4>
+      <ul className="space-y-3 text-gray-700 dark:text-gray-300">
+        <li><strong>📆 Full Month Grid:</strong> 7x5 or 7x6 grid showing all days including previous/next month overflow</li>
+        <li><strong>🎨 Color-Coded Events:</strong> Each event shows category color (Work=blue, Family=pink, etc.)</li>
+        <li><strong>💜 Today Highlight:</strong> Current day has purple ring border</li>
+        <li><strong>🌦️ Monthly Weather:</strong> Shows weather for first event with location in current month</li>
+        <li><strong>📋 Event Limit:</strong> Shows first 2 events per day + count if more exist</li>
+      </ul>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Pro Tip:</strong> Use <kbd>←</kbd> and <kbd>→</kbd> arrows to navigate months quickly. Press <kbd>M</kbd> to switch to Month View anytime!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+<section id="agenda-view" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <List className="w-8 h-8 text-amber-500" />
+    Agenda View - Upcoming Events
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Agenda View lists upcoming events chronologically, grouped by date. Focus on what's coming next without calendar grid clutter. Perfect for morning prep and weekly planning.
+    </p>
+
+    <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-6 border border-amber-200 dark:border-amber-800 mb-6">
+      <h4 className="text-lg font-semibold text-amber-900 dark:text-amber-100 mb-4">Agenda View Benefits</h4>
+      <ul className="space-y-3 text-gray-700 dark:text-gray-300">
+        <li><strong>📋 Chronological List:</strong> Events listed in time order, grouped by date</li>
+        <li><strong>🗓️ Date Headers:</strong> "Today", "Tomorrow", or specific dates for easy scanning</li>
+        <li><strong>🌦️ Inline Weather:</strong> Weather forecasts displayed directly with events</li>
+        <li><strong>✅ Status Management:</strong> Click checkboxes to update event status</li>
+        <li><strong>📍 Full Details:</strong> See time, location, category, and status at a glance</li>
+      </ul>
+    </div>
+
+    <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-emerald-900 dark:text-emerald-100">
+          <strong>Household Tip:</strong> Check Agenda View each morning to prep for the day. It's like your personal assistant showing what's ahead!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+<section id="timeline-view" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <LayoutGrid className="w-8 h-8 text-indigo-500" />
+    Timeline View - Horizontal Month
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Timeline View shows the entire month as a horizontal scrollable timeline. Each day is a compact vertical column. Excellent for finding schedule gaps and visual density planning.
+    </p>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-6 border border-indigo-200 dark:border-indigo-800 mb-6">
+      <h4 className="text-lg font-semibold text-indigo-900 dark:text-indigo-100 mb-4">Timeline Advantages</h4>
+      <ul className="space-y-3 text-gray-700 dark:text-gray-300">
+        <li><strong>↔️ Horizontal Scroll:</strong> Scroll left/right to see all month days in a row</li>
+        <li><strong>📊 Compact Columns:</strong> Each day is a vertical column showing all events</li>
+        <li><strong>🎨 Weekend Highlighting:</strong> Weekends (Sat/Sun) highlighted in gray</li>
+        <li><strong>🎯 Today Indicator:</strong> Current day column stands out with purple accent</li>
+        <li><strong>📈 Density View:</strong> Quickly spot busy vs. free days</li>
+      </ul>
+    </div>
+
+    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4 border border-purple-200 dark:border-purple-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-purple-900 dark:text-purple-100">
+          <strong>Pro Tip:</strong> Timeline View excels at finding free days for scheduling big events or projects. Empty columns = opportunity!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+<section id="list-view" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <List className="w-8 h-8 text-gray-500" />
+    List View - All Events
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      List View displays all events in a searchable, filterable list. Unlike other views, List View includes completed events and offers powerful status filtering.
+    </p>
+
+    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-700 mb-6">
+      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">List View Features</h4>
+      <ul className="space-y-3 text-gray-700 dark:text-gray-300">
+        <li><strong>🔍 Search Integration:</strong> Search bar filters events by title, location, or description</li>
+        <li><strong>🎛️ Status Filters:</strong> Filter by All, Not Started, In Progress, or Completed</li>
+        <li><strong>📋 Full Event List:</strong> See ALL events including completed (other views hide completed)</li>
+        <li><strong>📊 Event Cards:</strong> Compact cards with full details (time, category, location, status)</li>
+        <li><strong>🎨 Category Colors:</strong> Events show category color coding for quick identification</li>
+      </ul>
+    </div>
+
+    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-blue-900 dark:text-blue-100">
+          <strong>Pro Tip:</strong> Use List View with "Completed" filter to review what you've accomplished this week. Great for weekly reviews!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+{/* EVENT MANAGEMENT SECTIONS - Insert after line 900 (after shortcuts section) */}
+
+<section id="create-events" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Plus className="w-8 h-8 text-purple-500" />
+    Creating New Events
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Create events with the New Event modal, accessed via the toolbar or keyboard shortcut. Fill in details like title, date, time, location, and description to build comprehensive event records.
+    </p>
+
+    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800 mb-6">
+      <h4 className="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-4">Event Creation Steps</h4>
+      <ol className="space-y-3 text-gray-700 dark:text-gray-300">
+        <li><strong>1. Open Modal:</strong> Press <kbd>N</kbd> or click "New Event" button</li>
+        <li><strong>2. Enter Title:</strong> Required field - what's the event?</li>
+        <li><strong>3. Set Date & Time:</strong> Pick date, start time, and optional end time</li>
+        <li><strong>4. Add Location:</strong> Optional but enables weather forecasts</li>
+        <li><strong>5. Choose Category:</strong> Work, Personal, Family, Health, or Social</li>
+        <li><strong>6. Add Description:</strong> Optional details, notes, or instructions</li>
+        <li><strong>7. Save:</strong> Click Create Event or press <kbd>Enter</kbd></li>
+      </ol>
+    </div>
+
+    <div className="grid gap-4 mb-6">
+      <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+        <h4 className="font-semibold text-gray-900 dark:text-white mb-2">⏰ Time Fields</h4>
+        <p className="text-sm text-gray-700 dark:text-gray-300">Start time is required. End time is optional - if omitted, defaults to 1 hour duration for timeline views.</p>
+      </div>
+      
+      <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+        <h4 className="font-semibold text-gray-900 dark:text-white mb-2">📍 Location Benefits</h4>
+        <p className="text-sm text-gray-700 dark:text-gray-300">Adding location enables automatic weather forecasts (3-hour cache, 5-day window). Enter city names or specific addresses.</p>
+      </div>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Pro Tip:</strong> For recurring events, create the first occurrence manually, then use the recurring pattern feature to auto-generate the series!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+<section id="colors-categories" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Palette className="w-8 h-8 text-pink-500" />
+    Event Colors & Categories
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Every event belongs to one of five categories, each with distinctive colors and icons. Categories provide visual organization and help you quickly identify event types across all views.
+    </p>
+
+    <div className="grid gap-4 mb-6">
+      <div className="p-4 bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 rounded-lg">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-2xl">💼</span>
+          <h4 className="font-bold text-blue-700 dark:text-blue-300 text-lg">Work</h4>
+        </div>
+        <p className="text-sm text-gray-700 dark:text-gray-300">Meetings, calls, deadlines, projects. Blue color scheme.</p>
+      </div>
+
+      <div className="p-4 bg-purple-50 dark:bg-purple-900/30 border-l-4 border-purple-500 rounded-lg">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-2xl">👤</span>
+          <h4 className="font-bold text-purple-700 dark:text-purple-300 text-lg">Personal</h4>
+        </div>
+        <p className="text-sm text-gray-700 dark:text-gray-300">Appointments, hobbies, self-care, errands. Purple color scheme.</p>
+      </div>
+
+      <div className="p-4 bg-pink-50 dark:bg-pink-900/30 border-l-4 border-pink-500 rounded-lg">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-2xl">👨‍👩‍👧‍👦</span>
+          <h4 className="font-bold text-pink-700 dark:text-pink-300 text-lg">Family</h4>
+        </div>
+        <p className="text-sm text-gray-700 dark:text-gray-300">Family time, kids activities, holidays, celebrations. Pink color scheme.</p>
+      </div>
+
+      <div className="p-4 bg-green-50 dark:bg-green-900/30 border-l-4 border-green-500 rounded-lg">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-2xl">💪</span>
+          <h4 className="font-bold text-green-700 dark:text-green-300 text-lg">Health</h4>
+        </div>
+        <p className="text-sm text-gray-700 dark:text-gray-300">Doctor appointments, gym, therapy, wellness. Green color scheme.</p>
+      </div>
+
+      <div className="p-4 bg-orange-50 dark:bg-orange-900/30 border-l-4 border-orange-500 rounded-lg">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-2xl">🎉</span>
+          <h4 className="font-bold text-orange-700 dark:text-orange-300 text-lg">Social</h4>
+        </div>
+        <p className="text-sm text-gray-700 dark:text-gray-300">Dinners, parties, gatherings, date nights. Orange color scheme.</p>
+      </div>
+    </div>
+
+    <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-emerald-900 dark:text-emerald-100">
+          <strong>Household Tip:</strong> Consistent category usage makes visual scanning effortless. At a glance, you'll know if your week is work-heavy or family-balanced!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+<section id="recurring" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Repeat className="w-8 h-8 text-blue-500" />
+    Recurring Events
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Recurring events repeat automatically on a schedule you define. Perfect for weekly meetings, daily workouts, monthly bills, or any repeating commitment.
+    </p>
+
+    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 mb-6">
+      <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-4">Recurring Patterns</h4>
+      <ul className="space-y-3 text-gray-700 dark:text-gray-300">
+        <li><strong>📅 Daily:</strong> Repeats every day (e.g., morning exercise, daily standup)</li>
+        <li><strong>📆 Weekly:</strong> Repeats specific days each week (e.g., Monday meetings, Friday date night)</li>
+        <li><strong>📊 Monthly:</strong> Repeats on same day each month (e.g., rent payment, monthly review)</li>
+        <li><strong>⏰ Custom Intervals:</strong> Every N days/weeks/months</li>
+        <li><strong>🎯 End Date:</strong> Optional end date or repeat forever</li>
+      </ul>
+    </div>
+
+    <div className="grid gap-4 mb-6">
+      <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+        <h4 className="font-semibold text-gray-900 dark:text-white mb-2">✏️ Editing Series vs. Single</h4>
+        <p className="text-sm text-gray-700 dark:text-gray-300">When editing recurring events, choose "Edit this event" to change one occurrence or "Edit series" to update all future occurrences.</p>
+      </div>
+      
+      <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+        <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🗑️ Deletion Options</h4>
+        <p className="text-sm text-gray-700 dark:text-gray-300">Delete "This event only" to skip one occurrence or "All events in series" to cancel the recurring pattern entirely.</p>
+      </div>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Pro Tip:</strong> Use Quick Add to create recurring events naturally: "gym every Tuesday at 6pm" auto-creates a weekly recurring pattern!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+<section id="edit-events" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Edit className="w-8 h-8 text-indigo-500" />
+    Editing Events
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Edit events anytime to update details, reschedule, or delete. Changes sync instantly across all devices with real-time updates.
+    </p>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-6 border border-indigo-200 dark:border-indigo-800 mb-6">
+      <h4 className="text-lg font-semibold text-indigo-900 dark:text-indigo-100 mb-4">How to Edit</h4>
+      <ol className="space-y-3 text-gray-700 dark:text-gray-300">
+        <li><strong>1. Open Event:</strong> Click event card or press <kbd>Eye icon</kbd></li>
+        <li><strong>2. Click Edit:</strong> Click the <kbd>Edit</kbd> button (pencil icon)</li>
+        <li><strong>3. Modify Fields:</strong> Update title, date, time, location, category, or description</li>
+        <li><strong>4. Save Changes:</strong> Click "Update Event" or press <kbd>Enter</kbd></li>
+      </ol>
+    </div>
+
+    <div className="grid gap-4 mb-6">
+      <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+        <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🗑️ Deleting Events</h4>
+        <p className="text-sm text-gray-700 dark:text-gray-300">Click "Delete Event" in the edit modal. Confirmation required for irreversible deletion. Deletes attachments and comments too.</p>
+      </div>
+      
+      <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+        <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🔄 Real-time Sync</h4>
+        <p className="text-sm text-gray-700 dark:text-gray-300">All changes sync instantly to your partner's view with the "Live" indicator showing active connection.</p>
+      </div>
+    </div>
+
+    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4 border border-purple-200 dark:border-purple-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-purple-900 dark:text-purple-100">
+          <strong>Pro Tip:</strong> Hover over events in Day/Week views to see quick edit and view action buttons without opening the full modal!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+<section id="attachments" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Paperclip className="w-8 h-8 text-emerald-500" />
+    Event Attachments
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Attach files, images, and documents to events for easy reference. Perfect for tickets, confirmations, recipes, maps, or any supporting materials.
+    </p>
+
+    <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-6 border border-emerald-200 dark:border-emerald-800 mb-6">
+      <h4 className="text-lg font-semibold text-emerald-900 dark:text-emerald-100 mb-4">Using Attachments</h4>
+      <ol className="space-y-3 text-gray-700 dark:text-gray-300">
+        <li><strong>1. Open Event Details:</strong> Click event to open detail modal</li>
+        <li><strong>2. Go to Attachments Tab:</strong> Click "Attachments" tab</li>
+        <li><strong>3. Upload Files:</strong> Drag & drop or click to browse files</li>
+        <li><strong>4. View Gallery:</strong> Thumbnails for images, icons for documents</li>
+        <li><strong>5. Download/Delete:</strong> Click attachments to download or delete</li>
+      </ol>
+    </div>
+
+    <div className="grid gap-4 mb-6">
+      <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+        <h4 className="font-semibold text-gray-900 dark:text-white mb-2">📎 Supported Files</h4>
+        <p className="text-sm text-gray-700 dark:text-gray-300">Images (PNG, JPG, GIF), Documents (PDF), Text files, and more. Max 10MB per file.</p>
+      </div>
+      
+      <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+        <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🖼️ Image Gallery</h4>
+        <p className="text-sm text-gray-700 dark:text-gray-300">Images display as thumbnails in a gallery view. Click to open full-size lightbox with zoom.</p>
+      </div>
+    </div>
+
+    <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-amber-900 dark:text-amber-100">
+          <strong>Household Tip:</strong> Attach concert tickets, restaurant reservations, or travel confirmations so you have everything in one place on event day!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+<section id="emojis" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Smile className="w-8 h-8 text-yellow-500" />
+    Emoji Support
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Add emojis to event titles and descriptions to make your calendar more expressive and visually appealing. Emojis help you quickly identify events at a glance.
+    </p>
+
+    <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-6 border border-yellow-200 dark:border-yellow-800 mb-6">
+      <h4 className="text-lg font-semibold text-yellow-900 dark:text-yellow-100 mb-4">Adding Emojis</h4>
+      <ul className="space-y-3 text-gray-700 dark:text-gray-300">
+        <li><strong>⌨️ Keyboard Shortcuts:</strong> Mac: <kbd>Cmd</kbd>+<kbd>Ctrl</kbd>+<kbd>Space</kbd>, Windows: <kbd>Win</kbd>+<kbd>.</kbd></li>
+        <li><strong>📝 Inline Typing:</strong> Type emojis directly in title or description fields</li>
+        <li><strong>📋 Copy/Paste:</strong> Copy emojis from websites or emoji libraries</li>
+        <li><strong>🎨 Quick Add Parsing:</strong> Quick Add preserves emojis from natural language input</li>
+      </ul>
+    </div>
+
+    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-700 mb-6">
+      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Popular Emoji Ideas</h4>
+      <div className="grid sm:grid-cols-2 gap-3 text-sm">
+        <div>
+          <div className="text-purple-600 dark:text-purple-400 font-semibold mb-1">Meals & Food</div>
+          <div className="text-gray-600 dark:text-gray-400">🍕 Pizza Night • 🍜 Ramen Dinner • ☕ Coffee Date • 🥗 Meal Prep</div>
+        </div>
+        <div>
+          <div className="text-blue-600 dark:text-blue-400 font-semibold mb-1">Activities</div>
+          <div className="text-gray-600 dark:text-gray-400">🎬 Movie Night • 🏋️ Gym Session • 🎮 Game Time • 📚 Book Club</div>
+        </div>
+        <div>
+          <div className="text-green-600 dark:text-green-400 font-semibold mb-1">Celebrations</div>
+          <div className="text-gray-600 dark:text-gray-400">🎂 Birthday Party • 🎉 Anniversary • 🎊 Celebration • 💝 Valentine's</div>
+        </div>
+        <div>
+          <div className="text-pink-600 dark:text-pink-400 font-semibold mb-1">Health & Wellness</div>
+          <div className="text-gray-600 dark:text-gray-400">💊 Doctor Appt • 🧘 Yoga Class • 🏃 Morning Run • 💆 Spa Day</div>
+        </div>
+      </div>
+    </div>
+
+    <div className="bg-pink-50 dark:bg-pink-900/20 rounded-xl p-4 border border-pink-200 dark:border-pink-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-pink-600 dark:text-pink-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-pink-900 dark:text-pink-100">
+          <strong>Pro Tip:</strong> Consistent emoji usage creates visual patterns. Use 🍕 for all dinners out, 🏋️ for workouts - your calendar becomes a colorful story!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="event-details" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Eye className="w-8 h-8 text-purple-500" />
+    Event Detail Modal
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      View full event details in a modal with tabs for Comments and Attachments. See all event information including weather forecast, time, location, category, and description in one place.
+    </p>
+
+    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800 mb-6">
+      <h4 className="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Open event detail modal by clicking the Eye icon on any event or clicking the event card. Modal includes header with gradient background matching category color.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Pro Tip:</strong>  Event detail modal has fixed height - header stays visible while content scrolls. Perfect for long comment threads!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="shopping-integration" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <ShoppingBag className="w-8 h-8 text-emerald-500" />
+    Shopping List Integration
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Link calendar events to shopping lists for seamless meal planning. Events tagged as meals can auto-generate shopping lists with all ingredients needed.
+    </p>
+
+    <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-6 border border-emerald-200 dark:border-emerald-800 mb-6">
+      <h4 className="text-lg font-semibold text-emerald-900 dark:text-emerald-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Create meal events and link them to shopping lists from the event modal. Shopping integration automatically adds meal ingredients to your active shopping list.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Household Tip:</strong>  Plan weekly meals in calendar, then generate one master shopping list for the entire week. Saves time and reduces food waste!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="search-filter" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Search className="w-8 h-8 text-gray-500" />
+    Search & Filtering
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Search events by title, location, or description using the search bar. Press / to focus search instantly. Filter by status (Not Started, In Progress, Completed) in List view.
+    </p>
+
+    <div className="bg-gray-50 dark:bg-gray-900/20 rounded-xl p-6 border border-gray-200 dark:border-gray-800 mb-6">
+      <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Search bar appears at top of calendar. Type to filter events in real-time. Clear search with Esc key. Status filters only work in List view mode.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Pro Tip:</strong>  Search is perfect for finding that doctor appointment you scheduled months ago. Just type 'doctor' and find it instantly!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="status-management" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <CheckCircle className="w-8 h-8 text-green-500" />
+    Status Management
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Track event progress with three statuses: Not Started (red checkbox), In Progress (amber with dot), Completed (green with checkmark). Click checkbox to cycle through statuses.
+    </p>
+
+    <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800 mb-6">
+      <h4 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Status checkboxes appear on all event cards. Click to toggle: Not Started → In Progress → Completed → Not Started. Completed events hide from calendar views (except List view).
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Household Tip:</strong>  Use status to track party planning: Not Started=idea, In Progress=planning, Completed=party done!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="validation" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Target className="w-8 h-8 text-blue-500" />
+    Smart Validation
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Calendar validates your input to prevent errors. Detects time conflicts, validates required fields (title, start time), and shows helpful error messages in user-friendly language.
+    </p>
+
+    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 mb-6">
+      <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Validation happens automatically as you create/edit events. Red error messages appear below problematic fields. Fix errors before saving event.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Pro Tip:</strong>  Conflict detection warns you about overlapping events but doesn't block creation - sometimes double-booking is intentional!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="real-time" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Zap className="w-8 h-8 text-yellow-500" />
+    Real-time Sync
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      All calendar changes sync instantly across devices. The Live indicator (green dot with 'Live' badge) shows active real-time connection. No manual refresh needed.
+    </p>
+
+    <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-6 border border-yellow-200 dark:border-yellow-800 mb-6">
+      <h4 className="text-lg font-semibold text-yellow-900 dark:text-yellow-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Real-time sync powered by Supabase. When your partner creates/edits/deletes an event, you see it immediately. Connection status shown in header.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Pro Tip:</strong>  Real-time sync means instant coordination. Your partner adds a doctor appointment? You see it immediately on your phone!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="proposal-view" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Users className="w-8 h-8 text-pink-500" />
+    Proposal View Overview
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Collaborative scheduling made easy. Create event proposals with multiple time options, vote on preferences, and approve winning time slot to auto-create event.
+    </p>
+
+    <div className="bg-pink-50 dark:bg-pink-900/20 rounded-xl p-6 border border-pink-200 dark:border-pink-800 mb-6">
+      <h4 className="text-lg font-semibold text-pink-900 dark:text-pink-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Switch to Proposal view (Press P) to see all event proposals. Each proposal shows title, description, time slot options, and voting status from all participants.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Household Tip:</strong>  Perfect for date nights! Propose 3 restaurant times, both vote, winner gets auto-scheduled. No more back-and-forth texting!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="create-proposal" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Plus className="w-8 h-8 text-purple-500" />
+    Creating Proposals
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Propose events with 2-5 time slot options. Add title, description, and multiple date/time choices. Participants vote on their preferences to find best time.
+    </p>
+
+    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800 mb-6">
+      <h4 className="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Click 'Propose Event' from toolbar. Enter event details and add multiple time slot options. Participants automatically notified to vote on proposal.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Pro Tip:</strong>  Add 3-5 time options for best results. Too few options = no flexibility. Too many = decision fatigue!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="voting" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Star className="w-8 h-8 text-amber-500" />
+    Voting on Proposals
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Vote on time slots with three levels: Preferred ⭐ (best choice), Available 👍 (works), Unavailable 👎 (can't make it). See everyone's votes in real-time.
+    </p>
+
+    <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-6 border border-amber-200 dark:border-amber-800 mb-6">
+      <h4 className="text-lg font-semibold text-amber-900 dark:text-amber-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Open proposal and click time slots to cycle through votes. Your vote shows in your color. Partner's votes visible too. Proposal updates instantly.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Household Tip:</strong>  Be honest with votes! 'Available' when you mean 'Unavailable' leads to conflicts. Better to find a time that truly works!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="approve-proposals" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <CheckCircle className="w-8 h-8 text-green-500" />
+    Approving Proposals
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Review all votes, choose winning time slot, and approve to auto-create calendar event. Proposal disappears, event appears on calendar.
+    </p>
+
+    <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800 mb-6">
+      <h4 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Click 'Approve' on proposal, select time slot with most Preferred votes, confirm. Event auto-creates with all details from proposal.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Pro Tip:</strong>  Check weather forecast before approving outdoor event proposals! Rainy day might swing your choice to a different time slot.
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="counter-proposals" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <MessageSquare className="w-8 h-8 text-blue-500" />
+    Counter Proposals
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Can't make any proposed times? Add comments suggesting alternatives. Discussion thread helps find times that work for everyone.
+    </p>
+
+    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 mb-6">
+      <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Use comments section in proposal to suggest different times. Add '@partner' to notify them. Proposer can add suggested times as new slots.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Household Tip:</strong>  Counter-proposals keep communication transparent. No side-channel texting needed - everything documented in proposal!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="smart-scheduling" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Sparkles className="w-8 h-8 text-indigo-500" />
+    Smart Scheduling
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      AI analyzes everyone's availability and calendar patterns to suggest optimal meeting times. Considers work hours, typical free times, and existing commitments.
+    </p>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-6 border border-indigo-200 dark:border-indigo-800 mb-6">
+      <h4 className="text-lg font-semibold text-indigo-900 dark:text-indigo-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Smart scheduling (future feature) will auto-suggest time slots based on calendar analysis. Machine learning finds patterns in your schedule.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Pro Tip:</strong>  Smart scheduling learns from approved proposals. The more you use proposals, the smarter suggestions become!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="mobile" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Smartphone className="w-8 h-8 text-purple-500" />
+    Mobile Experience
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Rowan Calendar is fully responsive and mobile-optimized. Touch-friendly buttons, swipe navigation, and adaptive layouts work perfectly on phones and tablets.
+    </p>
+
+    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800 mb-6">
+      <h4 className="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        All calendar views work on mobile. Buttons sized for touch, text readable without zooming. Drawer menus for navigation. Landscape mode supported.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Household Tip:</strong>  Use mobile calendar for on-the-go updates. Stuck in traffic? Update event status from your phone. Instant sync to partner!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="dark-mode" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Moon className="w-8 h-8 text-indigo-500" />
+    Dark Mode
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Dark mode reduces eye strain and saves battery on OLED screens. System preference detection auto-enables dark mode at sunset.
+    </p>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-6 border border-indigo-200 dark:border-indigo-800 mb-6">
+      <h4 className="text-lg font-semibold text-indigo-900 dark:text-indigo-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Dark mode toggle in settings. Auto-detects system preference (iOS/Android/macOS). All UI elements optimized for dark backgrounds.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Pro Tip:</strong>  Dark mode perfect for bedtime calendar checks. Bright white screens at night disrupt sleep - dark mode is easier on eyes!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="keyboard-nav" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Command className="w-8 h-8 text-blue-500" />
+    Keyboard Navigation
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Master keyboard shortcuts for lightning-fast navigation. Every action accessible via keyboard - mouse optional.
+    </p>
+
+    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 mb-6">
+      <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        N=New Event, Q=Quick Add, D/W/M/A/T/P=View modes, /=Search, Esc=Close, ←→=Navigate months, Enter=Save.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Pro Tip:</strong>  Power users love keyboard nav. Once you memorize shortcuts, calendar becomes 10x faster to use!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="touch-gestures" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Hand className="w-8 h-8 text-pink-500" />
+    Touch Gestures
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Swipe left/right to navigate weeks/months. Pinch to zoom calendar. Long-press event for quick actions menu. Touch-optimized for natural mobile interaction.
+    </p>
+
+    <div className="bg-pink-50 dark:bg-pink-900/20 rounded-xl p-6 border border-pink-200 dark:border-pink-800 mb-6">
+      <h4 className="text-lg font-semibold text-pink-900 dark:text-pink-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Swipe gestures work in Month/Week/Timeline views. Long-press any event for context menu. Pinch zoom in/out (future feature).
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Household Tip:</strong>  Swipe navigation feels natural on tablets. Use tablet as family calendar dashboard on kitchen counter!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="accessibility" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Eye className="w-8 h-8 text-green-500" />
+    Accessibility
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      WCAG 2.1 AA compliant. Screen reader support (ARIA labels), keyboard-only navigation, high contrast mode, focus indicators, and semantic HTML.
+    </p>
+
+    <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800 mb-6">
+      <h4 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        All interactive elements have ARIA labels. Tab through UI with keyboard. Focus rings show current element. Color not sole indicator of information.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Pro Tip:</strong>  Accessibility benefits everyone! High contrast mode helps in bright sunlight. Keyboard navigation speeds up power users!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="category-tips" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Lightbulb className="w-8 h-8 text-amber-500" />
+    Category Organization Tips
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Consistent category usage creates visual patterns. Decide category rules with partner: Work=job only or includes side projects? Health=gym or all self-care?
+    </p>
+
+    <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-6 border border-amber-200 dark:border-amber-800 mb-6">
+      <h4 className="text-lg font-semibold text-amber-900 dark:text-amber-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Discuss category definitions: What counts as Family vs Social? Are couple events Family or Social? Consistency makes calendar scanning effortless.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Household Tip:</strong>  Weekly category review shows balance. Too much Work, not enough Family? Adjust next week's schedule proactively!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="color-strategy" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Palette className="w-8 h-8 text-purple-500" />
+    Color Coding Strategy
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Use category colors to create visual story of your week. Blue-heavy Monday? Work day. Pink-heavy Saturday? Family time. Color distribution shows life balance.
+    </p>
+
+    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800 mb-6">
+      <h4 className="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Month view color scanning: Is entire week one color? Time to diversify! Variety of colors = balanced life. Consistent colors = focused period.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Pro Tip:</strong>  Take screenshot of Month view each month. Watch color patterns evolve. Notice trends: more Health lately? Less Social? Adjust!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="collab-workflow" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Users className="w-8 h-8 text-blue-500" />
+    Collaboration Workflow
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Best practices for shared calendars: Check calendar before committing to plans. Add events immediately. Use proposals for group decisions. Comment for context.
+    </p>
+
+    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 mb-6">
+      <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Morning routine: Check Today in Agenda view. Evening routine: Add tomorrow's events. Weekly: Review proposals, approve or comment.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Household Tip:</strong>  'Calendar first' rule: Nothing is scheduled until it's in calendar. Prevents double-booking and miscommunication!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="recurring-mastery" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Repeat className="w-8 h-8 text-green-500" />
+    Recurring Events Mastery
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Advanced recurring patterns: Skip single occurrence by deleting just that instance. Change time for one occurrence with 'Edit this event'.
+    </p>
+
+    <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800 mb-6">
+      <h4 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Weekly patterns for regular commitments. Monthly for bills/meetings. Daily for habits. End dates for temporary patterns (summer gym pass).
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Pro Tip:</strong>  Recurring events save tons of time! Instead of creating 'Gym' 52 times, create once with 'Weekly on Tuesday' pattern.
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="integration-tips" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Zap className="w-8 h-8 text-indigo-500" />
+    Integration Best Practices
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Connect calendar with Shopping Lists and Meal Planning. Tag dinner events with meal plans. Link events to lists. Use status tracking for party prep.
+    </p>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-6 border border-indigo-200 dark:border-indigo-800 mb-6">
+      <h4 className="text-lg font-semibold text-indigo-900 dark:text-indigo-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Create meal event → Link recipe → Generate shopping list → Shop with list → Mark event complete. Full workflow integration.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Household Tip:</strong>  Friday night dinners? Create recurring dinner event, link to recipe rotation, auto-generate weekly shopping lists!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
+
+<section id="family-setup" className="scroll-mt-24">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+    <Heart className="w-8 h-8 text-pink-500" />
+    Family Calendar Setup
+  </h2>
+  <div className="prose dark:prose-invert max-w-none">
+    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Organize family life: Create events for kids activities, doctor appointments, school events, family outings. Use Family category. Add locations for directions.
+    </p>
+
+    <div className="bg-pink-50 dark:bg-pink-900/20 rounded-xl p-6 border border-pink-200 dark:border-pink-800 mb-6">
+      <h4 className="text-lg font-semibold text-pink-900 dark:text-pink-100 mb-4">Key Features</h4>
+      <p className="text-gray-700 dark:text-gray-300">
+        Color code by category: Blue=work, Pink=family. Use emojis: 🏫 School, ⚽ Soccer, 🏥 Doctor. Set up recurring for weekly activities.
+      </p>
+    </div>
+
+    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-indigo-900 dark:text-indigo-100">
+          <strong>Household Tip:</strong>  Shared family calendar = everyone on same page. No more 'I forgot about soccer practice!' moments. Life-changing for busy families!
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+    ↑ Back to top
+  </a>
+</section>
+
 
           {/* Continue with more sections... */}
           <section id="status-categories" className="scroll-mt-24">
