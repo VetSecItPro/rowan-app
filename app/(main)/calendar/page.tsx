@@ -525,18 +525,31 @@ export default function CalendarPage() {
           {!showGuidedFlow && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col gap-1">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                   {viewMode === 'list' ? `Upcoming Events (${filteredEvents.length})` : 'Event Calendar'}
                 </h2>
-                <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 border border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300 text-sm font-medium rounded-full">
-                  {format(new Date(), 'MMM yyyy')}
-                </span>
+                {viewMode !== 'list' && (
+                  <div className="text-sm font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                    {format(currentMonth, 'MMMM yyyy')}
+                  </div>
+                )}
               </div>
 
-              {/* View Mode Toggle - Only show in calendar view */}
+              {/* View Mode Toggle and Today Button - Only show in calendar view */}
               {viewMode !== 'list' && (
-                <div className="bg-gray-50 dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-lg p-0.5 flex gap-0.5">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleJumpToToday}
+                    className="px-3 py-1.5 bg-gradient-calendar text-white text-xs font-medium rounded-lg hover:opacity-90 transition-all shadow-sm group relative"
+                    title="Jump to today (T)"
+                  >
+                    Today
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                      Jump to today (T)
+                    </span>
+                  </button>
+                  <div className="bg-gray-50 dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-lg p-0.5 flex gap-0.5">
                   <button
                     onClick={() => setViewMode('day')}
                     className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
@@ -607,6 +620,7 @@ export default function CalendarPage() {
                       Timeline View
                     </span>
                   </button>
+                  </div>
                 </div>
               )}
 
@@ -667,7 +681,7 @@ export default function CalendarPage() {
                 /* Calendar View */
                 <div>
                   {/* Month Navigation */}
-                  <div className="flex items-center justify-between mb-4 sm:mb-6">
+                  <div className="flex items-center justify-center mb-4 sm:mb-6">
                     <button
                       onClick={handlePrevMonth}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
@@ -678,21 +692,9 @@ export default function CalendarPage() {
                         Previous month (←)
                       </span>
                     </button>
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-                        {format(currentMonth, 'MMMM yyyy')}
-                      </h3>
-                      <button
-                        onClick={handleJumpToToday}
-                        className="px-3 py-1.5 bg-gradient-calendar text-white text-xs font-medium rounded-lg hover:opacity-90 transition-all shadow-sm group relative"
-                        title="Jump to today (T)"
-                      >
-                        Today
-                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                          Jump to today (T)
-                        </span>
-                      </button>
-                    </div>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mx-6">
+                      {format(currentMonth, 'MMMM yyyy')}
+                    </h3>
                     <button
                       onClick={handleNextMonth}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
@@ -816,7 +818,7 @@ export default function CalendarPage() {
                 /* Week View */
                 <div>
                   {/* Week Navigation */}
-                  <div className="flex items-center justify-between mb-4 sm:mb-6">
+                  <div className="flex items-center justify-center mb-4 sm:mb-6">
                     <button
                       onClick={handlePrevMonth}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
@@ -827,21 +829,9 @@ export default function CalendarPage() {
                         Previous week (←)
                       </span>
                     </button>
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-                        Week of {format(startOfWeek(currentMonth), 'MMM d, yyyy')}
-                      </h3>
-                      <button
-                        onClick={handleJumpToToday}
-                        className="px-3 py-1.5 bg-gradient-calendar text-white text-xs font-medium rounded-lg hover:opacity-90 transition-all shadow-sm group relative"
-                        title="Jump to today (T)"
-                      >
-                        Today
-                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                          Jump to today (T)
-                        </span>
-                      </button>
-                    </div>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mx-6">
+                      Week of {format(startOfWeek(currentMonth), 'MMM d, yyyy')}
+                    </h3>
                     <button
                       onClick={handleNextMonth}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
@@ -937,7 +927,7 @@ export default function CalendarPage() {
                 /* Day View */
                 <div>
                   {/* Day Navigation */}
-                  <div className="flex items-center justify-between mb-4 sm:mb-6">
+                  <div className="flex items-center justify-center mb-4 sm:mb-6">
                     <button
                       onClick={handlePrevMonth}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
@@ -948,21 +938,9 @@ export default function CalendarPage() {
                         Previous day (←)
                       </span>
                     </button>
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-                        {format(currentMonth, 'EEEE, MMMM d, yyyy')}
-                      </h3>
-                      <button
-                        onClick={handleJumpToToday}
-                        className="px-3 py-1.5 bg-gradient-calendar text-white text-xs font-medium rounded-lg hover:opacity-90 transition-all shadow-sm group relative"
-                        title="Jump to today (T)"
-                      >
-                        Today
-                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                          Jump to today (T)
-                        </span>
-                      </button>
-                    </div>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mx-6">
+                      {format(currentMonth, 'EEEE, MMMM d, yyyy')}
+                    </h3>
                     <button
                       onClick={handleNextMonth}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
@@ -1232,19 +1210,120 @@ export default function CalendarPage() {
                   })()}
                 </div>
               ) : viewMode === 'timeline' ? (
-                /* Timeline View */
-                <div className="text-center py-12">
-                  <CalendarIcon className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Timeline View</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Timeline view coming soon - see events on a continuous horizontal timeline
-                  </p>
-                  <button
-                    onClick={() => setViewMode('month')}
-                    className="mt-6 px-4 py-2 bg-gradient-calendar text-white rounded-lg hover:opacity-90 transition-all"
-                  >
-                    Back to Month View
-                  </button>
+                /* Timeline View - Horizontal scrollable timeline */
+                <div>
+                  {/* Timeline Navigation */}
+                  <div className="flex items-center justify-center mb-4 sm:mb-6">
+                    <button
+                      onClick={handlePrevMonth}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
+                      title="Previous month (←)"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        Previous month (←)
+                      </span>
+                    </button>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mx-6">
+                      {format(startOfMonth(currentMonth), 'MMMM yyyy')} Timeline
+                    </h3>
+                    <button
+                      onClick={handleNextMonth}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
+                      title="Next month (→)"
+                    >
+                      <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        Next month (→)
+                      </span>
+                    </button>
+                  </div>
+
+                  {/* Timeline Grid */}
+                  <div className="relative">
+                    {/* Horizontal scrollable container */}
+                    <div className="overflow-x-auto pb-4">
+                      <div className="inline-flex gap-2 min-w-full">
+                        {eachDayOfInterval({
+                          start: startOfMonth(currentMonth),
+                          end: endOfMonth(currentMonth)
+                        }).map((day) => {
+                          const dayEvents = getEventsForDate(day);
+                          const isToday = isSameDay(day, new Date());
+                          const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+
+                          return (
+                            <div
+                              key={day.toISOString()}
+                              className={`flex-shrink-0 w-32 border rounded-lg overflow-hidden ${
+                                isToday
+                                  ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                                  : isWeekend
+                                  ? 'border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700/50'
+                                  : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
+                              }`}
+                            >
+                              {/* Date header */}
+                              <div className={`p-2 text-center border-b ${
+                                isToday
+                                  ? 'border-purple-300 dark:border-purple-700 bg-purple-100 dark:bg-purple-900/30'
+                                  : isWeekend
+                                  ? 'border-gray-300 dark:border-gray-600'
+                                  : 'border-gray-200 dark:border-gray-700'
+                              }`}>
+                                <div className={`text-xs font-medium ${
+                                  isToday
+                                    ? 'text-purple-700 dark:text-purple-300'
+                                    : 'text-gray-600 dark:text-gray-400'
+                                }`}>
+                                  {format(day, 'EEE')}
+                                </div>
+                                <div className={`text-lg font-bold ${
+                                  isToday
+                                    ? 'text-purple-700 dark:text-purple-300'
+                                    : 'text-gray-900 dark:text-white'
+                                }`}>
+                                  {format(day, 'd')}
+                                </div>
+                              </div>
+
+                              {/* Events for this day */}
+                              <div className="p-2 space-y-1 min-h-[200px]">
+                                {dayEvents.length > 0 ? (
+                                  dayEvents.map((event) => {
+                                    const categoryColor = getCategoryColor(event.category);
+                                    return (
+                                      <button
+                                        key={event.id}
+                                        onClick={() => handleEditEvent(event)}
+                                        className={`w-full text-left p-2 rounded text-xs ${categoryColor.bg} border-l-2 ${categoryColor.border} hover:opacity-80 transition-opacity`}
+                                      >
+                                        <div className={`font-medium ${categoryColor.text} text-[10px] mb-0.5`}>
+                                          {format(parseISO(event.start_time), 'h:mm a')}
+                                        </div>
+                                        <div className={`font-semibold ${categoryColor.text} line-clamp-2 text-xs`}>
+                                          {event.title}
+                                        </div>
+                                      </button>
+                                    );
+                                  })
+                                ) : (
+                                  <div className="text-center py-4 text-[10px] text-gray-400">
+                                    No events
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Scroll hint */}
+                    <div className="text-center mt-2 text-xs text-gray-500 dark:text-gray-400">
+                      ← Scroll horizontally to see all days →
+                    </div>
+                  </div>
                 </div>
               ) : (
                 /* List View */
