@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
-import { FeatureLayout } from '@/components/layout/FeatureLayout';
+import { Header } from '@/components/layout/Header';
 import { ReminderCard } from '@/components/reminders/ReminderCard';
 import { NewReminderModal } from '@/components/reminders/NewReminderModal';
 import GuidedReminderCreation from '@/components/guided/GuidedReminderCreation';
@@ -213,7 +213,8 @@ export default function RemindersPage() {
   }, [user]);
 
   return (
-    <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Reminders' }]}>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Header />
       <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
@@ -535,6 +536,8 @@ export default function RemindersPage() {
           </div>
         )
       )}
-    </FeatureLayout>
+        </div>
+      </div>
+    </div>
   );
 }
