@@ -16,6 +16,12 @@ export interface Reminder {
   repeat_pattern?: string;
   repeat_days?: number[];
   assigned_to?: string; // User ID this reminder is assigned to
+  assignee?: {
+    id: string;
+    name: string;
+    email: string;
+    avatar_url?: string;
+  };
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -51,12 +57,23 @@ export const remindersService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('reminders')
-      .select('*')
+      .select(`
+        *,
+        assignee:assigned_to (
+          id,
+          name,
+          email,
+          avatar_url
+        )
+      `)
       .eq('space_id', spaceId)
       .order('reminder_time', { ascending: true });
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map((reminder: any) => ({
+      ...reminder,
+      assignee: reminder.assignee || undefined,
+    }));
   },
 
   async getReminderById(id: string): Promise<Reminder | null> {
@@ -171,25 +188,47 @@ export const remindersService = {
 
     const { data, error } = await supabase
       .from('reminders')
-      .select('*')
+      .select(`
+        *,
+        assignee:assigned_to (
+          id,
+          name,
+          email,
+          avatar_url
+        )
+      `)
       .eq('space_id', spaceId)
       .eq('assigned_to', userId)
       .order('reminder_time', { ascending: true });
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map((reminder: any) => ({
+      ...reminder,
+      assignee: reminder.assignee || undefined,
+    }));
   },
 
   async getUnassignedReminders(spaceId: string): Promise<Reminder[]> {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('reminders')
-      .select('*')
+      .select(`
+        *,
+        assignee:assigned_to (
+          id,
+          name,
+          email,
+          avatar_url
+        )
+      `)
       .eq('space_id', spaceId)
       .is('assigned_to', null)
       .order('reminder_time', { ascending: true });
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map((reminder: any) => ({
+      ...reminder,
+      assignee: reminder.assignee || undefined,
+    }));
   },
 };
