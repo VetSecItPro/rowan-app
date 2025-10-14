@@ -13,6 +13,7 @@ export interface EventAttachment {
 
 export interface UploadAttachmentInput {
   event_id: string;
+  space_id: string;
   file: File;
 }
 
@@ -87,6 +88,7 @@ export const eventAttachmentsService = {
       .from('event_attachments')
       .insert([{
         event_id: input.event_id,
+        space_id: input.space_id,
         file_name: sanitizedFileName,
         file_size: input.file.size,
         mime_type: input.file.type,

@@ -20,6 +20,7 @@ export interface EventComment {
 
 export interface CreateCommentInput {
   event_id: string;
+  space_id: string;
   content: string;
   mentions?: string[];
   parent_comment_id?: string;
@@ -41,6 +42,7 @@ export const eventCommentsService = {
       .from('event_comments')
       .insert([{
         event_id: input.event_id,
+        space_id: input.space_id,
         content: input.content,
         mentions: input.mentions || [],
         parent_comment_id: input.parent_comment_id

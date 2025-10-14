@@ -349,6 +349,23 @@ export default function CalendarPage() {
     }
   }, [realtimeEvents]);
 
+  // Load saved view mode from localStorage on mount
+  useEffect(() => {
+    if (currentSpace?.id) {
+      const savedViewMode = localStorage.getItem(`calendar-view-${currentSpace.id}`);
+      if (savedViewMode && ['day', 'week', 'month', 'agenda', 'timeline', 'proposal', 'list'].includes(savedViewMode)) {
+        setViewMode(savedViewMode as ViewMode);
+      }
+    }
+  }, [currentSpace?.id]);
+
+  // Save view mode to localStorage whenever it changes
+  useEffect(() => {
+    if (currentSpace?.id) {
+      localStorage.setItem(`calendar-view-${currentSpace.id}`, viewMode);
+    }
+  }, [viewMode, currentSpace?.id]);
+
   // Handler for viewing event details
   const handleViewDetails = useCallback((event: CalendarEvent) => {
     setDetailEvent(event);
