@@ -495,7 +495,7 @@ export default function TasksPage() {
                 placeholder="Search tasks and chores..."
                 value={searchQuery}
                 onChange={handleSearchChange}
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full pl-10 pr-4 input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
           </div>
@@ -529,7 +529,7 @@ export default function TasksPage() {
                   <div className="bg-gray-50 dark:bg-gray-900 border-2 border-blue-200 dark:border-blue-700 rounded-lg p-1 flex gap-1 w-fit">
                     <button
                       onClick={() => setStatusFilter('all')}
-                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                         statusFilter === 'all'
                           ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
                           : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
@@ -539,7 +539,7 @@ export default function TasksPage() {
                     </button>
                     <button
                       onClick={() => setStatusFilter('pending')}
-                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[70px] ${
+                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[70px] ${
                         statusFilter === 'pending'
                           ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
                           : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
@@ -549,7 +549,7 @@ export default function TasksPage() {
                     </button>
                     <button
                       onClick={() => setStatusFilter('in_progress')}
-                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[85px] ${
+                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[85px] ${
                         statusFilter === 'in_progress'
                           ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
                           : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
@@ -559,7 +559,7 @@ export default function TasksPage() {
                     </button>
                     <button
                       onClick={() => setStatusFilter('completed')}
-                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
+                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[80px] ${
                         statusFilter === 'completed'
                           ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
                           : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
@@ -588,7 +588,7 @@ export default function TasksPage() {
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                         <button
                           onClick={handleOpenModal}
-                          className="px-6 py-3 shimmer-tasks text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                          className="btn-touch shimmer-tasks text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
                         >
                           <Plus className="w-5 h-5" />
                           Create {activeTab === 'task' ? 'Task' : 'Chore'}

@@ -709,7 +709,7 @@ export default function ShoppingPage() {
               <div className="bg-gray-50 dark:bg-gray-900 border-2 border-emerald-200 dark:border-emerald-700 rounded-lg p-1 flex gap-1 w-fit">
                 <button
                   onClick={() => { setStatusFilter('all'); setTimeFilter('all'); }}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                     statusFilter === 'all' && timeFilter === 'all'
                       ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
@@ -719,7 +719,7 @@ export default function ShoppingPage() {
                 </button>
                 <button
                   onClick={() => { setTimeFilter('week'); }}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
+                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[80px] ${
                     timeFilter === 'week'
                       ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
@@ -729,7 +729,7 @@ export default function ShoppingPage() {
                 </button>
                 <button
                   onClick={() => { setStatusFilter('active'); setTimeFilter('all'); }}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                     statusFilter === 'active' && timeFilter === 'all'
                       ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
@@ -739,7 +739,7 @@ export default function ShoppingPage() {
                 </button>
                 <button
                   onClick={() => { setStatusFilter('completed'); setTimeFilter('all'); }}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
+                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[80px] ${
                     statusFilter === 'completed' && timeFilter === 'all'
                       ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
@@ -761,7 +761,7 @@ export default function ShoppingPage() {
                 <p className="text-gray-500 dark:text-gray-500 mb-6">{searchQuery || statusFilter !== 'active' ? 'Try adjusting your filters' : 'Create your first shopping list!'}</p>
                 {!searchQuery && statusFilter === 'active' && (
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <button onClick={handleOpenNewListModal} className="px-6 py-3 shimmer-shopping text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                    <button onClick={handleOpenNewListModal} className="btn-touch shimmer-shopping text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
                       <Plus className="w-5 h-5" />
                       Create List
                     </button>

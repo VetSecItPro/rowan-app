@@ -247,7 +247,7 @@ export default function ProjectsPage() {
                 placeholder={`Search ${activeTab}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full pl-10 pr-4 input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
           </div>
@@ -269,17 +269,17 @@ export default function ProjectsPage() {
               {activeTab === 'projects' && filteredProjects.length > 0 && (
                 <div className="bg-gray-50 dark:bg-gray-900 border-2 border-amber-200 dark:border-amber-700 rounded-lg p-1 flex gap-1 w-fit">
                   <button
-                    className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md"
+                    className="px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md"
                   >
                     All
                   </button>
                   <button
-                    className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                    className="px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
                   >
                     Active
                   </button>
                   <button
-                    className="px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                    className="px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[80px] text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
                   >
                     Completed
                   </button>
@@ -297,7 +297,7 @@ export default function ProjectsPage() {
                 <div className="text-center py-12">
                   <Folder className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No projects found</p>
-                  <button onClick={() => setIsProjectModalOpen(true)} className="px-6 py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                  <button onClick={() => setIsProjectModalOpen(true)} className="btn-touch shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
                     <Plus className="w-5 h-5" />
                     Create Project
                   </button>
@@ -316,7 +316,7 @@ export default function ProjectsPage() {
                 <div className="text-center py-12">
                   <Wallet className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No Budget Set</p>
-                  <button onClick={() => setIsBudgetModalOpen(true)} className="px-6 py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                  <button onClick={() => setIsBudgetModalOpen(true)} className="btn-touch shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
                     <Plus className="w-5 h-5" />
                     Set Budget
                   </button>
@@ -408,7 +408,7 @@ export default function ProjectsPage() {
                 <div className="text-center py-12">
                   <Receipt className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No expenses found</p>
-                  <button onClick={() => setIsExpenseModalOpen(true)} className="px-6 py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                  <button onClick={() => setIsExpenseModalOpen(true)} className="btn-touch shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
                     <Plus className="w-5 h-5" />
                     Add Expense
                   </button>
