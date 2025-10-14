@@ -11,7 +11,7 @@ import { processReminderNotifications } from '@/lib/jobs/reminder-notifications-
  * {
  *   "crons": [{
  *     "path": "/api/cron/reminder-notifications",
- *     "schedule": "*/15 * * * *"
+ *     "schedule": "every 15 minutes"
  *   }]
  * }
  */
