@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { X, ChevronDown, Smile } from 'lucide-react';
 import { CreateReminderInput, Reminder } from '@/lib/services/reminders-service';
+import { UserPicker } from './UserPicker';
 
 interface NewReminderModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
     reminder_time: '',
     priority: 'medium',
     status: 'active',
+    assigned_to: undefined,
   });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedWeekdays, setSelectedWeekdays] = useState<number[]>([]);
@@ -48,6 +50,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
         priority: editReminder.priority || 'medium',
         status: editReminder.status || 'active',
         repeat_pattern: editReminder.repeat_pattern || '',
+        assigned_to: editReminder.assigned_to || undefined,
       });
 
       // Populate repeat days based on pattern
@@ -66,6 +69,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
         reminder_time: '',
         priority: 'medium',
         status: 'active',
+        assigned_to: undefined,
       });
       setSelectedWeekdays([]);
       setSelectedMonthDays([]);
@@ -235,6 +239,13 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
               ))}
             </div>
           </div>
+
+          {/* User Assignment */}
+          <UserPicker
+            spaceId={spaceId}
+            selectedUserId={formData.assigned_to}
+            onSelect={(userId) => setFormData({ ...formData, assigned_to: userId || undefined })}
+          />
 
           {/* Reminder Time */}
           <div>
