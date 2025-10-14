@@ -320,7 +320,7 @@ export default function MessagesPage() {
 
           {/* Stats Dashboard - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+          <div className="stats-grid-mobile gap-3 sm:gap-6">
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-2 sm:mb-4">
                 <h3 className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">Today</h3>
