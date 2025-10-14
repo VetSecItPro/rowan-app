@@ -4,6 +4,8 @@ import { getUserSpaces } from '@/lib/services/spaces-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/spaces
  * Get all spaces the authenticated user belongs to

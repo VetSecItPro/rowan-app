@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { processReminderNotifications } from '@/lib/jobs/reminder-notifications-job';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Cron job endpoint for processing reminder notifications
  *
