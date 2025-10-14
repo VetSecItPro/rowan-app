@@ -257,7 +257,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Add a description..."
               rows={3}
-              className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
+              className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
             />
           </div>
 
@@ -365,7 +365,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                 <select
                   value={formData.priority}
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none pr-10"
+                  className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none pr-10"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -389,7 +389,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                     setSelectedWeekdays([]);
                     setSelectedMonthDays([]);
                   }}
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none pr-10"
+                  className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none pr-10"
                 >
                   <option value="">Never</option>
                   <option value="daily">Daily</option>
