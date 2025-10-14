@@ -14,6 +14,7 @@ import { projectsService } from '@/lib/services/budgets-service';
 import { projectsOnlyService } from '@/lib/services/projects-service';
 import { goalsService } from '@/lib/services/goals-service';
 import { checkInsService, type DailyCheckIn, type CheckInStats } from '@/lib/services/checkins-service';
+import { reactionsService, type CheckInReaction } from '@/lib/services/reactions-service';
 import { createClient } from '@/lib/supabase/client';
 import {
   CheckSquare,
@@ -316,6 +317,8 @@ export default function DashboardPage() {
   const [viewMode, setViewMode] = useState<'checkin' | 'journal'>('checkin');
   const [journalView, setJournalView] = useState<'list' | 'calendar'>('list');
   const [calendarMonth, setCalendarMonth] = useState(new Date());
+  const [checkInReactions, setCheckInReactions] = useState<Record<string, CheckInReaction[]>>({});
+  const [partnerReactionLoading, setPartnerReactionLoading] = useState(false);
 
   // Auth protection - redirect to login if not authenticated
   useEffect(() => {
@@ -828,6 +831,21 @@ export default function DashboardPage() {
         const today = await checkInsService.getTodayCheckIn(currentSpace.id, user.id);
         setTodayCheckIn(today);
 
+        // Load reactions for all check-ins
+        const reactionsMap: Record<string, CheckInReaction[]> = {};
+        await Promise.all(
+          recent.map(async (checkIn) => {
+            try {
+              const reactions = await reactionsService.getReactionsForCheckIn(checkIn.id);
+              reactionsMap[checkIn.id] = reactions;
+            } catch (error) {
+              console.error(`Failed to load reactions for check-in ${checkIn.id}:`, error);
+              reactionsMap[checkIn.id] = [];
+            }
+          })
+        );
+        setCheckInReactions(reactionsMap);
+
         // Pre-populate form if user already checked in today
         if (today) {
           setSelectedMood(today.mood);
@@ -906,6 +924,32 @@ export default function DashboardPage() {
       setCheckInSaving(false);
     }
   }, [selectedMood, checkInNote, checkInHighlights, checkInChallenges, checkInGratitude, user, currentSpace]);
+
+  // Handle sending a reaction to partner's check-in
+  const handleSendReaction = useCallback(async (
+    checkinId: string,
+    reactionType: 'heart' | 'hug' | 'strength'
+  ) => {
+    if (!user) return;
+
+    setPartnerReactionLoading(true);
+    try {
+      const reaction = await reactionsService.createReaction(user.id, {
+        checkin_id: checkinId,
+        reaction_type: reactionType,
+      });
+
+      // Update local state
+      setCheckInReactions((prev) => ({
+        ...prev,
+        [checkinId]: [reaction],
+      }));
+    } catch (error) {
+      console.error('Failed to send reaction:', error);
+    } finally {
+      setPartnerReactionLoading(false);
+    }
+  }, [user]);
 
   // Greeting function - Memoized
   const greetingText = useMemo(() => {
@@ -1536,11 +1580,54 @@ export default function DashboardPage() {
                               <span className="text-xs font-medium text-gray-700 dark:text-gray-300">You</span>
                             </div>
                           )}
-                          {partnerEmoji && (
-                            <div className="flex items-center gap-2 px-3 py-2 bg-white/60 dark:bg-gray-800/60 rounded-full border border-purple-200/50 dark:border-purple-700/50">
-                              <span className="text-xl">{partnerEmoji}</span>
-                              <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Partner</span>
-                            </div>
+                          {partnerEmoji && partnerToday && (
+                            <>
+                              <div className="flex items-center gap-2 px-3 py-2 bg-white/60 dark:bg-gray-800/60 rounded-full border border-purple-200/50 dark:border-purple-700/50">
+                                <span className="text-xl">{partnerEmoji}</span>
+                                <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Partner</span>
+                              </div>
+
+                              {/* Reaction Buttons */}
+                              <div className="flex items-center gap-1">
+                                {checkInReactions[partnerToday.id]?.length > 0 ? (
+                                  <div className="flex items-center gap-1 px-2 py-1 bg-pink-100 dark:bg-pink-900/30 rounded-full border border-pink-300 dark:border-pink-700">
+                                    <span className="text-sm">
+                                      {checkInReactions[partnerToday.id][0].reaction_type === 'heart' && '❤️'}
+                                      {checkInReactions[partnerToday.id][0].reaction_type === 'hug' && '🤗'}
+                                      {checkInReactions[partnerToday.id][0].reaction_type === 'strength' && '💪'}
+                                    </span>
+                                    <span className="text-xs text-pink-600 dark:text-pink-400 font-medium">Sent</span>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <button
+                                      onClick={() => handleSendReaction(partnerToday.id, 'heart')}
+                                      disabled={partnerReactionLoading}
+                                      className="p-2 hover:bg-pink-100 dark:hover:bg-pink-900/30 rounded-full transition-colors disabled:opacity-50"
+                                      title="Send love"
+                                    >
+                                      <span className="text-lg">❤️</span>
+                                    </button>
+                                    <button
+                                      onClick={() => handleSendReaction(partnerToday.id, 'hug')}
+                                      disabled={partnerReactionLoading}
+                                      className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-full transition-colors disabled:opacity-50"
+                                      title="Send hug"
+                                    >
+                                      <span className="text-lg">🤗</span>
+                                    </button>
+                                    <button
+                                      onClick={() => handleSendReaction(partnerToday.id, 'strength')}
+                                      disabled={partnerReactionLoading}
+                                      className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-full transition-colors disabled:opacity-50"
+                                      title="Send strength"
+                                    >
+                                      <span className="text-lg">💪</span>
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </>
                           )}
                         </>
                       );
