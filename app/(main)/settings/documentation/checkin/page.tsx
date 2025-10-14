@@ -202,7 +202,7 @@ const guideSections: GuideSection[] = [
       },
       {
         title: 'Handling Missed Days',
-        description: 'Don't stress about broken streaks - consistency matters more than perfection',
+        description: 'Do not stress about broken streaks - consistency matters more than perfection',
         readTime: '2 min read',
         href: '#missed-days',
       },
