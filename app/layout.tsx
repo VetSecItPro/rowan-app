@@ -10,6 +10,24 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: "Rowan - Your Life, Organized",
   description: "Collaborative life management for couples and families",
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#fafafa' },
+    { media: '(prefers-color-scheme: dark)', color: '#000000' }
+  ],
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Rowan',
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export default function RootLayout({
@@ -22,19 +40,28 @@ export default function RootLayout({
       <body className="antialiased bg-gray-50 dark:bg-black text-gray-900 dark:text-white" style={{ scrollbarGutter: 'stable' }}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
+          defaultTheme="system"
+          enableSystem={true}
           storageKey="rowan-theme"
           disableTransitionOnChange
         >
           <AuthProvider>
             {children}
             <Toaster
-              position="bottom-right"
+              position="top-center"
               duration={4000}
               closeButton
               richColors
               theme="system"
+              toastOptions={{
+                className: 'w-full max-w-md mx-4 sm:mx-0',
+                style: {
+                  fontSize: '14px',
+                  padding: '12px 16px',
+                },
+              }}
+              visibleToasts={3}
+              offset="16px"
             />
           </AuthProvider>
         </ThemeProvider>

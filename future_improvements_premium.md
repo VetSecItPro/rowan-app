@@ -755,5 +755,1006 @@ Advanced calendar features that leverage AI for intelligent scheduling, provide 
 
 ---
 
+## 🔔 Reminders Advanced Features
+
+### Phase 2: Intelligence, Location & Workflow Automation
+
+**Feature Name:** Smart Reminders with Location & Dependencies
+
+**Description:**
+Advanced reminder features that leverage location awareness, workflow automation, and AI to create intelligent, context-aware reminders that trigger at the right time and place.
+
+**Current Status:** Phase 1 Complete (11/12 features)
+- ✅ Templates, Categories, Priorities
+- ✅ Advanced Recurrence Patterns
+- ✅ @Mentions Integration
+- ✅ Attachments & Context (Files, URLs, Links)
+- ✅ Activity Timeline, Comments, Multi-select
+- ⏳ Location-Based, Dependencies, AI (Phase 2)
+
+**Planned Features:**
+
+#### 1. Location-Based Reminders (Feature #8)
+- **What:** Trigger reminders when entering/leaving specific locations
+- **Why:** Context-aware notifications that fire at the right place
+- **Technical Implementation:**
+  - **APIs:**
+    - Geolocation API (browser native)
+    - Google Maps Geocoding API (address → coordinates)
+    - Mapbox API (alternative, better pricing)
+  - **Installation:**
+    ```bash
+    npm install @googlemaps/js-api-loader
+    # OR
+    npm install mapbox-gl @mapbox/mapbox-sdk
+    ```
+  - **Database Schema:**
+    ```sql
+    -- Add to reminders table
+    ALTER TABLE reminders ADD COLUMN location_trigger JSONB;
+    -- Structure: {
+    --   enabled: boolean,
+    --   type: 'arrive' | 'leave',
+    --   address: string,
+    --   latitude: number,
+    --   longitude: number,
+    --   radius_meters: number (default 100m),
+    --   last_triggered: timestamp
+    -- }
+
+    -- Create location history table for privacy-conscious tracking
+    CREATE TABLE location_triggers_history (
+      id UUID PRIMARY KEY,
+      reminder_id UUID REFERENCES reminders(id),
+      triggered_at TIMESTAMP,
+      location_lat FLOAT,
+      location_lng FLOAT,
+      trigger_type TEXT -- 'arrive' | 'leave'
+    );
+
+    -- Index for geospatial queries
+    CREATE INDEX idx_reminders_location ON reminders
+    USING gist ((location_trigger->'latitude'), (location_trigger->'longitude'));
+    ```
+  - **Core Service:**
+    ```typescript
+    // lib/services/location-reminders-service.ts
+    import { createClient } from '@/lib/supabase/client';
+
+    interface LocationTrigger {
+      enabled: boolean;
+      type: 'arrive' | 'leave';
+      address: string;
+      latitude: number;
+      longitude: number;
+      radius_meters: number;
+      last_triggered?: string;
+    }
+
+    export const locationRemindersService = {
+      /**
+       * Geocode address to coordinates using Google Maps API
+       */
+      async geocodeAddress(address: string): Promise<{ lat: number; lng: number }> {
+        const response = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+        );
+        const data = await response.json();
+
+        if (data.results.length === 0) {
+          throw new Error('Address not found');
+        }
+
+        const { lat, lng } = data.results[0].geometry.location;
+        return { lat, lng };
+      },
+
+      /**
+       * Calculate distance between two coordinates (Haversine formula)
+       */
+      calculateDistance(
+        lat1: number, lng1: number,
+        lat2: number, lng2: number
+      ): number {
+        const R = 6371e3; // Earth radius in meters
+        const φ1 = (lat1 * Math.PI) / 180;
+        const φ2 = (lat2 * Math.PI) / 180;
+        const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+        const Δλ = ((lng2 - lng1) * Math.PI) / 180;
+
+        const a =
+          Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+          Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c; // Distance in meters
+      },
+
+      /**
+       * Check if user's current location triggers any reminders
+       */
+      async checkLocationTriggers(
+        userId: string,
+        currentLat: number,
+        currentLng: number
+      ): Promise<string[]> {
+        const supabase = createClient();
+
+        // Get all active reminders with location triggers
+        const { data: reminders } = await supabase
+          .from('reminders')
+          .select('id, title, location_trigger')
+          .eq('status', 'active')
+          .not('location_trigger', 'is', null);
+
+        const triggeredReminderIds: string[] = [];
+
+        for (const reminder of reminders || []) {
+          const trigger = reminder.location_trigger as LocationTrigger;
+          if (!trigger.enabled) continue;
+
+          const distance = this.calculateDistance(
+            currentLat, currentLng,
+            trigger.latitude, trigger.longitude
+          );
+
+          // Check if within trigger radius
+          if (distance <= trigger.radius_meters) {
+            // Prevent re-triggering within 30 minutes
+            const lastTriggered = trigger.last_triggered
+              ? new Date(trigger.last_triggered)
+              : null;
+            const now = new Date();
+
+            if (!lastTriggered || (now.getTime() - lastTriggered.getTime()) > 30 * 60 * 1000) {
+              triggeredReminderIds.push(reminder.id);
+
+              // Update last triggered time
+              await supabase
+                .from('reminders')
+                .update({
+                  location_trigger: {
+                    ...trigger,
+                    last_triggered: now.toISOString()
+                  }
+                })
+                .eq('id', reminder.id);
+
+              // Log trigger event
+              await supabase
+                .from('location_triggers_history')
+                .insert({
+                  reminder_id: reminder.id,
+                  triggered_at: now.toISOString(),
+                  location_lat: currentLat,
+                  location_lng: currentLng,
+                  trigger_type: trigger.type
+                });
+            }
+          }
+        }
+
+        return triggeredReminderIds;
+      },
+
+      /**
+       * Set location trigger on reminder
+       */
+      async setLocationTrigger(
+        reminderId: string,
+        trigger: LocationTrigger
+      ): Promise<void> {
+        const supabase = createClient();
+
+        await supabase
+          .from('reminders')
+          .update({ location_trigger: trigger })
+          .eq('id', reminderId);
+      }
+    };
+    ```
+  - **Background Location Tracking:**
+    ```typescript
+    // lib/hooks/useLocationTracking.ts
+    import { useEffect, useRef } from 'react';
+    import { locationRemindersService } from '@/lib/services/location-reminders-service';
+
+    export function useLocationTracking(userId: string | undefined) {
+      const watchIdRef = useRef<number | null>(null);
+
+      useEffect(() => {
+        if (!userId || !('geolocation' in navigator)) return;
+
+        // Request permission
+        const startTracking = async () => {
+          try {
+            const permission = await navigator.permissions.query({ name: 'geolocation' });
+
+            if (permission.state === 'granted' || permission.state === 'prompt') {
+              watchIdRef.current = navigator.geolocation.watchPosition(
+                async (position) => {
+                  const { latitude, longitude } = position.coords;
+
+                  // Check for triggered reminders
+                  const triggered = await locationRemindersService.checkLocationTriggers(
+                    userId,
+                    latitude,
+                    longitude
+                  );
+
+                  // Send notifications for triggered reminders
+                  if (triggered.length > 0) {
+                    for (const reminderId of triggered) {
+                      // Use Web Notifications API
+                      if ('Notification' in window && Notification.permission === 'granted') {
+                        new Notification('Location Reminder', {
+                          body: 'You have a reminder for this location',
+                          icon: '/icon.png'
+                        });
+                      }
+                    }
+                  }
+                },
+                (error) => {
+                  console.error('Location tracking error:', error);
+                },
+                {
+                  enableHighAccuracy: false, // Battery saving
+                  maximumAge: 300000, // 5 minutes
+                  timeout: 10000
+                }
+              );
+            }
+          } catch (error) {
+            console.error('Permission error:', error);
+          }
+        };
+
+        startTracking();
+
+        return () => {
+          if (watchIdRef.current !== null) {
+            navigator.geolocation.clearWatch(watchIdRef.current);
+          }
+        };
+      }, [userId]);
+    }
+    ```
+  - **UI Components:**
+    ```typescript
+    // components/reminders/LocationTriggerPicker.tsx
+    'use client';
+
+    import { useState } from 'react';
+    import { MapPin, Search } from 'lucide-react';
+    import { locationRemindersService } from '@/lib/services/location-reminders-service';
+
+    interface LocationTriggerPickerProps {
+      value: LocationTrigger | null;
+      onChange: (trigger: LocationTrigger) => void;
+    }
+
+    export function LocationTriggerPicker({ value, onChange }: LocationTriggerPickerProps) {
+      const [address, setAddress] = useState(value?.address || '');
+      const [loading, setLoading] = useState(false);
+
+      const handleGeocode = async () => {
+        if (!address.trim()) return;
+
+        setLoading(true);
+        try {
+          const coords = await locationRemindersService.geocodeAddress(address);
+
+          onChange({
+            enabled: true,
+            type: 'arrive',
+            address: address.trim(),
+            latitude: coords.lat,
+            longitude: coords.lng,
+            radius_meters: 100
+          });
+        } catch (error) {
+          alert('Could not find location. Please try a different address.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div className="space-y-3">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <MapPin className="w-4 h-4 inline mr-1" />
+            Location Trigger
+          </label>
+
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Enter address (e.g., 123 Main St, City)"
+              className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg"
+            />
+            <button
+              onClick={handleGeocode}
+              disabled={loading}
+              className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 disabled:opacity-50"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+          </div>
+
+          {value && (
+            <div className="space-y-2">
+              <select
+                value={value.type}
+                onChange={(e) => onChange({ ...value, type: e.target.value as 'arrive' | 'leave' })}
+                className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg"
+              >
+                <option value="arrive">When I arrive</option>
+                <option value="leave">When I leave</option>
+              </select>
+
+              <div>
+                <label className="text-xs text-gray-600 dark:text-gray-400">
+                  Trigger radius: {value.radius_meters}m
+                </label>
+                <input
+                  type="range"
+                  min="50"
+                  max="500"
+                  step="50"
+                  value={value.radius_meters}
+                  onChange={(e) => onChange({ ...value, radius_meters: parseInt(e.target.value) })}
+                  className="w-full"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+    ```
+  - **Privacy Considerations:**
+    - Location tracking opt-in only
+    - Clear permission prompts
+    - Location data stored locally, only coordinates sent to server
+    - 30-minute cooldown to prevent spam
+    - User can disable tracking anytime
+    - History retention: 30 days max
+- **User Benefit:** Never forget tasks when you're at the right place
+- **Examples:**
+  - "Remind me to buy milk when I'm near the grocery store"
+  - "Remind me to water plants when I get home"
+  - "Remind me to submit expense report when I leave the office"
+- **Complexity:** High (5-7 days + API setup + privacy review)
+- **Premium Feature:** Yes
+
+#### 2. Dependencies & Workflows (Feature #9)
+- **What:** Chain reminders together with conditional logic and workflows
+- **Why:** Automate multi-step processes, prevent premature actions
+- **Technical Implementation:**
+  - **Database Schema:**
+    ```sql
+    -- Add dependency support to reminders table
+    ALTER TABLE reminders ADD COLUMN depends_on UUID[] DEFAULT '{}';
+    ALTER TABLE reminders ADD COLUMN blocks UUID[] DEFAULT '{}';
+    ALTER TABLE reminders ADD COLUMN workflow_id UUID;
+
+    -- Create workflows table
+    CREATE TABLE reminder_workflows (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      space_id UUID NOT NULL REFERENCES spaces(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      description TEXT,
+      created_by UUID NOT NULL REFERENCES users(id),
+      is_template BOOLEAN DEFAULT false,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    -- Create workflow steps table
+    CREATE TABLE workflow_steps (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      workflow_id UUID NOT NULL REFERENCES reminder_workflows(id) ON DELETE CASCADE,
+      reminder_id UUID REFERENCES reminders(id) ON DELETE CASCADE,
+      step_order INTEGER NOT NULL,
+      depends_on_step INTEGER, -- Previous step number
+      auto_trigger BOOLEAN DEFAULT false, -- Auto-create when dependency completes
+      delay_hours INTEGER DEFAULT 0, -- Delay after dependency completes
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    -- Create workflow automation rules
+    CREATE TABLE workflow_automation_rules (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      workflow_id UUID NOT NULL REFERENCES reminder_workflows(id),
+      trigger_event TEXT NOT NULL, -- 'step_complete', 'step_snoozed', 'step_overdue'
+      condition JSONB, -- { field: 'status', operator: 'equals', value: 'completed' }
+      action TEXT NOT NULL, -- 'create_next_step', 'send_notification', 'update_status'
+      action_params JSONB,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    -- Indexes
+    CREATE INDEX idx_workflow_steps_workflow_id ON workflow_steps(workflow_id);
+    CREATE INDEX idx_workflow_steps_order ON workflow_steps(workflow_id, step_order);
+    ```
+  - **Core Service:**
+    ```typescript
+    // lib/services/reminder-workflows-service.ts
+    import { createClient } from '@/lib/supabase/client';
+    import { remindersService } from './reminders-service';
+
+    interface Workflow {
+      id: string;
+      space_id: string;
+      name: string;
+      description?: string;
+      created_by: string;
+      is_template: boolean;
+      steps?: WorkflowStep[];
+    }
+
+    interface WorkflowStep {
+      id: string;
+      workflow_id: string;
+      reminder_id?: string;
+      step_order: number;
+      depends_on_step?: number;
+      auto_trigger: boolean;
+      delay_hours: number;
+      reminder_template?: Partial<CreateReminderInput>;
+    }
+
+    export const workflowsService = {
+      /**
+       * Create a new workflow
+       */
+      async createWorkflow(
+        spaceId: string,
+        name: string,
+        description: string,
+        createdBy: string
+      ): Promise<Workflow> {
+        const supabase = createClient();
+
+        const { data, error } = await supabase
+          .from('reminder_workflows')
+          .insert({
+            space_id: spaceId,
+            name,
+            description,
+            created_by: createdBy
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        return data;
+      },
+
+      /**
+       * Add step to workflow
+       */
+      async addWorkflowStep(
+        workflowId: string,
+        stepOrder: number,
+        dependsOnStep: number | null,
+        reminderTemplate: Partial<CreateReminderInput>,
+        autoTrigger: boolean = false,
+        delayHours: number = 0
+      ): Promise<WorkflowStep> {
+        const supabase = createClient();
+
+        // Store reminder template in step
+        const { data, error } = await supabase
+          .from('workflow_steps')
+          .insert({
+            workflow_id: workflowId,
+            step_order: stepOrder,
+            depends_on_step: dependsOnStep,
+            auto_trigger: autoTrigger,
+            delay_hours: delayHours,
+            reminder_template: reminderTemplate as any
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        return data;
+      },
+
+      /**
+       * Check dependencies and trigger next steps
+       */
+      async checkAndTriggerNextSteps(
+        reminderId: string,
+        userId: string
+      ): Promise<void> {
+        const supabase = createClient();
+
+        // Get the reminder and its workflow
+        const { data: reminder } = await supabase
+          .from('reminders')
+          .select('workflow_id, status')
+          .eq('id', reminderId)
+          .single();
+
+        if (!reminder?.workflow_id || reminder.status !== 'completed') return;
+
+        // Get the current step
+        const { data: currentStep } = await supabase
+          .from('workflow_steps')
+          .select('step_order')
+          .eq('reminder_id', reminderId)
+          .single();
+
+        if (!currentStep) return;
+
+        // Find next steps that depend on this one
+        const { data: nextSteps } = await supabase
+          .from('workflow_steps')
+          .select('*')
+          .eq('workflow_id', reminder.workflow_id)
+          .eq('depends_on_step', currentStep.step_order)
+          .eq('auto_trigger', true);
+
+        // Create reminders for next steps
+        for (const step of nextSteps || []) {
+          const template = step.reminder_template as Partial<CreateReminderInput>;
+
+          // Calculate reminder time with delay
+          const reminderTime = new Date();
+          reminderTime.setHours(reminderTime.getHours() + step.delay_hours);
+
+          // Create the reminder
+          const newReminder = await remindersService.createReminder({
+            ...template,
+            reminder_time: reminderTime.toISOString(),
+            space_id: template.space_id!
+          });
+
+          // Link reminder to workflow step
+          await supabase
+            .from('workflow_steps')
+            .update({ reminder_id: newReminder.id })
+            .eq('id', step.id);
+        }
+      },
+
+      /**
+       * Get workflow with all steps
+       */
+      async getWorkflowWithSteps(workflowId: string): Promise<Workflow> {
+        const supabase = createClient();
+
+        const { data: workflow } = await supabase
+          .from('reminder_workflows')
+          .select(`
+            *,
+            steps:workflow_steps(
+              *,
+              reminder:reminders(*)
+            )
+          `)
+          .eq('id', workflowId)
+          .single();
+
+        return workflow;
+      },
+
+      /**
+       * Create workflow from template
+       */
+      async createFromTemplate(
+        templateId: string,
+        spaceId: string,
+        userId: string
+      ): Promise<Workflow> {
+        const template = await this.getWorkflowWithSteps(templateId);
+
+        // Create new workflow
+        const newWorkflow = await this.createWorkflow(
+          spaceId,
+          template.name,
+          template.description || '',
+          userId
+        );
+
+        // Clone all steps
+        for (const step of template.steps || []) {
+          await this.addWorkflowStep(
+            newWorkflow.id,
+            step.step_order,
+            step.depends_on_step,
+            step.reminder_template || {},
+            step.auto_trigger,
+            step.delay_hours
+          );
+        }
+
+        return newWorkflow;
+      }
+    };
+    ```
+  - **UI Components:**
+    ```typescript
+    // components/reminders/WorkflowBuilder.tsx
+    'use client';
+
+    import { useState } from 'react';
+    import { Plus, GitBranch, Clock } from 'lucide-react';
+    import { WorkflowStep } from '@/lib/services/reminder-workflows-service';
+
+    export function WorkflowBuilder() {
+      const [steps, setSteps] = useState<WorkflowStep[]>([]);
+
+      const addStep = () => {
+        setSteps([
+          ...steps,
+          {
+            id: crypto.randomUUID(),
+            step_order: steps.length + 1,
+            auto_trigger: true,
+            delay_hours: 0,
+            reminder_template: {
+              title: '',
+              priority: 'medium'
+            }
+          }
+        ]);
+      };
+
+      return (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Workflow Steps</h3>
+            <button
+              onClick={addStep}
+              className="px-3 py-1.5 bg-pink-600 text-white rounded-lg"
+            >
+              <Plus className="w-4 h-4 inline mr-1" />
+              Add Step
+            </button>
+          </div>
+
+          <div className="space-y-3">
+            {steps.map((step, index) => (
+              <div key={step.id} className="relative">
+                {/* Connector line */}
+                {index > 0 && (
+                  <div className="absolute left-6 -top-3 w-0.5 h-3 bg-gray-300 dark:bg-gray-600" />
+                )}
+
+                <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border-2 border-gray-200 dark:border-gray-700">
+                  <div className="w-12 h-12 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center text-pink-700 dark:text-pink-300 font-bold flex-shrink-0">
+                    {index + 1}
+                  </div>
+
+                  <div className="flex-1 space-y-3">
+                    <input
+                      type="text"
+                      value={step.reminder_template?.title || ''}
+                      onChange={(e) => {
+                        const updated = [...steps];
+                        updated[index].reminder_template = {
+                          ...updated[index].reminder_template,
+                          title: e.target.value
+                        };
+                        setSteps(updated);
+                      }}
+                      placeholder="Step title..."
+                      className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg"
+                    />
+
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-2 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={step.auto_trigger}
+                          onChange={(e) => {
+                            const updated = [...steps];
+                            updated[index].auto_trigger = e.target.checked;
+                            setSteps(updated);
+                          }}
+                          className="rounded border-gray-300"
+                        />
+                        <GitBranch className="w-4 h-4" />
+                        Auto-trigger
+                      </label>
+
+                      <label className="flex items-center gap-2 text-sm">
+                        <Clock className="w-4 h-4" />
+                        Delay:
+                        <input
+                          type="number"
+                          value={step.delay_hours}
+                          onChange={(e) => {
+                            const updated = [...steps];
+                            updated[index].delay_hours = parseInt(e.target.value) || 0;
+                            setSteps(updated);
+                          }}
+                          className="w-16 px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded"
+                        />
+                        hours
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    ```
+  - **Workflow Templates:**
+    - "Home Move Checklist" (utilities → address change → movers → unpacking)
+    - "Project Launch" (planning → development → testing → deployment)
+    - "Event Planning" (venue → catering → invites → setup)
+    - "Onboarding Process" (paperwork → training → introductions → first project)
+  - **Automation Rules:**
+    - If step 1 complete → Auto-create step 2 after 24 hours
+    - If step snoozed 3 times → Escalate to urgent
+    - If step overdue → Notify workflow creator
+    - If all steps complete → Mark workflow as done
+- **User Benefit:** Streamline complex processes, ensure proper order
+- **Complexity:** Very High (7-10 days)
+- **Premium Feature:** Yes
+
+#### 3. AI-Powered Smart Reminders (Feature #11)
+- **What:** AI suggests optimal reminder times, generates descriptions, auto-categorizes
+- **Why:** Reduce cognitive load, intelligent scheduling
+- **Technical Implementation:**
+  - **APIs:**
+    - OpenAI GPT-4 or Anthropic Claude API
+    - Local pattern analysis (PostgreSQL analytics)
+  - **Database Schema:**
+    ```sql
+    -- Track user reminder patterns
+    CREATE TABLE reminder_patterns (
+      id UUID PRIMARY KEY,
+      user_id UUID REFERENCES users(id),
+      pattern_type TEXT, -- 'completion_time', 'category_frequency', 'priority_accuracy'
+      pattern_data JSONB,
+      confidence_score FLOAT,
+      samples_count INTEGER,
+      last_updated TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    -- AI suggestions history
+    CREATE TABLE ai_reminder_suggestions (
+      id UUID PRIMARY KEY,
+      reminder_id UUID REFERENCES reminders(id),
+      suggestion_type TEXT, -- 'time', 'category', 'priority', 'description'
+      suggested_value JSONB,
+      accepted BOOLEAN,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+    ```
+  - **AI Service:**
+    ```typescript
+    // lib/services/ai-reminders-service.ts
+    import OpenAI from 'openai';
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
+    });
+
+    export const aiRemindersService = {
+      /**
+       * Suggest optimal reminder time based on user patterns
+       */
+      async suggestReminderTime(
+        userId: string,
+        reminderTitle: string,
+        category: string
+      ): Promise<{ time: string; reason: string }[]> {
+        // Get user patterns
+        const patterns = await getUserPatterns(userId);
+
+        const prompt = `Based on these user patterns: ${JSON.stringify(patterns)}
+
+        Suggest 3 optimal times for this reminder:
+        Title: ${reminderTitle}
+        Category: ${category}
+
+        Consider:
+        - User's typical completion times for this category
+        - Day of week patterns
+        - Optimal notification times (not late night/early morning)
+
+        Return JSON array: [{ time: "ISO timestamp", reason: "why this time works" }]`;
+
+        const response = await openai.chat.completions.create({
+          model: 'gpt-4',
+          messages: [{ role: 'user', content: prompt }],
+          response_format: { type: 'json_object' }
+        });
+
+        return JSON.parse(response.choices[0].message.content!).suggestions;
+      },
+
+      /**
+       * Auto-categorize reminder based on title and description
+       */
+      async categorizeReminder(
+        title: string,
+        description?: string
+      ): Promise<string> {
+        const prompt = `Categorize this reminder into one of: bills, health, work, personal, household
+
+        Title: ${title}
+        Description: ${description || 'N/A'}
+
+        Return only the category name.`;
+
+        const response = await openai.chat.completions.create({
+          model: 'gpt-4',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 20
+        });
+
+        return response.choices[0].message.content!.trim().toLowerCase();
+      },
+
+      /**
+       * Generate smart description from brief title
+       */
+      async expandDescription(title: string): Promise<string> {
+        const prompt = `Create a helpful, brief description for this reminder:
+        Title: ${title}
+
+        Write 1-2 sentences with actionable details. Be concise and helpful.`;
+
+        const response = await openai.chat.completions.create({
+          model: 'gpt-4',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 100
+        });
+
+        return response.choices[0].message.content!.trim();
+      },
+
+      /**
+       * Analyze reminder patterns and suggest improvements
+       */
+      async analyzeReminderEffectiveness(userId: string): Promise<{
+        insights: string[];
+        recommendations: string[];
+      }> {
+        const supabase = createClient();
+
+        // Get last 90 days of reminders
+        const { data: reminders } = await supabase
+          .from('reminders')
+          .select('*')
+          .eq('created_by', userId)
+          .gte('created_at', new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString());
+
+        const stats = {
+          total: reminders?.length || 0,
+          completed: reminders?.filter(r => r.status === 'completed').length || 0,
+          snoozed: reminders?.filter(r => r.status === 'snoozed').length || 0,
+          overdue: reminders?.filter(r => {
+            return r.reminder_time && new Date(r.reminder_time) < new Date() && r.status === 'active';
+          }).length || 0,
+          by_category: {} as Record<string, number>
+        };
+
+        const prompt = `Analyze these reminder statistics and provide insights:
+        ${JSON.stringify(stats)}
+
+        Provide:
+        1. 3 key insights about reminder usage patterns
+        2. 3 actionable recommendations to improve reminder effectiveness
+
+        Format as JSON: { insights: string[], recommendations: string[] }`;
+
+        const response = await openai.chat.completions.create({
+          model: 'gpt-4',
+          messages: [{ role: 'user', content: prompt }],
+          response_format: { type: 'json_object' }
+        });
+
+        return JSON.parse(response.choices[0].message.content!);
+      }
+    };
+    ```
+  - **UI Integration:**
+    - "✨ Smart Suggest" button in reminder creation modal
+    - Auto-categorization on blur of title field
+    - AI description preview with "Use this" button
+    - Analytics dashboard showing AI insights
+- **Features:**
+  - Smart time suggestions based on completion patterns
+  - Auto-categorization from title/description
+  - Description generation from brief titles
+  - Priority prediction based on keywords
+  - Effectiveness analytics and recommendations
+  - Natural language parsing ("Remind me to call mom tomorrow at 3pm")
+- **User Benefit:** Faster reminder creation, smarter scheduling, actionable insights
+- **Complexity:** Very High (7-10 days + API costs)
+- **Estimated Cost:** $0.02-0.10 per suggestion (OpenAI GPT-4)
+- **Premium Feature:** Yes
+
+#### 4. Recurring Reminder Exceptions
+- **What:** Edit single instance of recurring reminder without breaking pattern
+- **Why:** Handle schedule changes flexibly
+- **Implementation:** Similar to calendar recurring exceptions (see Calendar section)
+- **Complexity:** Medium (3-4 days)
+
+#### 5. Reminder Analytics Dashboard (Premium)
+- **What:** Insights into reminder patterns, completion rates, effectiveness
+- **Features:**
+  - Completion rate by category
+  - Average time to completion
+  - Most snoozed reminders (identify problematic tasks)
+  - Peak reminder times heatmap
+  - Trend analysis over time
+  - AI-generated insights
+- **Complexity:** Medium (3-5 days)
+- **Premium Feature:** Yes
+
+---
+
+## 📊 Reminders Implementation Priority
+
+| Feature | Priority | Effort | Impact | Premium? | Dependencies |
+|---------|----------|--------|--------|----------|--------------|
+| Location-Based Reminders | Medium | Very High | High | Yes | Google Maps API, Geolocation |
+| Dependencies & Workflows | Low | Very High | Very High | Yes | Complex DB schema |
+| AI Smart Suggestions | Low | Very High | High | Yes | OpenAI/Claude API |
+| Recurring Exceptions | Medium | Medium | Medium | No | DB schema update |
+| Analytics Dashboard | Low | Medium | Medium | Yes | Data aggregation |
+
+---
+
+## 🎯 Reminders Phase 2 Rollout Plan
+
+**Q1 2026: Mobile & Location**
+- Location-based reminders
+- Geofencing setup and testing
+- Privacy controls and permissions
+- Mobile notification improvements
+
+**Q2 2026: Workflows & Automation**
+- Dependencies & workflow system
+- Workflow templates
+- Auto-triggering and delays
+- Workflow analytics
+
+**Q3 2026: AI Intelligence**
+- Smart time suggestions (GPT-4)
+- Auto-categorization
+- Description generation
+- Natural language parsing
+
+**Q4 2026: Analytics & Optimization**
+- Reminder effectiveness dashboard
+- AI-powered insights
+- Pattern recognition
+- Optimization recommendations
+
+---
+
+## 💡 Additional Reminders Ideas (Brainstorm)
+
+- **Voice Reminders:** Create reminders via voice command
+- **Email to Reminder:** Forward emails to create reminders
+- **Smart Home Integration:** Trigger reminders via Alexa/Google Home
+- **Reminder Sharing:** Send reminders to other space members
+- **Reminder Groups:** Bundle related reminders (e.g., "Moving checklist")
+- **Follow-up Reminders:** Auto-create follow-up if not completed
+- **Reminder Insights Widget:** Dashboard widget showing upcoming/overdue
+- **Cross-Feature Smart Links:** "Create task from reminder" with one click
+- **Reminder Heatmap:** Visual calendar showing reminder density
+- **Habit Tracking Integration:** Convert recurring reminders to habits
+- **Weather-Aware Reminders:** Suggest reschedule if outdoor reminder + rain
+- **Commute-Aware Timing:** Adjust reminder times based on traffic/commute
+
+---
+
 *Last Updated: January 14, 2025*
-*Status: Phase 1 Completed - All core calendar features implemented*
+*Status: Phase 1 Completed - Core reminders with @mentions and attachments implemented*
