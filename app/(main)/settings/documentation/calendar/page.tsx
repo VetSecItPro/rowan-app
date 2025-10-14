@@ -268,6 +268,24 @@ const guideSections: GuideSection[] = [
         href: '#event-details',
       },
       {
+        title: 'Event Comments & Threading',
+        description: 'Add comments, reply to others, mention users, and collaborate on events',
+        readTime: '5 min read',
+        href: '#comments-threading',
+      },
+      {
+        title: 'Weather Integration',
+        description: 'See weather forecasts for events with automatic warnings for outdoor activities',
+        readTime: '4 min read',
+        href: '#weather',
+      },
+      {
+        title: 'Conflict Detection',
+        description: 'Automatic detection of overlapping events with visual indicators and warnings',
+        readTime: '4 min read',
+        href: '#conflict-detection',
+      },
+      {
         title: 'Shopping List Integration',
         description: 'Link shopping lists to events for parties, dinners, and gatherings',
         readTime: '4 min read',
@@ -286,6 +304,12 @@ const guideSections: GuideSection[] = [
         href: '#status-management',
       },
       {
+        title: 'Timezone Support',
+        description: 'Set custom timezones for events and see times in your local timezone',
+        readTime: '3 min read',
+        href: '#timezone',
+      },
+      {
         title: 'Date & Time Validation',
         description: 'Automatic validation prevents end times before start times',
         readTime: '2 min read',
@@ -296,6 +320,12 @@ const guideSections: GuideSection[] = [
         description: 'See updates instantly when space members create or modify events',
         readTime: '3 min read',
         href: '#real-time',
+      },
+      {
+        title: 'View Mode Persistence',
+        description: 'Calendar remembers your preferred view mode per space automatically',
+        readTime: '2 min read',
+        href: '#view-persistence',
       },
     ],
   },
@@ -437,6 +467,22 @@ export default function CalendarDocumentationPage() {
                   <div className="flex items-start gap-2">
                     <ThumbsUp className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <span><strong>Vote on Times</strong> - Preferred, Available, or Unavailable</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <MessageSquare className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Comments & Threading</strong> - Collaborate with @mentions and replies</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Sun className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Weather Forecasts</strong> - Auto warnings for outdoor events</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Target className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Conflict Detection</strong> - Visual indicators for overlaps</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Paperclip className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>File Attachments</strong> - Add images and documents to events</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Palette className="w-4 h-4 mt-0.5 flex-shrink-0" />
@@ -1201,7 +1247,249 @@ export default function CalendarDocumentationPage() {
             </a>
           </section>
 
-          {/* Add remaining sections here - let me know if you want me to continue with all 40+ sections */}
+          <section id="comments-threading" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <MessageSquare className="w-8 h-8 text-blue-500" />
+              Event Comments & Threading
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                Collaborate on events with threaded comments, @mentions, and replies. Perfect for coordinating details, asking questions, or discussing changes with space members.
+              </p>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Key Features</h3>
+              <div className="grid gap-4 mb-6">
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">💬 Threaded Comments</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Reply to any comment to create conversation threads. Keep discussions organized and easy to follow.</p>
+                </div>
+
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">@ Mentions</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Type @ to mention space members. They'll get notified and can respond quickly to your questions.</p>
+                </div>
+
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">✏️ Edit & Delete</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Edit your comments anytime or delete them if needed. Edited comments are marked with an indicator.</p>
+                </div>
+
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🔔 Real-Time Updates</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">See new comments instantly when other space members add them. No refresh needed!</p>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">How to Use</h3>
+              <ol className="space-y-3 text-gray-700 dark:text-gray-300 mb-6">
+                <li><strong>1. Open event details:</strong> Click any event to open the detail modal</li>
+                <li><strong>2. Navigate to Comments tab:</strong> Click the Comments tab at the top</li>
+                <li><strong>3. Write your comment:</strong> Type in the text box at the bottom</li>
+                <li><strong>4. Mention someone:</strong> Type @ and select a space member</li>
+                <li><strong>5. Reply to comments:</strong> Click Reply on any comment to create a thread</li>
+                <li><strong>6. Edit or delete:</strong> Use the edit/delete buttons on your own comments</li>
+              </ol>
+
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-emerald-900 dark:text-emerald-100">
+                    <strong>Household Tip:</strong> Use comments for event coordination! "Can someone pick up the cake?" "@John can you bring the decorations?" "Should we move this to 6pm instead?" Perfect for family gatherings and parties!
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="weather" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <Sun className="w-8 h-8 text-orange-500" />
+              Weather Integration
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                See weather forecasts for events with locations. Get automatic warnings for outdoor activities when poor weather is expected, so you can plan accordingly or reschedule.
+              </p>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Key Features</h3>
+              <div className="grid gap-4 mb-6">
+                <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🌤️ 5-Day Forecasts</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">See temperature, conditions, humidity, and wind speed for events with locations. Powered by OpenWeatherMap.</p>
+                </div>
+
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">⚠️ Smart Warnings</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Automatic alerts for outdoor events when storms, rain, snow, extreme heat/cold, or high winds are forecasted.</p>
+                </div>
+
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🎯 Outdoor Detection</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Auto-detects outdoor events by location (park, beach, hike, picnic, etc.) and shows weather warnings.</p>
+                </div>
+
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">💡 Recommendations</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Get helpful suggestions: "Bring umbrellas", "Consider rescheduling", "Stay hydrated", "Dress warmly".</p>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Where Weather Displays</h3>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300 mb-6">
+                <li><strong>• Event Detail Modal:</strong> Full weather card with forecast details and alerts</li>
+                <li><strong>• Agenda View:</strong> Compact weather badges (emoji + temp) inline with events</li>
+                <li><strong>• Weather automatically loads:</strong> When an event has a location set</li>
+              </ul>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Setup Required</h3>
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-4 border border-yellow-200 dark:border-yellow-800 mb-6">
+                <div className="flex items-start gap-2">
+                  <Info className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-yellow-900 dark:text-yellow-100">
+                    <strong>API Key Required:</strong> Sign up for a free OpenWeatherMap API key at openweathermap.org/api (1000 calls/day free). Add NEXT_PUBLIC_OPENWEATHER_API_KEY to your .env.local file.
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-emerald-900 dark:text-emerald-100">
+                    <strong>Household Tip:</strong> Perfect for outdoor family events! Birthday parties at the park, weekend hikes, beach trips, or backyard BBQs. Get storm warnings 24-48 hours ahead so you can move indoors or reschedule!
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="conflict-detection" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <Target className="w-8 h-8 text-red-500" />
+              Conflict Detection
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                Rowan automatically detects overlapping events, travel time conflicts, and back-to-back scheduling issues. Get warnings with severity levels and smart suggestions for resolution.
+              </p>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Types of Conflicts</h3>
+              <div className="grid gap-4 mb-6">
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🔴 Time Overlaps (High Severity)</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Two events scheduled at the exact same time. Can't physically be in two places at once!</p>
+                </div>
+
+                <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🟠 Travel Time Issues (Medium Severity)</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Not enough time to travel between locations. "Doctor at 2pm, Meeting at 2:30pm across town" = warning.</p>
+                </div>
+
+                <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🟡 Back-to-Back Events (Low Severity)</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Events scheduled with no buffer time. You might want 15-30 minutes between for breaks or transitions.</p>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Visual Indicators</h3>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300 mb-6">
+                <li><strong>• Purple shading:</strong> Overlapping events shown side-by-side with distinct purple shades</li>
+                <li><strong>• Warning badges:</strong> Red/orange/yellow icons on events with conflicts</li>
+                <li><strong>• Conflict list:</strong> Click to see full details of all conflicts for an event</li>
+              </ul>
+
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-blue-900 dark:text-blue-100">
+                    <strong>Power User Tip:</strong> Rowan warns about conflicts but doesn't block them. Sometimes overlaps are intentional (optional events, backup plans, different people in household). You stay in control!
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="timezone" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <Clock className="w-8 h-8 text-indigo-500" />
+              Timezone Support
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                Set custom timezones for events and Rowan handles the conversion. Perfect for remote work, coordinating with family in different time zones, or travel planning.
+              </p>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">How It Works</h3>
+              <ol className="space-y-3 text-gray-700 dark:text-gray-300 mb-6">
+                <li><strong>1. Set event timezone:</strong> When creating/editing an event, set the timezone (defaults to UTC)</li>
+                <li><strong>2. View in your timezone:</strong> Events display in your local timezone automatically</li>
+                <li><strong>3. Database stores UTC:</strong> All times stored in UTC for accuracy</li>
+                <li><strong>4. Conversion handled:</strong> Rowan converts times when displaying events</li>
+              </ol>
+
+              <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4 border border-purple-200 dark:border-purple-800">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-purple-900 dark:text-purple-100">
+                    <strong>Use Case:</strong> Grandparents in different timezone? Set their timezone on family video call events. You'll see "3pm" while they see "6pm" - everyone views in their local time!
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="view-persistence" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <Eye className="w-8 h-8 text-teal-500" />
+              View Mode Persistence
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                Rowan remembers your preferred calendar view for each space. Switch to Agenda view once, and it stays in Agenda view every time you return!
+              </p>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">How It Works</h3>
+              <div className="grid gap-4 mb-6">
+                <div className="p-4 bg-teal-50 dark:bg-teal-900/20 rounded-lg border border-teal-200 dark:border-teal-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">💾 Automatic Saving</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Every time you switch views (Day/Week/Month/Agenda/Timeline/Proposal), Rowan saves your preference in localStorage.</p>
+                </div>
+
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🏠 Per-Space Memory</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Each space remembers its own view. "Family" space can be Agenda while "Work" space stays in Week view.</p>
+                </div>
+
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🔄 Instant Restore</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">When you navigate to Calendar, your last-used view loads automatically. No need to switch every time!</p>
+                </div>
+              </div>
+
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-emerald-900 dark:text-emerald-100">
+                    <strong>Quality of Life:</strong> Small feature, huge impact! Set your preferred view once and forget about it. Rowan adapts to YOUR workflow, not the other way around.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
 
           <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
             <div className="text-center">
