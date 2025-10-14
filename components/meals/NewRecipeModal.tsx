@@ -637,7 +637,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g., Spaghetti Bolognese"
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                  className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -648,7 +648,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={2}
                   placeholder="Brief description of the recipe"
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white resize-none"
+                  className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white resize-none"
                 />
               </div>
 
@@ -659,7 +659,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                     type="number"
                     value={formData.prep_time || ''}
                     onChange={(e) => setFormData({ ...formData, prep_time: e.target.value ? parseInt(e.target.value) : undefined })}
-                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                   />
                 </div>
                 <div>
@@ -668,7 +668,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                     type="number"
                     value={formData.cook_time || ''}
                     onChange={(e) => setFormData({ ...formData, cook_time: e.target.value ? parseInt(e.target.value) : undefined })}
-                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                   />
                 </div>
                 <div>
@@ -677,7 +677,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                     type="number"
                     value={formData.servings || ''}
                     onChange={(e) => setFormData({ ...formData, servings: e.target.value ? parseInt(e.target.value) : undefined })}
-                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
@@ -731,7 +731,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
                   rows={6}
                   placeholder="Step-by-step cooking instructions..."
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white resize-none"
+                  className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white resize-none"
                 />
               </div>
 
