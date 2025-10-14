@@ -65,11 +65,11 @@ export function EventDetailModal({ isOpen, onClose, event }: EventDetailModalPro
       onClick={onClose}
     >
       <div
-        className="bg-gray-50 dark:bg-gray-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
+        className="bg-gray-50 dark:bg-gray-800 rounded-2xl max-w-4xl w-full h-[90vh] overflow-hidden shadow-2xl flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className={`bg-gradient-to-r ${categoryConfig.gradient} text-white p-6`}>
+        {/* Header - Fixed */}
+        <div className={`bg-gradient-to-r ${categoryConfig.gradient} text-white p-6 flex-shrink-0`}>
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
@@ -124,8 +124,8 @@ export function EventDetailModal({ isOpen, onClose, event }: EventDetailModalPro
           )}
         </div>
 
-        {/* Tab Navigation */}
-        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6">
+        {/* Tab Navigation - Fixed */}
+        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 flex-shrink-0">
           <div className="flex gap-4">
             <button
               onClick={() => setActiveTab('comments')}
@@ -156,8 +156,8 @@ export function EventDetailModal({ isOpen, onClose, event }: EventDetailModalPro
           </div>
         </div>
 
-        {/* Tab Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        {/* Tab Content - Scrollable with fixed height */}
+        <div className="flex-1 overflow-y-auto p-6 min-h-0">
           {activeTab === 'comments' ? (
             <EventCommentThread eventId={event.id} spaceId={event.space_id} />
           ) : (
