@@ -1,12 +1,15 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, List, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, List, ChevronLeft, ChevronRight, Check, Users } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { EventCard } from '@/components/calendar/EventCard';
 import { NewEventModal } from '@/components/calendar/NewEventModal';
+import { EventDetailModal } from '@/components/calendar/EventDetailModal';
+import { EventProposalModal } from '@/components/calendar/EventProposalModal';
 import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
 import { calendarService, CalendarEvent, CreateEventInput } from '@/lib/services/calendar-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
@@ -27,6 +30,14 @@ export default function CalendarPage() {
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [statusFilter, setStatusFilter] = useState<'all' | 'not-started' | 'in-progress' | 'completed'>('all');
   const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, any>>({});
+  const [detailEvent, setDetailEvent] = useState<CalendarEvent | null>(null);
+  const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
+
+  // Initialize realtime connection
+  const { events: realtimeEvents, isConnected: realtimeConnected } = useCalendarRealtime(
+    currentSpace?.id,
+    user?.id
+  );
 
   // Memoize stats calculations
   const stats = useMemo(() => {
@@ -277,6 +288,24 @@ export default function CalendarPage() {
     loadEvents();
   }, [loadEvents]);
 
+  // Merge realtime events with local events
+  useEffect(() => {
+    if (realtimeEvents.length > 0) {
+      setEvents(prevEvents => {
+        const eventMap = new Map(prevEvents.map(e => [e.id, e]));
+        realtimeEvents.forEach(rtEvent => {
+          eventMap.set(rtEvent.id, rtEvent);
+        });
+        return Array.from(eventMap.values());
+      });
+    }
+  }, [realtimeEvents]);
+
+  // Handler for viewing event details
+  const handleViewDetails = useCallback((event: CalendarEvent) => {
+    setDetailEvent(event);
+  }, []);
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Calendar' }]}>
       <div className="p-4 sm:p-8">
@@ -288,9 +317,17 @@ export default function CalendarPage() {
                 <CalendarIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-calendar bg-clip-text text-transparent">
-                  Calendar
-                </h1>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-calendar bg-clip-text text-transparent">
+                    Calendar
+                  </h1>
+                  {realtimeConnected && (
+                    <div className="flex items-center gap-1.5 px-2 py-1 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-full">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                      <span className="text-xs font-medium text-green-700 dark:text-green-300">Live</span>
+                    </div>
+                  )}
+                </div>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">
                   Shared events and schedules
                 </p>
@@ -322,6 +359,14 @@ export default function CalendarPage() {
                   <span className="text-sm">List</span>
                 </button>
               </div>
+              <button
+                onClick={() => setIsProposalModalOpen(true)}
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+              >
+                <Users className="w-5 h-5" />
+                <span className="hidden sm:inline">Propose Event</span>
+                <span className="sm:hidden">Propose</span>
+              </button>
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="px-4 sm:px-6 py-2 sm:py-3 shimmer-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
@@ -667,6 +712,7 @@ export default function CalendarPage() {
                         onEdit={handleEditEvent}
                         onDelete={handleDeleteEvent}
                         onStatusChange={handleStatusChange}
+                        onViewDetails={handleViewDetails}
                         linkedShoppingList={linkedShoppingLists[event.id]}
                       />
                     ))}
@@ -687,6 +733,28 @@ export default function CalendarPage() {
           onSave={handleCreateEvent}
           editEvent={editingEvent}
           spaceId={currentSpace.id}
+        />
+      )}
+
+      {/* Event Detail Modal */}
+      {detailEvent && (
+        <EventDetailModal
+          isOpen={!!detailEvent}
+          onClose={() => setDetailEvent(null)}
+          event={detailEvent}
+        />
+      )}
+
+      {/* Event Proposal Modal */}
+      {currentSpace && (
+        <EventProposalModal
+          isOpen={isProposalModalOpen}
+          onClose={() => setIsProposalModalOpen(false)}
+          spaceId={currentSpace.id}
+          onProposalCreated={() => {
+            setIsProposalModalOpen(false);
+            loadEvents();
+          }}
         />
       )}
     </FeatureLayout>
