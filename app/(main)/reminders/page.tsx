@@ -1,17 +1,19 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown, TrendingUp } from 'lucide-react';
+import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown, TrendingUp, Sparkles, Zap } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ReminderCard } from '@/components/reminders/ReminderCard';
 import { NewReminderModal } from '@/components/reminders/NewReminderModal';
+import { BulkActionsToolbar } from '@/components/reminders/BulkActionsToolbar';
 import GuidedReminderCreation from '@/components/guided/GuidedReminderCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { remindersService, Reminder, CreateReminderInput } from '@/lib/services/reminders-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
+import { reminderTemplatesService, ReminderTemplate } from '@/lib/services/reminder-templates-service';
 
-export default function RemindersPage() {
+export default function RemindersPage(): JSX.Element {
   const { currentSpace, user } = useAuth();
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,8 +21,12 @@ export default function RemindersPage() {
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [assignmentFilter, setAssignmentFilter] = useState('all');
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
+  const [popularTemplates, setPopularTemplates] = useState<ReminderTemplate[]>([]);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedReminderIds, setSelectedReminderIds] = useState<Set<string>>(new Set());
 
   // Memoized filtered reminders - expensive filtering operation
   const filteredReminders = useMemo(() => {
@@ -29,6 +35,15 @@ export default function RemindersPage() {
     // Status filter
     if (statusFilter !== 'all') {
       filtered = filtered.filter(r => r.status === statusFilter);
+    }
+
+    // Assignment filter
+    if (assignmentFilter !== 'all' && user) {
+      if (assignmentFilter === 'mine') {
+        filtered = filtered.filter(r => r.assigned_to === user.id);
+      } else if (assignmentFilter === 'unassigned') {
+        filtered = filtered.filter(r => !r.assigned_to);
+      }
     }
 
     // Search filter
@@ -42,7 +57,7 @@ export default function RemindersPage() {
     }
 
     return filtered;
-  }, [reminders, statusFilter, searchQuery]);
+  }, [reminders, statusFilter, assignmentFilter, searchQuery, user]);
 
   // Memoized stats calculation - expensive computation
   const stats = useMemo(() => {
@@ -70,13 +85,15 @@ export default function RemindersPage() {
 
     try {
       setLoading(true);
-      const [remindersData, statsData, userProgressResult] = await Promise.all([
+      const [remindersData, statsData, userProgressResult, templatesData] = await Promise.all([
         remindersService.getReminders(currentSpace.id),
         remindersService.getReminderStats(currentSpace.id),
         getUserProgress(user.id),
+        reminderTemplatesService.getPopularTemplates(currentSpace.id, 5),
       ]);
 
       setReminders(remindersData);
+      setPopularTemplates(templatesData);
 
       // Check if user has completed the guided reminder flow
       const userProgress = userProgressResult.success ? userProgressResult.data : null;
@@ -202,6 +219,71 @@ export default function RemindersPage() {
     }
   }, [user]);
 
+  const handleQuickTemplateCreate = useCallback(async (template: ReminderTemplate) => {
+    if (!currentSpace || !user) return;
+
+    try {
+      // Apply template with defaults
+      const reminderData = reminderTemplatesService.applyTemplate(template, {});
+
+      // Create reminder
+      await remindersService.createReminder({
+        space_id: currentSpace.id,
+        title: reminderData.title,
+        description: reminderData.description,
+        emoji: reminderData.emoji,
+        category: reminderData.category as any,
+        priority: reminderData.priority as any,
+        reminder_time: reminderData.reminder_time,
+        repeat_pattern: reminderData.repeat_pattern,
+        repeat_days: reminderData.repeat_days,
+        status: 'active',
+      });
+
+      // Increment template usage
+      await reminderTemplatesService.incrementUsage(template.id);
+
+      // Reload reminders
+      loadReminders();
+    } catch (error) {
+      console.error('Failed to create reminder from template:', error);
+    }
+  }, [currentSpace, user, loadReminders]);
+
+  const handleSelectionChange = useCallback((reminderId: string, selected: boolean) => {
+    setSelectedReminderIds((prev) => {
+      const newSet = new Set(prev);
+      if (selected) {
+        newSet.add(reminderId);
+      } else {
+        newSet.delete(reminderId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const handleSelectAll = useCallback(() => {
+    if (selectedReminderIds.size === filteredReminders.length) {
+      setSelectedReminderIds(new Set());
+    } else {
+      setSelectedReminderIds(new Set(filteredReminders.map((r) => r.id)));
+    }
+  }, [filteredReminders, selectedReminderIds.size]);
+
+  const handleClearSelection = useCallback(() => {
+    setSelectedReminderIds(new Set());
+    setSelectionMode(false);
+  }, []);
+
+  const handleBulkOperationComplete = useCallback(() => {
+    setSelectedReminderIds(new Set());
+    loadReminders();
+  }, [loadReminders]);
+
+  const selectedReminders = useMemo(() => {
+    return reminders.filter((r) => selectedReminderIds.has(r.id));
+  }, [reminders, selectedReminderIds]);
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Reminders' }]}>
       <div className="p-4 sm:p-8">
@@ -222,13 +304,33 @@ export default function RemindersPage() {
               </div>
             </div>
 
-            <button
-              onClick={handleOpenModal}
-              className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 shimmer-reminders text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              New Reminder
-            </button>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              {!selectionMode ? (
+                <>
+                  <button
+                    onClick={() => setSelectionMode(true)}
+                    className="px-4 py-2 sm:px-6 sm:py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors shadow-lg flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle2 className="w-5 h-5" />
+                    <span className="hidden sm:inline">Select</span>
+                  </button>
+                  <button
+                    onClick={handleOpenModal}
+                    className="flex-1 sm:flex-none px-4 py-2 sm:px-6 sm:py-3 shimmer-reminders text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                  >
+                    <Plus className="w-5 h-5" />
+                    New Reminder
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={handleClearSelection}
+                  className="w-full px-4 py-2 sm:px-6 sm:py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors shadow-lg flex items-center justify-center gap-2"
+                >
+                  Cancel Selection
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Guided Creation - MOVED TO TOP */}
@@ -327,6 +429,46 @@ export default function RemindersPage() {
           </div>
           )}
 
+          {/* Popular Templates Quick Actions */}
+          {!showGuidedFlow && popularTemplates.length > 0 && (
+            <div className="bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900/10 dark:to-purple-900/10 border border-pink-200 dark:border-pink-800 rounded-xl p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Quick Templates
+                </h3>
+                <span className="px-2 py-0.5 bg-pink-200 dark:bg-pink-800 text-pink-700 dark:text-pink-300 text-xs font-medium rounded-full">
+                  Popular
+                </span>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Create common reminders with one click
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                {popularTemplates.map((template) => (
+                  <button
+                    key={template.id}
+                    onClick={() => handleQuickTemplateCreate(template)}
+                    className="flex flex-col items-start p-4 bg-white dark:bg-gray-800 border border-pink-200 dark:border-pink-800 rounded-lg hover:shadow-lg hover:scale-105 transition-all text-left group"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-2xl">{template.emoji}</span>
+                      <Zap className="w-4 h-4 text-pink-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+                      {template.name}
+                    </h4>
+                    {template.description && (
+                      <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+                        {template.description}
+                      </p>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Search & Filter Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
@@ -346,22 +488,65 @@ export default function RemindersPage() {
               </div>
           )}
 
-              {/* Reminders List - Only show when NOT in guided flow */}
-              {!showGuidedFlow && (
-              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            {/* Header with Month Badge and Status Filter */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-              <div className="flex items-center gap-3">
+          {/* Reminders List - Only show when NOT in guided flow */}
+          {!showGuidedFlow && (
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            {/* Header with Month Badge and Filters */}
+            <div className="flex flex-col items-start gap-4 mb-6">
+              <div className="flex items-center gap-3 flex-wrap">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                   All Reminders ({filteredReminders.length})
                 </h2>
                 <span className="px-3 py-1 bg-pink-100 dark:bg-pink-900/30 border border-pink-300 dark:border-pink-700 text-pink-700 dark:text-pink-300 text-sm font-medium rounded-full">
                   {format(new Date(), 'MMM yyyy')}
                 </span>
+                {selectionMode && filteredReminders.length > 0 && (
+                  <button
+                    onClick={handleSelectAll}
+                    className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 text-sm font-medium rounded-full hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                  >
+                    {selectedReminderIds.size === filteredReminders.length ? 'Deselect All' : 'Select All'}
+                  </button>
+                )}
               </div>
 
-              {/* Status Filter - Segmented Buttons */}
-              <div className="bg-gray-50 dark:bg-gray-900 border-2 border-pink-200 dark:border-pink-700 rounded-lg p-1 flex gap-1 w-fit">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
+                {/* Assignment Filter */}
+                <div className="bg-gray-50 dark:bg-gray-900 border-2 border-blue-200 dark:border-blue-700 rounded-lg p-1 flex gap-1 w-fit">
+                  <button
+                    onClick={() => setAssignmentFilter('all')}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                      assignmentFilter === 'all'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                    }`}
+                  >
+                    All
+                  </button>
+                  <button
+                    onClick={() => setAssignmentFilter('mine')}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                      assignmentFilter === 'mine'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                    }`}
+                  >
+                    My Reminders
+                  </button>
+                  <button
+                    onClick={() => setAssignmentFilter('unassigned')}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
+                      assignmentFilter === 'unassigned'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                    }`}
+                  >
+                    Unassigned
+                  </button>
+                </div>
+
+                {/* Status Filter - Segmented Buttons */}
+                <div className="bg-gray-50 dark:bg-gray-900 border-2 border-pink-200 dark:border-pink-700 rounded-lg p-1 flex gap-1 w-fit">
                 <button
                   onClick={() => setStatusFilter('all')}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
@@ -403,6 +588,7 @@ export default function RemindersPage() {
                   Completed
                 </button>
               </div>
+            </div>
             </div>
 
             {loading ? (
@@ -450,6 +636,9 @@ export default function RemindersPage() {
                     onEdit={handleEditReminder}
                     onDelete={handleDeleteReminder}
                     onSnooze={handleSnoozeReminder}
+                    selectionMode={selectionMode}
+                    selected={selectedReminderIds.has(reminder.id)}
+                    onSelectionChange={handleSelectionChange}
                   />
                 ))}
               </div>
@@ -487,6 +676,17 @@ export default function RemindersPage() {
             </div>
           </div>
         )
+      )}
+
+      {/* Bulk Actions Toolbar */}
+      {currentSpace && (
+        <BulkActionsToolbar
+          selectedCount={selectedReminderIds.size}
+          selectedReminders={selectedReminders}
+          onClearSelection={handleClearSelection}
+          onComplete={handleBulkOperationComplete}
+          spaceId={currentSpace.id}
+        />
       )}
     </FeatureLayout>
   );
