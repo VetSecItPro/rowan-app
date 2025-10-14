@@ -460,7 +460,7 @@ export default function CalendarPage() {
                   else if (activeAction === 'propose') setIsProposalModalOpen(true);
                   else setIsModalOpen(true);
                 }}
-                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 w-full sm:w-auto sm:min-w-[160px]"
+                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 w-full sm:w-[180px]"
                 title={
                   activeAction === 'quick-add' ? 'Quick add with natural language (Q)' :
                   activeAction === 'templates' ? 'Create from template' :
