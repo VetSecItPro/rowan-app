@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { format, parseISO, isSameDay, getHours, getMinutes, differenceInMinutes, startOfWeek, endOfWeek, eachDayOfInterval, isToday } from 'date-fns';
 import { Check, Eye, Edit, MapPin, Clock } from 'lucide-react';
 import type { CalendarEvent } from '@/lib/types';
+import { WeatherBadge } from './WeatherBadge';
 
 interface EnhancedWeekViewProps {
   date: Date;
@@ -139,8 +140,22 @@ export function EnhancedWeekView({
     setDraggedEvent(null);
   };
 
+  // Get first event with location for weather (across the whole week)
+  const firstEventWithLocation = weekDays.flatMap(day => getEventsForDay(day)).find(e => e.location);
+
   return (
     <div className="relative bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-x-auto">
+      {/* Weather Badge Header */}
+      {firstEventWithLocation && (
+        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+          <WeatherBadge
+            eventTime={firstEventWithLocation.start_time}
+            location={firstEventWithLocation.location}
+            compact={true}
+          />
+        </div>
+      )}
+
       {/* Header with day names */}
       <div className="flex border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900 z-30">
         {/* Time column spacer */}

@@ -814,6 +814,28 @@ export default function CalendarPage() {
               ) : viewMode === 'month' ? (
                 /* Calendar View */
                 <div>
+                  {/* Weather Badge Header */}
+                  {(() => {
+                    // Find first event with location in the current month
+                    const firstEventWithLocation = filteredEvents.find(e => {
+                      const eventDate = parseISO(e.start_time);
+                      return isSameMonth(eventDate, currentMonth) && e.location;
+                    });
+
+                    if (firstEventWithLocation) {
+                      return (
+                        <div className="px-4 py-3 mb-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                          <WeatherBadge
+                            eventTime={firstEventWithLocation.start_time}
+                            location={firstEventWithLocation.location}
+                            compact={true}
+                          />
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+
                   {/* Month Navigation */}
                   <div className="flex items-center justify-center mb-4 sm:mb-6">
                     <button

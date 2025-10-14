@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { format, parseISO, isSameDay, getHours, getMinutes, differenceInMinutes } from 'date-fns';
 import { Check, Eye, Edit, MapPin, Clock } from 'lucide-react';
 import type { CalendarEvent } from '@/lib/types';
+import { WeatherBadge } from './WeatherBadge';
 
 interface EnhancedDayViewProps {
   date: Date;
@@ -127,8 +128,22 @@ export function EnhancedDayView({
     social: { icon: '🎉', label: 'Social' },
   };
 
+  // Get first event with location for weather
+  const firstEventWithLocation = dayEvents.find(e => e.location);
+
   return (
     <div className="relative bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+      {/* Weather Badge Header */}
+      {firstEventWithLocation && (
+        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+          <WeatherBadge
+            eventTime={firstEventWithLocation.start_time}
+            location={firstEventWithLocation.location}
+            compact={true}
+          />
+        </div>
+      )}
+
       {/* Time column + Events container */}
       <div className="flex">
         {/* Time labels */}
