@@ -151,9 +151,9 @@ export function EventDetailModal({ isOpen, onClose, event }: EventDetailModalPro
         {/* Tab Content */}
         <div className="flex-1 overflow-y-auto p-6">
           {activeTab === 'comments' ? (
-            <EventCommentThread eventId={event.id} />
+            <EventCommentThread eventId={event.id} spaceId={event.space_id} />
           ) : (
-            <AttachmentGallery eventId={event.id} canUpload={true} canDelete={true} />
+            <AttachmentGallery eventId={event.id} spaceId={event.space_id} canUpload={true} canDelete={true} />
           )}
         </div>
       </div>

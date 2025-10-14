@@ -7,11 +7,12 @@ import { useAuth } from '@/lib/contexts/auth-context';
 
 interface AttachmentGalleryProps {
   eventId: string;
+  spaceId: string;
   canUpload?: boolean;
   canDelete?: boolean;
 }
 
-export function AttachmentGallery({ eventId, canUpload = true, canDelete = true }: AttachmentGalleryProps) {
+export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelete = true }: AttachmentGalleryProps) {
   const { user } = useAuth();
   const [attachments, setAttachments] = useState<EventAttachment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,6 +58,7 @@ export function AttachmentGallery({ eventId, canUpload = true, canDelete = true 
       for (const file of files) {
         await eventAttachmentsService.uploadAttachment({
           event_id: eventId,
+          space_id: spaceId,
           file
         });
       }
