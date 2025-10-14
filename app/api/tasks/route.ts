@@ -5,6 +5,8 @@ import { ratelimit } from '@/lib/ratelimit';
 import { verifySpaceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { createTaskSchema } from '@/lib/validations/task-schemas';
+import { ZodError } from 'zod';
 
 /**
  * GET /api/tasks
@@ -137,21 +139,34 @@ export async function POST(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(session.user);
 
-    // Parse request body
+    // Parse and validate request body with Zod
     const body = await req.json();
-    const { space_id, title } = body;
 
-    // Validate required fields
-    if (!space_id || !title) {
-      return NextResponse.json(
-        { error: 'space_id and title are required' },
-        { status: 400 }
-      );
+    let validatedData;
+    try {
+      validatedData = createTaskSchema.parse({
+        ...body,
+        created_by: session.user.id,
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return NextResponse.json(
+          {
+            error: 'Validation failed',
+            details: error.errors.map(e => ({
+              field: e.path.join('.'),
+              message: e.message,
+            })),
+          },
+          { status: 400 }
+        );
+      }
+      throw error;
     }
 
     // Verify user has access to this space
     try {
-      await verifySpaceAccess(session.user.id, space_id);
+      await verifySpaceAccess(session.user.id, validatedData.space_id);
     } catch (error) {
       return NextResponse.json(
         { error: 'You do not have access to this space' },
@@ -160,10 +175,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create task using service
-    const task = await tasksService.createTask({
-      ...body,
-      created_by: session.user.id,
-    });
+    const task = await tasksService.createTask(validatedData);
 
     return NextResponse.json({
       success: true,
