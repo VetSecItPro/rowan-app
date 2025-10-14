@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, List, ChevronLeft, ChevronRight, Check, Users } from 'lucide-react';
+import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, List, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { EventCard } from '@/components/calendar/EventCard';
 import { NewEventModal } from '@/components/calendar/NewEventModal';
@@ -14,7 +14,7 @@ import { useCalendarShortcuts } from '@/lib/hooks/useCalendarShortcuts';
 import { calendarService, CalendarEvent, CreateEventInput } from '@/lib/services/calendar-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, parseISO } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, parseISO, addDays } from 'date-fns';
 
 type ViewMode = 'month' | 'week' | 'day' | 'agenda' | 'timeline' | 'list';
 
@@ -538,17 +538,17 @@ export default function CalendarPage() {
               {viewMode !== 'list' && (
                 <div className="bg-gray-50 dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-lg p-0.5 flex gap-0.5">
                   <button
-                    onClick={() => setViewMode('month')}
+                    onClick={() => setViewMode('day')}
                     className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
-                      viewMode === 'month'
+                      viewMode === 'day'
                         ? 'bg-gradient-calendar text-white shadow-md'
                         : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
                     }`}
-                    title="Month View (M)"
+                    title="Day View (D)"
                   >
-                    Month
+                    Day
                     <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                      Month View (M)
+                      Day View (D)
                     </span>
                   </button>
                   <button
@@ -566,17 +566,17 @@ export default function CalendarPage() {
                     </span>
                   </button>
                   <button
-                    onClick={() => setViewMode('day')}
+                    onClick={() => setViewMode('month')}
                     className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
-                      viewMode === 'day'
+                      viewMode === 'month'
                         ? 'bg-gradient-calendar text-white shadow-md'
                         : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
                     }`}
-                    title="Day View (D)"
+                    title="Month View (M)"
                   >
-                    Day
+                    Month
                     <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                      Day View (D)
+                      Month View (M)
                     </span>
                   </button>
                   <button
@@ -814,48 +814,422 @@ export default function CalendarPage() {
                 </div>
               ) : viewMode === 'week' ? (
                 /* Week View */
-                <div className="text-center py-12">
-                  <CalendarRange className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Week View</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Week view coming soon - see events organized by week with hourly time slots
-                  </p>
-                  <button
-                    onClick={() => setViewMode('month')}
-                    className="mt-6 px-4 py-2 bg-gradient-calendar text-white rounded-lg hover:opacity-90 transition-all"
-                  >
-                    Back to Month View
-                  </button>
+                <div>
+                  {/* Week Navigation */}
+                  <div className="flex items-center justify-between mb-4 sm:mb-6">
+                    <button
+                      onClick={handlePrevMonth}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
+                      title="Previous week (←)"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        Previous week (←)
+                      </span>
+                    </button>
+                    <div className="flex items-center gap-3">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                        Week of {format(startOfWeek(currentMonth), 'MMM d, yyyy')}
+                      </h3>
+                      <button
+                        onClick={handleJumpToToday}
+                        className="px-3 py-1.5 bg-gradient-calendar text-white text-xs font-medium rounded-lg hover:opacity-90 transition-all shadow-sm group relative"
+                        title="Jump to today (T)"
+                      >
+                        Today
+                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                          Jump to today (T)
+                        </span>
+                      </button>
+                    </div>
+                    <button
+                      onClick={handleNextMonth}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
+                      title="Next week (→)"
+                    >
+                      <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        Next week (→)
+                      </span>
+                    </button>
+                  </div>
+
+                  {/* Week Grid - showing each day as a column */}
+                  <div className="grid grid-cols-7 gap-2">
+                    {/* Day headers */}
+                    {eachDayOfInterval({
+                      start: startOfWeek(currentMonth),
+                      end: endOfWeek(currentMonth)
+                    }).map((day) => {
+                      const isToday = isSameDay(day, new Date());
+                      return (
+                        <div key={day.toISOString()} className="text-center">
+                          <div className={`text-xs sm:text-sm font-medium py-2 ${
+                            isToday
+                              ? 'text-purple-600 dark:text-purple-400'
+                              : 'text-gray-600 dark:text-gray-400'
+                          }`}>
+                            <div>{format(day, 'EEE')}</div>
+                            <div className={`text-lg ${isToday ? 'font-bold' : ''}`}>
+                              {format(day, 'd')}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {/* Day columns with events */}
+                    {eachDayOfInterval({
+                      start: startOfWeek(currentMonth),
+                      end: endOfWeek(currentMonth)
+                    }).map((day) => {
+                      const dayEvents = getEventsForDate(day);
+                      const isToday = isSameDay(day, new Date());
+
+                      return (
+                        <div
+                          key={day.toISOString()}
+                          className={`min-h-[400px] p-2 rounded-lg border ${
+                            isToday
+                              ? 'border-purple-300 dark:border-purple-700 bg-purple-50 dark:bg-purple-900/10'
+                              : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
+                          }`}
+                        >
+                          <div className="space-y-1">
+                            {dayEvents.map((event) => {
+                              const categoryColor = getCategoryColor(event.category);
+                              const categoryConfig = {
+                                work: { icon: '💼', label: 'Work' },
+                                personal: { icon: '👤', label: 'Personal' },
+                                family: { icon: '👨‍👩‍👧‍👦', label: 'Family' },
+                                health: { icon: '💪', label: 'Health' },
+                                social: { icon: '🎉', label: 'Social' },
+                              };
+                              const category = categoryConfig[event.category as keyof typeof categoryConfig] || categoryConfig.personal;
+
+                              return (
+                                <button
+                                  key={event.id}
+                                  onClick={() => handleEditEvent(event)}
+                                  className={`w-full text-left p-2 rounded text-xs ${categoryColor.bg} border-l-2 ${categoryColor.border} hover:opacity-80 transition-opacity`}
+                                >
+                                  <div className={`font-medium ${categoryColor.text} truncate`}>
+                                    {format(parseISO(event.start_time), 'h:mm a')}
+                                  </div>
+                                  <div className={`font-semibold ${categoryColor.text} truncate`}>
+                                    {event.title}
+                                  </div>
+                                </button>
+                              );
+                            })}
+                            {dayEvents.length === 0 && (
+                              <div className="text-center py-4 text-xs text-gray-400">
+                                No events
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               ) : viewMode === 'day' ? (
                 /* Day View */
-                <div className="text-center py-12">
-                  <CalendarDays className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Day View</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Day view coming soon - see a detailed hourly breakdown of your day
-                  </p>
-                  <button
-                    onClick={() => setViewMode('month')}
-                    className="mt-6 px-4 py-2 bg-gradient-calendar text-white rounded-lg hover:opacity-90 transition-all"
-                  >
-                    Back to Month View
-                  </button>
+                <div>
+                  {/* Day Navigation */}
+                  <div className="flex items-center justify-between mb-4 sm:mb-6">
+                    <button
+                      onClick={handlePrevMonth}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
+                      title="Previous day (←)"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        Previous day (←)
+                      </span>
+                    </button>
+                    <div className="flex items-center gap-3">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                        {format(currentMonth, 'EEEE, MMMM d, yyyy')}
+                      </h3>
+                      <button
+                        onClick={handleJumpToToday}
+                        className="px-3 py-1.5 bg-gradient-calendar text-white text-xs font-medium rounded-lg hover:opacity-90 transition-all shadow-sm group relative"
+                        title="Jump to today (T)"
+                      >
+                        Today
+                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                          Jump to today (T)
+                        </span>
+                      </button>
+                    </div>
+                    <button
+                      onClick={handleNextMonth}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
+                      title="Next day (→)"
+                    >
+                      <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        Next day (→)
+                      </span>
+                    </button>
+                  </div>
+
+                  {/* Day Schedule */}
+                  <div className="space-y-2">
+                    {(() => {
+                      const dayEvents = getEventsForDate(currentMonth);
+                      const isToday = isSameDay(currentMonth, new Date());
+
+                      return (
+                        <div className={`p-6 rounded-xl border-2 ${
+                          isToday
+                            ? 'border-purple-300 dark:border-purple-700 bg-purple-50 dark:bg-purple-900/10'
+                            : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
+                        }`}>
+                          {dayEvents.length > 0 ? (
+                            <div className="space-y-4">
+                              {dayEvents.map((event) => {
+                                const categoryColor = getCategoryColor(event.category);
+                                const categoryConfig = {
+                                  work: { icon: '💼', label: 'Work' },
+                                  personal: { icon: '👤', label: 'Personal' },
+                                  family: { icon: '👨‍👩‍👧‍👦', label: 'Family' },
+                                  health: { icon: '💪', label: 'Health' },
+                                  social: { icon: '🎉', label: 'Social' },
+                                };
+                                const category = categoryConfig[event.category as keyof typeof categoryConfig] || categoryConfig.personal;
+
+                                return (
+                                  <div
+                                    key={event.id}
+                                    className={`p-4 rounded-lg border-l-4 ${categoryColor.border} ${categoryColor.bg}`}
+                                  >
+                                    <div className="flex items-start justify-between">
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-3 mb-2">
+                                          <button
+                                            onClick={(e) => handleEventStatusClick(e, event.id, event.status)}
+                                            className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
+                                              event.status === 'completed'
+                                                ? 'bg-green-500 border-green-500'
+                                                : event.status === 'in-progress'
+                                                ? 'bg-amber-500 border-amber-500'
+                                                : 'bg-transparent border-red-500'
+                                            }`}
+                                          >
+                                            {event.status === 'completed' && <Check className="w-4 h-4 text-white" />}
+                                            {event.status === 'in-progress' && <div className="w-2 h-2 bg-white rounded-full" />}
+                                          </button>
+                                          <div className="text-lg font-bold text-gray-900 dark:text-white">
+                                            {format(parseISO(event.start_time), 'h:mm a')}
+                                          </div>
+                                          <span className={`px-2 py-1 rounded text-xs font-medium ${categoryColor.color}`}>
+                                            {category.icon} {category.label}
+                                          </span>
+                                        </div>
+                                        <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                                          {event.title}
+                                        </h4>
+                                        {event.description && (
+                                          <p className="text-gray-600 dark:text-gray-400 mb-2">
+                                            {event.description}
+                                          </p>
+                                        )}
+                                        {event.location && (
+                                          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                            <MapPin className="w-4 h-4" />
+                                            <span className="text-sm">{event.location}</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={() => handleViewDetails(event)}
+                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                                          title="View Details"
+                                        >
+                                          <Eye className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                                        </button>
+                                        <button
+                                          onClick={() => handleEditEvent(event)}
+                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                                          title="Edit Event"
+                                        >
+                                          <Edit className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <div className="text-center py-12">
+                              <CalendarDays className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                              <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No events scheduled</p>
+                              <button
+                                onClick={() => setIsModalOpen(true)}
+                                className="mt-4 px-6 py-3 bg-gradient-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                              >
+                                <Plus className="w-5 h-5" />
+                                Create Event
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </div>
                 </div>
               ) : viewMode === 'agenda' ? (
-                /* Agenda View */
-                <div className="text-center py-12">
-                  <CalendarClock className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Agenda View</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Agenda view coming soon - see a chronological list of upcoming events with details
-                  </p>
-                  <button
-                    onClick={() => setViewMode('month')}
-                    className="mt-6 px-4 py-2 bg-gradient-calendar text-white rounded-lg hover:opacity-90 transition-all"
-                  >
-                    Back to Month View
-                  </button>
+                /* Agenda View - Chronological list grouped by date */
+                <div>
+                  {/* Agenda Header */}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      Upcoming Events
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      Showing all future events in chronological order
+                    </p>
+                  </div>
+
+                  {/* Agenda List */}
+                  {(() => {
+                    // Get all future events
+                    const now = new Date();
+                    const futureEvents = filteredEvents
+                      .filter(e => parseISO(e.start_time) >= now)
+                      .sort((a, b) => parseISO(a.start_time).getTime() - parseISO(b.start_time).getTime());
+
+                    if (futureEvents.length === 0) {
+                      return (
+                        <div className="text-center py-12">
+                          <CalendarClock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                          <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No upcoming events</p>
+                          <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="mt-4 px-6 py-3 bg-gradient-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                          >
+                            <Plus className="w-5 h-5" />
+                            Create Event
+                          </button>
+                        </div>
+                      );
+                    }
+
+                    // Group events by date
+                    const eventsByDate = new Map<string, typeof futureEvents>();
+                    futureEvents.forEach(event => {
+                      const dateKey = format(parseISO(event.start_time), 'yyyy-MM-dd');
+                      if (!eventsByDate.has(dateKey)) {
+                        eventsByDate.set(dateKey, []);
+                      }
+                      eventsByDate.get(dateKey)!.push(event);
+                    });
+
+                    return (
+                      <div className="space-y-6">
+                        {Array.from(eventsByDate.entries()).map(([dateKey, events]) => {
+                          const date = parseISO(events[0].start_time);
+                          const isToday = isSameDay(date, new Date());
+                          const isTomorrow = isSameDay(date, addDays(new Date(), 1));
+
+                          let dateLabel = format(date, 'EEEE, MMMM d, yyyy');
+                          if (isToday) dateLabel = `Today, ${format(date, 'MMMM d')}`;
+                          if (isTomorrow) dateLabel = `Tomorrow, ${format(date, 'MMMM d')}`;
+
+                          return (
+                            <div key={dateKey} className="space-y-3">
+                              <div className={`sticky top-0 z-10 py-2 px-4 rounded-lg ${
+                                isToday
+                                  ? 'bg-purple-100 dark:bg-purple-900/30 border border-purple-300 dark:border-purple-700'
+                                  : 'bg-gray-100 dark:bg-gray-700'
+                              }`}>
+                                <h4 className={`text-sm font-bold ${
+                                  isToday
+                                    ? 'text-purple-700 dark:text-purple-300'
+                                    : 'text-gray-700 dark:text-gray-300'
+                                }`}>
+                                  {dateLabel}
+                                </h4>
+                              </div>
+
+                              {events.map(event => {
+                                const categoryColor = getCategoryColor(event.category);
+                                const categoryConfig = {
+                                  work: { icon: '💼', label: 'Work' },
+                                  personal: { icon: '👤', label: 'Personal' },
+                                  family: { icon: '👨‍👩‍👧‍👦', label: 'Family' },
+                                  health: { icon: '💪', label: 'Health' },
+                                  social: { icon: '🎉', label: 'Social' },
+                                };
+                                const category = categoryConfig[event.category as keyof typeof categoryConfig] || categoryConfig.personal;
+
+                                return (
+                                  <div
+                                    key={event.id}
+                                    className={`p-4 rounded-lg border-l-4 ${categoryColor.border} ${categoryColor.bg} hover:shadow-md transition-shadow`}
+                                  >
+                                    <div className="flex items-start gap-4">
+                                      <div className="flex-shrink-0 text-center min-w-[60px]">
+                                        <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                                          {format(parseISO(event.start_time), 'h:mm')}
+                                        </div>
+                                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                                          {format(parseISO(event.start_time), 'a')}
+                                        </div>
+                                      </div>
+
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-2">
+                                          <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                            {event.title}
+                                          </h4>
+                                          <span className={`px-2 py-1 rounded text-xs font-medium ${categoryColor.color}`}>
+                                            {category.icon} {category.label}
+                                          </span>
+                                        </div>
+                                        {event.description && (
+                                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                            {event.description}
+                                          </p>
+                                        )}
+                                        {event.location && (
+                                          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                            <MapPin className="w-4 h-4" />
+                                            {event.location}
+                                          </div>
+                                        )}
+                                      </div>
+
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={() => handleViewDetails(event)}
+                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                                          title="View Details"
+                                        >
+                                          <Eye className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                                        </button>
+                                        <button
+                                          onClick={() => handleEditEvent(event)}
+                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                                          title="Edit Event"
+                                        >
+                                          <Edit className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
                 </div>
               ) : viewMode === 'timeline' ? (
                 /* Timeline View */
