@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { Header } from '@/components/layout/Header';
 import { ReminderCard } from '@/components/reminders/ReminderCard';
 import { NewReminderModal } from '@/components/reminders/NewReminderModal';
+import { BulkActionsToolbar } from '@/components/reminders/BulkActionsToolbar';
 import GuidedReminderCreation from '@/components/guided/GuidedReminderCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { remindersService, Reminder, CreateReminderInput } from '@/lib/services/reminders-service';
@@ -24,6 +25,8 @@ export default function RemindersPage() {
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [popularTemplates, setPopularTemplates] = useState<ReminderTemplate[]>([]);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedReminderIds, setSelectedReminderIds] = useState<Set<string>>(new Set());
 
   const filteredReminders = useMemo(() => {
     let filtered = reminders;
@@ -227,6 +230,40 @@ export default function RemindersPage() {
     }
   }, [currentSpace, user, loadReminders]);
 
+  const handleSelectionChange = useCallback((reminderId: string, selected: boolean) => {
+    setSelectedReminderIds((prev) => {
+      const newSet = new Set(prev);
+      if (selected) {
+        newSet.add(reminderId);
+      } else {
+        newSet.delete(reminderId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const handleSelectAll = useCallback(() => {
+    if (selectedReminderIds.size === filteredReminders.length) {
+      setSelectedReminderIds(new Set());
+    } else {
+      setSelectedReminderIds(new Set(filteredReminders.map((r) => r.id)));
+    }
+  }, [filteredReminders, selectedReminderIds.size]);
+
+  const handleClearSelection = useCallback(() => {
+    setSelectedReminderIds(new Set());
+    setSelectionMode(false);
+  }, []);
+
+  const handleBulkOperationComplete = useCallback(() => {
+    setSelectedReminderIds(new Set());
+    loadReminders();
+  }, [loadReminders]);
+
+  const selectedReminders = useMemo(() => {
+    return reminders.filter((r) => selectedReminderIds.has(r.id));
+  }, [reminders, selectedReminderIds]);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header />
@@ -247,13 +284,33 @@ export default function RemindersPage() {
               </div>
             </div>
 
-            <button
-              onClick={handleOpenModal}
-              className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 shimmer-reminders text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              New Reminder
-            </button>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              {!selectionMode ? (
+                <>
+                  <button
+                    onClick={() => setSelectionMode(true)}
+                    className="px-4 py-2 sm:px-6 sm:py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors shadow-lg flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle2 className="w-5 h-5" />
+                    <span className="hidden sm:inline">Select</span>
+                  </button>
+                  <button
+                    onClick={handleOpenModal}
+                    className="flex-1 sm:flex-none px-4 py-2 sm:px-6 sm:py-3 shimmer-reminders text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                  >
+                    <Plus className="w-5 h-5" />
+                    New Reminder
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={handleClearSelection}
+                  className="w-full px-4 py-2 sm:px-6 sm:py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors shadow-lg flex items-center justify-center gap-2"
+                >
+                  Cancel Selection
+                </button>
+              )}
+            </div>
           </div>
 
           {!loading && showGuidedFlow && (
@@ -405,13 +462,21 @@ export default function RemindersPage() {
               {!showGuidedFlow && (
               <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             <div className="flex flex-col items-start gap-4 mb-6">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                   All Reminders ({filteredReminders.length})
                 </h2>
                 <span className="px-3 py-1 bg-pink-100 dark:bg-pink-900/30 border border-pink-300 dark:border-pink-700 text-pink-700 dark:text-pink-300 text-sm font-medium rounded-full">
                   {format(new Date(), 'MMM yyyy')}
                 </span>
+                {selectionMode && filteredReminders.length > 0 && (
+                  <button
+                    onClick={handleSelectAll}
+                    className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 text-sm font-medium rounded-full hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                  >
+                    {selectedReminderIds.size === filteredReminders.length ? 'Deselect All' : 'Select All'}
+                  </button>
+                )}
               </div>
 
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
@@ -537,6 +602,9 @@ export default function RemindersPage() {
                     onEdit={handleEditReminder}
                     onDelete={handleDeleteReminder}
                     onSnooze={handleSnoozeReminder}
+                    selectionMode={selectionMode}
+                    selected={selectedReminderIds.has(reminder.id)}
+                    onSelectionChange={handleSelectionChange}
                   />
                 ))}
               </div>
@@ -572,6 +640,17 @@ export default function RemindersPage() {
             </div>
           </div>
         )
+      )}
+
+      {/* Bulk Actions Toolbar */}
+      {currentSpace && (
+        <BulkActionsToolbar
+          selectedCount={selectedReminderIds.size}
+          selectedReminders={selectedReminders}
+          onClearSelection={handleClearSelection}
+          onComplete={handleBulkOperationComplete}
+          spaceId={currentSpace.id}
+        />
       )}
     </div>
   );
