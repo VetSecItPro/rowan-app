@@ -13,6 +13,13 @@ export interface Reminder {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   status: 'active' | 'completed' | 'snoozed';
   snooze_until?: string;
+  snoozed_by?: string; // User ID who snoozed this reminder
+  snoozer?: {
+    id: string;
+    name: string;
+    email: string;
+    avatar_url?: string;
+  };
   repeat_pattern?: string;
   repeat_days?: number[];
   assigned_to?: string; // User ID this reminder is assigned to
@@ -64,6 +71,12 @@ export const remindersService = {
           name,
           email,
           avatar_url
+        ),
+        snoozer:snoozed_by (
+          id,
+          name,
+          email,
+          avatar_url
         )
       `)
       .eq('space_id', spaceId)
@@ -73,6 +86,7 @@ export const remindersService = {
     return (data || []).map((reminder: any) => ({
       ...reminder,
       assignee: reminder.assignee || undefined,
+      snoozer: reminder.snoozer || undefined,
     }));
   },
 
@@ -159,7 +173,7 @@ export const remindersService = {
     };
   },
 
-  async snoozeReminder(id: string, minutes: number): Promise<Reminder> {
+  async snoozeReminder(id: string, minutes: number, userId: string): Promise<Reminder> {
     const supabase = createClient();
     const snoozeUntil = new Date();
     snoozeUntil.setMinutes(snoozeUntil.getMinutes() + minutes);
@@ -167,6 +181,7 @@ export const remindersService = {
     return this.updateReminder(id, {
       status: 'snoozed',
       snooze_until: snoozeUntil.toISOString(),
+      snoozed_by: userId,
     });
   },
 

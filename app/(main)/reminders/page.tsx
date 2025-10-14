@@ -19,20 +19,17 @@ export default function RemindersPage() {
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [assignmentFilter, setAssignmentFilter] = useState('all'); // all, mine, unassigned
+  const [assignmentFilter, setAssignmentFilter] = useState('all');
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
 
-  // Memoized filtered reminders - expensive filtering operation
   const filteredReminders = useMemo(() => {
     let filtered = reminders;
 
-    // Status filter
     if (statusFilter !== 'all') {
       filtered = filtered.filter(r => r.status === statusFilter);
     }
 
-    // Assignment filter
     if (assignmentFilter !== 'all' && user) {
       if (assignmentFilter === 'mine') {
         filtered = filtered.filter(r => r.assigned_to === user.id);
@@ -41,7 +38,6 @@ export default function RemindersPage() {
       }
     }
 
-    // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(r =>
@@ -54,7 +50,6 @@ export default function RemindersPage() {
     return filtered;
   }, [reminders, statusFilter, assignmentFilter, searchQuery, user]);
 
-  // Memoized stats calculation - expensive computation
   const stats = useMemo(() => {
     const now = new Date();
 
@@ -70,9 +65,7 @@ export default function RemindersPage() {
     return { total, active, completed, overdue };
   }, [reminders]);
 
-  // Stable reference to loadReminders
   const loadReminders = useCallback(async () => {
-    // Don't load data if user doesn't have a space yet
     if (!currentSpace || !user) {
       setLoading(false);
       return;
@@ -88,13 +81,11 @@ export default function RemindersPage() {
 
       setReminders(remindersData);
 
-      // Check if user has completed the guided reminder flow
       const userProgress = userProgressResult.success ? userProgressResult.data : null;
       if (userProgress) {
         setHasCompletedGuide(userProgress.first_reminder_created);
       }
 
-      // Show guided flow if no reminders exist, user hasn't completed the guide, AND user hasn't skipped it
       if (
         remindersData.length === 0 &&
         !userProgress?.first_reminder_created &&
@@ -113,7 +104,6 @@ export default function RemindersPage() {
     loadReminders();
   }, [loadReminders]);
 
-  // Memoized callback for creating/updating reminders
   const handleCreateReminder = useCallback(async (reminderData: CreateReminderInput) => {
     try {
       if (editingReminder) {
@@ -128,25 +118,21 @@ export default function RemindersPage() {
     }
   }, [editingReminder, loadReminders]);
 
-  // Memoized callback for status changes
   const handleStatusChange = useCallback(async (reminderId: string, status: string) => {
-    // Optimistic update - update UI immediately
     setReminders(prevReminders =>
       prevReminders.map(reminder =>
         reminder.id === reminderId ? { ...reminder, status: status as 'active' | 'completed' | 'snoozed' } : reminder
       )
     );
 
-    // Update in background
     try {
       await remindersService.updateReminder(reminderId, { status: status as 'active' | 'completed' | 'snoozed' });
     } catch (error) {
       console.error('Failed to update reminder status:', error);
-      loadReminders(); // Revert on error
+      loadReminders();
     }
   }, [loadReminders]);
 
-  // Memoized callback for deleting reminders
   const handleDeleteReminder = useCallback(async (reminderId: string) => {
     try {
       await remindersService.deleteReminder(reminderId);
@@ -156,39 +142,34 @@ export default function RemindersPage() {
     }
   }, [loadReminders]);
 
-  // Memoized callback for snoozing reminders
   const handleSnoozeReminder = useCallback(async (reminderId: string, minutes: number) => {
+    if (!user) return;
     try {
-      await remindersService.snoozeReminder(reminderId, minutes);
+      await remindersService.snoozeReminder(reminderId, minutes, user.id);
       loadReminders();
     } catch (error) {
       console.error('Failed to snooze reminder:', error);
     }
-  }, [loadReminders]);
+  }, [loadReminders, user]);
 
-  // Memoized callback for editing reminders
   const handleEditReminder = useCallback((reminder: Reminder) => {
     setEditingReminder(reminder);
     setIsModalOpen(true);
   }, []);
 
-  // Memoized callback for closing modal
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
     setEditingReminder(null);
   }, []);
 
-  // Memoized callback for opening new reminder modal
   const handleOpenModal = useCallback(() => {
     setIsModalOpen(true);
   }, []);
 
-  // Memoized callback for search query changes
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   }, []);
 
-  // Memoized callback for status filter changes
   const handleStatusFilterChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     setStatusFilter(e.target.value);
   }, []);
@@ -196,13 +177,12 @@ export default function RemindersPage() {
   const handleGuidedFlowComplete = useCallback(() => {
     setShowGuidedFlow(false);
     setHasCompletedGuide(true);
-    loadReminders(); // Reload to show newly created reminder
+    loadReminders();
   }, [loadReminders]);
 
   const handleGuidedFlowSkip = useCallback(async () => {
     setShowGuidedFlow(false);
 
-    // Mark the guide as skipped in user progress
     if (user) {
       try {
         await markFlowSkipped(user.id, 'reminder_guide');
@@ -217,7 +197,6 @@ export default function RemindersPage() {
       <Header />
       <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
-          {/* Header */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
               <div className="w-12 h-12 rounded-xl bg-gradient-reminders flex items-center justify-center">
@@ -242,7 +221,6 @@ export default function RemindersPage() {
             </button>
           </div>
 
-          {/* Guided Creation - MOVED TO TOP */}
           {!loading && showGuidedFlow && (
             <GuidedReminderCreation
               onComplete={handleGuidedFlowComplete}
@@ -250,10 +228,8 @@ export default function RemindersPage() {
             />
           )}
 
-          {/* Stats Cards - Horizontal Row - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            {/* Active */}
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Active</h3>
@@ -272,7 +248,6 @@ export default function RemindersPage() {
               </div>
             </div>
 
-            {/* Overdue */}
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Overdue</h3>
@@ -291,7 +266,6 @@ export default function RemindersPage() {
               </div>
             </div>
 
-            {/* Completed */}
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completed</h3>
@@ -317,7 +291,6 @@ export default function RemindersPage() {
               </div>
             </div>
 
-            {/* Total */}
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total</h3>
@@ -338,11 +311,9 @@ export default function RemindersPage() {
           </div>
           )}
 
-          {/* Search & Filter Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-                  {/* Search */}
                   <div className="flex-1 relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
@@ -357,12 +328,9 @@ export default function RemindersPage() {
               </div>
           )}
 
-              {/* Reminders List - Only show when NOT in guided flow */}
               {!showGuidedFlow && (
               <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            {/* Header with Month Badge and Filters */}
             <div className="flex flex-col items-start gap-4 mb-6">
-              {/* Title Row */}
               <div className="flex items-center gap-3">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                   All Reminders ({filteredReminders.length})
@@ -372,9 +340,7 @@ export default function RemindersPage() {
                 </span>
               </div>
 
-              {/* Filters Row */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
-                {/* Assignment Filter */}
                 <div className="bg-gray-50 dark:bg-gray-900 border-2 border-blue-200 dark:border-blue-700 rounded-lg p-1 flex gap-1 w-fit">
                   <button
                     onClick={() => setAssignmentFilter('all')}
@@ -408,7 +374,6 @@ export default function RemindersPage() {
                   </button>
                 </div>
 
-                {/* Status Filter - Segmented Buttons */}
                 <div className="bg-gray-50 dark:bg-gray-900 border-2 border-pink-200 dark:border-pink-700 rounded-lg p-1 flex gap-1 w-fit">
                 <button
                   onClick={() => setStatusFilter('all')}
@@ -507,7 +472,6 @@ export default function RemindersPage() {
         </div>
       </div>
 
-      {/* New/Edit Reminder Modal */}
       {currentSpace ? (
         <NewReminderModal
           isOpen={isModalOpen}
@@ -517,7 +481,6 @@ export default function RemindersPage() {
           spaceId={currentSpace.id}
         />
       ) : (
-        /* Show a message if no space exists */
         isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleCloseModal} />
@@ -536,8 +499,6 @@ export default function RemindersPage() {
           </div>
         )
       )}
-        </div>
-      </div>
     </div>
   );
 }

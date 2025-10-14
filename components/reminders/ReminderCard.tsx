@@ -233,8 +233,15 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
 
       {/* Snoozed Until */}
       {reminder.status === 'snoozed' && reminder.snooze_until && (
-        <div className="mt-2 text-xs text-purple-600 dark:text-purple-400">
-          Snoozed until {formatTimestamp(reminder.snooze_until, 'MMM d, h:mm a')}
+        <div className="mt-2 text-xs text-purple-600 dark:text-purple-400 flex items-center gap-1">
+          <span>
+            Snoozed until {formatTimestamp(reminder.snooze_until, 'MMM d, h:mm a')}
+          </span>
+          {reminder.snoozer && (
+            <span className="text-gray-600 dark:text-gray-400">
+              by {reminder.snoozer.name}
+            </span>
+          )}
         </div>
       )}
 
