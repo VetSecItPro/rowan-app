@@ -45,9 +45,40 @@ export function useTaskRealtime({
   useEffect(() => {
     const supabase = createClient();
     let channel: RealtimeChannel;
+    let accessCheckInterval: NodeJS.Timeout;
+
+    // Verify user still has access to this space
+    async function verifyAccess(): Promise<boolean> {
+      try {
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+        if (authError || !user) {
+          return false;
+        }
+
+        const { data: membership, error: memberError } = await supabase
+          .from('space_members')
+          .select('user_id, role')
+          .eq('space_id', spaceId)
+          .eq('user_id', user.id)
+          .single();
+
+        return !memberError && !!membership;
+      } catch (err) {
+        return false;
+      }
+    }
 
     async function loadTasks() {
       try {
+        // Verify access before loading
+        const hasAccess = await verifyAccess();
+        if (!hasAccess) {
+          setError(new Error('You do not have access to this space'));
+          setLoading(false);
+          return;
+        }
+
         let query = supabase
           .from('tasks')
           .select('*')
@@ -71,7 +102,6 @@ export function useTaskRealtime({
 
         setTasks(data || []);
       } catch (err) {
-        console.error('Error loading tasks:', err);
         setError(err as Error);
       } finally {
         setLoading(false);
@@ -168,10 +198,28 @@ export function useTaskRealtime({
     loadTasks();
     setupRealtimeSubscription();
 
-    // Cleanup subscription on unmount
+    // Periodic access verification (every 15 minutes)
+    accessCheckInterval = setInterval(async () => {
+      const hasAccess = await verifyAccess();
+
+      if (!hasAccess) {
+        // Access revoked - disconnect and clear data
+        if (channel) {
+          supabase.removeChannel(channel);
+        }
+        clearInterval(accessCheckInterval);
+        setTasks([]);
+        setError(new Error('Access to this space has been revoked'));
+      }
+    }, 15 * 60 * 1000); // 15 minutes
+
+    // Cleanup subscription and interval on unmount
     return () => {
       if (channel) {
         supabase.removeChannel(channel);
+      }
+      if (accessCheckInterval) {
+        clearInterval(accessCheckInterval);
       }
     };
   }, [spaceId, filters?.status, filters?.priority, filters?.assignedTo]);

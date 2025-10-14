@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 import type {
   Task,
   CreateTaskInput,
@@ -112,7 +113,11 @@ export const tasksService = {
 
       return data || [];
     } catch (error) {
-      console.error('Error in getTasks:', error);
+      logger.error('Error in getTasks', error, {
+        component: 'tasksService',
+        action: 'getTasks',
+        spaceId,
+      });
       throw error;
     }
   },
@@ -186,7 +191,10 @@ export const tasksService = {
         hasMore,
       };
     } catch (error) {
-      console.error('Error in getTasksPaginated:', error);
+      logger.error('Error in getTasksPaginated', error, {
+        component: 'tasksService',
+        action: 'getTasksPaginated',
+      });
       throw error;
     }
   },
@@ -224,7 +232,7 @@ export const tasksService = {
 
       return data;
     } catch (error) {
-      console.error('Error in getTaskById:', error);
+      logger.error('Error in getTaskById', error, { component: 'tasksService', action: 'getTaskById' });
       throw error;
     }
   },
@@ -262,7 +270,7 @@ export const tasksService = {
 
       return task;
     } catch (error) {
-      console.error('Error in createTask:', error);
+      logger.error('Error in createTask', error, { component: 'tasksService', action: 'createTask' });
       throw error;
     }
   },
@@ -295,7 +303,7 @@ export const tasksService = {
 
       return data || [];
     } catch (error) {
-      console.error('Error in createTasksBatch:', error);
+      logger.error('Error in createTasksBatch', error, { component: 'tasksService', action: 'createTasksBatch' });
       throw error;
     }
   },
@@ -344,7 +352,7 @@ export const tasksService = {
 
       return data;
     } catch (error) {
-      console.error('Error in updateTask:', error);
+      logger.error('Error in updateTask', error, { component: 'tasksService', action: 'updateTask' });
       throw error;
     }
   },
@@ -384,7 +392,7 @@ export const tasksService = {
 
       return data || [];
     } catch (error) {
-      console.error('Error in updateTasksBatch:', error);
+      logger.error('Error in updateTasksBatch', error, { component: 'tasksService', action: 'updateTasksBatch' });
       throw error;
     }
   },
@@ -412,7 +420,7 @@ export const tasksService = {
         throw new Error(`Failed to delete task: ${error.message}`);
       }
     } catch (error) {
-      console.error('Error in deleteTask:', error);
+      logger.error('Error in deleteTask', error, { component: 'tasksService', action: 'deleteTask' });
       throw error;
     }
   },
@@ -440,7 +448,7 @@ export const tasksService = {
         throw new Error(`Failed to delete tasks: ${error.message}`);
       }
     } catch (error) {
-      console.error('Error in deleteTasksBatch:', error);
+      logger.error('Error in deleteTasksBatch', error, { component: 'tasksService', action: 'deleteTasksBatch' });
       throw error;
     }
   },
@@ -493,7 +501,7 @@ export const tasksService = {
         byPriority,
       };
     } catch (error) {
-      console.error('Error in getTaskStats:', error);
+      logger.error('Error in getTaskStats', error, { component: 'tasksService', action: 'getTaskStats' });
       throw error;
     }
   },
@@ -597,7 +605,7 @@ export const tasksService = {
 
       return data || [];
     } catch (error) {
-      console.error('Error in getTasksByDueDate:', error);
+      logger.error('Error in getTasksByDueDate', error, { component: 'tasksService', action: 'getTasksByDueDate' });
       throw error;
     }
   },
@@ -632,7 +640,7 @@ export const tasksService = {
 
       return data || [];
     } catch (error) {
-      console.error('Error in getOverdueTasks:', error);
+      logger.error('Error in getOverdueTasks', error, { component: 'tasksService', action: 'getOverdueTasks' });
       throw error;
     }
   },
