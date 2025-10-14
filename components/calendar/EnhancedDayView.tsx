@@ -9,7 +9,7 @@ import { WeatherBadge } from './WeatherBadge';
 interface EnhancedDayViewProps {
   date: Date;
   events: CalendarEvent[];
-  onEventStatusClick: (e: React.MouseEvent, eventId: string, currentStatus: string) => void;
+  onEventStatusClick: (e: React.MouseEvent, eventId: string, currentStatus: 'not-started' | 'in-progress' | 'completed') => void;
   onViewDetails: (event: CalendarEvent) => void;
   onEditEvent: (event: CalendarEvent) => void;
   getCategoryColor: (category: string) => any;

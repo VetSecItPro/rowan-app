@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, List, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit } from 'lucide-react';
+import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, List } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { EventCard } from '@/components/calendar/EventCard';
 import { NewEventModal } from '@/components/calendar/NewEventModal';
@@ -18,6 +18,7 @@ import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
 import { useCalendarShortcuts } from '@/lib/hooks/useCalendarShortcuts';
+import { useCalendarGestures } from '@/lib/hooks/useCalendarGestures';
 import { calendarService, CalendarEvent, CreateEventInput } from '@/lib/services/calendar-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
@@ -36,16 +37,19 @@ export default function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'not-started' | 'in-progress' | 'completed'>('all');
   const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, any>>({});
   const [detailEvent, setDetailEvent] = useState<CalendarEvent | null>(null);
   const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
   const [isTemplateLibraryOpen, setIsTemplateLibraryOpen] = useState(false);
   const [activeAction, setActiveAction] = useState<'quick-add' | 'templates' | 'propose' | 'new-event'>('new-event');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'not-started' | 'in-progress' | 'completed'>('all');
 
   // Ref for search input
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Ref for gesture detection on calendar content
+  const calendarContentRef = useRef<HTMLDivElement>(null);
 
   // Initialize realtime connection
   const { events: realtimeEvents, isConnected: realtimeConnected } = useCalendarRealtime(
@@ -79,25 +83,30 @@ export default function CalendarPage() {
     };
   }, [events]);
 
-  // Memoize filtered events (exclude completed events in calendar views, apply status filter in list view)
+  // Memoize filtered events (handle list view vs calendar views differently)
   const filteredEvents = useMemo(() => {
     let filtered = events;
 
-    // In calendar views (month/week/day/agenda/timeline), always exclude completed events
-    // In list view, apply status filter
+    // For calendar views (not list), exclude completed events
     if (viewMode !== 'list') {
       filtered = events.filter(e => e.status !== 'completed');
-    } else if (statusFilter !== 'all') {
-      filtered = events.filter(e => e.status === statusFilter);
+    } else {
+      // For list view, apply status filter
+      if (statusFilter !== 'all') {
+        filtered = events.filter(e => e.status === statusFilter);
+      }
     }
 
-    if (!searchQuery) return filtered;
+    // Apply search filter
+    if (searchQuery) {
+      filtered = filtered.filter(e =>
+        e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        e.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        e.location?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
 
-    return filtered.filter(e =>
-      e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      e.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      e.location?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    return filtered;
   }, [events, searchQuery, viewMode, statusFilter]);
 
   // Memoize calendar days calculation
@@ -130,11 +139,11 @@ export default function CalendarPage() {
   // Memoize category colors lookup
   const getCategoryColor = useCallback((category: string) => {
     const colors = {
-      work: { bg: 'bg-blue-100 dark:bg-blue-900/30', border: 'border-blue-500', text: 'text-blue-700 dark:text-blue-300' },
-      personal: { bg: 'bg-purple-100 dark:bg-purple-900/30', border: 'border-purple-500', text: 'text-purple-700 dark:text-purple-300' },
-      family: { bg: 'bg-pink-100 dark:bg-pink-900/30', border: 'border-pink-500', text: 'text-pink-700 dark:text-pink-300' },
-      health: { bg: 'bg-green-100 dark:bg-green-900/30', border: 'border-green-500', text: 'text-green-700 dark:text-green-300' },
-      social: { bg: 'bg-orange-100 dark:bg-orange-900/30', border: 'border-orange-500', text: 'text-orange-700 dark:text-orange-300' },
+      work: { bg: 'bg-blue-100 dark:bg-blue-900/30', border: 'border-blue-500', text: 'text-blue-700 dark:text-blue-300', color: 'bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100' },
+      personal: { bg: 'bg-purple-100 dark:bg-purple-900/30', border: 'border-purple-500', text: 'text-purple-700 dark:text-purple-300', color: 'bg-purple-100 dark:bg-purple-900 text-purple-900 dark:text-purple-100' },
+      family: { bg: 'bg-pink-100 dark:bg-pink-900/30', border: 'border-pink-500', text: 'text-pink-700 dark:text-pink-300', color: 'bg-pink-100 dark:bg-pink-900 text-pink-900 dark:text-pink-100' },
+      health: { bg: 'bg-green-100 dark:bg-green-900/30', border: 'border-green-500', text: 'text-green-700 dark:text-green-300', color: 'bg-green-100 dark:bg-green-900 text-green-900 dark:text-green-100' },
+      social: { bg: 'bg-orange-100 dark:bg-orange-900/30', border: 'border-orange-500', text: 'text-orange-700 dark:text-orange-300', color: 'bg-orange-100 dark:bg-orange-900 text-orange-900 dark:text-orange-100' },
     };
     return colors[category as keyof typeof colors] || colors.personal;
   }, []);
@@ -393,6 +402,31 @@ export default function CalendarPage() {
     },
   });
 
+  // Touch gestures for mobile navigation
+  useCalendarGestures(calendarContentRef, {
+    onSwipeLeft: () => {
+      // Navigate to next period based on current view
+      if (viewMode === 'week') {
+        handleNextWeek();
+      } else if (viewMode === 'month' || viewMode === 'timeline') {
+        handleNextMonth();
+      } else if (viewMode === 'day') {
+        setCurrentMonth(prev => addDays(prev, 1));
+      }
+    },
+    onSwipeRight: () => {
+      // Navigate to previous period based on current view
+      if (viewMode === 'week') {
+        handlePrevWeek();
+      } else if (viewMode === 'month' || viewMode === 'timeline') {
+        handlePrevMonth();
+      } else if (viewMode === 'day') {
+        setCurrentMonth(prev => addDays(prev, -1));
+      }
+    },
+    enabled: viewMode !== 'proposal' && viewMode !== 'list' && viewMode !== 'agenda',
+  });
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Calendar' }]}>
       <div className="p-4 sm:p-8">
@@ -609,39 +643,40 @@ export default function CalendarPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex flex-col gap-1">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                  {viewMode === 'list' ? `Upcoming Events (${filteredEvents.length})` : viewMode === 'proposal' ? 'Event Proposals' : 'Event Calendar'}
+                  {viewMode === 'proposal' ? 'Event Proposals' : 'Event Calendar'}
                 </h2>
-                {viewMode !== 'list' && viewMode !== 'proposal' && (
+                {viewMode !== 'proposal' && (
                   <div className="text-sm font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                     {format(currentMonth, 'MMMM yyyy')}
                   </div>
                 )}
               </div>
 
-              {/* View Mode Toggle and Today Button - Only show in calendar view (not list) */}
-              {viewMode !== 'list' && (
-                <div className="flex items-center gap-2">
-                  {/* Weather Badge for Today's Events */}
-                  {(() => {
-                    // Find today's first event with a location
-                    const today = new Date();
-                    const todayEvents = events.filter(e => {
-                      const eventDate = parseISO(e.start_time);
-                      return isSameDay(eventDate, today) && e.location;
-                    });
+              {/* View Mode Toggle and Today Button */}
+              <div className="flex items-center gap-2">
+                {/* Weather Badge for Today's Events - Only show for calendar views */}
+                {viewMode !== 'proposal' && viewMode !== 'list' && (() => {
+                  // Find today's first event with a location
+                  const today = new Date();
+                  const todayEvents = events.filter(e => {
+                    const eventDate = parseISO(e.start_time);
+                    return isSameDay(eventDate, today) && e.location;
+                  });
 
-                    if (todayEvents.length > 0) {
-                      return (
-                        <WeatherBadge
-                          eventTime={todayEvents[0].start_time}
-                          location={todayEvents[0].location}
-                          compact={true}
-                        />
-                      );
-                    }
-                    return null;
-                  })()}
+                  if (todayEvents.length > 0) {
+                    return (
+                      <WeatherBadge
+                        eventTime={todayEvents[0].start_time}
+                        location={todayEvents[0].location}
+                        compact={true}
+                      />
+                    );
+                  }
+                  return null;
+                })()}
 
+                {/* Today Button - Only show for calendar views */}
+                {viewMode !== 'proposal' && viewMode !== 'list' && (
                   <button
                     onClick={handleJumpToToday}
                     className="px-3 py-1.5 bg-gradient-calendar text-white text-xs font-medium rounded-lg hover:opacity-90 transition-all shadow-sm group relative"
@@ -652,7 +687,10 @@ export default function CalendarPage() {
                       Jump to today (T)
                     </span>
                   </button>
-                  <div className="bg-gray-50 dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-lg p-0.5 flex gap-0.5">
+                )}
+
+                {/* View Mode Toggle - Always visible */}
+                <div className="bg-gray-50 dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-lg p-0.5 flex gap-0.5">
                   <button
                     onClick={() => setViewMode('day')}
                     className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
@@ -737,61 +775,77 @@ export default function CalendarPage() {
                       Proposal View (P)
                     </span>
                   </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Status Filter Toggle - Only show in list view */}
-              {viewMode === 'list' && (
-                <div className="bg-gray-50 dark:bg-gray-800 border-2 border-purple-200 dark:border-purple-700 rounded-lg p-1 flex gap-1 w-fit">
                   <button
-                    onClick={() => setStatusFilter('all')}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
-                      statusFilter === 'all'
+                    onClick={() => setViewMode('list')}
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
+                      viewMode === 'list'
                         ? 'bg-gradient-calendar text-white shadow-md'
                         : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                    }`}
+                    title="List View (L)"
+                  >
+                    List
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                      List View (L)
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Status Filter - Only show in List View */}
+            {viewMode === 'list' && (
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by status:</span>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setStatusFilter('all')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                      statusFilter === 'all'
+                        ? 'bg-gradient-calendar text-white shadow-md'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
                     All
                   </button>
                   <button
                     onClick={() => setStatusFilter('not-started')}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                       statusFilter === 'not-started'
-                        ? 'bg-gradient-calendar text-white shadow-md'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                        ? 'bg-red-500 text-white shadow-md'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
-                    Pending
+                    Not Started
                   </button>
                   <button
                     onClick={() => setStatusFilter('in-progress')}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[72px] ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                       statusFilter === 'in-progress'
-                        ? 'bg-gradient-calendar text-white shadow-md'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                        ? 'bg-amber-500 text-white shadow-md'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
                     In Progress
                   </button>
                   <button
                     onClick={() => setStatusFilter('completed')}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[72px] ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                       statusFilter === 'completed'
-                        ? 'bg-gradient-calendar text-white shadow-md'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                        ? 'bg-green-500 text-white shadow-md'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
                     Completed
                   </button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Calendar Content with Sidebar */}
             <div className="flex gap-6">
               {/* Mini-Calendar Sidebar - Hidden on mobile, visible on lg+ */}
-              {viewMode !== 'list' && viewMode !== 'proposal' && !loading && (
+              {viewMode !== 'proposal' && viewMode !== 'list' && !loading && (
                 <div className="hidden lg:block w-64 flex-shrink-0">
                   <MiniCalendar
                     currentDate={currentMonth}
@@ -805,7 +859,7 @@ export default function CalendarPage() {
               )}
 
               {/* Main Calendar Content */}
-              <div className="flex-1 min-w-0 min-h-[600px]">
+              <div ref={calendarContentRef} className="flex-1 min-w-0 min-h-[600px] touch-pan-y">
               {loading ? (
                 <div className="text-center py-12">
                   <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
@@ -1324,58 +1378,62 @@ export default function CalendarPage() {
                     </div>
                   </div>
                 </div>
-              ) : viewMode === 'proposal' ? (
+              ) : viewMode === 'list' ? (
+                /* List View - All events with status filtering */
+                <div>
+                  {/* List Header */}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      All Events
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      {statusFilter === 'all' ? 'Showing all events' :
+                       statusFilter === 'not-started' ? 'Showing not started events' :
+                       statusFilter === 'in-progress' ? 'Showing in-progress events' :
+                       'Showing completed events'}
+                    </p>
+                  </div>
+
+                  {/* Event List */}
+                  {filteredEvents.length === 0 ? (
+                    <div className="text-center py-12">
+                      <List className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">
+                        {statusFilter === 'all' ? 'No events found' : `No ${statusFilter} events`}
+                      </p>
+                      <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="mt-4 px-6 py-3 bg-gradient-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                      >
+                        <Plus className="w-5 h-5" />
+                        Create Event
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {filteredEvents
+                        .sort((a, b) => parseISO(a.start_time).getTime() - parseISO(b.start_time).getTime())
+                        .map(event => (
+                          <EventCard
+                            key={event.id}
+                            event={event}
+                            onStatusChange={handleStatusChange}
+                            onEdit={handleEditEvent}
+                            onDelete={handleDeleteEvent}
+                            onViewDetails={handleViewDetails}
+                            linkedShoppingList={linkedShoppingLists[event.id]}
+                          />
+                        ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
                 /* Proposal View */
                 currentSpace && (
                   <ProposalsList
                     spaceId={currentSpace.id}
                     onCreateProposal={() => setIsProposalModalOpen(true)}
                   />
-                )
-              ) : (
-                /* List View */
-                filteredEvents.length === 0 ? (
-                  <div className="text-center py-12">
-                    <CalendarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No events found</p>
-                    <p className="text-gray-500 dark:text-gray-500 mb-6">
-                      {searchQuery ? 'Try adjusting your search' : 'Create your first event to get started!'}
-                    </p>
-                    {!searchQuery && (
-                      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <button
-                          onClick={() => setIsModalOpen(true)}
-                          className="px-6 py-3 shimmer-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
-                        >
-                          <Plus className="w-5 h-5" />
-                          Create Event
-                        </button>
-                        {!hasCompletedGuide && (
-                          <button
-                            onClick={() => setShowGuidedFlow(true)}
-                            className="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
-                          >
-                            <CalendarIcon className="w-5 h-5" />
-                            Try Guided Creation
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-                    {filteredEvents.map((event) => (
-                      <EventCard
-                        key={event.id}
-                        event={event}
-                        onEdit={handleEditEvent}
-                        onDelete={handleDeleteEvent}
-                        onStatusChange={handleStatusChange}
-                        onViewDetails={handleViewDetails}
-                        linkedShoppingList={linkedShoppingLists[event.id]}
-                      />
-                    ))}
-                  </div>
                 )
               )}
             </div>
