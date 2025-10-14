@@ -43,6 +43,7 @@ END $$;
 ALTER TABLE event_attachments ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
+DROP POLICY IF EXISTS "Users can view attachments in their space" ON event_attachments;
 CREATE POLICY "Users can view attachments in their space"
   ON event_attachments FOR SELECT
   USING (
@@ -53,6 +54,7 @@ CREATE POLICY "Users can view attachments in their space"
     )
   );
 
+DROP POLICY IF EXISTS "Users can upload attachments to events in their space" ON event_attachments;
 CREATE POLICY "Users can upload attachments to events in their space"
   ON event_attachments FOR INSERT
   WITH CHECK (
@@ -64,6 +66,7 @@ CREATE POLICY "Users can upload attachments to events in their space"
     AND uploaded_by = auth.uid()
   );
 
+DROP POLICY IF EXISTS "Users can delete their own attachments" ON event_attachments;
 CREATE POLICY "Users can delete their own attachments"
   ON event_attachments FOR DELETE
   USING (uploaded_by = auth.uid());

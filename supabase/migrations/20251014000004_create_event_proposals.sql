@@ -42,6 +42,7 @@ ALTER TABLE event_proposals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE event_proposal_votes ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for event_proposals
+DROP POLICY IF EXISTS "Users can view proposals in their space" ON event_proposals;
 CREATE POLICY "Users can view proposals in their space"
   ON event_proposals FOR SELECT
   USING (
@@ -52,6 +53,7 @@ CREATE POLICY "Users can view proposals in their space"
     )
   );
 
+DROP POLICY IF EXISTS "Users can create proposals in their space" ON event_proposals;
 CREATE POLICY "Users can create proposals in their space"
   ON event_proposals FOR INSERT
   WITH CHECK (
@@ -63,16 +65,19 @@ CREATE POLICY "Users can create proposals in their space"
     AND proposed_by = auth.uid()
   );
 
+DROP POLICY IF EXISTS "Proposal creators can update their proposals" ON event_proposals;
 CREATE POLICY "Proposal creators can update their proposals"
   ON event_proposals FOR UPDATE
   USING (proposed_by = auth.uid())
   WITH CHECK (proposed_by = auth.uid());
 
+DROP POLICY IF EXISTS "Proposal creators can delete their proposals" ON event_proposals;
 CREATE POLICY "Proposal creators can delete their proposals"
   ON event_proposals FOR DELETE
   USING (proposed_by = auth.uid());
 
 -- RLS Policies for event_proposal_votes
+DROP POLICY IF EXISTS "Users can view votes in their space proposals" ON event_proposal_votes;
 CREATE POLICY "Users can view votes in their space proposals"
   ON event_proposal_votes FOR SELECT
   USING (
@@ -86,6 +91,7 @@ CREATE POLICY "Users can view votes in their space proposals"
     )
   );
 
+DROP POLICY IF EXISTS "Users can vote on proposals in their space" ON event_proposal_votes;
 CREATE POLICY "Users can vote on proposals in their space"
   ON event_proposal_votes FOR INSERT
   WITH CHECK (
@@ -100,11 +106,13 @@ CREATE POLICY "Users can vote on proposals in their space"
     AND user_id = auth.uid()
   );
 
+DROP POLICY IF EXISTS "Users can update their own votes" ON event_proposal_votes;
 CREATE POLICY "Users can update their own votes"
   ON event_proposal_votes FOR UPDATE
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Users can delete their own votes" ON event_proposal_votes;
 CREATE POLICY "Users can delete their own votes"
   ON event_proposal_votes FOR DELETE
   USING (user_id = auth.uid());
