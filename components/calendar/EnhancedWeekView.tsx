@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { format, parseISO, isSameDay, getHours, getMinutes, differenceInMinutes, startOfWeek, endOfWeek, eachDayOfInterval, isToday } from 'date-fns';
 import { Check, Eye, Edit, MapPin, Clock } from 'lucide-react';
 import type { CalendarEvent } from '@/lib/types';
+import { conflictDetectionService } from '@/lib/services/conflict-detection-service';
+import { ConflictIndicator } from './ConflictIndicator';
 
 interface EnhancedWeekViewProps {
   date: Date;
@@ -122,6 +124,11 @@ export function EnhancedWeekView({
 
   const currentTimeTop = getCurrentTimePosition();
 
+  // Detect conflicts
+  const conflictMap = useMemo(() => {
+    return conflictDetectionService.findAllConflicts(events);
+  }, [events]);
+
   const categoryConfig = {
     work: { icon: '💼', label: 'Work' },
     personal: { icon: '👤', label: 'Personal' },
@@ -233,6 +240,8 @@ export function EnhancedWeekView({
                 const style = getEventStyle(event);
                 const categoryColor = getCategoryColor(event.category);
                 const category = categoryConfig[event.category as keyof typeof categoryConfig] || categoryConfig.personal;
+                const conflicts = conflictMap.get(event.id) || [];
+                const hasConflict = conflicts.length > 0;
 
                 const width = maxColumns > 1 ? `${100 / maxColumns}%` : '100%';
                 const left = maxColumns > 1 ? `${(column * 100) / maxColumns}%` : '0';
@@ -252,7 +261,11 @@ export function EnhancedWeekView({
                     onDragEnd={handleDragEnd}
                   >
                     <div
-                      className={`h-full p-1.5 rounded-md border-l-4 ${categoryColor.border} ${categoryColor.bg} shadow-sm hover:shadow-md transition-all overflow-hidden text-xs`}
+                      className={`h-full p-1.5 rounded-md ${
+                        hasConflict
+                          ? 'border-l-4 border-red-500 ring-2 ring-red-500/50 dark:ring-red-400/50'
+                          : `border-l-4 ${categoryColor.border}`
+                      } ${categoryColor.bg} shadow-sm hover:shadow-md transition-all overflow-hidden text-xs`}
                     >
                       <div className="flex items-start gap-1">
                         {/* Status checkbox */}
@@ -286,12 +299,15 @@ export function EnhancedWeekView({
                             {event.title}
                           </h4>
 
-                          {/* Category badge (if tall enough) */}
+                          {/* Category badge and conflict indicator (if tall enough) */}
                           {parseInt(style.height) > 50 && (
-                            <div className="flex items-center gap-0.5">
+                            <div className="flex items-center gap-0.5 flex-wrap">
                               <span className={`text-[9px] px-1 py-0.5 rounded ${categoryColor.color} truncate`}>
                                 {category.icon} {category.label}
                               </span>
+                              {hasConflict && (
+                                <ConflictIndicator conflicts={conflicts} compact />
+                              )}
                             </div>
                           )}
 
