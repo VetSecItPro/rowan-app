@@ -10,11 +10,21 @@ CREATE TABLE IF NOT EXISTS event_proposals (
   time_slots JSONB NOT NULL, -- Array of {start_time, end_time} objects
   status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'countered')),
   approved_slot_index INTEGER, -- Index of approved time slot
-  created_event_id UUID REFERENCES events(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   expires_at TIMESTAMPTZ
 );
+
+-- Add created_event_id column if it doesn't exist
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'event_proposals' AND column_name = 'created_event_id'
+  ) THEN
+    ALTER TABLE event_proposals ADD COLUMN created_event_id UUID REFERENCES events(id) ON DELETE SET NULL;
+  END IF;
+END $$;
 
 -- Create event_proposal_votes table
 CREATE TABLE IF NOT EXISTS event_proposal_votes (

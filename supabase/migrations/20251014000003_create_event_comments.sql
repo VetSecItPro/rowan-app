@@ -2,7 +2,6 @@
 CREATE TABLE IF NOT EXISTS event_comments (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-  space_id UUID NOT NULL REFERENCES spaces(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   content TEXT NOT NULL,
   mentions UUID[], -- Array of mentioned user IDs
@@ -12,18 +11,30 @@ CREATE TABLE IF NOT EXISTS event_comments (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Add indexes
-CREATE INDEX IF NOT EXISTS idx_event_comments_event_id ON event_comments(event_id);
--- Only create space_id index if column exists
+-- Add space_id column if it doesn't exist (for existing tables)
 DO $$
 BEGIN
-  IF EXISTS (
+  IF NOT EXISTS (
     SELECT 1 FROM information_schema.columns
     WHERE table_name = 'event_comments' AND column_name = 'space_id'
   ) THEN
-    CREATE INDEX IF NOT EXISTS idx_event_comments_space_id ON event_comments(space_id);
+    -- Add column without NOT NULL first
+    ALTER TABLE event_comments ADD COLUMN space_id UUID REFERENCES spaces(id) ON DELETE CASCADE;
+
+    -- Populate space_id from events table for existing rows
+    UPDATE event_comments ec
+    SET space_id = e.space_id
+    FROM events e
+    WHERE ec.event_id = e.id AND ec.space_id IS NULL;
+
+    -- Make it NOT NULL after populating
+    ALTER TABLE event_comments ALTER COLUMN space_id SET NOT NULL;
   END IF;
 END $$;
+
+-- Add indexes
+CREATE INDEX IF NOT EXISTS idx_event_comments_event_id ON event_comments(event_id);
+CREATE INDEX IF NOT EXISTS idx_event_comments_space_id ON event_comments(space_id);
 CREATE INDEX IF NOT EXISTS idx_event_comments_user_id ON event_comments(user_id);
 CREATE INDEX IF NOT EXISTS idx_event_comments_parent ON event_comments(parent_comment_id);
 CREATE INDEX IF NOT EXISTS idx_event_comments_mentions ON event_comments USING GIN(mentions);
