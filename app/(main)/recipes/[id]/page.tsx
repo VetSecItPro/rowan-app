@@ -9,7 +9,7 @@ import Link from 'next/link';
 export default function RecipeDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const recipeId = params.id as string;
+  const recipeId = params?.id as string;
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);

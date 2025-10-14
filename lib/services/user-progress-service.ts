@@ -137,8 +137,8 @@ export async function getOrCreateUserProgress(
     // Try to get existing progress
     const existingProgress = await getUserProgress(userId);
 
-    if (existingProgress.success && existingProgress.data) {
-      return existingProgress;
+    if (existingProgress.success && existingProgress.data && existingProgress.data !== null) {
+      return { success: true, data: existingProgress.data };
     }
 
     // Create new progress if doesn't exist

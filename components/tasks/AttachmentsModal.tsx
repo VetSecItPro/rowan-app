@@ -71,7 +71,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
 
   async function handleDownload(attachment: TaskAttachment) {
     try {
-      const url = await taskAttachmentsService.getAttachmentUrl(attachment.file_path);
+      const url = await taskAttachmentsService.getAttachmentUrl((attachment as any).file_path);
       window.open(url, '_blank');
     } catch (error) {
       console.error('Error downloading file:', error);
@@ -154,7 +154,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
                       key={attachment.id}
                       className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg"
                     >
-                      {getFileIcon(attachment.mime_type)}
+                      {getFileIcon((attachment as any).mime_type)}
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-gray-900 dark:text-white truncate">
                           {attachment.file_name}

@@ -111,7 +111,7 @@ export default function SettingsPage() {
   const searchParams = useSearchParams();
 
   // Get initial tab from URL or default to 'profile'
-  const initialTab = (searchParams.get('tab') as SettingsTab) || 'profile';
+  const initialTab = (searchParams?.get('tab') as SettingsTab) || 'profile';
   const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const profileImageInputRef = useRef<HTMLInputElement>(null);

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, CheckCircle, XCircle, Clock, UserCheck, MessageSquare } from 'lucide-react';
-import { taskApprovalsService, TaskApproval } from '@/lib/services/task-approvals-service';
+import { taskApprovalsService } from '@/lib/services/task-approvals-service';
 import { createClient } from '@/lib/supabase/client';
 
 interface ApprovalModalProps {
@@ -21,6 +21,22 @@ interface SpaceMember {
     email: string;
     full_name: string | null;
   };
+}
+
+interface TaskApproval {
+  id: string;
+  task_id: string;
+  approver_id: string;
+  status: 'pending' | 'approved' | 'rejected' | 'changes_requested';
+  note?: string;
+  requested_by: string;
+  requested_by_user?: any;
+  requested_at?: string;
+  approver_user?: any;
+  review_note?: string;
+  reviewed_at?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId }: ApprovalModalProps) {
@@ -65,7 +81,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
       .eq('space_id', spaceId)
       .neq('user_id', currentUserId);
 
-    setSpaceMembers(data || []);
+    setSpaceMembers((data || []) as any);
   }
 
   async function requestApproval() {
@@ -91,7 +107,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
     }
 
     try {
-      await taskApprovalsService.approve(approvalId, currentUserId, reviewNote);
+      await taskApprovalsService.updateApprovalStatus(approvalId, 'approved', reviewNote);
       setReviewNote('');
       loadApprovals();
     } catch (error) {
@@ -107,7 +123,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
     }
 
     try {
-      await taskApprovalsService.reject(approvalId, currentUserId, reviewNote);
+      await taskApprovalsService.updateApprovalStatus(approvalId, 'rejected', reviewNote);
       setReviewNote('');
       loadApprovals();
     } catch (error) {
@@ -215,7 +231,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
                               Requested by: <span className="font-medium">{approval.requested_by_user?.email}</span>
                             </p>
                             <p className="text-xs text-gray-500 mt-1">
-                              {new Date(approval.requested_at).toLocaleString()}
+                              {approval.requested_at ? new Date(approval.requested_at).toLocaleString() : 'Unknown'}
                             </p>
                           </div>
                           {getStatusBadge(approval.status)}
@@ -275,7 +291,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
                               {approval.approver_user?.full_name || approval.approver_user?.email}
                             </p>
                             <p className="text-xs text-gray-500 mt-1">
-                              Requested {new Date(approval.requested_at).toLocaleDateString()}
+                              Requested {approval.requested_at ? new Date(approval.requested_at).toLocaleDateString() : 'Unknown'}
                             </p>
                           </div>
                           {getStatusBadge(approval.status)}

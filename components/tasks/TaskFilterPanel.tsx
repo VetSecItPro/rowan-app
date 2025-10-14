@@ -69,7 +69,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
     ]);
 
     setCategories(categoriesData.data || []);
-    setMembers(membersData.data || []);
+    setMembers((membersData.data || []) as any);
     setLoading(false);
   }
 

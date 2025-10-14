@@ -219,6 +219,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
           try {
             await eventAttachmentsService.uploadAttachment({
               event_id: createdEvent.id,
+              space_id: cleanedData.space_id,
               file
             });
           } catch (error) {

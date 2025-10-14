@@ -182,7 +182,7 @@ export default function RecipesPage() {
                   {cuisines.map((cuisine) => (
                     <button
                       key={cuisine}
-                      onClick={() => setSelectedCuisine(cuisine === selectedCuisine ? null : cuisine)}
+                      onClick={() => setSelectedCuisine(cuisine === selectedCuisine ? null : (cuisine || null))}
                       className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                         selectedCuisine === cuisine
                           ? 'bg-orange-500 text-white'
@@ -204,7 +204,7 @@ export default function RecipesPage() {
                   {difficulties.map((difficulty) => (
                     <button
                       key={difficulty}
-                      onClick={() => setSelectedDifficulty(difficulty === selectedDifficulty ? null : difficulty)}
+                      onClick={() => setSelectedDifficulty(difficulty === selectedDifficulty ? null : (difficulty || null))}
                       className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                         selectedDifficulty === difficulty
                           ? 'bg-orange-500 text-white'

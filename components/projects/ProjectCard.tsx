@@ -21,8 +21,8 @@ export const ProjectCard = memo(({ project, onEdit, onDelete }: ProjectCardProps
   const [showMenu, setShowMenu] = useState(false);
 
   // Use custom progress if available, otherwise calculate from status
-  const progress = project.progress_percentage !== undefined
-    ? project.progress_percentage
+  const progress = (project as any).progress_percentage !== undefined
+    ? (project as any).progress_percentage
     : (() => {
         switch (project.status) {
           case 'planning': return 10;

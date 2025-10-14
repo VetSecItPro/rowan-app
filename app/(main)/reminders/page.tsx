@@ -52,7 +52,7 @@ export default function RemindersPage() {
     const active = reminders.filter(r => r.status === 'active').length;
     const completed = reminders.filter(r => r.status === 'completed').length;
     const overdue = reminders.filter(r => {
-      if (r.status !== 'active') return false;
+      if (r.status !== 'active' || !r.reminder_time) return false;
       const reminderTime = new Date(r.reminder_time);
       return reminderTime < now;
     }).length;
