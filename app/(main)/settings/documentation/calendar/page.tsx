@@ -44,6 +44,7 @@ import {
   Hand,
   Heart,
   ShoppingBag,
+  Edit,
 } from 'lucide-react';
 
 interface GuideSection {
@@ -130,12 +131,6 @@ const guideSections: GuideSection[] = [
         description: 'Horizontal scrollable timeline showing entire month at a glance',
         readTime: '3 min read',
         href: '#timeline-view',
-      },
-      {
-        title: 'List View - Complete Overview',
-        description: 'All events in list format with filtering by status (All, Pending, In Progress, Completed)',
-        readTime: '4 min read',
-        href: '#list-view',
       },
     ],
   },
@@ -912,42 +907,7 @@ export default function CalendarDocumentationPage() {
   </a>
 </section>
 
-<section id="list-view" className="scroll-mt-24">
-  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
-    <List className="w-8 h-8 text-gray-500" />
-    List View - All Events
-  </h2>
-  <div className="prose dark:prose-invert max-w-none">
-    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      List View displays all events in a searchable, filterable list. Unlike other views, List View includes completed events and offers powerful status filtering.
-    </p>
-
-    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-700 mb-6">
-      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">List View Features</h4>
-      <ul className="space-y-3 text-gray-700 dark:text-gray-300">
-        <li><strong>🔍 Search Integration:</strong> Search bar filters events by title, location, or description</li>
-        <li><strong>🎛️ Status Filters:</strong> Filter by All, Not Started, In Progress, or Completed</li>
-        <li><strong>📋 Full Event List:</strong> See ALL events including completed (other views hide completed)</li>
-        <li><strong>📊 Event Cards:</strong> Compact cards with full details (time, category, location, status)</li>
-        <li><strong>🎨 Category Colors:</strong> Events show category color coding for quick identification</li>
-      </ul>
-    </div>
-
-    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
-      <div className="flex items-start gap-2">
-        <Lightbulb className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-        <div className="text-sm text-blue-900 dark:text-blue-100">
-          <strong>Pro Tip:</strong> Use List View with "Completed" filter to review what you've accomplished this week. Great for weekly reviews!
-        </div>
-      </div>
-    </div>
-  </div>
-  <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
-    ↑ Back to top
-  </a>
-</section>
-
-{/* EVENT MANAGEMENT SECTIONS - Insert after line 900 (after shortcuts section) */}
+{/* EVENT MANAGEMENT SECTIONS */}
 
 <section id="create-events" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">

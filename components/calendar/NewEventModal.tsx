@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Smile, Image as ImageIcon, Paperclip, Calendar, ChevronDown, Palette } from 'lucide-react';
+import { X, Smile, Image as ImageIcon, Paperclip, Calendar, ChevronDown, Palette, ShoppingCart } from 'lucide-react';
 import { CreateEventInput, CalendarEvent } from '@/lib/services/calendar-service';
 import { eventAttachmentsService } from '@/lib/services/event-attachments-service';
+import { shoppingService, ShoppingList } from '@/lib/services/shopping-service';
+import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { toDateTimeLocalValue, fromDateTimeLocalValue, fromUTC, toUTC } from '@/lib/utils/timezone-utils';
 
 interface NewEventModalProps {
@@ -65,6 +67,9 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
   const [selectedDaysOfMonth, setSelectedDaysOfMonth] = useState<number[]>([]);
   const [dateError, setDateError] = useState<string>('');
   const [customColor, setCustomColor] = useState<string>('');
+  const [linkToShopping, setLinkToShopping] = useState(false);
+  const [selectedListId, setSelectedListId] = useState('');
+  const [shoppingLists, setShoppingLists] = useState<ShoppingList[]>([]);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -93,6 +98,26 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
         category: editEvent.category || 'personal',
       });
       setCustomColor((editEvent as any).custom_color || '');
+
+      // Parse recurrence pattern if it exists
+      if (editEvent.recurrence_pattern) {
+        const pattern = editEvent.recurrence_pattern;
+        if (pattern === 'daily') {
+          setRecurringFrequency('daily');
+        } else if (pattern.startsWith('weekly:')) {
+          setRecurringFrequency('weekly');
+          const days = pattern.split(':')[1].split(',').map(Number);
+          setSelectedDaysOfWeek(days);
+        } else if (pattern.startsWith('monthly:')) {
+          setRecurringFrequency('monthly');
+          const days = pattern.split(':')[1].split(',').map(Number);
+          setSelectedDaysOfMonth(days);
+        }
+      } else {
+        setRecurringFrequency('weekly');
+        setSelectedDaysOfWeek([]);
+        setSelectedDaysOfMonth([]);
+      }
     } else {
       setFormData({
         space_id: spaceId,
@@ -105,13 +130,36 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
         category: 'personal',
       });
       setCustomColor('');
+      setRecurringFrequency('weekly');
+      setSelectedDaysOfWeek([]);
+      setSelectedDaysOfMonth([]);
     }
-    // Reset attachments when modal opens/closes
+    // Reset attachments and shopping link when modal opens/closes
     setAttachedImages([]);
     setAttachedFiles([]);
     setShowEmojiPicker(false);
     setDateError('');
+    setLinkToShopping(false);
+    setSelectedListId('');
   }, [editEvent, spaceId, isOpen]);
+
+  // Load shopping lists on mount
+  useEffect(() => {
+    if (isOpen && spaceId) {
+      loadShoppingLists();
+    }
+  }, [isOpen, spaceId]);
+
+  const loadShoppingLists = async () => {
+    try {
+      const lists = await shoppingService.getLists(spaceId);
+      // Only show active shopping lists
+      const activeLists = lists.filter(list => list.status === 'active');
+      setShoppingLists(activeLists);
+    } catch (error) {
+      console.error('Failed to load shopping lists:', error);
+    }
+  };
 
   const [uploading, setUploading] = useState(false);
 
@@ -134,6 +182,18 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
     setUploading(true);
 
     try {
+      // Build recurrence pattern string if recurring
+      let recurrencePattern: string | undefined;
+      if (formData.is_recurring) {
+        if (recurringFrequency === 'daily') {
+          recurrencePattern = 'daily';
+        } else if (recurringFrequency === 'weekly' && selectedDaysOfWeek.length > 0) {
+          recurrencePattern = `weekly:${selectedDaysOfWeek.sort((a, b) => a - b).join(',')}`;
+        } else if (recurringFrequency === 'monthly' && selectedDaysOfMonth.length > 0) {
+          recurrencePattern = `monthly:${selectedDaysOfMonth.sort((a, b) => a - b).join(',')}`;
+        }
+      }
+
       // Clean up the form data - remove empty strings
       const cleanedData: CreateEventInput = {
         space_id: formData.space_id,
@@ -142,6 +202,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
         start_time: formData.start_time,
         end_time: formData.end_time || undefined,
         is_recurring: formData.is_recurring,
+        recurrence_pattern: recurrencePattern,
         location: formData.location || undefined,
         category: formData.category,
         custom_color: customColor || undefined,
@@ -164,6 +225,16 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
             console.error('Failed to upload attachment:', file.name, error);
             // Continue uploading other files even if one fails
           }
+        }
+      }
+
+      // Link to shopping list if selected
+      if (createdEvent?.id && linkToShopping && selectedListId) {
+        try {
+          await shoppingIntegrationService.linkToCalendar(selectedListId, createdEvent.id);
+        } catch (error) {
+          console.error('Failed to link shopping list:', error);
+          // Don't fail the whole operation if linking fails
         }
       }
 
@@ -601,6 +672,62 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Shopping List Integration */}
+          <div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={linkToShopping}
+                onChange={(e) => setLinkToShopping(e.target.checked)}
+                className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                <ShoppingCart className="w-4 h-4" />
+                Link to Shopping List
+              </span>
+            </label>
+          </div>
+
+          {/* Shopping List Selection */}
+          {linkToShopping && (
+            <div className="space-y-4 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-200 dark:border-emerald-700">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Select Shopping List
+                </label>
+                {shoppingLists.length > 0 ? (
+                  <div className="relative">
+                    <select
+                      value={selectedListId}
+                      onChange={(e) => setSelectedListId(e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
+                      style={{ paddingRight: '2.5rem' }}
+                    >
+                      <option value="">Choose a list...</option>
+                      {shoppingLists.map((list) => (
+                        <option key={list.id} value={list.id}>
+                          {list.title} ({list.items?.length || 0} items)
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  </div>
+                ) : (
+                  <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      No active shopping lists found. Create a shopping list first to link it to this event.
+                    </p>
+                  </div>
+                )}
+              </div>
+              <div className="bg-emerald-100 dark:bg-emerald-900/30 rounded-lg p-3 border border-emerald-300 dark:border-emerald-700">
+                <p className="text-xs text-emerald-900 dark:text-emerald-100">
+                  <strong>Tip:</strong> Linking a shopping list helps you coordinate your shopping trip with this event. The list will appear in your event details.
+                </p>
+              </div>
             </div>
           )}
 
