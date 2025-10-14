@@ -180,17 +180,23 @@ export default function CalendarPage() {
   }, [currentSpace, user]);
 
   // Stable callback for creating/updating events
-  const handleCreateEvent = useCallback(async (eventData: CreateEventInput) => {
+  const handleCreateEvent = useCallback(async (eventData: CreateEventInput): Promise<CalendarEvent | void> => {
     try {
+      let createdEvent: CalendarEvent | undefined;
+
       if (editingEvent) {
         await calendarService.updateEvent(editingEvent.id, eventData);
       } else {
-        await calendarService.createEvent(eventData);
+        createdEvent = await calendarService.createEvent(eventData);
       }
+
       loadEvents();
       setEditingEvent(null);
+
+      return createdEvent;
     } catch (error) {
       console.error('Failed to save event:', error);
+      throw error; // Re-throw so modal can handle it
     }
   }, [editingEvent, loadEvents]);
 
