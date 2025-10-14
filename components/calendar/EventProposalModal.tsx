@@ -69,7 +69,7 @@ export function EventProposalModal({
       const voteMap: Record<number, 'available' | 'unavailable' | 'preferred'> = {};
       userVotes.forEach((vote: ProposalVote) => {
         if (vote.user_id === user?.id) {
-          voteMap[vote.slot_index] = vote.availability;
+          voteMap[vote.time_slot_index] = vote.vote;
         }
       });
       setVotes(voteMap);
@@ -105,7 +105,6 @@ export function EventProposalModal({
         space_id: spaceId,
         title,
         description,
-        location,
         time_slots: timeSlots
       };
 
@@ -129,8 +128,8 @@ export function EventProposalModal({
 
       await eventProposalsService.voteOnProposal({
         proposal_id: proposal.id,
-        slot_index: slotIndex,
-        availability: newVote
+        time_slot_index: slotIndex,
+        vote: newVote
       });
 
       setVotes({ ...votes, [slotIndex]: newVote });
@@ -191,7 +190,7 @@ export function EventProposalModal({
           </div>
           {mode === 'vote' && proposal && (
             <p className="mt-2 text-purple-100 text-sm">
-              Created by {proposal.created_by_user?.name} • {formatDistance(new Date(proposal.created_at), new Date(), { addSuffix: true })}
+              Created by {proposal.proposer?.name} • {formatDistance(new Date(proposal.created_at), new Date(), { addSuffix: true })}
             </p>
           )}
         </div>
@@ -351,12 +350,6 @@ export function EventProposalModal({
                     {proposal.description}
                   </p>
                 )}
-                {proposal.location && (
-                  <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                    <span>📍</span>
-                    <span>{proposal.location}</span>
-                  </div>
-                )}
               </div>
 
               {/* Voting Instructions */}
@@ -383,10 +376,10 @@ export function EventProposalModal({
 
               {/* Time Slot Voting */}
               <div className="space-y-3">
-                {proposal.time_slots.map((slot: TimeSlot, index: number) => {
+                {proposal.time_slots.map((slot, index) => {
                   const slotSummary = voteSummary?.slots[index];
                   const userVote = votes[index];
-                  const isCreator = proposal.created_by === user?.id;
+                  const isCreator = proposal.proposed_by === user?.id;
 
                   return (
                     <div key={index} className="bg-white dark:bg-gray-900 rounded-xl p-5 border-2 border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-600 transition-colors">
@@ -400,7 +393,7 @@ export function EventProposalModal({
                             {format(new Date(slot.start_time), 'EEEE, MMMM d')}
                           </div>
                           <div className="text-sm text-gray-500 dark:text-gray-500">
-                            {format(new Date(slot.start_time), 'h:mm a')} - {format(new Date(slot.end_time), 'h:mm a')}
+                            {format(new Date(slot.start_time), 'h:mm a')} {slot.end_time && `- ${format(new Date(slot.end_time), 'h:mm a')}`}
                           </div>
                         </div>
 
