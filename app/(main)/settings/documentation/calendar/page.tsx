@@ -177,6 +177,43 @@ const guideSections: GuideSection[] = [
     ],
   },
   {
+    title: 'Quick Creation & Templates',
+    icon: Zap,
+    color: 'from-pink-500 to-pink-600',
+    articles: [
+      {
+        title: 'Quick Add with Natural Language',
+        description: 'Type naturally like "dinner with Sarah tomorrow at 7pm" and events are created automatically',
+        readTime: '4 min read',
+        href: '#quick-add',
+      },
+      {
+        title: 'Event Templates',
+        description: 'Use 10 pre-built templates (Date Night, Doctor, Team Meeting) or create custom ones',
+        readTime: '5 min read',
+        href: '#templates',
+      },
+      {
+        title: 'Enhanced Day View - Hourly Breakdown',
+        description: 'See your day hour-by-hour from 6am-11pm with time-based event positioning',
+        readTime: '4 min read',
+        href: '#enhanced-day',
+      },
+      {
+        title: 'Enhanced Week View - Hourly Grid',
+        description: 'Week view with hourly slots showing exactly when events occur throughout the week',
+        readTime: '5 min read',
+        href: '#enhanced-week',
+      },
+      {
+        title: 'Visual Overlap Indicators',
+        description: 'Overlapping events shown with purple shades for easy visual identification',
+        readTime: '3 min read',
+        href: '#visual-overlap',
+      },
+    ],
+  },
+  {
     title: 'Collaborative Scheduling',
     icon: Sparkles,
     color: 'from-indigo-500 to-indigo-600',
@@ -221,7 +258,7 @@ const guideSections: GuideSection[] = [
   },
   {
     title: 'Advanced Features',
-    icon: Zap,
+    icon: Target,
     color: 'from-amber-500 to-amber-600',
     articles: [
       {
@@ -391,7 +428,11 @@ export default function CalendarDocumentationPage() {
                   </div>
                   <div className="flex items-start gap-2">
                     <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                    <span><strong>Smart Proposals</strong> - Collaborative scheduling with AI suggestions</span>
+                    <span><strong>Quick Add</strong> - Natural language parsing ("dinner tomorrow at 7pm")</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <FileText className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Event Templates</strong> - 10 pre-built templates for common events</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <ThumbsUp className="w-4 h-4 mt-0.5 flex-shrink-0" />
@@ -802,6 +843,355 @@ export default function CalendarDocumentationPage() {
                   <Zap className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-amber-900 dark:text-amber-100">
                     <strong>Power User Tip:</strong> Memorize T, N, and the arrow keys for the fastest calendar experience. Press T to jump to today, N to create an event, and arrow keys to navigate through time!
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          {/* QUICK CREATION & TEMPLATES */}
+          <section id="quick-add" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <Sparkles className="w-8 h-8 text-pink-500" />
+              Quick Add with Natural Language
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                Quick Add lets you create events by typing naturally, just like you'd tell a friend. Powered by intelligent natural language parsing, it understands dates, times, locations, and event types automatically.
+              </p>
+
+              <div className="bg-pink-50 dark:bg-pink-900/20 rounded-xl p-6 border border-pink-200 dark:border-pink-800 mb-6">
+                <h4 className="text-lg font-semibold text-pink-900 dark:text-pink-100 mb-4">How to Use Quick Add</h4>
+                <ol className="space-y-3 text-gray-700 dark:text-gray-300">
+                  <li><strong>1. Select "Quick Add" from the toolbar</strong> - Click the Quick Add toggle, then click the action button (or press Q)</li>
+                  <li><strong>2. Type naturally</strong> - Examples: "dinner with Sarah tomorrow at 7pm", "doctor appointment next Monday at 2pm", "team meeting Friday at 10am"</li>
+                  <li><strong>3. See the preview</strong> - Quick Add shows what it understood before creating</li>
+                  <li><strong>4. Create or adjust</strong> - Click Create if it looks good, or manually adjust if needed</li>
+                </ol>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">What Quick Add Understands</h3>
+              <div className="grid gap-4 mb-6">
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">📅 Dates & Times</h4>
+                  <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                    <li>• "tomorrow", "next Monday", "in 3 days", "June 15th"</li>
+                    <li>• "at 7pm", "at 2:30pm", "from 9am to 11am"</li>
+                    <li>• "next week Tuesday", "this Friday"</li>
+                  </ul>
+                </div>
+
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">📍 Locations</h4>
+                  <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                    <li>• "at Olive Garden", "at the park", "at home"</li>
+                    <li>• Location is automatically extracted from "at [place]" or "@ [place]"</li>
+                  </ul>
+                </div>
+
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🏷️ Event Types</h4>
+                  <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                    <li>• "meeting", "call", "appointment" → Work category</li>
+                    <li>• "dinner", "lunch", "birthday", "party" → Social category</li>
+                    <li>• "doctor", "gym", "therapy" → Health category</li>
+                  </ul>
+                </div>
+
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🔁 Recurring Events</h4>
+                  <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                    <li>• "every Monday", "every day", "weekly meeting"</li>
+                    <li>• Automatically sets up recurring patterns</li>
+                  </ul>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Example Phrases</h3>
+              <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                <div className="grid sm:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <div className="text-pink-600 dark:text-pink-400 font-mono mb-1">"dinner with Sarah tomorrow at 7pm"</div>
+                    <div className="text-gray-600 dark:text-gray-400 text-xs">→ Dinner event, tomorrow 7:00 PM, Social category</div>
+                  </div>
+                  <div>
+                    <div className="text-pink-600 dark:text-pink-400 font-mono mb-1">"team meeting Friday at 2pm"</div>
+                    <div className="text-gray-600 dark:text-gray-400 text-xs">→ Team Meeting, this Friday 2:00 PM, Work category</div>
+                  </div>
+                  <div>
+                    <div className="text-pink-600 dark:text-pink-400 font-mono mb-1">"doctor appointment next Monday at 10am"</div>
+                    <div className="text-gray-600 dark:text-gray-400 text-xs">→ Doctor Appointment, next Monday 10:00 AM, Health category</div>
+                  </div>
+                  <div>
+                    <div className="text-pink-600 dark:text-pink-400 font-mono mb-1">"gym every Tuesday at 6pm"</div>
+                    <div className="text-gray-600 dark:text-gray-400 text-xs">→ Gym event, recurring weekly Tuesdays 6:00 PM, Health category</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800 mt-6">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-indigo-900 dark:text-indigo-100">
+                    <strong>Pro Tip:</strong> The more natural you type, the better! "coffee with mom tomorrow morning at 9" works just as well as formal phrasing. Quick Add is designed to understand how you normally speak.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="templates" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <FileText className="w-8 h-8 text-pink-500" />
+              Event Templates
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                Event Templates let you create common events in one click. Rowan comes with 10 pre-built templates for popular event types, and you can create custom templates for events you schedule regularly.
+              </p>
+
+              <div className="bg-pink-50 dark:bg-pink-900/20 rounded-xl p-6 border border-pink-200 dark:border-pink-800 mb-6">
+                <h4 className="text-lg font-semibold text-pink-900 dark:text-pink-100 mb-4">How to Use Templates</h4>
+                <ol className="space-y-3 text-gray-700 dark:text-gray-300">
+                  <li><strong>1. Select "Templates" from the toolbar</strong> - Click the Templates toggle, then click the action button</li>
+                  <li><strong>2. Browse available templates</strong> - See system templates (pre-built) and your custom templates</li>
+                  <li><strong>3. Click a template</strong> - Event is created instantly with pre-filled details</li>
+                  <li><strong>4. Edit the event</strong> - Automatically opens in edit mode so you can adjust the time and details</li>
+                </ol>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Pre-Built System Templates</h3>
+              <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <div className="text-2xl mb-2">💑</div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Date Night</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Romantic evening out with your partner (3 hours, Family category)</p>
+                </div>
+
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <div className="text-2xl mb-2">🏥</div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Doctor Appointment</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Medical checkup or doctor visit (1 hour, Health category)</p>
+                </div>
+
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <div className="text-2xl mb-2">💪</div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Gym Session</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Workout or exercise session (1.5 hours, Health category)</p>
+                </div>
+
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                  <div className="text-2xl mb-2">👥</div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Team Meeting</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Work meeting with team members (1 hour, Work category)</p>
+                </div>
+
+                <div className="p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg border border-pink-200 dark:border-pink-800">
+                  <div className="text-2xl mb-2">📞</div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Phone Call</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Scheduled call or video meeting (30 minutes, Work category)</p>
+                </div>
+
+                <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                  <div className="text-2xl mb-2">🍽️</div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Family Dinner</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Dinner with family members (2 hours, Family category)</p>
+                </div>
+
+                <div className="p-4 bg-rose-50 dark:bg-rose-900/20 rounded-lg border border-rose-200 dark:border-rose-800">
+                  <div className="text-2xl mb-2">🎬</div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Movie Night</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Watching a movie together (2.5 hours, Social category)</p>
+                </div>
+
+                <div className="p-4 bg-teal-50 dark:bg-teal-900/20 rounded-lg border border-teal-200 dark:border-teal-800">
+                  <div className="text-2xl mb-2">🛒</div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Grocery Shopping</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Weekly grocery shopping trip (1.5 hours, Personal category)</p>
+                </div>
+
+                <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                  <div className="text-2xl mb-2">🎉</div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Birthday Party</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Birthday celebration (3 hours, Social category)</p>
+                </div>
+
+                <div className="p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg border border-cyan-200 dark:border-cyan-800">
+                  <div className="text-2xl mb-2">☕</div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Coffee Chat</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Casual coffee meetup (1 hour, Social category)</p>
+                </div>
+              </div>
+
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800 mt-6">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-emerald-900 dark:text-emerald-100">
+                    <strong>Household Tip:</strong> Templates track usage count! The more you use a template, the higher it appears in the list. Your most common events will always be easy to find.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="enhanced-day" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <CalendarDays className="w-8 h-8 text-pink-500" />
+              Enhanced Day View - Hourly Breakdown
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                The Enhanced Day View shows your entire day from 6am to 11pm in an hourly grid. Events appear exactly where they occur in the timeline, making it easy to see your schedule at a glance and spot gaps or busy periods.
+              </p>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Key Features</h3>
+              <div className="grid gap-4 mb-6">
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">⏰ Hourly Time Grid</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">18-hour view from 6am-11pm with hour labels on the left. Grid lines mark each hour for precise time visualization.</p>
+                </div>
+
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">📍 Precise Event Positioning</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Events appear exactly at their scheduled time. A 2:30pm event appears at 2:30, not just "afternoon".</p>
+                </div>
+
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">📏 Visual Duration</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Event height matches duration. A 2-hour meeting is twice as tall as a 1-hour meeting, making time commitment immediately visible.</p>
+                </div>
+
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🔴 Current Time Indicator</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Red line shows exactly what time it is right now (updates every minute). Only visible for today's date.</p>
+                </div>
+
+                <div className="p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg border border-pink-200 dark:border-pink-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">↔️ Side-by-Side Overlaps</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">When events overlap, they appear side-by-side in purple shades so you can see both at once.</p>
+                </div>
+              </div>
+
+              <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-indigo-900 dark:text-indigo-100">
+                    <strong>Pro Tip:</strong> Use Enhanced Day View when you have a packed schedule. The hourly breakdown helps you see exactly where you have free time and how much time you have between events. Perfect for planning your day or fitting in one more task!
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="enhanced-week" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <CalendarRange className="w-8 h-8 text-pink-500" />
+              Enhanced Week View - Hourly Grid
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                The Enhanced Week View combines the weekly overview with hourly time slots. See all 7 days (Monday-Sunday) with events positioned exactly when they occur throughout each day. Perfect for weekly planning and workload balancing.
+              </p>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Key Features</h3>
+              <div className="grid gap-4 mb-6">
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">📅 7-Day Grid with Hours</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Monday through Sunday columns, each with the same 6am-11pm hourly grid. See your entire week's schedule at once.</p>
+                </div>
+
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">📊 Workload Visualization</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Quickly spot busy days vs. light days. See which days are packed and which have more breathing room.</p>
+                </div>
+
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🎯 Today Highlighting</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Today's column has a purple tint and shows the current time indicator, making it easy to spot where you are in the week.</p>
+                </div>
+
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">📝 Event Count Headers</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Each day's header shows the date and how many events are scheduled. "3 events", "No events", etc.</p>
+                </div>
+
+                <div className="p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg border border-pink-200 dark:border-pink-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🖱️ Compact Event Cards</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Events show time, title, category, and location (if tall enough). Hover for action buttons to view details or edit.</p>
+                </div>
+              </div>
+
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-emerald-900 dark:text-emerald-100">
+                    <strong>Household Tip:</strong> Use Enhanced Week View for family schedule coordination. Quickly see who has activities when, spot scheduling conflicts, and find times when everyone is free for family activities or meals together!
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="visual-overlap" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <Palette className="w-8 h-8 text-pink-500" />
+              Visual Overlap Indicators
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                When events overlap in time, Rowan displays them side-by-side with distinct purple shades. This helps you quickly identify overlapping commitments without blocking you from creating them—because sometimes overlaps are intentional!
+              </p>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">How It Works</h3>
+              <div className="grid gap-4 mb-6">
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🟣 Purple Shade #1</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">First overlapping event gets a light purple background (bg-purple-100)</p>
+                </div>
+
+                <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🟣 Indigo Shade #2</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Second overlapping event gets an indigo background (bg-indigo-100)</p>
+                </div>
+
+                <div className="p-4 bg-violet-50 dark:bg-violet-900/20 rounded-lg border border-violet-200 dark:border-violet-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🟣 Violet Shade #3</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Third overlapping event gets a violet background (bg-violet-100)</p>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Why Overlaps Are Allowed</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                Rowan doesn't block overlapping events because there are many valid reasons to schedule them:
+              </p>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300 mb-6">
+                <li><strong>• Optional events:</strong> "I might go to the gym OR meet Sarah for coffee"</li>
+                <li><strong>• Backup plans:</strong> Schedule multiple options and cancel one later</li>
+                <li><strong>• Different people:</strong> Partner's doctor appointment overlaps with your gym session (you're in different places)</li>
+                <li><strong>• Flexible timing:</strong> "Dinner sometime between 6-8pm" with another event at 7pm</li>
+                <li><strong>• Ambitious scheduling:</strong> See what you WANT to accomplish, even if it's tight</li>
+              </ul>
+
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-blue-900 dark:text-blue-100">
+                    <strong>Power User Tip:</strong> The purple shades make overlaps visually obvious without being alarming. If you see purple, take a second look—but you're always in control. Rowan trusts you to manage your own time!
                   </div>
                 </div>
               </div>
