@@ -11,6 +11,7 @@ import { ProposalsList } from '@/components/calendar/ProposalsList';
 import { MiniCalendar } from '@/components/calendar/MiniCalendar';
 import { QuickAddEvent } from '@/components/calendar/QuickAddEvent';
 import { EnhancedDayView } from '@/components/calendar/EnhancedDayView';
+import { EnhancedWeekView } from '@/components/calendar/EnhancedWeekView';
 import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
@@ -872,7 +873,7 @@ export default function CalendarPage() {
                   </div>
                 </div>
               ) : viewMode === 'week' ? (
-                /* Week View */
+                /* Enhanced Week View with Hourly Breakdown */
                 <div>
                   {/* Week Navigation */}
                   <div className="flex items-center justify-center mb-4 sm:mb-6">
@@ -901,84 +902,15 @@ export default function CalendarPage() {
                     </button>
                   </div>
 
-                  {/* Week Grid - showing each day as a column */}
-                  <div className="grid grid-cols-7 gap-2">
-                    {/* Day headers */}
-                    {eachDayOfInterval({
-                      start: startOfWeek(currentMonth, { weekStartsOn: 1 }),
-                      end: endOfWeek(currentMonth, { weekStartsOn: 1 })
-                    }).map((day) => {
-                      const isToday = isSameDay(day, new Date());
-                      return (
-                        <div key={day.toISOString()} className="text-center">
-                          <div className={`text-xs sm:text-sm font-medium py-2 ${
-                            isToday
-                              ? 'text-purple-600 dark:text-purple-400'
-                              : 'text-gray-600 dark:text-gray-400'
-                          }`}>
-                            <div>{format(day, 'EEE')}</div>
-                            <div className={`text-lg ${isToday ? 'font-bold' : ''}`}>
-                              {format(day, 'd')}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-
-                    {/* Day columns with events */}
-                    {eachDayOfInterval({
-                      start: startOfWeek(currentMonth),
-                      end: endOfWeek(currentMonth)
-                    }).map((day) => {
-                      const dayEvents = getEventsForDate(day);
-                      const isToday = isSameDay(day, new Date());
-
-                      return (
-                        <div
-                          key={day.toISOString()}
-                          className={`min-h-[400px] p-2 rounded-lg border ${
-                            isToday
-                              ? 'border-purple-300 dark:border-purple-700 bg-purple-50 dark:bg-purple-900/10'
-                              : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
-                          }`}
-                        >
-                          <div className="space-y-1">
-                            {dayEvents.map((event) => {
-                              const categoryColor = getCategoryColor(event.category);
-                              const categoryConfig = {
-                                work: { icon: '💼', label: 'Work' },
-                                personal: { icon: '👤', label: 'Personal' },
-                                family: { icon: '👨‍👩‍👧‍👦', label: 'Family' },
-                                health: { icon: '💪', label: 'Health' },
-                                social: { icon: '🎉', label: 'Social' },
-                              };
-                              const category = categoryConfig[event.category as keyof typeof categoryConfig] || categoryConfig.personal;
-
-                              return (
-                                <button
-                                  key={event.id}
-                                  onClick={() => handleEditEvent(event)}
-                                  className={`w-full text-left p-2 rounded text-xs ${categoryColor.bg} border-l-2 ${categoryColor.border} hover:opacity-80 transition-opacity`}
-                                >
-                                  <div className={`font-medium ${categoryColor.text} truncate`}>
-                                    {format(parseISO(event.start_time), 'h:mm a')}
-                                  </div>
-                                  <div className={`font-semibold ${categoryColor.text} truncate`}>
-                                    {event.title}
-                                  </div>
-                                </button>
-                              );
-                            })}
-                            {dayEvents.length === 0 && (
-                              <div className="text-center py-4 text-xs text-gray-400">
-                                No events
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                  {/* Enhanced Week View Component */}
+                  <EnhancedWeekView
+                    date={currentMonth}
+                    events={events}
+                    onEventStatusClick={handleEventStatusClick}
+                    onViewDetails={handleViewDetails}
+                    onEditEvent={handleEditEvent}
+                    getCategoryColor={getCategoryColor}
+                  />
                 </div>
               ) : viewMode === 'day' ? (
                 /* Enhanced Day View with Hourly Breakdown */
