@@ -6,6 +6,7 @@ import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
 import { ActivityTimeline } from './ActivityTimeline';
 import { CommentsSection } from './CommentsSection';
+import { AttachmentList } from './AttachmentList';
 
 interface ReminderCardProps {
   reminder: Reminder;
@@ -265,6 +266,11 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
         </div>
       )}
 
+      {/* Attachments */}
+      <div className="mt-4">
+        <AttachmentList reminderId={reminder.id} />
+      </div>
+
       {/* Activity Timeline */}
       <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
         <ActivityTimeline reminderId={reminder.id} />
@@ -272,7 +278,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
 
       {/* Comments Section */}
       <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <CommentsSection reminderId={reminder.id} />
+        <CommentsSection reminderId={reminder.id} spaceId={reminder.space_id} />
       </div>
     </div>
   );
