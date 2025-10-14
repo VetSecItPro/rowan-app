@@ -95,6 +95,32 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                   {categoryConfig[reminder.category as keyof typeof categoryConfig]?.icon} {categoryConfig[reminder.category as keyof typeof categoryConfig]?.label}
                 </span>
               )}
+
+              {/* Assignee Avatar Badge */}
+              {reminder.assignee && (
+                <div className="relative group/avatar">
+                  {reminder.assignee.avatar_url ? (
+                    <img
+                      src={reminder.assignee.avatar_url}
+                      alt={reminder.assignee.name}
+                      className="w-6 h-6 rounded-full object-cover border-2 border-white dark:border-gray-800"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white text-[10px] font-bold border-2 border-white dark:border-gray-800">
+                      {reminder.assignee.name
+                        .split(' ')
+                        .map((n) => n[0])
+                        .join('')
+                        .toUpperCase()
+                        .slice(0, 2)}
+                    </div>
+                  )}
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover/avatar:opacity-100 transition-opacity pointer-events-none z-10">
+                    Assigned to {reminder.assignee.name}
+                  </div>
+                </div>
+              )}
             </div>
             {reminder.description && (
               <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
