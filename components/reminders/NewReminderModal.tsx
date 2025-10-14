@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, ChevronDown, Smile } from 'lucide-react';
+import { X, ChevronDown, Smile, Sparkles } from 'lucide-react';
 import { CreateReminderInput, Reminder } from '@/lib/services/reminders-service';
 import { UserPicker } from './UserPicker';
+import { TemplatePicker } from './TemplatePicker';
 
 interface NewReminderModalProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
   const [selectedWeekdays, setSelectedWeekdays] = useState<number[]>([]);
   const [selectedMonthDays, setSelectedMonthDays] = useState<number[]>([]);
   const [dateError, setDateError] = useState<string>('');
+  const [showTemplatePicker, setShowTemplatePicker] = useState(false);
 
   // Helper function to convert ISO string to datetime-local format
   const formatDatetimeLocal = (isoString: string) => {
@@ -76,6 +78,34 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
     }
     setDateError('');
   }, [editReminder, spaceId]);
+
+  const handleSelectTemplate = (reminderData: Partial<CreateReminderInput>) => {
+    // Populate form with template data
+    setFormData({
+      ...formData,
+      title: reminderData.title || formData.title,
+      description: reminderData.description || formData.description,
+      emoji: reminderData.emoji || formData.emoji,
+      category: (reminderData.category as any) || formData.category,
+      priority: (reminderData.priority as any) || formData.priority,
+      reminder_time: reminderData.reminder_time
+        ? formatDatetimeLocal(reminderData.reminder_time)
+        : formData.reminder_time,
+      repeat_pattern: reminderData.repeat_pattern || formData.repeat_pattern,
+    });
+
+    // Set repeat days if provided
+    if (reminderData.repeat_days) {
+      if (reminderData.repeat_pattern === 'weekly') {
+        setSelectedWeekdays(reminderData.repeat_days);
+      } else if (reminderData.repeat_pattern === 'monthly') {
+        setSelectedMonthDays(reminderData.repeat_days);
+      }
+    }
+
+    // Close template picker
+    setShowTemplatePicker(false);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,12 +157,23 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
       />
 
       {/* Modal */}
-      <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {editReminder ? 'Edit Reminder' : 'Create New Reminder'}
-          </h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {editReminder ? 'Edit Reminder' : showTemplatePicker ? 'Choose Template' : 'Create New Reminder'}
+            </h2>
+            {!editReminder && !showTemplatePicker && (
+              <button
+                onClick={() => setShowTemplatePicker(true)}
+                className="flex items-center gap-2 px-3 py-1.5 bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 rounded-lg hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors text-sm font-medium"
+              >
+                <Sparkles className="w-4 h-4" />
+                Use Template
+              </button>
+            )}
+          </div>
           <button
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -142,8 +183,15 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        {/* Template Picker or Form */}
+        {showTemplatePicker ? (
+          <TemplatePicker
+            spaceId={spaceId}
+            onSelectTemplate={handleSelectTemplate}
+            onClose={() => setShowTemplatePicker(false)}
+          />
+        ) : (
+          <form onSubmit={handleSubmit} className="p-6 space-y-6 overflow-y-auto flex-1">
           {/* Title with Emoji Picker */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -413,6 +461,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
             </button>
           </div>
         </form>
+        )}
       </div>
     </div>
   );
