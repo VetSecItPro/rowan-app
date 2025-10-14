@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
-import { CheckSquare, Calendar, Bell, MessageSquare, ShoppingBag, UtensilsCrossed, Home, Target, BookOpen, ArrowLeft } from 'lucide-react';
+import { CheckSquare, Calendar, Bell, MessageSquare, ShoppingBag, UtensilsCrossed, Home, Target, BookOpen, ArrowLeft, Heart } from 'lucide-react';
 
 const features = [
   {
@@ -12,6 +12,15 @@ const features = [
     icon: CheckSquare,
     color: 'from-blue-500 to-blue-600',
     href: '/settings/documentation/tasks-chores',
+    available: true,
+  },
+  {
+    id: 'checkin',
+    name: 'Daily Check-In Guide',
+    description: 'Track emotional wellness and connect with your partner',
+    icon: Heart,
+    color: 'from-pink-500 to-purple-500',
+    href: '/settings/documentation/checkin',
     available: true,
   },
   {
@@ -30,7 +39,7 @@ const features = [
     icon: Bell,
     color: 'from-pink-500 to-pink-600',
     href: '/settings/documentation/reminders',
-    available: false,
+    available: true,
   },
   {
     id: 'messages',
