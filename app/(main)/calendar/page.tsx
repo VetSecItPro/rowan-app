@@ -621,6 +621,27 @@ export default function CalendarPage() {
               {/* View Mode Toggle and Today Button - Only show in calendar view (not list) */}
               {viewMode !== 'list' && (
                 <div className="flex items-center gap-2">
+                  {/* Weather Badge for Today's Events */}
+                  {(() => {
+                    // Find today's first event with a location
+                    const today = new Date();
+                    const todayEvents = events.filter(e => {
+                      const eventDate = parseISO(e.start_time);
+                      return isSameDay(eventDate, today) && e.location;
+                    });
+
+                    if (todayEvents.length > 0) {
+                      return (
+                        <WeatherBadge
+                          eventTime={todayEvents[0].start_time}
+                          location={todayEvents[0].location}
+                          compact={true}
+                        />
+                      );
+                    }
+                    return null;
+                  })()}
+
                   <button
                     onClick={handleJumpToToday}
                     className="px-3 py-1.5 bg-gradient-calendar text-white text-xs font-medium rounded-lg hover:opacity-90 transition-all shadow-sm group relative"
