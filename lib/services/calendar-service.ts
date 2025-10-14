@@ -46,6 +46,41 @@ export interface EventStats {
   thisMonth: number;
 }
 
+export interface EventTemplate {
+  id: string;
+  space_id: string;
+  created_by: string;
+  name: string;
+  description?: string;
+  category: 'work' | 'personal' | 'family' | 'health' | 'social';
+  icon?: string;
+  is_system_template: boolean;
+  default_duration?: number; // minutes
+  default_location?: string;
+  default_attendees?: string[];
+  default_reminders?: any;
+  default_color?: string;
+  default_recurrence?: any;
+  use_count: number;
+  last_used_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateTemplateInput {
+  space_id: string;
+  name: string;
+  description?: string;
+  category: 'work' | 'personal' | 'family' | 'health' | 'social';
+  icon?: string;
+  default_duration?: number;
+  default_location?: string;
+  default_attendees?: string[];
+  default_reminders?: any;
+  default_color?: string;
+  default_recurrence?: any;
+}
+
 export const calendarService = {
   async getEvents(spaceId: string, includeDeleted = false): Promise<CalendarEvent[]> {
     const supabase = createClient();
@@ -264,5 +299,183 @@ export const calendarService = {
 
     if (error) throw error;
     return data || [];
+  },
+
+  // ==========================================
+  // EVENT TEMPLATES
+  // ==========================================
+
+  async getTemplates(spaceId: string): Promise<EventTemplate[]> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('event_templates')
+      .select('*')
+      .or(`space_id.eq.${spaceId},is_system_template.eq.true`)
+      .order('is_system_template', { ascending: false })
+      .order('use_count', { ascending: false })
+      .order('name', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getTemplateById(id: string): Promise<EventTemplate | null> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('event_templates')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async createTemplate(input: CreateTemplateInput): Promise<EventTemplate> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase
+      .from('event_templates')
+      .insert({
+        ...input,
+        created_by: user.id,
+        is_system_template: false,
+        use_count: 0
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async updateTemplate(id: string, updates: Partial<CreateTemplateInput>): Promise<EventTemplate> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('event_templates')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteTemplate(id: string): Promise<void> {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('event_templates')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  },
+
+  async useTemplate(templateId: string): Promise<EventTemplate> {
+    const supabase = createClient();
+
+    // First, get the current template
+    const { data: template, error: fetchError } = await supabase
+      .from('event_templates')
+      .select('use_count')
+      .eq('id', templateId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    // Update with incremented count
+    const { data, error } = await supabase
+      .from('event_templates')
+      .update({
+        use_count: (template?.use_count || 0) + 1,
+        last_used_at: new Date().toISOString()
+      })
+      .eq('id', templateId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async createEventFromTemplate(
+    template: EventTemplate,
+    startTime: string,
+    overrides?: Partial<CreateEventInput>
+  ): Promise<CalendarEvent> {
+    // Calculate end time based on template default duration
+    let endTime = overrides?.end_time;
+    if (!endTime && template.default_duration) {
+      const start = new Date(startTime);
+      const end = new Date(start.getTime() + template.default_duration * 60000);
+      endTime = end.toISOString();
+    }
+
+    const eventInput: CreateEventInput = {
+      space_id: template.space_id,
+      title: template.name,
+      description: template.description,
+      start_time: startTime,
+      end_time: endTime,
+      location: template.default_location,
+      category: template.category,
+      custom_color: template.default_color,
+      ...overrides
+    };
+
+    // Increment template usage count
+    await this.useTemplate(template.id);
+
+    return this.createEvent(eventInput);
+  },
+
+  async ensureSystemTemplates(spaceId: string): Promise<void> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('User not authenticated');
+
+    // Check if system templates already exist for this space
+    const { data: existing } = await supabase
+      .from('event_templates')
+      .select('id')
+      .eq('space_id', spaceId)
+      .eq('is_system_template', true)
+      .limit(1);
+
+    if (existing && existing.length > 0) return; // Already exists
+
+    // System templates to create
+    const systemTemplates = [
+      { name: 'Date Night', description: 'Romantic evening out with your partner', category: 'family' as const, icon: '💑', default_duration: 180 },
+      { name: 'Doctor Appointment', description: 'Medical checkup or doctor visit', category: 'health' as const, icon: '🏥', default_duration: 60 },
+      { name: 'Dentist Visit', description: 'Dental checkup or cleaning', category: 'health' as const, icon: '🦷', default_duration: 60 },
+      { name: 'Team Meeting', description: 'Regular team sync or standup', category: 'work' as const, icon: '💼', default_duration: 60 },
+      { name: 'Coffee Chat', description: 'Casual coffee meeting', category: 'social' as const, icon: '☕', default_duration: 30 },
+      { name: 'Gym Session', description: 'Workout or exercise time', category: 'health' as const, icon: '💪', default_duration: 60 },
+      { name: 'Lunch Break', description: 'Scheduled lunch time', category: 'personal' as const, icon: '🍽️', default_duration: 60 },
+      { name: 'Parent-Teacher Conference', description: 'School meeting about kids', category: 'family' as const, icon: '👨‍🏫', default_duration: 45 },
+      { name: 'Birthday Party', description: 'Birthday celebration', category: 'social' as const, icon: '🎂', default_duration: 120 },
+      { name: 'Project Deadline', description: 'Important project due date', category: 'work' as const, icon: '📅', default_duration: 0 }
+    ];
+
+    // Insert all system templates
+    const { error } = await supabase
+      .from('event_templates')
+      .insert(
+        systemTemplates.map(template => ({
+          ...template,
+          space_id: spaceId,
+          created_by: user.id,
+          is_system_template: true,
+          use_count: 0
+        }))
+      );
+
+    if (error) throw error;
   }
 };
