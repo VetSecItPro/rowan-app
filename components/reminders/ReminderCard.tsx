@@ -4,6 +4,7 @@ import { Clock, Flag, MoreVertical, Timer, Check, Edit, Trash2 } from 'lucide-re
 import { Reminder } from '@/lib/services/reminders-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
+import { ActivityTimeline } from './ActivityTimeline';
 
 interface ReminderCardProps {
   reminder: Reminder;
@@ -235,6 +236,11 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
           Snoozed until {formatTimestamp(reminder.snooze_until, 'MMM d, h:mm a')}
         </div>
       )}
+
+      {/* Activity Timeline */}
+      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <ActivityTimeline reminderId={reminder.id} />
+      </div>
     </div>
   );
 }
