@@ -1,4 +1,5 @@
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, addDays, differenceInDays } from 'date-fns';
+import { weatherCacheService } from './weather-cache-service';
 
 export interface WeatherForecast {
   condition: 'clear' | 'clouds' | 'rain' | 'storm' | 'snow' | 'fog';
@@ -20,11 +21,34 @@ export interface WeatherAlert {
 
 /**
  * Weather service for event planning
- * Uses OpenWeatherMap API for forecasts
+ * Uses Open-Meteo API (FREE, no API key required)
+ * Includes 3-hour caching and smart fetching
  */
 export const weatherService = {
   /**
+   * Check if we should fetch weather for this event
+   * Smart fetching: Only fetch for events within 5 days
+   */
+  shouldFetchWeather(eventTime: string, location?: string): boolean {
+    if (!location) return false;
+
+    try {
+      const eventDate = parseISO(eventTime);
+      const now = new Date();
+      const daysUntilEvent = differenceInDays(eventDate, now);
+
+      // Only fetch for events that are:
+      // 1. In the future (not past)
+      // 2. Within 5 days (forecast limit)
+      return daysUntilEvent >= 0 && daysUntilEvent <= 5;
+    } catch (error) {
+      return false;
+    }
+  },
+
+  /**
    * Get weather forecast for a specific location and time
+   * Uses Open-Meteo API (FREE) with 3-hour caching
    */
   async getWeatherForEvent(
     location: string | undefined,
@@ -32,97 +56,162 @@ export const weatherService = {
   ): Promise<WeatherForecast | null> {
     if (!location) return null;
 
-    const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
-    if (!apiKey) {
-      console.warn('OpenWeatherMap API key not configured');
+    // Smart fetching: Only fetch for upcoming events within 5 days
+    if (!this.shouldFetchWeather(eventTime, location)) {
+      console.log(`[Weather] Skipping fetch for ${location} - event outside 5-day window`);
       return null;
     }
 
+    // Use cache with 3-hour TTL
+    return weatherCacheService.getOrFetchWeather(
+      location,
+      eventTime,
+      () => this.fetchWeatherFromAPI(location, eventTime)
+    );
+  },
+
+  /**
+   * Fetch weather from Open-Meteo API (internal method)
+   */
+  async fetchWeatherFromAPI(
+    location: string,
+    eventTime: string
+  ): Promise<WeatherForecast | null> {
     try {
-      // Get coordinates for location (geocoding)
-      const geoResponse = await fetch(
-        `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(location)}&limit=1&appid=${apiKey}`
+      // Step 1: Geocode location with caching (permanent cache)
+      const coords = await weatherCacheService.getOrFetchGeocode(
+        location,
+        () => this.geocodeLocation(location)
       );
 
-      if (!geoResponse.ok) throw new Error('Geocoding failed');
+      if (!coords) return null;
 
-      const geoData = await geoResponse.json();
-      if (!geoData || geoData.length === 0) return null;
-
-      const { lat, lon } = geoData[0];
-
-      // Get 5-day forecast
-      const forecastResponse = await fetch(
-        `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`
-      );
-
-      if (!forecastResponse.ok) throw new Error('Forecast fetch failed');
-
-      const forecastData = await forecastResponse.json();
+      // Step 2: Get weather forecast from Open-Meteo
       const eventDate = parseISO(eventTime);
+      const dateStr = format(eventDate, 'yyyy-MM-dd');
 
-      // Find forecast closest to event time
-      const closestForecast = forecastData.list.reduce((closest: any, current: any) => {
-        const currentTime = new Date(current.dt * 1000);
-        const closestTime = new Date(closest.dt * 1000);
+      // Open-Meteo API (FREE, no API key needed!)
+      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,windspeed_10m_max&timezone=auto`;
 
-        return Math.abs(currentTime.getTime() - eventDate.getTime()) <
-               Math.abs(closestTime.getTime() - eventDate.getTime())
-          ? current
-          : closest;
-      });
+      const weatherResponse = await fetch(weatherUrl);
 
-      return this.mapWeatherData(closestForecast);
+      if (!weatherResponse.ok) {
+        throw new Error('Weather fetch failed');
+      }
+
+      const weatherData = await weatherResponse.json();
+
+      // Find the forecast for the event date
+      const dateIndex = weatherData.daily.time.indexOf(dateStr);
+
+      if (dateIndex === -1) {
+        console.log(`[Weather] No forecast available for ${dateStr}`);
+        return null;
+      }
+
+      // Map Open-Meteo weather codes to our conditions
+      const weatherCode = weatherData.daily.weathercode[dateIndex];
+      const condition = this.mapWeatherCode(weatherCode);
+
+      // Calculate average temperature and feels like
+      const tempMax = weatherData.daily.temperature_2m_max[dateIndex];
+      const tempMin = weatherData.daily.temperature_2m_min[dateIndex];
+      const temp = Math.round((tempMax + tempMin) / 2);
+
+      const feelsLikeMax = weatherData.daily.apparent_temperature_max[dateIndex];
+      const feelsLikeMin = weatherData.daily.apparent_temperature_min[dateIndex];
+      const feelsLike = Math.round((feelsLikeMax + feelsLikeMin) / 2);
+
+      return {
+        condition,
+        temp,
+        feelsLike,
+        description: this.getWeatherDescription(weatherCode),
+        humidity: 0, // Open-Meteo daily API doesn't include humidity
+        windSpeed: Math.round(weatherData.daily.windspeed_10m_max[dateIndex]),
+        icon: weatherCode.toString(),
+        timestamp: eventTime,
+      };
     } catch (error) {
-      console.error('Failed to fetch weather:', error);
+      console.error('[Weather] Failed to fetch weather:', error);
       return null;
     }
   },
 
   /**
-   * Map OpenWeatherMap data to our format
+   * Geocode location using Open-Meteo Geocoding API (FREE)
    */
-  mapWeatherData(data: any): WeatherForecast {
-    const mainCondition = data.weather[0].main.toLowerCase();
+  async geocodeLocation(location: string): Promise<{ lat: number; lon: number } | null> {
+    try {
+      const geocodeUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1&language=en&format=json`;
 
-    // Map OpenWeatherMap conditions to our simplified types
-    let condition: WeatherForecast['condition'];
-    switch (mainCondition) {
-      case 'clear':
-        condition = 'clear';
-        break;
-      case 'clouds':
-        condition = 'clouds';
-        break;
-      case 'rain':
-      case 'drizzle':
-        condition = 'rain';
-        break;
-      case 'thunderstorm':
-        condition = 'storm';
-        break;
-      case 'snow':
-        condition = 'snow';
-        break;
-      case 'mist':
-      case 'fog':
-      case 'haze':
-        condition = 'fog';
-        break;
-      default:
-        condition = 'clouds';
+      const response = await fetch(geocodeUrl);
+
+      if (!response.ok) {
+        throw new Error('Geocoding failed');
+      }
+
+      const data = await response.json();
+
+      if (!data.results || data.results.length === 0) {
+        console.log(`[Weather] Location not found: ${location}`);
+        return null;
+      }
+
+      const result = data.results[0];
+      return {
+        lat: result.latitude,
+        lon: result.longitude,
+      };
+    } catch (error) {
+      console.error('[Weather] Geocoding error:', error);
+      return null;
     }
+  },
 
-    return {
-      condition,
-      temp: Math.round(data.main.temp),
-      feelsLike: Math.round(data.main.feels_like),
-      description: data.weather[0].description,
-      humidity: data.main.humidity,
-      windSpeed: data.wind.speed,
-      icon: data.weather[0].icon,
-      timestamp: new Date(data.dt * 1000).toISOString(),
+  /**
+   * Map Open-Meteo weather codes to our simplified conditions
+   * https://open-meteo.com/en/docs
+   */
+  mapWeatherCode(code: number): WeatherForecast['condition'] {
+    if (code === 0 || code === 1) return 'clear'; // Clear sky, mainly clear
+    if (code === 2 || code === 3) return 'clouds'; // Partly cloudy, overcast
+    if (code >= 45 && code <= 48) return 'fog'; // Fog
+    if (code >= 51 && code <= 67) return 'rain'; // Drizzle, rain
+    if (code >= 71 && code <= 77) return 'snow'; // Snow
+    if (code >= 80 && code <= 99) return 'storm'; // Rain showers, thunderstorms
+    return 'clouds'; // Default
+  },
+
+  /**
+   * Get human-readable description from weather code
+   */
+  getWeatherDescription(code: number): string {
+    const descriptions: Record<number, string> = {
+      0: 'clear sky',
+      1: 'mainly clear',
+      2: 'partly cloudy',
+      3: 'overcast',
+      45: 'foggy',
+      48: 'depositing rime fog',
+      51: 'light drizzle',
+      53: 'moderate drizzle',
+      55: 'dense drizzle',
+      61: 'slight rain',
+      63: 'moderate rain',
+      65: 'heavy rain',
+      71: 'slight snow',
+      73: 'moderate snow',
+      75: 'heavy snow',
+      80: 'slight rain showers',
+      81: 'moderate rain showers',
+      82: 'violent rain showers',
+      95: 'thunderstorm',
+      96: 'thunderstorm with slight hail',
+      99: 'thunderstorm with heavy hail',
     };
+
+    return descriptions[code] || 'unknown';
   },
 
   /**
@@ -150,7 +239,7 @@ export const weatherService = {
     if (!weather) return null;
 
     // Check if event is likely outdoor
-    const outdoorKeywords = ['park', 'outdoor', 'picnic', 'hike', 'beach', 'garden', 'field', 'trail', 'lake'];
+    const outdoorKeywords = ['park', 'outdoor', 'picnic', 'hike', 'beach', 'garden', 'field', 'trail', 'lake', 'pool', 'playground', 'bbq', 'barbecue'];
     const isOutdoor = eventLocation
       ? outdoorKeywords.some(kw => eventLocation.toLowerCase().includes(kw))
       : false;
@@ -218,7 +307,7 @@ export const weatherService = {
   },
 
   /**
-   * Get human-readable weather description
+   * Get human-readable weather summary
    */
   getWeatherSummary(weather: WeatherForecast): string {
     const emoji = this.getWeatherEmoji(weather.condition);
