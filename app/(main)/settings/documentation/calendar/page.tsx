@@ -38,6 +38,7 @@ import {
   Image,
   Paperclip,
   Smile,
+  Info,
 } from 'lucide-react';
 
 interface GuideSection {
