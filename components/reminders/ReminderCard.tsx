@@ -169,7 +169,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                 className="fixed inset-0 z-10"
                 onClick={() => setShowMenu(false)}
               />
-              <div className="absolute right-0 mt-2 w-48 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
+              <div className="absolute right-0 mt-2 w-48 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
                 <button
                   onClick={() => {
                     onEdit(reminder);
