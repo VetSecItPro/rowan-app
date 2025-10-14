@@ -21,7 +21,7 @@ const features = [
     icon: Calendar,
     color: 'from-purple-500 to-purple-600',
     href: '/settings/documentation/calendar',
-    available: false,
+    available: true,
   },
   {
     id: 'reminders',
