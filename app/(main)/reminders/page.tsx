@@ -123,9 +123,11 @@ export default function RemindersPage(): JSX.Element {
   // Memoized callback for creating/updating reminders
   const handleCreateReminder = useCallback(async (reminderData: CreateReminderInput) => {
     try {
-      if (editingReminder) {
+      // Check if we're updating an existing reminder (has an id) or creating a new one
+      if (editingReminder && editingReminder.id) {
         await remindersService.updateReminder(editingReminder.id, reminderData);
       } else {
+        // Create new reminder (even if editingReminder is set, if it has no id, it's new)
         await remindersService.createReminder(reminderData);
       }
       loadReminders();
@@ -219,36 +221,35 @@ export default function RemindersPage(): JSX.Element {
     }
   }, [user]);
 
-  const handleQuickTemplateCreate = useCallback(async (template: ReminderTemplate) => {
+  const handleQuickTemplateCreate = useCallback((template: ReminderTemplate) => {
     if (!currentSpace || !user) return;
 
-    try {
-      // Apply template with defaults
-      const reminderData = reminderTemplatesService.applyTemplate(template, {});
+    // Apply template with defaults to get pre-filled data
+    const reminderData = reminderTemplatesService.applyTemplate(template, {});
 
-      // Create reminder
-      await remindersService.createReminder({
-        space_id: currentSpace.id,
-        title: reminderData.title,
-        description: reminderData.description,
-        emoji: reminderData.emoji,
-        category: reminderData.category as any,
-        priority: reminderData.priority as any,
-        reminder_time: reminderData.reminder_time,
-        repeat_pattern: reminderData.repeat_pattern,
-        repeat_days: reminderData.repeat_days,
-        status: 'active',
-      });
+    // Create a partial reminder object with template data (not saved yet)
+    const templateReminder: Partial<Reminder> = {
+      space_id: currentSpace.id,
+      title: reminderData.title,
+      description: reminderData.description,
+      emoji: reminderData.emoji,
+      category: reminderData.category as any,
+      priority: reminderData.priority as any,
+      reminder_time: reminderData.reminder_time,
+      repeat_pattern: reminderData.repeat_pattern,
+      repeat_days: reminderData.repeat_days,
+      status: 'active',
+    };
 
-      // Increment template usage
-      await reminderTemplatesService.incrementUsage(template.id);
+    // Open modal with pre-filled template data
+    setEditingReminder(templateReminder as Reminder);
+    setIsModalOpen(true);
 
-      // Reload reminders
-      loadReminders();
-    } catch (error) {
-      console.error('Failed to create reminder from template:', error);
-    }
-  }, [currentSpace, user, loadReminders]);
+    // Increment template usage (they clicked on it)
+    reminderTemplatesService.incrementUsage(template.id).catch((error) => {
+      console.error('Failed to increment template usage:', error);
+    });
+  }, [currentSpace, user]);
 
   const handleSelectionChange = useCallback((reminderId: string, selected: boolean) => {
     setSelectedReminderIds((prev) => {
@@ -449,7 +450,7 @@ export default function RemindersPage(): JSX.Element {
                 </span>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                Create common reminders with one click
+                Quick start with pre-filled templates – customize before saving
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                 {popularTemplates.map((template) => (
@@ -488,7 +489,7 @@ export default function RemindersPage(): JSX.Element {
                       placeholder="Search reminders..."
                       value={searchQuery}
                       onChange={handleSearchChange}
-                      className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                      className="w-full pl-10 pr-4 input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>
@@ -498,8 +499,9 @@ export default function RemindersPage(): JSX.Element {
           {/* Reminders List - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            {/* Header with Month Badge and Filters */}
-            <div className="flex flex-col items-start gap-4 mb-6">
+            {/* Header with Month Badge and Filters - Now with filters on the right */}
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6">
+              {/* Left side: Title and month badge */}
               <div className="flex items-center gap-3 flex-wrap">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                   All Reminders ({filteredReminders.length})
@@ -510,42 +512,43 @@ export default function RemindersPage(): JSX.Element {
                 {selectionMode && filteredReminders.length > 0 && (
                   <button
                     onClick={handleSelectAll}
-                    className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 text-sm font-medium rounded-full hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                    className="px-3 py-1 bg-pink-100 dark:bg-pink-900/30 border border-pink-300 dark:border-pink-700 text-pink-700 dark:text-pink-300 text-sm font-medium rounded-full hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors"
                   >
                     {selectedReminderIds.size === filteredReminders.length ? 'Deselect All' : 'Select All'}
                   </button>
                 )}
               </div>
 
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
+              {/* Right side: Filters */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 {/* Assignment Filter */}
-                <div className="bg-gray-50 dark:bg-gray-900 border-2 border-blue-200 dark:border-blue-700 rounded-lg p-1 flex gap-1 w-fit">
+                <div className="bg-gray-50 dark:bg-gray-900 border-2 border-pink-200 dark:border-pink-700 rounded-lg p-1 flex gap-1 w-fit">
                   <button
                     onClick={() => setAssignmentFilter('all')}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                    className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                       assignmentFilter === 'all'
-                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                        ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
                     }`}
                   >
                     All
                   </button>
                   <button
                     onClick={() => setAssignmentFilter('mine')}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                    className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                       assignmentFilter === 'mine'
-                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                        ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
                     }`}
                   >
                     My Reminders
                   </button>
                   <button
                     onClick={() => setAssignmentFilter('unassigned')}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
+                    className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[80px] ${
                       assignmentFilter === 'unassigned'
-                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                        ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
                     }`}
                   >
                     Unassigned
@@ -556,7 +559,7 @@ export default function RemindersPage(): JSX.Element {
                 <div className="bg-gray-50 dark:bg-gray-900 border-2 border-pink-200 dark:border-pink-700 rounded-lg p-1 flex gap-1 w-fit">
                 <button
                   onClick={() => setStatusFilter('all')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                     statusFilter === 'all'
                       ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
@@ -566,7 +569,7 @@ export default function RemindersPage(): JSX.Element {
                 </button>
                 <button
                   onClick={() => setStatusFilter('active')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                     statusFilter === 'active'
                       ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
@@ -576,7 +579,7 @@ export default function RemindersPage(): JSX.Element {
                 </button>
                 <button
                   onClick={() => setStatusFilter('snoozed')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[70px] ${
+                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[70px] ${
                     statusFilter === 'snoozed'
                       ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
@@ -586,7 +589,7 @@ export default function RemindersPage(): JSX.Element {
                 </button>
                 <button
                   onClick={() => setStatusFilter('completed')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
+                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[80px] ${
                     statusFilter === 'completed'
                       ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
@@ -616,7 +619,7 @@ export default function RemindersPage(): JSX.Element {
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                     <button
                       onClick={handleOpenModal}
-                      className="px-6 py-3 shimmer-reminders text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                      className="btn-touch shimmer-reminders text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
                     >
                       <Plus className="w-5 h-5" />
                       Create Reminder
