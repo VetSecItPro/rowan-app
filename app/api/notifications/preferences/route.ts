@@ -166,7 +166,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json(
         {
           error: 'Validation failed',
-          details: validation.error.errors.map(e => ({
+          details: validation.error.issues.map((e) => ({
             field: e.path.join('.'),
             message: e.message
           }))

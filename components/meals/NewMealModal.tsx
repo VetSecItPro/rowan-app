@@ -199,7 +199,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setCuisineFilter(cuisine === cuisineFilter ? null : cuisine);
+                                setCuisineFilter(cuisine === cuisineFilter ? null : (cuisine || null));
                               }}
                               className={`px-2 py-1 text-xs rounded-full transition-colors ${
                                 cuisineFilter === cuisine

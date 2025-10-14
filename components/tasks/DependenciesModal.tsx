@@ -2,8 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { X, Link2, AlertCircle, Search, Trash2 } from 'lucide-react';
-import { taskDependenciesService, TaskDependency } from '@/lib/services/task-dependencies-service';
+import { taskDependenciesService } from '@/lib/services/task-dependencies-service';
 import { createClient } from '@/lib/supabase/client';
+
+interface TaskDependency {
+  id: string;
+  task_id: string;
+  depends_on_task_id: string;
+  dependency_type: string;
+  dependent_task?: any;
+  created_at: string;
+}
 
 interface DependenciesModalProps {
   isOpen: boolean;

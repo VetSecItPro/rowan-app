@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error: 'Validation failed',
-          details: validation.error.errors.map((e) => ({
+          details: validation.error.issues.map((e) => ({
             field: e.path.join('.'),
             message: e.message,
           })),
@@ -192,7 +192,11 @@ export async function POST(req: NextRequest) {
 
       if (user?.email) {
         await notificationService.sendShoppingListEmail(
-          user,
+          {
+            id: session.user.id,
+            email: user.email,
+            name: user.name,
+          },
           finalListName,
           shoppingList.id,
           aggregatedIngredients.length,

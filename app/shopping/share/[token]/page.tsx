@@ -36,7 +36,7 @@ interface ShoppingData {
 
 export default function PublicShoppingListPage() {
   const params = useParams();
-  const token = params.token as string;
+  const token = params?.token as string;
 
   const [data, setData] = useState<ShoppingData | null>(null);
   const [loading, setLoading] = useState(true);

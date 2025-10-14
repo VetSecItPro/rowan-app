@@ -609,11 +609,11 @@ export default function TasksPage() {
                   /* Drag-and-drop for tasks */
                   <DraggableTaskList
                     spaceId={currentSpace.id}
-                    initialTasks={filteredItems.filter(item => item.type === 'task') as Task[]}
+                    initialTasks={filteredItems.filter(item => item.type === 'task') as any}
                     onStatusChange={handleStatusChange}
-                    onEdit={handleEditItem}
+                    onEdit={handleEditItem as any}
                     onDelete={handleDeleteItem}
-                    onViewDetails={handleViewDetails}
+                    onViewDetails={handleViewDetails as any}
                   />
                 ) : (
                   /* Regular list for chores or when drag-drop disabled */
@@ -621,11 +621,11 @@ export default function TasksPage() {
                     {filteredItems.map((item) => (
                       <TaskCard
                         key={item.id}
-                        task={item}
-                        onStatusChange={handleStatusChange}
-                        onEdit={handleEditItem}
+                        task={item as any}
+                        onStatusChange={handleStatusChange as any}
+                        onEdit={handleEditItem as any}
                         onDelete={handleDeleteItem}
-                        onViewDetails={handleViewDetails}
+                        onViewDetails={handleViewDetails as any}
                         linkedShoppingList={item.type === 'task' ? linkedShoppingLists[item.id] : undefined}
                       />
                     ))}

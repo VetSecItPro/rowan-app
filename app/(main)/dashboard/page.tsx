@@ -526,9 +526,11 @@ export default function DashboardPage() {
       ).length;
 
       // Combine tasks and chores stats with proper null checks
+      const choresCompleted = allChores.filter(c => c.status === 'completed').length;
+      const choresPending = allChores.filter(c => c.status === 'pending').length;
       const combinedTotal = (taskStats?.total || 0) + (choreStats?.total || 0);
-      const combinedCompleted = (taskStats?.completed || 0) + (choreStats?.completed || 0);
-      const combinedPending = (taskStats?.pending || 0) + (choreStats?.pending || 0);
+      const combinedCompleted = (taskStats?.completed || 0) + choresCompleted;
+      const combinedPending = (taskStats?.pending || 0) + choresPending;
       const combinedRecentItems = [...recentTasks, ...recentChores]
         .sort((a, b) => {
           if (!a.due_date) return 1;
