@@ -3,11 +3,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Smile, Image as ImageIcon, Paperclip, Calendar, ChevronDown, Palette } from 'lucide-react';
 import { CreateEventInput, CalendarEvent } from '@/lib/services/calendar-service';
+import { eventAttachmentsService } from '@/lib/services/event-attachments-service';
 
 interface NewEventModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (event: CreateEventInput) => void;
+  onSave: (event: CreateEventInput) => Promise<CalendarEvent | void>;
   editEvent?: CalendarEvent | null;
   spaceId: string;
 }
@@ -111,7 +112,9 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
     setDateError('');
   }, [editEvent, spaceId, isOpen]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [uploading, setUploading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validate end time is not before start time
@@ -127,22 +130,49 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
 
     // Clear any previous errors
     setDateError('');
+    setUploading(true);
 
-    // Clean up the form data - remove empty strings
-    const cleanedData: CreateEventInput = {
-      space_id: formData.space_id,
-      title: formData.title,
-      description: formData.description || undefined,
-      start_time: formData.start_time,
-      end_time: formData.end_time || undefined,
-      is_recurring: formData.is_recurring,
-      location: formData.location || undefined,
-      category: formData.category,
-      custom_color: customColor || undefined,
-    };
+    try {
+      // Clean up the form data - remove empty strings
+      const cleanedData: CreateEventInput = {
+        space_id: formData.space_id,
+        title: formData.title,
+        description: formData.description || undefined,
+        start_time: formData.start_time,
+        end_time: formData.end_time || undefined,
+        is_recurring: formData.is_recurring,
+        location: formData.location || undefined,
+        category: formData.category,
+        custom_color: customColor || undefined,
+      };
 
-    onSave(cleanedData);
-    onClose();
+      // Save the event and get the created event back
+      const createdEvent = await onSave(cleanedData);
+
+      // Upload attachments if we have an event ID and files to upload
+      if (createdEvent?.id && (attachedImages.length > 0 || attachedFiles.length > 0)) {
+        const allFiles = [...attachedImages, ...attachedFiles];
+
+        for (const file of allFiles) {
+          try {
+            await eventAttachmentsService.uploadAttachment({
+              event_id: createdEvent.id,
+              file
+            });
+          } catch (error) {
+            console.error('Failed to upload attachment:', file.name, error);
+            // Continue uploading other files even if one fails
+          }
+        }
+      }
+
+      onClose();
+    } catch (error) {
+      console.error('Failed to save event:', error);
+      setDateError('Failed to save event. Please try again.');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleEmojiClick = (emoji: string) => {
@@ -678,12 +708,12 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
             </button>
             <button
               type="submit"
-              disabled={!!dateError}
+              disabled={!!dateError || uploading}
               className={`flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl transition-all shadow-lg font-medium ${
-                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
+                dateError || uploading ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
               }`}
             >
-              {editEvent ? 'Update Event' : 'Create Event'}
+              {uploading ? 'Saving...' : editEvent ? 'Update Event' : 'Create Event'}
             </button>
           </div>
 
