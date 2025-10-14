@@ -1,11 +1,8 @@
 -- Create checkin_reactions table for partner validation and support features
 -- Part of Phase 2: Validation System
 
--- Ensure uuid extension is enabled
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 CREATE TABLE IF NOT EXISTS checkin_reactions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   checkin_id UUID NOT NULL REFERENCES daily_checkins(id) ON DELETE CASCADE,
   from_user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   reaction_type TEXT NOT NULL CHECK (reaction_type IN ('heart', 'hug', 'strength', 'custom')),
