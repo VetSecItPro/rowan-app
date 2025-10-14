@@ -13,6 +13,9 @@ interface ReminderCardProps {
   onEdit: (reminder: Reminder) => void;
   onDelete: (reminderId: string) => void;
   onSnooze: (reminderId: string, minutes: number) => void;
+  selectionMode?: boolean;
+  selected?: boolean;
+  onSelectionChange?: (reminderId: string, selected: boolean) => void;
 }
 
 const priorityColors = {
@@ -36,7 +39,7 @@ const categoryConfig = {
   household: { label: 'Household', icon: '🏠', color: 'bg-amber-500', textColor: 'text-amber-700 dark:text-amber-300', bgColor: 'bg-amber-100 dark:bg-amber-900/30' },
 };
 
-export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSnooze }: ReminderCardProps) {
+export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSnooze, selectionMode, selected, onSelectionChange }: ReminderCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showSnoozeMenu, setShowSnoozeMenu] = useState(false);
 
@@ -52,10 +55,27 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
   };
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-800 border border-transparent rounded-lg p-4 hover:shadow-lg transition-all duration-200 group">
+    <div className={`bg-gray-50 dark:bg-gray-800 border-2 rounded-lg p-4 hover:shadow-lg transition-all duration-200 group ${
+      selected ? 'border-pink-500 dark:border-pink-500 ring-2 ring-pink-200 dark:ring-pink-800' : 'border-transparent'
+    }`}>
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-start gap-3 flex-1">
+          {/* Multi-select Checkbox (when selection mode enabled) */}
+          {selectionMode && (
+            <button
+              onClick={() => onSelectionChange?.(reminder.id, !selected)}
+              aria-label={`Select reminder: ${reminder.title}`}
+              className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+                selected
+                  ? 'bg-pink-500 border-pink-500'
+                  : 'bg-transparent border-gray-400 dark:border-gray-500 hover:border-pink-500'
+              }`}
+            >
+              {selected && <Check className="w-3 h-3 text-white" />}
+            </button>
+          )}
+
           {/* Three-state Checkbox */}
           <div className="relative group">
             <button
