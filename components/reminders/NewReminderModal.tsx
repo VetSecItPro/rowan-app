@@ -5,6 +5,8 @@ import { X, ChevronDown, Smile, Sparkles } from 'lucide-react';
 import { CreateReminderInput, Reminder } from '@/lib/services/reminders-service';
 import { UserPicker } from './UserPicker';
 import { TemplatePicker } from './TemplatePicker';
+import { AttachmentUploader } from './AttachmentUploader';
+import { AttachmentList } from './AttachmentList';
 
 interface NewReminderModalProps {
   isOpen: boolean;
@@ -31,6 +33,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
   const [selectedMonthDays, setSelectedMonthDays] = useState<number[]>([]);
   const [dateError, setDateError] = useState<string>('');
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
+  const [attachmentRefreshTrigger, setAttachmentRefreshTrigger] = useState(0);
 
   // Helper function to convert ISO string to datetime-local format
   const formatDatetimeLocal = (isoString: string) => {
@@ -257,6 +260,25 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
               className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
             />
           </div>
+
+          {/* Attachments (only when editing) */}
+          {editReminder && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Attachments
+                </label>
+                <AttachmentList
+                  reminderId={editReminder.id}
+                  refreshTrigger={attachmentRefreshTrigger}
+                />
+              </div>
+              <AttachmentUploader
+                reminderId={editReminder.id}
+                onUploadComplete={() => setAttachmentRefreshTrigger(prev => prev + 1)}
+              />
+            </div>
+          )}
 
           {/* Category Selector */}
           <div>
