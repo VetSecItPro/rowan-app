@@ -5,6 +5,8 @@ import { ratelimit } from '@/lib/ratelimit';
 import { verifyResourceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { updateTaskSchema } from '@/lib/validations/task-schemas';
+import { ZodError } from 'zod';
 
 /**
  * GET /api/tasks/[id]
@@ -144,11 +146,30 @@ export async function PATCH(
       );
     }
 
-    // Parse request body
+    // Parse and validate request body with Zod
     const updates = await req.json();
 
+    let validatedUpdates;
+    try {
+      validatedUpdates = updateTaskSchema.parse(updates);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return NextResponse.json(
+          {
+            error: 'Validation failed',
+            details: error.errors.map(e => ({
+              field: e.path.join('.'),
+              message: e.message,
+            })),
+          },
+          { status: 400 }
+        );
+      }
+      throw error;
+    }
+
     // Update task using service
-    const updatedTask = await tasksService.updateTask(params.id, updates);
+    const updatedTask = await tasksService.updateTask(params.id, validatedUpdates);
 
     return NextResponse.json({
       success: true,
