@@ -1347,11 +1347,14 @@ export default function CalendarPage() {
       )}
 
       {/* Quick Add Event Modal */}
-      <QuickAddEvent
-        isOpen={isQuickAddOpen}
-        onClose={() => setIsQuickAddOpen(false)}
-        onCreateEvent={handleCreateEvent}
-      />
+      {currentSpace && (
+        <QuickAddEvent
+          isOpen={isQuickAddOpen}
+          onClose={() => setIsQuickAddOpen(false)}
+          onCreateEvent={handleCreateEvent}
+          spaceId={currentSpace.id}
+        />
+      )}
 
       {/* Template Library Modal */}
       {currentSpace && (
