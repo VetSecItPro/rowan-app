@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, List, ChevronLeft, ChevronRight, Check, Users } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { EventCard } from '@/components/calendar/EventCard';
@@ -10,12 +10,13 @@ import { EventProposalModal } from '@/components/calendar/EventProposalModal';
 import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
+import { useCalendarShortcuts } from '@/lib/hooks/useCalendarShortcuts';
 import { calendarService, CalendarEvent, CreateEventInput } from '@/lib/services/calendar-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, parseISO } from 'date-fns';
 
-type ViewMode = 'calendar' | 'list';
+type ViewMode = 'month' | 'week' | 'day' | 'agenda' | 'timeline' | 'list';
 
 export default function CalendarPage() {
   const { currentSpace, user } = useAuth();
@@ -24,7 +25,7 @@ export default function CalendarPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<ViewMode>('calendar');
+  const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
@@ -32,6 +33,9 @@ export default function CalendarPage() {
   const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, any>>({});
   const [detailEvent, setDetailEvent] = useState<CalendarEvent | null>(null);
   const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
+
+  // Ref for search input
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize realtime connection
   const { events: realtimeEvents, isConnected: realtimeConnected } = useCalendarRealtime(
@@ -65,15 +69,15 @@ export default function CalendarPage() {
     };
   }, [events]);
 
-  // Memoize filtered events (exclude completed events in calendar view, apply status filter in list view)
+  // Memoize filtered events (exclude completed events in calendar views, apply status filter in list view)
   const filteredEvents = useMemo(() => {
     let filtered = events;
 
-    // In calendar view, always exclude completed events
+    // In calendar views (month/week/day/agenda/timeline), always exclude completed events
     // In list view, apply status filter
-    if (viewMode === 'calendar') {
+    if (viewMode !== 'list') {
       filtered = events.filter(e => e.status !== 'completed');
-    } else if (viewMode === 'list' && statusFilter !== 'all') {
+    } else if (statusFilter !== 'all') {
       filtered = events.filter(e => e.status === statusFilter);
     }
 
@@ -244,7 +248,7 @@ export default function CalendarPage() {
   }, []);
 
   // Stable callback for view mode changes
-  const handleSetViewCalendar = useCallback(() => setViewMode('calendar'), []);
+  const handleSetViewCalendar = useCallback(() => setViewMode('month'), []);
   const handleSetViewList = useCallback(() => setViewMode('list'), []);
 
   // Stable callback for month navigation
@@ -254,6 +258,10 @@ export default function CalendarPage() {
 
   const handleNextMonth = useCallback(() => {
     setCurrentMonth(prev => addMonths(prev, 1));
+  }, []);
+
+  const handleJumpToToday = useCallback(() => {
+    setCurrentMonth(new Date());
   }, []);
 
   // Helper to get events for a specific date
@@ -312,6 +320,25 @@ export default function CalendarPage() {
     setDetailEvent(event);
   }, []);
 
+  // Keyboard shortcuts
+  useCalendarShortcuts({
+    jumpToToday: handleJumpToToday,
+    previousPeriod: handlePrevMonth,
+    nextPeriod: handleNextMonth,
+    switchToDay: () => setViewMode('day'),
+    switchToWeek: () => setViewMode('week'),
+    switchToMonth: () => setViewMode('month'),
+    switchToAgenda: () => setViewMode('agenda'),
+    switchToList: () => setViewMode('list'),
+    newEvent: () => setIsModalOpen(true),
+    focusSearch: () => searchInputRef.current?.focus(),
+    closeModals: () => {
+      setIsModalOpen(false);
+      setDetailEvent(null);
+      setIsProposalModalOpen(false);
+    },
+  });
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Calendar' }]}>
       <div className="p-4 sm:p-8">
@@ -345,7 +372,7 @@ export default function CalendarPage() {
                 <button
                   onClick={handleSetViewCalendar}
                   className={`px-3 sm:px-4 py-2 rounded-md font-medium transition-all flex items-center justify-center gap-2 flex-1 sm:flex-initial ${
-                    viewMode === 'calendar'
+                    viewMode !== 'list'
                       ? 'bg-gradient-calendar text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
@@ -367,18 +394,26 @@ export default function CalendarPage() {
               </div>
               <button
                 onClick={() => setIsProposalModalOpen(true)}
-                className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 group relative"
+                title="Propose event times for collaborative scheduling"
               >
                 <Users className="w-5 h-5" />
                 <span className="hidden sm:inline">Propose Event</span>
                 <span className="sm:hidden">Propose</span>
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                  Propose event times for collaborative scheduling
+                </span>
               </button>
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 group relative"
+                title="Create a new event (N)"
               >
                 <Plus className="w-5 h-5" />
                 <span>New Event</span>
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                  Create a new event (N)
+                </span>
               </button>
             </div>
           </div>
@@ -471,14 +506,16 @@ export default function CalendarPage() {
           {/* Search Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className="relative">
+            <div className="relative group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
+                ref={searchInputRef}
                 type="text"
-                placeholder="Search events..."
+                placeholder="Search events... (Press / to focus)"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                title="Search events (Press / to focus)"
               />
             </div>
           </div>
@@ -490,12 +527,88 @@ export default function CalendarPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                  {viewMode === 'calendar' ? 'Event Calendar' : `Upcoming Events (${filteredEvents.length})`}
+                  {viewMode === 'list' ? `Upcoming Events (${filteredEvents.length})` : 'Event Calendar'}
                 </h2>
                 <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 border border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300 text-sm font-medium rounded-full">
                   {format(new Date(), 'MMM yyyy')}
                 </span>
               </div>
+
+              {/* View Mode Toggle - Only show in calendar view */}
+              {viewMode !== 'list' && (
+                <div className="bg-gray-50 dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-lg p-0.5 flex gap-0.5">
+                  <button
+                    onClick={() => setViewMode('month')}
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
+                      viewMode === 'month'
+                        ? 'bg-gradient-calendar text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                    }`}
+                    title="Month View (M)"
+                  >
+                    Month
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                      Month View (M)
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setViewMode('week')}
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
+                      viewMode === 'week'
+                        ? 'bg-gradient-calendar text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                    }`}
+                    title="Week View (W)"
+                  >
+                    Week
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                      Week View (W)
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setViewMode('day')}
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
+                      viewMode === 'day'
+                        ? 'bg-gradient-calendar text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                    }`}
+                    title="Day View (D)"
+                  >
+                    Day
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                      Day View (D)
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setViewMode('agenda')}
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
+                      viewMode === 'agenda'
+                        ? 'bg-gradient-calendar text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                    }`}
+                    title="Agenda View (A)"
+                  >
+                    Agenda
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                      Agenda View (A)
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setViewMode('timeline')}
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
+                      viewMode === 'timeline'
+                        ? 'bg-gradient-calendar text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                    }`}
+                    title="Timeline View"
+                  >
+                    Timeline
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                      Timeline View
+                    </span>
+                  </button>
+                </div>
+              )}
 
               {/* Status Filter Toggle - Only show in list view */}
               {viewMode === 'list' && (
@@ -550,25 +663,45 @@ export default function CalendarPage() {
                   <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                   <p className="mt-4 text-gray-600 dark:text-gray-400">Loading events...</p>
                 </div>
-              ) : viewMode === 'calendar' ? (
+              ) : viewMode === 'month' ? (
                 /* Calendar View */
                 <div>
                   {/* Month Navigation */}
                   <div className="flex items-center justify-between mb-4 sm:mb-6">
                     <button
                       onClick={handlePrevMonth}
-                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
+                      title="Previous month (←)"
                     >
                       <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        Previous month (←)
+                      </span>
                     </button>
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-                      {format(currentMonth, 'MMMM yyyy')}
-                    </h3>
+                    <div className="flex items-center gap-3">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                        {format(currentMonth, 'MMMM yyyy')}
+                      </h3>
+                      <button
+                        onClick={handleJumpToToday}
+                        className="px-3 py-1.5 bg-gradient-calendar text-white text-xs font-medium rounded-lg hover:opacity-90 transition-all shadow-sm group relative"
+                        title="Jump to today (T)"
+                      >
+                        Today
+                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                          Jump to today (T)
+                        </span>
+                      </button>
+                    </div>
                     <button
                       onClick={handleNextMonth}
-                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
+                      title="Next month (→)"
                     >
                       <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        Next month (→)
+                      </span>
                     </button>
                   </div>
 
@@ -678,6 +811,66 @@ export default function CalendarPage() {
                       );
                     })}
                   </div>
+                </div>
+              ) : viewMode === 'week' ? (
+                /* Week View */
+                <div className="text-center py-12">
+                  <CalendarRange className="w-16 h-16 text-purple-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Week View</h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Week view coming soon - see events organized by week with hourly time slots
+                  </p>
+                  <button
+                    onClick={() => setViewMode('month')}
+                    className="mt-6 px-4 py-2 bg-gradient-calendar text-white rounded-lg hover:opacity-90 transition-all"
+                  >
+                    Back to Month View
+                  </button>
+                </div>
+              ) : viewMode === 'day' ? (
+                /* Day View */
+                <div className="text-center py-12">
+                  <CalendarDays className="w-16 h-16 text-purple-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Day View</h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Day view coming soon - see a detailed hourly breakdown of your day
+                  </p>
+                  <button
+                    onClick={() => setViewMode('month')}
+                    className="mt-6 px-4 py-2 bg-gradient-calendar text-white rounded-lg hover:opacity-90 transition-all"
+                  >
+                    Back to Month View
+                  </button>
+                </div>
+              ) : viewMode === 'agenda' ? (
+                /* Agenda View */
+                <div className="text-center py-12">
+                  <CalendarClock className="w-16 h-16 text-purple-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Agenda View</h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Agenda view coming soon - see a chronological list of upcoming events with details
+                  </p>
+                  <button
+                    onClick={() => setViewMode('month')}
+                    className="mt-6 px-4 py-2 bg-gradient-calendar text-white rounded-lg hover:opacity-90 transition-all"
+                  >
+                    Back to Month View
+                  </button>
+                </div>
+              ) : viewMode === 'timeline' ? (
+                /* Timeline View */
+                <div className="text-center py-12">
+                  <CalendarIcon className="w-16 h-16 text-purple-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Timeline View</h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Timeline view coming soon - see events on a continuous horizontal timeline
+                  </p>
+                  <button
+                    onClick={() => setViewMode('month')}
+                    className="mt-6 px-4 py-2 bg-gradient-calendar text-white rounded-lg hover:opacity-90 transition-all"
+                  >
+                    Back to Month View
+                  </button>
                 </div>
               ) : (
                 /* List View */
