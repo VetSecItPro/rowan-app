@@ -19,6 +19,7 @@ export default function RemindersPage() {
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [assignmentFilter, setAssignmentFilter] = useState('all'); // all, mine, unassigned
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
 
@@ -29,6 +30,15 @@ export default function RemindersPage() {
     // Status filter
     if (statusFilter !== 'all') {
       filtered = filtered.filter(r => r.status === statusFilter);
+    }
+
+    // Assignment filter
+    if (assignmentFilter !== 'all' && user) {
+      if (assignmentFilter === 'mine') {
+        filtered = filtered.filter(r => r.assigned_to === user.id);
+      } else if (assignmentFilter === 'unassigned') {
+        filtered = filtered.filter(r => !r.assigned_to);
+      }
     }
 
     // Search filter
@@ -42,7 +52,7 @@ export default function RemindersPage() {
     }
 
     return filtered;
-  }, [reminders, statusFilter, searchQuery]);
+  }, [reminders, statusFilter, assignmentFilter, searchQuery, user]);
 
   // Memoized stats calculation - expensive computation
   const stats = useMemo(() => {
@@ -349,8 +359,9 @@ export default function RemindersPage() {
               {/* Reminders List - Only show when NOT in guided flow */}
               {!showGuidedFlow && (
               <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            {/* Header with Month Badge and Status Filter */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            {/* Header with Month Badge and Filters */}
+            <div className="flex flex-col items-start gap-4 mb-6">
+              {/* Title Row */}
               <div className="flex items-center gap-3">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                   All Reminders ({filteredReminders.length})
@@ -360,8 +371,44 @@ export default function RemindersPage() {
                 </span>
               </div>
 
-              {/* Status Filter - Segmented Buttons */}
-              <div className="bg-gray-50 dark:bg-gray-900 border-2 border-pink-200 dark:border-pink-700 rounded-lg p-1 flex gap-1 w-fit">
+              {/* Filters Row */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
+                {/* Assignment Filter */}
+                <div className="bg-gray-50 dark:bg-gray-900 border-2 border-blue-200 dark:border-blue-700 rounded-lg p-1 flex gap-1 w-fit">
+                  <button
+                    onClick={() => setAssignmentFilter('all')}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                      assignmentFilter === 'all'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                    }`}
+                  >
+                    All
+                  </button>
+                  <button
+                    onClick={() => setAssignmentFilter('mine')}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
+                      assignmentFilter === 'mine'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                    }`}
+                  >
+                    My Reminders
+                  </button>
+                  <button
+                    onClick={() => setAssignmentFilter('unassigned')}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[80px] ${
+                      assignmentFilter === 'unassigned'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                    }`}
+                  >
+                    Unassigned
+                  </button>
+                </div>
+
+                {/* Status Filter - Segmented Buttons */}
+                <div className="bg-gray-50 dark:bg-gray-900 border-2 border-pink-200 dark:border-pink-700 rounded-lg p-1 flex gap-1 w-fit">
                 <button
                   onClick={() => setStatusFilter('all')}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap min-w-[60px] ${
@@ -415,11 +462,11 @@ export default function RemindersPage() {
                 <Bell className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No reminders found</p>
                 <p className="text-gray-500 dark:text-gray-500 mb-6">
-                  {searchQuery || statusFilter !== 'all'
+                  {searchQuery || statusFilter !== 'all' || assignmentFilter !== 'all'
                     ? 'Try adjusting your filters'
                     : 'Create your first reminder to get started!'}
                 </p>
-                {!searchQuery && statusFilter === 'all' && (
+                {!searchQuery && statusFilter === 'all' && assignmentFilter === 'all' && (
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                     <button
                       onClick={handleOpenModal}
