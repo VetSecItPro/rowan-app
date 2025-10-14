@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Smile, Image as ImageIcon, Paperclip, Calendar, ChevronDown, Palette } from 'lucide-react';
 import { CreateEventInput, CalendarEvent } from '@/lib/services/calendar-service';
 import { eventAttachmentsService } from '@/lib/services/event-attachments-service';
+import { toDateTimeLocalValue, fromDateTimeLocalValue, fromUTC, toUTC } from '@/lib/utils/timezone-utils';
 
 interface NewEventModalProps {
   isOpen: boolean;
@@ -424,16 +425,17 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
               <input
                 type="datetime-local"
                 required
-                value={formData.start_time ? formData.start_time.slice(0, 16) : ''}
+                value={formData.start_time ? toDateTimeLocalValue(formData.start_time) : ''}
                 onChange={(e) => {
                   if (e.target.value) {
-                    const newStartTime = new Date(e.target.value).toISOString();
+                    // Convert from datetime-local (user's local time) to UTC for storage
+                    const newStartTime = fromDateTimeLocalValue(e.target.value);
                     setFormData({ ...formData, start_time: newStartTime });
 
                     // Re-validate if end time is already set
                     if (formData.end_time) {
-                      const startDate = new Date(newStartTime);
-                      const endDate = new Date(formData.end_time);
+                      const startDate = fromUTC(newStartTime);
+                      const endDate = fromUTC(formData.end_time);
 
                       if (endDate < startDate) {
                         setDateError('End date & time cannot be before start date & time');
@@ -453,16 +455,17 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
               </label>
               <input
                 type="datetime-local"
-                value={formData.end_time ? formData.end_time.slice(0, 16) : ''}
+                value={formData.end_time ? toDateTimeLocalValue(formData.end_time) : ''}
                 onChange={(e) => {
                   if (e.target.value) {
-                    const newEndTime = new Date(e.target.value).toISOString();
+                    // Convert from datetime-local (user's local time) to UTC for storage
+                    const newEndTime = fromDateTimeLocalValue(e.target.value);
                     setFormData({ ...formData, end_time: newEndTime });
 
                     // Validate end time is not before start time
                     if (formData.start_time) {
-                      const startDate = new Date(formData.start_time);
-                      const endDate = new Date(newEndTime);
+                      const startDate = fromUTC(formData.start_time);
+                      const endDate = fromUTC(newEndTime);
 
                       if (endDate < startDate) {
                         setDateError('End date & time cannot be before start date & time');
