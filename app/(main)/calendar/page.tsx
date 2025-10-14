@@ -7,6 +7,7 @@ import { EventCard } from '@/components/calendar/EventCard';
 import { NewEventModal } from '@/components/calendar/NewEventModal';
 import { EventDetailModal } from '@/components/calendar/EventDetailModal';
 import { EventProposalModal } from '@/components/calendar/EventProposalModal';
+import { ProposalsList } from '@/components/calendar/ProposalsList';
 import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
@@ -14,9 +15,9 @@ import { useCalendarShortcuts } from '@/lib/hooks/useCalendarShortcuts';
 import { calendarService, CalendarEvent, CreateEventInput } from '@/lib/services/calendar-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, parseISO, addDays } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, parseISO, addDays, addWeeks, subWeeks } from 'date-fns';
 
-type ViewMode = 'month' | 'week' | 'day' | 'agenda' | 'timeline' | 'list';
+type ViewMode = 'day' | 'week' | 'month' | 'agenda' | 'timeline' | 'proposal' | 'list';
 
 export default function CalendarPage() {
   const { currentSpace, user } = useAuth();
@@ -258,6 +259,15 @@ export default function CalendarPage() {
 
   const handleNextMonth = useCallback(() => {
     setCurrentMonth(prev => addMonths(prev, 1));
+  }, []);
+
+  // Stable callback for week navigation
+  const handlePrevWeek = useCallback(() => {
+    setCurrentMonth(prev => subWeeks(prev, 1));
+  }, []);
+
+  const handleNextWeek = useCallback(() => {
+    setCurrentMonth(prev => addWeeks(prev, 1));
   }, []);
 
   const handleJumpToToday = useCallback(() => {
@@ -527,17 +537,17 @@ export default function CalendarPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex flex-col gap-1">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                  {viewMode === 'list' ? `Upcoming Events (${filteredEvents.length})` : 'Event Calendar'}
+                  {viewMode === 'list' ? `Upcoming Events (${filteredEvents.length})` : viewMode === 'proposal' ? 'Event Proposals' : 'Event Calendar'}
                 </h2>
-                {viewMode !== 'list' && (
+                {viewMode !== 'list' && viewMode !== 'proposal' && (
                   <div className="text-sm font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                     {format(currentMonth, 'MMMM yyyy')}
                   </div>
                 )}
               </div>
 
-              {/* View Mode Toggle and Today Button - Only show in calendar view */}
-              {viewMode !== 'list' && (
+              {/* View Mode Toggle and Today Button - Only show in calendar view (not list or proposal) */}
+              {viewMode !== 'list' && viewMode !== 'proposal' && (
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handleJumpToToday}
@@ -618,6 +628,20 @@ export default function CalendarPage() {
                     Timeline
                     <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                       Timeline View
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setViewMode('proposal')}
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
+                      viewMode === 'proposal'
+                        ? 'bg-gradient-calendar text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                    }`}
+                    title="Proposal View (P)"
+                  >
+                    Proposal
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                      Proposal View (P)
                     </span>
                   </button>
                   </div>
@@ -820,7 +844,7 @@ export default function CalendarPage() {
                   {/* Week Navigation */}
                   <div className="flex items-center justify-center mb-4 sm:mb-6">
                     <button
-                      onClick={handlePrevMonth}
+                      onClick={handlePrevWeek}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
                       title="Previous week (←)"
                     >
@@ -830,10 +854,10 @@ export default function CalendarPage() {
                       </span>
                     </button>
                     <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mx-6">
-                      Week of {format(startOfWeek(currentMonth), 'MMM d, yyyy')}
+                      Week of {format(startOfWeek(currentMonth, { weekStartsOn: 1 }), 'MMM d, yyyy')}
                     </h3>
                     <button
-                      onClick={handleNextMonth}
+                      onClick={handleNextWeek}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
                       title="Next week (→)"
                     >
@@ -848,8 +872,8 @@ export default function CalendarPage() {
                   <div className="grid grid-cols-7 gap-2">
                     {/* Day headers */}
                     {eachDayOfInterval({
-                      start: startOfWeek(currentMonth),
-                      end: endOfWeek(currentMonth)
+                      start: startOfWeek(currentMonth, { weekStartsOn: 1 }),
+                      end: endOfWeek(currentMonth, { weekStartsOn: 1 })
                     }).map((day) => {
                       const isToday = isSameDay(day, new Date());
                       return (
@@ -1325,6 +1349,14 @@ export default function CalendarPage() {
                     </div>
                   </div>
                 </div>
+              ) : viewMode === 'proposal' ? (
+                /* Proposal View */
+                currentSpace && (
+                  <ProposalsList
+                    spaceId={currentSpace.id}
+                    onCreateProposal={() => setIsProposalModalOpen(true)}
+                  />
+                )
               ) : (
                 /* List View */
                 filteredEvents.length === 0 ? (
