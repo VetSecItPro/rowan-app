@@ -41,6 +41,7 @@ export default function CalendarPage() {
   const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
   const [isTemplateLibraryOpen, setIsTemplateLibraryOpen] = useState(false);
+  const [activeAction, setActiveAction] = useState<'quick-add' | 'templates' | 'propose' | 'new-event'>('new-event');
 
   // Ref for search input
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -275,10 +276,6 @@ export default function CalendarPage() {
     }
   }, [loadEvents, handleEditEvent]);
 
-  // Stable callback for view mode changes
-  const handleSetViewCalendar = useCallback(() => setViewMode('month'), []);
-  const handleSetViewList = useCallback(() => setViewMode('list'), []);
-
   // Stable callback for month navigation
   const handlePrevMonth = useCallback(() => {
     setCurrentMonth(prev => subMonths(prev, 1));
@@ -407,72 +404,79 @@ export default function CalendarPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <div className="bg-gray-50 dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-lg p-1 flex gap-1">
+              {/* Segmented Toggle for Action Selection */}
+              <div className="bg-gray-50 dark:bg-gray-900 border-2 border-purple-200 dark:border-purple-700 rounded-lg p-1 flex gap-1 flex-wrap sm:flex-nowrap">
                 <button
-                  onClick={handleSetViewCalendar}
-                  className={`px-3 sm:px-4 py-2 rounded-md font-medium transition-all flex items-center justify-center gap-2 flex-1 sm:flex-initial ${
-                    viewMode !== 'list'
-                      ? 'bg-gradient-calendar text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  onClick={() => setActiveAction('quick-add')}
+                  className={`px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1.5 flex-1 sm:flex-initial ${
+                    activeAction === 'quick-add'
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
                   }`}
                 >
-                  <LayoutGrid className="w-4 h-4" />
-                  <span className="text-sm">Calendar</span>
+                  <span className="text-base">✨</span>
+                  <span>Quick Add</span>
                 </button>
                 <button
-                  onClick={handleSetViewList}
-                  className={`px-3 sm:px-4 py-2 rounded-md font-medium transition-all flex items-center justify-center gap-2 flex-1 sm:flex-initial ${
-                    viewMode === 'list'
-                      ? 'bg-gradient-calendar text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  onClick={() => setActiveAction('templates')}
+                  className={`px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1.5 flex-1 sm:flex-initial ${
+                    activeAction === 'templates'
+                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
                   }`}
                 >
-                  <List className="w-4 h-4" />
-                  <span className="text-sm">List</span>
+                  <span className="text-base">📋</span>
+                  <span>Templates</span>
+                </button>
+                <button
+                  onClick={() => setActiveAction('propose')}
+                  className={`px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1.5 flex-1 sm:flex-initial ${
+                    activeAction === 'propose'
+                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                  }`}
+                >
+                  <Users className="w-4 h-4" />
+                  <span>Propose Event</span>
+                </button>
+                <button
+                  onClick={() => setActiveAction('new-event')}
+                  className={`px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1.5 flex-1 sm:flex-initial ${
+                    activeAction === 'new-event'
+                      ? 'bg-gradient-to-r from-purple-500 to-purple-700 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                  }`}
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>New Event</span>
                 </button>
               </div>
+
+              {/* Dynamic Action Button */}
               <button
-                onClick={() => setIsQuickAddOpen(true)}
-                className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 group relative"
-                title="Quick add with natural language (Q)"
+                onClick={() => {
+                  if (activeAction === 'quick-add') setIsQuickAddOpen(true);
+                  else if (activeAction === 'templates') setIsTemplateLibraryOpen(true);
+                  else if (activeAction === 'propose') setIsProposalModalOpen(true);
+                  else setIsModalOpen(true);
+                }}
+                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                title={
+                  activeAction === 'quick-add' ? 'Quick add with natural language (Q)' :
+                  activeAction === 'templates' ? 'Create from template' :
+                  activeAction === 'propose' ? 'Propose event times' :
+                  'Create a new event (N)'
+                }
               >
-                <span className="text-lg">✨</span>
-                <span>Quick Add</span>
-                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                  Quick add with natural language (Q)
-                </span>
-              </button>
-              <button
-                onClick={() => setIsTemplateLibraryOpen(true)}
-                className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 group relative"
-                title="Create from template"
-              >
-                <span className="text-lg">📋</span>
-                <span>Templates</span>
-                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                  Create from template
-                </span>
-              </button>
-              <button
-                onClick={() => setIsProposalModalOpen(true)}
-                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 group relative"
-                title="Propose event times for collaborative scheduling"
-              >
-                <Users className="w-5 h-5" />
-                <span>Propose Event</span>
-                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                  Propose event times for collaborative scheduling
-                </span>
-              </button>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 group relative"
-                title="Create a new event (N)"
-              >
-                <Plus className="w-5 h-5" />
-                <span>New Event</span>
-                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                  Create a new event (N)
+                {activeAction === 'quick-add' && <span className="text-lg">✨</span>}
+                {activeAction === 'templates' && <span className="text-lg">📋</span>}
+                {activeAction === 'propose' && <Users className="w-5 h-5" />}
+                {activeAction === 'new-event' && <Plus className="w-5 h-5" />}
+                <span>
+                  {activeAction === 'quick-add' ? 'Quick Add' :
+                   activeAction === 'templates' ? 'Templates' :
+                   activeAction === 'propose' ? 'Propose Event' :
+                   'New Event'}
                 </span>
               </button>
             </div>

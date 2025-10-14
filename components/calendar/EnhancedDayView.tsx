@@ -1,11 +1,9 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { format, parseISO, isSameDay, getHours, getMinutes, differenceInMinutes } from 'date-fns';
 import { Check, Eye, Edit, MapPin, Clock } from 'lucide-react';
 import type { CalendarEvent } from '@/lib/types';
-import { conflictDetectionService } from '@/lib/services/conflict-detection-service';
-import { ConflictIndicator } from './ConflictIndicator';
 
 interface EnhancedDayViewProps {
   date: Date;
@@ -43,11 +41,6 @@ export function EnhancedDayView({
 
   // Get events for this day
   const dayEvents = events.filter(event => isSameDay(parseISO(event.start_time), date));
-
-  // Detect conflicts
-  const conflictMap = useMemo(() => {
-    return conflictDetectionService.findAllConflicts(events);
-  }, [events]);
 
   // Calculate event position and height
   const getEventStyle = (event: CalendarEvent) => {
@@ -185,11 +178,18 @@ export function EnhancedDayView({
             const style = getEventStyle(event);
             const categoryColor = getCategoryColor(event.category);
             const category = categoryConfig[event.category as keyof typeof categoryConfig] || categoryConfig.personal;
-            const conflicts = conflictMap.get(event.id) || [];
-            const hasConflict = conflicts.length > 0;
 
             const width = maxColumns > 1 ? `${100 / maxColumns}%` : '100%';
             const left = maxColumns > 1 ? `${(column * 100) / maxColumns}%` : '0';
+
+            // Use purple shades for overlapping events (calendar brand color)
+            const isOverlapping = maxColumns > 1;
+            const purpleShades = [
+              'bg-purple-100 dark:bg-purple-900/30 border-purple-500',
+              'bg-indigo-100 dark:bg-indigo-900/30 border-indigo-500',
+              'bg-violet-100 dark:bg-violet-900/30 border-violet-500',
+            ];
+            const overlappingStyle = isOverlapping ? purpleShades[column % purpleShades.length] : '';
 
             return (
               <div
@@ -203,11 +203,11 @@ export function EnhancedDayView({
                 }}
               >
                 <div
-                  className={`h-full p-2 rounded-lg ${
-                    hasConflict
-                      ? 'border-l-4 border-red-500 ring-2 ring-red-500/50 dark:ring-red-400/50'
-                      : `border-l-4 ${categoryColor.border}`
-                  } ${categoryColor.bg} shadow-sm hover:shadow-md transition-shadow overflow-hidden`}
+                  className={`h-full p-2 rounded-lg border-l-4 ${
+                    isOverlapping
+                      ? overlappingStyle
+                      : `${categoryColor.border} ${categoryColor.bg}`
+                  } shadow-sm hover:shadow-md transition-shadow overflow-hidden`}
                 >
                   <div className="flex items-start justify-between gap-1 h-full">
                     <div className="flex-1 min-w-0">
@@ -237,14 +237,13 @@ export function EnhancedDayView({
                         {event.title}
                       </h4>
 
-                      {/* Category badge and conflict indicator */}
+                      {/* Category badge */}
                       <div className="flex items-center gap-1 mt-1 flex-wrap">
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded ${categoryColor.color}`}>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+                          isOverlapping ? 'bg-purple-200 dark:bg-purple-800 text-purple-900 dark:text-purple-100' : categoryColor.color
+                        }`}>
                           {category.icon} {category.label}
                         </span>
-                        {hasConflict && (
-                          <ConflictIndicator conflicts={conflicts} compact />
-                        )}
                       </div>
 
                       {/* Location (if event is tall enough) */}
