@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown, TrendingUp } from 'lucide-react';
+import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown, TrendingUp, Sparkles, Zap } from 'lucide-react';
 import { format } from 'date-fns';
 import { Header } from '@/components/layout/Header';
 import { ReminderCard } from '@/components/reminders/ReminderCard';
@@ -10,6 +10,7 @@ import GuidedReminderCreation from '@/components/guided/GuidedReminderCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { remindersService, Reminder, CreateReminderInput } from '@/lib/services/reminders-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
+import { reminderTemplatesService, ReminderTemplate } from '@/lib/services/reminder-templates-service';
 
 export default function RemindersPage() {
   const { currentSpace, user } = useAuth();
@@ -22,6 +23,7 @@ export default function RemindersPage() {
   const [assignmentFilter, setAssignmentFilter] = useState('all');
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
+  const [popularTemplates, setPopularTemplates] = useState<ReminderTemplate[]>([]);
 
   const filteredReminders = useMemo(() => {
     let filtered = reminders;
@@ -73,13 +75,15 @@ export default function RemindersPage() {
 
     try {
       setLoading(true);
-      const [remindersData, statsData, userProgressResult] = await Promise.all([
+      const [remindersData, statsData, userProgressResult, templatesData] = await Promise.all([
         remindersService.getReminders(currentSpace.id),
         remindersService.getReminderStats(currentSpace.id),
         getUserProgress(user.id),
+        reminderTemplatesService.getPopularTemplates(currentSpace.id, 5),
       ]);
 
       setReminders(remindersData);
+      setPopularTemplates(templatesData);
 
       const userProgress = userProgressResult.success ? userProgressResult.data : null;
       if (userProgress) {
@@ -191,6 +195,37 @@ export default function RemindersPage() {
       }
     }
   }, [user]);
+
+  const handleQuickTemplateCreate = useCallback(async (template: ReminderTemplate) => {
+    if (!currentSpace || !user) return;
+
+    try {
+      // Apply template with defaults
+      const reminderData = reminderTemplatesService.applyTemplate(template, {});
+
+      // Create reminder
+      await remindersService.createReminder({
+        space_id: currentSpace.id,
+        title: reminderData.title,
+        description: reminderData.description,
+        emoji: reminderData.emoji,
+        category: reminderData.category as any,
+        priority: reminderData.priority as any,
+        reminder_time: reminderData.reminder_time,
+        repeat_pattern: reminderData.repeat_pattern,
+        repeat_days: reminderData.repeat_days,
+        status: 'active',
+      });
+
+      // Increment template usage
+      await reminderTemplatesService.incrementUsage(template.id);
+
+      // Reload reminders
+      loadReminders();
+    } catch (error) {
+      console.error('Failed to create reminder from template:', error);
+    }
+  }, [currentSpace, user, loadReminders]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -309,6 +344,45 @@ export default function RemindersPage() {
               </div>
             </div>
           </div>
+          )}
+
+          {!showGuidedFlow && popularTemplates.length > 0 && (
+            <div className="bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900/10 dark:to-purple-900/10 border border-pink-200 dark:border-pink-800 rounded-xl p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Quick Templates
+                </h3>
+                <span className="px-2 py-0.5 bg-pink-200 dark:bg-pink-800 text-pink-700 dark:text-pink-300 text-xs font-medium rounded-full">
+                  Popular
+                </span>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Create common reminders with one click
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                {popularTemplates.map((template) => (
+                  <button
+                    key={template.id}
+                    onClick={() => handleQuickTemplateCreate(template)}
+                    className="flex flex-col items-start p-4 bg-white dark:bg-gray-800 border border-pink-200 dark:border-pink-800 rounded-lg hover:shadow-lg hover:scale-105 transition-all text-left group"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-2xl">{template.emoji}</span>
+                      <Zap className="w-4 h-4 text-pink-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+                      {template.name}
+                    </h4>
+                    {template.description && (
+                      <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+                        {template.description}
+                      </p>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
 
           {!showGuidedFlow && (
