@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { processReminderNotifications } from '@/lib/jobs/reminder-notifications-job';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +25,10 @@ export async function GET(request: NextRequest) {
     const expectedSecret = process.env.CRON_SECRET;
 
     if (!expectedSecret) {
-      console.error('CRON_SECRET environment variable is not set');
+      logger.error('CRON_SECRET environment variable is not set', undefined, {
+        component: 'ReminderNotificationsCron',
+        action: 'verify_secret',
+      });
       return NextResponse.json(
         { error: 'Server configuration error' },
         { status: 500 }
@@ -32,7 +36,10 @@ export async function GET(request: NextRequest) {
     }
 
     if (authHeader !== `Bearer ${expectedSecret}`) {
-      console.error('Unauthorized cron request');
+      logger.warn('Unauthorized cron request attempt', {
+        component: 'ReminderNotificationsCron',
+        action: 'verify_auth',
+      });
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -43,7 +50,9 @@ export async function GET(request: NextRequest) {
     const result = await processReminderNotifications();
 
     // Log results
-    console.log('Reminder notification job completed:', {
+    logger.info('Reminder notification job completed', {
+      component: 'ReminderNotificationsCron',
+      action: 'process',
       success: result.success,
       notificationsSent: result.notificationsSent,
       emailsSent: result.emailsSent,
@@ -51,7 +60,11 @@ export async function GET(request: NextRequest) {
     });
 
     if (result.errors.length > 0) {
-      console.error('Notification job errors:', result.errors);
+      logger.error('Notification job errors', undefined, {
+        component: 'ReminderNotificationsCron',
+        action: 'process',
+        errors: result.errors,
+      });
     }
 
     return NextResponse.json({
@@ -62,7 +75,10 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Cron job failed:', error);
+    logger.error('Cron job failed', error, {
+      component: 'ReminderNotificationsCron',
+      action: 'execute',
+    });
     return NextResponse.json(
       {
         error: 'Job execution failed',
