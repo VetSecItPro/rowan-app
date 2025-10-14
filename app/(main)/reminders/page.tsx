@@ -309,10 +309,17 @@ export default function RemindersPage(): JSX.Element {
                 <>
                   <button
                     onClick={() => setSelectionMode(true)}
-                    className="px-4 py-2 sm:px-6 sm:py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors shadow-lg flex items-center justify-center gap-2"
+                    className="px-4 py-2 sm:px-6 sm:py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors shadow-lg flex items-center justify-center gap-2 group relative"
+                    title="Select multiple reminders to complete, delete, or snooze them all at once"
                   >
                     <CheckCircle2 className="w-5 h-5" />
-                    <span className="hidden sm:inline">Select</span>
+                    <span className="hidden sm:inline">Bulk Select</span>
+
+                    {/* Tooltip - appears on hover */}
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-10">
+                      Select multiple reminders for bulk actions
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+                    </div>
                   </button>
                   <button
                     onClick={handleOpenModal}
@@ -343,7 +350,7 @@ export default function RemindersPage(): JSX.Element {
 
           {/* Stats Cards - Horizontal Row - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+          <div className="stats-grid-mobile gap-4 sm:gap-6">
             {/* Active */}
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">

@@ -54,9 +54,11 @@ export function Header() {
             <Image
               src="/rowan-logo.png"
               alt="Rowan Logo"
-              width={32}
-              height={32}
-              className="w-8 h-8 transition-transform group-hover:scale-110"
+              width={48}
+              height={48}
+              sizes="(max-width: 640px) 32px, (max-width: 1024px) 40px, 48px"
+              className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 transition-transform group-hover:scale-110"
+              priority
             />
             <span className="text-2xl font-semibold gradient-text">Rowan</span>
           </Link>
@@ -72,7 +74,7 @@ export function Header() {
                 <NotificationCenter userId={user.id} />
                 <Link
                   href="/settings"
-                  className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
+                  className="hidden sm:flex items-center justify-center btn-icon-mobile rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all touch-feedback focus-mobile"
                   aria-label="Settings"
                 >
                   <svg className="w-5 h-5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,7 +91,7 @@ export function Header() {
             {user ? (
               <Link
                 href="/dashboard"
-                className="hidden sm:flex items-center gap-2 px-5 py-2 shimmer-bg text-white rounded-full hover:opacity-90 transition-all shadow-md hover:shadow-lg font-medium"
+                className="hidden sm:flex items-center gap-2 btn-touch shimmer-bg text-white rounded-full hover:opacity-90 transition-all shadow-md hover:shadow-lg font-medium touch-feedback"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />

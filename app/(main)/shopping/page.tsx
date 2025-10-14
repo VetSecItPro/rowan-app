@@ -581,7 +581,7 @@ export default function ShoppingPage() {
 
           {/* Stats Dashboard - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+          <div className="stats-grid-mobile gap-4 sm:gap-6">
             <button
               onClick={handleItemsThisWeekClick}
               className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
