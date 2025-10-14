@@ -408,7 +408,7 @@ export default function CalendarPage() {
               <div className="bg-gray-50 dark:bg-gray-900 border-2 border-purple-200 dark:border-purple-700 rounded-lg p-1 flex gap-1 flex-wrap sm:flex-nowrap">
                 <button
                   onClick={() => setActiveAction('quick-add')}
-                  className={`px-2 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1.5 flex-1 sm:w-[120px] ${
+                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[105px] ${
                     activeAction === 'quick-add'
                       ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
@@ -419,7 +419,7 @@ export default function CalendarPage() {
                 </button>
                 <button
                   onClick={() => setActiveAction('templates')}
-                  className={`px-2 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1.5 flex-1 sm:w-[120px] ${
+                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[105px] ${
                     activeAction === 'templates'
                       ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
@@ -430,24 +430,24 @@ export default function CalendarPage() {
                 </button>
                 <button
                   onClick={() => setActiveAction('propose')}
-                  className={`px-2 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1.5 flex-1 sm:w-[120px] ${
+                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[125px] ${
                     activeAction === 'propose'
                       ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
                   }`}
                 >
-                  <Users className="w-4 h-4" />
+                  <Users className="w-3.5 h-3.5" />
                   <span>Propose Event</span>
                 </button>
                 <button
                   onClick={() => setActiveAction('new-event')}
-                  className={`px-2 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1.5 flex-1 sm:w-[120px] ${
+                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[105px] ${
                     activeAction === 'new-event'
                       ? 'bg-gradient-to-r from-purple-500 to-purple-700 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
                   }`}
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-3.5 h-3.5" />
                   <span>New Event</span>
                 </button>
               </div>
@@ -460,7 +460,7 @@ export default function CalendarPage() {
                   else if (activeAction === 'propose') setIsProposalModalOpen(true);
                   else setIsModalOpen(true);
                 }}
-                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 w-full sm:w-[180px]"
+                className="px-4 sm:px-5 py-2 sm:py-3 shimmer-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 w-full sm:w-[155px]"
                 title={
                   activeAction === 'quick-add' ? 'Quick add with natural language (Q)' :
                   activeAction === 'templates' ? 'Create from template' :
