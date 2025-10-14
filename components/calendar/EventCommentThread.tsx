@@ -8,10 +8,11 @@ import { formatDistance } from 'date-fns';
 
 interface EventCommentThreadProps {
   eventId: string;
+  spaceId: string;
   onClose?: () => void;
 }
 
-export function EventCommentThread({ eventId, onClose }: EventCommentThreadProps) {
+export function EventCommentThread({ eventId, spaceId, onClose }: EventCommentThreadProps) {
   const { user } = useAuth();
   const [comments, setComments] = useState<EventComment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,6 +44,7 @@ export function EventCommentThread({ eventId, onClose }: EventCommentThreadProps
     try {
       await eventCommentsService.createComment({
         event_id: eventId,
+        space_id: spaceId,
         content: newComment,
         parent_comment_id: replyTo || undefined
       });
