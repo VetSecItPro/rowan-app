@@ -9,6 +9,7 @@ import { EventDetailModal } from '@/components/calendar/EventDetailModal';
 import { EventProposalModal } from '@/components/calendar/EventProposalModal';
 import { ProposalsList } from '@/components/calendar/ProposalsList';
 import { MiniCalendar } from '@/components/calendar/MiniCalendar';
+import { QuickAddEvent } from '@/components/calendar/QuickAddEvent';
 import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
@@ -35,6 +36,7 @@ export default function CalendarPage() {
   const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, any>>({});
   const [detailEvent, setDetailEvent] = useState<CalendarEvent | null>(null);
   const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
+  const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
 
   // Ref for search input
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -342,11 +344,13 @@ export default function CalendarPage() {
     switchToAgenda: () => setViewMode('agenda'),
     switchToList: () => setViewMode('list'),
     newEvent: () => setIsModalOpen(true),
+    quickAdd: () => setIsQuickAddOpen(true),
     focusSearch: () => searchInputRef.current?.focus(),
     closeModals: () => {
       setIsModalOpen(false);
       setDetailEvent(null);
       setIsProposalModalOpen(false);
+      setIsQuickAddOpen(false);
     },
   });
 
@@ -403,6 +407,17 @@ export default function CalendarPage() {
                   <span className="text-sm">List</span>
                 </button>
               </div>
+              <button
+                onClick={() => setIsQuickAddOpen(true)}
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 group relative"
+                title="Quick add with natural language (Q)"
+              >
+                <span className="text-lg">✨</span>
+                <span>Quick Add</span>
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                  Quick add with natural language (Q)
+                </span>
+              </button>
               <button
                 onClick={() => setIsProposalModalOpen(true)}
                 className="px-4 sm:px-6 py-2 sm:py-3 shimmer-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 group relative"
@@ -1461,6 +1476,13 @@ export default function CalendarPage() {
           }}
         />
       )}
+
+      {/* Quick Add Event Modal */}
+      <QuickAddEvent
+        isOpen={isQuickAddOpen}
+        onClose={() => setIsQuickAddOpen(false)}
+        onCreateEvent={handleCreateEvent}
+      />
     </FeatureLayout>
   );
 }
