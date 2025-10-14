@@ -14,7 +14,16 @@ CREATE TABLE IF NOT EXISTS event_comments (
 
 -- Add indexes
 CREATE INDEX IF NOT EXISTS idx_event_comments_event_id ON event_comments(event_id);
-CREATE INDEX IF NOT EXISTS idx_event_comments_space_id ON event_comments(space_id);
+-- Only create space_id index if column exists
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'event_comments' AND column_name = 'space_id'
+  ) THEN
+    CREATE INDEX IF NOT EXISTS idx_event_comments_space_id ON event_comments(space_id);
+  END IF;
+END $$;
 CREATE INDEX IF NOT EXISTS idx_event_comments_user_id ON event_comments(user_id);
 CREATE INDEX IF NOT EXISTS idx_event_comments_parent ON event_comments(parent_comment_id);
 CREATE INDEX IF NOT EXISTS idx_event_comments_mentions ON event_comments USING GIN(mentions);
@@ -23,6 +32,7 @@ CREATE INDEX IF NOT EXISTS idx_event_comments_mentions ON event_comments USING G
 ALTER TABLE event_comments ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
+DROP POLICY IF EXISTS "Users can view comments in their space" ON event_comments;
 CREATE POLICY "Users can view comments in their space"
   ON event_comments FOR SELECT
   USING (
@@ -33,6 +43,7 @@ CREATE POLICY "Users can view comments in their space"
     )
   );
 
+DROP POLICY IF EXISTS "Users can create comments in their space" ON event_comments;
 CREATE POLICY "Users can create comments in their space"
   ON event_comments FOR INSERT
   WITH CHECK (
@@ -44,11 +55,13 @@ CREATE POLICY "Users can create comments in their space"
     AND user_id = auth.uid()
   );
 
+DROP POLICY IF EXISTS "Users can update their own comments" ON event_comments;
 CREATE POLICY "Users can update their own comments"
   ON event_comments FOR UPDATE
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Users can delete their own comments" ON event_comments;
 CREATE POLICY "Users can delete their own comments"
   ON event_comments FOR DELETE
   USING (user_id = auth.uid());
