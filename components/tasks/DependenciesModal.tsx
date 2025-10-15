@@ -149,7 +149,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
                   Add Dependency
                 </h3>
 
-                <div className="flex gap-2 mb-3">
+                <div className="flex gap-3 sm:gap-2 mb-3">
                   <button
                     onClick={() => setDependencyType('blocks')}
                     className={`px-3 py-1.5 text-sm rounded-lg ${
