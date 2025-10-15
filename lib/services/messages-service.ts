@@ -62,11 +62,26 @@ export interface Conversation {
   id: string;
   space_id: string;
   title?: string;
+  conversation_type: 'direct' | 'group' | 'general';
+  last_message_preview?: string;
+  last_message_at?: string;
+  is_archived: boolean;
+  avatar_url?: string;
+  description?: string;
   participants: string[];
   last_message?: Message;
   unread_count: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface CreateConversationInput {
+  space_id: string;
+  title?: string;
+  conversation_type?: 'direct' | 'group' | 'general';
+  description?: string;
+  avatar_url?: string;
+  participants?: string[];
 }
 
 export interface CreateMessageInput {
@@ -689,5 +704,233 @@ export const messagesService = {
     } else {
       return await this.pinMessage(messageId, userId);
     }
+  },
+
+  // =====================================================
+  // CONVERSATION MANAGEMENT (PHASE 9)
+  // =====================================================
+
+  /**
+   * Get all conversations for a space with unread counts
+   */
+  async getConversationsList(spaceId: string, userId: string): Promise<Conversation[]> {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .rpc('get_conversations_with_unread', {
+        space_id_param: spaceId,
+        user_id_param: userId,
+      });
+
+    if (error) {
+      console.error('Error fetching conversations:', error);
+      throw error;
+    }
+
+    return data as Conversation[];
+  },
+
+  /**
+   * Create a new conversation
+   */
+  async createConversation(input: CreateConversationInput): Promise<Conversation> {
+    const supabase = createClient();
+
+    const conversationData = {
+      space_id: input.space_id,
+      title: input.title || 'New Conversation',
+      conversation_type: input.conversation_type || 'direct',
+      description: input.description,
+      avatar_url: input.avatar_url,
+      participants: input.participants || [],
+      is_archived: false,
+    };
+
+    const { data, error } = await supabase
+      .from('conversations')
+      .insert(conversationData)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating conversation:', error);
+      throw error;
+    }
+
+    return data as Conversation;
+  },
+
+  /**
+   * Get a single conversation by ID
+   */
+  async getConversation(conversationId: string): Promise<Conversation | null> {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from('conversations')
+      .select('*')
+      .eq('id', conversationId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching conversation:', error);
+      return null;
+    }
+
+    return data as Conversation;
+  },
+
+  /**
+   * Update conversation metadata
+   */
+  async updateConversation(
+    conversationId: string,
+    updates: Partial<CreateConversationInput>
+  ): Promise<Conversation> {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from('conversations')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', conversationId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating conversation:', error);
+      throw error;
+    }
+
+    return data as Conversation;
+  },
+
+  /**
+   * Archive a conversation
+   */
+  async archiveConversation(conversationId: string): Promise<Conversation> {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from('conversations')
+      .update({
+        is_archived: true,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', conversationId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error archiving conversation:', error);
+      throw error;
+    }
+
+    return data as Conversation;
+  },
+
+  /**
+   * Unarchive a conversation
+   */
+  async unarchiveConversation(conversationId: string): Promise<Conversation> {
+    const supabase = createClient();
+
+    const { data, error} = await supabase
+      .from('conversations')
+      .update({
+        is_archived: false,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', conversationId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error unarchiving conversation:', error);
+      throw error;
+    }
+
+    return data as Conversation;
+  },
+
+  /**
+   * Delete a conversation and all its messages
+   */
+  async deleteConversation(conversationId: string): Promise<void> {
+    const supabase = createClient();
+
+    const { error } = await supabase
+      .from('conversations')
+      .delete()
+      .eq('id', conversationId);
+
+    if (error) {
+      console.error('Error deleting conversation:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Subscribe to conversation list changes
+   */
+  subscribeToConversations(
+    spaceId: string,
+    callbacks: {
+      onInsert?: (conversation: Conversation) => void;
+      onUpdate?: (conversation: Conversation) => void;
+      onDelete?: (conversationId: string) => void;
+    }
+  ): RealtimeChannel {
+    const supabase = createClient();
+
+    const channel = supabase
+      .channel(`conversations:${spaceId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'conversations',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        (payload) => {
+          if (callbacks.onInsert) {
+            callbacks.onInsert(payload.new as Conversation);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'conversations',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        (payload) => {
+          if (callbacks.onUpdate) {
+            callbacks.onUpdate(payload.new as Conversation);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'conversations',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        (payload) => {
+          if (callbacks.onDelete) {
+            callbacks.onDelete(payload.old.id);
+          }
+        }
+      )
+      .subscribe();
+
+    return channel;
   },
 };
