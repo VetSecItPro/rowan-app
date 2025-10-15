@@ -65,7 +65,7 @@ export function Header() {
 
           {/* Menu, Theme Toggle & Auth Buttons */}
           <div className="flex items-center gap-4">
-            <a href="#pricing" className="hidden md:block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors active:opacity-80">Pricing</a>
+            <a href="#pricing" className="hidden md:block inline-block py-3 px-4 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors active:opacity-80">Pricing</a>
             <HamburgerMenu />
 
             {/* Only show Settings and Notifications for logged-in users */}

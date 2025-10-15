@@ -238,7 +238,7 @@ export default function ResetPasswordPage() {
         <div className="mt-6 text-center">
           <Link
             href="/login"
-            className="text-sm text-purple-600 dark:text-purple-400 hover:underline font-medium"
+            className="inline-block py-2 px-3 text-sm text-purple-600 dark:text-purple-400 hover:underline font-medium"
           >
             ← Back to Login
           </Link>
