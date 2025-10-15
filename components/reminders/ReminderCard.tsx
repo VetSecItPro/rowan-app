@@ -67,13 +67,13 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
             <button
               onClick={() => onSelectionChange?.(reminder.id, !selected)}
               aria-label={`Select reminder: ${reminder.title}`}
-              className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+              className={`mt-1 w-6 h-6 sm:w-5 sm:h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 active:scale-95 ${
                 selected
                   ? 'bg-pink-500 border-pink-500'
                   : 'bg-transparent border-gray-400 dark:border-gray-500 hover:border-pink-500'
               }`}
             >
-              {selected && <Check className="w-3 h-3 text-white" />}
+              {selected && <Check className="w-4 h-4 sm:w-3 sm:h-3 text-white" />}
             </button>
           )}
 
@@ -82,7 +82,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
             <button
               onClick={handleCheckboxClick}
               aria-label={`Toggle reminder status: ${reminder.status === 'active' ? 'Active' : reminder.status === 'snoozed' ? 'Snoozed' : 'Completed'}`}
-              className={`mt-1 w-6 h-6 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+              className={`mt-1 w-6 h-6 sm:w-5 sm:h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 active:scale-95 ${
                 reminder.status === 'completed'
                   ? 'bg-green-500 border-green-500'
                   : reminder.status === 'snoozed'
@@ -90,7 +90,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                   : 'bg-transparent border-blue-500'
               }`}
             >
-              {reminder.status === 'completed' && <Check className="w-4 h-4 text-white" />}
+              {reminder.status === 'completed' && <Check className="w-4 h-4 sm:w-3 sm:h-3 text-white" />}
               {reminder.status === 'snoozed' && <div className="w-2 h-2 bg-white rounded-full" />}
             </button>
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
@@ -158,9 +158,9 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
           <button
             onClick={() => setShowMenu(!showMenu)}
             aria-label="Reminder options menu"
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 sm:p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95 flex items-center justify-center"
           >
-            <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <MoreVertical className="w-5 h-5 sm:w-4 sm:h-4 text-gray-600 dark:text-gray-400" />
           </button>
 
           {showMenu && (
@@ -169,13 +169,13 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                 className="fixed inset-0 z-10"
                 onClick={() => setShowMenu(false)}
               />
-              <div className="absolute right-0 mt-2 w-48 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
+              <div className="absolute right-0 mt-2 w-44 sm:w-40 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
                 <button
                   onClick={() => {
                     onEdit(reminder);
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-t-lg"
+                  className="w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-t-lg active:scale-[0.98]"
                 >
                   <Edit className="w-4 h-4" />
                   Edit Reminder
@@ -187,7 +187,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                     }
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-b-lg"
+                  className="w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-b-lg active:scale-[0.98]"
                 >
                   <Trash2 className="w-4 h-4" />
                   Delete Reminder
