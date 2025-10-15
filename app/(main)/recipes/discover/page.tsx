@@ -369,7 +369,7 @@ export default function DiscoverRecipesPage() {
               <button
                 key={cuisine.value}
                 onClick={() => handleCuisineClick(cuisine.value)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`px-4 py-2.5 md:px-4 md:py-2 text-sm min-h-[44px] md:min-h-0 rounded-full font-medium transition-all ${
                   selectedCuisine === cuisine.value
                     ? 'bg-orange-500 text-white shadow-md scale-105'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-gray-600 hover:scale-105'

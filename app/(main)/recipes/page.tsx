@@ -189,7 +189,7 @@ export default function RecipesPage() {
                     <button
                       key={cuisine}
                       onClick={() => setSelectedCuisine(cuisine === selectedCuisine ? null : (cuisine || null))}
-                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      className={`px-4 py-2.5 md:px-3 md:py-1 text-sm min-h-[44px] md:min-h-0 rounded-full font-medium transition-colors ${
                         selectedCuisine === cuisine
                           ? 'bg-orange-500 text-white'
                           : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-gray-600'
@@ -211,7 +211,7 @@ export default function RecipesPage() {
                     <button
                       key={difficulty}
                       onClick={() => setSelectedDifficulty(difficulty === selectedDifficulty ? null : (difficulty || null))}
-                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      className={`px-4 py-2.5 md:px-3 md:py-1 text-sm min-h-[44px] md:min-h-0 rounded-full font-medium transition-colors ${
                         selectedDifficulty === difficulty
                           ? 'bg-orange-500 text-white'
                           : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-gray-600'
