@@ -36,6 +36,7 @@
     "next-themes": "^0.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-markdown": "^10.1.0",
     "react-media-recorder": "^1.7.2",
     "react-window": "^2.2.1",
     "resend": "^6.1.2",
