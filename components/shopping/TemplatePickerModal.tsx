@@ -111,7 +111,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                   Or Choose a Template
                 </h3>
               </div>
-              <div className="space-y-3">
+              <div className="flex flex-col gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-3">
                 {templates.map((template) => {
                   const itemCount = Array.isArray(template.items)
                     ? template.items.length
@@ -124,7 +124,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                       key={template.id}
                       onClick={() => handleSelectTemplate(template.id)}
                       disabled={selectedTemplateId === template.id}
-                      className="w-full p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group disabled:opacity-50 disabled:cursor-not-allowed min-h-[80px]"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -132,7 +132,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <h4 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate">
+                            <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate">
                               {template.name}
                             </h4>
                             <Tooltip content={`${itemCount} items in template`}>
@@ -142,7 +142,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                             </Tooltip>
                           </div>
                           {template.description && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
+                            <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
                               {template.description}
                             </p>
                           )}

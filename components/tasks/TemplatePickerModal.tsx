@@ -66,7 +66,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelect, spaceId }: Temp
           ) : filteredTemplates.length === 0 ? (
             <div className="text-center py-8 text-gray-500">No templates found</div>
           ) : (
-            <div className="grid gap-3 max-h-96 overflow-y-auto">
+            <div className="flex flex-col gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-3 max-h-96 overflow-y-auto">
               {filteredTemplates.map((template) => (
                 <button
                   key={template.id}
@@ -74,12 +74,12 @@ export function TemplatePickerModal({ isOpen, onClose, onSelect, spaceId }: Temp
                     onSelect(template.id);
                     onClose();
                   }}
-                  className="flex items-start gap-3 p-4 text-left bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                  className="w-full flex items-start gap-3 p-4 text-left bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg transition-colors min-h-[80px]"
                 >
                   {template.is_favorite && <Star className="w-4 h-4 text-amber-500 flex-shrink-0" />}
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-gray-900 dark:text-white">{template.name}</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{template.title}</p>
+                    <h3 className="text-base sm:text-sm font-medium text-gray-900 dark:text-white">{template.name}</h3>
+                    <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 truncate">{template.title}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs text-gray-500">Used {template.use_count} times</span>
                       {template.priority && (
