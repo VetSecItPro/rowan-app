@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { RealtimeChannel } from '@supabase/supabase-js';
+import { FileUploadResult } from './file-upload-service';
 
 export interface Message {
   id: string;
@@ -12,6 +13,10 @@ export interface Message {
   attachments?: string[];
   created_at: string;
   updated_at: string;
+}
+
+export interface MessageWithAttachments extends Message {
+  attachments_data?: FileUploadResult[];
 }
 
 export interface MessageSubscriptionCallbacks {
@@ -82,6 +87,21 @@ export const messagesService = {
     const { data, error } = await supabase
       .from('messages')
       .select('*')
+      .eq('conversation_id', conversationId)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getMessagesWithAttachments(conversationId: string): Promise<MessageWithAttachments[]> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('messages')
+      .select(`
+        *,
+        attachments_data:message_attachments(*)
+      `)
       .eq('conversation_id', conversationId)
       .order('created_at', { ascending: true });
 
