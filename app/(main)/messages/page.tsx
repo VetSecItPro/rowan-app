@@ -13,6 +13,7 @@ import { PinnedMessages } from '@/components/messages/PinnedMessages';
 import { MentionInput } from '@/components/messages/MentionInput';
 import { ConversationSidebar } from '@/components/messages/ConversationSidebar';
 import { NewConversationModal } from '@/components/messages/NewConversationModal';
+import { ForwardMessageModal } from '@/components/messages/ForwardMessageModal';
 import GuidedMessageCreation from '@/components/guided/GuidedMessageCreation';
 import { fileUploadService } from '@/lib/services/file-upload-service';
 import { useAuth } from '@/lib/contexts/auth-context';
@@ -70,6 +71,8 @@ export default function MessagesPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [showNewConversationModal, setShowNewConversationModal] = useState(false);
   const [showConversationSidebar, setShowConversationSidebar] = useState(false);
+  const [showForwardModal, setShowForwardModal] = useState(false);
+  const [forwardingMessage, setForwardingMessage] = useState<Message | null>(null);
 
   const [stats, setStats] = useState({
     thisWeek: 0,
@@ -612,6 +615,39 @@ export default function MessagesPage() {
     setSelectedThread(null);
   }, []);
 
+  // Handle forward message
+  const handleForwardMessage = useCallback((message: Message | MessageWithReplies) => {
+    setForwardingMessage(message as Message);
+    setShowForwardModal(true);
+  }, []);
+
+  // Handle forward to conversations
+  const handleForward = useCallback(async (conversationIds: string[]) => {
+    if (!forwardingMessage || !currentSpace || !user) return;
+
+    try {
+      // Send the message to each selected conversation
+      await Promise.all(
+        conversationIds.map((convId) =>
+          messagesService.createMessage({
+            space_id: currentSpace.id,
+            conversation_id: convId,
+            sender_id: user.id,
+            content: `📨 Forwarded: ${forwardingMessage.content}`,
+          })
+        )
+      );
+
+      toast.success(`Message forwarded to ${conversationIds.length} conversation${conversationIds.length > 1 ? 's' : ''}`);
+      setShowForwardModal(false);
+      setForwardingMessage(null);
+    } catch (error) {
+      console.error('Failed to forward message:', error);
+      toast.error('Failed to forward message');
+      throw error;
+    }
+  }, [forwardingMessage, currentSpace, user]);
+
   // Handle selecting a conversation
   const handleSelectConversation = useCallback(async (selectedConversationId: string) => {
     if (!currentSpace) return;
@@ -957,6 +993,7 @@ export default function MessagesPage() {
                           onDelete={handleDeleteMessage}
                           onMarkRead={handleMarkRead}
                           onTogglePin={handleTogglePin}
+                          onForward={handleForwardMessage}
                           isOwn={message.sender_id === currentSpace?.id}
                           currentUserId={currentSpace?.id || ''}
                           onReply={handleReply}
@@ -1201,6 +1238,20 @@ export default function MessagesPage() {
           onClose={() => setShowNewConversationModal(false)}
           onCreate={handleCreateConversation}
           spaceId={currentSpace.id}
+        />
+      )}
+
+      {/* Forward Message Modal */}
+      {forwardingMessage && (
+        <ForwardMessageModal
+          isOpen={showForwardModal}
+          onClose={() => {
+            setShowForwardModal(false);
+            setForwardingMessage(null);
+          }}
+          onForward={handleForward}
+          conversations={conversations}
+          messagePreview={forwardingMessage.content}
         />
       )}
 
