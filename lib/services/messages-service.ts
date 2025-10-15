@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { RealtimeChannel } from '@supabase/supabase-js';
 
 export interface Message {
   id: string;
@@ -11,6 +12,12 @@ export interface Message {
   attachments?: string[];
   created_at: string;
   updated_at: string;
+}
+
+export interface MessageSubscriptionCallbacks {
+  onInsert?: (message: Message) => void;
+  onUpdate?: (message: Message) => void;
+  onDelete?: (messageId: string) => void;
 }
 
 export interface Conversation {
@@ -197,7 +204,7 @@ export const messagesService = {
 
   async searchMessages(spaceId: string, query: string): Promise<Message[]> {
     const supabase = createClient();
-    const { data, error } = await supabase
+    const { data, error} = await supabase
       .from('messages')
       .select('*, conversation:conversations!inner(space_id)')
       .eq('conversation.space_id', spaceId)
@@ -207,5 +214,99 @@ export const messagesService = {
 
     if (error) throw error;
     return data || [];
+  },
+
+  /**
+   * Subscribe to real-time message updates for a conversation
+   */
+  subscribeToMessages(
+    conversationId: string,
+    callbacks: MessageSubscriptionCallbacks
+  ): RealtimeChannel {
+    const supabase = createClient();
+
+    const channel = supabase
+      .channel(`messages:${conversationId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          if (callbacks.onInsert) {
+            callbacks.onInsert(payload.new as Message);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          if (callbacks.onUpdate) {
+            callbacks.onUpdate(payload.new as Message);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          if (callbacks.onDelete) {
+            callbacks.onDelete(payload.old.id);
+          }
+        }
+      )
+      .subscribe();
+
+    return channel;
+  },
+
+  /**
+   * Subscribe to conversation updates
+   */
+  subscribeToConversation(
+    conversationId: string,
+    onUpdate: (conversation: Conversation) => void
+  ): RealtimeChannel {
+    const supabase = createClient();
+
+    const channel = supabase
+      .channel(`conversation:${conversationId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'conversations',
+          filter: `id=eq.${conversationId}`,
+        },
+        (payload) => {
+          onUpdate(payload.new as Conversation);
+        }
+      )
+      .subscribe();
+
+    return channel;
+  },
+
+  /**
+   * Unsubscribe from channel (cleanup)
+   */
+  unsubscribe(channel: RealtimeChannel): void {
+    const supabase = createClient();
+    supabase.removeChannel(channel);
   },
 };

@@ -540,7 +540,7 @@ export default function TasksPage() {
                   <div className="bg-gray-50 dark:bg-gray-900 border-2 border-blue-200 dark:border-blue-700 rounded-lg p-1 flex gap-1 w-fit">
                     <button
                       onClick={() => setStatusFilter('all')}
-                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
+                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                         statusFilter === 'all'
                           ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
                           : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
@@ -550,7 +550,7 @@ export default function TasksPage() {
                     </button>
                     <button
                       onClick={() => setStatusFilter('pending')}
-                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[70px] ${
+                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[70px] ${
                         statusFilter === 'pending'
                           ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
                           : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
@@ -560,7 +560,7 @@ export default function TasksPage() {
                     </button>
                     <button
                       onClick={() => setStatusFilter('in_progress')}
-                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[85px] ${
+                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[85px] ${
                         statusFilter === 'in_progress'
                           ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
                           : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
@@ -570,7 +570,7 @@ export default function TasksPage() {
                     </button>
                     <button
                       onClick={() => setStatusFilter('completed')}
-                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[80px] ${
+                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[80px] ${
                         statusFilter === 'completed'
                           ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
                           : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
