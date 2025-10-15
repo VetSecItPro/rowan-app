@@ -491,27 +491,42 @@ export default function RemindersPage(): JSX.Element {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Quick start with pre-filled templates – customize before saving
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                {popularTemplates.map((template) => (
-                  <button
-                    key={template.id}
-                    onClick={() => handleQuickTemplateCreate(template)}
-                    className="flex flex-col items-start p-4 bg-white dark:bg-gray-800 border border-pink-200 dark:border-pink-800 rounded-lg hover:shadow-lg hover:scale-105 transition-all text-left group"
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-2xl">{template.emoji}</span>
-                      <Zap className="w-4 h-4 text-pink-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
-                      {template.name}
-                    </h4>
-                    {template.description && (
-                      <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
-                        {template.description}
-                      </p>
-                    )}
-                  </button>
-                ))}
+
+              {/* Mobile: Horizontal Scrolling | Desktop: Grid */}
+              <div className="relative">
+                {/* Scroll fade indicators - mobile only */}
+                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-pink-50 dark:from-pink-900/10 to-transparent pointer-events-none z-10 sm:hidden" />
+                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-pink-50 dark:from-pink-900/10 to-transparent pointer-events-none z-10 sm:hidden" />
+
+                <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-5 sm:overflow-x-visible">
+                  {popularTemplates.map((template) => (
+                    <button
+                      key={template.id}
+                      onClick={() => handleQuickTemplateCreate(template)}
+                      className="flex-none w-[240px] sm:w-auto snap-start flex flex-col items-start p-4 bg-white dark:bg-gray-800 border-2 border-pink-200 dark:border-pink-800 rounded-lg hover:shadow-lg hover:scale-105 transition-all text-left group min-h-[120px]"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-2xl">{template.emoji}</span>
+                        <Zap className="w-4 h-4 text-pink-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white mb-1">
+                        {template.name}
+                      </h4>
+                      {template.description && (
+                        <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+                          {template.description}
+                        </p>
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Swipe hint - mobile only */}
+                {popularTemplates.length > 2 && (
+                  <div className="text-center mt-3 text-xs text-gray-500 dark:text-gray-400 sm:hidden">
+                    ← Swipe to see more →
+                  </div>
+                )}
               </div>
             </div>
           )}
