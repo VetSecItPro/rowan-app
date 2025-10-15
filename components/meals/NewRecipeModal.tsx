@@ -303,23 +303,23 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-orange-500 to-orange-600 p-6 z-10">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-orange-500 to-orange-600 px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-lg sm:text-xl font-bold text-white">
               {editRecipe ? 'Edit Recipe' : 'Create New Recipe'}
             </h2>
-            <button onClick={onClose} aria-label="Close modal" className="p-2 rounded-lg hover:bg-orange-700 transition-colors">
-              <X className="w-5 h-5 text-white" />
+            <button onClick={onClose} aria-label="Close modal" className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-orange-700 transition-all active:scale-95">
+              <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
             </button>
           </div>
         </div>
 
         {/* Content - scrollable with fixed height */}
-        <div className="flex-1 overflow-y-auto h-[600px]">
+        <div className="flex-1 overflow-y-auto">
           {/* Toggle Buttons - In Content Area */}
           {!editRecipe && (
             <div className="p-6 pb-0">

@@ -42,21 +42,21 @@ export function QuickPlanModal({ isOpen, onClose, onPlan, recipeName }: QuickPla
   const Icon = selectedOption.icon;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-md sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-6">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-orange-500 to-orange-600 px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Plan Meal</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-white">Plan Meal</h2>
                 <p className="text-orange-100 text-sm mt-0.5">Quick add to meal plan</p>
               </div>
             </div>
@@ -64,15 +64,15 @@ export function QuickPlanModal({ isOpen, onClose, onPlan, recipeName }: QuickPla
               onClick={onClose}
               disabled={isPlanning}
               aria-label="Close modal"
-              className="p-2 rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50"
+              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-orange-700 transition-all active:scale-95 disabled:opacity-50"
             >
-              <X className="w-5 h-5 text-white" />
+              <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
             </button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-5">
+        <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-5">
           {/* Recipe Name Display */}
           <div className="p-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg">
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Recipe</p>

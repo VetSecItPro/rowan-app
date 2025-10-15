@@ -47,20 +47,20 @@ export function IngredientReviewModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md mx-4 max-h-[80vh] flex flex-col">
+      <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-md sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-t-xl">
+        <div className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 sm:rounded-t-xl">
           <div className="flex items-center gap-3">
             <ShoppingCart className="w-6 h-6 text-white" />
             <div>
-              <h2 className="text-xl font-bold text-white">Review Ingredients</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-white">Review Ingredients</h2>
               <p className="text-sm text-emerald-100">{recipeName}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-emerald-700 transition-colors">
-            <X className="w-5 h-5 text-white" />
+          <button onClick={onClose} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-emerald-700 transition-all active:scale-95">
+            <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
           </button>
         </div>
 
