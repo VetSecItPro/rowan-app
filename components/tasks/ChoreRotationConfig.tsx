@@ -243,7 +243,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
         <div className="space-y-4">
           {/* Rotation Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Rotation Type
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -274,7 +274,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
 
           {/* Interval */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               <Calendar className="w-4 h-4 inline mr-1" />
               Rotation Interval
             </label>
@@ -300,7 +300,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
 
           {/* Members */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               <Users className="w-4 h-4 inline mr-1" />
               Select Members ({formData.member_ids.length} selected)
             </label>
@@ -308,12 +308,13 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
               {spaceMembers.map((member) => (
                 <label
                   key={member.user_id}
-                  className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded"
+                  htmlFor="field-4" className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded"
                 >
                   <input
                     type="checkbox"
                     checked={formData.member_ids.includes(member.user_id)}
-                    onChange={() => toggleMember(member.user_id)}
+                    id="field-4"
+              onChange={() =>  toggleMember(member.user_id)}
                     className="rounded border-gray-300 text-purple-500"
                   />
                   <span className="text-sm text-gray-700 dark:text-gray-300">

@@ -150,13 +150,14 @@ export function GenerateListModal({
         <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
           {/* List Name Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-1"className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               List Name (optional)
             </label>
             <input
               type="text"
               value={listName}
-              onChange={(e) => setListName(e.target.value)}
+              id="field-1"
+              onChange={(e) =>  setListName(e.target.value)}
               placeholder="e.g., Weekly Groceries"
               className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 text-gray-900 dark:text-white"
               disabled={isGenerating}

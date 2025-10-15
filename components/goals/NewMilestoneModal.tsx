@@ -108,7 +108,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Title *
             </label>
             <div className="relative">
@@ -154,7 +154,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Description
             </label>
             <textarea
@@ -208,7 +208,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
           {showValueInputs && (
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                   Target {formData.type === 'percentage' ? 'Percentage' : formData.type === 'money' ? 'Amount' : 'Count'} *
                 </label>
                 <input
@@ -223,7 +223,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="field-5" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                   Current Progress
                 </label>
                 <input
@@ -242,7 +242,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
           {/* Date Input */}
           {formData.type === 'date' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-6" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Target Date *
               </label>
               <input

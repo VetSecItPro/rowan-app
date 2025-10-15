@@ -352,7 +352,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Event Title *
             </label>
             <div className="relative">
@@ -398,7 +398,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Description
             </label>
             <textarea
@@ -460,7 +460,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
           {/* Attached Files */}
           {attachedFiles.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Attached Files ({attachedFiles.length})
               </label>
               <div className="flex flex-wrap gap-2">
@@ -486,7 +486,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
           {/* Date & Time */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-5" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Start Date & Time *
               </label>
               <input
@@ -517,7 +517,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-6" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 End Date & Time
               </label>
               <input
@@ -560,7 +560,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
 
           {/* Location */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-7" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Location
             </label>
             <input
@@ -574,7 +574,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
 
           {/* Recurring */}
           <div>
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label htmlFor="field-8" className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={formData.is_recurring}
@@ -589,7 +589,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
           {formData.is_recurring && (
             <div className="space-y-4 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-700">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="field-9" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                   Frequency
                 </label>
                 <div className="relative">
@@ -641,7 +641,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
               {/* Day Selection for Monthly */}
               {recurringFrequency === 'monthly' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  <label htmlFor="field-11" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 cursor-pointer">
                     Select Days of Month
                   </label>
                   <div className="grid grid-cols-7 gap-2">
@@ -673,7 +673,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
 
           {/* Shopping List Integration */}
           <div>
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label htmlFor="field-12" className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={linkToShopping}
@@ -691,7 +691,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
           {linkToShopping && (
             <div className="space-y-4 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-200 dark:border-emerald-700">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="field-13" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                   Select Shopping List
                 </label>
                 {shoppingLists.length > 0 ? (
@@ -729,7 +729,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
 
           {/* Custom Color */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+            <label htmlFor="field-14" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2 cursor-pointer">
               <Palette className="w-4 h-4" />
               Custom Color (Optional)
             </label>

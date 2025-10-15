@@ -207,7 +207,7 @@ export function EventProposalModal({
 
             {/* Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Event Title *
               </label>
               <input
@@ -222,7 +222,7 @@ export function EventProposalModal({
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Description
               </label>
               <textarea
@@ -236,7 +236,7 @@ export function EventProposalModal({
 
             {/* Location */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Location
               </label>
               <input
@@ -250,7 +250,7 @@ export function EventProposalModal({
 
             {/* Time Slots */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 cursor-pointer">
                 Proposed Time Slots *
               </label>
               <div className="space-y-3">
@@ -273,7 +273,7 @@ export function EventProposalModal({
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                        <label htmlFor="field-5" className="block text-xs text-gray-600 dark:text-gray-400 mb-1 cursor-pointer">
                           Start Time
                         </label>
                         <input
@@ -285,7 +285,7 @@ export function EventProposalModal({
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                        <label htmlFor="field-6" className="block text-xs text-gray-600 dark:text-gray-400 mb-1 cursor-pointer">
                           End Time
                         </label>
                         <input

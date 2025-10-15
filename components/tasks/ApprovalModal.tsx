@@ -238,7 +238,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
                         </div>
 
                         <div className="mb-3">
-                          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                          <label htmlFor="field-1" className="block text-xs text-gray-600 dark:text-gray-400 mb-1 cursor-pointer">
                             Review Note
                           </label>
                           <textarea

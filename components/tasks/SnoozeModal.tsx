@@ -143,7 +143,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
             </h3>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                <label htmlFor="field-1" className="block text-xs text-gray-600 dark:text-gray-400 mb-1 cursor-pointer">
                   Date
                 </label>
                 <input
@@ -154,7 +154,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                <label htmlFor="field-2" className="block text-xs text-gray-600 dark:text-gray-400 mb-1 cursor-pointer">
                   Time
                 </label>
                 <input
@@ -167,7 +167,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
             </div>
 
             <div className="mb-3">
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+              <label htmlFor="field-3" className="block text-xs text-gray-600 dark:text-gray-400 mb-1 cursor-pointer">
                 Reason (Optional)
               </label>
               <input

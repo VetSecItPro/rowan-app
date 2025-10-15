@@ -64,7 +64,7 @@ export function RecurringTaskModal({ isOpen, onClose, onSave, spaceId, userId }:
 
         <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Title *</label>
+            <label htmlFor="field-1" className="block text-sm font-medium mb-2 cursor-pointer">Title *</label>
             <input
               type="text"
               required
@@ -75,7 +75,7 @@ export function RecurringTaskModal({ isOpen, onClose, onSave, spaceId, userId }:
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Pattern</label>
+            <label htmlFor="field-2" className="block text-sm font-medium mb-2 cursor-pointer">Pattern</label>
             <select
               value={formData.pattern}
               onChange={(e) => setFormData({ ...formData, pattern: e.target.value as any })}
@@ -89,7 +89,7 @@ export function RecurringTaskModal({ isOpen, onClose, onSave, spaceId, userId }:
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Every</label>
+            <label htmlFor="field-3" className="block text-sm font-medium mb-2 cursor-pointer">Every</label>
             <input
               type="number"
               min="1"

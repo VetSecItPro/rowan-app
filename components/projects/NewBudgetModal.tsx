@@ -63,7 +63,7 @@ export function NewBudgetModal({
 
         <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-1"className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Monthly Budget Amount
             </label>
             <div className="relative">
@@ -73,7 +73,8 @@ export function NewBudgetModal({
                 step="0.01"
                 min="0"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                id="field-1"
+              onChange={(e) =>  setAmount(e.target.value)}
                 placeholder="5000.00"
                 className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white text-lg"
                 required

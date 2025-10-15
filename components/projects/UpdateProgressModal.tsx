@@ -69,7 +69,7 @@ export function UpdateProgressModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Completion Percentage: {completion}%
             </label>
             <input
@@ -108,7 +108,7 @@ export function UpdateProgressModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Notes / Remarks (Optional)
             </label>
             <textarea

@@ -134,7 +134,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId }: New
         <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Task Title *
             </label>
             <div className="relative">
@@ -180,7 +180,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId }: New
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Description
             </label>
             <textarea
@@ -196,7 +196,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId }: New
           <div className="grid grid-cols-2 gap-4">
             {/* Priority */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Priority
               </label>
               <div className="relative">
@@ -217,7 +217,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId }: New
 
             {/* Status */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Status
               </label>
               <div className="relative">
@@ -241,7 +241,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId }: New
           <div className="grid grid-cols-2 gap-4">
             {/* Category */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-5" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Category
               </label>
               <div className="relative">
@@ -269,7 +269,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId }: New
 
             {/* Due Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-6" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Due Date
               </label>
               <input

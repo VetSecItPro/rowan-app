@@ -88,7 +88,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
 
         <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">
               Project Name *
             </label>
             <input
@@ -101,7 +101,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">
               Description
             </label>
             <textarea
@@ -113,7 +113,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="field-3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">
               Status
             </label>
             <select
@@ -130,7 +130,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">
                 Start Date
               </label>
               <input
@@ -141,7 +141,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="field-5" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">
                 Target Date
               </label>
               <input
@@ -155,7 +155,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="field-6" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">
                 Budget Amount
               </label>
               <input

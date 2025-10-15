@@ -197,7 +197,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
           <form onSubmit={handleSubmit} className="p-6 space-y-6 overflow-y-auto flex-1">
           {/* Title with Emoji Picker */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Reminder Title *
             </label>
             <div className="relative">
@@ -205,7 +205,8 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                 type="text"
                 required
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                id="field-1"
+              onChange={(e) =>  setFormData({ ...formData, title: e.target.value })}
                 placeholder="Enter reminder title..."
                 className="w-full px-4 pr-12 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               />
@@ -249,12 +250,13 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Description
             </label>
             <textarea
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              id="field-2"
+              onChange={(e) =>  setFormData({ ...formData, description: e.target.value })}
               placeholder="Add a description..."
               rows={3}
               className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
@@ -319,13 +321,14 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
 
           {/* Reminder Time */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-5" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Reminder Time
             </label>
             <input
               type="datetime-local"
               value={formData.reminder_time || ''}
-              onChange={(e) => {
+              id="field-5"
+              onChange={(e) =>  {
                 setFormData({ ...formData, reminder_time: e.target.value });
 
                 // Validate on change
@@ -358,13 +361,14 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
           <div className="grid grid-cols-2 gap-4">
             {/* Priority */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-6" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Priority
               </label>
               <div className="relative">
                 <select
                   value={formData.priority}
-                  onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
+                  id="field-6"
+              onChange={(e) =>  setFormData({ ...formData, priority: e.target.value as any })}
                   className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none pr-10"
                 >
                   <option value="low">Low</option>
@@ -378,13 +382,14 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
 
             {/* Repeat Pattern */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-7" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Repeat
               </label>
               <div className="relative">
                 <select
                   value={formData.repeat_pattern || ''}
-                  onChange={(e) => {
+                  id="field-7"
+              onChange={(e) =>  {
                     setFormData({ ...formData, repeat_pattern: e.target.value });
                     setSelectedWeekdays([]);
                     setSelectedMonthDays([]);
