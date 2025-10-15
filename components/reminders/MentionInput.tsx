@@ -67,7 +67,7 @@ export function MentionInput({
         return;
       }
 
-      setMembers(data || []);
+      setMembers((data as unknown as SpaceMember[]) || []);
     };
 
     fetchMembers();

@@ -36,7 +36,7 @@ export interface ReminderActivity {
 }
 
 // Zod schema for activity validation
-const ActivityMetadataSchema = z.record(z.any()).optional();
+const ActivityMetadataSchema = z.record(z.string(), z.any()).optional();
 
 const CreateActivitySchema = z.object({
   reminder_id: z.string().uuid(),
@@ -166,6 +166,23 @@ export const reminderActivityService = {
     const supabase = createClient();
     const { limit = 20 } = options || {};
 
+    // First, get reminder IDs for this space
+    const { data: reminderIds, error: reminderError } = await supabase
+      .from('reminders')
+      .select('id')
+      .eq('space_id', spaceId);
+
+    if (reminderError) {
+      console.error('Error fetching reminder IDs:', reminderError);
+      throw new Error('Failed to fetch reminder IDs');
+    }
+
+    const ids = reminderIds?.map((r: { id: string }) => r.id) || [];
+
+    if (ids.length === 0) {
+      return [];
+    }
+
     const { data, error } = await supabase
       .from('reminder_activity')
       .select(`
@@ -182,13 +199,7 @@ export const reminderActivityService = {
           emoji
         )
       `)
-      .in(
-        'reminder_id',
-        supabase
-          .from('reminders')
-          .select('id')
-          .eq('space_id', spaceId)
-      )
+      .in('reminder_id', ids)
       .order('created_at', { ascending: false })
       .limit(limit);
 

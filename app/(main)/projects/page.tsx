@@ -198,7 +198,7 @@ export default function ProjectsPage() {
           </div>
 
           {activeTab === 'expenses' && expenses.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="stats-grid-mobile gap-4 sm:gap-6">
               {/* Total Expenses */}
               <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">

@@ -206,13 +206,14 @@ export default function RemindersPage(): JSX.Element {
 
   // Memoized callback for snoozing reminders
   const handleSnoozeReminder = useCallback(async (reminderId: string, minutes: number) => {
+    if (!user) return;
     try {
-      await remindersService.snoozeReminder(reminderId, minutes);
+      await remindersService.snoozeReminder(reminderId, minutes, user.id);
       loadReminders();
     } catch (error) {
       console.error('Failed to snooze reminder:', error);
     }
-  }, [loadReminders]);
+  }, [loadReminders, user]);
 
   // Memoized callback for editing reminders
   const handleEditReminder = useCallback((reminder: Reminder) => {

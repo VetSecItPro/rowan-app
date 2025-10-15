@@ -104,7 +104,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
               {/* Emoji */}
               <span className="text-lg">{reminder.emoji || '🔔'}</span>
 
-              <h3 className={`font-semibold flex-1 ${
+              <h3 className={`font-semibold flex-1 truncate ${
                 reminder.status === 'completed'
                   ? 'line-through opacity-60 text-gray-900 dark:text-white'
                   : categoryConfig[reminder.category as keyof typeof categoryConfig]?.textColor || 'text-gray-900 dark:text-white'

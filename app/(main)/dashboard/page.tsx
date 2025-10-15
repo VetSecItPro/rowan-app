@@ -1042,7 +1042,7 @@ export default function DashboardPage() {
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              <div className="stats-grid-mobile gap-4 sm:gap-6">
                 {[...Array(8)].map((_, i) => (
                   <div key={i} className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg animate-pulse">
                     <div className="h-28 sm:h-32 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -1050,7 +1050,7 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              <div className="stats-grid-mobile gap-4 sm:gap-6">
                 {/* Tasks & Chores Card */}
                 <Link
                   href="/tasks"

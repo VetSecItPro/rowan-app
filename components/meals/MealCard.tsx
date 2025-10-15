@@ -32,12 +32,12 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-3">
-            <div className={`w-10 h-10 ${typeColor} rounded-lg flex items-center justify-center ${isPastMeal ? 'opacity-70' : ''}`}>
+            <div className={`w-10 h-10 ${typeColor} rounded-lg flex items-center justify-center flex-shrink-0 ${isPastMeal ? 'opacity-70' : ''}`}>
               <UtensilsCrossed className="w-5 h-5 text-white" />
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className={`text-lg font-semibold text-gray-900 dark:text-white ${isPastMeal ? 'line-through' : ''}`}>
+                <h3 className={`text-lg font-semibold text-gray-900 dark:text-white truncate ${isPastMeal ? 'line-through' : ''}`}>
                   {meal.name || meal.recipe?.name || 'Untitled Meal'}
                 </h3>
                 {isPastMeal && (
@@ -51,10 +51,10 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
             </div>
           </div>
           {meal.recipe?.description && (
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{meal.recipe.description}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 break-words line-clamp-2">{meal.recipe.description}</p>
           )}
           {meal.notes && (
-            <p className="text-sm text-gray-500 dark:text-gray-500 italic">{meal.notes}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-500 italic break-words line-clamp-2">{meal.notes}</p>
           )}
         </div>
         <div className="relative">
