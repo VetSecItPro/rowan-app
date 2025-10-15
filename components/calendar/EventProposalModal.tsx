@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, Calendar, Clock, Users, CheckCircle2, XCircle, Star, Send, AlertCircle } from 'lucide-react';
 import { eventProposalsService, EventProposal, ProposalVote, CreateProposalInput } from '@/lib/services/event-proposals-service';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { formatDistance, format } from 'date-fns';
 
 interface EventProposalModalProps {
@@ -29,6 +30,8 @@ export function EventProposalModal({
   const { user } = useAuth();
   const [mode, setMode] = useState<'create' | 'vote'>('create');
   const [loading, setLoading] = useState(false);
+  const [showApproveConfirm, setShowApproveConfirm] = useState(false);
+  const [slotToApprove, setSlotToApprove] = useState<number | null>(null);
 
   // Create mode state
   const [title, setTitle] = useState('');
@@ -141,14 +144,16 @@ export function EventProposalModal({
 
   const handleApproveProposal = async (slotIndex: number) => {
     if (!proposal) return;
+    setSlotToApprove(slotIndex);
+    setShowApproveConfirm(true);
+  };
 
-    if (!confirm('Create this event? This will finalize the time and notify all participants.')) {
-      return;
-    }
+  const confirmApproveProposal = async () => {
+    if (!proposal || slotToApprove === null) return;
 
     setLoading(true);
     try {
-      await eventProposalsService.approveProposal(proposal.id, slotIndex);
+      await eventProposalsService.approveProposal(proposal.id, slotToApprove);
       alert('Event created successfully!');
       onProposalCreated?.();
       onClose();
@@ -157,6 +162,8 @@ export function EventProposalModal({
       alert('Failed to create event. Please try again.');
     } finally {
       setLoading(false);
+      setShowApproveConfirm(false);
+      setSlotToApprove(null);
     }
   };
 
@@ -473,6 +480,22 @@ export function EventProposalModal({
           )
         )}
       </div>
+
+      {/* Approve Proposal Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={showApproveConfirm}
+        onClose={() => {
+          setShowApproveConfirm(false);
+          setSlotToApprove(null);
+        }}
+        onConfirm={confirmApproveProposal}
+        title="Create Event"
+        message="Create this event? This will finalize the time and notify all participants."
+        confirmLabel="Create Event"
+        cancelLabel="Cancel"
+        variant="warning"
+        confirmLoading={loading}
+      />
     </div>
   );
 }

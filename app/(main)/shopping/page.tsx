@@ -10,6 +10,7 @@ import { SaveTemplateModal } from '@/components/shopping/SaveTemplateModal';
 import { TemplatePickerModal } from '@/components/shopping/TemplatePickerModal';
 import { ScheduleTripModal } from '@/components/shopping/ScheduleTripModal';
 import { FrequentItemsPanel } from '@/components/shopping/FrequentItemsPanel';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import GuidedShoppingCreation from '@/components/guided/GuidedShoppingCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { shoppingService, ShoppingList, CreateListInput } from '@/lib/services/shopping-service';
@@ -32,6 +33,7 @@ export default function ShoppingPage() {
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [showScheduleTripModal, setShowScheduleTripModal] = useState(false);
   const [listToSchedule, setListToSchedule] = useState<ShoppingList | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, listId: '' });
 
   const [stats, setStats] = useState({
     totalLists: 0,
@@ -197,7 +199,12 @@ export default function ShoppingPage() {
 
   // Memoized callback for deleting lists
   const handleDeleteList = useCallback(async (listId: string) => {
-    if (!confirm('Are you sure you want to delete this list?')) return;
+    setConfirmDialog({ isOpen: true, listId });
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    const listId = confirmDialog.listId;
+    setConfirmDialog({ isOpen: false, listId: '' });
 
     // Optimistic update - remove from UI immediately
     setLists(prevLists => prevLists.filter(list => list.id !== listId));
@@ -210,7 +217,7 @@ export default function ShoppingPage() {
       // Revert on error - reload lists to restore deleted item
       loadLists();
     }
-  }, []);
+  }, [confirmDialog]);
 
   // Memoized callback for completing lists
   const handleCompleteList = useCallback(async (listId: string) => {
@@ -833,6 +840,17 @@ export default function ShoppingPage() {
           )}
         </>
       )}
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ isOpen: false, listId: '' })}
+        onConfirm={handleConfirmDelete}
+        title="Delete Shopping List"
+        message="Are you sure you want to delete this shopping list? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </FeatureLayout>
   );
 }

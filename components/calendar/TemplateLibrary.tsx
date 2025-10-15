@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { X, Clock, Plus, Trash2, Star } from 'lucide-react';
 import { calendarService, EventTemplate, CreateTemplateInput } from '@/lib/services/calendar-service';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { format, addHours } from 'date-fns';
 
 interface TemplateLibraryProps {
@@ -17,6 +18,8 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [templateToDelete, setTemplateToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen && spaceId) {
@@ -46,14 +49,22 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
 
   const handleDeleteTemplate = async (templateId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!confirm('Are you sure you want to delete this template?')) return;
+    setTemplateToDelete(templateId);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!templateToDelete) return;
 
     try {
-      await calendarService.deleteTemplate(templateId);
-      setTemplates(templates.filter(t => t.id !== templateId));
+      await calendarService.deleteTemplate(templateToDelete);
+      setTemplates(templates.filter(t => t.id !== templateToDelete));
     } catch (error) {
       console.error('Error deleting template:', error);
       alert('Failed to delete template');
+    } finally {
+      setShowDeleteConfirm(false);
+      setTemplateToDelete(null);
     }
   };
 
@@ -242,6 +253,21 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
           </p>
         </div>
       </div>
+
+      {/* Delete Template Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setTemplateToDelete(null);
+        }}
+        onConfirm={confirmDelete}
+        title="Delete Template"
+        message="Are you sure you want to delete this template? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </div>
   );
 }

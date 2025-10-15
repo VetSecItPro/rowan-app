@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { X, Paperclip, Upload, Download, Trash2, FileText, Image as ImageIcon } from 'lucide-react';
 import { taskAttachmentsService, TaskAttachment } from '@/lib/services/task-attachments-service';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 
 interface AttachmentsModalProps {
   isOpen: boolean;
@@ -16,6 +17,10 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    attachmentId: string | null;
+  }>({ isOpen: false, attachmentId: null });
 
   useEffect(() => {
     if (isOpen) loadAttachments();
@@ -78,11 +83,16 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
     }
   }
 
-  async function handleDelete(attachmentId: string) {
-    if (!confirm('Are you sure you want to delete this attachment?')) return;
+  function handleDeleteClick(attachmentId: string) {
+    setConfirmDialog({ isOpen: true, attachmentId });
+  }
+
+  async function handleDeleteConfirm() {
+    if (!confirmDialog.attachmentId) return;
 
     try {
-      await taskAttachmentsService.deleteAttachment(attachmentId);
+      await taskAttachmentsService.deleteAttachment(confirmDialog.attachmentId);
+      setConfirmDialog({ isOpen: false, attachmentId: null });
       loadAttachments();
     } catch (error) {
       console.error('Error deleting attachment:', error);
@@ -172,7 +182,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
                           <Download className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDelete(attachment.id)}
+                          onClick={() => handleDeleteClick(attachment.id)}
                           className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg"
                           title="Delete"
                         >
@@ -187,6 +197,17 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ isOpen: false, attachmentId: null })}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Attachment"
+        message="Are you sure you want to delete this attachment? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </div>
   );
 }

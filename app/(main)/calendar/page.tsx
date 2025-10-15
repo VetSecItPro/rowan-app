@@ -14,6 +14,7 @@ import { EnhancedDayView } from '@/components/calendar/EnhancedDayView';
 import { EnhancedWeekView } from '@/components/calendar/EnhancedWeekView';
 import { TemplateLibrary } from '@/components/calendar/TemplateLibrary';
 import { WeatherBadge } from '@/components/calendar/WeatherBadge';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
@@ -44,6 +45,7 @@ export default function CalendarPage() {
   const [isTemplateLibraryOpen, setIsTemplateLibraryOpen] = useState(false);
   const [activeAction, setActiveAction] = useState<'quick-add' | 'templates' | 'propose' | 'new-event'>('new-event');
   const [statusFilter, setStatusFilter] = useState<'all' | 'not-started' | 'in-progress' | 'completed'>('all');
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, eventId: '' });
 
   // Ref for search input
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -225,7 +227,12 @@ export default function CalendarPage() {
 
   // Stable callback for deleting events
   const handleDeleteEvent = useCallback(async (eventId: string) => {
-    if (!confirm('Are you sure you want to delete this event?')) return;
+    setConfirmDialog({ isOpen: true, eventId });
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    const eventId = confirmDialog.eventId;
+    setConfirmDialog({ isOpen: false, eventId: '' });
 
     try {
       await calendarService.deleteEvent(eventId);
@@ -233,7 +240,7 @@ export default function CalendarPage() {
     } catch (error) {
       console.error('Failed to delete event:', error);
     }
-  }, [loadEvents]);
+  }, [confirmDialog, loadEvents]);
 
   // Stable callback for status changes
   const handleStatusChange = useCallback(async (eventId: string, status: 'not-started' | 'in-progress' | 'completed') => {
@@ -1497,6 +1504,17 @@ export default function CalendarPage() {
           onSelectTemplate={handleSelectTemplate}
         />
       )}
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ isOpen: false, eventId: '' })}
+        onConfirm={handleConfirmDelete}
+        title="Delete Event"
+        message="Are you sure you want to delete this event? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </FeatureLayout>
   );
 }
