@@ -382,12 +382,13 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
 
               {/* Text Input */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                   Paste Recipe Text
                 </label>
                 <textarea
                   value={recipeText}
-                  onChange={(e) => setRecipeText(e.target.value)}
+                  id="field-1"
+              onChange={(e) =>  setRecipeText(e.target.value)}
                   placeholder="Paste your recipe here... Include ingredients, instructions, prep time, etc."
                   rows={8}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white placeholder-gray-500 resize-none"
@@ -406,7 +407,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
 
               {/* Image Upload */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                   Upload Recipe Image
                 </label>
                 <div className="space-y-3 max-w-md">
@@ -416,7 +417,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                     accept="image/*"
                     onChange={handleImageSelect}
                     className="hidden"
-                  />
+                  id="field-2" />
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
@@ -630,22 +631,24 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
           {activeTab === 'manual' && (
             <form onSubmit={handleSubmit} className={`p-6 space-y-4 h-full ${!editRecipe ? 'pt-4' : ''}`}>
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Recipe Name *</label>
+                <label htmlFor="field-3" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Recipe Name *</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  id="field-3"
+              onChange={(e) =>  setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g., Spaghetti Bolognese"
                   className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Description</label>
+                <label htmlFor="field-4" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Description</label>
                 <textarea
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  id="field-4"
+              onChange={(e) =>  setFormData({ ...formData, description: e.target.value })}
                   rows={2}
                   placeholder="Brief description of the recipe"
                   className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white resize-none"
@@ -654,36 +657,39 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Prep Time (min)</label>
+                  <label htmlFor="field-5" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Prep Time (min)</label>
                   <input
                     type="number"
                     value={formData.prep_time || ''}
-                    onChange={(e) => setFormData({ ...formData, prep_time: e.target.value ? parseInt(e.target.value) : undefined })}
+                    id="field-5"
+              onChange={(e) =>  setFormData({ ...formData, prep_time: e.target.value ? parseInt(e.target.value) : undefined })}
                     className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Cook Time (min)</label>
+                  <label htmlFor="field-6" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Cook Time (min)</label>
                   <input
                     type="number"
                     value={formData.cook_time || ''}
-                    onChange={(e) => setFormData({ ...formData, cook_time: e.target.value ? parseInt(e.target.value) : undefined })}
+                    id="field-6"
+              onChange={(e) =>  setFormData({ ...formData, cook_time: e.target.value ? parseInt(e.target.value) : undefined })}
                     className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Servings</label>
+                  <label htmlFor="field-7" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Servings</label>
                   <input
                     type="number"
                     value={formData.servings || ''}
-                    onChange={(e) => setFormData({ ...formData, servings: e.target.value ? parseInt(e.target.value) : undefined })}
+                    id="field-7"
+              onChange={(e) =>  setFormData({ ...formData, servings: e.target.value ? parseInt(e.target.value) : undefined })}
                     className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Ingredients *</label>
+                <label htmlFor="field-8" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Ingredients *</label>
                 <div className="space-y-2">
                   {formData.ingredients.map((ingredient, index) => {
                     const displayValue = typeof ingredient === 'string'
@@ -697,7 +703,8 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                         <input
                           type="text"
                           value={displayValue}
-                          onChange={(e) => updateIngredient(index, e.target.value)}
+                          id="field-8"
+              onChange={(e) =>  updateIngredient(index, e.target.value)}
                           placeholder="e.g., 2 cups flour"
                           className="flex-1 px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                         />
@@ -725,10 +732,11 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Instructions</label>
+                <label htmlFor="field-9" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Instructions</label>
                 <textarea
                   value={formData.instructions}
-                  onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
+                  id="field-9"
+              onChange={(e) =>  setFormData({ ...formData, instructions: e.target.value })}
                   rows={6}
                   placeholder="Step-by-step cooking instructions..."
                   className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white resize-none"
@@ -736,7 +744,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Recipe Image</label>
+                <label htmlFor="field-10" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Recipe Image</label>
                 <div className="w-full max-w-sm">
                   <ImageUpload
                     label=""
@@ -751,12 +759,13 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Tags</label>
+                <label htmlFor="field-11" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Tags</label>
                 <div className="flex gap-2 mb-2">
                   <input
                     type="text"
                     value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
+                    id="field-11"
+              onChange={(e) =>  setTagInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                     placeholder="Add a tag (e.g., Italian, Quick, Vegetarian)"
                     className="flex-1 px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"

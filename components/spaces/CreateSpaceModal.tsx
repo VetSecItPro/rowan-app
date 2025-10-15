@@ -91,14 +91,15 @@ export function CreateSpaceModal({ isOpen, onClose, onSpaceCreated }: CreateSpac
         <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
           {/* Space Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-1"className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Space Name *
             </label>
             <input
               type="text"
               required
               value={spaceName}
-              onChange={(e) => setSpaceName(e.target.value)}
+              id="field-1"
+              onChange={(e) =>  setSpaceName(e.target.value)}
               placeholder="e.g., Our Family, The Johnsons, Home Sweet Home"
               className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               disabled={loading}

@@ -283,10 +283,11 @@ export default function NewRecipePage() {
 
             {/* Text Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="recipe-text" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Paste Recipe Text
               </label>
               <textarea
+                id="recipe-text"
                 value={recipeText}
                 onChange={(e) => setRecipeText(e.target.value)}
                 placeholder="Paste your recipe here... Include ingredients, instructions, prep time, etc."
@@ -307,11 +308,12 @@ export default function NewRecipePage() {
 
             {/* Image Upload */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="recipe-image-upload" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Upload Recipe Image
               </label>
               <div className="space-y-3">
                 <input
+                  id="recipe-image-upload"
                   ref={fileInputRef}
                   type="file"
                   accept="image/*"
@@ -385,10 +387,11 @@ export default function NewRecipePage() {
 
               {/* Recipe Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="recipe-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                   Recipe Name <span className="text-red-500">*</span>
                 </label>
                 <input
+                  id="recipe-name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -400,10 +403,11 @@ export default function NewRecipePage() {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="recipe-description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                   Description
                 </label>
                 <textarea
+                  id="recipe-description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Brief description of the recipe..."
@@ -414,10 +418,11 @@ export default function NewRecipePage() {
 
               {/* Image URL */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="recipe-image-url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                   Image URL
                 </label>
                 <input
+                  id="recipe-image-url"
                   type="url"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
@@ -488,10 +493,11 @@ export default function NewRecipePage() {
 
             {/* Instructions */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="recipe-instructions" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Instructions
               </label>
               <textarea
+                id="recipe-instructions"
                 value={instructions}
                 onChange={(e) => setInstructions(e.target.value)}
                 placeholder="Step-by-step cooking instructions..."
@@ -507,10 +513,11 @@ export default function NewRecipePage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Prep Time */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label htmlFor="recipe-prep-time" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                     Prep Time (minutes)
                   </label>
                   <input
+                    id="recipe-prep-time"
                     type="number"
                     value={prepTime}
                     onChange={(e) => setPrepTime(e.target.value)}
@@ -523,10 +530,11 @@ export default function NewRecipePage() {
 
                 {/* Cook Time */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label htmlFor="recipe-cook-time" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                     Cook Time (minutes)
                   </label>
                   <input
+                    id="recipe-cook-time"
                     type="number"
                     value={cookTime}
                     onChange={(e) => setCookTime(e.target.value)}
@@ -539,10 +547,11 @@ export default function NewRecipePage() {
 
                 {/* Servings */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label htmlFor="recipe-servings" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                     Servings
                   </label>
                   <input
+                    id="recipe-servings"
                     type="number"
                     value={servings}
                     onChange={(e) => setServings(e.target.value)}
@@ -557,10 +566,11 @@ export default function NewRecipePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Difficulty */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label htmlFor="recipe-difficulty" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                     Difficulty
                   </label>
                   <select
+                    id="recipe-difficulty"
                     value={difficulty}
                     onChange={(e) => setDifficulty(e.target.value)}
                     className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
@@ -575,10 +585,11 @@ export default function NewRecipePage() {
 
                 {/* Cuisine Type */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label htmlFor="recipe-cuisine-type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                     Cuisine Type
                   </label>
                   <input
+                    id="recipe-cuisine-type"
                     type="text"
                     value={cuisineType}
                     onChange={(e) => setCuisineType(e.target.value)}
@@ -591,10 +602,11 @@ export default function NewRecipePage() {
 
               {/* Tags */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="recipe-tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                   Tags (comma-separated)
                 </label>
                 <input
+                  id="recipe-tags"
                   type="text"
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}

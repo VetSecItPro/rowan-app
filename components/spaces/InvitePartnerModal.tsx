@@ -129,7 +129,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
           <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
             {/* Email Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Email Address *
               </label>
               <div className="relative">
@@ -138,7 +138,8 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
                   type="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="field-1"
+              onChange={(e) =>  setEmail(e.target.value)}
                   placeholder="partner@example.com"
                   className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                   disabled={loading}
@@ -185,7 +186,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
 
             {/* Invitation URL */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Invitation Link
               </label>
               <div className="flex gap-2">
@@ -194,7 +195,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
                   value={invitationUrl}
                   readOnly
                   className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white text-sm"
-                />
+                id="field-2" />
                 <button
                   type="button"
                   onClick={handleCopyUrl}

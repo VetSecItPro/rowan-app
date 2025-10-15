@@ -120,14 +120,15 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
               {availableColumns.map((column) => (
                 <label
                   key={column.key}
-                  className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                  htmlFor="field-1" className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 ${
                     column.required ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
                   <input
                     type="checkbox"
                     checked={selectedColumns.includes(column.key)}
-                    onChange={() => toggleColumn(column.key)}
+                    id="field-1"
+              onChange={() =>  toggleColumn(column.key)}
                     disabled={column.required}
                     className="rounded border-gray-300 text-blue-500"
                   />

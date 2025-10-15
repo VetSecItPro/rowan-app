@@ -146,7 +146,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
         <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Title *</label>
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">Title *</label>
             <input
               type="text"
               required
@@ -159,7 +159,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
 
           {/* Store */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Store</label>
+            <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">Store</label>
             <input
               type="text"
               value={formData.store_name || ''}
@@ -171,7 +171,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
+            <label htmlFor="field-3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">Description</label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -184,7 +184,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
           {/* Items */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Items</label>
+              <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">Items</label>
               {items.length > 1 && (
                 <button
                   type="button"
