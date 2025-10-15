@@ -20,6 +20,7 @@ import {
   Timer,
   Lightbulb,
   Calendar,
+  AlertCircle,
 } from 'lucide-react';
 
 interface GuideSection {
