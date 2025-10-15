@@ -1654,19 +1654,19 @@ export default function DashboardPage() {
                 )}
 
                 {/* Compact Mood Selector - Horizontal Row */}
-                <div className="flex items-center justify-between w-full mb-3">
+                <div className="grid grid-cols-5 gap-2 sm:gap-3 w-full mb-3">
               {moodOptions.map((mood) => (
                 <Tooltip key={mood.value} content={`I'm feeling ${mood.label.toLowerCase()} today`} position="top">
                   <button
                     onClick={() => handleMoodSelect(mood.value)}
-                    className={`w-[18%] aspect-square p-3 sm:p-4 rounded-xl border-2 transition-all duration-300 transform hover:scale-110 active:scale-95 flex items-center justify-center ${
+                    className={`aspect-square p-4 sm:p-5 md:p-6 rounded-xl border-2 transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center justify-center ${
                       selectedMood === mood.value
                         ? 'border-pink-500 bg-pink-100 dark:bg-pink-900/30 scale-105 mood-selected shadow-lg shadow-pink-500/20'
                         : 'border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-600 bg-white/50 dark:bg-gray-800/50 hover:shadow-lg'
                     }`}
                     title={mood.label}
                   >
-                    <div className={`text-3xl sm:text-4xl md:text-5xl transition-transform ${selectedMood === mood.value ? 'scale-110' : ''}`}>
+                    <div className={`text-3xl sm:text-4xl transition-transform ${selectedMood === mood.value ? 'scale-110' : ''}`}>
                       {mood.emoji}
                     </div>
                   </button>
