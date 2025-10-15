@@ -386,7 +386,7 @@ export default function NotificationSettingsPage() {
                             type="time"
                             value={quietHoursStart}
                             onChange={(e) => setQuietHoursStart(e.target.value)}
-                            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500"
+                            className="w-full px-3 sm:px-4 py-3 text-base min-h-[48px] bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500"
                           />
                         </div>
                         <div>
@@ -398,7 +398,7 @@ export default function NotificationSettingsPage() {
                             type="time"
                             value={quietHoursEnd}
                             onChange={(e) => setQuietHoursEnd(e.target.value)}
-                            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500"
+                            className="w-full px-3 sm:px-4 py-3 text-base min-h-[48px] bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500"
                           />
                         </div>
                         <p className="text-sm text-gray-600 dark:text-gray-400">

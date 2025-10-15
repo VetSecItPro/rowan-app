@@ -1054,7 +1054,7 @@ export default function SettingsPage() {
                                         setIsSavingPrefs(false);
                                       }
                                     }}
-                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                                    className="w-full px-3 sm:px-4 py-3 text-base min-h-[48px] bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                                   />
                                 </div>
                                 <div>
@@ -1081,7 +1081,7 @@ export default function SettingsPage() {
                                         setIsSavingPrefs(false);
                                       }
                                     }}
-                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                                    className="w-full px-3 sm:px-4 py-3 text-base min-h-[48px] bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                                   />
                                 </div>
                               </div>
