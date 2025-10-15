@@ -13,6 +13,7 @@ import GuidedMessageCreation from '@/components/guided/GuidedMessageCreation';
 import { fileUploadService } from '@/lib/services/file-upload-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { messagesService, Message, MessageWithReplies, CreateMessageInput, TypingIndicator as TypingIndicatorType } from '@/lib/services/messages-service';
+import { mentionsService } from '@/lib/services/mentions-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { format, isSameDay, isToday, isYesterday } from 'date-fns';
 import { RealtimeChannel } from '@supabase/supabase-js';
@@ -337,12 +338,25 @@ export default function MessagesPage() {
 
     try {
       // Send to server
-      await messagesService.createMessage({
+      const savedMessage = await messagesService.createMessage({
         space_id: currentSpace.id,
         conversation_id: conversationId,
         sender_id: user.id,
         content: optimisticMessage.content,
       });
+
+      // Process @mentions
+      try {
+        await mentionsService.processMessageMentions(
+          savedMessage.id,
+          savedMessage.content,
+          user.id,
+          currentSpace.id
+        );
+      } catch (mentionError) {
+        console.error('Failed to process mentions:', mentionError);
+        // Don't block message sending if mentions fail
+      }
 
       // Real-time subscription will add the server message,
       // so remove the temp message to avoid duplicates
