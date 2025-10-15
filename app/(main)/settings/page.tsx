@@ -7,6 +7,7 @@ import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
 import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { createClient } from '@/lib/supabase/client';
 import {
   Settings,
@@ -146,6 +147,8 @@ export default function SettingsPage() {
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const [show2FAModal, setShow2FAModal] = useState(false);
   const [showRevokeSessionModal, setShowRevokeSessionModal] = useState(false);
+  const [showRemoveMemberConfirm, setShowRemoveMemberConfirm] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
 
   // Invite modal state
   const [inviteEmail, setInviteEmail] = useState('');
@@ -350,11 +353,15 @@ export default function SettingsPage() {
       return;
     }
 
-    if (!confirm(`Are you sure you want to remove ${member.name} from this space?`)) {
-      return;
-    }
+    setMemberToRemove(memberId);
+    setShowRemoveMemberConfirm(true);
+  };
 
-    setSpaceMembers(spaceMembers.filter(m => m.id !== memberId));
+  const confirmRemoveMember = async () => {
+    if (!memberToRemove) return;
+    setSpaceMembers(spaceMembers.filter(m => m.id !== memberToRemove));
+    setShowRemoveMemberConfirm(false);
+    setMemberToRemove(null);
   };
 
   const handleLeaveSpace = async () => {
@@ -1791,6 +1798,21 @@ export default function SettingsPage() {
           </div>
         </div>
       )}
+
+      {/* Remove Member Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={showRemoveMemberConfirm}
+        onClose={() => {
+          setShowRemoveMemberConfirm(false);
+          setMemberToRemove(null);
+        }}
+        onConfirm={confirmRemoveMember}
+        title="Remove Member"
+        message={`Are you sure you want to remove ${spaceMembers.find(m => m.id === memberToRemove)?.name} from this space? They will lose access to all shared content.`}
+        confirmLabel="Remove"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </FeatureLayout>
   );
 }

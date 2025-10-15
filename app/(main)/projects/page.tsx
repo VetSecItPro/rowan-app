@@ -9,6 +9,7 @@ import { NewProjectModal } from '@/components/projects/NewProjectModal';
 import { ExpenseCard } from '@/components/projects/ExpenseCard';
 import { NewExpenseModal } from '@/components/projects/NewExpenseModal';
 import { NewBudgetModal } from '@/components/projects/NewBudgetModal';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { projectsOnlyService, type CreateProjectInput } from '@/lib/services/projects-service';
 import { projectsService, type Expense, type CreateExpenseInput } from '@/lib/services/budgets-service';
@@ -30,6 +31,7 @@ export default function ProjectsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentBudget, setCurrentBudget] = useState<number>(0);
   const [budgetStats, setBudgetStats] = useState({ monthlyBudget: 0, spentThisMonth: 0, remaining: 0, pendingBills: 0 });
+  const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; action: 'delete-project' | 'delete-expense'; id: string }>({ isOpen: false, action: 'delete-project', id: '' });
 
   const loadData = useCallback(async () => {
     if (!currentSpace || !user) {
@@ -75,14 +77,8 @@ export default function ProjectsPage() {
   }, [editingProject, loadData]);
 
   const handleDeleteProject = useCallback(async (projectId: string) => {
-    if (!confirm('Are you sure?')) return;
-    try {
-      await projectsOnlyService.deleteProject(projectId);
-      loadData();
-    } catch (error) {
-      console.error('Failed to delete project:', error);
-    }
-  }, [loadData]);
+    setConfirmDialog({ isOpen: true, action: 'delete-project', id: projectId });
+  }, []);
 
   const handleCreateExpense = useCallback(async (data: CreateExpenseInput) => {
     try {
@@ -99,14 +95,24 @@ export default function ProjectsPage() {
   }, [editingExpense, loadData]);
 
   const handleDeleteExpense = useCallback(async (expenseId: string) => {
-    if (!confirm('Are you sure?')) return;
+    setConfirmDialog({ isOpen: true, action: 'delete-expense', id: expenseId });
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    const { action, id } = confirmDialog;
+    setConfirmDialog({ isOpen: false, action: 'delete-project', id: '' });
+
     try {
-      await projectsService.deleteExpense(expenseId);
+      if (action === 'delete-project') {
+        await projectsOnlyService.deleteProject(id);
+      } else if (action === 'delete-expense') {
+        await projectsService.deleteExpense(id);
+      }
       loadData();
     } catch (error) {
-      console.error('Failed to delete expense:', error);
+      console.error(`Failed to ${action}:`, error);
     }
-  }, [loadData]);
+  }, [confirmDialog, loadData]);
 
   const handleStatusChange = useCallback(async (expenseId: string, newStatus: 'pending' | 'paid') => {
     try {
@@ -433,6 +439,19 @@ export default function ProjectsPage() {
           <NewBudgetModal isOpen={isBudgetModalOpen} onClose={() => setIsBudgetModalOpen(false)} onSave={handleSetBudget} currentBudget={currentBudget} spaceId={currentSpace.id} />
         </>
       )}
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ isOpen: false, action: 'delete-project', id: '' })}
+        onConfirm={handleConfirmDelete}
+        title={confirmDialog.action === 'delete-project' ? 'Delete Project' : 'Delete Expense'}
+        message={confirmDialog.action === 'delete-project'
+          ? 'Are you sure you want to delete this project? This action cannot be undone.'
+          : 'Are you sure you want to delete this expense? This action cannot be undone.'}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </FeatureLayout>
   );
 }

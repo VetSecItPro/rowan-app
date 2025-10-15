@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, Clock, Users, ChefHat, ExternalLink, Edit, Trash2, Loader2, Calendar } from 'lucide-react';
 import { mealsService, type Recipe } from '@/lib/services/meals-service';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import Link from 'next/link';
 
 export default function RecipeDetailPage() {
@@ -14,6 +15,7 @@ export default function RecipeDetailPage() {
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState(false);
 
   useEffect(() => {
     const loadRecipe = async () => {
@@ -33,8 +35,12 @@ export default function RecipeDetailPage() {
   }, [recipeId]);
 
   const handleDelete = async () => {
-    if (!recipe || !confirm('Are you sure you want to delete this recipe?')) return;
+    setConfirmDialog(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    if (!recipe) return;
+    setConfirmDialog(false);
     setDeleting(true);
     try {
       await mealsService.deleteRecipe(recipe.id);
@@ -277,6 +283,17 @@ export default function RecipeDetailPage() {
           </Link>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={confirmDialog}
+        onClose={() => setConfirmDialog(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Recipe"
+        message="Are you sure you want to delete this recipe? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </div>
   );
 }

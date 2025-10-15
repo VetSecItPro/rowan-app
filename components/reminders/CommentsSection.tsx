@@ -5,6 +5,7 @@ import { MessageCircle, Send, Edit, Trash2, X } from 'lucide-react';
 import { reminderCommentsService, ReminderComment } from '@/lib/services/reminder-comments-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { createClient } from '@/lib/supabase/client';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { MentionInput } from './MentionInput';
 
 interface CommentsSectionProps {
@@ -20,6 +21,8 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
   const [submitting, setSubmitting] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
   const supabase = createClient();
 
   // Fetch comments
@@ -118,14 +121,22 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
   // Delete comment
   const handleDelete = async (commentId: string) => {
     if (!user) return;
-    if (!confirm('Are you sure you want to delete this comment?')) return;
+    setCommentToDelete(commentId);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!user || !commentToDelete) return;
 
     try {
-      await reminderCommentsService.deleteComment(commentId, user.id);
+      await reminderCommentsService.deleteComment(commentToDelete, user.id);
       // Comments will update via real-time subscription
     } catch (error) {
       console.error('Error deleting comment:', error);
       alert('Failed to delete comment. Please try again.');
+    } finally {
+      setShowDeleteConfirm(false);
+      setCommentToDelete(null);
     }
   };
 
@@ -221,6 +232,21 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
           </button>
         </div>
       </form>
+
+      {/* Delete Comment Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setCommentToDelete(null);
+        }}
+        onConfirm={confirmDelete}
+        title="Delete Comment"
+        message="Are you sure you want to delete this comment? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </div>
   );
 }

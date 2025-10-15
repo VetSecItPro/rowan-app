@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Download, Trash2, ExternalLink, FileIcon } from 'lucide-react';
 import { reminderAttachmentsService, ReminderAttachment } from '@/lib/services/reminder-attachments-service';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 
 interface AttachmentListProps {
   reminderId: string;
@@ -15,6 +16,8 @@ export function AttachmentList({ reminderId, refreshTrigger }: AttachmentListPro
   const [attachments, setAttachments] = useState<ReminderAttachment[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [attachmentToDelete, setAttachmentToDelete] = useState<string | null>(null);
 
   // Fetch attachments
   const fetchAttachments = async () => {
@@ -36,18 +39,25 @@ export function AttachmentList({ reminderId, refreshTrigger }: AttachmentListPro
   // Delete attachment
   const handleDelete = async (attachmentId: string) => {
     if (!user) return;
-    if (!confirm('Are you sure you want to delete this attachment?')) return;
+    setAttachmentToDelete(attachmentId);
+    setShowDeleteConfirm(true);
+  };
 
-    setDeletingId(attachmentId);
+  const confirmDelete = async () => {
+    if (!user || !attachmentToDelete) return;
+
+    setDeletingId(attachmentToDelete);
+    setShowDeleteConfirm(false);
 
     try {
-      await reminderAttachmentsService.deleteAttachment(attachmentId, user.id);
-      setAttachments((prev) => prev.filter((a) => a.id !== attachmentId));
+      await reminderAttachmentsService.deleteAttachment(attachmentToDelete, user.id);
+      setAttachments((prev) => prev.filter((a) => a.id !== attachmentToDelete));
     } catch (error) {
       console.error('Error deleting attachment:', error);
       alert(`Failed to delete attachment: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setDeletingId(null);
+      setAttachmentToDelete(null);
     }
   };
 
@@ -78,18 +88,35 @@ export function AttachmentList({ reminderId, refreshTrigger }: AttachmentListPro
   }
 
   return (
-    <div className="space-y-2">
-      {attachments.map((attachment) => (
-        <AttachmentItem
-          key={attachment.id}
-          attachment={attachment}
-          onDelete={() => handleDelete(attachment.id)}
-          onDownload={() => handleDownload(attachment)}
-          isDeleting={deletingId === attachment.id}
-          canDelete={user?.id === attachment.uploaded_by}
-        />
-      ))}
-    </div>
+    <>
+      <div className="space-y-2">
+        {attachments.map((attachment) => (
+          <AttachmentItem
+            key={attachment.id}
+            attachment={attachment}
+            onDelete={() => handleDelete(attachment.id)}
+            onDownload={() => handleDownload(attachment)}
+            isDeleting={deletingId === attachment.id}
+            canDelete={user?.id === attachment.uploaded_by}
+          />
+        ))}
+      </div>
+
+      {/* Delete Attachment Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setAttachmentToDelete(null);
+        }}
+        onConfirm={confirmDelete}
+        title="Delete Attachment"
+        message="Are you sure you want to delete this attachment? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
+    </>
   );
 }
 

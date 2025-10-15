@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Repeat, Users, Calendar, Settings, Trash2, Play, Pause } from 'lucide-react';
 import { choreRotationService } from '@/lib/services/chore-rotation-service';
 import { createClient } from '@/lib/supabase/client';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 
 interface ChoreRotationConfigProps {
   taskId: string;
@@ -34,6 +35,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const [formData, setFormData] = useState<RotationConfig>({
     rotation_type: 'round-robin',
@@ -110,10 +112,10 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
 
   async function handleDelete() {
     if (!rotation?.id) return;
-    if (!confirm('Are you sure you want to delete this rotation?')) return;
 
     try {
       await choreRotationService.deleteRotation(rotation.id);
+      setShowDeleteConfirm(false);
       setRotation(null);
       setFormData({
         rotation_type: 'round-robin',
@@ -192,7 +194,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
               <Settings className="w-4 h-4" />
             </button>
             <button
-              onClick={handleDelete}
+              onClick={() => setShowDeleteConfirm(true)}
               className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg"
             >
               <Trash2 className="w-4 h-4" />
@@ -356,6 +358,17 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
           based on the interval you set. Members will be notified when assigned.
         </p>
       </div>
+
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title="Delete Rotation"
+        message="Are you sure you want to delete this rotation? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </div>
   );
 }

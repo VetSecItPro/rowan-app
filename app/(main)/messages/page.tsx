@@ -5,6 +5,7 @@ import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as Imag
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { MessageCard } from '@/components/messages/MessageCard';
 import { NewMessageModal } from '@/components/messages/NewMessageModal';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import GuidedMessageCreation from '@/components/guided/GuidedMessageCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { messagesService, Message, CreateMessageInput } from '@/lib/services/messages-service';
@@ -44,6 +45,7 @@ export default function MessagesPage() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, messageId: '' });
 
   const [stats, setStats] = useState({
     thisWeek: 0,
@@ -162,7 +164,12 @@ export default function MessagesPage() {
 
   // Memoize handleDeleteMessage callback
   const handleDeleteMessage = useCallback(async (messageId: string) => {
-    if (!confirm('Are you sure you want to delete this message?')) return;
+    setConfirmDialog({ isOpen: true, messageId });
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    const messageId = confirmDialog.messageId;
+    setConfirmDialog({ isOpen: false, messageId: '' });
 
     try {
       await messagesService.deleteMessage(messageId);
@@ -170,7 +177,7 @@ export default function MessagesPage() {
     } catch (error) {
       console.error('Failed to delete message:', error);
     }
-  }, [loadMessages]);
+  }, [confirmDialog, loadMessages]);
 
   // Memoize handleMarkRead callback
   const handleMarkRead = useCallback(async (messageId: string) => {
@@ -629,6 +636,17 @@ export default function MessagesPage() {
           conversationId={conversationId}
         />
       )}
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ isOpen: false, messageId: '' })}
+        onConfirm={handleConfirmDelete}
+        title="Delete Message"
+        message="Are you sure you want to delete this message? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </FeatureLayout>
   );
 }

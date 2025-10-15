@@ -8,6 +8,7 @@ import { GoalCard } from '@/components/goals/GoalCard';
 import { MilestoneCard } from '@/components/goals/MilestoneCard';
 import { NewGoalModal } from '@/components/goals/NewGoalModal';
 import { NewMilestoneModal } from '@/components/goals/NewMilestoneModal';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import GuidedGoalCreation from '@/components/guided/GuidedGoalCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput } from '@/lib/services/goals-service';
@@ -29,6 +30,7 @@ export default function GoalsPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; action: 'delete-goal' | 'delete-milestone'; id: string }>({ isOpen: false, action: 'delete-goal', id: '' });
 
   // Memoized filtered goals with search and status
   const filteredGoals = useMemo(() => {
@@ -135,14 +137,8 @@ export default function GoalsPage() {
   }, [editingGoal, loadData]);
 
   const handleDeleteGoal = useCallback(async (goalId: string) => {
-    if (!confirm('Are you sure you want to delete this goal?')) return;
-    try {
-      await goalsService.deleteGoal(goalId);
-      loadData();
-    } catch (error) {
-      console.error('Failed to delete goal:', error);
-    }
-  }, [loadData]);
+    setConfirmDialog({ isOpen: true, action: 'delete-goal', id: goalId });
+  }, []);
 
   const handleCreateMilestone = useCallback(async (milestoneData: CreateMilestoneInput) => {
     try {
@@ -159,14 +155,24 @@ export default function GoalsPage() {
   }, [editingMilestone, loadData]);
 
   const handleDeleteMilestone = useCallback(async (milestoneId: string) => {
-    if (!confirm('Are you sure you want to delete this milestone?')) return;
+    setConfirmDialog({ isOpen: true, action: 'delete-milestone', id: milestoneId });
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    const { action, id } = confirmDialog;
+    setConfirmDialog({ isOpen: false, action: 'delete-goal', id: '' });
+
     try {
-      await goalsService.deleteMilestone(milestoneId);
+      if (action === 'delete-goal') {
+        await goalsService.deleteGoal(id);
+      } else if (action === 'delete-milestone') {
+        await goalsService.deleteMilestone(id);
+      }
       loadData();
     } catch (error) {
-      console.error('Failed to delete milestone:', error);
+      console.error(`Failed to ${action}:`, error);
     }
-  }, [loadData]);
+  }, [confirmDialog, loadData]);
 
   const handleToggleMilestone = useCallback(async (milestoneId: string, completed: boolean) => {
     try {
@@ -569,6 +575,19 @@ export default function GoalsPage() {
           />
         </>
       )}
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ isOpen: false, action: 'delete-goal', id: '' })}
+        onConfirm={handleConfirmDelete}
+        title={confirmDialog.action === 'delete-goal' ? 'Delete Goal' : 'Delete Milestone'}
+        message={confirmDialog.action === 'delete-goal'
+          ? 'Are you sure you want to delete this goal? This action cannot be undone.'
+          : 'Are you sure you want to delete this milestone? This action cannot be undone.'}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </FeatureLayout>
   );
 }

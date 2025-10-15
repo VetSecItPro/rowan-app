@@ -31,6 +31,7 @@ import { TaskComments } from '@/components/tasks/TaskComments';
 import { TaskQuickActions } from '@/components/tasks/TaskQuickActions';
 import { CalendarSyncToggle } from '@/components/tasks/CalendarSyncToggle';
 import { ChoreRotationConfig } from '@/components/tasks/ChoreRotationConfig';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 
 type TaskType = 'task' | 'chore';
 type TaskOrChore = (Task & { type: 'task' }) | (Chore & { type: 'chore' });
@@ -50,6 +51,8 @@ export default function TasksPage() {
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, any>>({});
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{ id: string; type: 'task' | 'chore' } | null>(null);
 
   // Advanced features state
   const [showFilters, setShowFilters] = useState(false);
@@ -232,21 +235,29 @@ export default function TasksPage() {
     }
   }, [loadData]);
 
-  const handleDeleteItem = useCallback(async (itemId: string, type?: 'task' | 'chore') => {
+  const handleDeleteItem = useCallback((itemId: string, type?: 'task' | 'chore') => {
     const itemType = type === 'chore' ? 'chore' : 'task';
-    if (!confirm(`Are you sure you want to delete this ${itemType}?`)) return;
+    setItemToDelete({ id: itemId, type: itemType });
+    setShowDeleteConfirm(true);
+  }, []);
+
+  const confirmDeleteItem = useCallback(async () => {
+    if (!itemToDelete) return;
 
     try {
-      if (type === 'chore') {
-        await choresService.deleteChore(itemId);
+      if (itemToDelete.type === 'chore') {
+        await choresService.deleteChore(itemToDelete.id);
       } else {
-        await tasksService.deleteTask(itemId);
+        await tasksService.deleteTask(itemToDelete.id);
       }
       loadData();
     } catch (error) {
-      console.error(`Failed to delete ${itemType}:`, error);
+      console.error(`Failed to delete ${itemToDelete.type}:`, error);
+    } finally {
+      setShowDeleteConfirm(false);
+      setItemToDelete(null);
     }
-  }, [loadData]);
+  }, [itemToDelete, loadData]);
 
   const handleEditItem = useCallback((item: TaskOrChore) => {
     if (item.type === 'chore') {
@@ -790,6 +801,21 @@ export default function TasksPage() {
           onActionComplete={handleBulkActionComplete}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setItemToDelete(null);
+        }}
+        onConfirm={confirmDeleteItem}
+        title={`Delete ${itemToDelete?.type || 'Item'}`}
+        message={`Are you sure you want to delete this ${itemToDelete?.type || 'item'}? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </FeatureLayout>
   );
 }

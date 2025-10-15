@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Upload, Image as ImageIcon, FileText, Download, Trash2, X, Loader2, Paperclip } from 'lucide-react';
 import { eventAttachmentsService, EventAttachment } from '@/lib/services/event-attachments-service';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 
 interface AttachmentGalleryProps {
   eventId: string;
@@ -19,6 +20,8 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
   const [uploading, setUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [attachmentUrls, setAttachmentUrls] = useState<Record<string, string>>({});
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [attachmentToDelete, setAttachmentToDelete] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -73,19 +76,27 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
   };
 
   const handleDelete = async (attachmentId: string) => {
-    if (!confirm('Delete this attachment?')) return;
+    setAttachmentToDelete(attachmentId);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!attachmentToDelete) return;
 
     try {
-      await eventAttachmentsService.deleteAttachment(attachmentId);
-      setAttachments(attachments.filter(a => a.id !== attachmentId));
+      await eventAttachmentsService.deleteAttachment(attachmentToDelete);
+      setAttachments(attachments.filter(a => a.id !== attachmentToDelete));
 
       // Remove URL from cache
       const newUrls = { ...attachmentUrls };
-      delete newUrls[attachmentId];
+      delete newUrls[attachmentToDelete];
       setAttachmentUrls(newUrls);
     } catch (error) {
       console.error('Failed to delete attachment:', error);
       alert('Failed to delete attachment. Please try again.');
+    } finally {
+      setShowDeleteConfirm(false);
+      setAttachmentToDelete(null);
     }
   };
 
@@ -313,6 +324,21 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
           />
         </div>
       )}
+
+      {/* Delete Attachment Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setAttachmentToDelete(null);
+        }}
+        onConfirm={confirmDelete}
+        title="Delete Attachment"
+        message="Are you sure you want to delete this attachment? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </div>
   );
 }
