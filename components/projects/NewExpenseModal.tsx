@@ -134,7 +134,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
                 required
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-4 py-2 pr-12 bg-gray-50 dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm pr-12 bg-gray-50 dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
 
               {/* Emoji Picker Button */}
@@ -159,7 +159,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="field-2" className="block text-sm font-medium mb-2 cursor-pointer">Amount *</label>
-              <input type="number" required step="0.01" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })} className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border rounded-lg" />
+              <input type="number" required step="0.01" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })} className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-900 border rounded-lg" />
             </div>
             <div>
               <label htmlFor="field-3" className="block text-sm font-medium mb-2 cursor-pointer">Category</label>
@@ -172,7 +172,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
                       setCustomCategory('');
                     }
                   }}
-                  className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border rounded-lg appearance-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-900 border rounded-lg appearance-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                   style={{ paddingRight: '2.5rem' }}
                 >
                   <option value="">Select category...</option>
@@ -203,7 +203,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
                 value={customCategory}
                 onChange={(e) => setCustomCategory(e.target.value)}
                 placeholder="Enter custom category..."
-                className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
           )}
