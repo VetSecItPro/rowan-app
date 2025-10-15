@@ -392,7 +392,7 @@ export default function RemindersPage(): JSX.Element {
           {!showGuidedFlow && (
           <div className="stats-grid-mobile gap-4 sm:gap-6">
             {/* Active */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Active</h3>
                 <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
@@ -411,7 +411,7 @@ export default function RemindersPage(): JSX.Element {
             </div>
 
             {/* Overdue */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Overdue</h3>
                 <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center">
@@ -430,7 +430,7 @@ export default function RemindersPage(): JSX.Element {
             </div>
 
             {/* Completed */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completed</h3>
                 <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
@@ -456,7 +456,7 @@ export default function RemindersPage(): JSX.Element {
             </div>
 
             {/* Total */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total</h3>
                 <div className="w-12 h-12 bg-gradient-reminders rounded-xl flex items-center justify-center">
