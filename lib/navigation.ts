@@ -21,13 +21,6 @@ export interface NavItem {
 
 export const NAVIGATION_ITEMS: NavItem[] = [
   {
-    name: 'Daily Check-In',
-    href: '/dashboard',
-    icon: Heart,
-    gradient: 'bg-gradient-to-r from-pink-500 to-purple-500',
-    description: 'Track your mood',
-  },
-  {
     name: 'Tasks & Chores',
     href: '/tasks',
     icon: CheckSquare,
@@ -82,5 +75,12 @@ export const NAVIGATION_ITEMS: NavItem[] = [
     icon: Target,
     gradient: 'bg-gradient-goals',
     description: 'Track progress',
+  },
+  {
+    name: 'Daily Check-In',
+    href: '/dashboard',
+    icon: Heart,
+    gradient: 'bg-gradient-to-r from-pink-500 to-purple-500',
+    description: 'Track your mood',
   },
 ];
