@@ -13,6 +13,9 @@ export interface Message {
   attachments?: string[];
   parent_message_id?: string;
   thread_reply_count?: number;
+  is_pinned?: boolean;
+  pinned_at?: string;
+  pinned_by?: string;
   created_at: string;
   updated_at: string;
 }
@@ -583,5 +586,108 @@ export const messagesService = {
   unsubscribe(channel: RealtimeChannel): void {
     const supabase = createClient();
     supabase.removeChannel(channel);
+  },
+
+  // =====================================================
+  // MESSAGE PINNING
+  // =====================================================
+
+  /**
+   * Pin a message to the top of the conversation
+   */
+  async pinMessage(messageId: string, userId: string): Promise<Message> {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from('messages')
+      .update({
+        is_pinned: true,
+        pinned_by: userId,
+      })
+      .eq('id', messageId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error pinning message:', error);
+      throw error;
+    }
+
+    return data as Message;
+  },
+
+  /**
+   * Unpin a message
+   */
+  async unpinMessage(messageId: string): Promise<Message> {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from('messages')
+      .update({
+        is_pinned: false,
+        pinned_by: null,
+        pinned_at: null,
+      })
+      .eq('id', messageId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error unpinning message:', error);
+      throw error;
+    }
+
+    return data as Message;
+  },
+
+  /**
+   * Get all pinned messages for a conversation
+   */
+  async getPinnedMessages(conversationId: string): Promise<MessageWithAttachments[]> {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from('messages')
+      .select(`
+        *,
+        attachments_data:message_attachments(*)
+      `)
+      .eq('conversation_id', conversationId)
+      .eq('is_pinned', true)
+      .order('pinned_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching pinned messages:', error);
+      throw error;
+    }
+
+    return data as MessageWithAttachments[];
+  },
+
+  /**
+   * Toggle pin status of a message
+   */
+  async togglePin(messageId: string, userId: string): Promise<Message> {
+    const supabase = createClient();
+
+    // First, get current pin status
+    const { data: currentMessage, error: fetchError } = await supabase
+      .from('messages')
+      .select('is_pinned')
+      .eq('id', messageId)
+      .single();
+
+    if (fetchError) {
+      console.error('Error fetching message:', fetchError);
+      throw fetchError;
+    }
+
+    // Toggle the pin status
+    if (currentMessage.is_pinned) {
+      return await this.unpinMessage(messageId);
+    } else {
+      return await this.pinMessage(messageId, userId);
+    }
   },
 };
