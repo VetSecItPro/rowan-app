@@ -107,19 +107,19 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
   const statusLabel = getStatusLabel();
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-lg transition-all duration-200 group">
+    <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-4 hover:shadow-lg transition-all duration-200 group">
       {/* Header */}
-      <div className="flex items-start justify-between mb-3">
+      <div className="flex items-start justify-between mb-3 gap-3">
         <div className="flex items-start gap-3 flex-1">
           {/* Checkbox */}
           <button
             onClick={handleStatusClick}
             title={getStatusTooltip()}
             aria-label={`Toggle task status: ${statusLabel.text}`}
-            className={`mt-1 flex-shrink-0 w-5 h-5 rounded flex items-center justify-center transition-all ${getCheckboxStyle()}`}
+            className={`mt-0.5 flex-shrink-0 w-6 h-6 sm:w-5 sm:h-5 rounded flex items-center justify-center transition-all active:scale-95 ${getCheckboxStyle()}`}
           >
             {task.status === 'completed' && (
-              <CheckSquare className="w-3 h-3 text-white" />
+              <CheckSquare className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
             )}
           </button>
 
@@ -163,9 +163,9 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
             onClick={() => setShowMenu(!showMenu)}
             title="Edit or Delete"
             aria-label="Task options menu"
-            className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+            className="p-2 sm:p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95 flex items-center justify-center"
           >
-            <MoreVertical className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            <MoreVertical className="w-5 h-5 sm:w-4 sm:h-4 text-gray-600 dark:text-gray-400" />
           </button>
 
           {showMenu && (
@@ -174,14 +174,14 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
                 className="fixed inset-0 z-10"
                 onClick={() => setShowMenu(false)}
               />
-              <div className="absolute right-0 mt-1 w-40 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+              <div className="absolute right-0 mt-1 w-44 sm:w-40 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
                 {onViewDetails && task.type === 'task' && (
                   <button
                     onClick={() => {
                       onViewDetails(task);
                       setShowMenu(false);
                     }}
-                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
+                    className="w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg transition-colors active:scale-[0.98]"
                   >
                     View Details
                   </button>
