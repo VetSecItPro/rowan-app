@@ -1787,7 +1787,7 @@ export default function DashboardPage() {
                     onClick={() => setJournalView('calendar')}
                     className={`px-2 sm:px-3 py-1.5 rounded-md flex items-center justify-center gap-1 transition-all font-medium ${
                       journalView === 'calendar'
-                        ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
+                        ? 'bg-gradient-to-r from-pink-500 via-pink-600 to-purple-600 text-white shadow-md'
                         : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                     }`}
                   >
@@ -1798,7 +1798,7 @@ export default function DashboardPage() {
                     onClick={() => setJournalView('list')}
                     className={`px-2 sm:px-3 py-1.5 rounded-md flex items-center justify-center gap-1 transition-all font-medium ${
                       journalView === 'list'
-                        ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
+                        ? 'bg-gradient-to-r from-pink-500 via-pink-600 to-purple-600 text-white shadow-md'
                         : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                     }`}
                   >
