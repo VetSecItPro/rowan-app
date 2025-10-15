@@ -582,9 +582,23 @@ export default function TasksPage() {
                 </div>
 
                 {loading || (activeTab === 'task' && realtimeLoading) ? (
-                  <div className="text-center py-12">
-                    <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-                    <p className="mt-4 text-gray-600 dark:text-gray-400">Loading tasks...</p>
+                  <div className="space-y-4">
+                    {[...Array(6)].map((_, i) => (
+                      <div key={i} className="bg-white dark:bg-gray-700 rounded-xl p-6 shadow-lg animate-pulse">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-5 h-5 bg-gray-200 dark:bg-gray-600 rounded" />
+                            <div className="h-5 bg-gray-200 dark:bg-gray-600 rounded w-48" />
+                          </div>
+                          <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-20" />
+                        </div>
+                        <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-full mb-2" />
+                        <div className="flex items-center gap-2 mt-3">
+                          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-24" />
+                          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-32" />
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ) : filteredItems.length === 0 ? (
                   <div className="text-center py-12">

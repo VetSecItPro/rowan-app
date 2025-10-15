@@ -896,8 +896,25 @@ export default function SettingsPage() {
                     </div>
 
                     {isLoadingPrefs ? (
-                      <div className="flex items-center justify-center p-12">
-                        <div className="w-8 h-8 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+                      <div className="space-y-6">
+                        {[...Array(3)].map((_, i) => (
+                          <div key={i}>
+                            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-4 animate-pulse" />
+                            <div className="space-y-3">
+                              {[...Array(4)].map((_, j) => (
+                                <div key={j} className="p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl animate-pulse">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex-1">
+                                      <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-32 mb-2" />
+                                      <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-48" />
+                                    </div>
+                                    <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 rounded-full" />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     ) : (
                       <>

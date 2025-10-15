@@ -294,9 +294,19 @@ export default function ProjectsPage() {
             </div>
 
             {loading ? (
-              <div className="text-center py-12">
-                <div className="inline-block w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
-                <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="bg-white dark:bg-gray-700 rounded-xl p-6 shadow-lg animate-pulse">
+                    <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-3/4 mb-4" />
+                    <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-full mb-2" />
+                    <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-5/6 mb-4" />
+                    <div className="h-2 bg-gray-200 dark:bg-gray-600 rounded w-full mb-2" />
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-20" />
+                      <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-24" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : activeTab === 'projects' ? (
               filteredProjects.length === 0 ? (
