@@ -1654,19 +1654,19 @@ export default function DashboardPage() {
                 )}
 
                 {/* Compact Mood Selector - Horizontal Row */}
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 sm:gap-3 mb-3">
               {moodOptions.map((mood) => (
                 <Tooltip key={mood.value} content={`I'm feeling ${mood.label.toLowerCase()} today`} position="top">
                   <button
                     onClick={() => handleMoodSelect(mood.value)}
-                    className={`flex-1 p-2 sm:p-3 rounded-xl border-2 transition-all duration-300 transform hover:scale-110 active:scale-95 ${
+                    className={`flex-1 p-3 sm:p-4 rounded-xl border-2 transition-all duration-300 transform hover:scale-110 active:scale-95 ${
                       selectedMood === mood.value
-                        ? 'border-pink-500 bg-pink-100 dark:bg-pink-900/30 scale-105 mood-selected'
+                        ? 'border-pink-500 bg-pink-100 dark:bg-pink-900/30 scale-105 mood-selected shadow-lg shadow-pink-500/20'
                         : 'border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-600 bg-white/50 dark:bg-gray-800/50 hover:shadow-lg'
                     }`}
                     title={mood.label}
                   >
-                    <div className={`text-2xl sm:text-3xl transition-transform ${selectedMood === mood.value ? 'scale-110' : ''}`}>
+                    <div className={`text-3xl sm:text-4xl md:text-5xl transition-transform ${selectedMood === mood.value ? 'scale-110' : ''}`}>
                       {mood.emoji}
                     </div>
                   </button>
@@ -1880,15 +1880,15 @@ export default function DashboardPage() {
                                   return (
                                     <div
                                       key={idx}
-                                      className={`flex items-center gap-0.5 sm:gap-1 px-1 py-0.5 rounded text-[9px] sm:text-[10px] ${
+                                      className={`flex items-center gap-1 px-1.5 py-1 rounded text-[9px] sm:text-[10px] ${
                                         isUser
                                           ? 'bg-pink-100 dark:bg-pink-900/40 border border-pink-200 dark:border-pink-700/50'
                                           : 'bg-purple-100 dark:bg-purple-900/40 border border-purple-200 dark:border-purple-700/50'
                                       }`}
                                       title={isUser ? 'You' : 'Partner'}
                                     >
-                                      <span className="text-[10px] sm:text-xs leading-none">{moodEmoji}</span>
-                                      <span className="text-[8px] sm:text-[9px] text-gray-700 dark:text-gray-300 truncate">
+                                      <span className="text-sm sm:text-base leading-none">{moodEmoji}</span>
+                                      <span className="text-[9px] sm:text-[10px] text-gray-700 dark:text-gray-300 truncate font-medium">
                                         {isUser ? 'You' : 'Partner'}
                                       </span>
                                     </div>
@@ -1943,11 +1943,16 @@ export default function DashboardPage() {
                               return (
                                 <div key={checkIn.id} className="bg-white/60 dark:bg-gray-800/60 rounded-lg p-4 border border-gray-200 dark:border-gray-700 ml-2">
                                   <div className="flex items-start justify-between mb-2">
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-2xl">{moodEmoji}</span>
-                                      <p className="text-xs font-semibold text-gray-900 dark:text-white">
-                                        {isUser ? 'You' : 'Partner'}
-                                      </p>
+                                    <div className="flex items-center gap-3">
+                                      <span className="text-3xl sm:text-4xl">{moodEmoji}</span>
+                                      <div>
+                                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                          {isUser ? 'You' : 'Partner'}
+                                        </p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                          {moodOptions.find(m => m.value === checkIn.mood)?.label}
+                                        </p>
+                                      </div>
                                     </div>
                                   </div>
                                   {checkIn.highlights && (
