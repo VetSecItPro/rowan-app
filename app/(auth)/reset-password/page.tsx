@@ -136,12 +136,12 @@ export default function ResetPasswordPage() {
             <div className="flex items-start gap-2">
               <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-red-800 dark:text-red-200">Error</p>
-                <p className="text-xs text-red-700 dark:text-red-300 mt-1">{error}</p>
+                <p className="text-base md:text-sm font-medium text-red-800 dark:text-red-200">Error</p>
+                <p className="text-sm md:text-xs text-red-700 dark:text-red-300 mt-1">{error}</p>
                 {error.includes('Invalid or expired') && (
                   <Link
                     href="/login"
-                    className="text-xs text-red-600 dark:text-red-400 hover:underline mt-2 inline-block"
+                    className="text-sm md:text-xs text-red-600 dark:text-red-400 hover:underline mt-2 inline-block"
                   >
                     Return to login and request a new reset link →
                   </Link>
