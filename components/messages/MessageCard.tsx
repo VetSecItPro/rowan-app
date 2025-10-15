@@ -6,6 +6,7 @@ import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState, useEffect } from 'react';
 import { AttachmentPreview } from './AttachmentPreview';
 import { ReactionPicker } from './ReactionPicker';
+import { MentionHighlight } from './MentionHighlight';
 
 interface MessageCardProps {
   message: MessageWithAttachments | MessageWithReplies;
@@ -102,7 +103,7 @@ export function MessageCard({
             {/* Message Content */}
             {message.content && (
               <p className="break-words whitespace-pre-wrap text-gray-900 dark:text-white text-sm">
-                {message.content}
+                <MentionHighlight content={message.content} currentUserId={currentUserId} />
               </p>
             )}
 
