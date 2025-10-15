@@ -540,11 +540,18 @@ export default function RemindersPage(): JSX.Element {
                   {/* Search */}
                   <div className="flex-1 relative">
                     <input
-                      type="text"
+                      type="search"
+                      inputMode="search"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="none"
+                      spellCheck="false"
+
                       placeholder="Search reminders..."
                       value={searchQuery}
                       onChange={handleSearchChange}
-                      className="w-full pl-4 pr-20 px-4 py-3 text-base md:px-4 md:py-2 md:text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 dark:text-white"
+
+                      className="w-full pl-4 pr-20 py-3 text-base md:pl-4 md:pr-20 md:py-2 md:text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 dark:text-white"
                     />
                     {searchQuery && (
                       <button

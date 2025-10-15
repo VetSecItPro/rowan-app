@@ -9,10 +9,14 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { ThreadView } from '@/components/messages/ThreadView';
 import { TypingIndicator } from '@/components/messages/TypingIndicator';
 import { VoiceRecorder } from '@/components/messages/VoiceRecorder';
+import { PinnedMessages } from '@/components/messages/PinnedMessages';
+import { MentionInput } from '@/components/messages/MentionInput';
+import { ConversationSidebar } from '@/components/messages/ConversationSidebar';
+import { NewConversationModal } from '@/components/messages/NewConversationModal';
 import GuidedMessageCreation from '@/components/guided/GuidedMessageCreation';
 import { fileUploadService } from '@/lib/services/file-upload-service';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { messagesService, Message, MessageWithReplies, CreateMessageInput, TypingIndicator as TypingIndicatorType } from '@/lib/services/messages-service';
+import { messagesService, Message, MessageWithReplies, CreateMessageInput, TypingIndicator as TypingIndicatorType, Conversation, CreateConversationInput } from '@/lib/services/messages-service';
 import { mentionsService } from '@/lib/services/mentions-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { format, isSameDay, isToday, isYesterday } from 'date-fns';
@@ -59,6 +63,10 @@ export default function MessagesPage() {
   const [typingUsers, setTypingUsers] = useState<TypingIndicatorType[]>([]);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
+  const [pinnedMessages, setPinnedMessages] = useState<Message[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [showNewConversationModal, setShowNewConversationModal] = useState(false);
+  const [showConversationSidebar, setShowConversationSidebar] = useState(false);
 
   const [stats, setStats] = useState({
     thisWeek: 0,
@@ -127,13 +135,17 @@ export default function MessagesPage() {
 
       setConversationId(defaultConversation.id);
 
-      const [messagesData, statsData, userProgressResult] = await Promise.all([
+      const [messagesData, statsData, userProgressResult, pinnedData, conversationsData] = await Promise.all([
         messagesService.getMessages(defaultConversation.id),
         messagesService.getMessageStats(currentSpace.id),
         getUserProgress(user.id),
+        messagesService.getPinnedMessages(defaultConversation.id),
+        messagesService.getConversationsList(currentSpace.id),
       ]);
       setMessages(messagesData);
       setStats(statsData);
+      setPinnedMessages(pinnedData);
+      setConversations(conversationsData);
 
       // Check if user has completed the guided message flow
       const userProgress = userProgressResult.success ? userProgressResult.data : null;
@@ -289,6 +301,44 @@ export default function MessagesPage() {
     }
   }, [loadMessages]);
 
+  // Handle pin/unpin toggle
+  const handleTogglePin = useCallback(async (messageId: string) => {
+    if (!user) return;
+
+    try {
+      await messagesService.togglePin(messageId, user.id);
+
+      // Reload pinned messages
+      if (conversationId) {
+        const pinnedData = await messagesService.getPinnedMessages(conversationId);
+        setPinnedMessages(pinnedData);
+      }
+
+      toast.success('Message pin toggled');
+    } catch (error) {
+      console.error('Failed to toggle pin:', error);
+      toast.error('Failed to update pin status');
+    }
+  }, [user, conversationId]);
+
+  // Handle unpin from pinned section
+  const handleUnpinMessage = useCallback(async (messageId: string) => {
+    try {
+      await messagesService.unpinMessage(messageId);
+
+      // Reload pinned messages
+      if (conversationId) {
+        const pinnedData = await messagesService.getPinnedMessages(conversationId);
+        setPinnedMessages(pinnedData);
+      }
+
+      toast.success('Message unpinned');
+    } catch (error) {
+      console.error('Failed to unpin:', error);
+      toast.error('Failed to unpin message');
+    }
+  }, [conversationId]);
+
   // Memoize handleEditMessage callback
   const handleEditMessage = useCallback((message: Message) => {
     setEditingMessage(message);
@@ -301,9 +351,8 @@ export default function MessagesPage() {
     setEditingMessage(null);
   }, []);
 
-  // Memoize handleSendMessage callback with optimistic UI
-  const handleSendMessage = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Memoize handleSubmitMessage for MentionInput
+  const handleSubmitMessage = useCallback(async () => {
     if (!messageInput.trim() || isSending || !conversationId) return;
     if (!currentSpace || !user) return;
 
@@ -375,6 +424,12 @@ export default function MessagesPage() {
     }
   }, [messageInput, isSending, conversationId, currentSpace, user, scrollToBottom]);
 
+  // Wrapper for form submission
+  const handleSendMessage = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    handleSubmitMessage();
+  }, [handleSubmitMessage]);
+
   // Memoize handleEmojiClick callback
   const handleEmojiClick = useCallback((emoji: string) => {
     setMessageInput(prev => prev + emoji);
@@ -387,8 +442,8 @@ export default function MessagesPage() {
   }, []);
 
   // Memoize handleMessageInputChange callback with typing indicator
-  const handleMessageInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setMessageInput(e.target.value);
+  const handleMessageInputChange = useCallback((value: string) => {
+    setMessageInput(value);
 
     // Update typing indicator (throttled)
     if (conversationId && user) {
@@ -483,6 +538,50 @@ export default function MessagesPage() {
   const handleCloseThread = useCallback(() => {
     setSelectedThread(null);
   }, []);
+
+  // Handle selecting a conversation
+  const handleSelectConversation = useCallback(async (selectedConversationId: string) => {
+    if (!currentSpace) return;
+
+    try {
+      setConversationId(selectedConversationId);
+
+      // Load messages and pinned messages for the selected conversation
+      const [messagesData, pinnedData] = await Promise.all([
+        messagesService.getMessages(selectedConversationId),
+        messagesService.getPinnedMessages(selectedConversationId),
+      ]);
+
+      setMessages(messagesData);
+      setPinnedMessages(pinnedData);
+      setShowConversationSidebar(false); // Close mobile sidebar
+    } catch (error) {
+      console.error('Failed to load conversation:', error);
+      toast.error('Failed to load conversation');
+    }
+  }, [currentSpace]);
+
+  // Handle creating a new conversation
+  const handleCreateConversation = useCallback(async (conversationData: CreateConversationInput) => {
+    if (!currentSpace) return;
+
+    try {
+      const newConversation = await messagesService.createConversation(conversationData);
+
+      // Reload conversations list
+      const conversationsData = await messagesService.getConversationsList(currentSpace.id);
+      setConversations(conversationsData);
+
+      // Switch to the new conversation
+      await handleSelectConversation(newConversation.id);
+
+      toast.success('Conversation created successfully');
+    } catch (error) {
+      console.error('Failed to create conversation:', error);
+      toast.error('Failed to create conversation');
+      throw error;
+    }
+  }, [currentSpace, handleSelectConversation]);
 
   // Handle sending voice message
   const handleSendVoice = useCallback(async (audioBlob: Blob, duration: number) => {
@@ -633,33 +732,73 @@ export default function MessagesPage() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
               <input
-                type="text"
+                type="search"
+                inputMode="search"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck="false"
+
                 placeholder="Search messages..."
                 value={searchQuery}
                 onChange={handleSearchChange}
-                className="w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-2.5 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+
+                className="w-full pl-9 pr-4 py-3 text-base md:pl-10 md:pr-4 md:py-2 md:text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
           </div>
           )}
 
-          {/* Chat Interface - Only show when NOT in guided flow */}
+          {/* Conversations and Chat Interface - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden flex flex-col h-[400px] sm:h-[500px] md:h-[600px]">
+          <div className="flex gap-4">
+            {/* Conversation Sidebar - Desktop */}
+            <div className="hidden md:block w-80 flex-shrink-0">
+              <div className="sticky top-4 h-[600px]">
+                <ConversationSidebar
+                  conversations={conversations}
+                  activeConversationId={conversationId || undefined}
+                  onSelectConversation={handleSelectConversation}
+                  onNewConversation={() => setShowNewConversationModal(true)}
+                />
+              </div>
+            </div>
+
+            {/* Chat Interface */}
+            <div className="flex-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden flex flex-col h-[400px] sm:h-[500px] md:h-[600px]">
             {/* Chat Header */}
             <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-              <div className="flex items-center gap-3">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-                  Conversation
-                </h2>
-                <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-300 text-sm font-medium rounded-full">
-                  {format(new Date(), 'MMM yyyy')}
-                </span>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  {/* Mobile Menu Button */}
+                  <button
+                    onClick={() => setShowConversationSidebar(true)}
+                    className="md:hidden p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    aria-label="Open conversations"
+                  >
+                    <MessageCircle className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  </button>
+
+                  <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                    Conversation
+                  </h2>
+                  <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-300 text-sm font-medium rounded-full">
+                    {format(new Date(), 'MMM yyyy')}
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-3 sm:py-4 space-y-3">
+              {/* Pinned Messages Section */}
+              {pinnedMessages.length > 0 && (
+                <PinnedMessages
+                  messages={pinnedMessages}
+                  onUnpin={handleUnpinMessage}
+                />
+              )}
+
               {loading ? (
                 <div className="space-y-4">
                   {[...Array(6)].map((_, i) => (
@@ -715,6 +854,7 @@ export default function MessagesPage() {
                           onEdit={handleEditMessage}
                           onDelete={handleDeleteMessage}
                           onMarkRead={handleMarkRead}
+                          onTogglePin={handleTogglePin}
                           isOwn={message.sender_id === currentSpace?.id}
                           currentUserId={currentSpace?.id || ''}
                           onReply={handleReply}
@@ -740,15 +880,19 @@ export default function MessagesPage() {
 
             {/* Message Input */}
             <div className="px-3 sm:px-4 py-3 sm:py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-              <form onSubmit={handleSendMessage} className="flex items-center gap-1 sm:gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
                 {/* Message Input - Left */}
-                <input
-                  type="text"
-                  value={messageInput}
-                  onChange={handleMessageInputChange}
-                  placeholder="Send message"
-                  className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
-                />
+                {currentSpace && (
+                  <MentionInput
+                    value={messageInput}
+                    onChange={handleMessageInputChange}
+                    onSubmit={handleSubmitMessage}
+                    spaceId={currentSpace.id}
+                    placeholder="Send message (use @ to mention)"
+                    disabled={isSending}
+                    className="flex-1 text-sm sm:text-base rounded-full"
+                  />
+                )}
 
                 {/* Right side buttons - Emoji, Image, File, Send */}
                 <div className="flex items-center gap-0.5 sm:gap-1">
@@ -843,7 +987,8 @@ export default function MessagesPage() {
                   {/* Send Button with Right-Pointing Arrow */}
                   <div className="relative group">
                     <button
-                      type="submit"
+                      type="button"
+                      onClick={handleSubmitMessage}
                       disabled={isSending || !messageInput.trim()}
                       style={{ cursor: messageInput.trim() && !isSending ? 'pointer' : 'not-allowed' }}
                       className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg ${
@@ -866,7 +1011,7 @@ export default function MessagesPage() {
                     )}
                   </div>
                 </div>
-              </form>
+              </div>
 
               {/* Voice Recorder */}
               {showVoiceRecorder && (
@@ -896,7 +1041,30 @@ export default function MessagesPage() {
                 className="hidden"
               />
             </div>
+            </div>
           </div>
+          )}
+
+          {/* Mobile Conversation Sidebar Drawer */}
+          {showConversationSidebar && (
+            <>
+              {/* Backdrop */}
+              <div
+                className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                onClick={() => setShowConversationSidebar(false)}
+              />
+
+              {/* Drawer */}
+              <div className="fixed inset-y-0 left-0 w-80 z-50 md:hidden">
+                <ConversationSidebar
+                  conversations={conversations}
+                  activeConversationId={conversationId || undefined}
+                  onSelectConversation={handleSelectConversation}
+                  onNewConversation={() => setShowNewConversationModal(true)}
+                  onClose={() => setShowConversationSidebar(false)}
+                />
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -923,6 +1091,16 @@ export default function MessagesPage() {
         cancelLabel="Cancel"
         variant="danger"
       />
+
+      {/* New Conversation Modal */}
+      {currentSpace && (
+        <NewConversationModal
+          isOpen={showNewConversationModal}
+          onClose={() => setShowNewConversationModal(false)}
+          onCreate={handleCreateConversation}
+          spaceId={currentSpace.id}
+        />
+      )}
 
       {/* Thread View Modal */}
       {selectedThread && conversationId && currentSpace && user && (
