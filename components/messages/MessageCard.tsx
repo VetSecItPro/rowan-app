@@ -1,19 +1,21 @@
 'use client';
 
 import { Clock, Check, CheckCheck, MoreVertical } from 'lucide-react';
-import { Message } from '@/lib/services/messages-service';
+import { MessageWithAttachments } from '@/lib/services/messages-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
+import { AttachmentPreview } from './AttachmentPreview';
 
 interface MessageCardProps {
-  message: Message;
-  onEdit: (message: Message) => void;
+  message: MessageWithAttachments;
+  onEdit: (message: MessageWithAttachments) => void;
   onDelete: (messageId: string) => void;
   onMarkRead: (messageId: string) => void;
   isOwn?: boolean;
   currentUserId?: string;
   partnerName?: string;
   partnerColor?: string;
+  compact?: boolean;
 }
 
 export function MessageCard({
@@ -24,7 +26,8 @@ export function MessageCard({
   isOwn = false,
   currentUserId,
   partnerName = 'Partner',
-  partnerColor = '#34D399' // Default green color
+  partnerColor = '#34D399', // Default green color
+  compact = false
 }: MessageCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
@@ -59,9 +62,24 @@ export function MessageCard({
             }}
           >
             {/* Message Content */}
-            <p className="break-words whitespace-pre-wrap text-gray-900 dark:text-white text-sm">
-              {message.content}
-            </p>
+            {message.content && (
+              <p className="break-words whitespace-pre-wrap text-gray-900 dark:text-white text-sm">
+                {message.content}
+              </p>
+            )}
+
+            {/* Attachments */}
+            {message.attachments_data && message.attachments_data.length > 0 && (
+              <div className={`space-y-2 ${message.content ? 'mt-2' : ''}`}>
+                {message.attachments_data.map((attachment) => (
+                  <AttachmentPreview
+                    key={attachment.id}
+                    attachment={attachment}
+                    compact={compact}
+                  />
+                ))}
+              </div>
+            )}
 
             {/* Timestamp and Read Status */}
             <div className="flex items-center gap-2 mt-1.5 text-xs text-gray-500 dark:text-gray-400">
@@ -87,9 +105,9 @@ export function MessageCard({
                   onClick={() => setShowMenu(!showMenu)}
                   title="Edit or Delete"
                   aria-label="Message options menu"
-                  className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all opacity-0 group-hover:opacity-100 active:scale-95"
+                  className="w-12 h-12 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all opacity-0 group-hover:opacity-100 active:scale-95"
                 >
-                  <MoreVertical className="w-3 h-3 text-gray-600 dark:text-gray-400" />
+                  <MoreVertical className="w-5 h-5 md:w-4 md:h-4 text-gray-600 dark:text-gray-400" />
                 </button>
 
                 {showMenu && (
