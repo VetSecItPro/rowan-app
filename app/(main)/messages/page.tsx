@@ -182,16 +182,24 @@ export default function MessagesPage() {
 
   // Set up real-time subscription
   useEffect(() => {
-    if (!conversationId || !user) return;
+    if (!conversationId || !user) {
+      console.warn('[DEBUG] Real-time subscription not initialized:', { conversationId, userId: user?.id });
+      return;
+    }
+
+    console.log('[DEBUG] Setting up real-time subscription for conversation:', conversationId);
 
     // Subscribe to real-time updates
     const channel = messagesService.subscribeToMessages(conversationId, {
       onInsert: (newMessage) => {
+        console.log('[DEBUG] Real-time INSERT received:', newMessage.id, newMessage.content.substring(0, 30));
         setMessages((prev) => {
           // Prevent duplicates
           if (prev.some((m) => m.id === newMessage.id)) {
+            console.log('[DEBUG] Duplicate message detected, skipping:', newMessage.id);
             return prev;
           }
+          console.log('[DEBUG] Adding new message to state');
           return [...prev, newMessage];
         });
 
@@ -206,11 +214,13 @@ export default function MessagesPage() {
         setTimeout(scrollToBottom, 100);
       },
       onUpdate: (updatedMessage) => {
+        console.log('[DEBUG] Real-time UPDATE received:', updatedMessage.id);
         setMessages((prev) =>
           prev.map((m) => (m.id === updatedMessage.id ? updatedMessage : m))
         );
       },
       onDelete: (messageId) => {
+        console.log('[DEBUG] Real-time DELETE received:', messageId);
         setMessages((prev) => prev.filter((m) => m.id !== messageId));
       },
     });
@@ -356,8 +366,33 @@ export default function MessagesPage() {
 
   // Memoize handleSubmitMessage for MentionInput
   const handleSubmitMessage = useCallback(async () => {
-    if (!messageInput.trim() || isSending || !conversationId) return;
-    if (!currentSpace || !user) return;
+    // Debug logging
+    console.log('[DEBUG] handleSubmitMessage called:', {
+      messageInput: messageInput.trim(),
+      isSending,
+      conversationId,
+      currentSpace: currentSpace?.id,
+      user: user?.id,
+    });
+
+    if (!messageInput.trim()) {
+      console.warn('[DEBUG] Empty message input');
+      return;
+    }
+    if (isSending) {
+      console.warn('[DEBUG] Already sending a message');
+      return;
+    }
+    if (!conversationId) {
+      console.error('[DEBUG] No conversationId - cannot send message');
+      toast.error('No conversation selected. Please refresh the page.');
+      return;
+    }
+    if (!currentSpace || !user) {
+      console.error('[DEBUG] Missing currentSpace or user');
+      toast.error('Please log in to send messages');
+      return;
+    }
 
     // Remove typing indicator
     if (typingTimeoutRef.current) {
@@ -390,12 +425,14 @@ export default function MessagesPage() {
 
     try {
       // Send to server
+      console.log('[DEBUG] Sending message to server...');
       const savedMessage = await messagesService.createMessage({
         space_id: currentSpace.id,
         conversation_id: conversationId,
         sender_id: user.id,
         content: optimisticMessage.content,
       });
+      console.log('[DEBUG] Message saved to server:', savedMessage.id);
 
       // Process @mentions
       try {
@@ -412,7 +449,10 @@ export default function MessagesPage() {
 
       // Real-time subscription will add the server message,
       // so remove the temp message to avoid duplicates
+      console.log('[DEBUG] Removing optimistic message, real-time should add server message');
       setMessages((prev) => prev.filter((m) => m.id !== tempId));
+
+      toast.success('Message sent!');
     } catch (error) {
       // Remove optimistic message on error
       setMessages((prev) => prev.filter((m) => m.id !== tempId));
