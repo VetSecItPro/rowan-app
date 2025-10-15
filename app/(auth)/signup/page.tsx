@@ -421,7 +421,7 @@ export default function SignUpPage() {
               Already have an account?{' '}
               <Link
                 href="/login"
-                className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-semibold transition-colors duration-200"
+                className="inline-block py-2 px-3 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-semibold transition-colors duration-200"
               >
                 Sign in
               </Link>

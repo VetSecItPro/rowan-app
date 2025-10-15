@@ -197,7 +197,7 @@ export default function ShoppingDocumentation() {
         <div className="max-w-6xl mx-auto px-6 py-12">
           <Link
             href="/settings/documentation"
-            className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 mb-6"
+            className="inline-flex items-center gap-2 py-2 px-3 text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Documentation
@@ -1820,7 +1820,7 @@ export default function ShoppingDocumentation() {
 
         {/* Footer */}
         <div className="mt-12 text-center text-gray-600 dark:text-gray-400">
-          <p>Need more help? Check out other <Link href="/settings/documentation" className="text-emerald-600 dark:text-emerald-400 hover:underline">documentation guides</Link></p>
+          <p>Need more help? Check out other <Link href="/settings/documentation" className="inline-block py-2 px-3 text-emerald-600 dark:text-emerald-400 hover:underline">documentation guides</Link></p>
         </div>
       </div>
     </div>

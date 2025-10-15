@@ -31,7 +31,7 @@ export default function HomePage() {
 
             {/* Menu, Theme Toggle & Auth Buttons */}
             <div className="flex items-center gap-4">
-              <a href="#pricing" className="hidden md:block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Pricing</a>
+              <a href="#pricing" className="hidden md:block inline-block py-3 px-4 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Pricing</a>
               <HamburgerMenu />
               <ThemeToggle />
               <Link
@@ -171,10 +171,10 @@ export default function HomePage() {
             </div>
 
             {/* Links - Now visible on mobile with smaller text */}
-            <div className="flex items-center gap-4 sm:gap-8 text-sm sm:text-base">
-              <Link href="/privacy" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Privacy</Link>
-              <Link href="/terms" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Terms</Link>
-              <Link href="/security" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Security</Link>
+            <div className="flex items-center gap-2 sm:gap-6 text-sm sm:text-base">
+              <Link href="/privacy" className="inline-block py-3 px-3 sm:px-4 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Privacy</Link>
+              <Link href="/terms" className="inline-block py-3 px-3 sm:px-4 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Terms</Link>
+              <Link href="/security" className="inline-block py-3 px-3 sm:px-4 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Security</Link>
             </div>
           </div>
         </div>
