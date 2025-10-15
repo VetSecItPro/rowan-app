@@ -113,21 +113,21 @@ export function GenerateListModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={handleClose}
       />
-      <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 p-6 border-b border-emerald-200 dark:border-emerald-800 z-10">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 px-4 sm:px-6 py-4 border-b border-emerald-200 dark:border-emerald-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 flex items-center justify-center">
                 <ShoppingBag className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">
+                <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">
                   Generate Shopping List
                 </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
@@ -139,15 +139,15 @@ export function GenerateListModal({
               onClick={handleClose}
               disabled={isGenerating}
               aria-label="Close modal"
-              className="p-2 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 disabled:opacity-50"
+              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-all active:scale-95 text-emerald-600 dark:text-emerald-400 disabled:opacity-50"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 sm:w-4 sm:h-4" />
             </button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
           {/* List Name Input */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
