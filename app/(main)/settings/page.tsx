@@ -702,7 +702,7 @@ export default function SettingsPage() {
                             value={profileData.timezone}
                             id="field-4"
               onChange={(e) =>  setProfileData({ ...profileData, timezone: e.target.value })}
-                            className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-11 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer"
+                            className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm pr-10 sm:pr-11 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer"
                           >
                             <option>Pacific Time (PT)</option>
                             <option>Eastern Time (ET)</option>
@@ -726,7 +726,7 @@ export default function SettingsPage() {
                         id="field-5"
               onChange={(e) =>  setProfileData({ ...profileData, bio: e.target.value })}
                         placeholder="Tell us about yourself..."
-                        className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
+                        className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm min-h-[120px] bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
                       />
                     </div>
 

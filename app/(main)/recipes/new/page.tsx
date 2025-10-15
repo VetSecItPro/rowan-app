@@ -292,7 +292,7 @@ export default function NewRecipePage() {
                 onChange={(e) => setRecipeText(e.target.value)}
                 placeholder="Paste your recipe here... Include ingredients, instructions, prep time, etc."
                 rows={10}
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white placeholder-gray-500"
+                className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm min-h-[120px] bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white placeholder-gray-500"
               />
             </div>
 
@@ -397,7 +397,7 @@ export default function NewRecipePage() {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g., Grandma's Apple Pie"
                   required
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -412,7 +412,7 @@ export default function NewRecipePage() {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Brief description of the recipe..."
                   rows={3}
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm min-h-[120px] bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -427,7 +427,7 @@ export default function NewRecipePage() {
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
                   placeholder="https://example.com/image.jpg"
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                   title="Optional: Add a URL to an image for this recipe"
                 />
               </div>
@@ -458,14 +458,14 @@ export default function NewRecipePage() {
                       value={ingredient.name}
                       onChange={(e) => updateIngredient(index, 'name', e.target.value)}
                       placeholder="Ingredient name"
-                      className="flex-1 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                      className="flex-1 px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                     />
                     <input
                       type="text"
                       value={ingredient.amount}
                       onChange={(e) => updateIngredient(index, 'amount', e.target.value)}
                       placeholder="Amount"
-                      className="w-24 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                      className="w-24 px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                       title="e.g., 2, 1/2, 3.5"
                     />
                     <input
@@ -473,7 +473,7 @@ export default function NewRecipePage() {
                       value={ingredient.unit}
                       onChange={(e) => updateIngredient(index, 'unit', e.target.value)}
                       placeholder="Unit"
-                      className="w-24 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                      className="w-24 px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                       title="e.g., cups, tsp, oz"
                     />
                     {ingredients.length > 1 && (
@@ -502,7 +502,7 @@ export default function NewRecipePage() {
                 onChange={(e) => setInstructions(e.target.value)}
                 placeholder="Step-by-step cooking instructions..."
                 rows={8}
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm min-h-[120px] bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
               />
             </div>
 
@@ -523,7 +523,7 @@ export default function NewRecipePage() {
                     onChange={(e) => setPrepTime(e.target.value)}
                     placeholder="30"
                     min="0"
-                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                     title="Time to prepare ingredients"
                   />
                 </div>
@@ -540,7 +540,7 @@ export default function NewRecipePage() {
                     onChange={(e) => setCookTime(e.target.value)}
                     placeholder="45"
                     min="0"
-                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                     title="Time to cook the recipe"
                   />
                 </div>
@@ -557,7 +557,7 @@ export default function NewRecipePage() {
                     onChange={(e) => setServings(e.target.value)}
                     placeholder="4"
                     min="1"
-                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                     title="Number of servings"
                   />
                 </div>
@@ -573,7 +573,7 @@ export default function NewRecipePage() {
                     id="recipe-difficulty"
                     value={difficulty}
                     onChange={(e) => setDifficulty(e.target.value)}
-                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                     title="Recipe difficulty level"
                   >
                     <option value="">Select difficulty...</option>
@@ -594,7 +594,7 @@ export default function NewRecipePage() {
                     value={cuisineType}
                     onChange={(e) => setCuisineType(e.target.value)}
                     placeholder="e.g., Italian, Mexican, Asian"
-                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                     title="Type of cuisine"
                   />
                 </div>
@@ -611,7 +611,7 @@ export default function NewRecipePage() {
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
                   placeholder="dessert, holiday, vegetarian"
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                   title="Add tags to categorize this recipe"
                 />
               </div>
