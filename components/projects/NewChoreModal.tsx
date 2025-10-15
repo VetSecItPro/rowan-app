@@ -372,7 +372,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
                 }`}
               />
               {dateError && (
-                <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                <p className="mt-2 text-base md:text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                   <span className="font-medium">⚠</span>
                   {dateError}
                 </p>
