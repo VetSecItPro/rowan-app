@@ -14,6 +14,7 @@ import { MentionInput } from '@/components/messages/MentionInput';
 import { ConversationSidebar } from '@/components/messages/ConversationSidebar';
 import { NewConversationModal } from '@/components/messages/NewConversationModal';
 import { ForwardMessageModal } from '@/components/messages/ForwardMessageModal';
+import { MessageNotificationBell } from '@/components/messages/MessageNotificationBell';
 import GuidedMessageCreation from '@/components/guided/GuidedMessageCreation';
 import { fileUploadService } from '@/lib/services/file-upload-service';
 import { useAuth } from '@/lib/contexts/auth-context';
@@ -740,7 +741,7 @@ export default function MessagesPage() {
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-messages flex items-center justify-center">
               <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
-            <div>
+            <div className="flex-1">
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-messages bg-clip-text text-transparent">
                 Messages
               </h1>
@@ -748,6 +749,13 @@ export default function MessagesPage() {
                 Stay connected with your partner
               </p>
             </div>
+            {/* Notification Bell */}
+            {user && currentSpace && (
+              <MessageNotificationBell
+                userId={user.id}
+                spaceId={currentSpace.id}
+              />
+            )}
           </div>
 
           {/* Guided Creation - MOVED TO TOP */}
