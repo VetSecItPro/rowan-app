@@ -19,6 +19,7 @@ import {
   Download,
   Timer,
   Lightbulb,
+  Calendar,
 } from 'lucide-react';
 
 interface GuideSection {
