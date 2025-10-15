@@ -716,18 +716,40 @@ export const messagesService = {
   async getConversationsList(spaceId: string, userId: string): Promise<Conversation[]> {
     const supabase = createClient();
 
-    const { data, error } = await supabase
-      .rpc('get_conversations_with_unread', {
-        space_id_param: spaceId,
-        user_id_param: userId,
-      });
+    // Get all conversations for the space
+    const { data: conversations, error: conversationsError } = await supabase
+      .from('conversations')
+      .select('*')
+      .eq('space_id', spaceId)
+      .order('last_message_at', { ascending: false, nullsFirst: false });
 
-    if (error) {
-      console.error('Error fetching conversations:', error);
-      throw error;
+    if (conversationsError) {
+      console.error('Error fetching conversations:', conversationsError);
+      throw conversationsError;
     }
 
-    return data as Conversation[];
+    if (!conversations || conversations.length === 0) {
+      return [];
+    }
+
+    // Get unread counts for each conversation
+    const conversationsWithUnread = await Promise.all(
+      conversations.map(async (conv) => {
+        const { count } = await supabase
+          .from('messages')
+          .select('*', { count: 'exact', head: true })
+          .eq('conversation_id', conv.id)
+          .eq('read', false)
+          .neq('sender_id', userId);
+
+        return {
+          ...conv,
+          unread_count: count || 0,
+        };
+      })
+    );
+
+    return conversationsWithUnread as Conversation[];
   },
 
   /**
