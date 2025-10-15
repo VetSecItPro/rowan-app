@@ -48,6 +48,9 @@ export default function MessagesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Message[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [messageInput, setMessageInput] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -75,16 +78,16 @@ export default function MessagesPage() {
     total: 0,
   });
 
-  // Memoize filtered messages based on search query
+  // Use search results if searching, otherwise show current conversation messages
   const filteredMessages = useMemo(() => {
-    if (!searchQuery) {
-      return messages;
+    if (searchQuery && searchResults.length > 0) {
+      return searchResults;
     }
-
-    return messages.filter(m =>
-      m.content.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [messages, searchQuery]);
+    if (searchQuery && !isSearching && searchResults.length === 0) {
+      return []; // Show empty state when search has no results
+    }
+    return messages;
+  }, [messages, searchQuery, searchResults, isSearching]);
 
   // Memoize date label computation
   const getDateLabel = useCallback((date: Date): string => {
@@ -436,10 +439,40 @@ export default function MessagesPage() {
     setShowEmojiPicker(false);
   }, []);
 
-  // Memoize handleSearchChange callback
+  // Memoize handleSearchChange callback with debounced backend search
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  }, []);
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Clear search results if query is empty
+    if (!query.trim()) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    // Debounce search - wait 500ms after user stops typing
+    setIsSearching(true);
+    searchTimeoutRef.current = setTimeout(async () => {
+      if (!currentSpace) return;
+
+      try {
+        const results = await messagesService.searchMessages(currentSpace.id, query);
+        setSearchResults(results);
+      } catch (error) {
+        console.error('Search failed:', error);
+        toast.error('Search failed. Please try again.');
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500);
+  }, [currentSpace]);
 
   // Memoize handleMessageInputChange callback with typing indicator
   const handleMessageInputChange = useCallback((value: string) => {
@@ -739,13 +772,42 @@ export default function MessagesPage() {
                 autoCapitalize="none"
                 spellCheck="false"
 
-                placeholder="Search messages..."
+                placeholder="Search all messages across conversations..."
                 value={searchQuery}
                 onChange={handleSearchChange}
 
-                className="w-full pl-9 pr-4 py-3 text-base md:pl-10 md:pr-4 md:py-2 md:text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full pl-9 pr-12 py-3 text-base md:pl-10 md:pr-12 md:py-2 md:text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 dark:text-white"
               />
+              {isSearching && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <div className="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+              {searchQuery && !isSearching && (
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSearchResults([]);
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
             </div>
+            {searchQuery && (
+              <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                {isSearching ? (
+                  'Searching...'
+                ) : searchResults.length > 0 ? (
+                  `Found ${searchResults.length} message${searchResults.length === 1 ? '' : 's'}`
+                ) : (
+                  'No messages found'
+                )}
+              </div>
+            )}
           </div>
           )}
 
