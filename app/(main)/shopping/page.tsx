@@ -591,7 +591,7 @@ export default function ShoppingPage() {
           <div className="stats-grid-mobile gap-4 sm:gap-6">
             <button
               onClick={handleItemsThisWeekClick}
-              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Items This Week</h3>
@@ -609,7 +609,7 @@ export default function ShoppingPage() {
             </button>
             <button
               onClick={handleActiveListsClick}
-              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Active Lists</h3>
@@ -627,7 +627,7 @@ export default function ShoppingPage() {
             </button>
             <button
               onClick={handleCompletedListsClick}
-              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completed Lists</h3>
@@ -652,7 +652,7 @@ export default function ShoppingPage() {
             </button>
             <button
               onClick={handleTotalListsClick}
-              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Lists</h3>
