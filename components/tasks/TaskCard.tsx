@@ -191,7 +191,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
                     onEdit(task);
                     setShowMenu(false);
                   }}
-                  className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 ${!onViewDetails || task.type !== 'task' ? 'rounded-t-lg' : ''}`}
+                  className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-[0.98] ${!onViewDetails || task.type !== 'task' ? 'rounded-t-lg' : ''}`}
                 >
                   Edit
                 </button>
@@ -200,7 +200,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
                     onDelete(task.id, task.type);
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg"
+                  className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg active:scale-[0.98]"
                 >
                   Delete
                 </button>
@@ -245,7 +245,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
       {linkedShoppingList && (
         <Link
           href="/shopping"
-          className="mt-3 flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors text-sm"
+          className="mt-3 flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors text-sm active:opacity-80"
         >
           <ShoppingCart className="w-4 h-4" />
           <span className="font-medium">

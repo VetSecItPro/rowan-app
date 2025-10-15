@@ -85,7 +85,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
               <button
                 onClick={handleCheckboxClick}
                 aria-label={`Toggle event status: ${event.status === 'not-started' ? 'Not Started' : event.status === 'in-progress' ? 'In Progress' : 'Completed'}`}
-                className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+                className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 active:scale-95 ${
                   event.status === 'completed'
                     ? 'bg-green-500 border-green-500'
                     : event.status === 'in-progress'
@@ -152,7 +152,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
           {linkedShoppingList && (
             <Link
               href="/shopping"
-              className={`flex items-center gap-2 mt-3 ml-4 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors ${
+              className={`flex items-center gap-2 mt-3 ml-4 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors active:opacity-80 ${
                 event.status === 'completed' ? 'opacity-60' : ''
               }`}
             >
@@ -169,7 +169,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
           <button
             onClick={() => setShowMenu(!showMenu)}
             aria-label="Event options menu"
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95"
           >
             <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
           </button>
@@ -187,7 +187,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                       onViewDetails(event);
                       setShowMenu(false);
                     }}
-                    className="w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-t-lg"
+                    className="w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-t-lg active:scale-[0.98]"
                   >
                     <Eye className="w-4 h-4" />
                     View Details
@@ -198,7 +198,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                     onEdit(event);
                     setShowMenu(false);
                   }}
-                  className={`w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 ${
+                  className={`w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 active:scale-[0.98] ${
                     !onViewDetails ? 'rounded-t-lg' : ''
                   }`}
                 >
@@ -210,7 +210,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                     onDelete(event.id);
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-b-lg"
+                  className="w-full px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-b-lg active:scale-[0.98]"
                 >
                   <Trash2 className="w-4 h-4" />
                   Delete Event

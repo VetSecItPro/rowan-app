@@ -65,7 +65,7 @@ export function Header() {
 
           {/* Menu, Theme Toggle & Auth Buttons */}
           <div className="flex items-center gap-4">
-            <a href="#pricing" className="hidden md:block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Pricing</a>
+            <a href="#pricing" className="hidden md:block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors active:opacity-80">Pricing</a>
             <HamburgerMenu />
 
             {/* Only show Settings and Notifications for logged-in users */}
@@ -74,7 +74,7 @@ export function Header() {
                 <NotificationCenter userId={user.id} />
                 <Link
                   href="/settings"
-                  className="hidden sm:flex items-center justify-center btn-icon-mobile rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all touch-feedback focus-mobile"
+                  className="hidden sm:flex items-center justify-center btn-icon-mobile rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all touch-feedback focus-mobile active:scale-95"
                   aria-label="Settings"
                 >
                   <svg className="w-5 h-5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,7 +91,7 @@ export function Header() {
             {user ? (
               <Link
                 href="/dashboard"
-                className="hidden sm:flex items-center gap-2 btn-touch shimmer-bg text-white rounded-full hover:opacity-90 transition-all shadow-md hover:shadow-lg font-medium touch-feedback"
+                className="hidden sm:flex items-center gap-2 btn-touch shimmer-bg text-white rounded-full hover:opacity-90 transition-all shadow-md hover:shadow-lg font-medium touch-feedback active:scale-95"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -101,7 +101,7 @@ export function Header() {
             ) : (
               <Link
                 href="/signup"
-                className="hidden sm:flex items-center gap-2 px-5 py-2 shimmer-bg text-white rounded-full hover:opacity-90 transition-all shadow-md hover:shadow-lg font-medium"
+                className="hidden sm:flex items-center gap-2 px-5 py-2 shimmer-bg text-white rounded-full hover:opacity-90 transition-all shadow-md hover:shadow-lg font-medium active:scale-95"
               >
                 Create Your Account
               </Link>
@@ -112,7 +112,7 @@ export function Header() {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-white font-medium transition-all hover:opacity-90 ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-white font-medium transition-all hover:opacity-90 active:scale-95 ${
                     COLOR_THEMES[user.color_theme as keyof typeof COLOR_THEMES] || 'bg-purple-600'
                   }`}
                 >
@@ -126,7 +126,7 @@ export function Header() {
                     <Link
                       href="/dashboard"
                       onClick={() => setIsDropdownOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors active:scale-[0.98]"
                     >
                       <UserIcon className="w-4 h-4" />
                       Dashboard
@@ -134,7 +134,7 @@ export function Header() {
                     <hr className="my-1 border-gray-200 dark:border-gray-700" />
                     <button
                       onClick={handleSignOut}
-                      className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                      className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors active:scale-[0.98]"
                     >
                       <LogOut className="w-4 h-4" />
                       Sign Out
@@ -145,7 +145,7 @@ export function Header() {
             ) : (
               <Link
                 href="/login"
-                className="px-6 py-2 shimmer-bg text-white rounded-full hover:opacity-90 transition-all shadow-lg shadow-purple-500/30"
+                className="px-6 py-2 shimmer-bg text-white rounded-full hover:opacity-90 transition-all shadow-lg shadow-purple-500/30 active:scale-95"
               >
                 Login
               </Link>
