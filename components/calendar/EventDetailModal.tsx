@@ -60,16 +60,11 @@ export function EventDetailModal({ isOpen, onClose, event }: EventDetailModalPro
   const categoryConfig = getCategoryConfig();
 
   return (
-    <div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-      onClick={onClose}
-    >
-      <div
-        className="bg-gray-50 dark:bg-gray-800 rounded-2xl max-w-4xl w-full h-[90vh] overflow-hidden shadow-2xl flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-2xl sm:max-w-4xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header - Fixed */}
-        <div className={`bg-gradient-to-r ${categoryConfig.gradient} text-white p-6 flex-shrink-0`}>
+        <div className={`sticky top-0 z-10 bg-gradient-to-r ${categoryConfig.gradient} text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl flex-shrink-0`}>
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
@@ -78,14 +73,14 @@ export function EventDetailModal({ isOpen, onClose, event }: EventDetailModalPro
                   {categoryConfig.label}
                 </span>
               </div>
-              <h2 className="text-2xl font-bold">{event.title}</h2>
+              <h2 className="text-lg sm:text-xl font-bold">{event.title}</h2>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95"
               aria-label="Close modal"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 sm:w-4 sm:h-4" />
             </button>
           </div>
 
