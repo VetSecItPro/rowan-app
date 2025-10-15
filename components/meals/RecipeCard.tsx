@@ -34,19 +34,19 @@ export function RecipeCard({ recipe, onEdit, onDelete, onPlanMeal }: RecipeCardP
           <div className="flex items-center gap-2">
             <button
               onClick={() => onEdit(recipe)}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95"
+              className="w-12 h-12 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95"
               title="Edit recipe"
               aria-label="Edit recipe"
             >
-              <Edit className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+              <Edit className="w-5 h-5 md:w-4 md:h-4 text-gray-600 dark:text-gray-400" />
             </button>
             <button
               onClick={() => onDelete(recipe.id)}
-              className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors active:scale-95"
+              className="w-12 h-12 md:w-10 md:h-10 flex items-center justify-center hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors active:scale-95"
               title="Delete recipe"
               aria-label="Delete recipe"
             >
-              <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+              <Trash2 className="w-5 h-5 md:w-4 md:h-4 text-red-600 dark:text-red-400" />
             </button>
           </div>
         </div>
