@@ -1812,7 +1812,7 @@ export default function DashboardPage() {
 
                 {/* Calendar View */}
                 {journalView === 'calendar' && (
-                  <div className="space-y-3">
+                  <div className="max-h-96 overflow-y-auto space-y-3 pr-2">
                     {/* Month Navigation */}
                     <div className="flex items-center justify-between px-2">
                       <button
