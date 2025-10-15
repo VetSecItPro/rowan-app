@@ -66,17 +66,8 @@ export async function resolveMentions(
 ): Promise<MentionableUser[]> {
   if (mentionTexts.length === 0) return [];
 
-  const { data, error } = await supabase
-    .rpc('get_space_members_for_mentions', {
-      space_id_param: spaceId,
-    });
-
-  if (error) {
-    console.error('Error fetching space members for mentions:', error);
-    return [];
-  }
-
-  const spaceMembers = data as MentionableUser[];
+  // Get all mentionable users in the space
+  const spaceMembers = await getMentionableUsers(spaceId);
 
   // Match mention texts to users (case-insensitive)
   const resolvedUsers: MentionableUser[] = [];
@@ -272,17 +263,39 @@ export async function deleteMentionsForMessage(
 export async function getMentionableUsers(
   spaceId: string
 ): Promise<MentionableUser[]> {
-  const { data, error } = await supabase
-    .rpc('get_space_members_for_mentions', {
-      space_id_param: spaceId,
-    });
+  // Query partnership_members to get users in this space
+  const { data: members, error } = await supabase
+    .from('partnership_members')
+    .select(`
+      user_id,
+      users:user_id (
+        id,
+        email,
+        raw_user_meta_data
+      )
+    `)
+    .eq('partnership_id', spaceId);
 
   if (error) {
     console.error('Error fetching mentionable users:', error);
     return [];
   }
 
-  return data as MentionableUser[];
+  // Transform to MentionableUser format
+  const mentionableUsers: MentionableUser[] = (members || [])
+    .map((member: any) => {
+      const user = member.users;
+      if (!user) return null;
+
+      return {
+        user_id: user.id,
+        display_name: user.raw_user_meta_data?.full_name || user.email.split('@')[0],
+        email: user.email,
+      };
+    })
+    .filter((u): u is MentionableUser => u !== null);
+
+  return mentionableUsers;
 }
 
 /**
