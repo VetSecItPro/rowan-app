@@ -688,10 +688,10 @@ export default function ShoppingPage() {
               {searchQuery && (
                 <button
                   onClick={handleClearSearch}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-12 h-12 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
                   aria-label="Clear search"
                 >
-                  <X className="w-4 h-4 text-gray-400" />
+                  <X className="w-5 h-5 md:w-4 md:h-4 text-gray-400" />
                 </button>
               )}
             </div>

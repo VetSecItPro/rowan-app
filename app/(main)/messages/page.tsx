@@ -11,6 +11,8 @@ import { useAuth } from '@/lib/contexts/auth-context';
 import { messagesService, Message, CreateMessageInput } from '@/lib/services/messages-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { format, isSameDay, isToday, isYesterday } from 'date-fns';
+import { RealtimeChannel } from '@supabase/supabase-js';
+import { toast } from 'sonner';
 
 // Family-friendly universal emojis (30 total) - organized by theme
 const EMOJIS = [
@@ -42,6 +44,8 @@ export default function MessagesPage() {
   const [isSending, setIsSending] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const channelRef = useRef<RealtimeChannel | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
@@ -147,6 +151,57 @@ export default function MessagesPage() {
     loadMessages();
   }, [loadMessages]);
 
+  // Auto-scroll to bottom function
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
+  // Set up real-time subscription
+  useEffect(() => {
+    if (!conversationId || !user) return;
+
+    // Subscribe to real-time updates
+    const channel = messagesService.subscribeToMessages(conversationId, {
+      onInsert: (newMessage) => {
+        setMessages((prev) => {
+          // Prevent duplicates
+          if (prev.some((m) => m.id === newMessage.id)) {
+            return prev;
+          }
+          return [...prev, newMessage];
+        });
+
+        // Show notification for new messages from others
+        if (newMessage.sender_id !== user.id) {
+          toast.success('New message received', {
+            description: newMessage.content.substring(0, 50) + (newMessage.content.length > 50 ? '...' : ''),
+          });
+        }
+
+        // Auto-scroll to bottom
+        setTimeout(scrollToBottom, 100);
+      },
+      onUpdate: (updatedMessage) => {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === updatedMessage.id ? updatedMessage : m))
+        );
+      },
+      onDelete: (messageId) => {
+        setMessages((prev) => prev.filter((m) => m.id !== messageId));
+      },
+    });
+
+    channelRef.current = channel;
+
+    // Cleanup subscription on unmount
+    return () => {
+      if (channelRef.current) {
+        messagesService.unsubscribe(channelRef.current);
+        channelRef.current = null;
+      }
+    };
+  }, [conversationId, user, scrollToBottom]);
+
   // Memoize handleCreateMessage callback
   const handleCreateMessage = useCallback(async (messageData: CreateMessageInput) => {
     try {
@@ -201,25 +256,57 @@ export default function MessagesPage() {
     setEditingMessage(null);
   }, []);
 
-  // Memoize handleSendMessage callback
+  // Memoize handleSendMessage callback with optimistic UI
   const handleSendMessage = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!messageInput.trim() || isSending || !conversationId) return;
     if (!currentSpace || !user) return;
 
+    // Create optimistic message
+    const tempId = `temp-${Date.now()}-${Math.random()}`;
+    const optimisticMessage: Message = {
+      id: tempId,
+      space_id: currentSpace.id,
+      conversation_id: conversationId,
+      sender_id: user.id,
+      content: messageInput.trim(),
+      read: false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      attachments: [],
+    };
+
+    // Add optimistic message immediately
+    setMessages((prev) => [...prev, optimisticMessage]);
+    setMessageInput('');
+    setTimeout(scrollToBottom, 50);
     setIsSending(true);
+
     try {
-      await handleCreateMessage({
+      // Send to server
+      await messagesService.createMessage({
         space_id: currentSpace.id,
         conversation_id: conversationId,
         sender_id: user.id,
-        content: messageInput,
+        content: optimisticMessage.content,
       });
-      setMessageInput('');
+
+      // Real-time subscription will add the server message,
+      // so remove the temp message to avoid duplicates
+      setMessages((prev) => prev.filter((m) => m.id !== tempId));
+    } catch (error) {
+      // Remove optimistic message on error
+      setMessages((prev) => prev.filter((m) => m.id !== tempId));
+      console.error('Failed to send message:', error);
+      toast.error('Failed to send message', {
+        description: 'Please try again',
+      });
+      // Restore message input on error
+      setMessageInput(optimisticMessage.content);
     } finally {
       setTimeout(() => setIsSending(false), 300);
     }
-  }, [messageInput, isSending, conversationId, currentSpace, user, handleCreateMessage]);
+  }, [messageInput, isSending, conversationId, currentSpace, user, scrollToBottom]);
 
   // Memoize handleEmojiClick callback
   const handleEmojiClick = useCallback((emoji: string) => {
@@ -496,6 +583,8 @@ export default function MessagesPage() {
                       </div>
                     );
                   })}
+                  {/* Scroll anchor for auto-scroll */}
+                  <div ref={messagesEndRef} />
                 </>
               )}
             </div>

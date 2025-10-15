@@ -275,17 +275,17 @@ export default function ProjectsPage() {
               {activeTab === 'projects' && filteredProjects.length > 0 && (
                 <div className="bg-gray-50 dark:bg-gray-900 border-2 border-amber-200 dark:border-amber-700 rounded-lg p-1 flex gap-1 w-fit">
                   <button
-                    className="px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md"
+                    className="px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[60px] bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md"
                   >
                     All
                   </button>
                   <button
-                    className="px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                    className="px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[60px] text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
                   >
                     Active
                   </button>
                   <button
-                    className="px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[80px] text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                    className="px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[80px] text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
                   >
                     Completed
                   </button>
