@@ -203,7 +203,7 @@ export function VoiceRecorder({ onSendVoice, onCancel }: VoiceRecorderProps) {
       {/* Permission Error */}
       {status === 'permission_denied' && (
         <div className="text-center py-4">
-          <p className="text-sm text-red-600 dark:text-red-400">
+          <p className="text-base md:text-sm text-red-600 dark:text-red-400">
             Microphone permission denied. Please enable it in your browser settings.
           </p>
         </div>
