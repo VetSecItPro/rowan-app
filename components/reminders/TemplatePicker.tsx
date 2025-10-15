@@ -252,19 +252,19 @@ export function TemplatePicker({ spaceId, onSelectTemplate, onClose }: TemplateP
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="flex flex-col gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-3">
             {filteredTemplates.map((template) => (
               <button
                 key={template.id}
                 onClick={() => handleTemplateClick(template)}
-                className="p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-lg hover:border-pink-300 dark:hover:border-pink-600 transition-all text-left"
+                className="w-full p-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-lg hover:border-pink-300 dark:hover:border-pink-600 transition-all text-left min-h-[80px]"
               >
                 {/* Header */}
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="text-2xl">{template.emoji}</span>
                     <div>
-                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white">
                         {template.name}
                       </h4>
                       {template.is_system_template && (
@@ -282,7 +282,7 @@ export function TemplatePicker({ spaceId, onSelectTemplate, onClose }: TemplateP
 
                 {/* Description */}
                 {template.description && (
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
+                  <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
                     {template.description}
                   </p>
                 )}
