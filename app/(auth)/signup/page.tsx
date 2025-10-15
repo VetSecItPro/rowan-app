@@ -221,7 +221,7 @@ export default function SignUpPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Error message */}
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm animate-in slide-in-from-top-2 duration-300">
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-base md:text-sm animate-in slide-in-from-top-2 duration-300">
                 {error}
               </div>
             )}
