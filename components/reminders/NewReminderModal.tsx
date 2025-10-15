@@ -225,9 +225,9 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                     className="fixed inset-0 z-20"
                     onClick={() => setShowEmojiPicker(false)}
                   />
-                  <div className="absolute right-0 mt-2 p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-30 w-80">
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Select an emoji</h4>
-                    <div className="grid grid-cols-5 gap-2">
+                  <div className="absolute right-0 mt-2 p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-30 w-full sm:w-80 max-w-[calc(100vw-2rem)]">
+                    <h4 className="text-base sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Select an emoji</h4>
+                    <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-1.5">
                       {['🔔', '⏰', '📅', '⚡', '💡', '📌', '✅', '🎯', '⭐', '💊', '🏃', '💰', '🏠', '📝', '📧', '☎️', '🎉', '🎂', '❤️', '🔥'].map((emoji) => (
                         <button
                           key={emoji}
@@ -236,7 +236,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                             setFormData({ ...formData, emoji });
                             setShowEmojiPicker(false);
                           }}
-                          className="text-2xl p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          className="w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                         >
                           {emoji}
                         </button>

@@ -282,18 +282,21 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
 
                 {/* Emoji Picker Popup */}
                 {showEmojiPicker && (
-                  <div className="absolute bottom-full mb-2 left-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 grid grid-cols-5 gap-2 z-10 min-w-[240px]">
-                    {EMOJIS.map((emoji, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => handleEmojiClick(emoji)}
-                        className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-2xl transition-all hover:scale-110"
-                        title="Click to add emoji"
-                      >
-                        {emoji}
-                      </button>
-                    ))}
+                  <div className="absolute bottom-full mb-2 left-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 z-10 w-full sm:w-80 max-w-[calc(100vw-2rem)]">
+                    <h4 className="text-base sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Select an emoji</h4>
+                    <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-1.5">
+                      {EMOJIS.map((emoji, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => handleEmojiClick(emoji)}
+                          className="w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          title="Click to add emoji"
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
