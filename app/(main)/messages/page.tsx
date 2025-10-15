@@ -854,6 +854,16 @@ export default function MessagesPage() {
                 </div>
               </form>
 
+              {/* Voice Recorder */}
+              {showVoiceRecorder && (
+                <div className="mt-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <VoiceRecorder
+                    onSendVoice={handleSendVoice}
+                    onCancel={() => setShowVoiceRecorder(false)}
+                  />
+                </div>
+              )}
+
               {/* Hidden File Inputs */}
               <input
                 ref={imageInputRef}
