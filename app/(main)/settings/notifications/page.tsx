@@ -360,10 +360,11 @@ export default function NotificationSettingsPage() {
                     {quietHoursEnabled && (
                       <div className="pl-4 space-y-3 border-l-2 border-gray-200 dark:border-gray-700">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          <label htmlFor="quiet-hours-start" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">
                             Start Time
                           </label>
                           <input
+                            id="quiet-hours-start"
                             type="time"
                             value={quietHoursStart}
                             onChange={(e) => setQuietHoursStart(e.target.value)}
@@ -371,10 +372,11 @@ export default function NotificationSettingsPage() {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          <label htmlFor="quiet-hours-end" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">
                             End Time
                           </label>
                           <input
+                            id="quiet-hours-end"
                             type="time"
                             value={quietHoursEnd}
                             onChange={(e) => setQuietHoursEnd(e.target.value)}

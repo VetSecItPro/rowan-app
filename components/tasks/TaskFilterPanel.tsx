@@ -152,7 +152,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
         <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-4">
           {/* Search */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               <Search className="w-4 h-4 inline mr-1" />
               Search
             </label>
@@ -189,7 +189,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
 
           {/* Priority */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               <AlertCircle className="w-4 h-4 inline mr-1" />
               Priority
             </label>
@@ -213,7 +213,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
           {/* Assignees */}
           {members.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 <User className="w-4 h-4 inline mr-1" />
                 Assignee
               </label>
@@ -221,12 +221,13 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 {members.map((member) => (
                   <label
                     key={member.user_id}
-                    className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded"
+                    htmlFor="field-5" className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded"
                   >
                     <input
                       type="checkbox"
                       checked={filters.assignees?.includes(member.user_id) || false}
-                      onChange={() => toggleArrayFilter('assignees', member.user_id)}
+                      id="field-5"
+              onChange={() =>  toggleArrayFilter('assignees', member.user_id)}
                       className="rounded border-gray-300 text-blue-500"
                     />
                     <span className="text-sm text-gray-700 dark:text-gray-300">
@@ -241,7 +242,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
           {/* Categories */}
           {categories.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-6" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 <Tag className="w-4 h-4 inline mr-1" />
                 Category
               </label>
@@ -265,7 +266,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
 
           {/* Due Date Range */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-7" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               <Calendar className="w-4 h-4 inline mr-1" />
               Due Date
             </label>
@@ -287,11 +288,11 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
 
           {/* Special Filters */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-8" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Special Filters
             </label>
             <div className="space-y-2">
-              <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
+              <label htmlFor="field-9" className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
                 <input
                   type="checkbox"
                   checked={filters.isPastDue || false}
@@ -300,7 +301,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">Past Due</span>
               </label>
-              <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
+              <label htmlFor="field-10" className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
                 <input
                   type="checkbox"
                   checked={filters.hasAttachments || false}
@@ -309,7 +310,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">Has Attachments</span>
               </label>
-              <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
+              <label htmlFor="field-11" className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
                 <input
                   type="checkbox"
                   checked={filters.hasDependencies || false}

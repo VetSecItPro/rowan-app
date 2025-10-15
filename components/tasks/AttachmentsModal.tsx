@@ -121,7 +121,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
             <div className="text-center py-8 text-gray-500">Loading attachments...</div>
           ) : (
             <>
-              <label className="flex items-center justify-center gap-2 p-6 mb-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              <label htmlFor="field-1" className="flex items-center justify-center gap-2 p-6 mb-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                 <Upload className="w-5 h-5 text-gray-400" />
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   {uploading ? `Uploading... ${uploadProgress}%` : 'Click to upload file (max 50MB)'}
@@ -131,7 +131,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
                   onChange={handleFileSelect}
                   disabled={uploading}
                   className="hidden"
-                />
+                id="field-1" />
               </label>
 
               {uploading && (

@@ -645,52 +645,56 @@ export default function SettingsPage() {
                     {/* Form Fields */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                       <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label htmlFor="field-1" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                           Full Name
                         </label>
                         <input
                           type="text"
                           value={profileData.name}
-                          onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                          id="field-1"
+              onChange={(e) =>  setProfileData({ ...profileData, name: e.target.value })}
                           className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label htmlFor="field-2" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                           Email Address
                         </label>
                         <input
                           type="email"
                           value={profileData.email}
-                          onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                          id="field-2"
+              onChange={(e) =>  setProfileData({ ...profileData, email: e.target.value })}
                           className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label htmlFor="field-3" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                           <Phone className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
                           Phone Number
                         </label>
                         <input
                           type="tel"
                           value={profileData.phone}
-                          onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                          id="field-3"
+              onChange={(e) =>  setProfileData({ ...profileData, phone: e.target.value })}
                           placeholder="+1 (555) 000-0000"
                           className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label htmlFor="field-4" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                           <Globe className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
                           Time Zone
                         </label>
                         <div className="relative">
                           <select
                             value={profileData.timezone}
-                            onChange={(e) => setProfileData({ ...profileData, timezone: e.target.value })}
+                            id="field-4"
+              onChange={(e) =>  setProfileData({ ...profileData, timezone: e.target.value })}
                             className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-11 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer"
                           >
                             <option>Pacific Time (PT)</option>
@@ -706,13 +710,14 @@ export default function SettingsPage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label htmlFor="field-5" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                         Bio
                       </label>
                       <textarea
                         rows={4}
                         value={profileData.bio}
-                        onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
+                        id="field-5"
+              onChange={(e) =>  setProfileData({ ...profileData, bio: e.target.value })}
                         placeholder="Tell us about yourself..."
                         className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
                       />
@@ -909,11 +914,12 @@ export default function SettingsPage() {
                                   <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
                                   <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">{item.desc}</p>
                                 </div>
-                                <label className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0">
+                                <label htmlFor="field-6" className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0">
                                   <input
                                     type="checkbox"
                                     checked={notificationPrefs[item.key as keyof typeof notificationPrefs] as boolean}
-                                    onChange={() => handleNotificationToggle(item.key)}
+                                    id="field-6"
+              onChange={() =>  handleNotificationToggle(item.key)}
                                     className="sr-only peer"
                                   />
                                   <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
@@ -935,11 +941,12 @@ export default function SettingsPage() {
                                 <p className="text-sm font-medium text-gray-900 dark:text-white">Enable push notifications</p>
                                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Allow browser notifications for real-time alerts</p>
                               </div>
-                              <label className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0">
+                              <label htmlFor="field-7" className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0">
                                 <input
                                   type="checkbox"
                                   checked={notificationPrefs.push_enabled}
-                                  onChange={() => handleNotificationToggle('push_enabled')}
+                                  id="field-7"
+              onChange={() =>  handleNotificationToggle('push_enabled')}
                                   className="sr-only peer"
                                 />
                                 <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
@@ -957,11 +964,12 @@ export default function SettingsPage() {
                                   <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
                                   <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">{item.desc}</p>
                                 </div>
-                                <label className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0">
+                                <label htmlFor="field-8" className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0">
                                   <input
                                     type="checkbox"
                                     checked={notificationPrefs[item.key as keyof typeof notificationPrefs] as boolean}
-                                    onChange={() => handleNotificationToggle(item.key)}
+                                    id="field-8"
+              onChange={() =>  handleNotificationToggle(item.key)}
                                     disabled={!notificationPrefs.push_enabled}
                                     className="sr-only peer"
                                   />
@@ -984,11 +992,12 @@ export default function SettingsPage() {
                                 <p className="text-sm font-medium text-gray-900 dark:text-white">Enable quiet hours</p>
                                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Pause notifications during specific hours</p>
                               </div>
-                              <label className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0">
+                              <label htmlFor="field-9" className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0">
                                 <input
                                   type="checkbox"
                                   checked={notificationPrefs.quiet_hours_enabled}
-                                  onChange={() => handleNotificationToggle('quiet_hours_enabled')}
+                                  id="field-9"
+              onChange={() =>  handleNotificationToggle('quiet_hours_enabled')}
                                   className="sr-only peer"
                                 />
                                 <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
@@ -998,12 +1007,13 @@ export default function SettingsPage() {
                             {notificationPrefs.quiet_hours_enabled && (
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl">
                                 <div>
-                                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                  <label htmlFor="field-10" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                                     Start Time
                                   </label>
                                   <input
                                     type="time"
                                     value={notificationPrefs.quiet_hours_start}
+                                    id="field-10"
                                     onChange={async (e) => {
                                       const newValue = e.target.value;
                                       setNotificationPrefs(prev => ({ ...prev, quiet_hours_start: newValue }));
@@ -1024,12 +1034,13 @@ export default function SettingsPage() {
                                   />
                                 </div>
                                 <div>
-                                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                  <label htmlFor="field-11" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                                     End Time
                                   </label>
                                   <input
                                     type="time"
                                     value={notificationPrefs.quiet_hours_end}
+                                    id="field-11"
                                     onChange={async (e) => {
                                       const newValue = e.target.value;
                                       setNotificationPrefs(prev => ({ ...prev, quiet_hours_end: newValue }));
@@ -1071,11 +1082,11 @@ export default function SettingsPage() {
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Language & Region</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <label htmlFor="field-12" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                             Language
                           </label>
                           <div className="relative">
-                            <select className="w-full px-4 py-3 pr-11 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer">
+                            <select className="w-full px-4 py-3 pr-11 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer" id="field-12">
                               <option>English (US)</option>
                               <option>Español</option>
                               <option>Français</option>
@@ -1087,11 +1098,11 @@ export default function SettingsPage() {
                           </div>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <label htmlFor="field-13" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                             Date Format
                           </label>
                           <div className="relative">
-                            <select className="w-full px-4 py-3 pr-11 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer">
+                            <select className="w-full px-4 py-3 pr-11 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer" id="field-13">
                               <option>MM/DD/YYYY</option>
                               <option>DD/MM/YYYY</option>
                               <option>YYYY-MM-DD</option>
@@ -1126,11 +1137,12 @@ export default function SettingsPage() {
                             <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
                             <p className="text-xs text-gray-600 dark:text-gray-400">{item.desc}</p>
                           </div>
-                          <label className="relative inline-flex items-center cursor-pointer">
+                          <label htmlFor="field-14" className="relative inline-flex items-center cursor-pointer">
                             <input
                               type="checkbox"
                               checked={privacySettings[item.key as keyof typeof privacySettings]}
-                              onChange={() => handlePrivacyToggle(item.key)}
+                              id="field-14"
+              onChange={() =>  handlePrivacyToggle(item.key)}
                               className="sr-only peer"
                             />
                             <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
@@ -1585,36 +1597,39 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="field-15" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                   Enter your password to confirm
                 </label>
                 <input
                   type="password"
                   value={deletePassword}
-                  onChange={(e) => setDeletePassword(e.target.value)}
+                  id="field-15"
+              onChange={(e) =>  setDeletePassword(e.target.value)}
                   placeholder="Your password"
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="field-16" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                   Type DELETE to confirm
                 </label>
                 <input
                   type="text"
                   value={deleteConfirmText}
-                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  id="field-16"
+              onChange={(e) =>  setDeleteConfirmText(e.target.value)}
                   placeholder="DELETE"
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
 
-              <label className="flex items-start gap-3 cursor-pointer">
+              <label htmlFor="field-17" className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={deleteAcknowledged}
-                  onChange={(e) => setDeleteAcknowledged(e.target.checked)}
+                  id="field-17"
+              onChange={(e) =>  setDeleteAcknowledged(e.target.checked)}
                   className="mt-1 w-4 h-4 text-red-600 rounded focus:ring-red-500"
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">
@@ -1695,13 +1710,14 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="field-18" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                   Verification Code
                 </label>
                 <input
                   type="text"
                   value={twoFactorCode}
-                  onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  id="field-18"
+              onChange={(e) =>  setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   placeholder="000000"
                   maxLength={6}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 dark:text-white text-center text-lg tracking-widest"

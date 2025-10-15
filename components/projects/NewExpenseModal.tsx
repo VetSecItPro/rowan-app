@@ -127,7 +127,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
           onClose();
         }} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Title *</label>
+            <label htmlFor="field-1" className="block text-sm font-medium mb-2 cursor-pointer">Title *</label>
             <div className="relative">
               <input
                 type="text"
@@ -158,11 +158,11 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Amount *</label>
+              <label htmlFor="field-2" className="block text-sm font-medium mb-2 cursor-pointer">Amount *</label>
               <input type="number" required step="0.01" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })} className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border rounded-lg" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Category</label>
+              <label htmlFor="field-3" className="block text-sm font-medium mb-2 cursor-pointer">Category</label>
               <div className="relative">
                 <select
                   value={formData.category}
@@ -196,7 +196,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
           {/* Custom Category Input - shows when "Other" is selected */}
           {formData.category === 'other' && (
             <div>
-              <label className="block text-sm font-medium mb-2">Custom Category *</label>
+              <label htmlFor="field-4" className="block text-sm font-medium mb-2 cursor-pointer">Custom Category *</label>
               <input
                 type="text"
                 required
@@ -208,7 +208,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium mb-2">Due Date</label>
+            <label htmlFor="field-5" className="block text-sm font-medium mb-2 cursor-pointer">Due Date</label>
             <input
               type="date"
               value={formData.due_date}

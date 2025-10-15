@@ -118,7 +118,7 @@ export default function GuidedTaskCreation({ onComplete, onSkip }: GuidedTaskCre
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Task Title *
               </label>
               <input
@@ -132,7 +132,7 @@ export default function GuidedTaskCreation({ onComplete, onSkip }: GuidedTaskCre
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Description (Optional)
               </label>
               <textarea
@@ -198,7 +198,7 @@ export default function GuidedTaskCreation({ onComplete, onSkip }: GuidedTaskCre
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Due Date (Optional)
               </label>
               <input

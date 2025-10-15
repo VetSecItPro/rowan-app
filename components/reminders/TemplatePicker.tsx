@@ -158,13 +158,14 @@ export function TemplatePicker({ spaceId, onSelectTemplate, onClose }: TemplateP
               </p>
               {variableNames.map((varName) => (
                 <div key={varName}>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label htmlFor="field-1"className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                     {varName}
                   </label>
                   <input
                     type="text"
                     value={variables[varName]}
-                    onChange={(e) =>
+                    id="field-1"
+              onChange={(e) => 
                       setVariables({ ...variables, [varName]: e.target.value })
                     }
                     placeholder={`Enter ${varName.toLowerCase()}...`}
@@ -182,13 +183,14 @@ export function TemplatePicker({ spaceId, onSelectTemplate, onClose }: TemplateP
           {/* Custom Time Input */}
           {selectedTemplate.reminder_type === 'time' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-2"className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Reminder Time
               </label>
               <input
                 type="datetime-local"
                 value={customTime}
-                onChange={(e) => setCustomTime(e.target.value)}
+                id="field-2"
+              onChange={(e) =>  setCustomTime(e.target.value)}
                 className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>

@@ -135,7 +135,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
         <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Title *
             </label>
             <div className="relative">
@@ -181,7 +181,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
           </div>
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Description
             </label>
             <textarea
@@ -195,7 +195,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
           {/* Category & Progress */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Category
               </label>
               <select
@@ -210,7 +210,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Progress (%)
               </label>
               <input
@@ -227,7 +227,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
           {/* Custom Category */}
           {selectedCategory === 'Other' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-5" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Custom Category Name *
               </label>
               <input
@@ -243,7 +243,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
 
           {/* Target Date */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-6" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Target Date
             </label>
             <input

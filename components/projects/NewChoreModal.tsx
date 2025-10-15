@@ -138,7 +138,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
         <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Chore Title *
             </label>
             <div className="relative">
@@ -146,7 +146,8 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
                 type="text"
                 required
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                id="field-1"
+              onChange={(e) =>  setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Clean the kitchen"
                 className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
               />
@@ -184,12 +185,13 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Description
             </label>
             <textarea
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              id="field-2"
+              onChange={(e) =>  setFormData({ ...formData, description: e.target.value })}
               placeholder="Add details about this chore..."
               rows={3}
               className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
@@ -200,13 +202,14 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
           <div className="grid grid-cols-2 gap-4">
             {/* Category */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Category
               </label>
               <div className="relative">
                 <select
                   value={category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  id="field-3"
+              onChange={(e) =>  setCategory(e.target.value)}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
                   style={{ paddingRight: '2.5rem' }}
                 >
@@ -228,13 +231,14 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
 
             {/* Frequency */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Frequency
               </label>
               <div className="relative">
                 <select
                   value={formData.frequency}
-                  onChange={(e) => setFormData({ ...formData, frequency: e.target.value as any })}
+                  id="field-4"
+              onChange={(e) =>  setFormData({ ...formData, frequency: e.target.value as any })}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
                   style={{ paddingRight: '2.5rem' }}
                 >
@@ -282,7 +286,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
           {/* Day Selection for Monthly */}
           {formData.frequency === 'monthly' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label htmlFor="field-6" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 cursor-pointer">
                 Select Days of Month
               </label>
               <div className="grid grid-cols-7 gap-2">
@@ -314,13 +318,14 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
           <div className="grid grid-cols-2 gap-4">
             {/* Status */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-7" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Status
               </label>
               <div className="relative">
                 <select
                   value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value as 'pending' | 'completed' | 'skipped' })}
+                  id="field-7"
+              onChange={(e) =>  setFormData({ ...formData, status: e.target.value as 'pending' | 'completed' | 'skipped' })}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
                   style={{ paddingRight: '2.5rem' }}
                 >
@@ -334,13 +339,14 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
 
             {/* Due Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="field-8" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Due Date
               </label>
               <input
                 type="date"
                 value={formData.due_date}
-                onChange={(e) => {
+                id="field-8"
+              onChange={(e) =>  {
                   setFormData({ ...formData, due_date: e.target.value });
 
                   // Validate on change
