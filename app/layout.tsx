@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: "Rowan - Your Life, Organized",
   description: "Collaborative life management for couples and families",
+  manifest: '/manifest.json',
   viewport: {
     width: 'device-width',
     initialScale: 1,
@@ -27,6 +28,10 @@ export const metadata: Metadata = {
   },
   formatDetection: {
     telephone: false,
+  },
+  icons: {
+    icon: '/rowan-logo.png',
+    apple: '/rowan-logo.png',
   },
 };
 
