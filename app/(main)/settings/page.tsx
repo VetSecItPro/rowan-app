@@ -938,7 +938,7 @@ export default function SettingsPage() {
                                   <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
                                   <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">{item.desc}</p>
                                 </div>
-                                <label htmlFor="field-6" className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0">
+                                <label htmlFor="field-6" className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0 p-2">
                                   <input
                                     type="checkbox"
                                     checked={notificationPrefs[item.key as keyof typeof notificationPrefs] as boolean}
@@ -946,7 +946,7 @@ export default function SettingsPage() {
               onChange={() =>  handleNotificationToggle(item.key)}
                                     className="sr-only peer"
                                   />
-                                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                                  <div className="w-14 h-7 sm:w-11 sm:h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 sm:after:h-5 sm:after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
                                 </label>
                               </div>
                             ))}
@@ -965,7 +965,7 @@ export default function SettingsPage() {
                                 <p className="text-sm font-medium text-gray-900 dark:text-white">Enable push notifications</p>
                                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Allow browser notifications for real-time alerts</p>
                               </div>
-                              <label htmlFor="field-7" className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0">
+                              <label htmlFor="field-7" className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0 p-2">
                                 <input
                                   type="checkbox"
                                   checked={notificationPrefs.push_enabled}
@@ -973,7 +973,7 @@ export default function SettingsPage() {
               onChange={() =>  handleNotificationToggle('push_enabled')}
                                   className="sr-only peer"
                                 />
-                                <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                                <div className="w-14 h-7 sm:w-11 sm:h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 sm:after:h-5 sm:after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
                               </label>
                             </div>
                             {[
@@ -988,7 +988,7 @@ export default function SettingsPage() {
                                   <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
                                   <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">{item.desc}</p>
                                 </div>
-                                <label htmlFor="field-8" className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0">
+                                <label htmlFor="field-8" className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0 p-2">
                                   <input
                                     type="checkbox"
                                     checked={notificationPrefs[item.key as keyof typeof notificationPrefs] as boolean}
@@ -997,7 +997,7 @@ export default function SettingsPage() {
                                     disabled={!notificationPrefs.push_enabled}
                                     className="sr-only peer"
                                   />
-                                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600 peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                                  <div className="w-14 h-7 sm:w-11 sm:h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 sm:after:h-5 sm:after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600 peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
                                 </label>
                               </div>
                             ))}
@@ -1016,7 +1016,7 @@ export default function SettingsPage() {
                                 <p className="text-sm font-medium text-gray-900 dark:text-white">Enable quiet hours</p>
                                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Pause notifications during specific hours</p>
                               </div>
-                              <label htmlFor="field-9" className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0">
+                              <label htmlFor="field-9" className="relative inline-flex items-center cursor-pointer ml-auto sm:ml-0 p-2">
                                 <input
                                   type="checkbox"
                                   checked={notificationPrefs.quiet_hours_enabled}
@@ -1024,7 +1024,7 @@ export default function SettingsPage() {
               onChange={() =>  handleNotificationToggle('quiet_hours_enabled')}
                                   className="sr-only peer"
                                 />
-                                <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                <div className="w-14 h-7 sm:w-11 sm:h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 sm:after:h-5 sm:after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                               </label>
                             </div>
 
@@ -1161,7 +1161,7 @@ export default function SettingsPage() {
                             <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
                             <p className="text-xs text-gray-600 dark:text-gray-400">{item.desc}</p>
                           </div>
-                          <label htmlFor="field-14" className="relative inline-flex items-center cursor-pointer">
+                          <label htmlFor="field-14" className="relative inline-flex items-center cursor-pointer p-2">
                             <input
                               type="checkbox"
                               checked={privacySettings[item.key as keyof typeof privacySettings]}
@@ -1169,7 +1169,7 @@ export default function SettingsPage() {
               onChange={() =>  handlePrivacyToggle(item.key)}
                               className="sr-only peer"
                             />
-                            <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                            <div className="w-14 h-7 sm:w-11 sm:h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 sm:after:h-5 sm:after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
                           </label>
                         </div>
                       ))}
