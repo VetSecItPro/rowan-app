@@ -209,7 +209,7 @@ export default function RemindersDocumentationPage() {
         <div className="mb-8">
           <Link
             href="/settings/documentation"
-            className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 mb-6"
+            className="inline-flex items-center gap-2 py-2 px-3 text-gray-600 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Documentation

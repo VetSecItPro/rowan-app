@@ -245,7 +245,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
       {linkedShoppingList && (
         <Link
           href="/shopping"
-          className="mt-3 flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors text-sm active:opacity-80"
+          className="mt-3 inline-flex items-center gap-2 py-2 px-3 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors text-sm active:opacity-80"
         >
           <ShoppingCart className="w-4 h-4" />
           <span className="font-medium">

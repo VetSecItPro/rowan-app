@@ -152,7 +152,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
           {linkedShoppingList && (
             <Link
               href="/shopping"
-              className={`flex items-center gap-2 mt-3 ml-4 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors active:opacity-80 ${
+              className={`inline-flex items-center gap-2 py-2 px-3 mt-3 ml-4 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors active:opacity-80 ${
                 event.status === 'completed' ? 'opacity-60' : ''
               }`}
             >

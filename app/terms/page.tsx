@@ -196,7 +196,7 @@ export default function TermsPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Data and Privacy</h2>
             <p className="text-gray-700 dark:text-gray-300 mb-4">
-              Your privacy is important to us. Please review our <Link href="/privacy" className="text-purple-600 dark:text-purple-400 hover:underline">Privacy Policy</Link> to understand how we collect, use, and protect your data.
+              Your privacy is important to us. Please review our <Link href="/privacy" className="inline-block py-1 px-2 text-purple-600 dark:text-purple-400 hover:underline">Privacy Policy</Link> to understand how we collect, use, and protect your data.
             </p>
             <p className="text-gray-700 dark:text-gray-300 mb-4">
               Key points:
