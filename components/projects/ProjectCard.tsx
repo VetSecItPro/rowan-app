@@ -62,7 +62,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete }: ProjectCardProps
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 mt-1 w-32 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+              <div className="absolute right-0 mt-1 w-32 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
                 <button
                   onClick={() => { onEdit(project); setShowMenu(false); }}
                   className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg text-gray-900 dark:text-white active:scale-[0.98]"

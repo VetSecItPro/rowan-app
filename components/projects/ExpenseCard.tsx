@@ -53,7 +53,7 @@ export function ExpenseCard({ expense, onEdit, onDelete, onStatusChange }: Expen
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 mt-1 w-32 bg-gray-50 dark:bg-gray-800 border rounded-lg shadow-lg z-20">
+              <div className="absolute right-0 mt-1 w-32 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
                 <button onClick={() => { onEdit(expense); setShowMenu(false); }} className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg active:scale-[0.98]">Edit</button>
                 <button onClick={() => { onDelete(expense.id); setShowMenu(false); }} className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg active:scale-[0.98]">Delete</button>
               </div>
