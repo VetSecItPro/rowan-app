@@ -942,11 +942,11 @@ export default function MealsPage() {
 
           {/* Stats Dashboard - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+          <div className="stats-grid-mobile gap-4 sm:gap-6">
             {/* This Week Card */}
             <button
               onClick={handleThisWeekClick}
-              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">This Week</h3>
@@ -966,7 +966,7 @@ export default function MealsPage() {
             {/* Next Two Weeks Card */}
             <button
               onClick={handleNextTwoWeeksClick}
-              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Next Two Weeks</h3>
@@ -986,7 +986,7 @@ export default function MealsPage() {
             {/* Saved Recipes Card */}
             <button
               onClick={handleSavedRecipesClick}
-              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Saved Recipes</h3>
@@ -1006,7 +1006,7 @@ export default function MealsPage() {
             {/* Shopping Items Card */}
             <Link
               href="/shopping"
-              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer block"
+              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer block"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Shopping Items</h3>
