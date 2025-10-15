@@ -1,6 +1,6 @@
 'use client';
 
-import { Clock, Check, CheckCheck, MoreVertical, MessageSquare } from 'lucide-react';
+import { Clock, Check, CheckCheck, MoreVertical, MessageSquare, Pin } from 'lucide-react';
 import { MessageWithAttachments, MessageWithReplies, MessageReactionSummary, messagesService } from '@/lib/services/messages-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState, useEffect } from 'react';
@@ -13,6 +13,7 @@ interface MessageCardProps {
   onEdit: (message: MessageWithAttachments) => void;
   onDelete: (messageId: string) => void;
   onMarkRead: (messageId: string) => void;
+  onTogglePin?: (messageId: string) => void;
   isOwn?: boolean;
   currentUserId?: string;
   partnerName?: string;
@@ -27,6 +28,7 @@ export function MessageCard({
   onEdit,
   onDelete,
   onMarkRead,
+  onTogglePin,
   isOwn = false,
   currentUserId,
   partnerName = 'Partner',
@@ -203,7 +205,7 @@ export function MessageCard({
                       className="fixed inset-0 z-10"
                       onClick={() => setShowMenu(false)}
                     />
-                    <div className="absolute right-0 mt-1 w-32 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+                    <div className="absolute right-0 mt-1 w-40 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
                       <button
                         onClick={() => {
                           onEdit(message);
@@ -213,6 +215,18 @@ export function MessageCard({
                       >
                         Edit
                       </button>
+                      {onTogglePin && (
+                        <button
+                          onClick={() => {
+                            onTogglePin(message.id);
+                            setShowMenu(false);
+                          }}
+                          className="w-full px-4 py-2 text-left text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-[0.98] flex items-center gap-2"
+                        >
+                          <Pin className={`w-3.5 h-3.5 ${message.is_pinned ? 'rotate-45' : ''}`} />
+                          {message.is_pinned ? 'Unpin' : 'Pin'}
+                        </button>
+                      )}
                       <button
                         onClick={() => {
                           onDelete(message.id);
