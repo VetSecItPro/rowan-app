@@ -62,9 +62,9 @@ export function GoalCard({ goal, onEdit, onDelete, onStatusChange }: GoalCardPro
             <div className="w-8 h-8 bg-gradient-goals rounded-lg flex items-center justify-center flex-shrink-0">
               <Target className="w-4 h-4 text-white" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{goal.title}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">{goal.title}</h3>
           </div>
-          {goal.description && <p className="text-sm text-gray-600 dark:text-gray-400 ml-10">{goal.description}</p>}
+          {goal.description && <p className="text-sm text-gray-600 dark:text-gray-400 ml-10 break-words line-clamp-2">{goal.description}</p>}
         </div>
 
         {/* Three-dot menu */}

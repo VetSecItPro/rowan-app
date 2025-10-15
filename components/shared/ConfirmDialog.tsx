@@ -65,7 +65,7 @@ export function ConfirmDialog({
         aria-hidden="true"
       />
       <div
-        className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:h-auto sm:w-auto sm:max-w-md sm:rounded-xl shadow-2xl flex flex-col"
+        className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:h-auto sm:w-auto sm:max-w-md sm:max-h-[90vh] overflow-y-auto overscroll-contain sm:rounded-xl shadow-2xl flex flex-col"
         role="alertdialog"
         aria-labelledby="dialog-title"
         aria-describedby="dialog-description"

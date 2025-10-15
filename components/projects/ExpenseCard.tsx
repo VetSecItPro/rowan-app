@@ -24,16 +24,16 @@ export function ExpenseCard({ expense, onEdit, onDelete, onStatusChange }: Expen
   return (
     <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-lg transition-all">
       <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3 flex-1">
-          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${expense.status === 'paid' ? 'bg-green-500' : 'bg-orange-500'}`}>
+        <div className="flex items-start gap-3 flex-1 min-w-0">
+          <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${expense.status === 'paid' ? 'bg-green-500' : 'bg-orange-500'}`}>
             <DollarSign className="w-5 h-5 text-white" />
           </div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-gray-900 dark:text-white">{expense.title}</h3>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-gray-900 dark:text-white truncate">{expense.title}</h3>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">${expense.amount.toFixed(2)}</p>
-            <div className="flex items-center gap-3 mt-2 text-xs text-gray-600 dark:text-gray-400">
-              {expense.category && <span>{expense.category}</span>}
-              {expense.due_date && <span>Due {formatTimestamp(expense.due_date, 'MMM d')}</span>}
+            <div className="flex items-center gap-3 mt-2 text-xs text-gray-600 dark:text-gray-400 flex-wrap">
+              {expense.category && <span className="truncate">{expense.category}</span>}
+              {expense.due_date && <span className="whitespace-nowrap">Due {formatTimestamp(expense.due_date, 'MMM d')}</span>}
             </div>
           </div>
         </div>

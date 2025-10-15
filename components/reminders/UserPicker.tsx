@@ -62,8 +62,8 @@ export function UserPicker({
           return;
         }
 
-        setMembers(data || []);
-        setFilteredMembers(data || []);
+        setMembers((data as unknown as SpaceMember[]) || []);
+        setFilteredMembers((data as unknown as SpaceMember[]) || []);
       } catch (error) {
         console.error('Error fetching space members:', error);
       } finally {

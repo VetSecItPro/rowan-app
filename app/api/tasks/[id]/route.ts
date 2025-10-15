@@ -184,7 +184,7 @@ export async function PATCH(
         return NextResponse.json(
           {
             error: 'Validation failed',
-            details: error.errors.map(e => ({
+            details: error.issues.map((e) => ({
               field: e.path.join('.'),
               message: e.message,
             })),
@@ -195,8 +195,14 @@ export async function PATCH(
       throw error;
     }
 
-    // Update task using service
-    const updatedTask = await tasksService.updateTask(params.id, validatedUpdates);
+    // Update task using service (transform null to undefined for nullable fields)
+    const updatedTask = await tasksService.updateTask(params.id, {
+      ...validatedUpdates,
+      description: validatedUpdates.description ?? undefined,
+      category: validatedUpdates.category ?? undefined,
+      assigned_to: validatedUpdates.assigned_to ?? undefined,
+      due_date: validatedUpdates.due_date ?? undefined,
+    });
 
     return NextResponse.json({
       success: true,

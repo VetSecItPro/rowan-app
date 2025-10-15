@@ -13,6 +13,7 @@ interface UserProfile {
   pronouns?: string;
   color_theme: string;
   timezone: string;
+  avatar_url?: string;
 }
 
 interface AuthContextType {

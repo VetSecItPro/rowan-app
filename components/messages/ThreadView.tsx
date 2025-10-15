@@ -149,9 +149,9 @@ export function ThreadView({
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-0 md:p-4">
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-0 sm:p-4">
       {/* Thread Container */}
-      <div className="bg-white dark:bg-gray-900 w-full h-full md:max-w-2xl md:max-h-[90vh] md:rounded-lg flex flex-col overflow-hidden shadow-2xl">
+      <div className="bg-white dark:bg-gray-900 w-full h-full sm:max-w-2xl sm:max-h-[90vh] sm:rounded-lg flex flex-col overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
           <div>

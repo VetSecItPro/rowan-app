@@ -126,7 +126,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
           {/* Title & Description */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <h3 className={`font-semibold text-gray-900 dark:text-white ${
+              <h3 className={`font-semibold text-gray-900 dark:text-white truncate ${
                 task.status === 'completed' ? 'line-through opacity-60' : ''
               }`}>
                 {task.title}
@@ -247,8 +247,8 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
           href="/shopping"
           className="mt-3 inline-flex items-center gap-2 py-2 px-3 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors text-sm active:opacity-80"
         >
-          <ShoppingCart className="w-4 h-4" />
-          <span className="font-medium">
+          <ShoppingCart className="w-4 h-4 flex-shrink-0" />
+          <span className="font-medium truncate">
             {linkedShoppingList.title}
             {linkedShoppingList.items_count !== undefined && ` (${linkedShoppingList.items_count} items)`}
           </span>

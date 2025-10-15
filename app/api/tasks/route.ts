@@ -184,7 +184,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           {
             error: 'Validation failed',
-            details: error.errors.map(e => ({
+            details: error.issues.map((e) => ({
               field: e.path.join('.'),
               message: e.message,
             })),
@@ -205,8 +205,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create task using service
-    const task = await tasksService.createTask(validatedData);
+    // Create task using service (transform null to undefined for nullable fields)
+    const task = await tasksService.createTask({
+      ...validatedData,
+      description: validatedData.description ?? undefined,
+      category: validatedData.category ?? undefined,
+      assigned_to: validatedData.assigned_to ?? undefined,
+      due_date: validatedData.due_date ?? undefined,
+    });
 
     return NextResponse.json({
       success: true,

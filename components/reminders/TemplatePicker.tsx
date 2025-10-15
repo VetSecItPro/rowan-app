@@ -90,8 +90,8 @@ export function TemplatePicker({ spaceId, onSelectTemplate, onClose }: TemplateP
     // Increment usage count
     await reminderTemplatesService.incrementUsage(selectedTemplate.id);
 
-    // Pass to parent
-    onSelectTemplate(reminderData);
+    // Pass to parent (cast to match CreateReminderInput types)
+    onSelectTemplate(reminderData as Partial<CreateReminderInput>);
     onClose();
   };
 
