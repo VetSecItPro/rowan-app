@@ -6,9 +6,11 @@ import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { MessageCard } from '@/components/messages/MessageCard';
 import { NewMessageModal } from '@/components/messages/NewMessageModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { ThreadView } from '@/components/messages/ThreadView';
+import { TypingIndicator } from '@/components/messages/TypingIndicator';
 import GuidedMessageCreation from '@/components/guided/GuidedMessageCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { messagesService, Message, CreateMessageInput } from '@/lib/services/messages-service';
+import { messagesService, Message, MessageWithReplies, CreateMessageInput, TypingIndicator as TypingIndicatorType } from '@/lib/services/messages-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { format, isSameDay, isToday, isYesterday } from 'date-fns';
 import { RealtimeChannel } from '@supabase/supabase-js';
@@ -50,6 +52,9 @@ export default function MessagesPage() {
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, messageId: '' });
+  const [selectedThread, setSelectedThread] = useState<MessageWithReplies | null>(null);
+  const [typingUsers, setTypingUsers] = useState<TypingIndicatorType[]>([]);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [stats, setStats] = useState({
     thisWeek: 0,
@@ -202,6 +207,42 @@ export default function MessagesPage() {
     };
   }, [conversationId, user, scrollToBottom]);
 
+  // Poll for typing users
+  useEffect(() => {
+    if (!conversationId || !user) return;
+
+    // Poll every 2 seconds
+    const pollInterval = setInterval(async () => {
+      try {
+        const typingData = await messagesService.getTypingUsers(conversationId, user.id);
+        setTypingUsers(typingData);
+      } catch (error) {
+        console.error('Failed to fetch typing users:', error);
+      }
+    }, 2000);
+
+    // Initial fetch
+    messagesService.getTypingUsers(conversationId, user.id)
+      .then(setTypingUsers)
+      .catch((error) => console.error('Failed to fetch typing users:', error));
+
+    return () => {
+      clearInterval(pollInterval);
+    };
+  }, [conversationId, user]);
+
+  // Cleanup typing indicator on unmount or when sending message
+  useEffect(() => {
+    return () => {
+      if (conversationId && user && typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        messagesService.removeTypingIndicator(conversationId, user.id).catch((error) => {
+          console.error('Failed to cleanup typing indicator:', error);
+        });
+      }
+    };
+  }, [conversationId, user]);
+
   // Memoize handleCreateMessage callback
   const handleCreateMessage = useCallback(async (messageData: CreateMessageInput) => {
     try {
@@ -262,6 +303,15 @@ export default function MessagesPage() {
     if (!messageInput.trim() || isSending || !conversationId) return;
     if (!currentSpace || !user) return;
 
+    // Remove typing indicator
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
+    }
+    messagesService.removeTypingIndicator(conversationId, user.id).catch((error) => {
+      console.error('Failed to remove typing indicator:', error);
+    });
+
     // Create optimistic message
     const tempId = `temp-${Date.now()}-${Math.random()}`;
     const optimisticMessage: Message = {
@@ -319,10 +369,32 @@ export default function MessagesPage() {
     setSearchQuery(e.target.value);
   }, []);
 
-  // Memoize handleMessageInputChange callback
+  // Memoize handleMessageInputChange callback with typing indicator
   const handleMessageInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setMessageInput(e.target.value);
-  }, []);
+
+    // Update typing indicator (throttled)
+    if (conversationId && user) {
+      // Clear previous timeout
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+
+      // Send typing indicator
+      messagesService.updateTypingIndicator(conversationId, user.id).catch((error) => {
+        console.error('Failed to update typing indicator:', error);
+      });
+
+      // Stop typing after 3 seconds of inactivity
+      typingTimeoutRef.current = setTimeout(() => {
+        if (conversationId && user) {
+          messagesService.removeTypingIndicator(conversationId, user.id).catch((error) => {
+            console.error('Failed to remove typing indicator:', error);
+          });
+        }
+      }, 3000);
+    }
+  }, [conversationId, user]);
 
   // Memoize toggleEmojiPicker callback
   const toggleEmojiPicker = useCallback(() => {
@@ -384,6 +456,16 @@ export default function MessagesPage() {
       }
     }
   }, [user]);
+
+  // Handle opening thread view
+  const handleReply = useCallback((message: Message | MessageWithReplies) => {
+    setSelectedThread(message as MessageWithReplies);
+  }, []);
+
+  // Handle closing thread view
+  const handleCloseThread = useCallback(() => {
+    setSelectedThread(null);
+  }, []);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Messages' }]}>
@@ -579,10 +661,21 @@ export default function MessagesPage() {
                           onMarkRead={handleMarkRead}
                           isOwn={message.sender_id === currentSpace?.id}
                           currentUserId={currentSpace?.id || ''}
+                          onReply={handleReply}
+                          showReplyButton={true}
                         />
                       </div>
                     );
                   })}
+
+                  {/* Typing Indicator */}
+                  {typingUsers.length > 0 && (
+                    <TypingIndicator
+                      userName="Partner"
+                      userColor="#34D399"
+                    />
+                  )}
+
                   {/* Scroll anchor for auto-scroll */}
                   <div ref={messagesEndRef} />
                 </>
@@ -743,6 +836,19 @@ export default function MessagesPage() {
         cancelLabel="Cancel"
         variant="danger"
       />
+
+      {/* Thread View Modal */}
+      {selectedThread && conversationId && currentSpace && user && (
+        <ThreadView
+          parentMessage={selectedThread}
+          conversationId={conversationId}
+          spaceId={currentSpace.id}
+          currentUserId={user.id}
+          partnerName="Partner"
+          partnerColor="#34D399"
+          onClose={handleCloseThread}
+        />
+      )}
     </FeatureLayout>
   );
 }

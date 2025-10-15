@@ -1,13 +1,14 @@
 'use client';
 
-import { Clock, Check, CheckCheck, MoreVertical } from 'lucide-react';
-import { MessageWithAttachments } from '@/lib/services/messages-service';
+import { Clock, Check, CheckCheck, MoreVertical, MessageSquare } from 'lucide-react';
+import { MessageWithAttachments, MessageWithReplies, MessageReactionSummary, messagesService } from '@/lib/services/messages-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AttachmentPreview } from './AttachmentPreview';
+import { ReactionPicker } from './ReactionPicker';
 
 interface MessageCardProps {
-  message: MessageWithAttachments;
+  message: MessageWithAttachments | MessageWithReplies;
   onEdit: (message: MessageWithAttachments) => void;
   onDelete: (messageId: string) => void;
   onMarkRead: (messageId: string) => void;
@@ -16,6 +17,8 @@ interface MessageCardProps {
   partnerName?: string;
   partnerColor?: string;
   compact?: boolean;
+  onReply?: (message: MessageWithAttachments | MessageWithReplies) => void;
+  showReplyButton?: boolean;
 }
 
 export function MessageCard({
@@ -27,15 +30,50 @@ export function MessageCard({
   currentUserId,
   partnerName = 'Partner',
   partnerColor = '#34D399', // Default green color
-  compact = false
+  compact = false,
+  onReply,
+  showReplyButton = true
 }: MessageCardProps) {
   const [showMenu, setShowMenu] = useState(false);
+  const [reactions, setReactions] = useState<MessageReactionSummary[]>([]);
+  const [loadingReaction, setLoadingReaction] = useState(false);
 
   // Mock user color (in real app, this would come from user profile)
   const userColor = '#3B82F6'; // Blue for current user
 
   const senderColor = isOwn ? userColor : partnerColor;
   const senderName = isOwn ? 'You' : partnerName;
+
+  // Load reactions
+  useEffect(() => {
+    async function loadReactions() {
+      try {
+        const reactionsData = await messagesService.getMessageReactions(message.id, currentUserId);
+        setReactions(reactionsData);
+      } catch (error) {
+        console.error('Failed to load reactions:', error);
+      }
+    }
+
+    loadReactions();
+  }, [message.id, currentUserId]);
+
+  // Handle adding reaction
+  const handleAddReaction = async (emoji: string) => {
+    if (!currentUserId || loadingReaction) return;
+
+    setLoadingReaction(true);
+    try {
+      await messagesService.toggleReaction(message.id, currentUserId, emoji);
+      // Reload reactions
+      const reactionsData = await messagesService.getMessageReactions(message.id, currentUserId);
+      setReactions(reactionsData);
+    } catch (error) {
+      console.error('Failed to add reaction:', error);
+    } finally {
+      setLoadingReaction(false);
+    }
+  };
 
   return (
     <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
@@ -97,6 +135,54 @@ export function MessageCard({
                 </span>
               )}
             </div>
+
+            {/* Reply Button and Thread Count */}
+            {showReplyButton && onReply && !message.parent_message_id && (
+              <button
+                onClick={() => onReply(message)}
+                className="flex items-center gap-1 mt-2 px-2 py-1 rounded-md text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors active:scale-95"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>
+                  {('reply_count' in message && message.reply_count)
+                    ? `${message.reply_count} ${message.reply_count === 1 ? 'reply' : 'replies'}`
+                    : 'Reply'}
+                </span>
+              </button>
+            )}
+
+            {/* Reactions Display */}
+            {reactions.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {reactions.map((reaction) => (
+                  <button
+                    key={reaction.emoji}
+                    onClick={() => handleAddReaction(reaction.emoji)}
+                    disabled={loadingReaction}
+                    className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs border transition-all active:scale-95 ${
+                      reaction.reacted_by_current_user
+                        ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700'
+                        : 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    }`}
+                    title={`${reaction.count} ${reaction.count === 1 ? 'reaction' : 'reactions'}`}
+                  >
+                    <span>{reaction.emoji}</span>
+                    <span className="text-gray-600 dark:text-gray-400 font-medium">
+                      {reaction.count}
+                    </span>
+                  </button>
+                ))}
+                {/* Add Reaction Button */}
+                <ReactionPicker onSelectEmoji={handleAddReaction} />
+              </div>
+            )}
+
+            {/* Add Reaction Button (when no reactions) */}
+            {reactions.length === 0 && (
+              <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <ReactionPicker onSelectEmoji={handleAddReaction} />
+              </div>
+            )}
 
             {/* More Menu */}
             {isOwn && (
