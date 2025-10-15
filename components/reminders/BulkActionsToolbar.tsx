@@ -275,12 +275,12 @@ export function BulkActionsToolbar({
 
       {/* Complete Confirmation Dialog */}
       {showCompleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowCompleteConfirm(false)}
           />
-          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
+          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto overscroll-contain p-6">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
               Complete {selectedCount} Reminder{selectedCount > 1 ? 's' : ''}?
             </h3>
@@ -309,12 +309,12 @@ export function BulkActionsToolbar({
 
       {/* Delete Confirmation Dialog */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowDeleteConfirm(false)}
           />
-          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
+          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto overscroll-contain p-6">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
               Delete {selectedCount} Reminder{selectedCount > 1 ? 's' : ''}?
             </h3>
