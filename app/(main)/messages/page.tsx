@@ -436,8 +436,15 @@ export default function MessagesPage() {
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-3 sm:py-4 space-y-3">
               {loading ? (
-                <div className="flex items-center justify-center h-full">
-                  <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                <div className="space-y-4">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className={`flex ${i % 2 === 0 ? 'justify-start' : 'justify-end'}`}>
+                      <div className={`max-w-[70%] ${i % 2 === 0 ? 'bg-white dark:bg-gray-700' : 'bg-green-50 dark:bg-green-900/20'} rounded-2xl p-4 shadow-sm animate-pulse`}>
+                        <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-32 mb-2" />
+                        <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-20" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : filteredMessages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">

@@ -480,9 +480,21 @@ export default function GoalsPage() {
             </div>
 
             {loading ? (
-              <div className="text-center py-12">
-                <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-                <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+              <div className="space-y-4">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="bg-white dark:bg-gray-700 rounded-xl p-6 shadow-lg animate-pulse">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-64" />
+                      <div className="h-8 bg-gray-200 dark:bg-gray-600 rounded w-20" />
+                    </div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-full mb-3" />
+                    <div className="h-2 bg-gray-200 dark:bg-gray-600 rounded w-full mb-2" />
+                    <div className="flex items-center justify-between">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-24" />
+                      <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-32" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : viewMode === 'goals' ? (
               /* Goals View */

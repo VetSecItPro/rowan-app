@@ -74,14 +74,15 @@ function AcceptInvitationContent() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
-          <Loader2 className="w-16 h-16 text-purple-600 dark:text-purple-400 animate-spin mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Processing Invitation
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            Please wait while we add you to the space...
-          </p>
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full">
+          <div className="animate-pulse space-y-6">
+            <div className="w-16 h-16 bg-purple-200 dark:bg-purple-700 rounded-full mx-auto" />
+            <div className="space-y-3">
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mx-auto" />
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mx-auto" />
+            </div>
+          </div>
         </div>
       </div>
     );
