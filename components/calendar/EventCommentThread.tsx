@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { MessageCircle, Send, Reply, Edit2, Trash2, User } from 'lucide-react';
 import { eventCommentsService, EventComment } from '@/lib/services/event-comments-service';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { formatDistance } from 'date-fns';
 
 interface EventCommentThreadProps {
@@ -20,6 +21,8 @@ export function EventCommentThread({ eventId, spaceId, onClose }: EventCommentTh
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     loadComments();
@@ -74,13 +77,21 @@ export function EventCommentThread({ eventId, spaceId, onClose }: EventCommentTh
   };
 
   const handleDelete = async (commentId: string) => {
-    if (!confirm('Delete this comment?')) return;
+    setCommentToDelete(commentId);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!commentToDelete) return;
 
     try {
-      await eventCommentsService.deleteComment(commentId);
+      await eventCommentsService.deleteComment(commentToDelete);
       await loadComments();
     } catch (error) {
       console.error('Failed to delete comment:', error);
+    } finally {
+      setShowDeleteConfirm(false);
+      setCommentToDelete(null);
     }
   };
 
@@ -264,6 +275,21 @@ export function EventCommentThread({ eventId, spaceId, onClose }: EventCommentTh
           </button>
         </div>
       </form>
+
+      {/* Delete Comment Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setCommentToDelete(null);
+        }}
+        onConfirm={confirmDelete}
+        title="Delete Comment"
+        message="Are you sure you want to delete this comment? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </div>
   );
 }

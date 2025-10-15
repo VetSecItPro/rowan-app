@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { CheckCircle, Trash2, User, Tag, AlertCircle, X, MoreHorizontal } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 
 interface BulkActionsBarProps {
   selectedTaskIds: string[];
@@ -13,6 +14,7 @@ interface BulkActionsBarProps {
 export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComplete }: BulkActionsBarProps) {
   const [loading, setLoading] = useState(false);
   const [showMoreActions, setShowMoreActions] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   if (selectedTaskIds.length === 0) return null;
 
@@ -59,10 +61,6 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
   }
 
   async function bulkDelete() {
-    if (!confirm(`Are you sure you want to delete ${selectedTaskIds.length} task(s)? This action cannot be undone.`)) {
-      return;
-    }
-
     setLoading(true);
     try {
       const supabase = createClient();
@@ -73,6 +71,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
 
       if (error) throw error;
 
+      setShowDeleteConfirm(false);
       onActionComplete();
       onClearSelection();
     } catch (error) {
@@ -141,7 +140,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
               </button>
 
               <button
-                onClick={bulkDelete}
+                onClick={() => setShowDeleteConfirm(true)}
                 disabled={loading}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50"
                 title="Delete selected"
@@ -258,6 +257,18 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={bulkDelete}
+        title="Delete Tasks"
+        message={`Are you sure you want to delete ${selectedTaskIds.length} task${selectedTaskIds.length !== 1 ? 's' : ''}? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        confirmLoading={loading}
+      />
     </div>
   );
 }
