@@ -172,7 +172,7 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 sm:gap-2">
             <button
               onClick={handleExport}
               disabled={loading || selectedColumns.length === 0}

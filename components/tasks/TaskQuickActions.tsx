@@ -30,7 +30,7 @@ export function TaskQuickActions({ taskId, spaceId, userId, onAction }: TaskQuic
   }
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
+    <div className="flex items-center gap-3 sm:gap-2 flex-wrap">
       {actions.map((action) => (
         <button
           key={action.id}

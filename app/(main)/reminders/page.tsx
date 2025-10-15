@@ -344,7 +344,7 @@ export default function RemindersPage(): JSX.Element {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="flex items-center gap-3 sm:gap-2 w-full sm:w-auto">
               {!selectionMode ? (
                 <>
                   <button

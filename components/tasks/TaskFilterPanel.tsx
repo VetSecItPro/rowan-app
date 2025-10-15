@@ -170,7 +170,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Status
             </label>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3 sm:gap-2">
               {statusOptions.map((status) => (
                 <button
                   key={status.value}
@@ -193,7 +193,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
               <AlertCircle className="w-4 h-4 inline mr-1" />
               Priority
             </label>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3 sm:gap-2">
               {priorityOptions.map((priority) => (
                 <button
                   key={priority.value}
@@ -246,7 +246,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 <Tag className="w-4 h-4 inline mr-1" />
                 Category
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3 sm:gap-2">
                 {categories.map((category) => (
                   <button
                     key={category.id}
