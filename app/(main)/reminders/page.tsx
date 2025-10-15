@@ -574,7 +574,7 @@ export default function RemindersPage(): JSX.Element {
                 </div>
 
                 {/* Category & Priority Filters - Combined Row */}
-                <div className="flex flex-col lg:flex-row gap-3">
+                <div className="flex flex-col lg:flex-row lg:justify-between gap-4 lg:gap-6">
                   {/* Category Filter Pills */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
