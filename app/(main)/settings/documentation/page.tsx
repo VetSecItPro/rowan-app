@@ -15,15 +15,6 @@ const features = [
     available: true,
   },
   {
-    id: 'checkin',
-    name: 'Daily Check-In Guide',
-    description: 'Track emotional wellness and connect with your partner',
-    icon: Heart,
-    color: 'from-pink-500 to-purple-500',
-    href: '/settings/documentation/checkin',
-    available: true,
-  },
-  {
     id: 'calendar',
     name: 'Calendar & Events',
     description: 'Master your schedule with shared calendar features',
@@ -66,7 +57,7 @@ const features = [
     icon: UtensilsCrossed,
     color: 'from-orange-500 to-orange-600',
     href: '/settings/documentation/meals',
-    available: true, // This one is available!
+    available: true,
   },
   {
     id: 'household',
@@ -85,6 +76,15 @@ const features = [
     color: 'from-indigo-500 to-indigo-600',
     href: '/settings/documentation/goals',
     available: false,
+  },
+  {
+    id: 'checkin',
+    name: 'Daily Check-In',
+    description: 'Track emotional wellness and connect with your partner',
+    icon: Heart,
+    color: 'from-pink-500 to-purple-500',
+    href: '/settings/documentation/checkin',
+    available: true,
   },
 ];
 

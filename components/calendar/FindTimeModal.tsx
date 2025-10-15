@@ -75,26 +75,24 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-2xl sm:max-w-3xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-calendar text-white p-6 flex items-center justify-between">
+        <div className="sticky top-0 z-10 bg-gradient-calendar text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Sparkles className="w-6 h-6" />
             <div>
-              <h2 className="text-2xl font-bold">Find Optimal Time</h2>
-              <p className="text-purple-100 text-sm mt-1">AI-powered scheduling assistant</p>
+              <h2 className="text-lg sm:text-xl font-bold">Find Optimal Time</h2>
+              <p className="text-purple-100 text-xs sm:text-sm mt-1">AI-powered scheduling assistant</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors group relative"
+            className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-all active:scale-95"
             title="Close (Esc)"
           >
-            <X className="w-6 h-6" />
-            <span className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              Close (Esc)
-            </span>
+            <X className="w-5 h-5 sm:w-4 sm:h-4" />
           </button>
         </div>
 
