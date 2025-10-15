@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef, KeyboardEvent, ChangeEvent } from 'react';
+import { useState, useEffect, useRef, KeyboardEvent, ChangeEvent, forwardRef } from 'react';
 import { MentionableUser, mentionsService } from '@/lib/services/mentions-service';
 import { AtSign } from 'lucide-react';
+import { RichTextToolbar } from './RichTextToolbar';
 
 interface MentionInputProps {
   value: string;
@@ -12,6 +13,7 @@ interface MentionInputProps {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
+  showToolbar?: boolean;
 }
 
 export function MentionInput({
@@ -22,6 +24,7 @@ export function MentionInput({
   placeholder = 'Type a message...',
   disabled = false,
   className = '',
+  showToolbar = true,
 }: MentionInputProps) {
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [autocompleteUsers, setAutocompleteUsers] = useState<MentionableUser[]>([]);
@@ -162,24 +165,31 @@ export function MentionInput({
 
   return (
     <div className="relative w-full">
-      <textarea
-        ref={inputRef}
-        value={value}
-        onChange={handleInputChange}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-        disabled={disabled}
-        rows={1}
-        className={`w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 dark:border-gray-700
-          bg-white dark:bg-gray-800 text-gray-900 dark:text-white
-          placeholder-gray-500 dark:placeholder-gray-400
-          focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-600
-          resize-none min-h-[48px] max-h-[150px] ${className}`}
-        style={{
-          height: 'auto',
-          overflowY: value.split('\n').length > 3 ? 'scroll' : 'hidden',
-        }}
-      />
+      <div className={`border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden ${
+        showToolbar ? '' : ''
+      }`}>
+        {/* Rich Text Toolbar */}
+        {showToolbar && <RichTextToolbar textareaRef={inputRef} />}
+
+        <textarea
+          ref={inputRef}
+          value={value}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          disabled={disabled}
+          rows={1}
+          className={`w-full px-4 py-3 pr-12 ${showToolbar ? 'rounded-b-xl border-0' : 'rounded-xl border border-gray-200 dark:border-gray-700'}
+            bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+            placeholder-gray-500 dark:placeholder-gray-400
+            focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-600
+            resize-none min-h-[48px] max-h-[150px] ${className}`}
+          style={{
+            height: 'auto',
+            overflowY: value.split('\n').length > 3 ? 'scroll' : 'hidden',
+          }}
+        />
+      </div>
 
       {/* Autocomplete Dropdown */}
       {showAutocomplete && filteredUsers.length > 0 && (

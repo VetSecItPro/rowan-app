@@ -263,9 +263,9 @@ export async function deleteMentionsForMessage(
 export async function getMentionableUsers(
   spaceId: string
 ): Promise<MentionableUser[]> {
-  // Query partnership_members to get users in this space
+  // Query space_members to get users in this space
   const { data: members, error } = await supabase
-    .from('partnership_members')
+    .from('space_members')
     .select(`
       user_id,
       users:user_id (
@@ -274,7 +274,7 @@ export async function getMentionableUsers(
         raw_user_meta_data
       )
     `)
-    .eq('partnership_id', spaceId);
+    .eq('space_id', spaceId);
 
   if (error) {
     console.error('Error fetching mentionable users:', error);

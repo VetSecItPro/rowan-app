@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { AttachmentPreview } from './AttachmentPreview';
 import { ReactionPicker } from './ReactionPicker';
 import { MentionHighlight } from './MentionHighlight';
+import ReactMarkdown from 'react-markdown';
 
 interface MessageCardProps {
   message: MessageWithAttachments | MessageWithReplies;
@@ -104,11 +105,34 @@ export function MessageCard({
               borderColor: senderColor
             }}
           >
-            {/* Message Content */}
+            {/* Message Content with Markdown Support */}
             {message.content && (
-              <p className="break-words whitespace-pre-wrap text-gray-900 dark:text-white text-sm">
-                <MentionHighlight content={message.content} currentUserId={currentUserId} />
-              </p>
+              <div className="break-words text-gray-900 dark:text-white text-sm prose prose-sm dark:prose-invert max-w-none">
+                <ReactMarkdown
+                  components={{
+                    p: ({ children }) => <p className="mb-1 last:mb-0">{children}</p>,
+                    strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+                    em: ({ children }) => <em className="italic">{children}</em>,
+                    code: ({ children }) => (
+                      <code className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">
+                        {children}
+                      </code>
+                    ),
+                    a: ({ href, children }) => (
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                      >
+                        {children}
+                      </a>
+                    ),
+                  }}
+                >
+                  {message.content}
+                </ReactMarkdown>
+              </div>
             )}
 
             {/* Attachments */}
@@ -131,13 +155,25 @@ export function MessageCard({
                 <span className="italic">(edited)</span>
               )}
               {isOwn && (
-                <span className="ml-1">
+                <div className="ml-1 relative group/receipt">
                   {message.read ? (
-                    <CheckCheck className="w-3 h-3" />
+                    <>
+                      <CheckCheck className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400 transition-colors" />
+                      {message.read_at && (
+                        <div className="absolute bottom-full right-0 mb-1 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover/receipt:opacity-100 transition-opacity pointer-events-none z-10">
+                          Read {formatTimestamp(message.read_at, 'MMM d, h:mm a')}
+                        </div>
+                      )}
+                    </>
                   ) : (
-                    <Check className="w-3 h-3" />
+                    <>
+                      <Check className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 transition-colors" />
+                      <div className="absolute bottom-full right-0 mb-1 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover/receipt:opacity-100 transition-opacity pointer-events-none z-10">
+                        Sent
+                      </div>
+                    </>
                   )}
-                </span>
+                </div>
               )}
             </div>
 
