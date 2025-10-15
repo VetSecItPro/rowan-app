@@ -8,7 +8,9 @@ import { NewMessageModal } from '@/components/messages/NewMessageModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { ThreadView } from '@/components/messages/ThreadView';
 import { TypingIndicator } from '@/components/messages/TypingIndicator';
+import { VoiceRecorder } from '@/components/messages/VoiceRecorder';
 import GuidedMessageCreation from '@/components/guided/GuidedMessageCreation';
+import { fileUploadService } from '@/lib/services/file-upload-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { messagesService, Message, MessageWithReplies, CreateMessageInput, TypingIndicator as TypingIndicatorType } from '@/lib/services/messages-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
@@ -55,6 +57,7 @@ export default function MessagesPage() {
   const [selectedThread, setSelectedThread] = useState<MessageWithReplies | null>(null);
   const [typingUsers, setTypingUsers] = useState<TypingIndicatorType[]>([]);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
 
   const [stats, setStats] = useState({
     thisWeek: 0,
@@ -467,6 +470,45 @@ export default function MessagesPage() {
     setSelectedThread(null);
   }, []);
 
+  // Handle sending voice message
+  const handleSendVoice = useCallback(async (audioBlob: Blob, duration: number) => {
+    if (!currentSpace || !user || !conversationId) {
+      toast.error('Unable to send voice message');
+      return;
+    }
+
+    try {
+      // Create a File from the Blob
+      const audioFile = new File([audioBlob], `voice-${Date.now()}.webm`, {
+        type: 'audio/webm',
+      });
+
+      // Create a temporary message first
+      const tempMessage = await messagesService.createMessage({
+        space_id: currentSpace.id,
+        conversation_id: conversationId,
+        sender_id: user.id,
+        content: '🎤 Voice message',
+      });
+
+      // Upload the audio file
+      await fileUploadService.uploadFile(
+        audioFile,
+        currentSpace.id,
+        tempMessage.id,
+        () => {} // Progress callback not needed here
+      );
+
+      setShowVoiceRecorder(false);
+      toast.success('Voice message sent');
+      setTimeout(scrollToBottom, 100);
+    } catch (error) {
+      console.error('Failed to send voice message:', error);
+      toast.error('Failed to send voice message');
+      throw error;
+    }
+  }, [currentSpace, user, conversationId, scrollToBottom]);
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Messages' }]}>
       <div className="p-4 sm:p-8">
@@ -760,6 +802,27 @@ export default function MessagesPage() {
                     {/* Tooltip */}
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                       Attach file
+                    </div>
+                  </div>
+
+                  {/* Voice Message Button */}
+                  <div className="relative group">
+                    <button
+                      type="button"
+                      onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
+                      className={`p-1.5 sm:p-2 rounded-lg transition-colors cursor-pointer ${
+                        showVoiceRecorder
+                          ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+                          : 'hover:bg-gray-200 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                      </svg>
+                    </button>
+                    {/* Tooltip */}
+                    <div className="hidden sm:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                      {showVoiceRecorder ? 'Close recorder' : 'Voice message'}
                     </div>
                   </div>
 

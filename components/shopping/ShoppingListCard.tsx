@@ -121,14 +121,14 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                 {list.title}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
                 {checkedItems} of {totalItems} items • {list.store_name || 'No store set'}
               </p>
             </div>
           </div>
 
           {list.description && (
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 ml-[76px]">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 ml-[76px] break-words line-clamp-2">
               <span className="font-medium">Note:</span> {list.description}
             </p>
           )}
@@ -161,8 +161,8 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                       </Tooltip>
 
                       {/* Item name and quantity controls grouped together */}
-                      <div className="flex items-center gap-1.5 flex-1">
-                        <span className={`text-sm ${item.checked ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                      <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                        <span className={`text-sm truncate ${item.checked ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-300'}`}>
                           {item.name}
                         </span>
 
@@ -306,7 +306,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
           </span>
           {list.store_name && (
             <Tooltip content={`Shopping at ${list.store_name}`}>
-              <span className="px-2 py-1 text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full">
+              <span className="px-2 py-1 text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full truncate max-w-[120px]">
                 🏪 {list.store_name}
               </span>
             </Tooltip>

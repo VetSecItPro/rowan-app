@@ -41,11 +41,11 @@ export const ProjectCard = memo(({ project, onEdit, onDelete }: ProjectCardProps
     <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center">
+          <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center flex-shrink-0">
             <Folder className="w-5 h-5 text-white" />
           </div>
-          <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white">{project.name}</h3>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-gray-900 dark:text-white truncate">{project.name}</h3>
             <span className={`text-xs pl-1.5 pr-2.5 py-1 rounded-full ${statusInfo.color}`}>
               {statusInfo.label}
             </span>

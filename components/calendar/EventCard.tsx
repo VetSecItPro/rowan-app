@@ -102,11 +102,11 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
             </div>
 
             <div
-              className={`w-1 h-12 rounded-full ${getCategoryConfig().barColor}`}
+              className={`w-1 h-12 rounded-full ${getCategoryConfig().barColor} flex-shrink-0`}
             />
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className={`text-lg font-semibold text-gray-900 dark:text-white ${
+                <h3 className={`text-lg font-semibold text-gray-900 dark:text-white truncate ${
                   event.status === 'completed' ? 'line-through opacity-60' : ''
                 }`}>
                   {event.title}
@@ -133,7 +133,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
           </div>
 
           {event.description && (
-            <p className={`text-gray-600 dark:text-gray-400 mt-3 ml-4 ${
+            <p className={`text-gray-600 dark:text-gray-400 mt-3 ml-4 break-words line-clamp-2 ${
               event.status === 'completed' ? 'line-through opacity-60' : ''
             }`}>
               {event.description}
@@ -144,8 +144,8 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
             <div className={`flex items-center gap-2 mt-3 ml-4 text-gray-600 dark:text-gray-400 ${
               event.status === 'completed' ? 'line-through opacity-60' : ''
             }`}>
-              <MapPin className="w-4 h-4" />
-              <span className="text-sm">{event.location}</span>
+              <MapPin className="w-4 h-4 flex-shrink-0" />
+              <span className="text-sm truncate">{event.location}</span>
             </div>
           )}
 
@@ -156,8 +156,8 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                 event.status === 'completed' ? 'opacity-60' : ''
               }`}
             >
-              <ShoppingCart className="w-4 h-4" />
-              <span className="text-sm font-medium">
+              <ShoppingCart className="w-4 h-4 flex-shrink-0" />
+              <span className="text-sm font-medium truncate">
                 {linkedShoppingList.title}
                 {linkedShoppingList.items_count !== undefined && ` (${linkedShoppingList.items_count} items)`}
               </span>

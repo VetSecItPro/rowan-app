@@ -52,6 +52,11 @@ export interface CreateReminderInput {
   assigned_to?: string; // User ID to assign this reminder to
 }
 
+export interface UpdateReminderInput extends Partial<CreateReminderInput> {
+  snoozed_by?: string;
+  completed_at?: string;
+}
+
 export interface ReminderStats {
   total: number;
   active: number;
@@ -121,7 +126,7 @@ export const remindersService = {
     return data;
   },
 
-  async updateReminder(id: string, updates: Partial<CreateReminderInput>): Promise<Reminder> {
+  async updateReminder(id: string, updates: UpdateReminderInput): Promise<Reminder> {
     const supabase = createClient();
     const finalUpdates: any = { ...updates };
 
