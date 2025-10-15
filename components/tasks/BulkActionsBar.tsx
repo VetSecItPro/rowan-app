@@ -128,7 +128,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
 
             <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3 sm:gap-2">
               {/* Quick Actions */}
               <button
                 onClick={bulkComplete}

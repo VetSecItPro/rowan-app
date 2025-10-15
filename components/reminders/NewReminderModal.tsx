@@ -412,7 +412,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Select Days
               </label>
-              <div className="flex gap-2">
+              <div className="flex gap-3 sm:gap-2">
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
                   <button
                     key={day}
