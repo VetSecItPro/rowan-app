@@ -58,15 +58,15 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
           )}
         </div>
         <div className="relative">
-          <button onClick={() => setShowMenu(!showMenu)} aria-label="Meal options menu" className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+          <button onClick={() => setShowMenu(!showMenu)} aria-label="Meal options menu" className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg active:scale-95">
             <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
           </button>
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
               <div className="absolute right-0 mt-2 w-32 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
-                <button onClick={() => { onEdit(meal); setShowMenu(false); }} className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg">Edit</button>
-                <button onClick={() => { onDelete(meal.id); setShowMenu(false); }} className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg">Delete</button>
+                <button onClick={() => { onEdit(meal); setShowMenu(false); }} className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg active:scale-[0.98]">Edit</button>
+                <button onClick={() => { onDelete(meal.id); setShowMenu(false); }} className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg active:scale-[0.98]">Delete</button>
               </div>
             </>
           )}

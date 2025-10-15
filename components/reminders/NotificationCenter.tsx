@@ -100,7 +100,7 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
       {/* Bell Icon Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+        className="relative p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors active:scale-95"
         aria-label="Notifications"
       >
         <Bell className="w-6 h-6" />
@@ -131,14 +131,14 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
                 {unreadCount > 0 && (
                   <button
                     onClick={handleMarkAllAsRead}
-                    className="text-sm text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 font-medium"
+                    className="text-sm text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 font-medium active:opacity-80"
                   >
                     Mark all read
                   </button>
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors active:scale-95"
                   aria-label="Close notifications"
                 >
                   <X className="w-5 h-5" />
@@ -184,7 +184,7 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
                     setIsOpen(false);
                     router.push('/reminders');
                   }}
-                  className="text-sm text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 font-medium"
+                  className="text-sm text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 font-medium active:opacity-80"
                 >
                   View all reminders →
                 </button>
