@@ -84,7 +84,7 @@ export function GoalCard({ goal, onEdit, onDelete, onStatusChange }: GoalCardPro
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="w-44 sm:w-40 dropdown-mobile absolute right-0 mt-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20 overflow-hidden">
+              <div className="w-48 dropdown-mobile absolute right-0 mt-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20 overflow-hidden">
                 <button
                   onClick={() => { onEdit(goal); setShowMenu(false); }}
                   className="w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 active:scale-[0.98]"
