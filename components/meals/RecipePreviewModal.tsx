@@ -79,10 +79,10 @@ export function RecipePreviewModal({
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/70 rounded-lg transition-colors"
+            className="absolute top-4 right-4 w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center bg-black/50 hover:bg-black/70 rounded-full transition-all active:scale-95"
             aria-label="Close modal"
           >
-            <X className="w-5 h-5 text-white" />
+            <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
           </button>
 
           {/* Source Badge */}

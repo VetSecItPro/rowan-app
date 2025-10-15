@@ -340,11 +340,18 @@ export default function DiscoverRecipesPage() {
           <div className="relative max-w-2xl">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
-              type="text"
+              type="search"
+              inputMode="search"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="none"
+              spellCheck="false"
+
               value={searchQuery}
               onChange={handleSearchChange}
               placeholder="Search for pasta, chicken, desserts..."
-              className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border-0 rounded-lg shadow-lg focus:ring-2 focus:ring-orange-300 text-gray-900 dark:text-white placeholder-gray-500"
+
+              className="w-full pl-12 pr-4 py-3 text-base md:pl-12 md:pr-4 md:py-3 md:text-sm bg-gray-50 dark:bg-gray-800 border-0 rounded-lg shadow-lg focus:ring-2 focus:ring-orange-300 text-gray-900 dark:text-white placeholder-gray-500"
             />
           </div>
         </div>
