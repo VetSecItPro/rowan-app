@@ -425,7 +425,20 @@ export default function GoalsPage() {
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input type="text" placeholder="Search goals..." value={searchQuery} onChange={handleSearchChange} className="w-full pl-10 pr-4 px-4 py-3 text-base md:px-4 md:py-2 md:text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white" />
+              <input
+                type="search"
+                inputMode="search"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck="false"
+
+                placeholder="Search goals..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+
+                className="w-full pl-10 pr-4 py-3 text-base md:pl-10 md:pr-4 md:py-2 md:text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+              />
             </div>
           </div>
           )}
