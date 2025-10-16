@@ -15,6 +15,7 @@ import { ConversationSidebar } from '@/components/messages/ConversationSidebar';
 import { NewConversationModal } from '@/components/messages/NewConversationModal';
 import { ForwardMessageModal } from '@/components/messages/ForwardMessageModal';
 import { MessageNotificationBell } from '@/components/messages/MessageNotificationBell';
+import { SwipeableMessageCard } from '@/components/messages/SwipeableMessageCard';
 import GuidedMessageCreation from '@/components/guided/GuidedMessageCreation';
 import { fileUploadService } from '@/lib/services/file-upload-service';
 import { useAuth } from '@/lib/contexts/auth-context';
@@ -1029,19 +1030,25 @@ export default function MessagesPage() {
                           </div>
                         )}
 
-                        {/* Message Card */}
-                        <MessageCard
-                          message={message}
-                          onEdit={handleEditMessage}
-                          onDelete={handleDeleteMessage}
-                          onMarkRead={handleMarkRead}
-                          onTogglePin={handleTogglePin}
-                          onForward={handleForwardMessage}
+                        {/* Message Card with Swipe Gestures */}
+                        <SwipeableMessageCard
                           isOwn={message.sender_id === currentSpace?.id}
-                          currentUserId={currentSpace?.id || ''}
-                          onReply={handleReply}
-                          showReplyButton={true}
-                        />
+                          onEdit={() => handleEditMessage(message)}
+                          onDelete={() => handleDeleteMessage(message.id)}
+                        >
+                          <MessageCard
+                            message={message}
+                            onEdit={handleEditMessage}
+                            onDelete={handleDeleteMessage}
+                            onMarkRead={handleMarkRead}
+                            onTogglePin={handleTogglePin}
+                            onForward={handleForwardMessage}
+                            isOwn={message.sender_id === currentSpace?.id}
+                            currentUserId={currentSpace?.id || ''}
+                            onReply={handleReply}
+                            showReplyButton={true}
+                          />
+                        </SwipeableMessageCard>
                       </div>
                     );
                   })}
