@@ -24,6 +24,24 @@ export function GoalCard({ goal, onEdit, onDelete, onStatusChange }: GoalCardPro
 
   const goalState = getGoalState();
 
+  // Get color-coded progress styling based on percentage
+  const getProgressColor = () => {
+    if (goal.progress === 0) return 'from-gray-300 to-gray-400'; // Not started
+    if (goal.progress <= 25) return 'from-blue-300 to-blue-400'; // Just started
+    if (goal.progress <= 50) return 'from-blue-400 to-blue-500'; // Making progress
+    if (goal.progress <= 75) return 'from-blue-500 to-green-400'; // Getting there
+    if (goal.progress < 100) return 'from-green-400 to-green-500'; // Almost done
+    return 'from-green-500 to-green-600'; // Completed
+  };
+
+  // Get text color for progress percentage
+  const getProgressTextColor = () => {
+    if (goal.progress >= 75) return 'text-green-600 dark:text-green-400';
+    if (goal.progress >= 50) return 'text-blue-600 dark:text-blue-400';
+    if (goal.progress >= 25) return 'text-blue-500 dark:text-blue-300';
+    return 'text-gray-600 dark:text-gray-400';
+  };
+
   const handleCheckboxClick = () => {
     if (!onStatusChange) return;
 
@@ -34,7 +52,7 @@ export function GoalCard({ goal, onEdit, onDelete, onStatusChange }: GoalCardPro
   };
 
   return (
-    <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border-2 border-gray-200/50 dark:border-gray-700/50 rounded-xl p-6 hover:border-purple-300 dark:hover:border-purple-600 transition-all">
+    <div className="group relative bg-white/10 dark:bg-black/40 backdrop-blur-lg backdrop-saturate-150 border border-white/20 dark:border-white/10 rounded-xl p-6 hover:bg-white/15 dark:hover:bg-black/50 hover:border-white/30 dark:hover:border-white/20 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
       <div className="flex items-start gap-3 mb-4">
         {/* Three-state checkbox */}
         <div className="relative group">
@@ -104,12 +122,15 @@ export function GoalCard({ goal, onEdit, onDelete, onStatusChange }: GoalCardPro
       </div>
       <div className="space-y-3">
         <div>
-          <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-gray-600 dark:text-gray-400">Progress</span>
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">{goal.progress}%</span>
+            <span className={`text-sm font-bold ${getProgressTextColor()}`}>{goal.progress}%</span>
           </div>
-          <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-goals transition-all duration-300" style={{ width: `${goal.progress}%` }} />
+          <div className="h-3 bg-gray-200/50 dark:bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-sm">
+            <div
+              className={`h-full bg-gradient-to-r ${getProgressColor()} transition-all duration-700 ease-out rounded-full shadow-sm`}
+              style={{ width: `${goal.progress}%` }}
+            />
           </div>
         </div>
         <div className="flex items-center justify-between">
