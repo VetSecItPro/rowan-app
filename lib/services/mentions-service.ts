@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 
 // =====================================================
 // TYPES
@@ -102,6 +102,7 @@ export async function createMentions(
 ): Promise<MessageMention[]> {
   if (inputs.length === 0) return [];
 
+  const supabase = createClient();
   const { data, error } = await supabase
     .from('message_mentions')
     .insert(inputs)
@@ -121,6 +122,7 @@ export async function createMentions(
 export async function getMentionsForMessage(
   messageId: string
 ): Promise<MessageMention[]> {
+  const supabase = createClient();
   const { data, error } = await supabase
     .from('message_mentions')
     .select('*')
@@ -142,6 +144,7 @@ export async function getUnreadMentions(
   userId: string,
   spaceId?: string
 ): Promise<MessageMention[]> {
+  const supabase = createClient();
   let query = supabase
     .from('message_mentions')
     .select('*')
@@ -170,6 +173,7 @@ export async function getUnreadMentionCount(
   userId: string,
   spaceId?: string
 ): Promise<number> {
+  const supabase = createClient();
   let query = supabase
     .from('message_mentions')
     .select('id', { count: 'exact', head: true })
@@ -196,6 +200,7 @@ export async function getUnreadMentionCount(
 export async function markMentionAsRead(
   mentionId: string
 ): Promise<MessageMention> {
+  const supabase = createClient();
   const { data, error } = await supabase
     .from('message_mentions')
     .update({
@@ -221,6 +226,7 @@ export async function markMessageMentionsAsRead(
   messageId: string,
   userId: string
 ): Promise<void> {
+  const supabase = createClient();
   const { error } = await supabase
     .from('message_mentions')
     .update({
@@ -242,6 +248,7 @@ export async function markMessageMentionsAsRead(
 export async function deleteMentionsForMessage(
   messageId: string
 ): Promise<void> {
+  const supabase = createClient();
   const { error } = await supabase
     .from('message_mentions')
     .delete()
@@ -263,6 +270,7 @@ export async function deleteMentionsForMessage(
 export async function getMentionableUsers(
   spaceId: string
 ): Promise<MentionableUser[]> {
+  const supabase = createClient();
   // Query space_members to get users in this space
   const { data: members, error } = await supabase
     .from('space_members')
