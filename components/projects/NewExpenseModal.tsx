@@ -230,8 +230,8 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
                   setDateError('');
                 }
               }}
-              className={`w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border rounded-lg ${
-                dateError ? 'border-red-500 dark:border-red-500' : ''
+              className={`w-full px-4 py-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border rounded-lg focus:ring-2 focus:ring-amber-500/50 focus:border-transparent text-gray-900 dark:text-white ${
+                dateError ? 'border-red-500 dark:border-red-500' : 'border-gray-200/50 dark:border-gray-700/50'
               }`}
             />
             {dateError && (
