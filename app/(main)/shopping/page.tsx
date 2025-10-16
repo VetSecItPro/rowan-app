@@ -144,7 +144,7 @@ export default function ShoppingPage() {
   }, [currentSpace]);
 
   // Memoized callback for creating/updating lists
-  const handleCreateList = useCallback(async (listData: CreateListInput & { store_name?: string; items?: { id?: string; name: string; quantity: number; assigned_to?: string }[] }) => {
+  const handleCreateList = useCallback(async (listData: CreateListInput & { store_name?: string; budget?: number; items?: { id?: string; name: string; quantity: number; assigned_to?: string }[] }) => {
     try {
       if (editingList) {
         // Extract items before updating the list
@@ -172,16 +172,20 @@ export default function ShoppingPage() {
         // Extract items before creating the list
         const { items, ...listDataOnly } = listData;
 
+        console.log('Creating list with data:', listDataOnly);
         const newList = await shoppingService.createList(listDataOnly);
+        console.log('List created:', newList);
 
         // Add items if provided
         if (items && items.length > 0) {
+          console.log('Adding items:', items);
           for (const item of items) {
             const createdItem = await shoppingService.createItem({
               list_id: newList.id,
               name: item.name,
               quantity: item.quantity || 1,
             } as any);
+            console.log('Item created:', createdItem);
 
             // Update assigned_to if provided
             if (item.assigned_to) {
@@ -190,10 +194,16 @@ export default function ShoppingPage() {
           }
         }
       }
-      loadLists();
+
+      // Reload lists immediately after creation
+      console.log('Reloading lists...');
+      await loadLists();
+      console.log('Lists reloaded');
+
       setEditingList(null);
     } catch (error) {
       console.error('Failed to save list:', error);
+      alert('Failed to save shopping list. Please try again.');
     }
   }, [editingList]);
 
