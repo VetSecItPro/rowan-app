@@ -28,6 +28,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
   const [newItemName, setNewItemName] = useState('');
   const [isReorderMode, setIsReorderMode] = useState(false);
   const [spaceMembers, setSpaceMembers] = useState<any[]>([]);
+  const [defaultAssignee, setDefaultAssignee] = useState<string>('');
 
   useEffect(() => {
     if (editList) {
@@ -107,9 +108,14 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
 
   const handleAddItem = () => {
     if (newItemName.trim()) {
-      setItems([...items, { name: newItemName, quantity: 1, checked: false }]);
+      setItems([...items, { name: newItemName, quantity: 1, checked: false, assigned_to: defaultAssignee || undefined }]);
       setNewItemName('');
     }
+  };
+
+  const handleAssignAllItems = (userId: string | undefined) => {
+    setDefaultAssignee(userId || '');
+    setItems(items.map(item => ({ ...item, assigned_to: userId })));
   };
 
   const handleRemoveItem = (index: number) => {
@@ -208,16 +214,35 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
           <div>
             <div className="flex items-center justify-between mb-3">
               <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">Items</label>
-              {items.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => setIsReorderMode(!isReorderMode)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded-lg transition-colors"
-                >
-                  <GripVertical className="w-3.5 h-3.5" />
-                  {isReorderMode ? 'Done Reordering' : 'Reorder Items'}
-                </button>
-              )}
+              <div className="flex items-center gap-2">
+                {spaceMembers.length > 0 && items.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-600 dark:text-gray-400">Assign all to:</span>
+                    <select
+                      value={defaultAssignee}
+                      onChange={(e) => handleAssignAllItems(e.target.value || undefined)}
+                      className="text-xs bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 rounded-lg px-2 py-1.5 text-emerald-700 dark:text-emerald-300 font-medium focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    >
+                      <option value="">No one</option>
+                      {spaceMembers.map((member) => (
+                        <option key={member.user_id} value={member.user_id}>
+                          {member.display_name || member.email}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                {items.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setIsReorderMode(!isReorderMode)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded-lg transition-colors"
+                  >
+                    <GripVertical className="w-3.5 h-3.5" />
+                    {isReorderMode ? 'Done Reordering' : 'Reorder Items'}
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Add Item Input */}
