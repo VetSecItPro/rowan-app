@@ -34,11 +34,11 @@ ALTER TABLE goals ADD COLUMN IF NOT EXISTS target_date DATE;
 ALTER TABLE goals ADD COLUMN IF NOT EXISTS is_financial BOOLEAN DEFAULT false;
 
 -- Create indexes for performance
-CREATE INDEX idx_goal_contributions_goal ON goal_contributions(goal_id);
-CREATE INDEX idx_goal_contributions_user ON goal_contributions(user_id);
-CREATE INDEX idx_goal_contributions_date ON goal_contributions(contribution_date);
-CREATE INDEX idx_goals_financial ON goals(is_financial) WHERE is_financial = true;
-CREATE INDEX idx_goals_target_date ON goals(target_date) WHERE target_date IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_goal_contributions_goal ON goal_contributions(goal_id);
+CREATE INDEX IF NOT EXISTS idx_goal_contributions_user ON goal_contributions(user_id);
+CREATE INDEX IF NOT EXISTS idx_goal_contributions_date ON goal_contributions(contribution_date);
+CREATE INDEX IF NOT EXISTS idx_goals_financial ON goals(is_financial) WHERE is_financial = true;
+CREATE INDEX IF NOT EXISTS idx_goals_target_date ON goals(target_date) WHERE target_date IS NOT NULL;
 
 -- Enable RLS
 ALTER TABLE goal_contributions ENABLE ROW LEVEL SECURITY;
