@@ -18,6 +18,7 @@ import { useAuth } from '@/lib/contexts/auth-context';
 import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput, GoalTemplate } from '@/lib/services/goals-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { createClient } from '@/lib/supabase/client';
+import { toast } from 'sonner';
 
 type ViewMode = 'goals' | 'milestones';
 
@@ -26,6 +27,7 @@ export default function GoalsPage() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const goalsRef = useRef<Goal[]>([]);
+  const userActionsRef = useRef<Set<string>>(new Set()); // Track user-initiated actions
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>('goals');
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
@@ -119,12 +121,30 @@ export default function GoalsPage() {
           filter: `space_id=eq.${currentSpace.id}`
         },
         (payload) => {
+          const goalId = payload.new?.id || payload.old?.id;
+          const isUserAction = goalId && userActionsRef.current.has(goalId);
+
           if (payload.eventType === 'INSERT') {
-            setGoals(prev => [...prev, payload.new as Goal]);
+            const newGoal = payload.new as Goal;
+            setGoals(prev => [...prev, newGoal]);
+            if (!isUserAction) {
+              toast.info(`New goal added: ${newGoal.title}`);
+            }
           } else if (payload.eventType === 'UPDATE') {
-            setGoals(prev => prev.map(g => g.id === payload.new.id ? payload.new as Goal : g));
+            const updatedGoal = payload.new as Goal;
+            setGoals(prev => prev.map(g => g.id === updatedGoal.id ? updatedGoal : g));
+            if (!isUserAction) {
+              toast.info(`Goal updated: ${updatedGoal.title}`);
+            }
+            // Clean up action tracking
+            if (goalId) userActionsRef.current.delete(goalId);
           } else if (payload.eventType === 'DELETE') {
-            setGoals(prev => prev.filter(g => g.id !== payload.old.id));
+            const deletedId = payload.old.id;
+            setGoals(prev => prev.filter(g => g.id !== deletedId));
+            if (!isUserAction) {
+              toast.info('A goal was removed');
+            }
+            if (deletedId) userActionsRef.current.delete(deletedId);
           }
         }
       )
@@ -147,18 +167,33 @@ export default function GoalsPage() {
             return goalsRef.current.some(g => g.id === milestone.goal_id);
           };
 
+          const milestoneId = payload.new?.id || payload.old?.id;
+          const isUserAction = milestoneId && userActionsRef.current.has(milestoneId);
+
           if (payload.eventType === 'INSERT') {
             const newMilestone = payload.new as Milestone;
             if (belongsToCurrentSpace(newMilestone)) {
               setMilestones(prev => [...prev, newMilestone]);
+              if (!isUserAction) {
+                toast.info(`New milestone added: ${newMilestone.title}`);
+              }
             }
           } else if (payload.eventType === 'UPDATE') {
             const updatedMilestone = payload.new as Milestone;
             if (belongsToCurrentSpace(updatedMilestone)) {
               setMilestones(prev => prev.map(m => m.id === updatedMilestone.id ? updatedMilestone : m));
+              if (!isUserAction) {
+                toast.info(`Milestone updated: ${updatedMilestone.title}`);
+              }
             }
+            if (milestoneId) userActionsRef.current.delete(milestoneId);
           } else if (payload.eventType === 'DELETE') {
-            setMilestones(prev => prev.filter(m => m.id !== payload.old.id));
+            const deletedId = payload.old.id;
+            setMilestones(prev => prev.filter(m => m.id !== deletedId));
+            if (!isUserAction) {
+              toast.info('A milestone was removed');
+            }
+            if (deletedId) userActionsRef.current.delete(deletedId);
           }
         }
       )
@@ -263,6 +298,9 @@ export default function GoalsPage() {
   }, [confirmDialog, loadData]);
 
   const handleToggleMilestone = useCallback(async (milestoneId: string, completed: boolean) => {
+    // Mark as user action
+    userActionsRef.current.add(milestoneId);
+
     // Optimistic update
     const previousMilestones = milestones;
     setMilestones(prev => prev.map(m =>
@@ -278,6 +316,7 @@ export default function GoalsPage() {
       console.error('Failed to toggle milestone:', error);
       // Revert on error
       setMilestones(previousMilestones);
+      userActionsRef.current.delete(milestoneId);
     }
   }, [milestones]);
 
@@ -293,6 +332,9 @@ export default function GoalsPage() {
       'completed': 100,
     };
 
+    // Mark as user action
+    userActionsRef.current.add(goalId);
+
     // Optimistic update
     const previousGoals = goals;
     setGoals(prev => prev.map(g =>
@@ -306,11 +348,12 @@ export default function GoalsPage() {
         status: statusMap[status],
         progress: progressMap[status],
       });
-      // Real-time subscription will handle the update, but we'll reload to be safe
+      // Real-time subscription will handle the update
     } catch (error) {
       console.error('Failed to update goal status:', error);
       // Revert on error
       setGoals(previousGoals);
+      userActionsRef.current.delete(goalId);
     }
   }, [goals]);
 
@@ -415,6 +458,9 @@ export default function GoalsPage() {
   }, [currentSpace, goals, loadData]);
 
   const handlePriorityChange = useCallback(async (goalId: string, priority: 'none' | 'p1' | 'p2' | 'p3' | 'p4') => {
+    // Mark as user action
+    userActionsRef.current.add(goalId);
+
     // Optimistic update
     const previousGoals = goals;
     setGoals(prev => prev.map(g =>
@@ -428,10 +474,14 @@ export default function GoalsPage() {
       console.error('Failed to update goal priority:', error);
       // Revert on error
       setGoals(previousGoals);
+      userActionsRef.current.delete(goalId);
     }
   }, [goals]);
 
   const handleTogglePin = useCallback(async (goalId: string, isPinned: boolean) => {
+    // Mark as user action
+    userActionsRef.current.add(goalId);
+
     // Optimistic update
     const previousGoals = goals;
     setGoals(prev => prev.map(g =>
@@ -445,6 +495,7 @@ export default function GoalsPage() {
       console.error('Failed to toggle goal pin:', error);
       // Revert on error
       setGoals(previousGoals);
+      userActionsRef.current.delete(goalId);
     }
   }, [goals]);
 
