@@ -1141,6 +1141,194 @@ By implementing these features in phases, Rowan will provide couples with the to
 
 ---
 
-*Document Version: 1.0*
+## Implementation Task List
+
+### Phase 1 - Must Have Features (26 tasks)
+
+#### Enhanced Progress Visualization (4 tasks)
+- [ ] Design circular progress rings component
+- [ ] Implement animated progress bars with Framer Motion
+- [ ] Add color-coded progress states (gray, blue, green)
+- [ ] Apply glassmorphism styling to goal cards
+
+#### Shared Goal Spaces (5 tasks)
+- [ ] Create goal_collaborators database table and RLS policies
+- [ ] Add visibility column to goals table (private/shared)
+- [ ] Implement role-based permissions (owner/contributor/viewer)
+- [ ] Build real-time sync with Supabase subscriptions
+- [ ] Add visibility toggle UI in goal creation modal
+
+#### Smart Goal Templates (5 tasks)
+- [ ] Design template selection interface with categories
+- [ ] Create templates database table and seed data
+- [ ] Build 15+ goal templates (financial, health, home, relationship, career)
+- [ ] Implement template wizard with SMART goal framework
+- [ ] Add one-click template instantiation with auto-generated milestones
+
+#### Drag & Drop Prioritization (6 tasks)
+- [ ] Install @dnd-kit or react-beautiful-dnd library
+- [ ] Add priority_order column to goals table
+- [ ] Implement drag-to-reorder functionality in goals list
+- [ ] Build priority badge system (P1-P4) with color coding
+- [ ] Add Focus Mode toggle (show top 3 goals only)
+- [ ] Implement pin functionality for important goals
+
+#### Enhanced Mobile Experience (6 tasks)
+- [ ] Implement pull-to-refresh with haptic feedback
+- [ ] Add haptic feedback for milestone/goal completion
+- [ ] Configure Service Worker for offline mode
+- [ ] Implement IndexedDB for local data storage
+- [ ] Build sync queue for offline actions
+- [ ] Optimize tap targets to 44x44pt minimum
+
+### Phase 2 - Should Have Features (31 tasks)
+
+#### Interactive Timeline View (5 tasks)
+- [ ] Design horizontal timeline component layout
+- [ ] Implement milestone nodes with connecting lines
+- [ ] Add pulsing 'Today' marker on timeline
+- [ ] Build Gantt chart view for overlapping goals
+- [ ] Implement drag-to-adjust milestone dates
+
+#### Check-in System (6 tasks)
+- [ ] Create goal_check_ins database table
+- [ ] Build check-in modal with progress slider and emoji reactions
+- [ ] Implement check-in frequency settings (daily/weekly/monthly)
+- [ ] Add voice note recording with Web Speech API
+- [ ] Implement photo upload for milestone celebrations
+- [ ] Build check-in history timeline view
+
+#### Accountability Features (5 tasks)
+- [ ] Implement goal buddy assignment system
+- [ ] Build smart nudge system with frequency limits
+- [ ] Add partner nudge functionality with encouragement messages
+- [ ] Implement celebration together with confetti animations
+- [ ] Add support reaction emojis (🎉👏❤️💪🔥)
+
+#### Activity Feed & Comments (5 tasks)
+- [ ] Create activity_logs table for goal events
+- [ ] Build chronological activity feed with filters
+- [ ] Implement comment threads with @mentions
+- [ ] Add markdown support for comment formatting
+- [ ] Build notification system for mentions and updates
+
+#### Milestone Calendar Integration (5 tasks)
+- [ ] Add calendar view component (month/week/day)
+- [ ] Display milestone dots on calendar dates
+- [ ] Implement color-coding by goal category
+- [ ] Add quick-add milestone from calendar date
+- [ ] Build .ics export for external calendar sync
+
+#### Celebration & Rewards (6 tasks)
+- [ ] Install canvas-confetti library
+- [ ] Implement confetti animation on goal completion
+- [ ] Create achievement_badges table and seed badges
+- [ ] Build badge system with 10+ achievements
+- [ ] Add streak rewards (7, 30, 100 days)
+- [ ] Implement personalized celebration messages
+
+### Phase 3 - Nice to Have Features (30 tasks)
+
+#### Goal Dashboard with Widgets (6 tasks)
+- [ ] Install Chart.js or Recharts library
+- [ ] Build burndown chart widget
+- [ ] Create pie chart for goal distribution
+- [ ] Add bar chart for milestones completed
+- [ ] Implement GitHub-style heatmap calendar
+- [ ] Add drag-to-rearrange widgets with react-grid-layout
+
+#### Goal Dependencies & Relationships (5 tasks)
+- [ ] Create goal_dependencies table
+- [ ] Add parent_goal_id column for parent-child relationships
+- [ ] Build dependency visualization (arrows/tree)
+- [ ] Implement blocking logic (can't complete if dependencies incomplete)
+- [ ] Add parent progress rollup from child goals
+
+#### Recurring Goals & Habits (5 tasks)
+- [ ] Add is_recurring and recurrence_pattern columns
+- [ ] Build recurrence pattern editor (daily/weekly/monthly/custom)
+- [ ] Implement auto-generation of next instance on completion
+- [ ] Add streak counter and calendar heatmap
+- [ ] Build historical data view for recurring goals
+
+#### Advanced Milestone Features (5 tasks)
+- [ ] Implement sub-milestones (2 levels deep)
+- [ ] Create milestone_dependencies table
+- [ ] Add estimated_date and actual_date columns
+- [ ] Build milestone templates system
+- [ ] Implement milestone assignment to specific partners
+
+#### Goal Analytics Dashboard (6 tasks)
+- [ ] Build completion rate calculation and visualization
+- [ ] Calculate average time to complete goals
+- [ ] Create success by category breakdown
+- [ ] Build productivity heatmap calendar
+- [ ] Add comparative analytics (you vs partner)
+- [ ] Implement export as PDF/PNG functionality
+
+### Phase 4 - Future Enhancements (20 tasks)
+
+#### Streak & Momentum Indicators (4 tasks)
+- [ ] Build streak counter algorithm
+- [ ] Calculate momentum score based on velocity
+- [ ] Add 'On Fire' particle animation
+- [ ] Implement progress velocity badges (ahead/on track/behind)
+
+#### AI-Powered Insights (5 tasks)
+- [ ] Integrate OpenAI API for milestone suggestions
+- [ ] Build realistic deadline recommendation algorithm
+- [ ] Implement completion prediction with linear regression
+- [ ] Create weekly summary email system
+- [ ] Add smart nudges based on user patterns
+
+#### Year in Review (5 tasks)
+- [ ] Build annual data aggregation system
+- [ ] Design 8-10 review slides with gradient backgrounds
+- [ ] Implement slide transitions with animations
+- [ ] Add shareable image generation (1080x1920)
+- [ ] Create auto-trigger on January 1st
+
+#### Quick Actions & Shortcuts (4 tasks)
+- [ ] Implement keyboard shortcuts (N, M, G, /, Esc, Cmd+Enter)
+- [ ] Add mobile swipe gestures for actions
+- [ ] Build bulk operations mode with checkboxes
+- [ ] Create command palette (Cmd+K) with fuzzy search
+
+### Testing & Quality Assurance (6 tasks)
+- [ ] Create comprehensive test suite for goal CRUD operations
+- [ ] Test real-time collaboration features with multiple users
+- [ ] Perform accessibility audit (WCAG 2.1 AA compliance)
+- [ ] Test offline mode and sync conflict resolution
+- [ ] Conduct mobile device testing (iOS and Android)
+- [ ] Run performance benchmarks and optimize slow queries
+
+### Documentation (3 tasks)
+- [ ] Update API documentation for new endpoints
+- [ ] Create user guide for new goal features
+- [ ] Write database migration guides
+
+### Deployment (3 tasks)
+- [ ] Create database migration scripts for all schema changes
+- [ ] Update Supabase RLS policies for new tables
+- [ ] Deploy Phase 1 features to production
+
+---
+
+## Task Summary
+
+**Total Tasks:** 117
+- Phase 1 (Must Have): 26 tasks - 3-4 weeks
+- Phase 2 (Should Have): 31 tasks - 3-4 weeks
+- Phase 3 (Nice to Have): 30 tasks - 4-5 weeks
+- Phase 4 (Future): 20 tasks - 2-3 weeks
+- Testing: 6 tasks
+- Documentation: 3 tasks
+- Deployment: 3 tasks
+
+**Total Estimated Effort:** 12-16 weeks
+
+---
+
+*Document Version: 1.1*
 *Last Updated: October 15, 2025*
 *Author: Claude (AI Assistant)*
