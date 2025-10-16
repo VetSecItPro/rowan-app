@@ -107,7 +107,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
   const statusLabel = getStatusLabel();
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-4 hover:shadow-lg transition-all duration-200 group">
+    <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg p-4 sm:p-4 hover:shadow-lg transition-all duration-200 group">
       {/* Header */}
       <div className="flex items-start justify-between mb-3 gap-3">
         <div className="flex items-start gap-3 flex-1">
@@ -174,7 +174,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
                 className="fixed inset-0 z-10"
                 onClick={() => setShowMenu(false)}
               />
-              <div className="absolute right-0 mt-1 w-48 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+              <div className="absolute right-0 mt-1 w-48 dropdown-mobile bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-lg z-20">
                 {onViewDetails && task.type === 'task' && (
                   <button
                     onClick={() => {
