@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -9,6 +9,7 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  DragStartEvent,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -18,6 +19,7 @@ import {
 } from '@dnd-kit/sortable';
 import { Goal } from '@/lib/services/goals-service';
 import { SortableGoalCard } from './SortableGoalCard';
+import { hapticMedium, hapticLight } from '@/lib/utils/haptics';
 
 interface SortableGoalsListProps {
   goals: Goal[];
@@ -51,10 +53,16 @@ export function SortableGoalsList({
     })
   );
 
+  const handleDragStart = (event: DragStartEvent) => {
+    hapticMedium(); // Haptic feedback when drag starts
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
+      hapticLight(); // Haptic feedback when dropped in new position
+
       setItems((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id);
@@ -70,9 +78,9 @@ export function SortableGoalsList({
   };
 
   // Update items when goals prop changes
-  useState(() => {
+  useEffect(() => {
     setItems(goals);
-  });
+  }, [goals]);
 
   return (
     <DndContext
