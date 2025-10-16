@@ -68,11 +68,12 @@ export function Modal({
         aria-label="Close modal"
       />
 
-      {/* Modal Container */}
+      {/* Modal Container with Glassmorphism */}
       <div
         className={`
           relative
-          bg-white dark:bg-gray-800
+          bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl
+          border border-gray-200/50 dark:border-gray-700/50
           ${fullScreenOnMobile ? 'w-full h-full' : 'w-full max-w-md'}
           ${fullScreenOnMobile ? 'sm:w-auto sm:h-auto sm:rounded-xl' : 'rounded-xl'}
           ${fullScreenOnMobile ? `sm:${maxWidthClasses[maxWidth]}` : maxWidthClasses[maxWidth]}
@@ -85,7 +86,7 @@ export function Modal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-4 flex items-center justify-between">
+        <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 px-4 sm:px-6 py-4 flex items-center justify-between">
           <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white pr-12">
             {title}
           </h2>

@@ -91,18 +91,19 @@ export function MessageCard({
           </p>
         </div>
 
-        {/* Message Bubble */}
+        {/* Message Bubble with Glassmorphism */}
         <div className="relative group">
           <div
             className={`rounded-2xl px-4 py-3 ${
               isOwn
-                ? 'rounded-tr-sm bg-gray-50 dark:bg-gray-800'
-                : 'rounded-tl-sm bg-gray-50 dark:bg-gray-800'
-            }`}
+                ? 'rounded-tr-sm bg-white/40 dark:bg-gray-800/40'
+                : 'rounded-tl-sm bg-white/40 dark:bg-gray-800/40'
+            } backdrop-blur-md border shadow-lg`}
             style={{
-              borderWidth: '2px',
+              borderWidth: '1px',
               borderStyle: 'solid',
-              borderColor: senderColor
+              borderColor: `${senderColor}40`,
+              boxShadow: `0 8px 32px 0 rgba(0, 0, 0, 0.1), inset 0 1px 1px 0 ${senderColor}20`
             }}
           >
             {/* Message Content with Markdown Support */}
