@@ -4,12 +4,14 @@ import { useState } from 'react';
 import { MessageCircle, Search, Plus, Archive, X } from 'lucide-react';
 import { Conversation } from '@/lib/services/messages-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
+import { SwipeableConversationItem } from './SwipeableConversationItem';
 
 interface ConversationSidebarProps {
   conversations: Conversation[];
   activeConversationId?: string;
   onSelectConversation: (conversationId: string) => void;
   onNewConversation: () => void;
+  onDeleteConversation: (conversationId: string) => void;
   onClose?: () => void; // For mobile drawer
   showArchived?: boolean;
   className?: string;
@@ -20,6 +22,7 @@ export function ConversationSidebar({
   activeConversationId,
   onSelectConversation,
   onNewConversation,
+  onDeleteConversation,
   onClose,
   showArchived = false,
   className = '',
@@ -105,15 +108,25 @@ export function ConversationSidebar({
         ) : (
           <div>
             {filteredConversations.map((conversation) => (
-              <ConversationItem
+              <SwipeableConversationItem
                 key={conversation.id}
                 conversation={conversation}
-                isActive={conversation.id === activeConversationId}
+                isSelected={conversation.id === activeConversationId}
                 onClick={() => {
                   onSelectConversation(conversation.id);
                   onClose?.(); // Close mobile drawer on selection
                 }}
-              />
+                onDelete={onDeleteConversation}
+              >
+                <ConversationItem
+                  conversation={conversation}
+                  isActive={conversation.id === activeConversationId}
+                  onClick={() => {
+                    onSelectConversation(conversation.id);
+                    onClose?.(); // Close mobile drawer on selection
+                  }}
+                />
+              </SwipeableConversationItem>
             ))}
           </div>
         )}
