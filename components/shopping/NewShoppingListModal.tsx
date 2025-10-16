@@ -15,11 +15,12 @@ interface NewShoppingListModalProps {
 }
 
 export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceId }: NewShoppingListModalProps) {
-  const [formData, setFormData] = useState<CreateListInput & { store_name?: string }>({
+  const [formData, setFormData] = useState<CreateListInput & { store_name?: string; budget?: number }>({
     space_id: spaceId,
     title: '',
     description: '',
     store_name: '',
+    budget: undefined,
     status: 'active',
   });
 
@@ -35,6 +36,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
         title: editList.title,
         description: editList.description || '',
         store_name: editList.store_name || '',
+        budget: editList.budget,
         status: editList.status,
       });
       setItems((editList.items || []).map(item => ({
@@ -50,6 +52,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
         title: '',
         description: '',
         store_name: '',
+        budget: undefined,
         status: 'active',
       });
       setItems([]);
@@ -134,7 +137,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
   return (
     <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-3xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
+      <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-4xl lg:max-w-5xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         <div className="sticky top-0 z-10 bg-gradient-to-r from-emerald-500 to-emerald-600 flex items-center justify-between px-4 sm:px-6 py-5 border-b border-emerald-600">
           <h2 className="text-xl sm:text-2xl font-bold text-white">
             {editList ? 'Edit Shopping List' : 'New Shopping List'}
@@ -157,16 +160,36 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
             />
           </div>
 
-          {/* Store */}
-          <div>
-            <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">Store</label>
-            <input
-              type="text"
-              value={formData.store_name || ''}
-              onChange={(e) => setFormData({ ...formData, store_name: e.target.value })}
-              placeholder="Type your store"
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
-            />
+          {/* Store and Budget - Side by side on larger screens */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">Store</label>
+              <input
+                type="text"
+                value={formData.store_name || ''}
+                onChange={(e) => setFormData({ ...formData, store_name: e.target.value })}
+                placeholder="Type your store"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="field-budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                Budget (Optional)
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData.budget || ''}
+                  onChange={(e) => setFormData({ ...formData, budget: e.target.value ? parseFloat(e.target.value) : undefined })}
+                  placeholder="0.00"
+                  className="w-full pl-8 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                />
+              </div>
+            </div>
           </div>
 
           {/* Description */}

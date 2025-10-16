@@ -43,6 +43,8 @@ export interface CreateListInput {
   title: string;
   description?: string;
   status?: 'active' | 'completed' | 'archived';
+  store_name?: string;
+  budget?: number;
 }
 
 export interface CreateItemInput {
