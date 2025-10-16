@@ -1653,25 +1653,98 @@ export default function DashboardPage() {
                   </div>
                 )}
 
-                {/* Compact Mood Selector - Horizontal Row */}
-                <div className="grid grid-cols-5 gap-2 sm:gap-3 w-full mb-3">
-              {moodOptions.map((mood) => (
-                <Tooltip key={mood.value} content={`I'm feeling ${mood.label.toLowerCase()} today`} position="top">
-                  <button
-                    onClick={() => handleMoodSelect(mood.value)}
-                    className={`aspect-square p-4 sm:p-5 md:p-6 rounded-xl border-2 transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center justify-center ${
-                      selectedMood === mood.value
-                        ? 'border-pink-500 bg-pink-100 dark:bg-pink-900/30 scale-105 mood-selected shadow-lg shadow-pink-500/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-600 bg-white/50 dark:bg-gray-800/50 hover:shadow-lg'
-                    }`}
-                    title={mood.label}
-                  >
-                    <div className={`text-3xl sm:text-4xl transition-transform ${selectedMood === mood.value ? 'scale-110' : ''}`}>
-                      {mood.emoji}
-                    </div>
-                  </button>
-                </Tooltip>
-              ))}
+                {/* Elegant Mood Selector - Apple-Inspired Design */}
+                <div className="flex items-center justify-center gap-3 sm:gap-4 w-full mb-3">
+              {moodOptions.map((mood) => {
+                // Color schemes for each mood (Apple Health-inspired gradients)
+                const moodStyles = {
+                  great: {
+                    gradient: 'from-green-400 to-emerald-500',
+                    glow: 'shadow-green-500/30',
+                    ring: 'ring-green-400/50',
+                    bgActive: 'bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/40 dark:to-emerald-900/40',
+                    bgHover: 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20'
+                  },
+                  good: {
+                    gradient: 'from-blue-400 to-cyan-500',
+                    glow: 'shadow-blue-500/30',
+                    ring: 'ring-blue-400/50',
+                    bgActive: 'bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/40 dark:to-cyan-900/40',
+                    bgHover: 'bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20'
+                  },
+                  okay: {
+                    gradient: 'from-gray-400 to-slate-500',
+                    glow: 'shadow-gray-500/30',
+                    ring: 'ring-gray-400/50',
+                    bgActive: 'bg-gradient-to-br from-gray-100 to-slate-100 dark:from-gray-800/60 dark:to-slate-800/60',
+                    bgHover: 'bg-gradient-to-br from-gray-50 to-slate-50 dark:from-gray-800/40 dark:to-slate-800/40'
+                  },
+                  meh: {
+                    gradient: 'from-amber-400 to-orange-500',
+                    glow: 'shadow-amber-500/30',
+                    ring: 'ring-amber-400/50',
+                    bgActive: 'bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40',
+                    bgHover: 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20'
+                  },
+                  rough: {
+                    gradient: 'from-purple-400 to-pink-500',
+                    glow: 'shadow-purple-500/30',
+                    ring: 'ring-purple-400/50',
+                    bgActive: 'bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/40 dark:to-pink-900/40',
+                    bgHover: 'bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20'
+                  }
+                };
+
+                const style = moodStyles[mood.value as keyof typeof moodStyles];
+                const isSelected = selectedMood === mood.value;
+
+                return (
+                  <Tooltip key={mood.value} content={`I'm feeling ${mood.label.toLowerCase()} today`} position="top">
+                    <button
+                      onClick={() => handleMoodSelect(mood.value)}
+                      className={`group relative flex flex-col items-center gap-2 transition-all duration-300 transform ${
+                        isSelected ? 'scale-110' : 'hover:scale-105 active:scale-95'
+                      }`}
+                      title={mood.label}
+                    >
+                      {/* Emoji Container - Circular with gradient background */}
+                      <div className={`
+                        relative w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18
+                        rounded-full flex items-center justify-center
+                        transition-all duration-300
+                        ${isSelected
+                          ? `${style.bgActive} ring-4 ${style.ring} ${style.glow} shadow-xl`
+                          : `${style.bgHover} hover:shadow-lg`
+                        }
+                      `}>
+                        <div className={`
+                          text-3xl sm:text-4xl md:text-5xl
+                          transition-transform duration-300
+                          ${isSelected ? 'scale-110' : 'group-hover:scale-105'}
+                        `}>
+                          {mood.emoji}
+                        </div>
+
+                        {/* Selection indicator ring */}
+                        {isSelected && (
+                          <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${style.gradient} opacity-20 animate-pulse`} />
+                        )}
+                      </div>
+
+                      {/* Label - Only show on selected or desktop hover */}
+                      <span className={`
+                        text-xs sm:text-sm font-medium transition-all duration-200
+                        ${isSelected
+                          ? 'opacity-100 text-gray-900 dark:text-white'
+                          : 'opacity-0 sm:group-hover:opacity-70 text-gray-600 dark:text-gray-400'
+                        }
+                      `}>
+                        {mood.label}
+                      </span>
+                    </button>
+                  </Tooltip>
+                );
+              })}
             </div>
 
             {/* Smart Conditional Expansion */}
