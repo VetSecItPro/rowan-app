@@ -253,7 +253,7 @@ export default function ProjectsPage() {
                 placeholder={`Search ${activeTab}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full pl-10 pr-4 input-mobile bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-lg focus:ring-2 focus:ring-amber-500/50 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
           </div>

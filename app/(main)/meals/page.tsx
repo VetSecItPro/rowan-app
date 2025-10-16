@@ -1036,7 +1036,7 @@ export default function MealsPage() {
                 placeholder={viewMode === 'recipes' ? 'Search recipes... (Press / to type)' : 'Search meals... (Press / to type)'}
                 value={searchQuery}
                 onChange={handleSearchChange}
-                className="w-full pl-10 pr-10 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full pl-10 pr-10 py-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-lg focus:ring-2 focus:ring-purple-500/50 focus:border-transparent text-gray-900 dark:text-white"
               />
               {searchQuery && (
                 <button
