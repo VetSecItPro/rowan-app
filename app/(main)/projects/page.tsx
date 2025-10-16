@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Folder, Plus, Search, Wallet, Receipt, DollarSign, CheckCircle, Clock, FileText } from 'lucide-react';
+import { Folder, Plus, Search, Wallet, Receipt, DollarSign, CheckCircle, Clock, FileText, FileCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { ProjectCard } from '@/components/projects/ProjectCard';
@@ -11,29 +11,35 @@ import { NewExpenseModal } from '@/components/projects/NewExpenseModal';
 import { NewBudgetModal } from '@/components/projects/NewBudgetModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { SafeToSpendIndicator } from '@/components/projects/SafeToSpendIndicator';
+import { BillCard } from '@/components/projects/BillCard';
+import { NewBillModal } from '@/components/projects/NewBillModal';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { projectsOnlyService, type CreateProjectInput } from '@/lib/services/projects-service';
 import { projectsService, type Expense, type CreateExpenseInput } from '@/lib/services/budgets-service';
 import { budgetAlertsService } from '@/lib/services/budget-alerts-service';
+import { billsService, type Bill, type CreateBillInput } from '@/lib/services/bills-service';
 import type { Project } from '@/lib/types';
 
-type TabType = 'projects' | 'budgets' | 'expenses';
+type TabType = 'projects' | 'budgets' | 'expenses' | 'bills';
 
 export default function ProjectsPage() {
   const { currentSpace, user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('projects');
   const [projects, setProjects] = useState<Project[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [bills, setBills] = useState<Bill[]>([]);
   const [loading, setLoading] = useState(true);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
+  const [isBillModalOpen, setIsBillModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [editingBill, setEditingBill] = useState<Bill | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentBudget, setCurrentBudget] = useState<number>(0);
   const [budgetStats, setBudgetStats] = useState({ monthlyBudget: 0, spentThisMonth: 0, remaining: 0, pendingBills: 0 });
-  const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; action: 'delete-project' | 'delete-expense'; id: string }>({ isOpen: false, action: 'delete-project', id: '' });
+  const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; action: 'delete-project' | 'delete-expense' | 'delete-bill'; id: string }>({ isOpen: false, action: 'delete-project', id: '' });
 
   const loadData = useCallback(async () => {
     if (!currentSpace || !user) {
@@ -43,14 +49,16 @@ export default function ProjectsPage() {
 
     try {
       setLoading(true);
-      const [projectsData, expensesData, budgetData, stats] = await Promise.all([
+      const [projectsData, expensesData, billsData, budgetData, stats] = await Promise.all([
         projectsOnlyService.getProjects(currentSpace.id),
         projectsService.getExpenses(currentSpace.id),
+        billsService.getBills(currentSpace.id),
         projectsService.getBudget(currentSpace.id),
         projectsService.getBudgetStats(currentSpace.id),
       ]);
       setProjects(projectsData);
       setExpenses(expensesData);
+      setBills(billsData);
       setCurrentBudget(budgetData?.monthly_budget || 0);
       setBudgetStats(stats);
     } catch (error) {
@@ -115,6 +123,8 @@ export default function ProjectsPage() {
         await projectsOnlyService.deleteProject(id);
       } else if (action === 'delete-expense') {
         await projectsService.deleteExpense(id);
+      } else if (action === 'delete-bill') {
+        await billsService.deleteBill(id);
       }
       loadData();
     } catch (error) {
@@ -141,8 +151,38 @@ export default function ProjectsPage() {
     }
   }, [currentSpace, user, loadData]);
 
+  const handleCreateBill = useCallback(async (data: CreateBillInput) => {
+    if (!user) return;
+
+    try {
+      if (editingBill) {
+        await billsService.updateBill(editingBill.id, data);
+      } else {
+        await billsService.createBill(data, user.id);
+      }
+      loadData();
+      setEditingBill(null);
+    } catch (error) {
+      console.error('Failed to save bill:', error);
+    }
+  }, [editingBill, loadData, user]);
+
+  const handleDeleteBill = useCallback(async (billId: string) => {
+    setConfirmDialog({ isOpen: true, action: 'delete-bill', id: billId });
+  }, []);
+
+  const handleMarkBillPaid = useCallback(async (billId: string) => {
+    try {
+      await billsService.markBillAsPaid(billId, true);
+      loadData();
+    } catch (error) {
+      console.error('Failed to mark bill as paid:', error);
+    }
+  }, [loadData]);
+
   const filteredProjects = projects.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredExpenses = expenses.filter(e => e.title.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredBills = bills.filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const expenseStats = useMemo(() => {
     const totalCount = expenses.length;
@@ -170,8 +210,8 @@ export default function ProjectsPage() {
               </div>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-amber-100 to-amber-100 dark:from-amber-900/30 dark:to-amber-900/30 rounded-xl border border-amber-200 dark:border-amber-700 w-full sm:w-auto">
-                {(['projects', 'budgets', 'expenses'] as TabType[]).map((tab) => (
+              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-amber-100 to-amber-100 dark:from-amber-900/30 dark:to-amber-900/30 rounded-xl border border-amber-200 dark:border-amber-700 w-full sm:w-auto overflow-x-auto">
+                {(['projects', 'budgets', 'bills', 'expenses'] as TabType[]).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -183,6 +223,7 @@ export default function ProjectsPage() {
                   >
                     {tab === 'projects' && <Folder className="w-4 h-4" />}
                     {tab === 'budgets' && <Wallet className="w-4 h-4" />}
+                    {tab === 'bills' && <FileCheck className="w-4 h-4" />}
                     {tab === 'expenses' && <Receipt className="w-4 h-4" />}
                     <span className="text-sm capitalize">{tab}</span>
                   </button>
@@ -192,15 +233,16 @@ export default function ProjectsPage() {
                 onClick={() => {
                   if (activeTab === 'projects') setIsProjectModalOpen(true);
                   else if (activeTab === 'budgets') setIsBudgetModalOpen(true);
+                  else if (activeTab === 'bills') setIsBillModalOpen(true);
                   else setIsExpenseModalOpen(true);
                 }}
                 className="px-4 py-2 sm:px-6 sm:py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
                 <span className="hidden sm:inline">
-                  {activeTab === 'projects' ? 'New Project' : activeTab === 'budgets' ? 'Set Budget' : 'New Expense'}
+                  {activeTab === 'projects' ? 'New Project' : activeTab === 'budgets' ? 'Set Budget' : activeTab === 'bills' ? 'New Bill' : 'New Expense'}
                 </span>
-                <span className="sm:hidden">{activeTab === 'projects' ? 'Project' : activeTab === 'budgets' ? 'Budget' : 'Expense'}</span>
+                <span className="sm:hidden">{activeTab === 'projects' ? 'Project' : activeTab === 'budgets' ? 'Budget' : activeTab === 'bills' ? 'Bill' : 'Expense'}</span>
               </button>
             </div>
           </div>
@@ -272,6 +314,7 @@ export default function ProjectsPage() {
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                   {activeTab === 'projects' && `All Projects (${filteredProjects.length})`}
                   {activeTab === 'budgets' && 'Budget Overview'}
+                  {activeTab === 'bills' && `All Bills (${filteredBills.length})`}
                   {activeTab === 'expenses' && `All Expenses (${filteredExpenses.length})`}
                 </h2>
                 <span className="px-3 py-1 bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 text-sm font-medium rounded-full">
@@ -430,6 +473,31 @@ export default function ProjectsPage() {
                   </div>
                 </div>
               )
+            ) : activeTab === 'bills' ? (
+              filteredBills.length === 0 ? (
+                <div className="text-center py-12">
+                  <FileCheck className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No bills found</p>
+                  <button onClick={() => setIsBillModalOpen(true)} className="btn-touch shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                    <Plus className="w-5 h-5" />
+                    Create Bill
+                  </button>
+                </div>
+              ) : (
+                <div className="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    {filteredBills.map((bill) => (
+                      <BillCard
+                        key={bill.id}
+                        bill={bill}
+                        onEdit={(b) => { setEditingBill(b); setIsBillModalOpen(true); }}
+                        onDelete={handleDeleteBill}
+                        onMarkPaid={handleMarkBillPaid}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )
             ) : (
               filteredExpenses.length === 0 ? (
                 <div className="text-center py-12">
@@ -458,6 +526,7 @@ export default function ProjectsPage() {
           <NewProjectModal isOpen={isProjectModalOpen} onClose={() => { setIsProjectModalOpen(false); setEditingProject(null); }} onSave={handleCreateProject} editProject={editingProject} spaceId={currentSpace.id} />
           <NewExpenseModal isOpen={isExpenseModalOpen} onClose={() => { setIsExpenseModalOpen(false); setEditingExpense(null); }} onSave={handleCreateExpense} editExpense={editingExpense} spaceId={currentSpace.id} />
           <NewBudgetModal isOpen={isBudgetModalOpen} onClose={() => setIsBudgetModalOpen(false)} onSave={handleSetBudget} currentBudget={currentBudget} spaceId={currentSpace.id} />
+          <NewBillModal isOpen={isBillModalOpen} onClose={() => { setIsBillModalOpen(false); setEditingBill(null); }} onSave={handleCreateBill} editBill={editingBill} spaceId={currentSpace.id} />
         </>
       )}
 
@@ -465,9 +534,11 @@ export default function ProjectsPage() {
         isOpen={confirmDialog.isOpen}
         onClose={() => setConfirmDialog({ isOpen: false, action: 'delete-project', id: '' })}
         onConfirm={handleConfirmDelete}
-        title={confirmDialog.action === 'delete-project' ? 'Delete Project' : 'Delete Expense'}
+        title={confirmDialog.action === 'delete-project' ? 'Delete Project' : confirmDialog.action === 'delete-bill' ? 'Delete Bill' : 'Delete Expense'}
         message={confirmDialog.action === 'delete-project'
           ? 'Are you sure you want to delete this project? This action cannot be undone.'
+          : confirmDialog.action === 'delete-bill'
+          ? 'Are you sure you want to delete this bill? This action cannot be undone.'
           : 'Are you sure you want to delete this expense? This action cannot be undone.'}
         confirmLabel="Delete"
         cancelLabel="Cancel"

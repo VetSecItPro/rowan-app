@@ -8,10 +8,11 @@ import { GoalCard } from '@/components/goals/GoalCard';
 import { MilestoneCard } from '@/components/goals/MilestoneCard';
 import { NewGoalModal } from '@/components/goals/NewGoalModal';
 import { NewMilestoneModal } from '@/components/goals/NewMilestoneModal';
+import { TemplateSelectionModal } from '@/components/goals/TemplateSelectionModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import GuidedGoalCreation from '@/components/guided/GuidedGoalCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput } from '@/lib/services/goals-service';
+import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput, GoalTemplate } from '@/lib/services/goals-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 
 type ViewMode = 'goals' | 'milestones';
@@ -24,6 +25,7 @@ export default function GoalsPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('goals');
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
   const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -244,11 +246,34 @@ export default function GoalsPage() {
 
   const handleNewButtonClick = useCallback(() => {
     if (viewMode === 'goals') {
-      handleOpenGoalModal();
+      // Open template selection modal for goals
+      setIsTemplateModalOpen(true);
     } else {
       handleOpenMilestoneModal();
     }
-  }, [viewMode, handleOpenGoalModal, handleOpenMilestoneModal]);
+  }, [viewMode, handleOpenMilestoneModal]);
+
+  const handleSelectTemplate = useCallback(async (template: GoalTemplate) => {
+    if (!currentSpace) return;
+
+    try {
+      setIsTemplateModalOpen(false);
+      // Create goal from template with auto-generated milestones
+      await goalsService.createGoalFromTemplate(currentSpace.id, template.id);
+      loadData();
+    } catch (error) {
+      console.error('Failed to create goal from template:', error);
+    }
+  }, [currentSpace, loadData]);
+
+  const handleCloseTemplateModal = useCallback(() => {
+    setIsTemplateModalOpen(false);
+  }, []);
+
+  const handleCreateFromScratch = useCallback(() => {
+    setIsTemplateModalOpen(false);
+    setIsGoalModalOpen(true);
+  }, []);
 
   const handleGuidedFlowComplete = useCallback(() => {
     setShowGuidedFlow(false);
@@ -584,6 +609,13 @@ export default function GoalsPage() {
       </div>
       {currentSpace && (
         <>
+          <TemplateSelectionModal
+            isOpen={isTemplateModalOpen}
+            onClose={handleCloseTemplateModal}
+            onSelectTemplate={handleSelectTemplate}
+            onCreateFromScratch={handleCreateFromScratch}
+            spaceId={currentSpace.id}
+          />
           <NewGoalModal
             isOpen={isGoalModalOpen}
             onClose={handleCloseGoalModal}
