@@ -4,6 +4,132 @@ This document tracks planned enhancements and premium features for the Rowan app
 
 ---
 
+## 🚨 Current Feature Gaps (Budget & Projects)
+
+This section documents the most critical missing features in the Budget & Projects system that users are currently experiencing. Each gap is linked to its planned solution in the implementation roadmap.
+
+### High Priority Missing Features
+
+#### 1. ❌ No Receipt Scanning or Automation
+- **Current Gap:** Users must manually enter all expense data, including amounts, categories, and descriptions
+- **User Impact:**
+  - Time-consuming data entry for every expense
+  - High risk of data entry errors and forgotten expenses
+  - No digital record of physical receipts
+  - Missing merchant/location/tax information from receipts
+- **Planned Solution:** **Phase 2 - AI-Powered Receipt Scanning (#1 in budget-improvement.md)**
+  - OCR integration with Google Vision API, AWS Textract, or Tesseract
+  - Mobile camera integration for instant receipt capture
+  - ML-powered auto-categorization of expenses
+  - Supabase Storage for receipt image archival
+  - Advanced search by merchant, date, or amount
+- **Implementation Timeline:** Months 3-4 (Phase 2)
+- **Business Value:** Reduces expense entry time by ~80%, increases accuracy, enables receipt audit trail
+
+#### 2. ❌ Limited Spending Insights
+- **Current Gap:** Basic budget tracking exists, but no analytics, trends, or pattern recognition
+- **User Impact:**
+  - No visibility into spending patterns over time
+  - Can't identify where money is actually going
+  - No comparison of actual vs budgeted spending
+  - Missing alerts when approaching budget limits
+  - No predictive insights or recommendations
+- **Planned Solution:** **Phase 1 - Spending Insights (#7 in budget-improvement.md)**
+  - Analytics engine processing expense history
+  - Data visualization with Chart.js/Recharts
+  - Monthly/quarterly/yearly trend analysis
+  - Spending vs budget variance reports
+  - Category breakdown with percentages
+- **Implementation Timeline:** Months 2-3 (Phase 1)
+- **Business Value:** Helps users understand spending behavior, identify savings opportunities, make informed financial decisions
+
+#### 3. ❌ No Recurring Expense Detection
+- **Current Gap:** Subscriptions and recurring bills must be manually tracked and entered each month
+- **User Impact:**
+  - Easy to forget recurring payments
+  - No visibility into total subscription costs
+  - Can't detect duplicate or forgotten subscriptions
+  - Missing calendar view of upcoming recurring expenses
+  - Manual work to identify patterns in spending
+- **Planned Solution:** **Phase 2 - Recurring Expense Intelligence (#3 in budget-improvement.md)**
+  - Pattern recognition algorithm detecting recurring transactions
+  - Automatic frequency detection (daily/weekly/monthly/annual)
+  - Duplicate subscription alert system
+  - Calendar view showing all recurring bills with due dates
+  - One-click conversion to scheduled auto-entry expenses
+- **Implementation Timeline:** Months 4-5 (Phase 2)
+- **Business Value:** Reduces forgotten bills, identifies wasteful subscriptions, automates repetitive data entry
+
+#### 4. ❌ Missing Goal Tracking
+- **Current Gap:** No way to set financial goals or track progress toward savings targets
+- **User Impact:**
+  - No motivation or accountability for saving money
+  - Can't visualize progress toward financial milestones
+  - Missing shared couple goals (vacation fund, house down payment, etc.)
+  - No projected completion dates based on current saving rate
+  - Can't celebrate financial achievements with partner
+- **Planned Solution:** **Phase 3 - Shared Financial Goals (#5 in budget-improvement.md)**
+  - Goals database schema with target amounts and deadlines
+  - Visual progress tracking with milestone markers
+  - Contribution ledger tracking individual deposits
+  - Projected completion date calculator
+  - Milestone celebration notifications and badges
+- **Implementation Timeline:** Months 5-6 (Phase 3)
+- **Business Value:** Increases savings motivation, improves couple financial alignment, gamifies financial responsibility
+
+#### 5. ❌ No Multi-Account Support
+- **Current Gap:** Only supports manual entry, no integration with bank accounts, credit cards, or investment accounts
+- **User Impact:**
+  - No automatic transaction syncing from banks
+  - Can't see full financial picture (checking, savings, credit cards, loans)
+  - Missing net worth calculation across all accounts
+  - No debt payoff tracking or projections
+  - Complete financial picture requires external spreadsheets
+- **Planned Solution:** **Phase 5 - Multi-Account Intelligence (#10 in budget-improvement.md)**
+  - Plaid or Yodlee API integration for bank connections
+  - Account aggregation engine syncing transactions
+  - Net worth dashboard showing total assets and liabilities
+  - Debt payoff tracker with interest calculations
+  - Investment account balance tracking
+- **Implementation Timeline:** Months 8-10 (Phase 5)
+- **Business Value:** Provides complete financial visibility, eliminates manual entry, enables true financial planning
+- **Note:** Requires PCI DSS compliance, bank-level encryption, audit logging
+
+#### 6. ❌ Limited Collaboration Features
+- **Current Gap:** Budget system is shared but lacks collaboration tools for couple communication
+- **User Impact:**
+  - Can't discuss or comment on specific expenses
+  - No @mention system to ask partner about transactions
+  - Missing activity log showing who added/edited what
+  - No emoji reactions or quick acknowledgment of expenses
+  - Difficult to resolve expense disputes or ask clarifying questions
+- **Planned Solution:** **Phase 3 - Collaboration Features (#8 Expense Splitting, #13 Collaboration Comments in budget-improvement.md)**
+  - Comments table with polymorphic support for any entity
+  - @mention system with real-time notifications
+  - Activity log and audit trail for all changes
+  - Emoji reaction system for quick feedback
+  - Expense ownership tracking (shared/yours/mine)
+  - Intelligent split calculation with fairness based on income
+  - Settlement ledger for "who owes whom" tracking
+- **Implementation Timeline:** Months 6-7 (Phase 3)
+- **Business Value:** Reduces financial conflicts, improves transparency, enables couple financial communication
+
+---
+
+### How These Gaps Are Being Addressed
+
+All of the above gaps are documented with detailed implementation plans in `budget-improvement.md`. The roadmap is organized into 5 phases:
+
+- **Phase 1 (Months 1-3):** Foundation - Smart alerts, bill management, templates, basic insights
+- **Phase 2 (Months 3-5):** Automation - Receipt scanning, recurring expense AI, custom categories
+- **Phase 3 (Months 5-7):** Collaboration - Shared goals, expense splitting, comments/mentions
+- **Phase 4 (Months 7-9):** Advanced - Project tracking, financial reports, variance analysis
+- **Phase 5 (Months 8-12):** Intelligence - Multi-account sync, AI savings suggestions
+
+Each phase includes infrastructure work (cloud services, notifications, analytics) and security enhancements (PCI compliance, encryption, audit logs) to support the planned features.
+
+---
+
 ## 🛒 Shopping List & Meal Planning Integration
 
 ### Phase 2: Advanced Shopping List Features
