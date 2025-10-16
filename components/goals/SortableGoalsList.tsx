@@ -20,6 +20,7 @@ import {
 import { Goal } from '@/lib/services/goals-service';
 import { SortableGoalCard } from './SortableGoalCard';
 import { hapticMedium, hapticLight } from '@/lib/utils/haptics';
+import type { PresenceUser } from '@/lib/hooks/usePresence';
 
 interface SortableGoalsListProps {
   goals: Goal[];
@@ -29,6 +30,7 @@ interface SortableGoalsListProps {
   onStatusChange?: (goalId: string, status: 'not-started' | 'in-progress' | 'completed') => void;
   onPriorityChange?: (goalId: string, priority: 'none' | 'p1' | 'p2' | 'p3' | 'p4') => void;
   onTogglePin?: (goalId: string, isPinned: boolean) => void;
+  getUsersViewingGoal?: (goalId: string) => PresenceUser[];
 }
 
 export function SortableGoalsList({
@@ -39,6 +41,7 @@ export function SortableGoalsList({
   onStatusChange,
   onPriorityChange,
   onTogglePin,
+  getUsersViewingGoal,
 }: SortableGoalsListProps) {
   const [items, setItems] = useState(goals);
 
@@ -102,6 +105,7 @@ export function SortableGoalsList({
               onStatusChange={onStatusChange}
               onPriorityChange={onPriorityChange}
               onTogglePin={onTogglePin}
+              viewingUsers={getUsersViewingGoal ? getUsersViewingGoal(goal.id) : []}
             />
           ))}
         </div>
