@@ -108,7 +108,7 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
   }, [selectedMealIds, onBulkGenerateList]);
 
   return (
-    <div className="space-y-4">
+    <div className="w-full space-y-4">
       {/* Week Navigation Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
