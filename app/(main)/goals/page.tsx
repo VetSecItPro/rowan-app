@@ -12,6 +12,7 @@ import { NewMilestoneModal } from '@/components/goals/NewMilestoneModal';
 import { TemplateSelectionModal } from '@/components/goals/TemplateSelectionModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
+import { GoalCardSkeleton, MilestoneCardSkeleton, StatsCardSkeleton } from '@/components/ui/Skeleton';
 import GuidedGoalCreation from '@/components/guided/GuidedGoalCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput, GoalTemplate } from '@/lib/services/goals-service';
@@ -401,6 +402,15 @@ export default function GoalsPage() {
           {/* Stats Dashboard - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="stats-grid-mobile gap-4 sm:gap-6">
+            {loading ? (
+              <>
+                <StatsCardSkeleton />
+                <StatsCardSkeleton />
+                <StatsCardSkeleton />
+                <StatsCardSkeleton />
+              </>
+            ) : (
+              <>
             {/* Active Goals */}
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
@@ -483,6 +493,8 @@ export default function GoalsPage() {
                 )}
               </div>
             </div>
+            </>
+            )}
           </div>
           )}
 
@@ -577,20 +589,11 @@ export default function GoalsPage() {
 
             {loading ? (
               <div className="space-y-4">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="bg-white dark:bg-gray-700 rounded-xl p-6 shadow-lg animate-pulse">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-64" />
-                      <div className="h-8 bg-gray-200 dark:bg-gray-600 rounded w-20" />
-                    </div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-full mb-3" />
-                    <div className="h-2 bg-gray-200 dark:bg-gray-600 rounded w-full mb-2" />
-                    <div className="flex items-center justify-between">
-                      <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-24" />
-                      <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-32" />
-                    </div>
-                  </div>
-                ))}
+                {viewMode === 'goals' ? (
+                  [...Array(5)].map((_, i) => <GoalCardSkeleton key={i} />)
+                ) : (
+                  [...Array(5)].map((_, i) => <MilestoneCardSkeleton key={i} />)
+                )}
               </div>
             ) : viewMode === 'goals' ? (
               /* Goals View */
