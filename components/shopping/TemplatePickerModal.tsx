@@ -157,12 +157,185 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
               </div>
             </>
           ) : (
-            <div className="text-center py-8 px-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <ShoppingCart className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-600 dark:text-gray-400 mb-2">No templates saved yet</p>
-              <p className="text-sm text-gray-500 dark:text-gray-500">
-                Create a shopping list and save it as a template for future use!
-              </p>
+            <div className="space-y-4">
+              <div className="text-center py-6 px-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/50">
+                <ShoppingCart className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                <p className="text-gray-600 dark:text-gray-400 mb-2">No templates saved yet</p>
+                <p className="text-sm text-gray-500 dark:text-gray-500">
+                  Create a shopping list and save it as a template, or try one of our quick-start templates below!
+                </p>
+              </div>
+
+              {/* Quick Start Templates */}
+              <div className="pt-4 pb-2">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                  Quick Start Templates
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Click to create a pre-filled template
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3 sm:grid sm:grid-cols-2">
+                {/* Weekly Groceries Template */}
+                <button
+                  onClick={async () => {
+                    try {
+                      await shoppingService.createTemplate(
+                        spaceId,
+                        'Weekly Groceries',
+                        'Essential items for a week of groceries',
+                        [
+                          { name: 'Milk', quantity: 1, category: 'Dairy' },
+                          { name: 'Eggs', quantity: 12, category: 'Dairy' },
+                          { name: 'Bread', quantity: 1, category: 'Bakery' },
+                          { name: 'Chicken Breast', quantity: 2, category: 'Meat' },
+                          { name: 'Bananas', quantity: 6, category: 'Produce' },
+                          { name: 'Apples', quantity: 6, category: 'Produce' },
+                          { name: 'Rice', quantity: 1, category: 'Grains' },
+                          { name: 'Pasta', quantity: 2, category: 'Grains' },
+                        ]
+                      );
+                      loadTemplates();
+                    } catch (error) {
+                      console.error('Failed to create template:', error);
+                    }
+                  }}
+                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <ShoppingCart className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                        Weekly Groceries
+                      </h4>
+                      <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
+                        8 essential grocery items
+                      </p>
+                    </div>
+                  </div>
+                </button>
+
+                {/* Party Supplies Template */}
+                <button
+                  onClick={async () => {
+                    try {
+                      await shoppingService.createTemplate(
+                        spaceId,
+                        'Party Supplies',
+                        'Everything you need for a party',
+                        [
+                          { name: 'Chips', quantity: 3, category: 'Snacks' },
+                          { name: 'Soda', quantity: 6, category: 'Beverages' },
+                          { name: 'Pizza', quantity: 3, category: 'Food' },
+                          { name: 'Ice Cream', quantity: 2, category: 'Frozen' },
+                          { name: 'Paper Plates', quantity: 1, category: 'Party Supplies' },
+                          { name: 'Napkins', quantity: 1, category: 'Party Supplies' },
+                          { name: 'Cups', quantity: 1, category: 'Party Supplies' },
+                        ]
+                      );
+                      loadTemplates();
+                    } catch (error) {
+                      console.error('Failed to create template:', error);
+                    }
+                  }}
+                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                        Party Supplies
+                      </h4>
+                      <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
+                        7 party essentials
+                      </p>
+                    </div>
+                  </div>
+                </button>
+
+                {/* Breakfast Essentials Template */}
+                <button
+                  onClick={async () => {
+                    try {
+                      await shoppingService.createTemplate(
+                        spaceId,
+                        'Breakfast Essentials',
+                        'Start your day right',
+                        [
+                          { name: 'Cereal', quantity: 1, category: 'Breakfast' },
+                          { name: 'Milk', quantity: 1, category: 'Dairy' },
+                          { name: 'Orange Juice', quantity: 1, category: 'Beverages' },
+                          { name: 'Bagels', quantity: 6, category: 'Bakery' },
+                          { name: 'Cream Cheese', quantity: 1, category: 'Dairy' },
+                          { name: 'Yogurt', quantity: 4, category: 'Dairy' },
+                        ]
+                      );
+                      loadTemplates();
+                    } catch (error) {
+                      console.error('Failed to create template:', error);
+                    }
+                  }}
+                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                        Breakfast Essentials
+                      </h4>
+                      <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
+                        6 breakfast staples
+                      </p>
+                    </div>
+                  </div>
+                </button>
+
+                {/* Healthy Snacks Template */}
+                <button
+                  onClick={async () => {
+                    try {
+                      await shoppingService.createTemplate(
+                        spaceId,
+                        'Healthy Snacks',
+                        'Nutritious snacking options',
+                        [
+                          { name: 'Almonds', quantity: 1, category: 'Snacks' },
+                          { name: 'Greek Yogurt', quantity: 4, category: 'Dairy' },
+                          { name: 'Carrots', quantity: 1, category: 'Produce' },
+                          { name: 'Hummus', quantity: 1, category: 'Deli' },
+                          { name: 'Granola Bars', quantity: 1, category: 'Snacks' },
+                          { name: 'Fresh Berries', quantity: 2, category: 'Produce' },
+                        ]
+                      );
+                      loadTemplates();
+                    } catch (error) {
+                      console.error('Failed to create template:', error);
+                    }
+                  }}
+                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                        Healthy Snacks
+                      </h4>
+                      <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
+                        6 nutritious snacks
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              </div>
             </div>
           )}
         </div>
