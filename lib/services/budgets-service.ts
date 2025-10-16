@@ -49,6 +49,18 @@ export interface Budget {
   created_by: string;
   created_at: string;
   updated_at: string;
+  // Smart Budget Alerts fields
+  threshold_50_enabled?: boolean;
+  threshold_75_enabled?: boolean;
+  threshold_90_enabled?: boolean;
+  notifications_enabled?: boolean;
+  notification_preferences?: {
+    email: boolean;
+    push: boolean;
+    toast: boolean;
+  };
+  last_alert_sent_at?: string;
+  last_alert_threshold?: number;
 }
 
 export interface CreateBudgetInput {

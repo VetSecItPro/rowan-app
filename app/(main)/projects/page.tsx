@@ -10,9 +10,11 @@ import { ExpenseCard } from '@/components/projects/ExpenseCard';
 import { NewExpenseModal } from '@/components/projects/NewExpenseModal';
 import { NewBudgetModal } from '@/components/projects/NewBudgetModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { SafeToSpendIndicator } from '@/components/projects/SafeToSpendIndicator';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { projectsOnlyService, type CreateProjectInput } from '@/lib/services/projects-service';
 import { projectsService, type Expense, type CreateExpenseInput } from '@/lib/services/budgets-service';
+import { budgetAlertsService } from '@/lib/services/budget-alerts-service';
 import type { Project } from '@/lib/types';
 
 type TabType = 'projects' | 'budgets' | 'expenses';
@@ -81,18 +83,24 @@ export default function ProjectsPage() {
   }, []);
 
   const handleCreateExpense = useCallback(async (data: CreateExpenseInput) => {
+    if (!currentSpace) return;
+
     try {
       if (editingExpense) {
         await projectsService.updateExpense(editingExpense.id, data);
       } else {
         await projectsService.createExpense(data);
       }
+
+      // Check budget thresholds and trigger alerts if needed
+      await budgetAlertsService.checkBudgetAfterExpenseChange(currentSpace.id);
+
       loadData();
       setEditingExpense(null);
     } catch (error) {
       console.error('Failed to save expense:', error);
     }
-  }, [editingExpense, loadData]);
+  }, [editingExpense, loadData, currentSpace]);
 
   const handleDeleteExpense = useCallback(async (expenseId: string) => {
     setConfirmDialog({ isOpen: true, action: 'delete-expense', id: expenseId });
@@ -339,6 +347,9 @@ export default function ProjectsPage() {
                 </div>
               ) : (
                 <div className="space-y-6">
+                  {/* Safe to Spend Indicator */}
+                  <SafeToSpendIndicator spaceId={currentSpace.id} />
+
                   {/* Budget Header */}
                   <div className="flex items-center justify-between">
                     <div>
