@@ -13,11 +13,13 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { SafeToSpendIndicator } from '@/components/projects/SafeToSpendIndicator';
 import { BillCard } from '@/components/projects/BillCard';
 import { NewBillModal } from '@/components/projects/NewBillModal';
+import { BudgetTemplateModal } from '@/components/projects/BudgetTemplateModal';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { projectsOnlyService, type CreateProjectInput } from '@/lib/services/projects-service';
 import { projectsService, type Expense, type CreateExpenseInput } from '@/lib/services/budgets-service';
 import { budgetAlertsService } from '@/lib/services/budget-alerts-service';
 import { billsService, type Bill, type CreateBillInput } from '@/lib/services/bills-service';
+import { budgetTemplatesService, type BudgetTemplate, type BudgetTemplateCategory } from '@/lib/services/budget-templates-service';
 import type { Project } from '@/lib/types';
 
 type TabType = 'projects' | 'budgets' | 'expenses' | 'bills';
@@ -33,12 +35,15 @@ export default function ProjectsPage() {
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [isBillModalOpen, setIsBillModalOpen] = useState(false);
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [editingBill, setEditingBill] = useState<Bill | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentBudget, setCurrentBudget] = useState<number>(0);
   const [budgetStats, setBudgetStats] = useState({ monthlyBudget: 0, spentThisMonth: 0, remaining: 0, pendingBills: 0 });
+  const [budgetTemplates, setBudgetTemplates] = useState<BudgetTemplate[]>([]);
+  const [templateCategories, setTemplateCategories] = useState<Record<string, BudgetTemplateCategory[]>>({});
   const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; action: 'delete-project' | 'delete-expense' | 'delete-bill'; id: string }>({ isOpen: false, action: 'delete-project', id: '' });
 
   const loadData = useCallback(async () => {
@@ -71,6 +76,30 @@ export default function ProjectsPage() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Load budget templates (once on mount)
+  useEffect(() => {
+    async function loadTemplates() {
+      try {
+        const templates = await budgetTemplatesService.getBudgetTemplates();
+        setBudgetTemplates(templates);
+
+        // Load categories for each template
+        const categoriesMap: Record<string, BudgetTemplateCategory[]> = {};
+        await Promise.all(
+          templates.map(async (template) => {
+            const categories = await budgetTemplatesService.getTemplateCategories(template.id);
+            categoriesMap[template.id] = categories;
+          })
+        );
+        setTemplateCategories(categoriesMap);
+      } catch (error) {
+        console.error('Failed to load budget templates:', error);
+      }
+    }
+
+    loadTemplates();
+  }, []);
 
   const handleCreateProject = useCallback(async (data: CreateProjectInput) => {
     try {
@@ -179,6 +208,21 @@ export default function ProjectsPage() {
       console.error('Failed to mark bill as paid:', error);
     }
   }, [loadData]);
+
+  const handleApplyTemplate = useCallback(async (templateId: string, monthlyIncome: number) => {
+    if (!currentSpace) return;
+
+    try {
+      await budgetTemplatesService.applyTemplate({
+        space_id: currentSpace.id,
+        template_id: templateId,
+        monthly_income: monthlyIncome,
+      });
+      loadData();
+    } catch (error) {
+      console.error('Failed to apply budget template:', error);
+    }
+  }, [currentSpace, loadData]);
 
   const filteredProjects = projects.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredExpenses = expenses.filter(e => e.title.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -383,10 +427,17 @@ export default function ProjectsPage() {
                 <div className="text-center py-12">
                   <Wallet className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No Budget Set</p>
-                  <button onClick={() => setIsBudgetModalOpen(true)} className="btn-touch shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
-                    <Plus className="w-5 h-5" />
-                    Set Budget
-                  </button>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">Get started quickly with a template or set a custom amount</p>
+                  <div className="flex items-center gap-3 justify-center">
+                    <button onClick={() => setIsTemplateModalOpen(true)} className="btn-touch shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                      <FileText className="w-5 h-5" />
+                      Use Template
+                    </button>
+                    <button onClick={() => setIsBudgetModalOpen(true)} className="btn-touch bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all shadow-lg inline-flex items-center gap-2">
+                      <Plus className="w-5 h-5" />
+                      Set Custom
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -401,9 +452,15 @@ export default function ProjectsPage() {
                       </h3>
                       <p className="text-gray-500 dark:text-gray-400">Monthly Budget</p>
                     </div>
-                    <button onClick={() => setIsBudgetModalOpen(true)} className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all">
-                      Update Budget
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => setIsTemplateModalOpen(true)} className="px-4 py-2 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all inline-flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        Use Template
+                      </button>
+                      <button onClick={() => setIsBudgetModalOpen(true)} className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all">
+                        Update Budget
+                      </button>
+                    </div>
                   </div>
 
                   {/* Budget Progress Bar */}
@@ -527,6 +584,7 @@ export default function ProjectsPage() {
           <NewExpenseModal isOpen={isExpenseModalOpen} onClose={() => { setIsExpenseModalOpen(false); setEditingExpense(null); }} onSave={handleCreateExpense} editExpense={editingExpense} spaceId={currentSpace.id} />
           <NewBudgetModal isOpen={isBudgetModalOpen} onClose={() => setIsBudgetModalOpen(false)} onSave={handleSetBudget} currentBudget={currentBudget} spaceId={currentSpace.id} />
           <NewBillModal isOpen={isBillModalOpen} onClose={() => { setIsBillModalOpen(false); setEditingBill(null); }} onSave={handleCreateBill} editBill={editingBill} spaceId={currentSpace.id} />
+          <BudgetTemplateModal isOpen={isTemplateModalOpen} onClose={() => setIsTemplateModalOpen(false)} onApply={handleApplyTemplate} templates={budgetTemplates} templateCategories={templateCategories} />
         </>
       )}
 
