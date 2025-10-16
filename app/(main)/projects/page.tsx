@@ -579,7 +579,7 @@ export default function ProjectsPage() {
                   </div>
                 </div>
               )
-            ) : (
+            ) : activeTab === 'expenses' ? (
               filteredExpenses.length === 0 ? (
                 <div className="text-center py-12">
                   <Receipt className="w-16 h-16 text-gray-400 mx-auto mb-4" />

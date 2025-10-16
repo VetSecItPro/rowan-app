@@ -19,6 +19,8 @@ import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput, G
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
+import { usePresence } from '@/lib/hooks/usePresence';
+import { OnlineUsersIndicator, PresenceIndicator } from '@/components/shared/PresenceIndicator';
 
 type ViewMode = 'goals' | 'milestones';
 
@@ -41,6 +43,14 @@ export default function GoalsPage() {
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; action: 'delete-goal' | 'delete-milestone'; id: string }>({ isOpen: false, action: 'delete-goal', id: '' });
+
+  // Presence tracking for collaborative editing
+  const { onlineUsers, getUsersViewingGoal, updateViewingGoal } = usePresence({
+    channelName: 'goals-presence',
+    spaceId: currentSpace?.id || '',
+    userId: user?.id || '',
+    userEmail: user?.email,
+  });
 
   // Memoized filtered goals with search, status, and focus mode
   const filteredGoals = useMemo(() => {
@@ -518,6 +528,12 @@ export default function GoalsPage() {
                   Achieve your dreams together
                 </p>
               </div>
+              {/* Online users indicator */}
+              {onlineUsers.length > 0 && (
+                <div className="mt-2 sm:mt-0 sm:ml-4">
+                  <OnlineUsersIndicator count={onlineUsers.length} />
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
@@ -799,6 +815,7 @@ export default function GoalsPage() {
                     onStatusChange={handleGoalStatusChange}
                     onPriorityChange={handlePriorityChange}
                     onTogglePin={handleTogglePin}
+                    getUsersViewingGoal={getUsersViewingGoal}
                   />
                 </div>
               )
