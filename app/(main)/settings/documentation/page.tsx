@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
+import { SearchBar } from '@/components/documentation/SearchBar';
 import { CheckSquare, Calendar, Bell, MessageSquare, ShoppingBag, UtensilsCrossed, Home, Target, BookOpen, ArrowLeft, Heart } from 'lucide-react';
 
 const features = [
@@ -39,7 +40,7 @@ const features = [
     icon: MessageSquare,
     color: 'from-green-500 to-green-600',
     href: '/settings/documentation/messages',
-    available: false,
+    available: true,
   },
   {
     id: 'shopping',
@@ -103,13 +104,19 @@ export default function DocumentationPage() {
             <ArrowLeft className="w-4 h-4" />
             Back to Settings
           </Link>
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center">
-              <BookOpen className="w-7 h-7 text-white" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center flex-shrink-0">
+                <BookOpen className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">Documentation</h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">Comprehensive guides for all Rowan features</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">Documentation</h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">Comprehensive guides for all Rowan features</p>
+            {/* Search Bar */}
+            <div className="w-full sm:w-auto">
+              <SearchBar />
             </div>
           </div>
         </div>
@@ -125,7 +132,7 @@ export default function DocumentationPage() {
                 <Link
                   key={feature.id}
                   href={feature.href}
-                  className="group relative p-6 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-xl transition-all duration-200"
+                  className="group relative p-6 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl hover:shadow-xl transition-all duration-200"
                 >
                   <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4`}>
                     <Icon className="w-6 h-6 text-white" />
@@ -146,7 +153,7 @@ export default function DocumentationPage() {
               return (
                 <div
                   key={feature.id}
-                  className="relative p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl opacity-60"
+                  className="relative p-6 bg-white/40 dark:bg-gray-900/40 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl opacity-60"
                 >
                   <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${feature.color} opacity-50 flex items-center justify-center mb-4`}>
                     <Icon className="w-6 h-6 text-white" />
@@ -169,7 +176,7 @@ export default function DocumentationPage() {
         </div>
 
         {/* Help Section */}
-        <div className="mt-12 p-6 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl">
+        <div className="mt-12 p-6 bg-purple-50/60 dark:bg-purple-900/40 backdrop-blur-md border border-purple-200/50 dark:border-purple-800/50 rounded-xl">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Need More Help?</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Can't find what you're looking for? Our support team is here to help.
