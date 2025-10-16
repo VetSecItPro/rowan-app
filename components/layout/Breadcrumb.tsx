@@ -19,7 +19,7 @@ export function Breadcrumb({ items = [] }: BreadcrumbProps) {
 
   return (
     <nav className="px-4 sm:px-8 py-4">
-      <ol className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+      <ol className="max-w-7xl mx-auto flex items-center gap-2 overflow-x-auto scrollbar-hide">
         {/* Mobile: Back Button (only show if we have items to navigate back to) */}
         {items.length > 1 && (
           <li className="sm:hidden flex items-center gap-2 flex-shrink-0">

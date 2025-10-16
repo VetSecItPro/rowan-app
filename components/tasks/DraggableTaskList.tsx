@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   DndContext,
   DragEndEvent,
@@ -12,6 +12,7 @@ import {
   useSensors,
   closestCenter,
 } from '@dnd-kit/core';
+import { hapticMedium, hapticLight } from '@/lib/utils/haptics';
 import {
   SortableContext,
   sortableKeyboardCoordinates,
@@ -55,6 +56,8 @@ interface SortableTaskItemProps {
 
 function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete, onViewDetails }: SortableTaskItemProps) {
   const [showMenu, setShowMenu] = useState(false);
+  const [isDragReady, setIsDragReady] = useState(false);
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
 
   const {
     attributes,
@@ -64,6 +67,31 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
     transition,
     isDragging,
   } = useSortable({ id: task.id });
+
+  // Long-press handlers for mobile touch
+  const handleTouchStart = () => {
+    longPressTimer.current = setTimeout(() => {
+      setIsDragReady(true);
+      hapticMedium(); // Haptic feedback when drag is ready
+    }, 500); // 500ms long press
+  };
+
+  const handleTouchEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    // Reset after a delay to allow drag to complete
+    setTimeout(() => setIsDragReady(false), 100);
+  };
+
+  const handleTouchCancel = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    setIsDragReady(false);
+  };
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -137,14 +165,23 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
       style={style}
       className={`flex items-center gap-3 p-4 rounded-lg border-l-4 ${getStatusColor(task.status)} border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow`}
     >
-      {/* Drag Handle */}
+      {/* Drag Handle - Optimized for touch */}
       <button
         {...attributes}
         {...listeners}
-        className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded touch-none"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchCancel}
+        className={`cursor-grab active:cursor-grabbing p-2 md:p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded touch-none transition-all ${
+          isDragReady ? 'bg-blue-100 dark:bg-blue-900/30 scale-110' : ''
+        }`}
         onClick={(e) => e.stopPropagation()}
+        aria-label="Drag to reorder (long-press on mobile)"
+        title="Drag to reorder (long-press on mobile)"
       >
-        <GripVertical className="w-5 h-5 text-gray-400" />
+        <GripVertical className={`w-6 h-6 md:w-5 md:h-5 transition-colors ${
+          isDragReady ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'
+        }`} />
       </button>
 
       {/* Status Checkbox */}
@@ -262,6 +299,8 @@ export function DraggableTaskList({
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8, // 8px movement required before drag starts
+        delay: 200, // 200ms delay for touch devices to prevent scroll conflict
+        tolerance: 5,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -275,6 +314,7 @@ export function DraggableTaskList({
 
   function handleDragStart(event: DragStartEvent) {
     setActiveId(event.active.id as string);
+    hapticMedium(); // Haptic feedback on drag start
   }
 
   async function handleDragEnd(event: DragEndEvent) {
@@ -306,6 +346,7 @@ export function DraggableTaskList({
 
     // Update local state immediately for smooth UX
     setTasks(updatedTasks);
+    hapticLight(); // Haptic feedback on successful drop
 
     // Update all affected tasks in database (batch update)
     // Don't call onTasksReorder to avoid infinite loop - let real-time handle updates
