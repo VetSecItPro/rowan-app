@@ -98,22 +98,15 @@ export function MessageCard({
               isOwn
                 ? 'rounded-tr-sm'
                 : 'rounded-tl-sm'
-            } backdrop-blur-md border-2 shadow-lg relative overflow-hidden bg-white/40 dark:bg-gray-800/40`}
+            } backdrop-blur-md border-2 shadow-lg bg-white/40 dark:bg-gray-800/40`}
             style={{
-              borderColor: `${senderColor}60`,
+              borderColor: `${senderColor}`,
               boxShadow: `0 8px 32px 0 rgba(0, 0, 0, 0.1)`
             }}
           >
-            {/* Subtle gradient overlay covering the entire bubble */}
-            <div
-              className="absolute inset-0 pointer-events-none rounded-2xl"
-              style={{
-                background: `linear-gradient(135deg, ${senderColor}0A 0%, transparent 100%)`
-              }}
-            />
             {/* Message Content with Markdown Support */}
             {message.content && (
-              <div className="relative z-10 break-words text-gray-900 dark:text-white text-sm prose prose-sm dark:prose-invert max-w-none">
+              <div className="break-words text-gray-900 dark:text-white text-sm prose prose-sm dark:prose-invert max-w-none">
                 <ReactMarkdown
                   components={{
                     p: ({ children }) => <p className="mb-1 last:mb-0">{children}</p>,
@@ -143,7 +136,7 @@ export function MessageCard({
 
             {/* Attachments */}
             {message.attachments_data && message.attachments_data.length > 0 && (
-              <div className={`relative z-10 space-y-2 ${message.content ? 'mt-2' : ''}`}>
+              <div className={`space-y-2 ${message.content ? 'mt-2' : ''}`}>
                 {message.attachments_data.map((attachment) => (
                   <AttachmentPreview
                     key={attachment.id}
@@ -155,7 +148,7 @@ export function MessageCard({
             )}
 
             {/* Timestamp and Read Status */}
-            <div className="relative z-10 flex items-center gap-2 mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-2 mt-1.5 text-xs text-gray-500 dark:text-gray-400">
               <span>{formatTimestamp(message.created_at, 'h:mm a')}</span>
               {message.updated_at && message.updated_at !== message.created_at && (
                 <span className="italic">(edited)</span>
