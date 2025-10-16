@@ -6,6 +6,8 @@ import { Goal } from '@/lib/services/goals-service';
 import { GoalCard } from './GoalCard';
 import { GripVertical, Pin, Sparkles } from 'lucide-react';
 import { hapticLight, hapticMedium, hapticSuccess } from '@/lib/utils/haptics';
+import { PresenceIndicator } from '@/components/shared/PresenceIndicator';
+import type { PresenceUser } from '@/lib/hooks/usePresence';
 
 interface SortableGoalCardProps {
   goal: Goal;
@@ -14,6 +16,7 @@ interface SortableGoalCardProps {
   onStatusChange?: (goalId: string, status: 'not-started' | 'in-progress' | 'completed') => void;
   onPriorityChange?: (goalId: string, priority: 'none' | 'p1' | 'p2' | 'p3' | 'p4') => void;
   onTogglePin?: (goalId: string, isPinned: boolean) => void;
+  viewingUsers?: PresenceUser[];
 }
 
 const priorityConfig = {
@@ -31,6 +34,7 @@ export function SortableGoalCard({
   onStatusChange,
   onPriorityChange,
   onTogglePin,
+  viewingUsers = [],
 }: SortableGoalCardProps) {
   const {
     attributes,
@@ -115,6 +119,11 @@ export function SortableGoalCard({
           >
             {priorityInfo.label || 'Set Priority'}
           </button>
+        )}
+
+        {/* Presence Indicator */}
+        {viewingUsers.length > 0 && (
+          <PresenceIndicator users={viewingUsers} maxDisplay={2} />
         )}
       </div>
 
