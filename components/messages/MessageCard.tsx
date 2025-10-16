@@ -177,19 +177,19 @@ export function MessageCard({
               )}
             </div>
 
-            {/* Reply Button and Thread Count */}
+            {/* Reply Button - Elegant hover-only design */}
             {showReplyButton && onReply && !message.parent_message_id && (
-              <button
-                onClick={() => onReply(message)}
-                className="flex items-center gap-1 mt-2 px-2 py-1 rounded-md text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors active:scale-95"
-              >
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span>
-                  {('reply_count' in message && message.reply_count)
-                    ? `${message.reply_count} ${message.reply_count === 1 ? 'reply' : 'replies'}`
-                    : 'Reply'}
-                </span>
-              </button>
+              <div className="mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <button
+                  onClick={() => onReply(message)}
+                  className="flex items-center gap-1.5 px-2 py-1 rounded-full text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all duration-200 active:scale-95"
+                >
+                  <MessageSquare className="w-3 h-3" />
+                  {('reply_count' in message && message.reply_count) ? (
+                    <span className="font-medium">{message.reply_count}</span>
+                  ) : null}
+                </button>
+              </div>
             )}
 
             {/* Reactions Display */}

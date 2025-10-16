@@ -148,7 +148,7 @@ export default function MessagesPage() {
         messagesService.getMessageStats(currentSpace.id),
         getUserProgress(user.id),
         messagesService.getPinnedMessages(defaultConversation.id),
-        messagesService.getConversationsList(currentSpace.id),
+        messagesService.getConversationsList(currentSpace.id, user.id),
       ]);
       setMessages(messagesData);
       setStats(statsData);
