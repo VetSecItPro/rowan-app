@@ -671,6 +671,40 @@ export default function MessagesPage() {
     }
   }, [currentSpace]);
 
+  // Handle deleting a conversation
+  const handleDeleteConversation = useCallback(async (conversationIdToDelete: string) => {
+    if (!currentSpace || !user) return;
+
+    try {
+      await messagesService.deleteConversation(conversationIdToDelete);
+
+      // If we're deleting the active conversation, switch to first available conversation
+      if (conversationIdToDelete === conversationId) {
+        const conversationsData = await messagesService.getConversationsList(currentSpace.id, user.id);
+        setConversations(conversationsData);
+
+        const firstConv = conversationsData.find((c) => c.id !== conversationIdToDelete);
+        if (firstConv) {
+          setConversationId(firstConv.id);
+          const messagesData = await messagesService.getMessages(firstConv.id);
+          setMessages(messagesData);
+        } else {
+          setConversationId(null);
+          setMessages([]);
+        }
+      } else {
+        // Just reload conversations list
+        const conversationsData = await messagesService.getConversationsList(currentSpace.id, user.id);
+        setConversations(conversationsData);
+      }
+
+      toast.success('Conversation deleted');
+    } catch (error) {
+      console.error('Failed to delete conversation:', error);
+      toast.error('Failed to delete conversation');
+    }
+  }, [currentSpace, user, conversationId]);
+
   // Handle creating a new conversation
   const handleCreateConversation = useCallback(async (conversationData: CreateConversationInput) => {
     if (!currentSpace) return;
@@ -906,6 +940,7 @@ export default function MessagesPage() {
                   activeConversationId={conversationId || undefined}
                   onSelectConversation={handleSelectConversation}
                   onNewConversation={() => setShowNewConversationModal(true)}
+                  onDeleteConversation={handleDeleteConversation}
                 />
               </div>
             </div>
@@ -1208,6 +1243,7 @@ export default function MessagesPage() {
                   activeConversationId={conversationId || undefined}
                   onSelectConversation={handleSelectConversation}
                   onNewConversation={() => setShowNewConversationModal(true)}
+                  onDeleteConversation={handleDeleteConversation}
                   onClose={() => setShowConversationSidebar(false)}
                 />
               </div>

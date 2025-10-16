@@ -31,6 +31,7 @@ export function MentionInput({
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [mentionQuery, setMentionQuery] = useState('');
   const [cursorPosition, setCursorPosition] = useState(0);
+  const [isToolbarVisible, setIsToolbarVisible] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const autocompleteRef = useRef<HTMLDivElement>(null);
 
@@ -166,20 +167,21 @@ export function MentionInput({
   return (
     <div className="relative w-full">
       <div className={`border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden ${
-        showToolbar ? '' : ''
+        isToolbarVisible ? '' : ''
       }`}>
-        {/* Rich Text Toolbar */}
-        {showToolbar && <RichTextToolbar textareaRef={inputRef} />}
+        {/* Rich Text Toolbar - Only show when toggled */}
+        {showToolbar && isToolbarVisible && <RichTextToolbar textareaRef={inputRef} />}
 
         <textarea
           ref={inputRef}
           value={value}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
+          onFocus={() => setIsToolbarVisible(true)}
           placeholder={placeholder}
           disabled={disabled}
           rows={1}
-          className={`w-full px-4 py-3 pr-12 ${showToolbar ? 'rounded-b-xl border-0' : 'rounded-xl border border-gray-200 dark:border-gray-700'}
+          className={`w-full px-4 py-3 pr-12 ${isToolbarVisible ? 'rounded-b-xl border-0' : 'rounded-xl border border-gray-200 dark:border-gray-700'}
             bg-white dark:bg-gray-800 text-gray-900 dark:text-white
             placeholder-gray-500 dark:placeholder-gray-400
             focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-600
