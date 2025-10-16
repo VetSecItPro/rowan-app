@@ -1205,6 +1205,7 @@ export default function MealsPage() {
                     onAddMeal={handleAddMealForDate}
                     onBulkDelete={handleBulkDelete}
                     onBulkGenerateList={handleBulkGenerateList}
+                    onGenerateList={() => setIsGenerateListOpen(true)}
                   />
                 ) : calendarViewMode === '2weeks' ? (
                   /* Two Week Calendar View */
@@ -1216,27 +1217,41 @@ export default function MealsPage() {
                     onAddMeal={handleAddMealForDate}
                     onBulkDelete={handleBulkDelete}
                     onBulkGenerateList={handleBulkGenerateList}
+                    onGenerateList={() => setIsGenerateListOpen(true)}
                   />
                 ) : (
                   /* Month Calendar View */
-                  <div>
-                    {/* Month Navigation */}
-                    <div className="flex items-center justify-between mb-6">
-                      <button
-                        onClick={handlePreviousMonth}
-                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                      >
-                        <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                      </button>
-                      <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {format(currentMonth, 'MMMM yyyy')}
-                      </h3>
-                      <button
-                        onClick={handleNextMonth}
-                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                      >
-                        <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                      </button>
+                  <div className="space-y-4">
+                    {/* Month Navigation and Actions */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={handlePreviousMonth}
+                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        >
+                          <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                        </button>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                          {format(currentMonth, 'MMMM yyyy')}
+                        </h3>
+                        <button
+                          onClick={handleNextMonth}
+                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        >
+                          <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                        </button>
+                      </div>
+
+                      <div className="flex items-center gap-2 mr-4">
+                        <button
+                          onClick={() => setIsGenerateListOpen(true)}
+                          className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 rounded-lg transition-all flex items-center gap-2 text-sm font-medium shadow-sm"
+                          title="Generate shopping list from meals"
+                        >
+                          <ShoppingBag className="w-4 h-4" />
+                          Generate Shopping List
+                        </button>
+                      </div>
                     </div>
 
                     {/* Calendar Grid */}
