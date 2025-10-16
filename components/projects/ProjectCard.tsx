@@ -1,9 +1,10 @@
 'use client';
 
 import { memo, useState } from 'react';
-import { Folder, Calendar, DollarSign, MoreVertical, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Folder, Calendar, DollarSign, MoreVertical, AlertTriangle, CheckCircle, FileText } from 'lucide-react';
 import Link from 'next/link';
 import type { Project } from '@/lib/services/project-tracking-service';
+import { pdfExportService } from '@/lib/services/pdf-export-service';
 
 interface ProjectCardProps {
   project: Project;
@@ -29,11 +30,25 @@ const priorityConfig = {
 
 export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }: ProjectCardProps) => {
   const [showMenu, setShowMenu] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Calculate budget progress percentage
   const budgetProgress = project.estimated_budget
     ? Math.min(100, (project.actual_cost / project.estimated_budget) * 100)
     : 0;
+
+  const handleExportPDF = async () => {
+    try {
+      setIsExporting(true);
+      setShowMenu(false);
+      await pdfExportService.exportProjectCostReport(project.id);
+    } catch (error) {
+      console.error('Failed to export project report:', error);
+      alert('Failed to export project report. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const isOverBudget = project.budget_variance < 0;
   const isUnderBudget = project.budget_variance > 0 && project.estimated_budget;
@@ -79,7 +94,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
             {showMenu && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-                <div className="absolute right-0 mt-1 w-32 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+                <div className="absolute right-0 mt-1 w-40 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
                   {onEdit && (
                     <button
                       onClick={() => { onEdit(project); setShowMenu(false); }}
@@ -88,6 +103,14 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
                       Edit
                     </button>
                   )}
+                  <button
+                    onClick={handleExportPDF}
+                    disabled={isExporting}
+                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white active:scale-[0.98] flex items-center gap-2 disabled:opacity-50"
+                  >
+                    <FileText className="w-4 h-4" />
+                    {isExporting ? 'Exporting...' : 'Export PDF'}
+                  </button>
                   {onDelete && (
                     <button
                       onClick={() => { onDelete(project.id); setShowMenu(false); }}
