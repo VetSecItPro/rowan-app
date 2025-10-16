@@ -148,7 +148,7 @@ export function MentionInput({
     }
   };
 
-  // Click outside to close autocomplete
+  // Click outside to close autocomplete and toolbar
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -158,6 +158,11 @@ export function MentionInput({
       ) {
         setShowAutocomplete(false);
       }
+
+      // Hide toolbar when clicking outside the input container
+      if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
+        setIsToolbarVisible(false);
+      }
     }
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -166,11 +171,15 @@ export function MentionInput({
 
   return (
     <div className="relative w-full">
-      <div className={`border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden ${
+      <div className={`border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden transition-all duration-300 ${
         isToolbarVisible ? '' : ''
       }`}>
         {/* Rich Text Toolbar - Only show when toggled */}
-        {showToolbar && isToolbarVisible && <RichTextToolbar textareaRef={inputRef} />}
+        <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
+          showToolbar && isToolbarVisible ? 'max-h-12 opacity-100' : 'max-h-0 opacity-0'
+        }`}>
+          {showToolbar && <RichTextToolbar textareaRef={inputRef} />}
+        </div>
 
         <textarea
           ref={inputRef}
