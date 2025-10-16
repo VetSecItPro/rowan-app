@@ -3,8 +3,8 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('receipts', 'receipts', false)
 ON CONFLICT (id) DO NOTHING;
 
--- Enable RLS on storage.objects
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+-- Enable RLS on storage.objects (already enabled by default on Supabase)
+-- ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 
 -- Create policy for users to upload receipts to their own space
 CREATE POLICY "Users can upload receipts to their spaces"
@@ -15,8 +15,8 @@ WITH CHECK (
   (storage.foldername(name))[1] IN (
     SELECT spaces.id::text
     FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    INNER JOIN space_members ON spaces.id = space_members.space_id
+    WHERE space_members.user_id = auth.uid()
   )
 );
 
@@ -29,8 +29,8 @@ USING (
   (storage.foldername(name))[1] IN (
     SELECT spaces.id::text
     FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    INNER JOIN space_members ON spaces.id = space_members.space_id
+    WHERE space_members.user_id = auth.uid()
   )
 );
 
@@ -43,8 +43,8 @@ USING (
   (storage.foldername(name))[1] IN (
     SELECT spaces.id::text
     FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    INNER JOIN space_members ON spaces.id = space_members.space_id
+    WHERE space_members.user_id = auth.uid()
   )
 );
 
@@ -91,10 +91,9 @@ ON receipts FOR SELECT
 TO authenticated
 USING (
   space_id IN (
-    SELECT spaces.id
-    FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    SELECT space_id
+    FROM space_members
+    WHERE user_id = auth.uid()
   )
 );
 
@@ -103,10 +102,9 @@ ON receipts FOR INSERT
 TO authenticated
 WITH CHECK (
   space_id IN (
-    SELECT spaces.id
-    FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    SELECT space_id
+    FROM space_members
+    WHERE user_id = auth.uid()
   )
   AND created_by = auth.uid()
 );
@@ -116,10 +114,9 @@ ON receipts FOR UPDATE
 TO authenticated
 USING (
   space_id IN (
-    SELECT spaces.id
-    FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    SELECT space_id
+    FROM space_members
+    WHERE user_id = auth.uid()
   )
 );
 
@@ -128,10 +125,9 @@ ON receipts FOR DELETE
 TO authenticated
 USING (
   space_id IN (
-    SELECT spaces.id
-    FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    SELECT space_id
+    FROM space_members
+    WHERE user_id = auth.uid()
   )
 );
 
