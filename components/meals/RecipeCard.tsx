@@ -98,7 +98,7 @@ export function RecipeCard({ recipe, onEdit, onDelete, onPlanMeal }: RecipeCardP
 
         <button
           onClick={() => onPlanMeal(recipe)}
-          className="w-full px-4 py-2 shimmer-meals text-white rounded-lg hover:opacity-90 transition-opacity font-medium active:scale-95"
+          className="w-full px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg transition-all font-medium shadow-sm active:scale-95"
         >
           Plan This Meal
         </button>
