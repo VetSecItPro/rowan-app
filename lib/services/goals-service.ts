@@ -26,6 +26,32 @@ export interface GoalCollaborator {
   updated_at: string;
 }
 
+export interface MilestoneTemplate {
+  id: string;
+  template_id: string;
+  title: string;
+  description?: string;
+  type: 'percentage' | 'money' | 'count' | 'date';
+  target_value?: number;
+  order_index: number;
+  created_at: string;
+}
+
+export interface GoalTemplate {
+  id: string;
+  title: string;
+  description?: string;
+  category: 'financial' | 'health' | 'home' | 'relationship' | 'career' | 'personal' | 'education' | 'family';
+  icon?: string;
+  target_days?: number;
+  is_public: boolean;
+  created_by?: string;
+  usage_count: number;
+  milestones?: MilestoneTemplate[];
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Goal {
   id: string;
   space_id: string;
@@ -35,6 +61,7 @@ export interface Goal {
   status: 'active' | 'completed' | 'paused' | 'cancelled';
   progress: number;
   visibility?: 'private' | 'shared';
+  template_id?: string;
   target_date?: string;
   milestones?: Milestone[];
   collaborators?: GoalCollaborator[];
@@ -52,6 +79,7 @@ export interface CreateGoalInput {
   status?: 'active' | 'completed' | 'paused' | 'cancelled';
   progress?: number;
   visibility?: 'private' | 'shared';
+  template_id?: string;
   target_date?: string;
 }
 
@@ -315,5 +343,113 @@ export const goalsService = {
 
     if (error) throw error;
     return data;
+  },
+
+  // Template methods
+  async getGoalTemplates(category?: string): Promise<GoalTemplate[]> {
+    const supabase = createClient();
+    let query = supabase
+      .from('goal_templates')
+      .select('*, milestones:milestone_templates(*)')
+      .order('usage_count', { ascending: false });
+
+    if (category) {
+      query = query.eq('category', category);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getGoalTemplateById(id: string): Promise<GoalTemplate | null> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('goal_templates')
+      .select('*, milestones:milestone_templates(*)')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async createGoalFromTemplate(
+    spaceId: string,
+    templateId: string,
+    customizations?: {
+      title?: string;
+      description?: string;
+      target_date?: string;
+      visibility?: 'private' | 'shared';
+    }
+  ): Promise<Goal> {
+    const supabase = createClient();
+
+    // Get template with milestone templates
+    const template = await this.getGoalTemplateById(templateId);
+    if (!template) throw new Error('Template not found');
+
+    // Calculate target date if not provided
+    const targetDate = customizations?.target_date ||
+      (template.target_days
+        ? new Date(Date.now() + template.target_days * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        : undefined);
+
+    // Create goal from template
+    const goal = await this.createGoal({
+      space_id: spaceId,
+      title: customizations?.title || template.title,
+      description: customizations?.description || template.description,
+      category: template.category,
+      template_id: templateId,
+      target_date: targetDate,
+      visibility: customizations?.visibility,
+      status: 'active',
+      progress: 0,
+    });
+
+    // Create milestones from template
+    if (template.milestones && template.milestones.length > 0) {
+      for (const milestoneTemplate of template.milestones) {
+        await this.createMilestone({
+          goal_id: goal.id,
+          title: milestoneTemplate.title,
+          description: milestoneTemplate.description,
+          type: milestoneTemplate.type,
+          target_value: milestoneTemplate.target_value,
+        });
+      }
+    }
+
+    // Fetch complete goal with milestones
+    return await this.getGoalById(goal.id) || goal;
+  },
+
+  async getTemplateCategories(): Promise<Array<{ category: string; count: number; icon: string }>> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('goal_templates')
+      .select('category, icon')
+      .eq('is_public', true);
+
+    if (error) throw error;
+
+    // Group by category and count
+    const categoryMap = new Map<string, { count: number; icon: string }>();
+    data?.forEach(template => {
+      const current = categoryMap.get(template.category) || { count: 0, icon: template.icon || '📋' };
+      categoryMap.set(template.category, {
+        count: current.count + 1,
+        icon: template.icon || current.icon
+      });
+    });
+
+    return Array.from(categoryMap.entries()).map(([category, { count, icon }]) => ({
+      category,
+      count,
+      icon
+    }));
   },
 };
