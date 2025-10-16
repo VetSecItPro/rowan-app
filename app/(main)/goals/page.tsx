@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -17,6 +17,7 @@ import GuidedGoalCreation from '@/components/guided/GuidedGoalCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput, GoalTemplate } from '@/lib/services/goals-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
+import { createClient } from '@/lib/supabase/client';
 
 type ViewMode = 'goals' | 'milestones';
 
@@ -24,6 +25,7 @@ export default function GoalsPage() {
   const { currentSpace, user } = useAuth();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const goalsRef = useRef<Goal[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>('goals');
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
@@ -89,9 +91,84 @@ export default function GoalsPage() {
     return { active, completed, inProgress, milestonesReached };
   }, [goals, milestones]);
 
+  // Keep goalsRef in sync with goals state
+  useEffect(() => {
+    goalsRef.current = goals;
+  }, [goals]);
+
   useEffect(() => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSpace]);
+
+  // Real-time subscription for goals and milestones
+  useEffect(() => {
+    if (!currentSpace) return;
+
+    const supabase = createClient();
+
+    // Subscribe to goals changes
+    const goalsChannel = supabase
+      .channel('goals-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'goals',
+          filter: `space_id=eq.${currentSpace.id}`
+        },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            setGoals(prev => [...prev, payload.new as Goal]);
+          } else if (payload.eventType === 'UPDATE') {
+            setGoals(prev => prev.map(g => g.id === payload.new.id ? payload.new as Goal : g));
+          } else if (payload.eventType === 'DELETE') {
+            setGoals(prev => prev.filter(g => g.id !== payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    // Subscribe to milestones changes
+    // Note: goal_milestones doesn't have space_id, so we check if the milestone belongs to a goal in current space
+    const milestonesChannel = supabase
+      .channel('milestones-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'goal_milestones'
+        },
+        (payload) => {
+          // Check if milestone belongs to a goal in current space
+          const belongsToCurrentSpace = (milestone: Milestone) => {
+            return goalsRef.current.some(g => g.id === milestone.goal_id);
+          };
+
+          if (payload.eventType === 'INSERT') {
+            const newMilestone = payload.new as Milestone;
+            if (belongsToCurrentSpace(newMilestone)) {
+              setMilestones(prev => [...prev, newMilestone]);
+            }
+          } else if (payload.eventType === 'UPDATE') {
+            const updatedMilestone = payload.new as Milestone;
+            if (belongsToCurrentSpace(updatedMilestone)) {
+              setMilestones(prev => prev.map(m => m.id === updatedMilestone.id ? updatedMilestone : m));
+            }
+          } else if (payload.eventType === 'DELETE') {
+            setMilestones(prev => prev.filter(m => m.id !== payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    // Cleanup function
+    return () => {
+      supabase.removeChannel(goalsChannel);
+      supabase.removeChannel(milestonesChannel);
+    };
   }, [currentSpace]);
 
   const loadData = useCallback(async () => {
@@ -186,36 +263,56 @@ export default function GoalsPage() {
   }, [confirmDialog, loadData]);
 
   const handleToggleMilestone = useCallback(async (milestoneId: string, completed: boolean) => {
+    // Optimistic update
+    const previousMilestones = milestones;
+    setMilestones(prev => prev.map(m =>
+      m.id === milestoneId
+        ? { ...m, completed, completed_at: completed ? new Date().toISOString() : undefined }
+        : m
+    ));
+
     try {
       await goalsService.toggleMilestone(milestoneId, completed);
-      loadData();
+      // Real-time subscription will handle the update
     } catch (error) {
       console.error('Failed to toggle milestone:', error);
+      // Revert on error
+      setMilestones(previousMilestones);
     }
-  }, [loadData]);
+  }, [milestones]);
 
   const handleGoalStatusChange = useCallback(async (goalId: string, status: 'not-started' | 'in-progress' | 'completed') => {
-    try {
-      const statusMap = {
-        'not-started': 'active' as const,
-        'in-progress': 'active' as const,
-        'completed': 'completed' as const,
-      };
-      const progressMap = {
-        'not-started': 0,
-        'in-progress': 50,
-        'completed': 100,
-      };
+    const statusMap = {
+      'not-started': 'active' as const,
+      'in-progress': 'active' as const,
+      'completed': 'completed' as const,
+    };
+    const progressMap = {
+      'not-started': 0,
+      'in-progress': 50,
+      'completed': 100,
+    };
 
+    // Optimistic update
+    const previousGoals = goals;
+    setGoals(prev => prev.map(g =>
+      g.id === goalId
+        ? { ...g, status: statusMap[status], progress: progressMap[status] }
+        : g
+    ));
+
+    try {
       await goalsService.updateGoal(goalId, {
         status: statusMap[status],
         progress: progressMap[status],
       });
-      loadData();
+      // Real-time subscription will handle the update, but we'll reload to be safe
     } catch (error) {
       console.error('Failed to update goal status:', error);
+      // Revert on error
+      setGoals(previousGoals);
     }
-  }, [loadData]);
+  }, [goals]);
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -318,22 +415,38 @@ export default function GoalsPage() {
   }, [currentSpace, goals, loadData]);
 
   const handlePriorityChange = useCallback(async (goalId: string, priority: 'none' | 'p1' | 'p2' | 'p3' | 'p4') => {
+    // Optimistic update
+    const previousGoals = goals;
+    setGoals(prev => prev.map(g =>
+      g.id === goalId ? { ...g, priority } : g
+    ));
+
     try {
       await goalsService.updateGoalPriority(goalId, priority);
-      loadData();
+      // Real-time subscription will handle the update
     } catch (error) {
       console.error('Failed to update goal priority:', error);
+      // Revert on error
+      setGoals(previousGoals);
     }
-  }, [loadData]);
+  }, [goals]);
 
   const handleTogglePin = useCallback(async (goalId: string, isPinned: boolean) => {
+    // Optimistic update
+    const previousGoals = goals;
+    setGoals(prev => prev.map(g =>
+      g.id === goalId ? { ...g, is_pinned: isPinned } : g
+    ));
+
     try {
       await goalsService.toggleGoalPin(goalId, isPinned);
-      loadData();
+      // Real-time subscription will handle the update
     } catch (error) {
       console.error('Failed to toggle goal pin:', error);
+      // Revert on error
+      setGoals(previousGoals);
     }
-  }, [loadData]);
+  }, [goals]);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
