@@ -12,6 +12,8 @@ const features = [
     description: 'Manage daily tasks and household chores with smart features',
     icon: CheckSquare,
     color: 'from-blue-500 to-blue-600',
+    hoverBorder: 'hover:border-blue-500',
+    hoverShadow: 'hover:shadow-blue-500/50',
     href: '/settings/documentation/tasks-chores',
     available: true,
   },
@@ -21,6 +23,8 @@ const features = [
     description: 'Master your schedule with shared calendar features',
     icon: Calendar,
     color: 'from-purple-500 to-purple-600',
+    hoverBorder: 'hover:border-purple-500',
+    hoverShadow: 'hover:shadow-purple-500/50',
     href: '/settings/documentation/calendar',
     available: true,
   },
@@ -30,6 +34,8 @@ const features = [
     description: 'Set up and manage reminders for important tasks',
     icon: Bell,
     color: 'from-pink-500 to-pink-600',
+    hoverBorder: 'hover:border-pink-500',
+    hoverShadow: 'hover:shadow-pink-500/50',
     href: '/settings/documentation/reminders',
     available: true,
   },
@@ -39,6 +45,8 @@ const features = [
     description: 'Communicate effectively with your partner',
     icon: MessageSquare,
     color: 'from-green-500 to-green-600',
+    hoverBorder: 'hover:border-green-500',
+    hoverShadow: 'hover:shadow-green-500/50',
     href: '/settings/documentation/messages',
     available: true,
   },
@@ -48,6 +56,8 @@ const features = [
     description: 'Create and share shopping lists with ease',
     icon: ShoppingBag,
     color: 'from-emerald-500 to-emerald-600',
+    hoverBorder: 'hover:border-emerald-500',
+    hoverShadow: 'hover:shadow-emerald-500/50',
     href: '/settings/documentation/shopping',
     available: true,
   },
@@ -57,6 +67,8 @@ const features = [
     description: 'Plan meals, discover recipes, and generate shopping lists',
     icon: UtensilsCrossed,
     color: 'from-orange-500 to-orange-600',
+    hoverBorder: 'hover:border-orange-500',
+    hoverShadow: 'hover:shadow-orange-500/50',
     href: '/settings/documentation/meals',
     available: true,
   },
@@ -66,6 +78,8 @@ const features = [
     description: 'Manage chores, maintenance, and household tasks',
     icon: Home,
     color: 'from-amber-500 to-amber-600',
+    hoverBorder: 'hover:border-amber-500',
+    hoverShadow: 'hover:shadow-amber-500/50',
     href: '/settings/documentation/household',
     available: false,
   },
@@ -75,6 +89,8 @@ const features = [
     description: 'Set and track your shared goals and milestones',
     icon: Target,
     color: 'from-indigo-500 to-indigo-600',
+    hoverBorder: 'hover:border-indigo-500',
+    hoverShadow: 'hover:shadow-indigo-500/50',
     href: '/settings/documentation/goals',
     available: false,
   },
@@ -84,6 +100,8 @@ const features = [
     description: 'Track emotional wellness and connect with your partner',
     icon: Heart,
     color: 'from-pink-500 to-purple-500',
+    hoverBorder: 'hover:border-pink-500',
+    hoverShadow: 'hover:shadow-pink-500/50',
     href: '/settings/documentation/checkin',
     available: true,
   },
@@ -132,7 +150,7 @@ export default function DocumentationPage() {
                 <Link
                   key={feature.id}
                   href={feature.href}
-                  className="group relative p-6 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl hover:shadow-xl transition-all duration-200"
+                  className={`group relative p-6 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border-2 border-gray-200/50 dark:border-gray-700/50 ${feature.hoverBorder} ${feature.hoverShadow} rounded-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-200`}
                 >
                   <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4`}>
                     <Icon className="w-6 h-6 text-white" />
