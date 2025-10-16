@@ -120,10 +120,10 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
             onClick={() => setIsOpen(false)}
           />
 
-          {/* Panel */}
-          <div className="absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 max-h-[600px] overflow-hidden flex flex-col">
+          {/* Panel with Glassmorphism */}
+          <div className="absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 rounded-xl shadow-2xl z-50 max-h-[600px] overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div className="p-4 border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between backdrop-blur-md">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Notifications
               </h3>
@@ -178,7 +178,7 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
 
             {/* Footer */}
             {notifications.length > 0 && (
-              <div className="p-3 border-t border-gray-200 dark:border-gray-700 text-center">
+              <div className="p-3 border-t border-gray-200/50 dark:border-gray-700/50 text-center backdrop-blur-md">
                 <button
                   onClick={() => {
                     setIsOpen(false);

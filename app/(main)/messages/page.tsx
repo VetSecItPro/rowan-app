@@ -1032,7 +1032,7 @@ export default function MessagesPage() {
 
                         {/* Message Card with Swipe Gestures */}
                         <SwipeableMessageCard
-                          isOwn={message.sender_id === currentSpace?.id}
+                          isOwn={message.sender_id === user.id}
                           onEdit={() => handleEditMessage(message)}
                           onDelete={() => handleDeleteMessage(message.id)}
                         >
@@ -1043,8 +1043,8 @@ export default function MessagesPage() {
                             onMarkRead={handleMarkRead}
                             onTogglePin={handleTogglePin}
                             onForward={handleForwardMessage}
-                            isOwn={message.sender_id === currentSpace?.id}
-                            currentUserId={currentSpace?.id || ''}
+                            isOwn={message.sender_id === user.id}
+                            currentUserId={user.id}
                             onReply={handleReply}
                             showReplyButton={true}
                           />

@@ -171,7 +171,7 @@ export function MentionInput({
 
   return (
     <div className="relative w-full">
-      <div className={`border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden transition-all duration-300 ${
+      <div className={`border border-gray-200/50 dark:border-gray-700/50 rounded-xl overflow-hidden transition-all duration-300 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md shadow-lg ${
         isToolbarVisible ? '' : ''
       }`}>
         {/* Rich Text Toolbar - Only show when toggled */}
@@ -190,10 +190,10 @@ export function MentionInput({
           placeholder={placeholder}
           disabled={disabled}
           rows={1}
-          className={`w-full px-4 py-3 pr-12 ${isToolbarVisible ? 'rounded-b-xl border-0' : 'rounded-xl border border-gray-200 dark:border-gray-700'}
-            bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+          className={`w-full px-4 py-3 pr-12 ${isToolbarVisible ? 'rounded-b-xl border-0' : 'rounded-xl border-0'}
+            bg-transparent text-gray-900 dark:text-white
             placeholder-gray-500 dark:placeholder-gray-400
-            focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-600
+            focus:outline-none focus:ring-2 focus:ring-green-500/50 dark:focus:ring-green-600/50
             resize-none min-h-[48px] max-h-[150px] ${className}`}
           style={{
             height: 'auto',
@@ -202,12 +202,12 @@ export function MentionInput({
         />
       </div>
 
-      {/* Autocomplete Dropdown */}
+      {/* Autocomplete Dropdown with Glassmorphism */}
       {showAutocomplete && filteredUsers.length > 0 && (
         <div
           ref={autocompleteRef}
-          className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-gray-800
-            border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50
+          className="absolute bottom-full left-0 right-0 mb-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg
+            border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-xl z-50
             max-h-60 overflow-y-auto"
         >
           <div className="p-2">
