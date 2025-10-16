@@ -809,12 +809,31 @@ export default function CalendarPage() {
 
             {/* Status Filter - Only show in List View */}
             {viewMode === 'list' && (
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by status:</span>
-                <div className="flex gap-1">
+              <div className="mb-4">
+                <label htmlFor="status-filter-mobile" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 md:hidden">
+                  Filter by status:
+                </label>
+                <span className="hidden md:inline text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">Filter by status:</span>
+
+                {/* Mobile: Dropdown Select */}
+                <select
+                  id="status-filter-mobile"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as 'all' | 'not-started' | 'in-progress' | 'completed')}
+                  className="md:hidden w-full px-4 py-3 text-base bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white font-medium appearance-none cursor-pointer"
+                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
+                >
+                  <option value="all">All Events</option>
+                  <option value="not-started">Not Started</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+
+                {/* Desktop: Button Filters */}
+                <div className="hidden md:inline-flex gap-1">
                   <button
                     onClick={() => setStatusFilter('all')}
-                    className={`px-4 py-2.5 md:px-3 md:py-1.5 text-sm md:text-xs min-h-[44px] md:min-h-0 rounded-lg font-medium transition-all ${
+                    className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-all ${
                       statusFilter === 'all'
                         ? 'bg-gradient-calendar text-white shadow-md'
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -824,7 +843,7 @@ export default function CalendarPage() {
                   </button>
                   <button
                     onClick={() => setStatusFilter('not-started')}
-                    className={`px-4 py-2.5 md:px-3 md:py-1.5 text-sm md:text-xs min-h-[44px] md:min-h-0 rounded-lg font-medium transition-all ${
+                    className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-all ${
                       statusFilter === 'not-started'
                         ? 'bg-red-500 text-white shadow-md'
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -834,7 +853,7 @@ export default function CalendarPage() {
                   </button>
                   <button
                     onClick={() => setStatusFilter('in-progress')}
-                    className={`px-4 py-2.5 md:px-3 md:py-1.5 text-sm md:text-xs min-h-[44px] md:min-h-0 rounded-lg font-medium transition-all ${
+                    className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-all ${
                       statusFilter === 'in-progress'
                         ? 'bg-amber-500 text-white shadow-md'
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -844,7 +863,7 @@ export default function CalendarPage() {
                   </button>
                   <button
                     onClick={() => setStatusFilter('completed')}
-                    className={`px-4 py-2.5 md:px-3 md:py-1.5 text-sm md:text-xs min-h-[44px] md:min-h-0 rounded-lg font-medium transition-all ${
+                    className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-all ${
                       statusFilter === 'completed'
                         ? 'bg-green-500 text-white shadow-md'
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'

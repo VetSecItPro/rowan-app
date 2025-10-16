@@ -69,6 +69,10 @@ export default function TasksPage() {
     'attachments' | 'dependencies' | 'approval' | 'snooze' | 'details' | null
   >(null);
 
+  // Pagination state
+  const [displayLimit, setDisplayLimit] = useState(20);
+  const ITEMS_PER_PAGE = 20;
+
   // Real-time tasks with filters (only for task tab, not chores)
   const { tasks: realtimeTasks, loading: realtimeLoading, refreshTasks } = useTaskRealtime({
     spaceId: currentSpace?.id || '',
@@ -120,6 +124,28 @@ export default function TasksPage() {
 
     return filtered;
   }, [allItems, statusFilter, searchQuery, activeTab]);
+
+  // Paginated items for performance with large lists
+  const paginatedItems = useMemo(() => {
+    return filteredItems.slice(0, displayLimit);
+  }, [filteredItems, displayLimit]);
+
+  const hasMoreItems = filteredItems.length > displayLimit;
+  const remainingItemsCount = filteredItems.length - displayLimit;
+
+  // Pagination handlers
+  const handleLoadMore = useCallback(() => {
+    setDisplayLimit(prev => prev + ITEMS_PER_PAGE);
+  }, [ITEMS_PER_PAGE]);
+
+  const handleShowAll = useCallback(() => {
+    setDisplayLimit(filteredItems.length);
+  }, [filteredItems.length]);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setDisplayLimit(ITEMS_PER_PAGE);
+  }, [statusFilter, searchQuery, activeTab, ITEMS_PER_PAGE]);
 
   // Memoized loadData function to fetch both tasks and chores
   const loadData = useCallback(async () => {
@@ -543,48 +569,65 @@ export default function TasksPage() {
                     </span>
                   </div>
 
-                  {/* Status Filter - Segmented Buttons */}
-                  <div className="bg-gray-50 dark:bg-gray-900 border-2 border-blue-200 dark:border-blue-700 rounded-lg p-1 flex gap-1 w-fit">
-                    <button
-                      onClick={() => setStatusFilter('all')}
-                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[60px] ${
-                        statusFilter === 'all'
-                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                          : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
-                      }`}
+                  {/* Status Filter - Mobile Dropdown + Desktop Buttons */}
+                  <div>
+                    {/* Mobile: Dropdown Select */}
+                    <select
+                      id="status-filter-tasks-mobile"
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="md:hidden w-full max-w-xs px-4 py-3 text-base bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-blue-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white font-medium appearance-none cursor-pointer"
+                      style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
                     >
-                      All
-                    </button>
-                    <button
-                      onClick={() => setStatusFilter('pending')}
-                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[70px] ${
-                        statusFilter === 'pending'
-                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                          : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
-                      }`}
-                    >
-                      Pending
-                    </button>
-                    <button
-                      onClick={() => setStatusFilter('in_progress')}
-                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[85px] ${
-                        statusFilter === 'in_progress'
-                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                          : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
-                      }`}
-                    >
-                      In Progress
-                    </button>
-                    <button
-                      onClick={() => setStatusFilter('completed')}
-                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[80px] ${
-                        statusFilter === 'completed'
-                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                          : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
-                      }`}
-                    >
-                      Completed
-                    </button>
+                      <option value="all">All {activeTab === 'task' ? 'Tasks' : 'Chores'}</option>
+                      <option value="pending">Pending</option>
+                      <option value="in_progress">In Progress</option>
+                      <option value="completed">Completed</option>
+                    </select>
+
+                    {/* Desktop: Segmented Buttons */}
+                    <div className="hidden md:flex bg-gray-50 dark:bg-gray-900 border-2 border-blue-200 dark:border-blue-700 rounded-lg p-1 gap-1 w-fit">
+                      <button
+                        onClick={() => setStatusFilter('all')}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+                          statusFilter === 'all'
+                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                        }`}
+                      >
+                        All
+                      </button>
+                      <button
+                        onClick={() => setStatusFilter('pending')}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+                          statusFilter === 'pending'
+                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                        }`}
+                      >
+                        Pending
+                      </button>
+                      <button
+                        onClick={() => setStatusFilter('in_progress')}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+                          statusFilter === 'in_progress'
+                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                        }`}
+                      >
+                        In Progress
+                      </button>
+                      <button
+                        onClick={() => setStatusFilter('completed')}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+                          statusFilter === 'completed'
+                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                        }`}
+                      >
+                        Completed
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -649,10 +692,11 @@ export default function TasksPage() {
                   />
                 ) : (
                   /* Regular list for chores or when drag-drop disabled */
-                  <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-                    {filteredItems.map((item) => (
-                      <TaskCard
-                        key={item.id}
+                  <div className="space-y-4">
+                    <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+                      {paginatedItems.map((item) => (
+                        <TaskCard
+                          key={item.id}
                         task={item as any}
                         onStatusChange={handleStatusChange as any}
                         onEdit={handleEditItem as any}
