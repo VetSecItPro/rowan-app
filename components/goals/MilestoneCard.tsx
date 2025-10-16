@@ -28,6 +28,25 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
     return Math.min(Math.round((current / milestone.target_value) * 100), 100);
   };
 
+  // Color-coded progress styling based on percentage (consistent with GoalCard)
+  const getProgressColor = () => {
+    if (progressPercentage === 0) return 'from-gray-300 to-gray-400'; // Not started
+    if (progressPercentage <= 25) return 'from-blue-300 to-blue-400'; // Just started
+    if (progressPercentage <= 50) return 'from-blue-400 to-blue-500'; // Making progress
+    if (progressPercentage <= 75) return 'from-blue-500 to-green-400'; // Getting there
+    if (progressPercentage < 100) return 'from-green-400 to-green-500'; // Almost done
+    return 'from-green-500 to-green-600'; // Completed
+  };
+
+  // Get text color for progress percentage
+  const getProgressTextColor = () => {
+    if (progressPercentage >= 75) return 'text-green-600 dark:text-green-400';
+    if (progressPercentage >= 50) return 'text-blue-600 dark:text-blue-400';
+    if (progressPercentage >= 25) return 'text-blue-500 dark:text-blue-300';
+    return 'text-gray-600 dark:text-gray-400';
+  };
+
+  // Keep type-specific colors for icon badges
   const getGradientColor = () => {
     switch (milestone.type) {
       case 'money':
@@ -94,10 +113,10 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
 
   return (
     <div
-      className={`bg-gray-50 dark:bg-gray-800 border-2 rounded-xl p-6 transition-all ${
+      className={`group relative backdrop-blur-lg backdrop-saturate-150 rounded-xl p-6 transition-all duration-300 ${
         isCompleted
-          ? 'border-green-500 dark:border-green-600'
-          : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-600'
+          ? 'bg-green-500/10 dark:bg-green-500/10 border border-green-500/30 dark:border-green-500/30'
+          : 'bg-white/10 dark:bg-black/40 border border-white/20 dark:border-white/10 hover:bg-white/15 dark:hover:bg-black/50 hover:border-white/30 dark:hover:border-white/20 hover:shadow-xl hover:-translate-y-1'
       }`}
     >
       {/* Header */}
@@ -158,7 +177,7 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 mt-2 w-48 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20 overflow-hidden">
+              <div className="w-48 dropdown-mobile absolute right-0 mt-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-xl z-20 overflow-hidden">
                 <button
                   onClick={() => { onEdit(milestone); setShowMenu(false); }}
                   className="w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 active:scale-[0.98]"
@@ -183,15 +202,15 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
           {/* Values */}
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-600 dark:text-gray-400">Progress</span>
-            <span className="font-semibold text-gray-900 dark:text-white">
+            <span className={`font-semibold ${getProgressTextColor()}`}>
               {formatValue(milestone.current_value)} / {formatValue(milestone.target_value)}
             </span>
           </div>
 
-          {/* Progress Bar */}
-          <div className="relative w-full h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          {/* Progress Bar with color-coded gradient */}
+          <div className="relative w-full h-3 bg-gray-200/50 dark:bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-sm">
             <div
-              className={`absolute top-0 left-0 h-full bg-gradient-to-r ${getGradientColor()} transition-all duration-500 ease-out`}
+              className={`absolute top-0 left-0 h-full bg-gradient-to-r ${getProgressColor()} transition-all duration-700 ease-out rounded-full shadow-sm`}
               style={{ width: `${progressPercentage}%` }}
             />
             <div className="absolute inset-0 flex items-center justify-center">
