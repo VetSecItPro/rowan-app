@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List } from 'lucide-react';
+import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { GoalCard } from '@/components/goals/GoalCard';
+import { SortableGoalsList } from '@/components/goals/SortableGoalsList';
 import { MilestoneCard } from '@/components/goals/MilestoneCard';
 import { NewGoalModal } from '@/components/goals/NewGoalModal';
 import { NewMilestoneModal } from '@/components/goals/NewMilestoneModal';
@@ -32,9 +33,10 @@ export default function GoalsPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
+  const [focusMode, setFocusMode] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; action: 'delete-goal' | 'delete-milestone'; id: string }>({ isOpen: false, action: 'delete-goal', id: '' });
 
-  // Memoized filtered goals with search and status
+  // Memoized filtered goals with search, status, and focus mode
   const filteredGoals = useMemo(() => {
     let filtered = goals;
 
@@ -56,8 +58,13 @@ export default function GoalsPage() {
       );
     }
 
+    // Apply focus mode - show only top 3 goals (pinned + highest priority)
+    if (focusMode && filtered.length > 3) {
+      filtered = filtered.slice(0, 3);
+    }
+
     return filtered;
-  }, [goals, searchQuery, statusFilter]);
+  }, [goals, searchQuery, statusFilter, focusMode]);
 
   // Memoized filtered milestones with search
   const filteredMilestones = useMemo(() => {
@@ -294,6 +301,38 @@ export default function GoalsPage() {
     }
   }, [user]);
 
+  const handleReorderGoals = useCallback(async (goalIds: string[]) => {
+    if (!currentSpace) return;
+
+    try {
+      await goalsService.reorderGoals(currentSpace.id, goalIds);
+      // Optimistically update local state
+      const reorderedGoals = goalIds.map(id => goals.find(g => g.id === id)!).filter(Boolean);
+      setGoals(reorderedGoals);
+    } catch (error) {
+      console.error('Failed to reorder goals:', error);
+      loadData(); // Reload on error
+    }
+  }, [currentSpace, goals, loadData]);
+
+  const handlePriorityChange = useCallback(async (goalId: string, priority: 'none' | 'p1' | 'p2' | 'p3' | 'p4') => {
+    try {
+      await goalsService.updateGoalPriority(goalId, priority);
+      loadData();
+    } catch (error) {
+      console.error('Failed to update goal priority:', error);
+    }
+  }, [loadData]);
+
+  const handleTogglePin = useCallback(async (goalId: string, isPinned: boolean) => {
+    try {
+      await goalsService.toggleGoalPin(goalId, isPinned);
+      loadData();
+    } catch (error) {
+      console.error('Failed to toggle goal pin:', error);
+    }
+  }, [loadData]);
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
       <div className="p-4 sm:p-8">
@@ -515,6 +554,23 @@ export default function GoalsPage() {
                   Completed
                 </button>
               </div>
+
+              {/* Focus Mode Toggle */}
+              {viewMode === 'goals' && filteredGoals.length > 3 && (
+                <button
+                  onClick={() => setFocusMode(!focusMode)}
+                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap flex items-center gap-2 ${
+                    focusMode
+                      ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 border border-purple-300 dark:border-purple-700'
+                  }`}
+                  title="Show only top 3 priority goals"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span className="hidden sm:inline">Focus Mode</span>
+                  <span className="sm:hidden">Focus</span>
+                </button>
+              )}
             </div>
 
             {loading ? (
@@ -565,16 +621,16 @@ export default function GoalsPage() {
                   )}
                 </div>
               ) : (
-                <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-                  {filteredGoals.map((goal) => (
-                    <GoalCard
-                      key={goal.id}
-                      goal={goal}
-                      onEdit={handleEditGoal}
-                      onDelete={handleDeleteGoal}
-                      onStatusChange={handleGoalStatusChange}
-                    />
-                  ))}
+                <div className="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                  <SortableGoalsList
+                    goals={filteredGoals}
+                    onReorder={handleReorderGoals}
+                    onEdit={handleEditGoal}
+                    onDelete={handleDeleteGoal}
+                    onStatusChange={handleGoalStatusChange}
+                    onPriorityChange={handlePriorityChange}
+                    onTogglePin={handleTogglePin}
+                  />
                 </div>
               )
             ) : (
