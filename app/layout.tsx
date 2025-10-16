@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthProvider } from "@/lib/contexts/auth-context";
+import { CookieConsent } from "@/components/gdpr/CookieConsent";
 import { Toaster } from 'sonner';
 
 // Force dynamic rendering for all pages (needed for auth context)
@@ -52,6 +53,7 @@ export default function RootLayout({
         >
           <AuthProvider>
             {children}
+            <CookieConsent />
             <Toaster
               position="top-center"
               duration={4000}
