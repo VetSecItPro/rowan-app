@@ -13,6 +13,7 @@ interface WeekCalendarViewProps {
   onAddMeal: (date: Date, mealType?: string) => void;
   onBulkDelete?: (mealIds: string[]) => void;
   onBulkGenerateList?: (mealIds: string[]) => void;
+  onGenerateList?: () => void;
 }
 
 const MEAL_TYPE_CONFIG = {
@@ -29,7 +30,8 @@ export const WeekCalendarView = memo(function WeekCalendarView({
   onMealClick,
   onAddMeal,
   onBulkDelete,
-  onBulkGenerateList
+  onBulkGenerateList,
+  onGenerateList
 }: WeekCalendarViewProps) {
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedMealIds, setSelectedMealIds] = useState<Set<string>>(new Set());
@@ -130,25 +132,29 @@ export const WeekCalendarView = memo(function WeekCalendarView({
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mr-4">
+          {onGenerateList && !selectionMode && (
+            <button
+              onClick={onGenerateList}
+              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 rounded-lg transition-all flex items-center gap-2 text-sm font-medium shadow-sm"
+              title="Generate shopping list from meals"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              Generate Shopping List
+            </button>
+          )}
+
           <button
             onClick={toggleSelectionMode}
-            className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium relative group ${
+            className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium ${
               selectionMode
                 ? 'bg-red-600 text-white hover:bg-red-700'
                 : 'bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-sm'
             }`}
-            title={selectionMode ? 'Cancel selection' : 'Select multiple meals to generate shopping list or bulk delete'}
+            title={selectionMode ? 'Cancel selection' : 'Select meals for bulk delete'}
           >
             {selectionMode ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
-            {selectionMode ? 'Cancel Selection' : 'Select Meals'}
-            {/* Tooltip */}
-            {!selectionMode && (
-              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-lg">
-                Select multiple meals to generate shopping list or bulk delete
-                <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></span>
-              </span>
-            )}
+            {selectionMode ? 'Cancel' : 'Select for Delete'}
           </button>
 
           {!isCurrentWeek && !selectionMode && (
@@ -165,26 +171,17 @@ export const WeekCalendarView = memo(function WeekCalendarView({
 
       {/* Bulk Action Bar */}
       {selectionMode && selectedMealIds.size > 0 && (
-        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 border border-orange-200 dark:border-orange-700 rounded-lg">
+        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-red-100 to-red-200 dark:from-red-900/30 dark:to-red-900/40 border border-red-300 dark:border-red-700 rounded-lg">
           <span className="text-sm font-medium text-gray-900 dark:text-white">
             {selectedMealIds.size} meal{selectedMealIds.size > 1 ? 's' : ''} selected
           </span>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleBulkGenerateList}
-              className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-2 text-sm font-medium"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              Generate List
-            </button>
-            <button
-              onClick={handleBulkDelete}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 text-sm font-medium"
-            >
-              <Trash2 className="w-4 h-4" />
-              Delete
-            </button>
-          </div>
+          <button
+            onClick={handleBulkDelete}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 text-sm font-medium"
+          >
+            <Trash2 className="w-4 h-4" />
+            Delete Selected
+          </button>
         </div>
       )}
 
