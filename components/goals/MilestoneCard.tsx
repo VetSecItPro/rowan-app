@@ -126,7 +126,7 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
           <button
             onClick={handleCheckboxClick}
             aria-label={`Toggle milestone status: ${milestoneState === 'not-started' ? 'Not Started' : milestoneState === 'in-progress' ? 'In Progress' : 'Completed'}`}
-            className={`w-6 h-6 sm:w-5 sm:h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 active:scale-95 ${
+            className={`min-w-[44px] min-h-[44px] rounded-lg border-2 flex items-center justify-center transition-all flex-shrink-0 active:scale-95 ${
               milestoneState === 'completed'
                 ? 'bg-green-500 border-green-500'
                 : milestoneState === 'in-progress'
@@ -134,8 +134,8 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
                 : 'bg-transparent border-red-500'
             }`}
           >
-            {milestoneState === 'completed' && <Check className="w-4 h-4 sm:w-3 sm:h-3 text-white" />}
-            {milestoneState === 'in-progress' && <div className="w-2 h-2 bg-white rounded-full" />}
+            {milestoneState === 'completed' && <Check className="w-5 h-5 text-white" />}
+            {milestoneState === 'in-progress' && <div className="w-3 h-3 bg-white rounded-full" />}
           </button>
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
             {milestoneState === 'not-started' ? 'Not Started' : milestoneState === 'in-progress' ? 'In Progress' : 'Completed'}
@@ -166,9 +166,9 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
             <button
               onClick={() => setShowMenu(!showMenu)}
               aria-label="Milestone options menu"
-              className="p-2 sm:p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95 flex items-center justify-center"
+              className="min-w-[44px] min-h-[44px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95 flex items-center justify-center"
             >
-              <MoreVertical className="w-5 h-5 sm:w-4 sm:h-4 text-gray-600 dark:text-gray-400" />
+              <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
             <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
               Options

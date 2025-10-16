@@ -5,6 +5,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Goal } from '@/lib/services/goals-service';
 import { GoalCard } from './GoalCard';
 import { GripVertical, Pin, Sparkles } from 'lucide-react';
+import { hapticLight, hapticMedium, hapticSuccess } from '@/lib/utils/haptics';
 
 interface SortableGoalCardProps {
   goal: Goal;
@@ -50,6 +51,8 @@ export function SortableGoalCard({
     e.stopPropagation();
     if (!onPriorityChange) return;
 
+    hapticLight(); // Haptic feedback on priority change
+
     // Cycle through priorities: none → p1 → p2 → p3 → p4 → none
     const priorities: Array<'none' | 'p1' | 'p2' | 'p3' | 'p4'> = ['none', 'p1', 'p2', 'p3', 'p4'];
     const currentIndex = priorities.indexOf(goal.priority || 'none');
@@ -60,6 +63,11 @@ export function SortableGoalCard({
   const handlePinClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onTogglePin) {
+      if (!goal.is_pinned) {
+        hapticSuccess(); // Success haptic when pinning
+      } else {
+        hapticLight(); // Light haptic when unpinning
+      }
       onTogglePin(goal.id, !goal.is_pinned);
     }
   };
@@ -74,8 +82,8 @@ export function SortableGoalCard({
         {...listeners}
         className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-2 opacity-0 group-hover/sortable:opacity-100 transition-opacity cursor-grab active:cursor-grabbing z-10"
       >
-        <div className="w-8 h-8 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
-          <GripVertical className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+        <div className="w-11 h-11 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
+          <GripVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
         </div>
       </div>
 
@@ -85,14 +93,14 @@ export function SortableGoalCard({
         {onTogglePin && (
           <button
             onClick={handlePinClick}
-            className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all active:scale-95 ${
+            className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all active:scale-95 ${
               goal.is_pinned
                 ? 'bg-yellow-500 text-white'
                 : 'bg-gray-200/50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'
             }`}
             title={goal.is_pinned ? 'Unpin goal' : 'Pin goal'}
           >
-            <Pin className={`w-4 h-4 ${goal.is_pinned ? 'fill-current' : ''}`} />
+            <Pin className={`w-5 h-5 ${goal.is_pinned ? 'fill-current' : ''}`} />
           </button>
         )}
 
@@ -100,7 +108,7 @@ export function SortableGoalCard({
         {onPriorityChange && (
           <button
             onClick={handlePriorityClick}
-            className={`px-3 py-1 rounded-lg font-bold text-xs transition-all active:scale-95 ${
+            className={`px-4 py-3 min-h-[44px] rounded-lg font-bold text-xs transition-all active:scale-95 ${
               priorityInfo.color || 'bg-gray-200/50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'
             }`}
             title="Click to change priority"

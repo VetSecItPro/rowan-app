@@ -11,6 +11,7 @@ import { NewGoalModal } from '@/components/goals/NewGoalModal';
 import { NewMilestoneModal } from '@/components/goals/NewMilestoneModal';
 import { TemplateSelectionModal } from '@/components/goals/TemplateSelectionModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import GuidedGoalCreation from '@/components/guided/GuidedGoalCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput, GoalTemplate } from '@/lib/services/goals-service';
@@ -335,10 +336,11 @@ export default function GoalsPage() {
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
-      <div className="p-4 sm:p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <PullToRefresh onRefresh={loadData} disabled={loading || showGuidedFlow}>
+        <div className="p-4 sm:p-8">
+          <div className="max-w-7xl mx-auto space-y-8">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-gradient-goals flex items-center justify-center">
                 <Target className="w-6 h-6 text-white" />
@@ -663,6 +665,7 @@ export default function GoalsPage() {
           )}
         </div>
       </div>
+      </PullToRefresh>
       {currentSpace && (
         <>
           <TemplateSelectionModal
