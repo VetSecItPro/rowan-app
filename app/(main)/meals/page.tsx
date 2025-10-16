@@ -1158,7 +1158,7 @@ export default function MealsPage() {
               )
             ) : viewMode === 'calendar' ? (
               /* Calendar View */
-              <div>
+              <div className="w-full">
                 {/* Calendar View Mode Selector */}
                 <div className="flex items-center justify-center mb-6">
                   <div className="inline-flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700">
@@ -1221,7 +1221,7 @@ export default function MealsPage() {
                   />
                 ) : (
                   /* Month Calendar View */
-                  <div className="space-y-4">
+                  <div className="w-full space-y-4">
                     {/* Month Navigation and Actions */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
