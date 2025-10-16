@@ -14,6 +14,7 @@ import { SafeToSpendIndicator } from '@/components/projects/SafeToSpendIndicator
 import { BillCard } from '@/components/projects/BillCard';
 import { NewBillModal } from '@/components/projects/NewBillModal';
 import { BudgetTemplateModal } from '@/components/projects/BudgetTemplateModal';
+import { SpendingInsightsCard } from '@/components/projects/SpendingInsightsCard';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { projectsOnlyService, type CreateProjectInput } from '@/lib/services/projects-service';
 import { projectsService, type Expense, type CreateExpenseInput } from '@/lib/services/budgets-service';
@@ -528,6 +529,13 @@ export default function ProjectsPage() {
                       </p>
                     </div>
                   </div>
+
+                  {/* Spending Insights */}
+                  {currentSpace && (
+                    <div className="mt-6">
+                      <SpendingInsightsCard spaceId={currentSpace.id} />
+                    </div>
+                  )}
                 </div>
               )
             ) : activeTab === 'bills' ? (

@@ -59,7 +59,7 @@ export function GoalCard({ goal, onEdit, onDelete, onStatusChange }: GoalCardPro
           <button
             onClick={handleCheckboxClick}
             aria-label={`Toggle goal status: ${goalState === 'not-started' ? 'Not Started' : goalState === 'in-progress' ? 'In Progress' : 'Completed'}`}
-            className={`w-6 h-6 sm:w-5 sm:h-5 rounded border-2 flex items-center justify-center transition-all active:scale-95 ${
+            className={`min-w-[44px] min-h-[44px] rounded-lg border-2 flex items-center justify-center transition-all active:scale-95 ${
               goalState === 'completed'
                 ? 'bg-green-500 border-green-500'
                 : goalState === 'in-progress'
@@ -67,8 +67,8 @@ export function GoalCard({ goal, onEdit, onDelete, onStatusChange }: GoalCardPro
                 : 'bg-transparent border-red-500'
             }`}
           >
-            {goalState === 'completed' && <Check className="w-4 h-4 sm:w-3 sm:h-3 text-white" />}
-            {goalState === 'in-progress' && <div className="w-2 h-2 bg-white rounded-full" />}
+            {goalState === 'completed' && <Check className="w-5 h-5 text-white" />}
+            {goalState === 'in-progress' && <div className="w-3 h-3 bg-white rounded-full" />}
           </button>
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
             {goalState === 'not-started' ? 'Not Started' : goalState === 'in-progress' ? 'In Progress' : 'Completed'}
@@ -91,9 +91,9 @@ export function GoalCard({ goal, onEdit, onDelete, onStatusChange }: GoalCardPro
             <button
               onClick={() => setShowMenu(!showMenu)}
               aria-label="Goal options menu"
-              className="w-12 h-12 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95"
+              className="min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95"
             >
-              <MoreVertical className="w-5 h-5 md:w-4 md:h-4 text-gray-600 dark:text-gray-400" />
+              <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
             <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
               Options

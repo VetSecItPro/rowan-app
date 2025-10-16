@@ -1,81 +1,127 @@
 /**
- * Haptic Feedback Utilities
- * Provides vibration feedback for touch interactions on supported devices
+ * Haptic feedback utilities for mobile interactions
+ * Provides tactile feedback for better UX on touch devices
  */
 
-/**
- * Trigger a light haptic feedback (10ms vibration)
- * Use for: button taps, toggle switches, checkbox selection
- */
-export function hapticLight() {
-  if ('vibrate' in navigator) {
-    navigator.vibrate(10);
-  }
+export type HapticFeedbackType = 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' | 'selection';
+
+interface HapticPattern {
+  vibrate?: number | number[];
+  intensity?: number;
 }
 
-/**
- * Trigger a medium haptic feedback (20ms vibration)
- * Use for: navigation changes, modal opens/closes
- */
-export function hapticMedium() {
-  if ('vibrate' in navigator) {
-    navigator.vibrate(20);
-  }
-}
+const hapticPatterns: Record<HapticFeedbackType, HapticPattern> = {
+  light: { vibrate: 10 },
+  medium: { vibrate: 20 },
+  heavy: { vibrate: 30 },
+  success: { vibrate: [10, 50, 10] },
+  warning: { vibrate: [20, 100, 20] },
+  error: { vibrate: [30, 100, 30, 100, 30] },
+  selection: { vibrate: 5 },
+};
 
 /**
- * Trigger a heavy haptic feedback (30ms vibration)
- * Use for: destructive actions, errors, important confirmations
- */
-export function hapticHeavy() {
-  if ('vibrate' in navigator) {
-    navigator.vibrate(30);
-  }
-}
-
-/**
- * Trigger a success haptic pattern (two short pulses)
- * Use for: successful form submissions, completed actions
- */
-export function hapticSuccess() {
-  if ('vibrate' in navigator) {
-    navigator.vibrate([10, 50, 10]);
-  }
-}
-
-/**
- * Trigger an error haptic pattern (three short pulses)
- * Use for: form validation errors, failed actions
- */
-export function hapticError() {
-  if ('vibrate' in navigator) {
-    navigator.vibrate([15, 30, 15, 30, 15]);
-  }
-}
-
-/**
- * Trigger a warning haptic pattern (two medium pulses)
- * Use for: confirmations, warnings
- */
-export function hapticWarning() {
-  if ('vibrate' in navigator) {
-    navigator.vibrate([20, 50, 20]);
-  }
-}
-
-/**
- * Check if haptic feedback is supported on this device
+ * Check if haptic feedback is supported
  */
 export function isHapticSupported(): boolean {
-  return 'vibrate' in navigator;
+  return 'vibrate' in navigator || 'hapticEngine' in navigator;
 }
 
 /**
- * Custom haptic pattern
- * @param pattern - Array of durations (vibrate, pause, vibrate, ...)
+ * Trigger haptic feedback with specified type
  */
-export function hapticCustom(pattern: number | number[]) {
-  if ('vibrate' in navigator) {
-    navigator.vibrate(pattern);
+export function triggerHaptic(type: HapticFeedbackType = 'light'): void {
+  // Check if running in browser
+  if (typeof window === 'undefined') return;
+
+  const pattern = hapticPatterns[type];
+
+  // iOS Haptic Engine (Safari on iOS)
+  if ('hapticEngine' in navigator && typeof (navigator as any).hapticEngine === 'object') {
+    try {
+      const intensity = pattern.intensity || 0.5;
+      (navigator as any).hapticEngine.trigger(intensity);
+      return;
+    } catch (error) {
+      // Fallback to vibration API
+    }
   }
+
+  // Vibration API (most Android browsers)
+  if ('vibrate' in navigator && pattern.vibrate) {
+    try {
+      navigator.vibrate(pattern.vibrate);
+    } catch (error) {
+      console.warn('Haptic feedback failed:', error);
+    }
+  }
+}
+
+/**
+ * Trigger haptic feedback on button press
+ */
+export function hapticButtonPress(): void {
+  triggerHaptic('light');
+}
+
+/**
+ * Trigger haptic feedback on selection change
+ */
+export function hapticSelection(): void {
+  triggerHaptic('selection');
+}
+
+/**
+ * Trigger haptic feedback on success action
+ */
+export function hapticSuccess(): void {
+  triggerHaptic('success');
+}
+
+/**
+ * Trigger haptic feedback on error
+ */
+export function hapticError(): void {
+  triggerHaptic('error');
+}
+
+/**
+ * Trigger haptic feedback on warning
+ */
+export function hapticWarning(): void {
+  triggerHaptic('warning');
+}
+
+/**
+ * Trigger haptic feedback on drag start
+ */
+export function hapticDragStart(): void {
+  triggerHaptic('medium');
+}
+
+/**
+ * Trigger haptic feedback on drag end/drop
+ */
+export function hapticDragEnd(): void {
+  triggerHaptic('light');
+}
+
+/**
+ * Trigger haptic feedback on toggle
+ */
+export function hapticToggle(): void {
+  triggerHaptic('light');
+}
+
+/**
+ * Create a haptic-enabled click handler
+ */
+export function withHaptic<T extends (...args: any[]) => any>(
+  handler: T,
+  hapticType: HapticFeedbackType = 'light'
+): T {
+  return ((...args: any[]) => {
+    triggerHaptic(hapticType);
+    return handler(...args);
+  }) as T;
 }
