@@ -116,7 +116,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
   ];
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+    <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
@@ -149,7 +149,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
 
       {/* Filter Options */}
       {isExpanded && (
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-4">
+        <div className="p-4 border-t border-gray-200/50 dark:border-gray-700/50 space-y-4">
           {/* Search */}
           <div>
             <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
@@ -161,7 +161,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
               value={filters.search || ''}
               onChange={(e) => updateFilter('search', e.target.value || undefined)}
               placeholder="Search tasks..."
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
+              className="w-full px-3 py-2 border border-gray-200/50 dark:border-gray-700/50 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm"
             />
           </div>
 
@@ -275,13 +275,13 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 type="date"
                 value={filters.dueDateFrom || ''}
                 onChange={(e) => updateFilter('dueDateFrom', e.target.value || undefined)}
-                className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
+                className="px-3 py-2 text-sm border border-gray-200/50 dark:border-gray-700/50 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm"
               />
               <input
                 type="date"
                 value={filters.dueDateTo || ''}
                 onChange={(e) => updateFilter('dueDateTo', e.target.value || undefined)}
-                className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
+                className="px-3 py-2 text-sm border border-gray-200/50 dark:border-gray-700/50 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm"
               />
             </div>
           </div>
