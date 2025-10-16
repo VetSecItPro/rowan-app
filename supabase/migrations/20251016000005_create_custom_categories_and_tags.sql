@@ -112,9 +112,8 @@ CREATE POLICY "Users can view custom categories from their spaces"
 ON custom_categories FOR SELECT TO authenticated
 USING (
   space_id IN (
-    SELECT spaces.id FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    SELECT space_id FROM space_members
+    WHERE user_id = auth.uid()
   )
 );
 
@@ -122,9 +121,8 @@ CREATE POLICY "Users can insert custom categories in their spaces"
 ON custom_categories FOR INSERT TO authenticated
 WITH CHECK (
   space_id IN (
-    SELECT spaces.id FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    SELECT space_id FROM space_members
+    WHERE user_id = auth.uid()
   )
 );
 
@@ -132,9 +130,8 @@ CREATE POLICY "Users can update custom categories in their spaces"
 ON custom_categories FOR UPDATE TO authenticated
 USING (
   space_id IN (
-    SELECT spaces.id FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    SELECT space_id FROM space_members
+    WHERE user_id = auth.uid()
   )
 );
 
@@ -142,9 +139,8 @@ CREATE POLICY "Users can delete custom categories in their spaces"
 ON custom_categories FOR DELETE TO authenticated
 USING (
   space_id IN (
-    SELECT spaces.id FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    SELECT space_id FROM space_members
+    WHERE user_id = auth.uid()
   )
 );
 
@@ -153,9 +149,8 @@ CREATE POLICY "Users can view tags from their spaces"
 ON tags FOR SELECT TO authenticated
 USING (
   space_id IN (
-    SELECT spaces.id FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    SELECT space_id FROM space_members
+    WHERE user_id = auth.uid()
   )
 );
 
@@ -163,9 +158,8 @@ CREATE POLICY "Users can insert tags in their spaces"
 ON tags FOR INSERT TO authenticated
 WITH CHECK (
   space_id IN (
-    SELECT spaces.id FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    SELECT space_id FROM space_members
+    WHERE user_id = auth.uid()
   )
 );
 
@@ -173,9 +167,8 @@ CREATE POLICY "Users can update tags in their spaces"
 ON tags FOR UPDATE TO authenticated
 USING (
   space_id IN (
-    SELECT spaces.id FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    SELECT space_id FROM space_members
+    WHERE user_id = auth.uid()
   )
 );
 
@@ -183,9 +176,8 @@ CREATE POLICY "Users can delete tags in their spaces"
 ON tags FOR DELETE TO authenticated
 USING (
   space_id IN (
-    SELECT spaces.id FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    SELECT space_id FROM space_members
+    WHERE user_id = auth.uid()
   )
 );
 
@@ -195,9 +187,8 @@ ON expense_tags FOR SELECT TO authenticated
 USING (
   expense_id IN (
     SELECT expenses.id FROM expenses
-    INNER JOIN spaces ON expenses.space_id = spaces.id
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    INNER JOIN space_members ON expenses.space_id = space_members.space_id
+    WHERE space_members.user_id = auth.uid()
   )
 );
 
@@ -206,9 +197,8 @@ ON expense_tags FOR INSERT TO authenticated
 WITH CHECK (
   expense_id IN (
     SELECT expenses.id FROM expenses
-    INNER JOIN spaces ON expenses.space_id = spaces.id
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    INNER JOIN space_members ON expenses.space_id = space_members.space_id
+    WHERE space_members.user_id = auth.uid()
   )
 );
 
@@ -217,9 +207,8 @@ ON expense_tags FOR DELETE TO authenticated
 USING (
   expense_id IN (
     SELECT expenses.id FROM expenses
-    INNER JOIN spaces ON expenses.space_id = spaces.id
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    INNER JOIN space_members ON expenses.space_id = space_members.space_id
+    WHERE space_members.user_id = auth.uid()
   )
 );
 
@@ -229,9 +218,8 @@ ON goal_tags FOR SELECT TO authenticated
 USING (
   goal_id IN (
     SELECT goals.id FROM goals
-    INNER JOIN spaces ON goals.space_id = spaces.id
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    INNER JOIN space_members ON goals.space_id = space_members.space_id
+    WHERE space_members.user_id = auth.uid()
   )
 );
 
@@ -240,9 +228,8 @@ ON goal_tags FOR INSERT TO authenticated
 WITH CHECK (
   goal_id IN (
     SELECT goals.id FROM goals
-    INNER JOIN spaces ON goals.space_id = spaces.id
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    INNER JOIN space_members ON goals.space_id = space_members.space_id
+    WHERE space_members.user_id = auth.uid()
   )
 );
 
@@ -251,9 +238,8 @@ ON goal_tags FOR DELETE TO authenticated
 USING (
   goal_id IN (
     SELECT goals.id FROM goals
-    INNER JOIN spaces ON goals.space_id = spaces.id
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    INNER JOIN space_members ON goals.space_id = space_members.space_id
+    WHERE space_members.user_id = auth.uid()
   )
 );
 
@@ -263,9 +249,8 @@ ON task_tags FOR SELECT TO authenticated
 USING (
   task_id IN (
     SELECT tasks.id FROM tasks
-    INNER JOIN spaces ON tasks.space_id = spaces.id
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    INNER JOIN space_members ON tasks.space_id = space_members.space_id
+    WHERE space_members.user_id = auth.uid()
   )
 );
 
@@ -274,9 +259,8 @@ ON task_tags FOR INSERT TO authenticated
 WITH CHECK (
   task_id IN (
     SELECT tasks.id FROM tasks
-    INNER JOIN spaces ON tasks.space_id = spaces.id
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    INNER JOIN space_members ON tasks.space_id = space_members.space_id
+    WHERE space_members.user_id = auth.uid()
   )
 );
 
@@ -285,9 +269,8 @@ ON task_tags FOR DELETE TO authenticated
 USING (
   task_id IN (
     SELECT tasks.id FROM tasks
-    INNER JOIN spaces ON tasks.space_id = spaces.id
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    INNER JOIN space_members ON tasks.space_id = space_members.space_id
+    WHERE space_members.user_id = auth.uid()
   )
 );
 

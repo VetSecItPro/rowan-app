@@ -70,9 +70,8 @@ CREATE POLICY "Users can view patterns from their spaces"
 ON recurring_expense_patterns FOR SELECT TO authenticated
 USING (
   space_id IN (
-    SELECT spaces.id FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    SELECT space_id FROM space_members
+    WHERE user_id = auth.uid()
   )
 );
 
@@ -80,9 +79,8 @@ CREATE POLICY "Users can insert patterns in their spaces"
 ON recurring_expense_patterns FOR INSERT TO authenticated
 WITH CHECK (
   space_id IN (
-    SELECT spaces.id FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    SELECT space_id FROM space_members
+    WHERE user_id = auth.uid()
   )
 );
 
@@ -90,9 +88,8 @@ CREATE POLICY "Users can update patterns in their spaces"
 ON recurring_expense_patterns FOR UPDATE TO authenticated
 USING (
   space_id IN (
-    SELECT spaces.id FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    SELECT space_id FROM space_members
+    WHERE user_id = auth.uid()
   )
 );
 
@@ -100,9 +97,8 @@ CREATE POLICY "Users can delete patterns in their spaces"
 ON recurring_expense_patterns FOR DELETE TO authenticated
 USING (
   space_id IN (
-    SELECT spaces.id FROM spaces
-    INNER JOIN partnership_members ON spaces.partnership_id = partnership_members.partnership_id
-    WHERE partnership_members.user_id = auth.uid()
+    SELECT space_id FROM space_members
+    WHERE user_id = auth.uid()
   )
 );
 
