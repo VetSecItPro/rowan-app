@@ -1,18 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { Download, FileText, X, Calendar } from 'lucide-react';
+import { Download, FileText, X, Calendar, FileSpreadsheet, FilePdf } from 'lucide-react';
 import { exportService } from '@/lib/services/export-service';
+import { pdfExportService } from '@/lib/services/pdf-export-service';
 
 interface ExportButtonProps {
   spaceId: string;
 }
 
 type ExportType = 'monthly' | 'yearly' | 'custom' | 'category';
+type ExportFormat = 'csv' | 'pdf';
 
 export default function ExportButton({ spaceId }: ExportButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [exportType, setExportType] = useState<ExportType>('monthly');
+  const [exportFormat, setExportFormat] = useState<ExportFormat>('csv');
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [startDate, setStartDate] = useState('');
@@ -23,14 +26,25 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
     try {
       setIsExporting(true);
 
-      if (exportType === 'monthly') {
-        await exportService.exportMonthlyExpenses(spaceId, year, month);
-      } else if (exportType === 'yearly') {
-        await exportService.exportYearlyExpenses(spaceId, year);
-      } else if (exportType === 'custom' && startDate && endDate) {
-        await exportService.exportExpenses(spaceId, startDate, endDate);
-      } else if (exportType === 'category' && startDate && endDate) {
-        await exportService.exportCategoryBreakdown(spaceId, startDate, endDate);
+      if (exportFormat === 'pdf') {
+        // PDF exports only support monthly for now
+        if (exportType === 'monthly') {
+          await pdfExportService.exportMonthlyExpenseSummary(spaceId, year, month);
+        } else {
+          alert('PDF export currently only supports monthly summaries. Please select "This Month" or switch to CSV format.');
+          return;
+        }
+      } else {
+        // CSV exports
+        if (exportType === 'monthly') {
+          await exportService.exportMonthlyExpenses(spaceId, year, month);
+        } else if (exportType === 'yearly') {
+          await exportService.exportYearlyExpenses(spaceId, year);
+        } else if (exportType === 'custom' && startDate && endDate) {
+          await exportService.exportExpenses(spaceId, startDate, endDate);
+        } else if (exportType === 'category' && startDate && endDate) {
+          await exportService.exportCategoryBreakdown(spaceId, startDate, endDate);
+        }
       }
 
       setIsOpen(false);
@@ -49,7 +63,7 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
         className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
       >
         <Download className="w-4 h-4" />
-        Export CSV
+        Export
       </button>
 
       {isOpen && (
@@ -87,6 +101,37 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
 
               {/* Content */}
               <div className="p-6 space-y-6">
+                {/* Export Format Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Export Format
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => setExportFormat('csv')}
+                      className={`px-4 py-3 rounded-lg border-2 transition-all flex items-center justify-center gap-2 ${
+                        exportFormat === 'csv'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300'
+                      }`}
+                    >
+                      <FileSpreadsheet className="w-4 h-4" />
+                      <span className="font-medium">CSV</span>
+                    </button>
+                    <button
+                      onClick={() => setExportFormat('pdf')}
+                      className={`px-4 py-3 rounded-lg border-2 transition-all flex items-center justify-center gap-2 ${
+                        exportFormat === 'pdf'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300'
+                      }`}
+                    >
+                      <FilePdf className="w-4 h-4" />
+                      <span className="font-medium">PDF</span>
+                    </button>
+                  </div>
+                </div>
+
                 {/* Export Type Selection */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
@@ -228,21 +273,39 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                 {/* Info Box */}
                 <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                   <p className="text-sm text-blue-800 dark:text-blue-200">
-                    {exportType === 'yearly' && (
-                      <>CSV file will include all expenses for {year} (for tax filing)</>
-                    )}
-                    {exportType === 'monthly' && (
+                    {exportFormat === 'pdf' ? (
                       <>
-                        CSV file will include expenses for{' '}
-                        {new Date(year, month - 1).toLocaleDateString('en-US', {
-                          month: 'long',
-                          year: 'numeric',
-                        })}
+                        {exportType === 'monthly' ? (
+                          <>
+                            PDF report will include category breakdown and detailed expense list for{' '}
+                            {new Date(year, month - 1).toLocaleDateString('en-US', {
+                              month: 'long',
+                              year: 'numeric',
+                            })}
+                          </>
+                        ) : (
+                          <>PDF export currently only supports monthly summaries. Please select &quot;This Month&quot;.</>
+                        )}
                       </>
-                    )}
-                    {exportType === 'custom' && <>CSV file will include expenses in selected date range</>}
-                    {exportType === 'category' && (
-                      <>CSV file will group expenses by category with subtotals</>
+                    ) : (
+                      <>
+                        {exportType === 'yearly' && (
+                          <>CSV file will include all expenses for {year} (for tax filing)</>
+                        )}
+                        {exportType === 'monthly' && (
+                          <>
+                            CSV file will include expenses for{' '}
+                            {new Date(year, month - 1).toLocaleDateString('en-US', {
+                              month: 'long',
+                              year: 'numeric',
+                            })}
+                          </>
+                        )}
+                        {exportType === 'custom' && <>CSV file will include expenses in selected date range</>}
+                        {exportType === 'category' && (
+                          <>CSV file will group expenses by category with subtotals</>
+                        )}
+                      </>
                     )}
                   </p>
                 </div>
@@ -261,7 +324,8 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                   onClick={handleExport}
                   disabled={
                     isExporting ||
-                    ((exportType === 'custom' || exportType === 'category') && (!startDate || !endDate))
+                    ((exportType === 'custom' || exportType === 'category') && (!startDate || !endDate)) ||
+                    (exportFormat === 'pdf' && exportType !== 'monthly')
                   }
                   className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
@@ -273,7 +337,7 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                   ) : (
                     <>
                       <Download className="w-4 h-4" />
-                      Export CSV
+                      Export {exportFormat.toUpperCase()}
                     </>
                   )}
                 </button>
