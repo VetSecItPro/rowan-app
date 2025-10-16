@@ -30,6 +30,9 @@ export default function RemindersPage(): JSX.Element {
   const [popularTemplates, setPopularTemplates] = useState<ReminderTemplate[]>([]);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedReminderIds, setSelectedReminderIds] = useState<Set<string>>(new Set());
+  const [displayLimit, setDisplayLimit] = useState(20); // Pagination: show 20 items initially
+
+  const ITEMS_PER_PAGE = 20;
 
   // Memoized filtered reminders - expensive filtering operation
   const filteredReminders = useMemo(() => {
@@ -113,6 +116,28 @@ export default function RemindersPage(): JSX.Element {
 
     return { total, active, completed, overdue };
   }, [reminders]);
+
+  // Paginated reminders for performance with large lists
+  const paginatedReminders = useMemo(() => {
+    return filteredReminders.slice(0, displayLimit);
+  }, [filteredReminders, displayLimit]);
+
+  const hasMoreReminders = filteredReminders.length > displayLimit;
+  const remainingCount = filteredReminders.length - displayLimit;
+
+  // Handlers for pagination
+  const handleLoadMore = useCallback(() => {
+    setDisplayLimit(prev => prev + ITEMS_PER_PAGE);
+  }, [ITEMS_PER_PAGE]);
+
+  const handleShowAll = useCallback(() => {
+    setDisplayLimit(filteredReminders.length);
+  }, [filteredReminders.length]);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setDisplayLimit(ITEMS_PER_PAGE);
+  }, [statusFilter, assignmentFilter, categoryFilter, priorityFilter, searchQuery, sortBy, ITEMS_PER_PAGE]);
 
   // Stable reference to loadReminders
   const loadReminders = useCallback(async () => {
@@ -869,20 +894,47 @@ export default function RemindersPage(): JSX.Element {
                 )}
               </div>
             ) : (
-              <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-                {filteredReminders.map((reminder) => (
-                  <ReminderCard
-                    key={reminder.id}
-                    reminder={reminder}
-                    onStatusChange={handleStatusChange}
-                    onEdit={handleEditReminder}
-                    onDelete={handleDeleteReminder}
-                    onSnooze={handleSnoozeReminder}
-                    selectionMode={selectionMode}
-                    selected={selectedReminderIds.has(reminder.id)}
-                    onSelectionChange={handleSelectionChange}
-                  />
-                ))}
+              <div className="space-y-4">
+                <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+                  {paginatedReminders.map((reminder) => (
+                    <ReminderCard
+                      key={reminder.id}
+                      reminder={reminder}
+                      onStatusChange={handleStatusChange}
+                      onEdit={handleEditReminder}
+                      onDelete={handleDeleteReminder}
+                      onSnooze={handleSnoozeReminder}
+                      selectionMode={selectionMode}
+                      selected={selectedReminderIds.has(reminder.id)}
+                      onSelectionChange={handleSelectionChange}
+                    />
+                  ))}
+                </div>
+
+                {/* Pagination Controls */}
+                {hasMoreReminders && (
+                  <div className="flex flex-col items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Showing {paginatedReminders.length} of {filteredReminders.length} reminders
+                      <span className="ml-1 text-gray-500">({remainingCount} more)</span>
+                    </p>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={handleLoadMore}
+                        className="px-6 py-3 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-lg hover:opacity-90 transition-all shadow-md inline-flex items-center gap-2 font-medium"
+                      >
+                        Load {remainingCount > ITEMS_PER_PAGE ? ITEMS_PER_PAGE : remainingCount} More
+                        <ChevronDown className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={handleShowAll}
+                        className="px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all inline-flex items-center gap-2 font-medium"
+                      >
+                        Show All ({remainingCount})
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

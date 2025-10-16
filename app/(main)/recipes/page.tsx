@@ -186,17 +186,52 @@ export default function RecipesPage() {
             )}
           </div>
 
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-col md:flex-row md:flex-wrap gap-4">
             {/* Cuisine Filter */}
             {cuisines.length > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Cuisine:</span>
-                <div className="flex flex-wrap gap-2">
+              <div className="flex flex-col md:flex-row md:items-center gap-2">
+                <label htmlFor="cuisine-filter-mobile" className="text-sm font-medium text-gray-600 dark:text-gray-400 md:font-normal">Cuisine:</label>
+
+                {/* Mobile: Dropdown if 3+ options */}
+                {cuisines.length >= 3 ? (
+                  <select
+                    id="cuisine-filter-mobile"
+                    value={selectedCuisine || ''}
+                    onChange={(e) => setSelectedCuisine(e.target.value || null)}
+                    className="md:hidden w-full px-4 py-3 text-base bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 dark:text-white font-medium appearance-none cursor-pointer"
+                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
+                  >
+                    <option value="">All Cuisines</option>
+                    {cuisines.map((cuisine) => (
+                      <option key={cuisine} value={cuisine || ''}>{cuisine}</option>
+                    ))}
+                  </select>
+                ) : (
+                  /* Mobile: Pills if 1-2 options */
+                  <div className="md:hidden flex flex-wrap gap-2">
+                    {cuisines.map((cuisine) => (
+                      <button
+                        key={cuisine}
+                        onClick={() => setSelectedCuisine(cuisine === selectedCuisine ? null : (cuisine || null))}
+                        className={`px-4 py-2.5 text-sm min-h-[44px] rounded-full font-medium transition-colors ${
+                          selectedCuisine === cuisine
+                            ? 'bg-orange-500 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        {cuisine}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Desktop: Always use pills */}
+                <div className="hidden md:flex flex-wrap gap-2">
                   {cuisines.map((cuisine) => (
                     <button
                       key={cuisine}
                       onClick={() => setSelectedCuisine(cuisine === selectedCuisine ? null : (cuisine || null))}
-                      className={`px-4 py-2.5 md:px-3 md:py-1 text-sm min-h-[44px] md:min-h-0 rounded-full font-medium transition-colors ${
+                      className={`px-3 py-1 text-sm rounded-full font-medium transition-colors ${
                         selectedCuisine === cuisine
                           ? 'bg-orange-500 text-white'
                           : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-gray-600'
@@ -211,14 +246,49 @@ export default function RecipesPage() {
 
             {/* Difficulty Filter */}
             {difficulties.length > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Difficulty:</span>
-                <div className="flex flex-wrap gap-2">
+              <div className="flex flex-col md:flex-row md:items-center gap-2">
+                <label htmlFor="difficulty-filter-mobile" className="text-sm font-medium text-gray-600 dark:text-gray-400 md:font-normal">Difficulty:</label>
+
+                {/* Mobile: Dropdown if 3+ options */}
+                {difficulties.length >= 3 ? (
+                  <select
+                    id="difficulty-filter-mobile"
+                    value={selectedDifficulty || ''}
+                    onChange={(e) => setSelectedDifficulty(e.target.value || null)}
+                    className="md:hidden w-full px-4 py-3 text-base bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 dark:text-white font-medium appearance-none cursor-pointer"
+                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
+                  >
+                    <option value="">All Difficulties</option>
+                    {difficulties.map((difficulty) => (
+                      <option key={difficulty} value={difficulty || ''}>{difficulty}</option>
+                    ))}
+                  </select>
+                ) : (
+                  /* Mobile: Pills if 1-2 options */
+                  <div className="md:hidden flex flex-wrap gap-2">
+                    {difficulties.map((difficulty) => (
+                      <button
+                        key={difficulty}
+                        onClick={() => setSelectedDifficulty(difficulty === selectedDifficulty ? null : (difficulty || null))}
+                        className={`px-4 py-2.5 text-sm min-h-[44px] rounded-full font-medium transition-colors ${
+                          selectedDifficulty === difficulty
+                            ? 'bg-orange-500 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        {difficulty}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Desktop: Always use pills */}
+                <div className="hidden md:flex flex-wrap gap-2">
                   {difficulties.map((difficulty) => (
                     <button
                       key={difficulty}
                       onClick={() => setSelectedDifficulty(difficulty === selectedDifficulty ? null : (difficulty || null))}
-                      className={`px-4 py-2.5 md:px-3 md:py-1 text-sm min-h-[44px] md:min-h-0 rounded-full font-medium transition-colors ${
+                      className={`px-3 py-1 text-sm rounded-full font-medium transition-colors ${
                         selectedDifficulty === difficulty
                           ? 'bg-orange-500 text-white'
                           : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-gray-600'
