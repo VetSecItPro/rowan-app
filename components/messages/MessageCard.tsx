@@ -96,16 +96,21 @@ export function MessageCard({
           <div
             className={`rounded-2xl px-4 py-3 ${
               isOwn
-                ? 'rounded-tr-sm bg-white/40 dark:bg-gray-800/40'
-                : 'rounded-tl-sm bg-white/40 dark:bg-gray-800/40'
-            } backdrop-blur-md border shadow-lg`}
+                ? 'rounded-tr-sm'
+                : 'rounded-tl-sm'
+            } backdrop-blur-md border-2 shadow-lg relative overflow-hidden bg-white/40 dark:bg-gray-800/40`}
             style={{
-              borderWidth: '1px',
-              borderStyle: 'solid',
-              borderColor: `${senderColor}40`,
-              boxShadow: `0 8px 32px 0 rgba(0, 0, 0, 0.1), inset 0 1px 1px 0 ${senderColor}20`
+              borderColor: `${senderColor}60`,
+              boxShadow: `0 8px 32px 0 rgba(0, 0, 0, 0.1)`
             }}
           >
+            {/* Subtle gradient overlay covering the entire bubble */}
+            <div
+              className="absolute inset-0 pointer-events-none rounded-2xl"
+              style={{
+                background: `linear-gradient(135deg, ${senderColor}0A 0%, transparent 100%)`
+              }}
+            />
             {/* Message Content with Markdown Support */}
             {message.content && (
               <div className="break-words text-gray-900 dark:text-white text-sm prose prose-sm dark:prose-invert max-w-none">
