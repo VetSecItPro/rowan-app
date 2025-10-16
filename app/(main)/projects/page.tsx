@@ -286,23 +286,23 @@ export default function ProjectsPage() {
                     else if (activeTab === 'bills') setIsBillModalOpen(true);
                     else setIsExpenseModalOpen(true);
                   }}
-                className="px-4 py-2 sm:px-6 sm:py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                className="min-w-[120px] sm:min-w-[180px] px-4 py-2 sm:px-6 sm:py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
-                <Plus className="w-5 h-5" />
-                <span className="hidden sm:inline">
+                <Plus className="w-5 h-5 flex-shrink-0" />
+                <span className="hidden sm:inline whitespace-nowrap">
                   {activeTab === 'projects' ? 'New Project' : activeTab === 'budgets' ? 'Set Budget' : activeTab === 'bills' ? 'New Bill' : 'New Expense'}
                 </span>
-                <span className="sm:hidden">{activeTab === 'projects' ? 'Project' : activeTab === 'budgets' ? 'Budget' : activeTab === 'bills' ? 'Bill' : 'Expense'}</span>
+                <span className="sm:hidden whitespace-nowrap">{activeTab === 'projects' ? 'Project' : activeTab === 'budgets' ? 'Budget' : activeTab === 'bills' ? 'Bill' : 'Expense'}</span>
               </button>
               )}
               {activeTab === 'receipts' && (
                 <button
                   onClick={() => setIsReceiptModalOpen(true)}
-                  className="px-4 py-2 sm:px-6 sm:py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                  className="min-w-[120px] sm:min-w-[180px] px-4 py-2 sm:px-6 sm:py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
                 >
-                  <Plus className="w-5 h-5" />
-                  <span className="hidden sm:inline">Upload Receipt</span>
-                  <span className="sm:hidden">Upload</span>
+                  <Plus className="w-5 h-5 flex-shrink-0" />
+                  <span className="hidden sm:inline whitespace-nowrap">Upload Receipt</span>
+                  <span className="sm:hidden whitespace-nowrap">Upload</span>
                 </button>
               )}
             </div>
