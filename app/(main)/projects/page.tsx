@@ -15,6 +15,8 @@ import { BillCard } from '@/components/projects/BillCard';
 import { NewBillModal } from '@/components/projects/NewBillModal';
 import { BudgetTemplateModal } from '@/components/projects/BudgetTemplateModal';
 import { SpendingInsightsCard } from '@/components/projects/SpendingInsightsCard';
+import { ReceiptUploadModal } from '@/components/projects/ReceiptUploadModal';
+import { ReceiptsListCard } from '@/components/projects/ReceiptsListCard';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { projectsOnlyService, type CreateProjectInput } from '@/lib/services/projects-service';
 import { projectsService, type Expense, type CreateExpenseInput } from '@/lib/services/budgets-service';
@@ -23,7 +25,7 @@ import { billsService, type Bill, type CreateBillInput } from '@/lib/services/bi
 import { budgetTemplatesService, type BudgetTemplate, type BudgetTemplateCategory } from '@/lib/services/budget-templates-service';
 import type { Project } from '@/lib/types';
 
-type TabType = 'projects' | 'budgets' | 'expenses' | 'bills';
+type TabType = 'projects' | 'budgets' | 'expenses' | 'bills' | 'receipts';
 
 export default function ProjectsPage() {
   const { currentSpace, user } = useAuth();
@@ -37,6 +39,7 @@ export default function ProjectsPage() {
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [isBillModalOpen, setIsBillModalOpen] = useState(false);
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [editingBill, setEditingBill] = useState<Bill | null>(null);
@@ -256,7 +259,7 @@ export default function ProjectsPage() {
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-amber-100 to-amber-100 dark:from-amber-900/30 dark:to-amber-900/30 rounded-xl border border-amber-200 dark:border-amber-700 w-full sm:w-auto overflow-x-auto">
-                {(['projects', 'budgets', 'bills', 'expenses'] as TabType[]).map((tab) => (
+                {(['projects', 'budgets', 'bills', 'expenses', 'receipts'] as TabType[]).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -270,17 +273,19 @@ export default function ProjectsPage() {
                     {tab === 'budgets' && <Wallet className="w-4 h-4" />}
                     {tab === 'bills' && <FileCheck className="w-4 h-4" />}
                     {tab === 'expenses' && <Receipt className="w-4 h-4" />}
+                    {tab === 'receipts' && <Receipt className="w-4 h-4" />}
                     <span className="text-sm capitalize">{tab}</span>
                   </button>
                 ))}
               </div>
-              <button
-                onClick={() => {
-                  if (activeTab === 'projects') setIsProjectModalOpen(true);
-                  else if (activeTab === 'budgets') setIsBudgetModalOpen(true);
-                  else if (activeTab === 'bills') setIsBillModalOpen(true);
-                  else setIsExpenseModalOpen(true);
-                }}
+              {activeTab !== 'receipts' && (
+                <button
+                  onClick={() => {
+                    if (activeTab === 'projects') setIsProjectModalOpen(true);
+                    else if (activeTab === 'budgets') setIsBudgetModalOpen(true);
+                    else if (activeTab === 'bills') setIsBillModalOpen(true);
+                    else setIsExpenseModalOpen(true);
+                  }}
                 className="px-4 py-2 sm:px-6 sm:py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
@@ -289,6 +294,17 @@ export default function ProjectsPage() {
                 </span>
                 <span className="sm:hidden">{activeTab === 'projects' ? 'Project' : activeTab === 'budgets' ? 'Budget' : activeTab === 'bills' ? 'Bill' : 'Expense'}</span>
               </button>
+              )}
+              {activeTab === 'receipts' && (
+                <button
+                  onClick={() => setIsReceiptModalOpen(true)}
+                  className="px-4 py-2 sm:px-6 sm:py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span className="hidden sm:inline">Upload Receipt</span>
+                  <span className="sm:hidden">Upload</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -582,7 +598,9 @@ export default function ProjectsPage() {
                   </div>
                 </div>
               )
-            )}
+            ) : activeTab === 'receipts' ? (
+              currentSpace && <ReceiptsListCard spaceId={currentSpace.id} onDelete={() => loadData()} />
+            ) : null}
           </div>
         </div>
       </div>
@@ -593,6 +611,7 @@ export default function ProjectsPage() {
           <NewBudgetModal isOpen={isBudgetModalOpen} onClose={() => setIsBudgetModalOpen(false)} onSave={handleSetBudget} currentBudget={currentBudget} spaceId={currentSpace.id} />
           <NewBillModal isOpen={isBillModalOpen} onClose={() => { setIsBillModalOpen(false); setEditingBill(null); }} onSave={handleCreateBill} editBill={editingBill} spaceId={currentSpace.id} />
           <BudgetTemplateModal isOpen={isTemplateModalOpen} onClose={() => setIsTemplateModalOpen(false)} onApply={handleApplyTemplate} templates={budgetTemplates} templateCategories={templateCategories} />
+          <ReceiptUploadModal isOpen={isReceiptModalOpen} onClose={() => setIsReceiptModalOpen(false)} spaceId={currentSpace.id} onSuccess={() => loadData()} />
         </>
       )}
 
