@@ -62,6 +62,9 @@ export interface Goal {
   progress: number;
   visibility?: 'private' | 'shared';
   template_id?: string;
+  priority?: 'none' | 'p1' | 'p2' | 'p3' | 'p4';
+  priority_order?: number;
+  is_pinned?: boolean;
   target_date?: string;
   milestones?: Milestone[];
   collaborators?: GoalCollaborator[];
@@ -113,7 +116,8 @@ export const goalsService = {
       .from('goals')
       .select('*, milestones:goal_milestones(*)')
       .eq('space_id', spaceId)
-      .order('created_at', { ascending: false });
+      .order('is_pinned', { ascending: false })
+      .order('priority_order', { ascending: true });
 
     if (error) throw error;
     return data || [];
@@ -451,5 +455,50 @@ export const goalsService = {
       count,
       icon
     }));
+  },
+
+  // Priority and ordering methods
+  async updateGoalPriority(goalId: string, priority: 'none' | 'p1' | 'p2' | 'p3' | 'p4'): Promise<Goal> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('goals')
+      .update({ priority })
+      .eq('id', goalId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async toggleGoalPin(goalId: string, isPinned: boolean): Promise<Goal> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('goals')
+      .update({ is_pinned: isPinned })
+      .eq('id', goalId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async reorderGoals(spaceId: string, goalIds: string[]): Promise<void> {
+    const supabase = createClient();
+
+    // Update priority_order for each goal
+    const updates = goalIds.map((goalId, index) => ({
+      id: goalId,
+      priority_order: index + 1,
+    }));
+
+    for (const update of updates) {
+      await supabase
+        .from('goals')
+        .update({ priority_order: update.priority_order })
+        .eq('id', update.id)
+        .eq('space_id', spaceId);
+    }
   },
 };
