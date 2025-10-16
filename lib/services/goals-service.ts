@@ -15,6 +15,17 @@ export interface Milestone {
   updated_at: string;
 }
 
+export interface GoalCollaborator {
+  id: string;
+  goal_id: string;
+  user_id: string;
+  role: 'owner' | 'contributor' | 'viewer';
+  invited_by: string;
+  invited_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Goal {
   id: string;
   space_id: string;
@@ -23,8 +34,10 @@ export interface Goal {
   category?: string;
   status: 'active' | 'completed' | 'paused' | 'cancelled';
   progress: number;
+  visibility?: 'private' | 'shared';
   target_date?: string;
   milestones?: Milestone[];
+  collaborators?: GoalCollaborator[];
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -38,7 +51,14 @@ export interface CreateGoalInput {
   category?: string;
   status?: 'active' | 'completed' | 'paused' | 'cancelled';
   progress?: number;
+  visibility?: 'private' | 'shared';
   target_date?: string;
+}
+
+export interface AddCollaboratorInput {
+  goal_id: string;
+  user_id: string;
+  role: 'contributor' | 'viewer';
 }
 
 export interface CreateMilestoneInput {
@@ -227,5 +247,73 @@ export const goalsService = {
       inProgress: goals.filter(g => g.status === 'active' && g.progress > 0 && g.progress < 100).length,
       milestonesReached: completedMilestones,
     };
+  },
+
+  // Collaboration methods
+  async getGoalCollaborators(goalId: string): Promise<GoalCollaborator[]> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('goal_collaborators')
+      .select('*')
+      .eq('goal_id', goalId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async addCollaborator(input: AddCollaboratorInput): Promise<GoalCollaborator> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase
+      .from('goal_collaborators')
+      .insert([{
+        ...input,
+        invited_by: user.id,
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async updateCollaboratorRole(collaboratorId: string, role: 'contributor' | 'viewer'): Promise<GoalCollaborator> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('goal_collaborators')
+      .update({ role })
+      .eq('id', collaboratorId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async removeCollaborator(collaboratorId: string): Promise<void> {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('goal_collaborators')
+      .delete()
+      .eq('id', collaboratorId);
+
+    if (error) throw error;
+  },
+
+  async toggleGoalVisibility(goalId: string, visibility: 'private' | 'shared'): Promise<Goal> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('goals')
+      .update({ visibility })
+      .eq('id', goalId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   },
 };
