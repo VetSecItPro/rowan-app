@@ -9,7 +9,7 @@ import { createClient } from '@/lib/supabase/client';
 interface NewShoppingListModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (list: CreateListInput & { store_name?: string; items?: { id?: string; name: string; quantity: number }[] }) => void;
+  onSave: (list: CreateListInput & { store_name?: string; budget?: number; items?: { id?: string; name: string; quantity: number; assigned_to?: string }[] }) => void;
   editList?: ShoppingList | null;
   spaceId: string;
 }
