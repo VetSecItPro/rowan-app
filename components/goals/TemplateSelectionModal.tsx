@@ -9,6 +9,7 @@ interface TemplateSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectTemplate: (template: GoalTemplate) => void;
+  onCreateFromScratch?: () => void;
   spaceId: string;
 }
 
@@ -16,6 +17,7 @@ export function TemplateSelectionModal({
   isOpen,
   onClose,
   onSelectTemplate,
+  onCreateFromScratch,
   spaceId,
 }: TemplateSelectionModalProps) {
   const [templates, setTemplates] = useState<GoalTemplate[]>([]);
@@ -215,12 +217,22 @@ export function TemplateSelectionModal({
 
         {/* Footer */}
         <div className="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50">
-          <button
-            onClick={onClose}
-            className="w-full md:w-auto px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors active:scale-[0.98]"
-          >
-            Cancel
-          </button>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-between">
+            <button
+              onClick={onClose}
+              className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors active:scale-[0.98] order-2 sm:order-1"
+            >
+              Cancel
+            </button>
+            {onCreateFromScratch && (
+              <button
+                onClick={onCreateFromScratch}
+                className="px-6 py-3 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-600 transition-colors active:scale-[0.98] order-1 sm:order-2"
+              >
+                Create from Scratch
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
