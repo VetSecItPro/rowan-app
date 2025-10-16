@@ -51,14 +51,6 @@ export function Footer() {
             >
               Support
             </Link>
-            <a
-              href="https://github.com/VetSecItPro/rowan-app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-            >
-              GitHub
-            </a>
           </div>
         </div>
       </div>
