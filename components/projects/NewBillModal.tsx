@@ -1,8 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, AlertCircle } from 'lucide-react';
 import type { Bill, CreateBillInput, BillFrequency } from '@/lib/services/bills-service';
+import {
+  createBillSchema,
+  updateBillSchema,
+  safeValidateCreateBill,
+} from '@/lib/validations/bills';
+import type { ZodError } from 'zod';
 
 interface NewBillModalProps {
   isOpen: boolean;
@@ -30,8 +36,14 @@ export function NewBillModal({
   const [reminderDays, setReminderDays] = useState(3);
   const [notes, setNotes] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [generalError, setGeneralError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Clear errors when modal state changes
+    setErrors({});
+    setGeneralError(null);
+
     if (editBill) {
       setName(editBill.name);
       setAmount(editBill.amount.toString());
@@ -63,29 +75,48 @@ export function NewBillModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name.trim() || !amount || !dueDate) {
+    // Clear previous errors
+    setErrors({});
+    setGeneralError(null);
+
+    // Prepare data for validation
+    const billData = {
+      space_id: spaceId,
+      name: name.trim(),
+      amount: parseFloat(amount) || 0,
+      category: category.trim() || undefined,
+      payee: payee.trim() || undefined,
+      due_date: dueDate,
+      frequency,
+      auto_pay: autoPay,
+      reminder_enabled: reminderEnabled,
+      reminder_days_before: reminderDays,
+      notes: notes.trim() || undefined,
+    };
+
+    // Validate with Zod (security-first validation)
+    const validation = safeValidateCreateBill(billData);
+
+    if (!validation.success) {
+      // Extract and display validation errors
+      const fieldErrors: Record<string, string> = {};
+      validation.error.errors.forEach((err) => {
+        const field = err.path[0] as string;
+        fieldErrors[field] = err.message;
+      });
+      setErrors(fieldErrors);
+      setGeneralError('Please fix the errors below before submitting.');
       return;
     }
 
     setIsSaving(true);
     try {
-      await onSave({
-        space_id: spaceId,
-        name: name.trim(),
-        amount: parseFloat(amount),
-        category: category.trim() || undefined,
-        payee: payee.trim() || undefined,
-        due_date: dueDate,
-        frequency,
-        auto_pay: autoPay,
-        reminder_enabled: reminderEnabled,
-        reminder_days_before: reminderDays,
-        notes: notes.trim() || undefined,
-      });
-
+      // Data is now validated and sanitized by Zod
+      await onSave(validation.data);
       onClose();
     } catch (error) {
       console.error('Failed to save bill:', error);
+      setGeneralError('Failed to save bill. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -125,6 +156,16 @@ export function NewBillModal({
           </div>
 
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            {/* General Error Banner */}
+            {generalError && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-red-800 dark:text-red-200">{generalError}</p>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -136,9 +177,16 @@ export function NewBillModal({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g., Electric Bill, Netflix, Rent"
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${
+                    errors.name
+                      ? 'border-red-500 dark:border-red-500'
+                      : 'border-gray-300 dark:border-gray-600'
+                  }`}
                   required
                 />
+                {errors.name && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>
+                )}
               </div>
 
               <div>
@@ -152,13 +200,21 @@ export function NewBillModal({
                     type="number"
                     step="0.01"
                     min="0"
+                    max="999999999"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="0.00"
-                    className="w-full pl-8 pr-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    className={`w-full pl-8 pr-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${
+                      errors.amount
+                        ? 'border-red-500 dark:border-red-500'
+                        : 'border-gray-300 dark:border-gray-600'
+                    }`}
                     required
                   />
                 </div>
+                {errors.amount && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.amount}</p>
+                )}
               </div>
 
               <div>
@@ -170,9 +226,16 @@ export function NewBillModal({
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${
+                    errors.due_date
+                      ? 'border-red-500 dark:border-red-500'
+                      : 'border-gray-300 dark:border-gray-600'
+                  }`}
                   required
                 />
+                {errors.due_date && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.due_date}</p>
+                )}
               </div>
 
               <div>
@@ -201,7 +264,11 @@ export function NewBillModal({
                   id="category"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${
+                    errors.category
+                      ? 'border-red-500 dark:border-red-500'
+                      : 'border-gray-300 dark:border-gray-600'
+                  }`}
                 >
                   <option value="">Select category...</option>
                   {categories.map((cat) => (
@@ -210,6 +277,9 @@ export function NewBillModal({
                     </option>
                   ))}
                 </select>
+                {errors.category && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.category}</p>
+                )}
               </div>
 
               <div>
@@ -222,8 +292,16 @@ export function NewBillModal({
                   value={payee}
                   onChange={(e) => setPayee(e.target.value)}
                   placeholder="Who to pay"
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  maxLength={255}
+                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${
+                    errors.payee
+                      ? 'border-red-500 dark:border-red-500'
+                      : 'border-gray-300 dark:border-gray-600'
+                  }`}
                 />
+                {errors.payee && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.payee}</p>
+                )}
               </div>
 
               <div className="md:col-span-2">
@@ -236,8 +314,16 @@ export function NewBillModal({
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Additional notes..."
                   rows={3}
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none"
+                  maxLength={1000}
+                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none ${
+                    errors.notes
+                      ? 'border-red-500 dark:border-red-500'
+                      : 'border-gray-300 dark:border-gray-600'
+                  }`}
                 />
+                {errors.notes && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.notes}</p>
+                )}
               </div>
 
               <div className="md:col-span-2 space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -273,12 +359,17 @@ export function NewBillModal({
                     <input
                       id="reminderDays"
                       type="range"
-                      min="1"
-                      max="14"
+                      min="0"
+                      max="30"
                       value={reminderDays}
                       onChange={(e) => setReminderDays(parseInt(e.target.value))}
                       className="w-full"
                     />
+                    {errors.reminder_days_before && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                        {errors.reminder_days_before}
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
