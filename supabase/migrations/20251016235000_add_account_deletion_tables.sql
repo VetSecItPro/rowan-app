@@ -20,24 +20,39 @@ CREATE TABLE IF NOT EXISTS account_deletion_audit_log (
   created_at timestamptz DEFAULT now()
 );
 
+-- Add timestamp column if it doesn't exist (for backward compatibility)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                 WHERE table_name = 'account_deletion_audit_log'
+                 AND column_name = 'timestamp') THEN
+    ALTER TABLE account_deletion_audit_log
+    ADD COLUMN timestamp timestamptz NOT NULL DEFAULT now();
+  END IF;
+END $$;
+
 -- Enable RLS on both tables
 ALTER TABLE deleted_accounts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE account_deletion_audit_log ENABLE ROW LEVEL SECURITY;
 
 -- RLS policies for deleted_accounts
+DROP POLICY IF EXISTS "Users can view their own deletion records" ON deleted_accounts;
 CREATE POLICY "Users can view their own deletion records"
   ON deleted_accounts FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own deletion records" ON deleted_accounts;
 CREATE POLICY "Users can insert their own deletion records"
   ON deleted_accounts FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own deletion records (cancel)" ON deleted_accounts;
 CREATE POLICY "Users can delete their own deletion records (cancel)"
   ON deleted_accounts FOR DELETE
   USING (auth.uid() = user_id);
 
 -- RLS policies for audit log (admin/system access only)
+DROP POLICY IF EXISTS "Service role can manage audit logs" ON account_deletion_audit_log;
 CREATE POLICY "Service role can manage audit logs"
   ON account_deletion_audit_log FOR ALL
   USING (current_user = 'service_role');

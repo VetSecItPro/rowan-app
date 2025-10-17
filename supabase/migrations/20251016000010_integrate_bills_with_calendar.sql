@@ -140,7 +140,7 @@ BEGIN
       start_time = NEW.date::TIMESTAMPTZ,
       end_time = NEW.date::TIMESTAMPTZ + INTERVAL '1 hour',
       recurrence_pattern = NEW.recurring_frequency,
-      is_recurring = NEW.is_recurring
+      is_recurring = COALESCE(NEW.is_recurring, NEW.recurring, FALSE)
     WHERE id = NEW.event_id;
   END IF;
 
@@ -224,7 +224,7 @@ DECLARE
 BEGIN
   FOR v_expense IN
     SELECT id FROM expenses
-    WHERE is_recurring = TRUE
+    WHERE (is_recurring = TRUE OR recurring = TRUE)
       AND event_id IS NULL
   LOOP
     PERFORM create_bill_calendar_event(v_expense.id);
