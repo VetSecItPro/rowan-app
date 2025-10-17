@@ -125,3 +125,8 @@ export function withHaptic<T extends (...args: any[]) => any>(
     return handler(...args);
   }) as T;
 }
+
+// Convenience exports for common patterns
+export const hapticLight = () => triggerHaptic('light');
+export const hapticMedium = () => triggerHaptic('medium');
+export const hapticHeavy = () => triggerHaptic('heavy');
