@@ -45,6 +45,7 @@
     "sonner": "^2.0.7",
     "use-debounce": "^10.0.6",
     "wavesurfer.js": "^7.11.0",
+    "web-push": "^3.6.7",
     "zod": "^4.1.11"
   },
   "devDependencies": {
