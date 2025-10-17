@@ -84,7 +84,7 @@ export async function shareShoppingList(listName: string, items: string[], url?:
   return share({
     title: `Shopping List: ${listName}`,
     text,
-    url: url || window.location.href,
+    url: url || (typeof window !== 'undefined' ? window.location.href : ''),
   });
 }
 
@@ -99,7 +99,7 @@ export async function shareRecipe(
   return share({
     title: `Recipe: ${recipeName}`,
     text: description || `Check out this recipe: ${recipeName}`,
-    url: url || window.location.href,
+    url: url || (typeof window !== 'undefined' ? window.location.href : ''),
   });
 }
 
@@ -118,7 +118,7 @@ export async function shareMealPlan(
   return share({
     title: `Meal Plan - ${weekOf}`,
     text,
-    url: url || window.location.href,
+    url: url || (typeof window !== 'undefined' ? window.location.href : ''),
   });
 }
 
@@ -129,7 +129,7 @@ export async function shareGoal(goalName: string, description?: string, url?: st
   return share({
     title: `Goal: ${goalName}`,
     text: description || `I'm working on: ${goalName}`,
-    url: url || window.location.href,
+    url: url || (typeof window !== 'undefined' ? window.location.href : ''),
   });
 }
 
@@ -144,7 +144,7 @@ export async function shareProject(
   return share({
     title: `Project: ${projectName}`,
     text: description || `Check out this project: ${projectName}`,
-    url: url || window.location.href,
+    url: url || (typeof window !== 'undefined' ? window.location.href : ''),
   });
 }
 
@@ -153,9 +153,9 @@ export async function shareProject(
  */
 export async function sharePage(title?: string, text?: string): Promise<ShareResult> {
   return share({
-    title: title || document.title,
+    title: title || (typeof document !== 'undefined' ? document.title : 'Rowan App'),
     text: text || 'Check this out!',
-    url: window.location.href,
+    url: typeof window !== 'undefined' ? window.location.href : '',
   });
 }
 

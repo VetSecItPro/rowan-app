@@ -190,7 +190,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : 'https://rowan-app.vercel.app/dashboard',
         }
       });
 
