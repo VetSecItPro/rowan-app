@@ -92,7 +92,7 @@ const features = [
     hoverBorder: 'hover:border-indigo-500',
     hoverShadow: 'hover:shadow-indigo-500/50',
     href: '/settings/documentation/goals',
-    available: false,
+    available: true,
   },
   {
     id: 'checkin',
