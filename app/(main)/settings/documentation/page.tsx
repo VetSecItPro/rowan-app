@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
-import { SearchBar } from '@/components/documentation/SearchBar';
 import { CheckSquare, Calendar, Bell, MessageSquare, ShoppingBag, UtensilsCrossed, Home, Target, BookOpen, ArrowLeft, Heart } from 'lucide-react';
 
 const features = [
@@ -117,24 +116,18 @@ export default function DocumentationPage() {
         <div className="mb-8">
           <Link
             href="/settings"
-            className="inline-flex items-center gap-2 py-2 px-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-4"
+            className="inline-flex items-center gap-2 py-2 px-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Settings
           </Link>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center flex-shrink-0">
-                <BookOpen className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">Documentation</h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">Comprehensive guides for all Rowan features</p>
-              </div>
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+              <BookOpen className="w-8 h-8 text-white" />
             </div>
-            {/* Search Bar */}
-            <div className="w-full sm:w-auto">
-              <SearchBar />
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">Documentation</h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">Choose a feature to learn about</p>
             </div>
           </div>
         </div>
@@ -200,7 +193,7 @@ export default function DocumentationPage() {
             Can't find what you're looking for? Our support team is here to help.
           </p>
           <Link
-            href="/settings"
+            href="/settings/support"
             className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors text-sm font-medium"
           >
             Contact Support
