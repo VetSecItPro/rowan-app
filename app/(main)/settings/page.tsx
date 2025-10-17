@@ -19,7 +19,6 @@ import {
   User,
   Shield,
   Bell,
-  Palette,
   Lock,
   Users,
   Database,
