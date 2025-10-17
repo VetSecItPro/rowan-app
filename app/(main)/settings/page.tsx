@@ -1701,21 +1701,6 @@ export default function SettingsPage() {
                       })}
                     </div>
 
-                    {/* Help Section */}
-                    <div className="mt-16 max-w-2xl mx-auto text-center">
-                      <div className="p-8 bg-purple-50/80 dark:bg-purple-900/50 backdrop-blur-sm border border-purple-200/60 dark:border-purple-800/60 rounded-2xl shadow-lg">
-                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Need More Help?</h3>
-                        <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
-                          Can't find what you're looking for? Our support team is here to help you get the most out of Rowan.
-                        </p>
-                        <Link
-                          href="/settings/support"
-                          className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-colors text-sm font-semibold shadow-lg hover:shadow-xl"
-                        >
-                          Contact Support
-                        </Link>
-                      </div>
-                    </div>
                   </div>
                 )}
 
