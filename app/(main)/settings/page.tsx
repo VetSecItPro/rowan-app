@@ -10,6 +10,7 @@ import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PasswordConfirmModal } from '@/components/settings/PasswordConfirmModal';
 import { AccountDeletionModal } from '@/components/settings/AccountDeletionModal';
+import { Toggle } from '@/components/ui/Toggle';
 import { createClient } from '@/lib/supabase/client';
 import {
   Settings,
@@ -222,6 +223,8 @@ export default function SettingsPage() {
     readReceipts: true,
     analytics: true,
   });
+  const [isLoadingPrivacy, setIsLoadingPrivacy] = useState(true);
+  const [isSavingPrivacy, setIsSavingPrivacy] = useState(false);
 
   const validateProfileImage = (file: File): Promise<boolean> => {
     return new Promise((resolve, reject) => {
@@ -509,9 +512,67 @@ export default function SettingsPage() {
     }
   };
 
-  const handlePrivacyToggle = (key: string) => {
-    setPrivacySettings(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
+  // Load privacy settings from API
+  const loadPrivacySettings = async () => {
+    try {
+      setIsLoadingPrivacy(true);
+      const response = await fetch('/api/user/privacy-settings');
+      const result = await response.json();
+
+      if (result.success) {
+        setPrivacySettings(result.data);
+      } else {
+        console.error('Failed to load privacy settings:', result.error);
+      }
+    } catch (error) {
+      console.error('Error loading privacy settings:', error);
+    } finally {
+      setIsLoadingPrivacy(false);
+    }
   };
+
+  // Save privacy settings to API
+  const savePrivacySetting = async (key: string, value: boolean) => {
+    try {
+      setIsSavingPrivacy(true);
+      const response = await fetch('/api/user/privacy-settings', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ [key]: value }),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        // Revert the change if it failed
+        setPrivacySettings(prev => ({ ...prev, [key]: !value }));
+        console.error('Failed to save privacy setting:', result.error);
+      }
+    } catch (error) {
+      // Revert the change if it failed
+      setPrivacySettings(prev => ({ ...prev, [key]: !value }));
+      console.error('Error saving privacy setting:', error);
+    } finally {
+      setIsSavingPrivacy(false);
+    }
+  };
+
+  const handlePrivacyToggle = (key: string) => {
+    const newValue = !privacySettings[key as keyof typeof privacySettings];
+
+    // Optimistically update the UI
+    setPrivacySettings(prev => ({ ...prev, [key]: newValue }));
+
+    // Save to API
+    savePrivacySetting(key, newValue);
+  };
+
+  // Load privacy settings on mount
+  useEffect(() => {
+    loadPrivacySettings();
+  }, []);
 
   const handleRequestPasswordReset = async () => {
     if (!user?.email) return;
@@ -1151,30 +1212,43 @@ export default function SettingsPage() {
                       <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Control your data and visibility preferences</p>
                     </div>
 
-                    <div className="space-y-4">
-                      {[
-                        { key: 'profileVisibility', label: 'Profile visibility', desc: 'Allow other space members to see your profile' },
-                        { key: 'activityStatus', label: 'Activity status', desc: 'Show when you\'re online and active' },
-                        { key: 'readReceipts', label: 'Read receipts', desc: 'Let others know when you\'ve read their messages' },
-                        { key: 'analytics', label: 'Analytics', desc: 'Help us improve Rowan by sharing anonymous usage data' },
-                      ].map((item) => (
-                        <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
-                          <div>
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">{item.desc}</p>
+                    {isLoadingPrivacy ? (
+                      <div className="space-y-4">
+                        {[1, 2, 3, 4].map((i) => (
+                          <div key={i} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl animate-pulse">
+                            <div className="space-y-2">
+                              <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-32"></div>
+                              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-48"></div>
+                            </div>
+                            <div className="w-11 h-6 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
                           </div>
-                          <label htmlFor="field-14" className="relative inline-flex items-center cursor-pointer p-2">
-                            <input
-                              type="checkbox"
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {[
+                          { key: 'profileVisibility', label: 'Profile visibility', desc: 'Allow other space members to see your profile' },
+                          { key: 'activityStatus', label: 'Activity status', desc: 'Show when you\'re online and active' },
+                          { key: 'readReceipts', label: 'Read receipts', desc: 'Let others know when you\'ve read their messages' },
+                          { key: 'analytics', label: 'Analytics', desc: 'Help us improve Rowan by sharing anonymous usage data' },
+                        ].map((item) => (
+                          <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">{item.label}</p>
+                              <p className="text-xs text-gray-600 dark:text-gray-400">{item.desc}</p>
+                            </div>
+                            <Toggle
+                              id={`privacy-${item.key}`}
                               checked={privacySettings[item.key as keyof typeof privacySettings]}
-                              id="field-14"
-              onChange={() =>  handlePrivacyToggle(item.key)}
-                              className="sr-only peer"
+                              onChange={() => handlePrivacyToggle(item.key)}
+                              disabled={isSavingPrivacy}
+                              size="md"
+                              color="purple"
                             />
-                            <div className="w-14 h-7 sm:w-11 sm:h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 sm:after:h-5 sm:after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
-                          </label>
-                        </div>
-                      ))}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     </div>
                   </div>
                 )}
