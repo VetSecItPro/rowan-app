@@ -129,8 +129,7 @@ export default function SettingsPage() {
     name: user?.name || '',
     email: user?.email || '',
     phone: '',
-    timezone: 'Pacific Time (PT)',
-    bio: ''
+    timezone: 'Pacific Time (PT)'
   });
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
@@ -784,58 +783,6 @@ export default function SettingsPage() {
                           </select>
                           <div className="absolute inset-y-0 right-0 flex items-center pr-3 sm:pr-4 pointer-events-none">
                             <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 dark:text-gray-400" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label htmlFor="field-5" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
-                        Bio
-                      </label>
-                      <textarea
-                        rows={4}
-                        value={profileData.bio}
-                        id="field-5"
-              onChange={(e) =>  setProfileData({ ...profileData, bio: e.target.value })}
-                        placeholder="Tell us about yourself..."
-                        className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm min-h-[120px] bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
-                      />
-                    </div>
-
-                    {/* Language & Region */}
-                    <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4">Language & Region</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                        <div>
-                          <label htmlFor="field-12" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
-                            Language
-                          </label>
-                          <div className="relative">
-                            <select className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-11 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer" id="field-12">
-                              <option>English (US)</option>
-                              <option>Español</option>
-                              <option>Français</option>
-                              <option>Deutsch</option>
-                            </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 sm:pr-4 pointer-events-none">
-                              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 dark:text-gray-400" />
-                            </div>
-                          </div>
-                        </div>
-                        <div>
-                          <label htmlFor="field-13" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
-                            Date Format
-                          </label>
-                          <div className="relative">
-                            <select className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-11 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer" id="field-13">
-                              <option>MM/DD/YYYY</option>
-                              <option>DD/MM/YYYY</option>
-                              <option>YYYY-MM-DD</option>
-                            </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 sm:pr-4 pointer-events-none">
-                              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 dark:text-gray-400" />
-                            </div>
                           </div>
                         </div>
                       </div>
