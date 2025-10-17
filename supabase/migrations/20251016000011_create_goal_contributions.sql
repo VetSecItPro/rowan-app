@@ -44,6 +44,7 @@ CREATE INDEX IF NOT EXISTS idx_goals_target_date ON goals(target_date) WHERE tar
 ALTER TABLE goal_contributions ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies: Users can view contributions for goals they have access to
+DROP POLICY IF EXISTS "Users can view goal contributions" ON goal_contributions;
 CREATE POLICY "Users can view goal contributions"
 ON goal_contributions FOR SELECT TO authenticated
 USING (
@@ -69,6 +70,7 @@ USING (
 );
 
 -- RLS Policies: Users can add contributions to goals they have access to
+DROP POLICY IF EXISTS "Users can add goal contributions" ON goal_contributions;
 CREATE POLICY "Users can add goal contributions"
 ON goal_contributions FOR INSERT TO authenticated
 WITH CHECK (
@@ -97,11 +99,13 @@ WITH CHECK (
 );
 
 -- RLS Policies: Users can update their own contributions
+DROP POLICY IF EXISTS "Users can update own contributions" ON goal_contributions;
 CREATE POLICY "Users can update own contributions"
 ON goal_contributions FOR UPDATE TO authenticated
 USING (user_id = auth.uid());
 
 -- RLS Policies: Users can delete their own contributions
+DROP POLICY IF EXISTS "Users can delete own contributions" ON goal_contributions;
 CREATE POLICY "Users can delete own contributions"
 ON goal_contributions FOR DELETE TO authenticated
 USING (user_id = auth.uid());
@@ -215,6 +219,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Add updated_at trigger
+DROP TRIGGER IF EXISTS goal_contributions_updated_at ON goal_contributions;
 CREATE TRIGGER goal_contributions_updated_at
 BEFORE UPDATE ON goal_contributions
 FOR EACH ROW

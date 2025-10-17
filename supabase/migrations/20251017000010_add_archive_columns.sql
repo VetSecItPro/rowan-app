@@ -18,36 +18,62 @@
  */
 
 -- Add archived column to expenses table
-ALTER TABLE expenses ADD COLUMN IF NOT EXISTS archived BOOLEAN DEFAULT FALSE;
-ALTER TABLE expenses ADD COLUMN IF NOT EXISTS archived_at TIMESTAMP WITH TIME ZONE;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'expenses') THEN
+    ALTER TABLE expenses ADD COLUMN IF NOT EXISTS archived BOOLEAN DEFAULT FALSE;
+    ALTER TABLE expenses ADD COLUMN IF NOT EXISTS archived_at TIMESTAMP WITH TIME ZONE;
+  END IF;
+END $$;
 
 -- Add archived column to tasks table
-ALTER TABLE tasks ADD COLUMN IF NOT EXISTS archived BOOLEAN DEFAULT FALSE;
-ALTER TABLE tasks ADD COLUMN IF NOT EXISTS archived_at TIMESTAMP WITH TIME ZONE;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'tasks') THEN
+    ALTER TABLE tasks ADD COLUMN IF NOT EXISTS archived BOOLEAN DEFAULT FALSE;
+    ALTER TABLE tasks ADD COLUMN IF NOT EXISTS archived_at TIMESTAMP WITH TIME ZONE;
+  END IF;
+END $$;
 
 -- Add archived column to calendar_events table
-ALTER TABLE calendar_events ADD COLUMN IF NOT EXISTS archived BOOLEAN DEFAULT FALSE;
-ALTER TABLE calendar_events ADD COLUMN IF NOT EXISTS archived_at TIMESTAMP WITH TIME ZONE;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'calendar_events') THEN
+    ALTER TABLE calendar_events ADD COLUMN IF NOT EXISTS archived BOOLEAN DEFAULT FALSE;
+    ALTER TABLE calendar_events ADD COLUMN IF NOT EXISTS archived_at TIMESTAMP WITH TIME ZONE;
+  END IF;
+END $$;
 
 -- Add indexes for efficient querying of archived data
-CREATE INDEX IF NOT EXISTS idx_expenses_archived ON expenses(archived, partnership_id);
-CREATE INDEX IF NOT EXISTS idx_tasks_archived ON tasks(archived, partnership_id);
-CREATE INDEX IF NOT EXISTS idx_calendar_events_archived ON calendar_events(archived, partnership_id);
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'expenses') THEN
+    CREATE INDEX IF NOT EXISTS idx_expenses_archived ON expenses(archived, partnership_id);
+    COMMENT ON COLUMN expenses.archived IS 'Whether this expense has been archived for data minimization';
+  END IF;
 
--- Add comments
-COMMENT ON COLUMN expenses.archived IS 'Whether this expense has been archived for data minimization';
-COMMENT ON COLUMN tasks.archived IS 'Whether this task has been archived for data minimization';
-COMMENT ON COLUMN calendar_events.archived IS 'Whether this event has been archived for data minimization';
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'tasks') THEN
+    CREATE INDEX IF NOT EXISTS idx_tasks_archived ON tasks(archived, partnership_id);
+    COMMENT ON COLUMN tasks.archived IS 'Whether this task has been archived for data minimization';
+  END IF;
+
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'calendar_events') THEN
+    CREATE INDEX IF NOT EXISTS idx_calendar_events_archived ON calendar_events(archived, partnership_id);
+    COMMENT ON COLUMN calendar_events.archived IS 'Whether this event has been archived for data minimization';
+  END IF;
+END $$;
 
 -- Function to automatically archive old completed tasks (run monthly via cron)
 CREATE OR REPLACE FUNCTION auto_archive_old_tasks()
 RETURNS void AS $$
 BEGIN
-  UPDATE tasks
-  SET archived = TRUE, archived_at = NOW()
-  WHERE completed = TRUE
-    AND completed_at < NOW() - INTERVAL '90 days'
-    AND archived = FALSE;
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'tasks') THEN
+    UPDATE tasks
+    SET archived = TRUE, archived_at = NOW()
+    WHERE completed = TRUE
+      AND completed_at < NOW() - INTERVAL '90 days'
+      AND archived = FALSE;
+  END IF;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -57,10 +83,12 @@ COMMENT ON FUNCTION auto_archive_old_tasks IS 'Automatically archives completed 
 CREATE OR REPLACE FUNCTION auto_archive_old_events()
 RETURNS void AS $$
 BEGIN
-  UPDATE calendar_events
-  SET archived = TRUE, archived_at = NOW()
-  WHERE end_time < NOW() - INTERVAL '90 days'
-    AND archived = FALSE;
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'calendar_events') THEN
+    UPDATE calendar_events
+    SET archived = TRUE, archived_at = NOW()
+    WHERE end_time < NOW() - INTERVAL '90 days'
+      AND archived = FALSE;
+  END IF;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
