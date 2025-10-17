@@ -44,6 +44,12 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
       onChange(e.target.checked);
     };
 
+    // Build the translate class based on size and checked state
+    const getTranslateClass = () => {
+      if (!checked) return '';
+      return size === 'sm' ? 'translate-x-4' : size === 'lg' ? 'translate-x-7' : 'translate-x-5';
+    };
+
     return (
       <div className="flex items-center gap-3">
         <label htmlFor={id} className="relative inline-flex items-center cursor-pointer">
@@ -58,29 +64,36 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
           />
           <div
             className={`
+              relative
               ${sizeClasses[size].container}
-              bg-gray-200 dark:bg-gray-700
+              ${checked ? colorClasses[color].split(' ')[0] : 'bg-gray-200 dark:bg-gray-700'}
               peer-focus:outline-none
               peer-focus:ring-4
-              ${colorClasses[color]}
+              ${colorClasses[color].split(' ').slice(1).join(' ')}
               rounded-full
-              peer
               peer-disabled:opacity-50
               peer-disabled:cursor-not-allowed
-              after:content-['']
-              after:absolute
-              after:top-0.5
-              after:left-0.5
-              after:bg-white
-              after:rounded-full
-              ${sizeClasses[size].thumb}
-              after:transition-transform
-              after:duration-200
-              after:ease-in-out
-              peer-checked:after:${sizeClasses[size].translate}
-              ${checked ? colorClasses[color].split(' ')[0] : ''}
+              transition-colors
+              duration-200
+              ease-in-out
             `}
-          />
+          >
+            <div
+              className={`
+                absolute
+                top-0.5
+                left-0.5
+                bg-white
+                rounded-full
+                ${sizeClasses[size].thumb}
+                transition-transform
+                duration-200
+                ease-in-out
+                shadow-lg
+                ${getTranslateClass()}
+              `}
+            />
+          </div>
         </label>
 
         {(label || description) && (
