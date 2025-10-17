@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { X, Download, FileJson, FileSpreadsheet, Check, AlertCircle } from 'lucide-react';
+import { logDataExport } from '@/lib/services/audit-log-service';
 
 interface ExportDataModalProps {
   isOpen: boolean;
@@ -77,6 +78,9 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
       }
+
+      // Log audit event
+      await logDataExport(userId, selectedFormat, selectedDataType !== 'all' ? selectedDataType : undefined);
 
       // Close modal on success
       onClose();
