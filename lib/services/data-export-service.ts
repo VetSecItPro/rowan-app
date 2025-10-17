@@ -217,3 +217,183 @@ export async function exportAllUserData(userId: string): Promise<ExportResult> {
     };
   }
 }
+
+/**
+ * CSV Export Utilities
+ *
+ * Converts JSON data to CSV format for spreadsheet compatibility
+ * Implements GDPR Article 20 (Data Portability) in machine-readable format
+ */
+
+/**
+ * Helper: Escape CSV field values
+ */
+function escapeCsvField(value: any): string {
+  if (value === null || value === undefined) return '';
+
+  const stringValue = String(value);
+
+  // If field contains comma, quote, or newline, wrap in quotes and escape quotes
+  if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+    return `"${stringValue.replace(/"/g, '""')}"`;
+  }
+
+  return stringValue;
+}
+
+/**
+ * Helper: Convert JSON array to CSV string
+ */
+function jsonToCsv(data: any[], includeHeaders: boolean = true): string {
+  if (!data || data.length === 0) {
+    return '';
+  }
+
+  // Get all unique keys from all objects
+  const allKeys = new Set<string>();
+  data.forEach(item => {
+    if (item && typeof item === 'object') {
+      Object.keys(item).forEach(key => allKeys.add(key));
+    }
+  });
+
+  const keys = Array.from(allKeys);
+
+  // Create header row
+  const rows: string[] = [];
+  if (includeHeaders) {
+    rows.push(keys.map(key => escapeCsvField(key)).join(','));
+  }
+
+  // Create data rows
+  data.forEach(item => {
+    const row = keys.map(key => {
+      const value = item[key];
+
+      // Handle nested objects/arrays by converting to JSON string
+      if (typeof value === 'object' && value !== null) {
+        return escapeCsvField(JSON.stringify(value));
+      }
+
+      return escapeCsvField(value);
+    }).join(',');
+
+    rows.push(row);
+  });
+
+  return rows.join('\n');
+}
+
+/**
+ * Export expenses to CSV format
+ */
+export async function exportExpensesToCsv(userId: string): Promise<string> {
+  const { data } = await exportAllUserData(userId);
+
+  if (!data || !data.expenses) {
+    return '';
+  }
+
+  return jsonToCsv(data.expenses);
+}
+
+/**
+ * Export tasks to CSV format
+ */
+export async function exportTasksToCsv(userId: string): Promise<string> {
+  const { data } = await exportAllUserData(userId);
+
+  if (!data || !data.tasks) {
+    return '';
+  }
+
+  return jsonToCsv(data.tasks);
+}
+
+/**
+ * Export calendar events to CSV format
+ */
+export async function exportEventsToCsv(userId: string): Promise<string> {
+  const { data } = await exportAllUserData(userId);
+
+  if (!data || !data.calendar_events) {
+    return '';
+  }
+
+  return jsonToCsv(data.calendar_events);
+}
+
+/**
+ * Export shopping lists to CSV format
+ */
+export async function exportShoppingListsToCsv(userId: string): Promise<string> {
+  const { data } = await exportAllUserData(userId);
+
+  if (!data || !data.shopping_lists) {
+    return '';
+  }
+
+  return jsonToCsv(data.shopping_lists);
+}
+
+/**
+ * Export messages to CSV format
+ */
+export async function exportMessagesToCsv(userId: string): Promise<string> {
+  const { data } = await exportAllUserData(userId);
+
+  if (!data || !data.messages) {
+    return '';
+  }
+
+  return jsonToCsv(data.messages);
+}
+
+/**
+ * Export ALL data to multiple CSV files (returns a ZIP-ready structure)
+ * Returns object with filename -> CSV content mapping
+ */
+export async function exportAllDataToCsv(userId: string): Promise<Record<string, string>> {
+  const { data } = await exportAllUserData(userId);
+
+  if (!data) {
+    return {};
+  }
+
+  const csvFiles: Record<string, string> = {};
+
+  // Export each data type to separate CSV file
+  const dataTypes = [
+    { key: 'expenses', filename: 'expenses.csv' },
+    { key: 'budgets', filename: 'budgets.csv' },
+    { key: 'bills', filename: 'bills.csv' },
+    { key: 'goals', filename: 'goals.csv' },
+    { key: 'projects', filename: 'projects.csv' },
+    { key: 'tasks', filename: 'tasks.csv' },
+    { key: 'calendar_events', filename: 'calendar_events.csv' },
+    { key: 'reminders', filename: 'reminders.csv' },
+    { key: 'messages', filename: 'messages.csv' },
+    { key: 'shopping_lists', filename: 'shopping_lists.csv' },
+    { key: 'shopping_items', filename: 'shopping_items.csv' },
+    { key: 'meals', filename: 'meals.csv' },
+    { key: 'recipes', filename: 'recipes.csv' },
+  ];
+
+  dataTypes.forEach(({ key, filename }) => {
+    const dataArray = (data as any)[key];
+    if (dataArray && Array.isArray(dataArray) && dataArray.length > 0) {
+      csvFiles[filename] = jsonToCsv(dataArray);
+    }
+  });
+
+  // Add export info as a CSV file
+  const exportInfo = [data.export_info];
+  csvFiles['export_info.csv'] = jsonToCsv(exportInfo);
+
+  // Add profile as a CSV file
+  if (data.profile) {
+    csvFiles['profile.csv'] = jsonToCsv([data.profile]);
+  }
+
+  return csvFiles;
+}
