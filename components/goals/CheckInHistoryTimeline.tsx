@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Calendar, MessageSquare, Camera, Mic, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { GoalCheckIn, GoalCheckInPhoto, goalsService } from '@/lib/services/goals-service';
+import { CheckInReactions } from './CheckInReactions';
 
 interface CheckInHistoryTimelineProps {
   goalId: string;
@@ -234,11 +235,16 @@ export function CheckInHistoryTimeline({ goalId, isOpen, onClose }: CheckInHisto
                             </div>
                           )}
 
+                          {/* Reactions */}
+                          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                            <CheckInReactions checkInId={checkIn.id} />
+                          </div>
+
                           {/* Expand/Collapse Button */}
                           {hasContent && (
                             <button
                               onClick={() => toggleExpanded(checkIn.id)}
-                              className="flex items-center gap-2 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
+                              className="flex items-center gap-2 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors mt-3"
                             >
                               {isExpanded ? (
                                 <>
