@@ -10,6 +10,7 @@ import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PasswordConfirmModal } from '@/components/settings/PasswordConfirmModal';
 import { AccountDeletionModal } from '@/components/settings/AccountDeletionModal';
+import { TwoFactorAuth } from '@/components/settings/TwoFactorAuth';
 import { Toggle } from '@/components/ui/Toggle';
 import { createClient } from '@/lib/supabase/client';
 import {
@@ -148,7 +149,6 @@ export default function SettingsPage() {
   const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
-  const [show2FAModal, setShow2FAModal] = useState(false);
   const [showRevokeSessionModal, setShowRevokeSessionModal] = useState(false);
   const [showRemoveMemberConfirm, setShowRemoveMemberConfirm] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
@@ -175,15 +175,6 @@ export default function SettingsPage() {
   const [deleteAcknowledged, setDeleteAcknowledged] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
-  // 2FA state
-  const [twoFactorCode, setTwoFactorCode] = useState('');
-  const [isEnabling2FA, setIsEnabling2FA] = useState(false);
-  const [isLoading2FA, setIsLoading2FA] = useState(false);
-  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
-  const [mfaFactor, setMfaFactor] = useState<any>(null);
-  const [mfaQRCode, setMfaQRCode] = useState<string | null>(null);
-  const [mfaSecret, setMfaSecret] = useState<string | null>(null);
-  const [enrollmentFactorId, setEnrollmentFactorId] = useState<string | null>(null);
 
   // Active sessions state
   const [activeSessions, setActiveSessions] = useState<ActiveSession[]>(mockSessions);
@@ -436,20 +427,6 @@ export default function SettingsPage() {
     setShowDeleteAccountModal(false);
   };
 
-  const handleEnable2FA = async () => {
-    if (!twoFactorCode || twoFactorCode.length !== 6) {
-      alert('Please enter a valid 6-digit code');
-      return;
-    }
-
-    setIsEnabling2FA(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-
-    setTwoFactorCode('');
-    setIsEnabling2FA(false);
-    setShow2FAModal(false);
-  };
 
   const handleRevokeSession = async (sessionId: string) => {
     setActiveSessions(activeSessions.filter(s => s.id !== sessionId));
@@ -457,9 +434,6 @@ export default function SettingsPage() {
     setSessionToRevoke(null);
   };
 
-  const copyBackupCode = (code: string) => {
-    navigator.clipboard.writeText(code);
-  };
 
   // Load notification preferences on mount
   useEffect(() => {
@@ -886,26 +860,7 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Two-Factor Authentication */}
-                    <div className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl p-4 sm:p-6">
-                      <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-                        <div className="flex items-start gap-3 sm:gap-4 flex-1">
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                            <Smartphone className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" />
-                          </div>
-                          <div>
-                            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Two-Factor Authentication</h3>
-                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Add an extra layer of security to your account</p>
-                            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-500 mt-2">Status: <span className="text-red-600 dark:text-red-400 font-medium">Not Enabled</span></p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => setShow2FAModal(true)}
-                          className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-green-600 text-white rounded-lg sm:rounded-xl hover:bg-green-700 transition-colors shadow-lg"
-                        >
-                          Enable 2FA
-                        </button>
-                      </div>
-                    </div>
+                    <TwoFactorAuth />
 
                     {/* Active Sessions */}
                     <div>
@@ -1247,7 +1202,6 @@ export default function SettingsPage() {
                         ))}
                       </div>
                     )}
-                    </div>
                   </div>
                 )}
 
@@ -1764,95 +1718,6 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* 2FA Modal */}
-      {show2FAModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Enable 2FA</h3>
-              <button onClick={() => setShow2FAModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-6">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  Scan this QR code with your authenticator app:
-                </p>
-                <div className="bg-gray-100 dark:bg-gray-900 rounded-xl p-8 flex items-center justify-center">
-                  <div className="w-48 h-48 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md rounded-lg border border-gray-200/50 dark:border-gray-700/50 flex items-center justify-center">
-                    <div className="text-center text-gray-400 dark:text-gray-500 text-xs">
-                      [QR Code Placeholder]
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Backup Codes</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                  Save these codes in a safe place. You can use them to access your account if you lose your device.
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {backupCodes.map((code, idx) => (
-                    <div key={idx} className="flex items-center gap-2 bg-gray-50 dark:bg-gray-900 p-2 rounded-lg">
-                      <code className="text-xs text-gray-900 dark:text-white flex-1">{code}</code>
-                      <button
-                        onClick={() => copyBackupCode(code)}
-                        className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                      >
-                        <Copy className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="field-18" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
-                  Verification Code
-                </label>
-                <input
-                  type="text"
-                  value={twoFactorCode}
-                  id="field-18"
-              onChange={(e) =>  setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  placeholder="000000"
-                  maxLength={6}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 dark:text-white text-center text-lg tracking-widest"
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                  Enter the 6-digit code from your authenticator app
-                </p>
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  onClick={() => setShow2FAModal(false)}
-                  className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleEnable2FA}
-                  disabled={isEnabling2FA || twoFactorCode.length !== 6}
-                  className="flex-1 px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {isEnabling2FA ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Enabling...
-                    </>
-                  ) : (
-                    'Enable 2FA'
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Revoke Session Modal */}
       {showRevokeSessionModal && sessionToRevoke && (
