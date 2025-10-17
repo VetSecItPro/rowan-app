@@ -50,6 +50,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Memoize to prevent creating multiple instances
   const supabase = useMemo(() => createClient(), []);
 
+  async function trackUserSession() {
+    try {
+      await fetch('/api/user/track-session', {
+        method: 'POST',
+      });
+    } catch (error) {
+      console.error('Error tracking session:', error);
+    }
+  }
+
   async function loadUserProfile(userId: string) {
     // Validate userId before making the query
     if (!userId || userId === 'undefined' || userId === 'null' || userId.length < 36) {
@@ -90,11 +100,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       if (session?.user) {
         loadUserProfile(session.user.id);
         loadUserSpace(session.user.id);
+
+        // Track session on sign in
+        if (event === 'SIGNED_IN') {
+          trackUserSession().catch(err => {
+            console.error('Failed to track session:', err);
+            // Don't block login if session tracking fails
+          });
+        }
       } else {
         setUser(null);
         setCurrentSpace(null);
