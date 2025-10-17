@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import {
   archiveOldExpenses,
   archiveOldTasks,
@@ -17,7 +17,7 @@ import {
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createServerClient();
+    const supabase = await createClient();
 
     // Get authenticated user
     const {

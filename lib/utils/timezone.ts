@@ -1,12 +1,12 @@
-import { format, toZonedTime } from 'date-fns-tz';
+import { format } from 'date-fns';
 
 export function formatInTimezone(
   utcDate: string,
   timezone: string,
   formatStr: string = 'MMM d, yyyy h:mm a'
 ): string {
-  const zonedDate = toZonedTime(utcDate, timezone);
-  return format(zonedDate, formatStr, { timeZone: timezone });
+  const date = new Date(utcDate);
+  return format(date, formatStr);
 }
 
 export function getUserTimezone(): string {

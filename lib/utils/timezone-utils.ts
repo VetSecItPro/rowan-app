@@ -1,9 +1,10 @@
 import { format, parseISO } from 'date-fns';
-import { toZonedTime, fromZonedTime, formatInTimeZone } from 'date-fns-tz';
 
 /**
  * Timezone utility functions for normalizing all times to UTC in database
  * and displaying in user's local timezone
+ *
+ * Note: Uses browser's built-in Intl API for timezone handling
  */
 
 /**
@@ -22,12 +23,8 @@ export function getUserTimezone(): string {
  * @returns UTC ISO string for database storage
  */
 export function toUTC(localDate: Date | string, timezone?: string): string {
-  const tz = timezone || getUserTimezone();
   const date = typeof localDate === 'string' ? parseISO(localDate) : localDate;
-
-  // Convert from user's timezone to UTC
-  const utcDate = fromZonedTime(date, tz);
-  return utcDate.toISOString();
+  return date.toISOString();
 }
 
 /**
@@ -39,11 +36,7 @@ export function toUTC(localDate: Date | string, timezone?: string): string {
  * @returns Date object in user's local timezone
  */
 export function fromUTC(utcISOString: string, timezone?: string): Date {
-  const tz = timezone || getUserTimezone();
-  const utcDate = parseISO(utcISOString);
-
-  // Convert from UTC to user's timezone
-  return toZonedTime(utcDate, tz);
+  return parseISO(utcISOString);
 }
 
 /**
@@ -59,8 +52,8 @@ export function formatInLocalTimezone(
   formatString: string = 'PPp',
   timezone?: string
 ): string {
-  const tz = timezone || getUserTimezone();
-  return formatInTimeZone(parseISO(utcISOString), tz, formatString);
+  const date = parseISO(utcISOString);
+  return format(date, formatString);
 }
 
 /**
@@ -118,9 +111,23 @@ export function formatWithDualTimezone(
     return formatInLocalTimezone(utcISOString, 'PPp', userTz);
   }
 
-  // Show both timezones
-  const localTime = formatInTimeZone(parseISO(utcISOString), userTz, 'h:mm a zzz');
-  const eventTime = formatInTimeZone(parseISO(utcISOString), eventTimezone, 'h:mm a zzz');
+  // Show both timezones using Intl API
+  const date = parseISO(utcISOString);
+  const localTime = new Intl.DateTimeFormat('en-US', {
+    timeZone: userTz,
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZoneName: 'short',
+  }).format(date);
+
+  const eventTime = new Intl.DateTimeFormat('en-US', {
+    timeZone: eventTimezone,
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZoneName: 'short',
+  }).format(date);
 
   return `${localTime} (${eventTime} event time)`;
 }
@@ -141,7 +148,14 @@ export function getTimezoneAbbreviation(timezone?: string): string {
   const tz = timezone || getUserTimezone();
   const date = new Date();
 
-  return formatInTimeZone(date, tz, 'zzz');
+  const formatted = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz,
+    timeZoneName: 'short',
+  }).format(date);
+
+  // Extract the timezone abbreviation from the formatted string
+  const parts = formatted.split(', ');
+  return parts[parts.length - 1] || '';
 }
 
 /**
@@ -151,9 +165,57 @@ export function getTimezoneOffset(timezone?: string): number {
   const tz = timezone || getUserTimezone();
   const date = new Date();
 
-  const offset = formatInTimeZone(date, tz, 'XXX'); // e.g., "-08:00"
-  const [hours] = offset.split(':');
-  return parseInt(hours, 10);
+  const tzDate = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).format(date);
+
+  const utcDate = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'UTC',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).format(date);
+
+  const tzTime = new Date(tzDate).getTime();
+  const utcTime = new Date(utcDate).getTime();
+  const offsetMs = tzTime - utcTime;
+
+  return Math.round(offsetMs / (1000 * 60 * 60));
+}
+
+/**
+ * Format in specific timezone using Intl API
+ */
+function formatInTimeZone(date: Date, timezone: string, formatStr: string): string {
+  // For simple time formats, use Intl API
+  if (formatStr === 'h:mm a' || formatStr === 'h:mm a zzz') {
+    const options: Intl.DateTimeFormatOptions = {
+      timeZone: timezone,
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    };
+
+    if (formatStr.includes('zzz')) {
+      options.timeZoneName = 'short';
+    }
+
+    return new Intl.DateTimeFormat('en-US', options).format(date);
+  }
+
+  // Fallback to date-fns format
+  return format(date, formatStr);
 }
 
 /**
@@ -180,13 +242,15 @@ export function formatEventTime(
   timezone?: string
 ): string {
   const tz = timezone || getUserTimezone();
+  const startDate = parseISO(startTimeUTC);
 
   if (!endTimeUTC) {
-    return formatInTimeZone(parseISO(startTimeUTC), tz, FORMATS.TIME_12H);
+    return formatInTimeZone(startDate, tz, FORMATS.TIME_12H);
   }
 
-  const startTime = formatInTimeZone(parseISO(startTimeUTC), tz, FORMATS.TIME_12H);
-  const endTime = formatInTimeZone(parseISO(endTimeUTC), tz, FORMATS.TIME_12H);
+  const endDate = parseISO(endTimeUTC);
+  const startTime = formatInTimeZone(startDate, tz, FORMATS.TIME_12H);
+  const endTime = formatInTimeZone(endDate, tz, FORMATS.TIME_12H);
 
   return `${startTime} - ${endTime}`;
 }
@@ -200,8 +264,9 @@ export function formatEventDateTime(
   timezone?: string
 ): string {
   const tz = timezone || getUserTimezone();
+  const startDate = parseISO(startTimeUTC);
 
-  const date = formatInTimeZone(parseISO(startTimeUTC), tz, FORMATS.DATE_MEDIUM);
+  const date = formatInTimeZone(startDate, tz, FORMATS.DATE_MEDIUM);
   const time = formatEventTime(startTimeUTC, endTimeUTC, tz);
 
   return `${date} at ${time}`;

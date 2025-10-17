@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { bulkExportByDateRange } from '@/lib/services/bulk-operations-service';
 
 /**
@@ -13,7 +13,7 @@ import { bulkExportByDateRange } from '@/lib/services/bulk-operations-service';
 
 export async function GET(request: Request) {
   try {
-    const supabase = await createServerClient();
+    const supabase = await createClient();
 
     // Get authenticated user
     const {
