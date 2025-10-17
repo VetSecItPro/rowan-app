@@ -178,14 +178,12 @@ export default function SettingsPage() {
   // 2FA state
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [isEnabling2FA, setIsEnabling2FA] = useState(false);
-  const [backupCodes] = useState([
-    'ABCD-1234-EFGH',
-    'IJKL-5678-MNOP',
-    'QRST-9012-UVWX',
-    'YZAB-3456-CDEF',
-    'GHIJ-7890-KLMN',
-    'OPQR-2345-STUV'
-  ]);
+  const [isLoading2FA, setIsLoading2FA] = useState(false);
+  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
+  const [mfaFactor, setMfaFactor] = useState<any>(null);
+  const [mfaQRCode, setMfaQRCode] = useState<string | null>(null);
+  const [mfaSecret, setMfaSecret] = useState<string | null>(null);
+  const [enrollmentFactorId, setEnrollmentFactorId] = useState<string | null>(null);
 
   // Active sessions state
   const [activeSessions, setActiveSessions] = useState<ActiveSession[]>(mockSessions);
