@@ -9,6 +9,8 @@ import {
   exportMessagesToCsv,
 } from '@/lib/services/data-export-service';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * CSV Data Export API
  *

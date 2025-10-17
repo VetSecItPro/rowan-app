@@ -3,6 +3,8 @@ import { accountDeletionService } from '@/lib/services/account-deletion-service'
 import { send30DayWarningEmail, sendPermanentDeletionConfirmationEmail } from '@/lib/services/email-notification-service';
 import { createClient } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Vercel Cron Job: Cleanup Deleted Accounts
  *

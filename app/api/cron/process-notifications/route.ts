@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { notificationQueueService } from '@/lib/services/notification-queue-service';
 import { reminderNotificationsService } from '@/lib/services/reminder-notifications-service';
 
+export const dynamic = 'force-dynamic';
+
 // This endpoint should be called by a cron job (e.g., Vercel Cron, or external service)
 // Authorization should be via a secret token
 
