@@ -109,6 +109,73 @@ export interface GoalStats {
   milestonesReached: number;
 }
 
+// Check-in system interfaces
+export interface GoalCheckIn {
+  id: string;
+  goal_id: string;
+  user_id: string;
+  progress_percentage: number;
+  mood: 'great' | 'okay' | 'struggling';
+  notes?: string;
+  blockers?: string;
+  need_help_from_partner: boolean;
+  voice_note_url?: string;
+  voice_note_duration?: number;
+  check_in_type: 'manual' | 'scheduled' | 'reminder';
+  scheduled_date?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GoalCheckInPhoto {
+  id: string;
+  check_in_id: string;
+  photo_url: string;
+  caption?: string;
+  order_index: number;
+  created_at: string;
+}
+
+export interface GoalCheckInSettings {
+  id: string;
+  goal_id: string;
+  user_id: string;
+  frequency: 'daily' | 'weekly' | 'biweekly' | 'monthly';
+  day_of_week?: number; // 0 = Sunday
+  day_of_month?: number;
+  reminder_time: string;
+  enable_reminders: boolean;
+  enable_voice_notes: boolean;
+  enable_photos: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateCheckInInput {
+  goal_id: string;
+  progress_percentage: number;
+  mood: 'great' | 'okay' | 'struggling';
+  notes?: string;
+  blockers?: string;
+  need_help_from_partner?: boolean;
+  voice_note_url?: string;
+  voice_note_duration?: number;
+  check_in_type?: 'manual' | 'scheduled' | 'reminder';
+  scheduled_date?: string;
+  photos?: File[];
+}
+
+export interface UpdateCheckInSettingsInput {
+  goal_id: string;
+  frequency?: 'daily' | 'weekly' | 'biweekly' | 'monthly';
+  day_of_week?: number;
+  day_of_month?: number;
+  reminder_time?: string;
+  enable_reminders?: boolean;
+  enable_voice_notes?: boolean;
+  enable_photos?: boolean;
+}
+
 export const goalsService = {
   async getGoals(spaceId: string): Promise<Goal[]> {
     const supabase = createClient();
@@ -500,5 +567,266 @@ export const goalsService = {
         .eq('id', update.id)
         .eq('space_id', spaceId);
     }
+  },
+
+  // Check-in system methods
+  async createCheckIn(input: CreateCheckInInput): Promise<GoalCheckIn> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('User not authenticated');
+
+    // Remove photos from input as they need to be handled separately
+    const { photos, ...checkInData } = input;
+
+    const { data, error } = await supabase
+      .from('goal_check_ins')
+      .insert([{
+        ...checkInData,
+        user_id: user.id,
+        check_in_type: input.check_in_type || 'manual',
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // Handle photo uploads if provided
+    if (photos && photos.length > 0) {
+      await this.uploadCheckInPhotos(data.id, photos);
+    }
+
+    return data;
+  },
+
+  async getGoalCheckIns(goalId: string): Promise<GoalCheckIn[]> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('goal_check_ins')
+      .select('*')
+      .eq('goal_id', goalId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getCheckInById(id: string): Promise<GoalCheckIn | null> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('goal_check_ins')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async getCheckInPhotos(checkInId: string): Promise<GoalCheckInPhoto[]> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('goal_check_in_photos')
+      .select('*')
+      .eq('check_in_id', checkInId)
+      .order('order_index', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async uploadCheckInPhotos(checkInId: string, photos: File[]): Promise<GoalCheckInPhoto[]> {
+    const supabase = createClient();
+    const uploadedPhotos: GoalCheckInPhoto[] = [];
+
+    for (let i = 0; i < photos.length; i++) {
+      const photo = photos[i];
+      const fileExt = photo.name.split('.').pop();
+      const fileName = `${checkInId}_${Date.now()}_${i}.${fileExt}`;
+
+      // Upload to storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('goal-check-in-photos')
+        .upload(fileName, photo);
+
+      if (uploadError) {
+        console.error('Photo upload error:', uploadError);
+        continue;
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('goal-check-in-photos')
+        .getPublicUrl(fileName);
+
+      // Save to database
+      const { data: photoData, error: photoError } = await supabase
+        .from('goal_check_in_photos')
+        .insert([{
+          check_in_id: checkInId,
+          photo_url: publicUrl,
+          order_index: i,
+        }])
+        .select()
+        .single();
+
+      if (photoError) {
+        console.error('Photo database error:', photoError);
+        continue;
+      }
+
+      uploadedPhotos.push(photoData);
+    }
+
+    return uploadedPhotos;
+  },
+
+  async updateCheckIn(id: string, updates: Partial<CreateCheckInInput>): Promise<GoalCheckIn> {
+    const supabase = createClient();
+
+    // Remove photos from updates as they need to be handled separately
+    const { photos, ...checkInUpdates } = updates;
+
+    const { data, error } = await supabase
+      .from('goal_check_ins')
+      .update(checkInUpdates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteCheckIn(id: string): Promise<void> {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('goal_check_ins')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  },
+
+  // Check-in settings methods
+  async getCheckInSettings(goalId: string, userId?: string): Promise<GoalCheckInSettings | null> {
+    const supabase = createClient();
+    let query = supabase
+      .from('goal_check_in_settings')
+      .select('*')
+      .eq('goal_id', goalId);
+
+    if (userId) {
+      query = query.eq('user_id', userId);
+    } else {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+      query = query.eq('user_id', user.id);
+    }
+
+    const { data, error } = await query.single();
+
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = not found
+    return data;
+  },
+
+  async updateCheckInSettings(input: UpdateCheckInSettingsInput): Promise<GoalCheckInSettings> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('User not authenticated');
+
+    const { goal_id, ...settings } = input;
+
+    // Try to update existing settings first
+    const { data: existingData, error: updateError } = await supabase
+      .from('goal_check_in_settings')
+      .update(settings)
+      .eq('goal_id', goal_id)
+      .eq('user_id', user.id)
+      .select()
+      .single();
+
+    if (!updateError) return existingData;
+
+    // If no existing settings, create new ones
+    const { data, error } = await supabase
+      .from('goal_check_in_settings')
+      .insert([{
+        goal_id,
+        user_id: user.id,
+        frequency: 'weekly',
+        day_of_week: 1, // Monday
+        reminder_time: '09:00:00',
+        enable_reminders: true,
+        enable_voice_notes: true,
+        enable_photos: true,
+        ...settings,
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async getUpcomingCheckIns(spaceId: string): Promise<Array<{ goal: Goal; settings: GoalCheckInSettings; nextDue: Date }>> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('User not authenticated');
+
+    // Get all goals and their check-in settings
+    const goals = await this.getGoals(spaceId);
+    const upcomingCheckIns: Array<{ goal: Goal; settings: GoalCheckInSettings; nextDue: Date }> = [];
+
+    for (const goal of goals) {
+      if (goal.status !== 'active') continue;
+
+      const settings = await this.getCheckInSettings(goal.id, user.id);
+      if (!settings || !settings.enable_reminders) continue;
+
+      // Calculate next due date based on frequency
+      const now = new Date();
+      let nextDue: Date;
+
+      switch (settings.frequency) {
+        case 'daily':
+          nextDue = new Date(now);
+          nextDue.setDate(now.getDate() + 1);
+          break;
+        case 'weekly':
+          nextDue = new Date(now);
+          const daysUntilTarget = (settings.day_of_week! - now.getDay() + 7) % 7;
+          nextDue.setDate(now.getDate() + (daysUntilTarget === 0 ? 7 : daysUntilTarget));
+          break;
+        case 'biweekly':
+          nextDue = new Date(now);
+          nextDue.setDate(now.getDate() + 14);
+          break;
+        case 'monthly':
+          nextDue = new Date(now);
+          if (settings.day_of_month) {
+            nextDue.setDate(settings.day_of_month);
+            if (nextDue <= now) {
+              nextDue.setMonth(nextDue.getMonth() + 1);
+            }
+          } else {
+            nextDue.setMonth(now.getMonth() + 1);
+          }
+          break;
+        default:
+          continue;
+      }
+
+      // Set the reminder time
+      const [hours, minutes] = settings.reminder_time.split(':');
+      nextDue.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+      upcomingCheckIns.push({ goal, settings, nextDue });
+    }
+
+    // Sort by next due date
+    return upcomingCheckIns.sort((a, b) => a.nextDue.getTime() - b.nextDue.getTime());
   },
 };

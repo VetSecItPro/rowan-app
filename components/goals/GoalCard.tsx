@@ -1,6 +1,6 @@
 'use client';
 
-import { Target, MoreVertical, Check } from 'lucide-react';
+import { Target, MoreVertical, Check, History } from 'lucide-react';
 import { Goal } from '@/lib/services/goals-service';
 import { formatDate } from '@/lib/utils/date-utils';
 import { useState } from 'react';
@@ -9,10 +9,12 @@ interface GoalCardProps {
   goal: Goal;
   onEdit: (goal: Goal) => void;
   onDelete: (goalId: string) => void;
+  onCheckIn?: (goal: Goal) => void;
+  onShowHistory?: (goal: Goal) => void;
   onStatusChange?: (goalId: string, status: 'not-started' | 'in-progress' | 'completed') => void;
 }
 
-export function GoalCard({ goal, onEdit, onDelete, onStatusChange }: GoalCardProps) {
+export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onStatusChange }: GoalCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   // Determine status based on goal.status and progress
@@ -103,6 +105,23 @@ export function GoalCard({ goal, onEdit, onDelete, onStatusChange }: GoalCardPro
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
               <div className="w-48 dropdown-mobile absolute right-0 mt-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-xl z-20 overflow-hidden">
+                {onCheckIn && goal.status === 'active' && (
+                  <button
+                    onClick={() => { onCheckIn(goal); setShowMenu(false); }}
+                    className="w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors flex items-center gap-2 active:scale-[0.98]"
+                  >
+                    Check In
+                  </button>
+                )}
+                {onShowHistory && (
+                  <button
+                    onClick={() => { onShowHistory(goal); setShowMenu(false); }}
+                    className="w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors flex items-center gap-2 active:scale-[0.98]"
+                  >
+                    <History className="w-4 h-4" />
+                    Check-In History
+                  </button>
+                )}
                 <button
                   onClick={() => { onEdit(goal); setShowMenu(false); }}
                   className="w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 active:scale-[0.98]"

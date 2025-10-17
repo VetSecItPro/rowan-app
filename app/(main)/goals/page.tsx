@@ -10,12 +10,14 @@ import { MilestoneCard } from '@/components/goals/MilestoneCard';
 import { NewGoalModal } from '@/components/goals/NewGoalModal';
 import { NewMilestoneModal } from '@/components/goals/NewMilestoneModal';
 import { TemplateSelectionModal } from '@/components/goals/TemplateSelectionModal';
+import { GoalCheckInModal } from '@/components/goals/GoalCheckInModal';
+import { CheckInHistoryTimeline } from '@/components/goals/CheckInHistoryTimeline';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { GoalCardSkeleton, MilestoneCardSkeleton, StatsCardSkeleton } from '@/components/ui/Skeleton';
 import GuidedGoalCreation from '@/components/guided/GuidedGoalCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput, GoalTemplate } from '@/lib/services/goals-service';
+import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput, GoalTemplate, CreateCheckInInput } from '@/lib/services/goals-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
@@ -35,8 +37,12 @@ export default function GoalsPage() {
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
   const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+  const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
+  const [isHistoryTimelineOpen, setIsHistoryTimelineOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null);
+  const [checkInGoal, setCheckInGoal] = useState<Goal | null>(null);
+  const [historyGoal, setHistoryGoal] = useState<Goal | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
@@ -287,6 +293,17 @@ export default function GoalsPage() {
     }
   }, [editingMilestone, loadData]);
 
+  const handleCreateCheckIn = useCallback(async (checkInData: CreateCheckInInput) => {
+    try {
+      await goalsService.createCheckIn(checkInData);
+      toast.success('Check-in saved successfully!');
+      loadData(); // Reload to update goal progress
+    } catch (error) {
+      console.error('Failed to save check-in:', error);
+      toast.error('Failed to save check-in. Please try again.');
+    }
+  }, [loadData]);
+
   const handleDeleteMilestone = useCallback(async (milestoneId: string) => {
     setConfirmDialog({ isOpen: true, action: 'delete-milestone', id: milestoneId });
   }, []);
@@ -391,6 +408,26 @@ export default function GoalsPage() {
   const handleCloseMilestoneModal = useCallback(() => {
     setIsMilestoneModalOpen(false);
     setEditingMilestone(null);
+  }, []);
+
+  const handleOpenCheckInModal = useCallback((goal: Goal) => {
+    setCheckInGoal(goal);
+    setIsCheckInModalOpen(true);
+  }, []);
+
+  const handleCloseCheckInModal = useCallback(() => {
+    setIsCheckInModalOpen(false);
+    setCheckInGoal(null);
+  }, []);
+
+  const handleOpenHistoryTimeline = useCallback((goal: Goal) => {
+    setHistoryGoal(goal);
+    setIsHistoryTimelineOpen(true);
+  }, []);
+
+  const handleCloseHistoryTimeline = useCallback(() => {
+    setIsHistoryTimelineOpen(false);
+    setHistoryGoal(null);
   }, []);
 
   const handleEditGoal = useCallback((goal: Goal) => {
@@ -812,6 +849,8 @@ export default function GoalsPage() {
                     onReorder={handleReorderGoals}
                     onEdit={handleEditGoal}
                     onDelete={handleDeleteGoal}
+                    onCheckIn={handleOpenCheckInModal}
+                    onShowHistory={handleOpenHistoryTimeline}
                     onStatusChange={handleGoalStatusChange}
                     onPriorityChange={handlePriorityChange}
                     onTogglePin={handleTogglePin}
@@ -873,6 +912,23 @@ export default function GoalsPage() {
             editMilestone={editingMilestone}
             goalId={goals[0]?.id || currentSpace.id}
           />
+          {checkInGoal && (
+            <GoalCheckInModal
+              isOpen={isCheckInModalOpen}
+              onClose={handleCloseCheckInModal}
+              onSave={handleCreateCheckIn}
+              goalTitle={checkInGoal.title}
+              goalId={checkInGoal.id}
+              currentProgress={checkInGoal.progress}
+            />
+          )}
+          {historyGoal && (
+            <CheckInHistoryTimeline
+              goalId={historyGoal.id}
+              isOpen={isHistoryTimelineOpen}
+              onClose={handleCloseHistoryTimeline}
+            />
+          )}
         </>
       )}
 
