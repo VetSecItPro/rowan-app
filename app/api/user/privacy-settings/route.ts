@@ -31,12 +31,29 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Default privacy settings if none exist
+    const defaultSettings = {
+      profileVisibility: true,
+      activityStatus: true,
+      readReceipts: true,
+      analytics: true,
+    };
+
     // Get user's privacy settings
     const { data: userProfile, error: profileError } = await supabase
       .from('users')
       .select('privacy_settings')
       .eq('id', user.id)
       .single();
+
+    // If column doesn't exist yet, return default settings
+    if (profileError && profileError.message?.includes('column "privacy_settings" does not exist')) {
+      console.log('Privacy settings column does not exist yet, returning defaults');
+      return NextResponse.json({
+        success: true,
+        data: defaultSettings,
+      });
+    }
 
     if (profileError) {
       console.error('Error fetching privacy settings:', profileError);
@@ -45,14 +62,6 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       );
     }
-
-    // Default privacy settings if none exist
-    const defaultSettings = {
-      profileVisibility: true,
-      activityStatus: true,
-      readReceipts: true,
-      analytics: true,
-    };
 
     const privacySettings = userProfile?.privacy_settings || defaultSettings;
 
@@ -84,12 +93,29 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const validatedData = PrivacySettingsSchema.parse(body);
 
+    // Default privacy settings if none exist
+    const defaultSettings = {
+      profileVisibility: true,
+      activityStatus: true,
+      readReceipts: true,
+      analytics: true,
+    };
+
     // Get current privacy settings
     const { data: userProfile, error: fetchError } = await supabase
       .from('users')
       .select('privacy_settings')
       .eq('id', user.id)
       .single();
+
+    // If column doesn't exist yet, return error for now (updates not supported without column)
+    if (fetchError && fetchError.message?.includes('column "privacy_settings" does not exist')) {
+      console.log('Privacy settings column does not exist yet, cannot update');
+      return NextResponse.json(
+        { error: 'Privacy settings feature not yet available' },
+        { status: 503 }
+      );
+    }
 
     if (fetchError) {
       console.error('Error fetching current privacy settings:', fetchError);
@@ -100,12 +126,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Merge with existing settings
-    const currentSettings = userProfile?.privacy_settings || {
-      profileVisibility: true,
-      activityStatus: true,
-      readReceipts: true,
-      analytics: true,
-    };
+    const currentSettings = userProfile?.privacy_settings || defaultSettings;
 
     const updatedSettings = {
       ...currentSettings,
