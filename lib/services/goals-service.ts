@@ -160,6 +160,15 @@ export interface CreateCheckInInput {
   need_help_from_partner?: boolean;
   voice_note_url?: string;
   voice_note_duration?: number;
+  voice_note_category?: 'progress' | 'challenges' | 'reflections' | 'goals' | 'general';
+  voice_note_template_id?: string | null;
+  voice_note_metadata?: {
+    transcription?: string;
+    confidence?: number;
+    keywords?: string[];
+    category?: string;
+    tags?: string[];
+  };
   check_in_type?: 'manual' | 'scheduled' | 'reminder';
   scheduled_date?: string;
   photos?: File[];
