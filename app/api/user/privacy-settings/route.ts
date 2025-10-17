@@ -32,8 +32,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user's privacy settings
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
+    const { data: userProfile, error: profileError } = await supabase
+      .from('users')
       .select('privacy_settings')
       .eq('id', user.id)
       .single();
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
       analytics: true,
     };
 
-    const privacySettings = profile?.privacy_settings || defaultSettings;
+    const privacySettings = userProfile?.privacy_settings || defaultSettings;
 
     return NextResponse.json({
       success: true,
@@ -85,8 +85,8 @@ export async function PATCH(request: NextRequest) {
     const validatedData = PrivacySettingsSchema.parse(body);
 
     // Get current privacy settings
-    const { data: profile, error: fetchError } = await supabase
-      .from('profiles')
+    const { data: userProfile, error: fetchError } = await supabase
+      .from('users')
       .select('privacy_settings')
       .eq('id', user.id)
       .single();
@@ -100,7 +100,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Merge with existing settings
-    const currentSettings = profile?.privacy_settings || {
+    const currentSettings = userProfile?.privacy_settings || {
       profileVisibility: true,
       activityStatus: true,
       readReceipts: true,
@@ -114,7 +114,7 @@ export async function PATCH(request: NextRequest) {
 
     // Update privacy settings
     const { data, error: updateError } = await supabase
-      .from('profiles')
+      .from('users')
       .update({
         privacy_settings: updatedSettings,
         updated_at: new Date().toISOString(),

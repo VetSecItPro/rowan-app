@@ -58,7 +58,7 @@ import {
   BookOpen
 } from 'lucide-react';
 
-type SettingsTab = 'profile' | 'security' | 'notifications' | 'appearance' | 'privacy' | 'documentation' | 'spaces' | 'analytics' | 'data' | 'help';
+type SettingsTab = 'profile' | 'security' | 'notifications' | 'privacy' | 'documentation' | 'spaces' | 'analytics' | 'data' | 'help';
 type UserRole = 'Admin' | 'Member' | 'Viewer';
 type ExportStatus = 'idle' | 'pending' | 'processing' | 'ready';
 
@@ -615,7 +615,6 @@ export default function SettingsPage() {
     { id: 'spaces' as SettingsTab, name: 'Spaces', icon: Users, description: 'Manage your spaces and members' },
     { id: 'security' as SettingsTab, name: 'Security', icon: Shield, description: 'Password and authentication' },
     { id: 'notifications' as SettingsTab, name: 'Notifications', icon: Bell, description: 'Email and push notifications' },
-    { id: 'appearance' as SettingsTab, name: 'Appearance', icon: Palette, description: 'Theme and display settings' },
     { id: 'privacy' as SettingsTab, name: 'Privacy', icon: Lock, description: 'Data and visibility settings' },
     { id: 'documentation' as SettingsTab, name: 'Documentation', icon: BookOpen, description: 'Browse our guides and tutorials' },
     { id: 'analytics' as SettingsTab, name: 'Analytics', icon: BarChart3, description: 'Track productivity trends' },
@@ -803,6 +802,44 @@ export default function SettingsPage() {
                         placeholder="Tell us about yourself..."
                         className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm min-h-[120px] bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
                       />
+                    </div>
+
+                    {/* Language & Region */}
+                    <div>
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4">Language & Region</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                        <div>
+                          <label htmlFor="field-12" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                            Language
+                          </label>
+                          <div className="relative">
+                            <select className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-11 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer" id="field-12">
+                              <option>English (US)</option>
+                              <option>Español</option>
+                              <option>Français</option>
+                              <option>Deutsch</option>
+                            </select>
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 sm:pr-4 pointer-events-none">
+                              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 dark:text-gray-400" />
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <label htmlFor="field-13" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                            Date Format
+                          </label>
+                          <div className="relative">
+                            <select className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-11 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer" id="field-13">
+                              <option>MM/DD/YYYY</option>
+                              <option>DD/MM/YYYY</option>
+                              <option>YYYY-MM-DD</option>
+                            </select>
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 sm:pr-4 pointer-events-none">
+                              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 dark:text-gray-400" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
                     <button
