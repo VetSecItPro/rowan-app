@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Download, FileJson, FileSpreadsheet, Check, AlertCircle } from 'lucide-react';
+import { X, Download, FileJson, FileSpreadsheet, FileText, Check, AlertCircle } from 'lucide-react';
 import { logDataExport } from '@/lib/services/audit-log-service';
 
 interface ExportDataModalProps {
@@ -10,7 +10,7 @@ interface ExportDataModalProps {
   userId: string;
 }
 
-type ExportFormat = 'json' | 'csv';
+type ExportFormat = 'json' | 'csv' | 'pdf';
 type DataType = 'all' | 'expenses' | 'tasks' | 'events' | 'shopping' | 'messages';
 
 export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProps) {
@@ -38,8 +38,11 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
       if (selectedFormat === 'json') {
         // Use existing JSON export endpoint
         apiUrl = '/api/user/export-data';
+      } else if (selectedFormat === 'pdf') {
+        // Use new PDF export endpoint with type parameter
+        apiUrl = `/api/user/export-data-pdf?type=${selectedDataType}`;
       } else {
-        // Use new CSV export endpoint with type parameter
+        // Use CSV export endpoint with type parameter
         apiUrl = `/api/user/export-data-csv?type=${selectedDataType}`;
       }
 
@@ -56,6 +59,17 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
         const a = document.createElement('a');
         a.href = url;
         a.download = `rowan-data-export-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else if (selectedFormat === 'pdf') {
+        // Download PDF file
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `rowan-${selectedDataType}-${new Date().toISOString().split('T')[0]}.pdf`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -119,7 +133,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
           {/* Format Selection */}
           <div>
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Select Format</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {/* JSON Option */}
               <button
                 onClick={() => setSelectedFormat('json')}
@@ -181,11 +195,42 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
                   </div>
                 </div>
               </button>
+
+              {/* PDF Option */}
+              <button
+                onClick={() => setSelectedFormat('pdf')}
+                className={`p-4 rounded-xl border-2 transition-all text-left ${
+                  selectedFormat === 'pdf'
+                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                    selectedFormat === 'pdf' ? 'bg-purple-500' : 'bg-gray-200 dark:bg-gray-700'
+                  }`}>
+                    <FileText className={`w-5 h-5 ${
+                      selectedFormat === 'pdf' ? 'text-white' : 'text-gray-600 dark:text-gray-400'
+                    }`} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-semibold text-gray-900 dark:text-white">PDF</h4>
+                      {selectedFormat === 'pdf' && (
+                        <Check className="w-4 h-4 text-purple-500" />
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                      Formatted document with tables
+                    </p>
+                  </div>
+                </div>
+              </button>
             </div>
           </div>
 
-          {/* Data Type Selection (CSV only) */}
-          {selectedFormat === 'csv' && (
+          {/* Data Type Selection (CSV and PDF) */}
+          {(selectedFormat === 'csv' || selectedFormat === 'pdf') && (
             <div>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Select Data Type</h3>
               <div className="space-y-2">

@@ -397,3 +397,82 @@ export async function exportAllDataToCsv(userId: string): Promise<Record<string,
 
   return csvFiles;
 }
+
+/**
+ * PDF EXPORT FUNCTIONALITY
+ * ========================
+ * Generate formatted PDF documents with tables for better readability
+ */
+
+/**
+ * Generate a PDF document with formatted tables for user data
+ * This uses jsPDF in a browser-compatible way (client-side only)
+ */
+export interface PdfExportOptions {
+  dataType?: 'all' | 'expenses' | 'tasks' | 'calendar_events' | 'messages' | 'shopping' | 'goals';
+  includeSummary?: boolean;
+}
+
+/**
+ * Format data for PDF table display
+ */
+function formatDataForPdfTable(data: any[]): any[] {
+  if (!data || data.length === 0) return [];
+
+  return data.map(item => {
+    const formatted: any = {};
+    Object.keys(item).forEach(key => {
+      // Skip internal fields and null values
+      if (key === 'id' || key === 'user_id' || key === 'partnership_id' || item[key] === null) {
+        return;
+      }
+
+      // Format dates
+      if (key.includes('date') || key.includes('_at') || key === 'created' || key === 'updated') {
+        formatted[key] = item[key] ? new Date(item[key]).toLocaleDateString() : '';
+        return;
+      }
+
+      // Format booleans
+      if (typeof item[key] === 'boolean') {
+        formatted[key] = item[key] ? 'Yes' : 'No';
+        return;
+      }
+
+      // Format objects/arrays as JSON strings
+      if (typeof item[key] === 'object') {
+        formatted[key] = JSON.stringify(item[key]);
+        return;
+      }
+
+      formatted[key] = item[key];
+    });
+    return formatted;
+  });
+}
+
+/**
+ * Get data subset based on data type selection
+ */
+export function getDataSubset(data: UserDataExport, dataType: string): { title: string; data: any[] } {
+  const dataMap: Record<string, { title: string; key: keyof UserDataExport }> = {
+    'expenses': { title: 'Expenses', key: 'expenses' },
+    'tasks': { title: 'Tasks & Chores', key: 'tasks' },
+    'calendar_events': { title: 'Calendar Events', key: 'calendar_events' },
+    'events': { title: 'Calendar Events', key: 'calendar_events' },
+    'messages': { title: 'Messages', key: 'messages' },
+    'shopping': { title: 'Shopping Lists & Items', key: 'shopping_lists' },
+    'shopping_lists': { title: 'Shopping Lists', key: 'shopping_lists' },
+    'goals': { title: 'Goals', key: 'goals' },
+  };
+
+  const mapping = dataMap[dataType];
+  if (!mapping) {
+    return { title: 'Unknown Data Type', data: [] };
+  }
+
+  return {
+    title: mapping.title,
+    data: data[mapping.key] as any[] || []
+  };
+}
