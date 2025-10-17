@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "validate-db": "npx tsx scripts/validate-database.ts"
+    "validate-db": "npx tsx scripts/validate-database.ts",
+    "setup-dev": "./scripts/dev-setup.sh"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
