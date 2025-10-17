@@ -10,6 +10,7 @@ import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PasswordConfirmModal } from '@/components/settings/PasswordConfirmModal';
 import { AccountDeletionModal } from '@/components/settings/AccountDeletionModal';
+import { ExportDataModal } from '@/components/settings/ExportDataModal';
 import { TwoFactorAuth } from '@/components/settings/TwoFactorAuth';
 import { Toggle } from '@/components/ui/Toggle';
 import { createClient } from '@/lib/supabase/client';
@@ -1641,65 +1642,12 @@ export default function SettingsPage() {
       )}
 
       {/* Export Data Modal */}
-      {showExportModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Export Your Data</h3>
-              <button onClick={() => setShowExportModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                We will create a complete export of your data including:
-              </p>
-
-              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
-                  All tasks and assignments
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
-                  Calendar events and reminders
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
-                  Messages and conversations
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
-                  Shopping lists and meal plans
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
-                  Goals and milestones
-                </li>
-              </ul>
-
-              <p className="text-xs text-gray-500 dark:text-gray-500 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg">
-                The export will be available for 7 days. We will send you an email when it&apos;s ready.
-              </p>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  onClick={() => setShowExportModal(false)}
-                  className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleRequestExport}
-                  className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
-                >
-                  Request Export
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      {user && (
+        <ExportDataModal
+          isOpen={showExportModal}
+          onClose={() => setShowExportModal(false)}
+          userId={user.id}
+        />
       )}
 
       {/* Delete Account Modal */}
