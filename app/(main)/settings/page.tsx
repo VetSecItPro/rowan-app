@@ -425,14 +425,6 @@ export default function SettingsPage() {
     setShowDeleteAccountModal(false);
   };
 
-
-  const handleRevokeSession = async (sessionId: string) => {
-    setActiveSessions(activeSessions.filter(s => s.id !== sessionId));
-    setShowRevokeSessionModal(false);
-    setSessionToRevoke(null);
-  };
-
-
   // Load notification preferences on mount
   useEffect(() => {
     const loadPreferences = async () => {
