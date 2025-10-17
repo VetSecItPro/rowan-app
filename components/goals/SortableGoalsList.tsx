@@ -27,6 +27,8 @@ interface SortableGoalsListProps {
   onReorder: (goalIds: string[]) => void;
   onEdit: (goal: Goal) => void;
   onDelete: (goalId: string) => void;
+  onCheckIn?: (goal: Goal) => void;
+  onShowHistory?: (goal: Goal) => void;
   onStatusChange?: (goalId: string, status: 'not-started' | 'in-progress' | 'completed') => void;
   onPriorityChange?: (goalId: string, priority: 'none' | 'p1' | 'p2' | 'p3' | 'p4') => void;
   onTogglePin?: (goalId: string, isPinned: boolean) => void;
@@ -38,6 +40,8 @@ export function SortableGoalsList({
   onReorder,
   onEdit,
   onDelete,
+  onCheckIn,
+  onShowHistory,
   onStatusChange,
   onPriorityChange,
   onTogglePin,
@@ -102,6 +106,8 @@ export function SortableGoalsList({
               goal={goal}
               onEdit={onEdit}
               onDelete={onDelete}
+              onCheckIn={onCheckIn}
+              onShowHistory={onShowHistory}
               onStatusChange={onStatusChange}
               onPriorityChange={onPriorityChange}
               onTogglePin={onTogglePin}
