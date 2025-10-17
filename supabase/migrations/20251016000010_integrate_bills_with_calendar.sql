@@ -13,13 +13,18 @@ ADD COLUMN IF NOT EXISTS expense_id UUID REFERENCES expenses(id) ON DELETE CASCA
 CREATE INDEX IF NOT EXISTS idx_events_expense_id ON events(expense_id);
 
 -- ==========================================
--- 2. ADD EVENT_ID TO EXPENSES TABLE
+-- 2. ADD EVENT_ID AND RECURRING_FREQUENCY TO EXPENSES TABLE
 -- ==========================================
--- Allow expenses to reference their calendar events
+-- Allow expenses to reference their calendar events and store recurrence pattern
 ALTER TABLE expenses
-ADD COLUMN IF NOT EXISTS event_id UUID REFERENCES events(id) ON DELETE SET NULL;
+ADD COLUMN IF NOT EXISTS event_id UUID REFERENCES events(id) ON DELETE SET NULL,
+ADD COLUMN IF NOT EXISTS recurring_frequency TEXT,
+ADD COLUMN IF NOT EXISTS is_recurring BOOLEAN DEFAULT FALSE;
 
 CREATE INDEX IF NOT EXISTS idx_expenses_event_id ON expenses(event_id);
+
+-- Update existing recurring expenses to use is_recurring column
+UPDATE expenses SET is_recurring = recurring WHERE recurring IS NOT NULL;
 
 -- ==========================================
 -- 3. FUNCTION: Create calendar event for recurring bill
@@ -35,7 +40,7 @@ BEGIN
   -- Get expense details
   SELECT * INTO v_expense FROM expenses WHERE id = p_expense_id;
 
-  IF NOT FOUND OR NOT v_expense.is_recurring THEN
+  IF NOT FOUND OR (NOT COALESCE(v_expense.is_recurring, FALSE) AND NOT COALESCE(v_expense.recurring, FALSE)) THEN
     RETURN NULL;
   END IF;
 
@@ -92,7 +97,7 @@ CREATE OR REPLACE FUNCTION auto_create_bill_calendar_event()
 RETURNS TRIGGER AS $$
 BEGIN
   -- Only create event for recurring expenses
-  IF NEW.is_recurring = TRUE AND NEW.event_id IS NULL THEN
+  IF (NEW.is_recurring = TRUE OR NEW.recurring = TRUE) AND NEW.event_id IS NULL THEN
     PERFORM create_bill_calendar_event(NEW.id);
   END IF;
 
@@ -151,7 +156,8 @@ CREATE TRIGGER update_bill_event_trigger
         OLD.amount IS DISTINCT FROM NEW.amount OR
         OLD.date IS DISTINCT FROM NEW.date OR
         OLD.recurring_frequency IS DISTINCT FROM NEW.recurring_frequency OR
-        OLD.is_recurring IS DISTINCT FROM NEW.is_recurring)
+        OLD.is_recurring IS DISTINCT FROM NEW.is_recurring OR
+        OLD.recurring IS DISTINCT FROM NEW.recurring)
   EXECUTE FUNCTION update_bill_calendar_event();
 
 -- ==========================================
