@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/Header';
 import { Bell, Mail, Smartphone, Clock, Moon, Save, ArrowLeft } from 'lucide-react';
 import { reminderNotificationsService, NotificationPreferences } from '@/lib/services/reminder-notifications-service';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { Toggle } from '@/components/ui/Toggle';
 import Link from 'next/link';
 
 export default function NotificationSettingsPage() {
@@ -193,126 +194,148 @@ export default function NotificationSettingsPage() {
 
                   <div className="space-y-4">
                     {/* Master Toggle */}
-                    <label className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
                       <div>
                         <div className="font-medium text-gray-900 dark:text-white">Enable Email Notifications</div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">Receive notifications via email</div>
                       </div>
-                      <input
-                        type="checkbox"
+                      <Toggle
+                        id="email-enabled"
                         checked={emailEnabled}
-                        onChange={(e) => setEmailEnabled(e.target.checked)}
-                        className="w-5 h-5 text-pink-600 rounded focus:ring-pink-500"
+                        onChange={setEmailEnabled}
+                        color="purple"
                       />
-                    </label>
+                    </div>
 
                     {/* Type-specific toggles */}
                     {emailEnabled && (
                       <div className="pl-4 space-y-3 border-l-2 border-gray-200 dark:border-gray-700">
-                        <label className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">Due & overdue reminders</span>
-                          <input
-                            type="checkbox"
-                            checked={emailDueReminders}
-                            onChange={(e) => setEmailDueReminders(e.target.checked)}
-                            className="w-5 h-5 text-pink-600 rounded focus:ring-pink-500"
-                          />
-                        </label>
-                        <label className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">Assignments</span>
-                          <input
-                            type="checkbox"
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-700 dark:text-gray-300">Task assignments</span>
+                          <Toggle
+                            id="email-assignments"
                             checked={emailAssignments}
-                            onChange={(e) => setEmailAssignments(e.target.checked)}
-                            className="w-5 h-5 text-pink-600 rounded focus:ring-pink-500"
+                            onChange={setEmailAssignments}
+                            color="purple"
+                            size="sm"
                           />
-                        </label>
-                        <label className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">Mentions</span>
-                          <input
-                            type="checkbox"
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-700 dark:text-gray-300">Event reminders</span>
+                          <Toggle
+                            id="email-due-reminders"
+                            checked={emailDueReminders}
+                            onChange={setEmailDueReminders}
+                            color="purple"
+                            size="sm"
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-700 dark:text-gray-300">New messages</span>
+                          <Toggle
+                            id="email-mentions"
                             checked={emailMentions}
-                            onChange={(e) => setEmailMentions(e.target.checked)}
-                            className="w-5 h-5 text-pink-600 rounded focus:ring-pink-500"
+                            onChange={setEmailMentions}
+                            color="purple"
+                            size="sm"
                           />
-                        </label>
-                        <label className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">Comments</span>
-                          <input
-                            type="checkbox"
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-700 dark:text-gray-300">Shopping lists</span>
+                          <Toggle
+                            id="email-comments"
                             checked={emailComments}
-                            onChange={(e) => setEmailComments(e.target.checked)}
-                            className="w-5 h-5 text-pink-600 rounded focus:ring-pink-500"
+                            onChange={setEmailComments}
+                            color="purple"
+                            size="sm"
                           />
-                        </label>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-700 dark:text-gray-300">Meal reminders</span>
+                          <Toggle
+                            id="email-meal-reminders"
+                            checked={emailComments}
+                            onChange={setEmailComments}
+                            color="purple"
+                            size="sm"
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-700 dark:text-gray-300">General reminders</span>
+                          <Toggle
+                            id="email-general-reminders"
+                            checked={emailComments}
+                            onChange={setEmailComments}
+                            color="purple"
+                            size="sm"
+                          />
+                        </div>
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* In-App Notifications */}
+                {/* Push Notifications */}
                 <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
                   <div className="flex items-center gap-3 mb-4">
                     <Bell className="w-6 h-6 text-pink-600 dark:text-pink-400" />
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                      In-App Notifications
+                      Push Notifications
                     </h2>
                   </div>
 
                   <div className="space-y-4">
                     {/* Master Toggle */}
-                    <label className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
                       <div>
-                        <div className="font-medium text-gray-900 dark:text-white">Enable In-App Notifications</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">Receive notifications in the app</div>
+                        <div className="font-medium text-gray-900 dark:text-white">Enable push notifications</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">Allow browser notifications for real-time alerts</div>
                       </div>
-                      <input
-                        type="checkbox"
+                      <Toggle
+                        id="push-enabled"
                         checked={inAppEnabled}
-                        onChange={(e) => setInAppEnabled(e.target.checked)}
-                        className="w-5 h-5 text-pink-600 rounded focus:ring-pink-500"
+                        onChange={setInAppEnabled}
+                        color="purple"
+                        disabled={true}
                       />
-                    </label>
+                    </div>
 
                     {/* Type-specific toggles */}
                     {inAppEnabled && (
                       <div className="pl-4 space-y-3 border-l-2 border-gray-200 dark:border-gray-700">
-                        <label className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">Due & overdue reminders</span>
-                          <input
-                            type="checkbox"
-                            checked={inAppDueReminders}
-                            onChange={(e) => setInAppDueReminders(e.target.checked)}
-                            className="w-5 h-5 text-pink-600 rounded focus:ring-pink-500"
-                          />
-                        </label>
-                        <label className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">Assignments</span>
-                          <input
-                            type="checkbox"
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-700 dark:text-gray-300">Task updates</span>
+                          <Toggle
+                            id="push-assignments"
                             checked={inAppAssignments}
-                            onChange={(e) => setInAppAssignments(e.target.checked)}
-                            className="w-5 h-5 text-pink-600 rounded focus:ring-pink-500"
+                            onChange={setInAppAssignments}
+                            color="purple"
+                            size="sm"
+                            disabled={true}
                           />
-                        </label>
-                        <label className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">Mentions</span>
-                          <input
-                            type="checkbox"
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-700 dark:text-gray-300">Reminders</span>
+                          <Toggle
+                            id="push-due-reminders"
+                            checked={inAppDueReminders}
+                            onChange={setInAppDueReminders}
+                            color="purple"
+                            size="sm"
+                            disabled={true}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-700 dark:text-gray-300">Messages</span>
+                          <Toggle
+                            id="push-mentions"
                             checked={inAppMentions}
-                            onChange={(e) => setInAppMentions(e.target.checked)}
-                            className="w-5 h-5 text-pink-600 rounded focus:ring-pink-500"
+                            onChange={setInAppMentions}
+                            color="purple"
+                            size="sm"
+                            disabled={true}
                           />
-                        </label>
-                        <label className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">Comments</span>
-                          <input
-                            type="checkbox"
-                            checked={inAppComments}
-                            onChange={(e) => setInAppComments(e.target.checked)}
-                            className="w-5 h-5 text-pink-600 rounded focus:ring-pink-500"
-                          />
-                        </label>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -362,18 +385,18 @@ export default function NotificationSettingsPage() {
                   </div>
 
                   <div className="space-y-4">
-                    <label className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
                       <div>
                         <div className="font-medium text-gray-900 dark:text-white">Enable Quiet Hours</div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">Pause notifications during specific hours</div>
                       </div>
-                      <input
-                        type="checkbox"
+                      <Toggle
+                        id="quiet-hours-enabled"
                         checked={quietHoursEnabled}
-                        onChange={(e) => setQuietHoursEnabled(e.target.checked)}
-                        className="w-5 h-5 text-pink-600 rounded focus:ring-pink-500"
+                        onChange={setQuietHoursEnabled}
+                        color="purple"
                       />
-                    </label>
+                    </div>
 
                     {quietHoursEnabled && (
                       <div className="pl-4 space-y-3 border-l-2 border-gray-200 dark:border-gray-700">
