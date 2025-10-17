@@ -15,9 +15,9 @@ Next.js 15 App Router · Supabase (DB + Auth) · TypeScript strict · Tailwind �
 - Use crypto.randomUUID() for tokens
 
 ### Data Protection
-- ALL queries filtered by `partnership_id`
-- RLS policies enforce partnership boundaries
-- No cross-partnership access
+- ALL queries filtered by `space_id`
+- RLS policies enforce space boundaries
+- No cross-space access
 
 ### Input Validation
 - Validate all input with Zod schemas
@@ -69,11 +69,11 @@ ALL database operations go through `lib/services/`
 
 ```typescript
 // lib/services/tasks-service.ts
-export async function getTasks(partnershipId: string) {
+export async function getTasks(spaceId: string) {
   const { data, error } = await supabase
     .from('tasks')
     .select('*')
-    .eq('partnership_id', partnershipId);
+    .eq('space_id', spaceId);
   if (error) throw error;
   return data;
 }
@@ -84,7 +84,7 @@ export async function getTasks(partnershipId: string) {
 useEffect(() => {
   const channel = supabase
     .channel('tasks')
-    .on('postgres_changes', { filter: `partnership_id=eq.${id}` }, callback)
+    .on('postgres_changes', { filter: `space_id=eq.${id}` }, callback)
     .subscribe();
   return () => supabase.removeChannel(channel); // MANDATORY cleanup
 }, []);
@@ -96,9 +96,9 @@ useEffect(() => {
 ```sql
 ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Partnership access" ON tasks
-USING (partnership_id IN (
-  SELECT partnership_id FROM partnership_members WHERE user_id = auth.uid()
+CREATE POLICY "Space access" ON tasks
+USING (space_id IN (
+  SELECT space_id FROM space_members WHERE user_id = auth.uid()
 ));
 ```
 
@@ -146,7 +146,7 @@ const COLORS = {
 - ❌ Missing subscription cleanup → ✅ Return cleanup in useEffect
 - ❌ Hardcoded IDs → ✅ From context/session
 - ❌ No input validation → ✅ Zod schemas
-- ❌ Missing partnership_id filter → ✅ Always filter
+- ❌ Missing space_id filter → ✅ Always filter
 - ❌ `any` types → ✅ Proper interfaces
 - ❌ Missing loading/empty states → ✅ Always include
 
@@ -154,7 +154,7 @@ const COLORS = {
 - [ ] RLS policies on new tables
 - [ ] Zod validation
 - [ ] Rate limiting on APIs
-- [ ] Partnership data isolation
+- [ ] Space data isolation
 - [ ] No `console.log` in production
 - [ ] Real-time cleanup
 - [ ] Dark mode tested
