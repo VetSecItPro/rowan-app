@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles } from 'lucide-react';
+import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { GoalCard } from '@/components/goals/GoalCard';
@@ -12,6 +12,7 @@ import { NewMilestoneModal } from '@/components/goals/NewMilestoneModal';
 import { TemplateSelectionModal } from '@/components/goals/TemplateSelectionModal';
 import { GoalCheckInModal } from '@/components/goals/GoalCheckInModal';
 import { CheckInHistoryTimeline } from '@/components/goals/CheckInHistoryTimeline';
+import { ActivityFeed } from '@/components/goals/ActivityFeed';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { GoalCardSkeleton, MilestoneCardSkeleton, StatsCardSkeleton } from '@/components/ui/Skeleton';
@@ -24,7 +25,7 @@ import { toast } from 'sonner';
 import { usePresence } from '@/lib/hooks/usePresence';
 import { OnlineUsersIndicator, PresenceIndicator } from '@/components/shared/PresenceIndicator';
 
-type ViewMode = 'goals' | 'milestones';
+type ViewMode = 'goals' | 'milestones' | 'activity';
 
 export default function GoalsPage() {
   const { currentSpace, user } = useAuth();
@@ -444,8 +445,11 @@ export default function GoalsPage() {
     if (viewMode === 'goals') {
       // Open template selection modal for goals
       setIsTemplateModalOpen(true);
-    } else {
+    } else if (viewMode === 'milestones') {
       handleOpenMilestoneModal();
+    } else if (viewMode === 'activity') {
+      // For activity view, default to creating a new goal
+      setIsTemplateModalOpen(true);
     }
   }, [viewMode, handleOpenMilestoneModal]);
 
@@ -574,10 +578,10 @@ export default function GoalsPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-indigo-100 to-indigo-200 dark:from-indigo-900/30 dark:to-indigo-800/30 rounded-xl border border-indigo-200 dark:border-indigo-700">
+              <div className="flex items-center gap-1 p-1.5 bg-gradient-to-r from-indigo-100 to-indigo-200 dark:from-indigo-900/30 dark:to-indigo-800/30 rounded-xl border border-indigo-200 dark:border-indigo-700">
                 <button
                   onClick={() => handleViewModeChange('goals')}
-                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
+                  className={`px-2 sm:px-3 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
                     viewMode === 'goals'
                       ? 'bg-gradient-goals text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
@@ -588,7 +592,7 @@ export default function GoalsPage() {
                 </button>
                 <button
                   onClick={() => handleViewModeChange('milestones')}
-                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
+                  className={`px-2 sm:px-3 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
                     viewMode === 'milestones'
                       ? 'bg-gradient-goals text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
@@ -597,13 +601,24 @@ export default function GoalsPage() {
                   <List className="w-4 h-4" />
                   <span className="text-sm">Milestones</span>
                 </button>
+                <button
+                  onClick={() => handleViewModeChange('activity')}
+                  className={`px-2 sm:px-3 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                    viewMode === 'activity'
+                      ? 'bg-gradient-goals text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                  }`}
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span className="text-sm">Activity</span>
+                </button>
               </div>
               <button
                 onClick={handleNewButtonClick}
                 className="px-4 sm:px-6 py-2 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
-                <span>New {viewMode === 'goals' ? 'Goal' : 'Milestone'}</span>
+                <span>New {viewMode === 'goals' ? 'Goal' : viewMode === 'milestones' ? 'Milestone' : 'Goal'}</span>
               </button>
             </div>
           </div>
@@ -745,15 +760,15 @@ export default function GoalsPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                  {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` : `Achievement Wall (${filteredMilestones.length})`}
+                  {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` : viewMode === 'milestones' ? `Achievement Wall (${filteredMilestones.length})` : 'Activity Feed'}
                 </h2>
                 <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 text-sm font-medium rounded-full">
                   {format(new Date(), 'MMM yyyy')}
                 </span>
               </div>
 
-              {/* Status Filter - Segmented Buttons - Hidden for milestones but space reserved */}
-              <div className={`bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 w-fit ${viewMode === 'milestones' ? 'invisible' : ''}`}>
+              {/* Status Filter - Segmented Buttons - Only show for goals view */}
+              <div className={`bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 w-fit ${viewMode !== 'goals' ? 'invisible' : ''}`}>
                 <button
                   onClick={() => setStatusFilter('all')}
                   className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
@@ -858,7 +873,7 @@ export default function GoalsPage() {
                   />
                 </div>
               )
-            ) : (
+            ) : viewMode === 'milestones' ? (
               /* Milestones View */
               filteredMilestones.length === 0 ? (
                 <div className="text-center py-12">
@@ -883,6 +898,14 @@ export default function GoalsPage() {
                   })}
                 </div>
               )
+            ) : (
+              /* Activity View */
+              <div className="space-y-6">
+                <ActivityFeed
+                  spaceId={currentSpace?.id || ''}
+                  className="max-h-[600px]"
+                />
+              </div>
             )}
           </div>
           )}
