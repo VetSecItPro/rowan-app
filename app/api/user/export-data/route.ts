@@ -1,0 +1,50 @@
+import { createClient } from '@/lib/supabase/server';
+import { exportAllUserData } from '@/lib/services/data-export-service';
+import { NextResponse } from 'next/server';
+
+/**
+ * API Route: Export All User Data
+ *
+ * GDPR Compliance: Right to Data Portability (Article 20)
+ * Allows authenticated users to export all their data in JSON format
+ */
+export async function GET() {
+  try {
+    // Get authenticated user
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Export all user data
+    const result = await exportAllUserData(user.id);
+
+    if (!result.success || !result.data) {
+      return NextResponse.json(
+        { error: result.error || 'Failed to export data' },
+        { status: 500 }
+      );
+    }
+
+    // Return data as downloadable JSON
+    const response = new NextResponse(JSON.stringify(result.data, null, 2), {
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Disposition': `attachment; filename="rowan-data-export-${new Date().toISOString().split('T')[0]}.json"`,
+      },
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Error in data export API:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
