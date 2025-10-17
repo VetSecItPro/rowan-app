@@ -176,6 +176,96 @@ export interface UpdateCheckInSettingsInput {
   enable_photos?: boolean;
 }
 
+// Activity Feed interfaces
+export interface GoalActivity {
+  id: string;
+  space_id: string;
+  goal_id?: string;
+  milestone_id?: string;
+  check_in_id?: string;
+  user_id: string;
+  activity_type: 'goal_created' | 'goal_updated' | 'goal_completed' | 'goal_deleted' |
+                 'milestone_created' | 'milestone_completed' | 'milestone_updated' | 'milestone_deleted' |
+                 'check_in_created' | 'check_in_updated' |
+                 'goal_shared' | 'goal_collaborated' | 'goal_commented';
+  activity_data: Record<string, any>;
+  title: string;
+  description?: string;
+  entity_title?: string;
+  entity_type?: string;
+  created_at: string;
+  updated_at: string;
+  // Populated relations
+  user?: {
+    id: string;
+    name: string;
+    avatar_url?: string;
+  };
+  goal?: Goal;
+  milestone?: Milestone;
+  check_in?: GoalCheckIn;
+}
+
+export interface GoalComment {
+  id: string;
+  goal_id: string;
+  user_id: string;
+  parent_comment_id?: string;
+  content: string;
+  content_type: 'text' | 'markdown';
+  reaction_counts: Record<string, number>;
+  is_edited: boolean;
+  edited_at?: string;
+  created_at: string;
+  updated_at: string;
+  // Populated relations
+  user?: {
+    id: string;
+    name: string;
+    avatar_url?: string;
+  };
+  replies?: GoalComment[];
+  user_reaction?: string; // Current user's reaction
+}
+
+export interface GoalCommentReaction {
+  id: string;
+  comment_id: string;
+  user_id: string;
+  emoji: string;
+  created_at: string;
+}
+
+export interface GoalMention {
+  id: string;
+  comment_id: string;
+  mentioned_user_id: string;
+  mentioning_user_id: string;
+  is_read: boolean;
+  read_at?: string;
+  created_at: string;
+}
+
+export interface CreateCommentInput {
+  goal_id: string;
+  content: string;
+  parent_comment_id?: string;
+  content_type?: 'text' | 'markdown';
+}
+
+export interface CreateActivityInput {
+  space_id: string;
+  goal_id?: string;
+  milestone_id?: string;
+  check_in_id?: string;
+  activity_type: GoalActivity['activity_type'];
+  title: string;
+  description?: string;
+  entity_title?: string;
+  entity_type?: string;
+  activity_data?: Record<string, any>;
+}
+
 export const goalsService = {
   async getGoals(spaceId: string): Promise<Goal[]> {
     const supabase = createClient();
@@ -828,5 +918,330 @@ export const goalsService = {
 
     // Sort by next due date
     return upcomingCheckIns.sort((a, b) => a.nextDue.getTime() - b.nextDue.getTime());
+  },
+
+  // Activity Feed methods
+  async getActivityFeed(spaceId: string, limit = 20, offset = 0): Promise<GoalActivity[]> {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from('goal_activities')
+      .select(`
+        *,
+        user:users(id, name, avatar_url),
+        goal:goals(id, title, status, progress),
+        milestone:goal_milestones(id, title, completed),
+        check_in:goal_check_ins(id, progress_percentage, mood)
+      `)
+      .eq('space_id', spaceId)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getGoalActivityFeed(goalId: string, limit = 20, offset = 0): Promise<GoalActivity[]> {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from('goal_activities')
+      .select(`
+        *,
+        user:users(id, name, avatar_url),
+        goal:goals(id, title, status, progress),
+        milestone:goal_milestones(id, title, completed),
+        check_in:goal_check_ins(id, progress_percentage, mood)
+      `)
+      .eq('goal_id', goalId)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async createActivity(input: CreateActivityInput): Promise<GoalActivity> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase
+      .from('goal_activities')
+      .insert([{
+        ...input,
+        user_id: user.id,
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Comments methods
+  async getGoalComments(goalId: string): Promise<GoalComment[]> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const { data, error } = await supabase
+      .from('goal_comments')
+      .select(`
+        *,
+        user:users(id, name, avatar_url)
+      `)
+      .eq('goal_id', goalId)
+      .is('parent_comment_id', null)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+
+    const comments = data || [];
+
+    // Get replies for each comment
+    for (const comment of comments) {
+      const { data: replies, error: repliesError } = await supabase
+        .from('goal_comments')
+        .select(`
+          *,
+          user:users(id, name, avatar_url)
+        `)
+        .eq('parent_comment_id', comment.id)
+        .order('created_at', { ascending: true });
+
+      if (!repliesError && replies) {
+        comment.replies = replies;
+      }
+
+      // Get user's reaction to this comment
+      if (user) {
+        const { data: userReaction } = await supabase
+          .from('goal_comment_reactions')
+          .select('emoji')
+          .eq('comment_id', comment.id)
+          .eq('user_id', user.id)
+          .single();
+
+        comment.user_reaction = userReaction?.emoji;
+      }
+    }
+
+    return comments;
+  },
+
+  async createComment(input: CreateCommentInput): Promise<GoalComment> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase
+      .from('goal_comments')
+      .insert([{
+        ...input,
+        user_id: user.id,
+      }])
+      .select(`
+        *,
+        user:users(id, name, avatar_url)
+      `)
+      .single();
+
+    if (error) throw error;
+
+    // Process @mentions in the comment
+    await this.processMentions(data.id, input.content);
+
+    // Create activity for the comment
+    const goal = await this.getGoalById(input.goal_id);
+    if (goal) {
+      await this.createActivity({
+        space_id: goal.space_id,
+        goal_id: input.goal_id,
+        activity_type: 'goal_commented',
+        title: 'Added comment',
+        description: `Comment added to "${goal.title}"`,
+        entity_title: goal.title,
+        entity_type: 'comment',
+        activity_data: {
+          goal_title: goal.title,
+          comment_content: input.content.slice(0, 100), // First 100 chars
+          is_reply: !!input.parent_comment_id,
+        },
+      });
+    }
+
+    return data;
+  },
+
+  async updateComment(commentId: string, content: string): Promise<GoalComment> {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from('goal_comments')
+      .update({
+        content,
+        is_edited: true,
+        edited_at: new Date().toISOString(),
+      })
+      .eq('id', commentId)
+      .select(`
+        *,
+        user:users(id, name, avatar_url)
+      `)
+      .single();
+
+    if (error) throw error;
+
+    // Update mentions
+    await this.processMentions(commentId, content);
+
+    return data;
+  },
+
+  async deleteComment(commentId: string): Promise<void> {
+    const supabase = createClient();
+
+    const { error } = await supabase
+      .from('goal_comments')
+      .delete()
+      .eq('id', commentId);
+
+    if (error) throw error;
+  },
+
+  async toggleCommentReaction(commentId: string, emoji: string): Promise<void> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('User not authenticated');
+
+    // Check if user already reacted with this emoji
+    const { data: existingReaction } = await supabase
+      .from('goal_comment_reactions')
+      .select('id')
+      .eq('comment_id', commentId)
+      .eq('user_id', user.id)
+      .eq('emoji', emoji)
+      .single();
+
+    if (existingReaction) {
+      // Remove reaction
+      const { error } = await supabase
+        .from('goal_comment_reactions')
+        .delete()
+        .eq('id', existingReaction.id);
+
+      if (error) throw error;
+    } else {
+      // Add reaction (first remove any other reaction from this user)
+      await supabase
+        .from('goal_comment_reactions')
+        .delete()
+        .eq('comment_id', commentId)
+        .eq('user_id', user.id);
+
+      const { error } = await supabase
+        .from('goal_comment_reactions')
+        .insert([{
+          comment_id: commentId,
+          user_id: user.id,
+          emoji,
+        }]);
+
+      if (error) throw error;
+    }
+  },
+
+  async processMentions(commentId: string, content: string): Promise<void> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return;
+
+    // Extract mentions from content (@username pattern)
+    const mentionRegex = /@(\w+)/g;
+    const mentions = [];
+    let match;
+
+    while ((match = mentionRegex.exec(content)) !== null) {
+      mentions.push(match[1]); // username without @
+    }
+
+    if (mentions.length === 0) return;
+
+    // Get user IDs for mentioned usernames
+    const { data: mentionedUsers } = await supabase
+      .from('users')
+      .select('id, name')
+      .in('name', mentions);
+
+    if (!mentionedUsers || mentionedUsers.length === 0) return;
+
+    // Remove existing mentions for this comment
+    await supabase
+      .from('goal_mentions')
+      .delete()
+      .eq('comment_id', commentId);
+
+    // Create new mentions
+    const mentionInserts = mentionedUsers.map(mentionedUser => ({
+      comment_id: commentId,
+      mentioned_user_id: mentionedUser.id,
+      mentioning_user_id: user.id,
+    }));
+
+    const { error } = await supabase
+      .from('goal_mentions')
+      .insert(mentionInserts);
+
+    if (error) {
+      console.error('Failed to create mentions:', error);
+    }
+  },
+
+  async getUserMentions(userId?: string): Promise<GoalMention[]> {
+    const supabase = createClient();
+    let targetUserId = userId;
+
+    if (!targetUserId) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+      targetUserId = user.id;
+    }
+
+    const { data, error } = await supabase
+      .from('goal_mentions')
+      .select(`
+        *,
+        comment:goal_comments(
+          id,
+          content,
+          goal_id,
+          user:users(id, name, avatar_url),
+          goal:goals(id, title)
+        ),
+        mentioning_user:users(id, name, avatar_url)
+      `)
+      .eq('mentioned_user_id', targetUserId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async markMentionAsRead(mentionId: string): Promise<void> {
+    const supabase = createClient();
+
+    const { error } = await supabase
+      .from('goal_mentions')
+      .update({
+        is_read: true,
+        read_at: new Date().toISOString(),
+      })
+      .eq('id', mentionId);
+
+    if (error) throw error;
   },
 };
