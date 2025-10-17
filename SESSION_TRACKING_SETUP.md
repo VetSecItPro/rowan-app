@@ -22,8 +22,11 @@ The `user_sessions` table needs to be created in your Supabase database. Due to 
 1. Go to your Supabase project dashboard
 2. Navigate to **SQL Editor**
 3. Click **New Query**
-4. Copy and paste the contents of: `supabase/migrations/20251017000030_add_user_sessions_table.sql`
+4. Copy and paste the contents of: `supabase/migrations/20251017000031_fix_user_sessions_table.sql`
+   - This version includes `DROP TABLE IF EXISTS` to handle any partial creation
 5. Click **Run** to execute the migration
+
+> **Note**: If you see an error about existing constraints, use the migration file ending in `000031` instead of `000030` - it includes cleanup of partial table creation.
 
 ### Option 2: Using Supabase CLI
 
@@ -70,9 +73,10 @@ If sessions don't appear after login:
    POST /api/user/track-session
    ```
 
-## Migration File Location
+## Migration Files
 
-The complete migration SQL can be found at:
-```
-supabase/migrations/20251017000030_add_user_sessions_table.sql
-```
+Two migration files are available:
+- `supabase/migrations/20251017000030_add_user_sessions_table.sql` - Original migration
+- `supabase/migrations/20251017000031_fix_user_sessions_table.sql` - Fixed version with cleanup (use this one)
+
+**Use the `000031` version** - it includes `DROP TABLE IF EXISTS` to handle partial table creation cleanly.
