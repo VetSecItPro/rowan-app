@@ -14,6 +14,7 @@ import { GoalCheckInModal } from '@/components/goals/GoalCheckInModal';
 import { CheckInHistoryTimeline } from '@/components/goals/CheckInHistoryTimeline';
 import { ActivityFeed } from '@/components/goals/ActivityFeed';
 import { CheckInFrequencyModal } from '@/components/goals/CheckInFrequencyModal';
+import { HabitTracker } from '@/components/goals/HabitTracker';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { GoalCardSkeleton, MilestoneCardSkeleton, StatsCardSkeleton } from '@/components/ui/Skeleton';
@@ -26,7 +27,7 @@ import { toast } from 'sonner';
 import { usePresence } from '@/lib/hooks/usePresence';
 import { OnlineUsersIndicator, PresenceIndicator } from '@/components/shared/PresenceIndicator';
 
-type ViewMode = 'goals' | 'milestones' | 'activity';
+type ViewMode = 'goals' | 'milestones' | 'habits' | 'activity';
 
 export default function GoalsPage() {
   const { currentSpace, user } = useAuth();
@@ -460,6 +461,9 @@ export default function GoalsPage() {
       setIsTemplateModalOpen(true);
     } else if (viewMode === 'milestones') {
       handleOpenMilestoneModal();
+    } else if (viewMode === 'habits') {
+      // TODO: Open habit creation modal (placeholder for now)
+      toast.info('Habit creation modal coming soon!');
     } else if (viewMode === 'activity') {
       // For activity view, default to creating a new goal
       setIsTemplateModalOpen(true);
@@ -615,6 +619,17 @@ export default function GoalsPage() {
                   <span className="text-sm">Milestones</span>
                 </button>
                 <button
+                  onClick={() => handleViewModeChange('habits')}
+                  className={`px-2 sm:px-3 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                    viewMode === 'habits'
+                      ? 'bg-gradient-goals text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                  }`}
+                >
+                  <Target className="w-4 h-4" />
+                  <span className="text-sm">Habits</span>
+                </button>
+                <button
                   onClick={() => handleViewModeChange('activity')}
                   className={`px-2 sm:px-3 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
                     viewMode === 'activity'
@@ -631,7 +646,7 @@ export default function GoalsPage() {
                 className="px-4 sm:px-6 py-2 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
-                <span>New {viewMode === 'goals' ? 'Goal' : viewMode === 'milestones' ? 'Milestone' : 'Goal'}</span>
+                <span>New {viewMode === 'goals' ? 'Goal' : viewMode === 'milestones' ? 'Milestone' : viewMode === 'habits' ? 'Habit' : 'Goal'}</span>
               </button>
             </div>
           </div>
@@ -773,7 +788,10 @@ export default function GoalsPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                  {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` : viewMode === 'milestones' ? `Achievement Wall (${filteredMilestones.length})` : 'Activity Feed'}
+                  {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` :
+                   viewMode === 'milestones' ? `Achievement Wall (${filteredMilestones.length})` :
+                   viewMode === 'habits' ? 'Habit Tracker' :
+                   'Activity Feed'}
                 </h2>
                 <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 text-sm font-medium rounded-full">
                   {format(new Date(), 'MMM yyyy')}
@@ -912,6 +930,9 @@ export default function GoalsPage() {
                   })}
                 </div>
               )
+            ) : viewMode === 'habits' ? (
+              /* Habits View */
+              <HabitTracker spaceId={currentSpace?.id || ''} />
             ) : (
               /* Activity View */
               <div className="space-y-6">
