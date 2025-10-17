@@ -1,5 +1,7 @@
 'use client';
 
+// Updated interface - direct access to feature cards without intermediate steps
+
 import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
 import { CheckSquare, Calendar, Bell, MessageSquare, ShoppingBag, UtensilsCrossed, Home, Target, BookOpen, ArrowLeft, Heart } from 'lucide-react';

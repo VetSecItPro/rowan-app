@@ -55,19 +55,32 @@ export default function NotificationBell() {
       const supabase = createClient();
       const {
         data: { user },
+        error: userError,
       } = await supabase.auth.getUser();
+
+      if (userError) {
+        console.warn('Auth error loading user:', userError);
+        return;
+      }
 
       if (user) {
         setUserId(user.id);
-        const [notifs, count] = await Promise.all([
-          getUserNotifications(user.id, 20),
-          getUnreadNotificationCount(user.id),
-        ]);
-        setNotifications(notifs);
-        setUnreadCount(count);
+        try {
+          const [notifs, count] = await Promise.all([
+            getUserNotifications(user.id, 20),
+            getUnreadNotificationCount(user.id),
+          ]);
+          setNotifications(notifs);
+          setUnreadCount(count);
+        } catch (notificationError) {
+          console.warn('Error loading notifications:', notificationError);
+          // Set empty state instead of crashing
+          setNotifications([]);
+          setUnreadCount(0);
+        }
       }
     } catch (error) {
-      console.error('Error loading notifications:', error);
+      console.warn('Error in loadUserAndNotifications:', error);
     } finally {
       setLoading(false);
     }
