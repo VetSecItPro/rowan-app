@@ -15,6 +15,7 @@ interface SortableGoalCardProps {
   onDelete: (goalId: string) => void;
   onCheckIn?: (goal: Goal) => void;
   onShowHistory?: (goal: Goal) => void;
+  onFrequencySettings?: (goal: Goal) => void;
   onStatusChange?: (goalId: string, status: 'not-started' | 'in-progress' | 'completed') => void;
   onPriorityChange?: (goalId: string, priority: 'none' | 'p1' | 'p2' | 'p3' | 'p4') => void;
   onTogglePin?: (goalId: string, isPinned: boolean) => void;
@@ -35,6 +36,7 @@ export function SortableGoalCard({
   onDelete,
   onCheckIn,
   onShowHistory,
+  onFrequencySettings,
   onStatusChange,
   onPriorityChange,
   onTogglePin,
@@ -144,6 +146,7 @@ export function SortableGoalCard({
           onDelete={onDelete}
           onCheckIn={onCheckIn}
           onShowHistory={onShowHistory}
+          onFrequencySettings={onFrequencySettings}
           onStatusChange={onStatusChange}
         />
       </div>
