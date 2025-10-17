@@ -1,6 +1,7 @@
 'use client';
 
-// Updated interface - direct access to feature cards without intermediate steps
+// Direct feature cards interface - Updated Oct 17, 2025 at 22:15
+// This shows feature cards immediately without intermediate steps
 
 import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
