@@ -37,6 +37,10 @@
     {
       "path": "/api/cron/reminder-notifications",
       "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/cleanup-deleted-accounts",
+      "schedule": "0 3 * * *"
     }
   ]
 }
