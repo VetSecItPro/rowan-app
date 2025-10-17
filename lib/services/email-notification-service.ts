@@ -85,7 +85,9 @@ export async function sendDeletionInitiatedEmail(
             <h3>To cancel deletion:</h3>
             <p>Simply log back into your Rowan account before ${deletionDate.toLocaleDateString()}. This will automatically cancel the deletion process.</p>
 
-            <a href="https://rowan-app.com/login" class="button">Cancel Deletion - Log In</a>
+            <a href="https://rowan-app.com/restore-account" class="button">🛑 Cancel Deletion - Restore Account</a>
+
+            <p style="margin-top: 15px; font-size: 14px; color: #666;">Or log in at: <a href="https://rowan-app.com/login" style="color: #007bff;">rowan-app.com/login</a></p>
 
             <p><strong>GDPR Compliance:</strong> This deletion process fulfills your Right to Erasure under GDPR Article 17. All personal data will be permanently removed after the grace period.</p>
           </div>
@@ -179,11 +181,13 @@ export async function send30DayWarningEmail(
             </ul>
 
             <h3>To cancel deletion:</h3>
-            <p><strong>Log into your account before ${finalDate.toLocaleDateString()}</strong> to automatically cancel the deletion process.</p>
+            <p><strong>Click the button below before ${finalDate.toLocaleDateString()}</strong> to automatically cancel the deletion process.</p>
 
-            <a href="https://rowan-app.com/login" class="button">🛑 CANCEL DELETION - LOG IN NOW</a>
+            <a href="https://rowan-app.com/restore-account" class="button">🛑 CANCEL DELETION - RESTORE ACCOUNT NOW</a>
 
-            <p>If you intended to delete your account, no further action is required. The deletion will proceed automatically on ${finalDate.toLocaleDateString()}.</p>
+            <p style="margin-top: 15px; font-size: 14px; color: #666;">Or log in at: <a href="https://rowan-app.com/login" style="color: #dc3545; font-weight: bold;">rowan-app.com/login</a></p>
+
+            <p><strong>⚠️ Important:</strong> If you intended to delete your account, no further action is required. The deletion will proceed automatically on ${finalDate.toLocaleDateString()}.</p>
           </div>
 
           <div class="footer">
