@@ -211,7 +211,10 @@ export default function NotificationSettingsPage() {
                     {emailEnabled && (
                       <div className="pl-4 space-y-3 border-l-2 border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">Task assignments</span>
+                          <div>
+                            <div className="text-gray-700 dark:text-gray-300">Task assignments</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">Get notified when someone assigns you a task</div>
+                          </div>
                           <Toggle
                             id="email-assignments"
                             checked={emailAssignments}
@@ -221,7 +224,10 @@ export default function NotificationSettingsPage() {
                           />
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">Event reminders</span>
+                          <div>
+                            <div className="text-gray-700 dark:text-gray-300">Due reminders</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">Reminders for upcoming and overdue items</div>
+                          </div>
                           <Toggle
                             id="email-due-reminders"
                             checked={emailDueReminders}
@@ -231,7 +237,10 @@ export default function NotificationSettingsPage() {
                           />
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">New messages</span>
+                          <div>
+                            <div className="text-gray-700 dark:text-gray-300">@Mentions</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">When someone mentions you in a comment</div>
+                          </div>
                           <Toggle
                             id="email-mentions"
                             checked={emailMentions}
@@ -241,29 +250,12 @@ export default function NotificationSettingsPage() {
                           />
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">Shopping lists</span>
+                          <div>
+                            <div className="text-gray-700 dark:text-gray-300">Comments</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">New comments on items you're following</div>
+                          </div>
                           <Toggle
                             id="email-comments"
-                            checked={emailComments}
-                            onChange={setEmailComments}
-                            color="purple"
-                            size="sm"
-                          />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">Meal reminders</span>
-                          <Toggle
-                            id="email-meal-reminders"
-                            checked={emailComments}
-                            onChange={setEmailComments}
-                            color="purple"
-                            size="sm"
-                          />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">General reminders</span>
-                          <Toggle
-                            id="email-general-reminders"
                             checked={emailComments}
                             onChange={setEmailComments}
                             color="purple"
@@ -304,7 +296,10 @@ export default function NotificationSettingsPage() {
                     {inAppEnabled && (
                       <div className="pl-4 space-y-3 border-l-2 border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">Task updates</span>
+                          <div className="flex-1">
+                            <div className="text-gray-700 dark:text-gray-300">Task assignments</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">Browser notifications for task updates</div>
+                          </div>
                           <Toggle
                             id="push-assignments"
                             checked={inAppAssignments}
@@ -315,7 +310,10 @@ export default function NotificationSettingsPage() {
                           />
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">Reminders</span>
+                          <div className="flex-1">
+                            <div className="text-gray-700 dark:text-gray-300">Due reminders</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">Push notifications for upcoming items</div>
+                          </div>
                           <Toggle
                             id="push-due-reminders"
                             checked={inAppDueReminders}
@@ -326,7 +324,10 @@ export default function NotificationSettingsPage() {
                           />
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-700 dark:text-gray-300">Messages</span>
+                          <div className="flex-1">
+                            <div className="text-gray-700 dark:text-gray-300">@Mentions & comments</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">Notifications for mentions and comments</div>
+                          </div>
                           <Toggle
                             id="push-mentions"
                             checked={inAppMentions}
@@ -335,6 +336,11 @@ export default function NotificationSettingsPage() {
                             size="sm"
                             disabled={true}
                           />
+                        </div>
+                        <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                          <p className="text-xs text-blue-700 dark:text-blue-300">
+                            <strong>Coming soon:</strong> Push notifications are currently being developed. Email notifications are fully functional.
+                          </p>
                         </div>
                       </div>
                     )}
