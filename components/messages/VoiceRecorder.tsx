@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Mic, Square, Play, Pause, Trash2, Send, Loader2 } from 'lucide-react';
-import { useReactMediaRecorder } from 'react-media-recorder';
 import { toast } from 'sonner';
 
 interface VoiceRecorderProps {
@@ -17,22 +16,11 @@ export function VoiceRecorder({ onSendVoice, onCancel }: VoiceRecorderProps) {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [sending, setSending] = useState(false);
-  const audioRef = useState<HTMLAudioElement | null>(null)[0];
+  const [permissionDenied, setPermissionDenied] = useState(false);
 
-  const {
-    status,
-    startRecording,
-    stopRecording,
-    mediaBlobUrl,
-    clearBlobUrl,
-  } = useReactMediaRecorder({
-    audio: true,
-    onStop: (blobUrl, blob) => {
-      setAudioUrl(blobUrl);
-      setAudioBlob(blob);
-      setIsRecording(false);
-    },
-  });
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Timer for recording duration
   useEffect(() => {
@@ -41,52 +29,86 @@ export function VoiceRecorder({ onSendVoice, onCancel }: VoiceRecorderProps) {
       interval = setInterval(() => {
         setRecordingDuration((prev) => prev + 1);
       }, 1000);
-    } else {
+    } else if (!audioBlob) {
       setRecordingDuration(0);
     }
     return () => clearInterval(interval);
-  }, [isRecording]);
+  }, [isRecording, audioBlob]);
 
-  // Audio player controls
-  useEffect(() => {
-    if (audioUrl && !audioRef) {
-      const audio = new Audio(audioUrl);
-      audio.onended = () => setIsPlaying(false);
-      (audioRef as any) = audio;
+  const handleStartRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const url = URL.createObjectURL(audioBlob);
+
+        setAudioUrl(url);
+        setAudioBlob(audioBlob);
+        setIsRecording(false);
+
+        // Stop all tracks to release microphone
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      setPermissionDenied(false);
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+      setPermissionDenied(true);
+      toast.error('Microphone permission denied');
     }
-  }, [audioUrl, audioRef]);
-
-  const handleStartRecording = () => {
-    setIsRecording(true);
-    startRecording();
   };
 
   const handleStopRecording = () => {
-    setIsRecording(false);
-    stopRecording();
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+    }
   };
 
   const handlePlayPause = () => {
-    if (!audioRef) return;
+    if (!audioUrl) return;
+
+    if (!audioRef.current) {
+      const audio = new Audio(audioUrl);
+      audio.onended = () => setIsPlaying(false);
+      audioRef.current = audio;
+    }
 
     if (isPlaying) {
-      (audioRef as any).pause();
+      audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      (audioRef as any).play();
+      audioRef.current.play();
       setIsPlaying(true);
     }
   };
 
   const handleDelete = () => {
+    if (audioUrl) {
+      URL.revokeObjectURL(audioUrl);
+    }
+
     setAudioUrl(null);
     setAudioBlob(null);
     setRecordingDuration(0);
-    clearBlobUrl();
-    if (audioRef) {
-      (audioRef as any).pause();
-      (audioRef as any).src = '';
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
     }
+
     if (onCancel) onCancel();
   };
 
@@ -201,7 +223,7 @@ export function VoiceRecorder({ onSendVoice, onCancel }: VoiceRecorderProps) {
       )}
 
       {/* Permission Error */}
-      {status === 'permission_denied' && (
+      {permissionDenied && (
         <div className="text-center py-4">
           <p className="text-base md:text-sm text-red-600 dark:text-red-400">
             Microphone permission denied. Please enable it in your browser settings.

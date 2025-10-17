@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { bulkDeleteExpenses, getExpensesBulkDeleteCount } from '@/lib/services/bulk-operations-service';
 
 /**
@@ -12,7 +12,7 @@ import { bulkDeleteExpenses, getExpensesBulkDeleteCount } from '@/lib/services/b
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createServerClient();
+    const supabase = await createClient();
 
     // Get authenticated user
     const {
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
 // Get count of expenses that would be deleted
 export async function GET(request: Request) {
   try {
-    const supabase = await createServerClient();
+    const supabase = await createClient();
 
     const {
       data: { user },
