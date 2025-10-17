@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getUserSessions, formatLastActive } from '@/lib/services/session-tracking-service';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/user/sessions
  * Fetch all active sessions for the authenticated user

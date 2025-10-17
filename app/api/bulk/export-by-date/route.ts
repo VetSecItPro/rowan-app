@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { bulkExportByDateRange } from '@/lib/services/bulk-operations-service';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Bulk Export by Date Range API Endpoint
  *

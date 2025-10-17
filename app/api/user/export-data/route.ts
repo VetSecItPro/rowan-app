@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server';
 import { exportAllUserData } from '@/lib/services/data-export-service';
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * API Route: Export All User Data
  *

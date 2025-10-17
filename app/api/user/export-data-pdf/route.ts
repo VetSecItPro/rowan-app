@@ -4,6 +4,8 @@ import { exportAllUserData, getDataSubset } from '@/lib/services/data-export-ser
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * PDF Export API Endpoint
  *
