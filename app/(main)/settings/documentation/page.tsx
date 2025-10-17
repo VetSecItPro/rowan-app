@@ -1,11 +1,8 @@
 'use client';
 
-// Direct feature cards interface - Updated Oct 17, 2025 at 22:15
-// This shows feature cards immediately without intermediate steps
-
 import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
-import { CheckSquare, Calendar, Bell, MessageSquare, ShoppingBag, UtensilsCrossed, Home, Target, BookOpen, ArrowLeft, Heart } from 'lucide-react';
+import { CheckSquare, Calendar, Bell, MessageSquare, ShoppingBag, UtensilsCrossed, Home, Target, ArrowLeft, Heart } from 'lucide-react';
 
 const features = [
   {
@@ -75,17 +72,6 @@ const features = [
     available: true,
   },
   {
-    id: 'household',
-    name: 'Household Management',
-    description: 'Manage chores, maintenance, and household tasks',
-    icon: Home,
-    color: 'from-amber-500 to-amber-600',
-    hoverBorder: 'hover:border-amber-500',
-    hoverShadow: 'hover:shadow-amber-500/50',
-    href: '/settings/documentation/household',
-    available: false,
-  },
-  {
     id: 'goals',
     name: 'Goals & Planning',
     description: 'Set and track your shared goals and milestones',
@@ -107,6 +93,17 @@ const features = [
     href: '/settings/documentation/checkin',
     available: true,
   },
+  {
+    id: 'household',
+    name: 'Household Management',
+    description: 'Manage chores, maintenance, and household tasks',
+    icon: Home,
+    color: 'from-amber-500 to-amber-600',
+    hoverBorder: 'hover:border-amber-500',
+    hoverShadow: 'hover:shadow-amber-500/50',
+    href: '/settings/documentation/household',
+    available: false,
+  },
 ];
 
 export default function DocumentationPage() {
@@ -114,96 +111,95 @@ export default function DocumentationPage() {
     <>
       <Header />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-blue-50/30 dark:from-gray-950 dark:via-purple-950/20 dark:to-blue-950/20">
-        <div className="max-w-7xl mx-auto p-4 sm:p-8">
-        {/* Header */}
-        <div className="mb-8">
-          <Link
-            href="/settings"
-            className="inline-flex items-center gap-2 py-2 px-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-6"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Settings
-          </Link>
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center flex-shrink-0 shadow-lg">
-              <BookOpen className="w-8 h-8 text-white" />
+        <div className="max-w-7xl mx-auto p-6 sm:p-8">
+          {/* Header */}
+          <div className="mb-8">
+            <Link
+              href="/settings"
+              className="inline-flex items-center gap-2 py-2 px-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-6"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Settings
+            </Link>
+            <div className="text-center mb-8">
+              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                Documentation
+              </h1>
+              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                Choose a feature to learn about. Comprehensive guides for all Rowan features.
+              </p>
             </div>
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">Documentation</h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">Choose a feature to learn about</p>
+          </div>
+
+          {/* Features Grid - Optimized for 9 cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {features.map((feature) => {
+              const Icon = feature.icon;
+              const isAvailable = feature.available;
+
+              if (isAvailable) {
+                return (
+                  <Link
+                    key={feature.id}
+                    href={feature.href}
+                    className={`group relative p-6 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-2 border-gray-200/60 dark:border-gray-700/60 ${feature.hoverBorder} ${feature.hoverShadow} rounded-2xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 hover:scale-105`}
+                  >
+                    <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4 shadow-lg`}>
+                      <Icon className="w-7 h-7 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                      {feature.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                      {feature.description}
+                    </p>
+                    <div className="flex items-center text-sm font-semibold text-purple-600 dark:text-purple-400">
+                      Read guides
+                      <span className="ml-2 group-hover:translate-x-2 transition-transform duration-300">→</span>
+                    </div>
+                  </Link>
+                );
+              } else {
+                return (
+                  <div
+                    key={feature.id}
+                    className="relative p-6 bg-white/40 dark:bg-gray-900/40 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-2xl opacity-60"
+                  >
+                    <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} opacity-50 flex items-center justify-center mb-4`}>
+                      <Icon className="w-7 h-7 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                      {feature.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                      {feature.description}
+                    </p>
+                    <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+                      Coming Soon
+                    </div>
+                  </div>
+                );
+              }
+            })}
+          </div>
+
+          {/* Help Section */}
+          <div className="mt-16 max-w-2xl mx-auto text-center">
+            <div className="p-8 bg-purple-50/80 dark:bg-purple-900/50 backdrop-blur-sm border border-purple-200/60 dark:border-purple-800/60 rounded-2xl shadow-lg">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Need More Help?</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+                Can't find what you're looking for? Our support team is here to help you get the most out of Rowan.
+              </p>
+              <Link
+                href="/settings/support"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-colors text-sm font-semibold shadow-lg hover:shadow-xl"
+              >
+                Contact Support
+              </Link>
             </div>
           </div>
         </div>
-
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature) => {
-            const Icon = feature.icon;
-            const isAvailable = feature.available;
-
-            if (isAvailable) {
-              return (
-                <Link
-                  key={feature.id}
-                  href={feature.href}
-                  className={`group relative p-6 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border-2 border-gray-200/50 dark:border-gray-700/50 ${feature.hoverBorder} ${feature.hoverShadow} rounded-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-200`}
-                >
-                  <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4`}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                    {feature.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {feature.description}
-                  </p>
-                  <div className="mt-4 flex items-center text-sm font-medium text-purple-600 dark:text-purple-400">
-                    Read guides
-                    <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-                  </div>
-                </Link>
-              );
-            } else {
-              return (
-                <div
-                  key={feature.id}
-                  className="relative p-6 bg-white/40 dark:bg-gray-900/40 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl opacity-60"
-                >
-                  <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${feature.color} opacity-50 flex items-center justify-center mb-4`}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    {feature.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {feature.description}
-                  </p>
-                  <div className="mt-4">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
-                      Coming Soon
-                    </span>
-                  </div>
-                </div>
-              );
-            }
-          })}
-        </div>
-
-        {/* Help Section */}
-        <div className="mt-12 p-6 bg-purple-50/60 dark:bg-purple-900/40 backdrop-blur-md border border-purple-200/50 dark:border-purple-800/50 rounded-xl">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Need More Help?</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Can't find what you're looking for? Our support team is here to help.
-          </p>
-          <Link
-            href="/settings/support"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors text-sm font-medium"
-          >
-            Contact Support
-          </Link>
-        </div>
       </div>
-    </div>
     </>
   );
 }
