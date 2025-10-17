@@ -951,6 +951,285 @@ sudo nginx -t
 
 ---
 
+## 🌐 Multi-Site Hosting Capacity Analysis
+
+### **Current Rowan App Resource Usage**
+
+**Rowan App Alone (Optimized):**
+- **RAM:** ~6GB (2 PM2 instances × 3GB each)
+- **CPU:** ~60-80% under normal load
+- **Storage:** ~15-25GB (app + logs + backups)
+- **Remaining Capacity:** 2GB RAM, 20-40% CPU, 75-85GB storage
+
+### **Additional Website Capacity Analysis**
+
+#### **✅ Excellent Candidates (Low Resource):**
+
+| Website Type | RAM Usage | CPU Usage | Storage | Concurrent Users |
+|--------------|-----------|-----------|---------|------------------|
+| **Static Sites** (Hugo/Jekyll) | 50-100MB | 5-10% | 1-5GB | 10,000+ |
+| **WordPress (optimized)** | 200-400MB | 10-20% | 5-10GB | 1,000-2,000 |
+| **Simple APIs** | 100-300MB | 5-15% | 2-5GB | 5,000+ |
+| **Landing Pages** | 50-150MB | 5-10% | 1-3GB | 5,000+ |
+
+#### **⚠️ Moderate Candidates (Medium Resource):**
+
+| Website Type | RAM Usage | CPU Usage | Storage | Concurrent Users |
+|--------------|-----------|-----------|---------|------------------|
+| **E-commerce** (WooCommerce) | 500MB-1GB | 20-30% | 10-20GB | 500-1,000 |
+| **Blog Platforms** | 300-600MB | 15-25% | 5-15GB | 1,000-2,000 |
+| **Small SaaS Apps** | 400-800MB | 20-30% | 10-25GB | 200-500 |
+
+#### **❌ Avoid (High Resource):**
+- Heavy Node.js applications
+- Resource-intensive databases
+- Video streaming platforms
+- Machine learning applications
+- Cryptocurrency mining
+
+### **Multi-Site Hosting Strategy**
+
+#### **Option 1: Nginx Virtual Hosts (Recommended)**
+```nginx
+# Optimized for multiple sites
+server {
+    server_name rowan.yourdomain.com;
+    location / {
+        proxy_pass http://localhost:3000;  # Rowan app
+    }
+}
+
+server {
+    server_name blog.yourdomain.com;
+    root /var/www/blog;  # Static site
+    index index.html;
+}
+
+server {
+    server_name api.yourdomain.com;
+    location / {
+        proxy_pass http://localhost:4000;  # Small API
+    }
+}
+```
+
+#### **Option 2: Docker Containers (Advanced)**
+```yaml
+# docker-compose.yml for multi-site management
+version: '3.8'
+services:
+  rowan-app:
+    build: ./rowan-app
+    ports: ["3000:3000"]
+    memory: 6g
+    cpus: 1.5
+
+  wordpress-blog:
+    image: wordpress:php8.1-fpm
+    ports: ["9000:9000"]
+    memory: 512m
+    cpus: 0.3
+
+  static-sites:
+    image: nginx:alpine
+    ports: ["8080:80"]
+    memory: 64m
+    cpus: 0.2
+```
+
+### **Realistic Multi-Site Scenarios**
+
+#### **Scenario A: Light Portfolio**
+```
+Primary: Rowan App (6GB RAM, 70% CPU)
++ 3-5 Static Sites (100MB RAM, 5% CPU)
++ 1 WordPress Blog (400MB RAM, 15% CPU)
++ 1 Simple API (200MB RAM, 10% CPU)
+---
+Total: 6.7GB RAM (84%), 100% CPU
+Remaining: 1.3GB RAM for buffers
+Status: ✅ Excellent performance
+```
+
+#### **Scenario B: Small Business Setup**
+```
+Primary: Rowan App (6GB RAM, 70% CPU)
++ 1 E-commerce Site (800MB RAM, 25% CPU)
++ 2 Landing Pages (100MB RAM, 5% CPU)
+---
+Total: 6.9GB RAM (86%), 100% CPU
+Status: ⚠️ Near capacity, monitor closely
+```
+
+#### **Scenario C: Development Environment**
+```
+Primary: Rowan App (6GB RAM, 70% CPU)
++ 5 Development Sites (500MB RAM, 15% CPU)
++ Testing Environment (500MB RAM, 10% CPU)
++ Staging Server (300MB RAM, 5% CPU)
+---
+Total: 7.3GB RAM (91%), 100% CPU
+Status: ❌ Over capacity, need optimization
+```
+
+### **Optimization Strategies for Multi-Site Hosting**
+
+#### **1. RAM Optimization**
+```bash
+# Reduce Rowan app instances when hosting other sites
+pm2 scale rowan-app 1  # Use 1 instance instead of 2
+# Frees up 3GB RAM for other websites
+
+# Use lightweight alternatives
+- Static site generators instead of WordPress
+- Nginx for file serving instead of Apache
+- Redis for shared caching across sites
+```
+
+#### **2. CPU Load Balancing**
+```bash
+# Stagger resource-intensive operations
+- Run backups at different times
+- Separate high-traffic from low-traffic sites
+- Use CDN for static assets across all sites
+```
+
+#### **3. Storage Management**
+```bash
+# Shared resources
+/var/www/
+├── rowan-app/          # 25GB
+├── static-sites/       # 10GB total
+├── wordpress/          # 15GB
+├── shared-assets/      # 20GB (images, videos)
+└── backups/           # 30GB (rotated)
+```
+
+### **Resource Allocation Recommendations**
+
+#### **Conservative Approach (Stable Performance):**
+```
+Rowan App: 5GB RAM, 60% CPU (1 PM2 instance)
+Buffer:    1GB RAM, 10% CPU (system overhead)
+Additional Sites: 2GB RAM, 30% CPU available
+```
+
+**Capacity for additional sites:**
+- 5-10 static sites
+- 2-3 WordPress sites
+- 1-2 small APIs
+
+#### **Optimized Approach (Maximum Utilization):**
+```
+Rowan App: 6GB RAM, 70% CPU (2 PM2 instances)
+Additional Sites: 1.5GB RAM, 25% CPU
+Buffer: 0.5GB RAM, 5% CPU
+```
+
+**Capacity for additional sites:**
+- 3-5 static sites
+- 1 WordPress site
+- 1 small application
+
+### **Traffic Handling Estimates**
+
+#### **Combined Traffic Capacity:**
+| Configuration | Daily Visitors | Concurrent Users | Page Views/Day |
+|---------------|----------------|------------------|----------------|
+| **Rowan + 5 Static Sites** | 50,000 | 1,000 | 200,000 |
+| **Rowan + 2 WordPress** | 25,000 | 600 | 100,000 |
+| **Rowan + 1 E-commerce** | 15,000 | 400 | 75,000 |
+
+#### **Bandwidth Usage:**
+- **8TB monthly** = ~267GB daily
+- **Rowan app:** ~50-100GB/day (heavy usage)
+- **Remaining:** ~167-217GB/day for additional sites
+- **Supports:** 50,000+ page views across all sites
+
+### **Multi-Site Upgrade Triggers**
+
+#### **Memory Constraints:**
+```bash
+# When to upgrade to 16GB RAM VPS:
+- RAM usage consistently >90% (7.2GB)
+- Frequent out-of-memory errors
+- Slow response times across sites
+- Need to run more PM2 instances
+```
+
+#### **CPU Constraints:**
+```bash
+# When to upgrade to 4 vCPU VPS:
+- CPU usage consistently >90%
+- Load average >3.0
+- Response times >3 seconds
+- Users reporting slow performance
+```
+
+#### **Storage Constraints:**
+```bash
+# When to upgrade storage:
+- Disk usage >85% (85GB)
+- Unable to store backups
+- Need more media storage
+- Log files growing rapidly
+```
+
+### **Best Practices for Multi-Site VPS**
+
+#### **1. Prioritize Your Sites**
+```
+Priority 1: Rowan App (primary business application)
+Priority 2: Revenue-generating sites
+Priority 3: Portfolio/demo sites
+Priority 4: Development/testing sites
+```
+
+#### **2. Use Resource Monitoring**
+```bash
+# Monitor per-site resource usage
+./scripts/site-resource-monitor.sh
+# Shows RAM/CPU usage per website
+# Alerts when any site is using excessive resources
+```
+
+#### **3. Implement Caching**
+```bash
+# Shared Redis cache for all sites
+- WordPress object caching
+- API response caching
+- Static file caching
+- Database query caching
+```
+
+#### **4. CDN for Static Assets**
+```bash
+# Use Cloudflare for all sites
+- Reduces bandwidth usage by 60-80%
+- Improves global performance
+- Reduces server load significantly
+```
+
+### **Recommended Multi-Site Setup**
+
+For your **2 vCPU / 8GB RAM** VPS, the optimal configuration:
+
+```
+✅ Rowan App (primary) - 5GB RAM, 60% CPU
+✅ 3-5 Static Sites - 300MB RAM, 10% CPU
+✅ 1 WordPress Blog - 500MB RAM, 20% CPU
+✅ 1 Simple API/Tool - 200MB RAM, 10% CPU
+---
+Total: 6GB RAM (75%), 100% CPU
+Buffer: 2GB RAM for peaks and system operations
+```
+
+**Result:** High-performance hosting for 6-8 websites with room for growth!
+
+**Capacity Summary:** Your VPS can comfortably host **5-8 additional websites** alongside the Rowan app, depending on their complexity and traffic. Start conservative and scale up as needed.
+
+---
+
 ## 📋 Final Deployment Checklist
 
 - [ ] ✅ VPS provisioned and secured
