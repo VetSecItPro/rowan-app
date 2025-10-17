@@ -833,6 +833,431 @@ The monetization strategy balances market accessibility with premium positioning
 
 ---
 
+## Infrastructure & Hosting Analysis
+
+### Executive Summary
+
+Analysis of migrating Rowan from the current Vercel + Supabase setup to a Hostinger KVM2 VPS reveals significant technical and economic challenges. **Recommendation: Maintain current cloud infrastructure** for optimal scalability, feature support, and cost-effectiveness.
+
+### Current Infrastructure Architecture
+
+#### **Existing Setup (Recommended)**
+- **Frontend Hosting:** Vercel (Next.js 15, edge functions, global CDN)
+- **Database:** Supabase PostgreSQL (managed, automatic backups, real-time subscriptions)
+- **Authentication:** Supabase Auth (MFA, session management, social logins)
+- **File Storage:** Supabase Storage (CDN, image optimization, secure uploads)
+- **Real-time Features:** Supabase Realtime (WebSocket management, conflict resolution)
+- **External Services:** Upstash Redis (rate limiting), Resend (email), Recipe APIs, OCR services
+
+#### **Technical Dependencies**
+- **Real-time Collaboration:** 10+ modules with live synchronization
+- **File Processing:** Receipt OCR, image optimization, avatar uploads
+- **Complex Queries:** Advanced analytics across multiple data models
+- **Session Management:** Multi-device tracking with location detection
+- **API Integrations:** Recipe discovery, email notifications, external services
+
+### Hostinger KVM2 VPS Analysis
+
+#### **Specifications**
+- **CPU:** 2 vCPU cores (AMD EPYC/Intel Xeon)
+- **RAM:** 8GB DDR4
+- **Storage:** 100GB NVMe SSD
+- **Bandwidth:** 8TB/month (unlimited at 300Mbps)
+- **Price:** $6.99/month ($84/year)
+- **Operating System:** Linux distributions (Ubuntu, CentOS, etc.)
+- **Management:** Full root access, managed hosting support
+
+#### **Included Features**
+- KVM virtualization with dedicated resources
+- Server snapshots for backups
+- Dedicated IP address
+- DDoS protection
+- Weekly automated backups
+- 24/7 technical support
+- 99.9% uptime guarantee
+
+### Resource Requirements Analysis
+
+#### **Rowan App Infrastructure Needs**
+
+**Next.js 15 Application Server:**
+- **Memory Usage:** 2-3GB for production with moderate traffic
+- **CPU Intensive Tasks:** Image optimization, OCR processing, real-time updates
+- **Known Issues:** Next.js 15 has high RAM usage in production builds
+
+**PostgreSQL Database Server:**
+- **Memory Usage:** 2-3GB for optimal performance with concurrent users
+- **Storage Growth:** Database + indexes + temporary files
+- **Real-time Features:** WebSocket connections, trigger processing
+
+**File Storage & Processing:**
+- **OCR Processing:** CPU-intensive receipt scanning
+- **Image Optimization:** Memory and CPU intensive for avatar/attachment processing
+- **File Storage:** Accumulating user uploads (receipts, avatars, attachments)
+
+#### **Projected Resource Usage**
+
+##### **Realistic Scenario (250 paying users by Year 1)**
+
+**Storage Breakdown:**
+- **Operating System & Software:** ~20GB (Ubuntu, Node.js, PostgreSQL, dependencies)
+- **Database Storage:** ~50MB per user × 250 = 12.5GB
+- **File Uploads:** ~200MB per user average = 50GB (receipts, avatars, attachments)
+- **Backups & Logs:** ~20GB (database backups, application logs, system logs)
+- **Total Storage Required:** ~102.5GB
+
+**Memory Requirements:**
+- **Next.js Application:** 2-3GB (production build with real-time features)
+- **PostgreSQL Database:** 2-3GB (optimized for concurrent queries)
+- **Operating System:** ~1GB (Ubuntu with essential services)
+- **Buffer/Cache:** ~1-2GB (file system cache, temporary processing)
+- **Total RAM Required:** ~6-9GB
+
+**CPU Usage Patterns:**
+- **Baseline Usage:** 15-25% of 2 cores during normal operation
+- **Peak Usage:** 80-100% during OCR processing, image optimization
+- **Real-time Features:** Continuous moderate CPU usage for WebSocket management
+- **Analytics Processing:** Periodic high CPU usage for report generation
+
+##### **Optimistic Scenario (600 paying users)**
+- **Storage Required:** ~245GB (exceeds all KVM plans except KVM8)
+- **Memory Required:** ~12-15GB (requires KVM8: 32GB RAM, $19.99/month)
+- **Concurrent Connections:** 150-200 WebSocket connections
+- **Database Load:** 2,000-3,000 queries per minute during peak hours
+
+### Technical Challenges & Limitations
+
+#### **Critical Infrastructure Gaps**
+
+**1. Real-time Collaboration Complexity**
+- **Current:** Supabase Realtime provides managed WebSocket infrastructure
+- **VPS Challenge:** Need to implement custom WebSocket server, message queuing, conflict resolution
+- **Development Time:** 3-6 months of complex engineering work
+- **Ongoing Maintenance:** Continuous monitoring, scaling, debugging of real-time features
+
+**2. Database Management Overhead**
+- **Current:** Supabase provides automated backups, scaling, maintenance, security patches
+- **VPS Challenge:** Manual PostgreSQL administration, backup strategies, security updates
+- **Skill Requirements:** Advanced database administration knowledge
+- **Risk Factors:** Data loss potential, security vulnerabilities, performance optimization complexity
+
+**3. File Storage & CDN Limitations**
+- **Current:** Supabase Storage with global CDN, automatic image optimization
+- **VPS Limitation:** No built-in CDN, manual file management, local storage only
+- **Performance Impact:** Slower file delivery to global users
+- **Storage Constraints:** Fixed 100GB limit with expensive upgrade path
+
+**4. Scalability Bottlenecks**
+- **Single Point of Failure:** All services on one server creates catastrophic failure risk
+- **Resource Competition:** Database and application compete for same CPU/memory
+- **Scaling Challenges:** Vertical scaling only (upgrade server vs. horizontal scaling)
+
+#### **Development & Operational Complexity**
+
+**Migration Requirements:**
+- **Real-time System:** Rebuild WebSocket infrastructure from scratch
+- **Authentication:** Implement custom auth system or integrate external provider
+- **File Handling:** Develop upload, processing, and delivery system
+- **Database Setup:** Configure PostgreSQL, implement backup strategies
+- **Monitoring:** Set up application and infrastructure monitoring
+- **Security:** Implement SSL, firewalls, intrusion detection
+- **Deployment:** Create CI/CD pipelines for VPS deployment
+
+**Ongoing Maintenance:**
+- **System Administration:** OS updates, security patches, service monitoring
+- **Database Management:** Backups, performance tuning, query optimization
+- **Infrastructure Monitoring:** Uptime monitoring, performance alerting
+- **Scaling Operations:** Manual resource adjustments based on usage
+- **Security Management:** Regular security audits, vulnerability patching
+
+### Cost Analysis Comparison
+
+#### **Hostinger VPS Hosting Costs**
+
+**KVM2 Plan (Insufficient for Growth):**
+- **Monthly Cost:** $6.99
+- **Annual Cost:** $84
+- **Limitations:** Storage exceeded in Year 1, insufficient for optimistic scenario
+
+**KVM8 Plan (Required for Growth):**
+- **Monthly Cost:** $19.99
+- **Annual Cost:** $240
+- **Specifications:** 8 vCPU, 32GB RAM, 400GB storage
+- **Still Missing:** CDN, managed database, real-time infrastructure
+
+**Additional VPS Costs:**
+- **SSL Certificate:** $10-50/year
+- **Backup Service:** $10-20/month
+- **Monitoring Tools:** $10-30/month
+- **CDN Service:** $20-50/month
+- **Email Service:** Still need external provider
+- **Development Time:** $15,000-30,000 (3-6 months at $50-100/hour)
+
+**Total Year 1 VPS Cost:** $240 + $360-1,200 + $15,000-30,000 = **$15,600-31,440**
+
+#### **Current Cloud Infrastructure Costs**
+
+**Vercel Hosting:**
+- **Hobby Plan:** $0 (sufficient for early stages)
+- **Pro Plan:** $20/month (250+ users)
+- **Team Plan:** $50/month (500+ users)
+
+**Supabase Costs:**
+- **Free Tier:** $0 (first 50,000 monthly active users)
+- **Pro Plan:** $25/month (up to 100,000 monthly active users)
+- **Team Plan:** $125/month (up to 500,000 monthly active users)
+
+**External Services:**
+- **Upstash Redis:** $5-20/month
+- **Resend Email:** $10-30/month
+- **Recipe APIs:** $20-50/month
+- **OCR Service:** $10-30/month
+
+**Scaling Cost Progression:**
+- **Phase 1 (0-100 users):** $35-100/month (mostly free tiers)
+- **Phase 2 (100-250 users):** $75-150/month
+- **Phase 3 (250-500 users):** $200-300/month
+- **Phase 4 (500+ users):** $300-500/month
+
+**Total Year 1 Cloud Cost:** $900-3,600 vs. VPS cost of **$15,600-31,440**
+
+### Performance & Reliability Comparison
+
+#### **Current Cloud Setup Advantages**
+
+**Global Performance:**
+- **Vercel CDN:** Global edge network with 40+ regions
+- **Supabase:** Multi-region database with read replicas
+- **File Delivery:** Global CDN with automatic image optimization
+- **Latency:** <100ms response times globally
+
+**Reliability & Uptime:**
+- **SLA Guarantees:** 99.9-99.99% uptime with financial penalties
+- **Automatic Failover:** Multi-region redundancy
+- **Managed Backups:** Automatic, tested, point-in-time recovery
+- **DDoS Protection:** Enterprise-grade protection included
+
+**Scalability:**
+- **Automatic Scaling:** Serverless functions scale to zero or infinity
+- **Database Scaling:** Automatic read replicas, connection pooling
+- **Real-time Scaling:** Managed WebSocket infrastructure
+- **No Manual Intervention:** Scaling happens automatically
+
+#### **VPS Hosting Limitations**
+
+**Single Region Performance:**
+- **Geographic Limitation:** Single server location
+- **Global Latency:** 200-500ms for distant users
+- **No CDN:** Files served from single location
+- **Bandwidth Limits:** 8TB/month with throttling
+
+**Reliability Risks:**
+- **Single Point of Failure:** One server failure = complete outage
+- **Manual Recovery:** No automatic failover
+- **Backup Reliability:** Manual backup testing required
+- **Human Error Risk:** Misconfiguration can cause outages
+
+**Scaling Constraints:**
+- **Vertical Scaling Only:** Must upgrade entire server
+- **Downtime Required:** Server upgrades require downtime
+- **Resource Limits:** Fixed CPU/memory pools
+- **Manual Monitoring:** No automatic scaling triggers
+
+### Storage Capacity Analysis
+
+#### **Projected Storage Growth**
+
+**User Data Growth Pattern:**
+- **Onboarding:** 10MB initial data per user
+- **Monthly Growth:** 5-10MB per active user
+- **File Uploads:** 20-50MB per user over time
+- **Database Growth:** 2-5MB per user per year
+
+**Storage Projections by Scenario:**
+
+| Timeframe | Conservative (250 users) | Realistic (400 users) | Optimistic (600 users) |
+|-----------|-------------------------|----------------------|------------------------|
+| Month 6 | 45GB | 70GB | 105GB |
+| Month 12 | 85GB | 135GB | 200GB |
+| Month 18 | 125GB | 200GB | 300GB |
+| Month 24 | 165GB | 265GB | 400GB |
+
+**KVM Plan Requirements:**
+- **Month 6:** KVM2 (100GB) marginal for conservative scenario
+- **Month 12:** KVM4 (200GB, $10.49/month) required for realistic scenario
+- **Month 18:** KVM8 (400GB, $19.99/month) required for all scenarios
+- **Month 24:** External storage solutions needed for optimistic scenario
+
+#### **Storage Type Requirements**
+
+**Database Storage (High IOPS):**
+- **Requirements:** NVMe SSD with high random read/write performance
+- **Growth Pattern:** Moderate, mostly indexes and query cache
+- **Backup Needs:** Daily incremental, weekly full backups
+
+**File Storage (High Throughput):**
+- **Requirements:** Large capacity for user uploads
+- **Growth Pattern:** Linear with user adoption
+- **Access Pattern:** Frequent reads, append-only writes
+
+**Log Storage (Sequential):**
+- **Requirements:** Moderate capacity for application/system logs
+- **Growth Pattern:** Steady, predictable growth
+- **Retention:** 30-90 days typical retention period
+
+### Security & Compliance Considerations
+
+#### **Current Cloud Security Benefits**
+
+**Built-in Security Features:**
+- **Supabase:** Row Level Security (RLS), automatic SQL injection protection
+- **Vercel:** Automatic HTTPS, DDoS protection, security headers
+- **Compliance:** SOC 2, GDPR, CCPA compliance built-in
+- **Updates:** Automatic security patches for all infrastructure
+
+**Data Protection:**
+- **Encryption:** At-rest and in-transit encryption by default
+- **Backup Security:** Encrypted backups with point-in-time recovery
+- **Access Controls:** Fine-grained permissions and audit logging
+- **Monitoring:** Built-in security monitoring and alerting
+
+#### **VPS Security Challenges**
+
+**Manual Security Management:**
+- **OS Security:** Manual security patches and updates
+- **Application Security:** Custom implementation of security measures
+- **Database Security:** Manual PostgreSQL security configuration
+- **Network Security:** Firewall rules, intrusion detection setup
+
+**Compliance Requirements:**
+- **GDPR/CCPA:** Manual implementation of data protection measures
+- **Audit Trails:** Custom logging and audit trail implementation
+- **Data Encryption:** Manual setup of encryption for data at rest/transit
+- **Backup Security:** Secure backup storage and access controls
+
+### Recommendations
+
+#### **Primary Recommendation: Maintain Cloud Infrastructure**
+
+**Strategic Rationale:**
+1. **Focus on Product Development:** Avoid 3-6 month infrastructure migration
+2. **Proven Scalability:** Current setup handles enterprise-scale applications
+3. **Cost Effectiveness:** Lower total cost of ownership including development time
+4. **Risk Mitigation:** Avoid single points of failure and complex operations
+5. **Feature Velocity:** Maintain rapid development pace vs. infrastructure maintenance
+
+#### **Cloud Infrastructure Optimization Strategy**
+
+**Phase 1 (0-100 users): Maximize Free Tiers**
+- **Vercel:** Hobby plan (free)
+- **Supabase:** Free tier (50k MAU)
+- **External services:** Free/low-cost tiers
+- **Monthly Cost:** $35-50
+
+**Phase 2 (100-250 users): Selective Upgrades**
+- **Vercel:** Pro plan ($20/month)
+- **Supabase:** Pro plan ($25/month)
+- **External services:** Scale as needed
+- **Monthly Cost:** $75-125
+
+**Phase 3 (250-500 users): Growth Optimization**
+- **Vercel:** Team plan ($50/month)
+- **Supabase:** Team plan ($125/month)
+- **CDN Optimization:** Implement advanced caching
+- **Monthly Cost:** $200-300
+
+**Phase 4 (500+ users): Enterprise Features**
+- **Custom Plans:** Negotiate enterprise pricing
+- **Advanced Features:** Multi-region deployment
+- **Performance Optimization:** Advanced monitoring and optimization
+- **Monthly Cost:** $300-500
+
+#### **Alternative: Hybrid Approach (Not Recommended)**
+
+If cost optimization is absolutely critical, consider hybrid approach:
+
+**Hybrid Option 1: Database Migration Only**
+- **Keep:** Vercel for frontend hosting
+- **Migrate:** Only database to managed PostgreSQL (DigitalOcean, AWS RDS)
+- **Challenges:** Lose Supabase real-time features, auth integration
+- **Savings:** Moderate cost reduction, significant feature loss
+
+**Hybrid Option 2: Gradual Migration**
+- **Phase 1:** Migrate non-critical services
+- **Phase 2:** Rebuild real-time infrastructure
+- **Phase 3:** Complete migration
+- **Risk:** Extended migration period, parallel maintenance costs
+
+#### **Long-term Infrastructure Strategy**
+
+**Year 1-2: Cloud-First Approach**
+- **Optimize current setup for growth
+- **Focus development resources on product features
+- **Monitor unit economics and scaling patterns
+- **Build strong product-market fit
+
+**Year 3+: Evaluate Custom Infrastructure**
+- **Consider infrastructure migration at significant scale (10,000+ users)
+- **Evaluate cost-benefit at $50k+ monthly infrastructure costs
+- **Plan for multi-region deployment requirements
+- **Consider hybrid cloud for specific workloads
+
+### Infrastructure Monitoring & Optimization
+
+#### **Key Metrics to Track**
+
+**Cost Metrics:**
+- **Monthly infrastructure cost per user
+- **Infrastructure cost as percentage of revenue
+- **Cost growth rate vs. user growth rate
+- **Break-even analysis by pricing tier
+
+**Performance Metrics:**
+- **Application response times (95th percentile)
+- **Database query performance
+- **File upload/download speeds
+- **Real-time feature latency
+
+**Reliability Metrics:**
+- **Uptime percentage (target: 99.9%+)
+- **Mean time to recovery (MTTR)
+- **Error rates by feature
+- **User-reported issues
+
+#### **Optimization Strategies**
+
+**Database Optimization:**
+- **Query Performance:** Regular query analysis and optimization
+- **Connection Pooling:** Optimize database connection usage
+- **Read Replicas:** Implement read replicas for analytics queries
+- **Caching:** Redis caching for frequently accessed data
+
+**Application Performance:**
+- **Code Splitting:** Optimize Next.js bundle sizes
+- **Image Optimization:** Implement advanced image compression
+- **CDN Usage:** Maximize CDN cache hit ratios
+- **API Optimization:** Reduce API call overhead
+
+**Cost Optimization:**
+- **Usage Monitoring:** Track feature usage by tier
+- **Right-sizing:** Optimize plan selections based on actual usage
+- **Bulk Discounts:** Negotiate annual commitments for discounts
+- **Feature Gating:** Ensure expensive features are properly tiered
+
+### Conclusion
+
+The analysis strongly recommends maintaining the current Vercel + Supabase infrastructure for the following reasons:
+
+1. **Technical Superiority:** Current setup provides enterprise-grade features that would be extremely complex to replicate on VPS
+2. **Cost Effectiveness:** Total cost of ownership is significantly lower when including development time and operational overhead
+3. **Scalability:** Proven ability to scale from startup to enterprise without major architecture changes
+4. **Risk Mitigation:** Avoids single points of failure and complex operational requirements
+5. **Development Focus:** Allows team to focus on product features rather than infrastructure maintenance
+
+**The Hostinger KVM2 VPS option presents significant risks and limitations that outweigh potential cost savings, particularly given Rowan's complex real-time collaboration requirements and ambitious growth projections.**
+
+---
+
 **Document End**
 
 *For questions or updates to this analysis, contact the strategy team.*
