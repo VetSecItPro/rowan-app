@@ -100,12 +100,7 @@ const mockSpaceMembers: SpaceMember[] = [
   { id: '4', name: 'Casey Wilson', email: 'casey@example.com', role: 'Viewer' },
 ];
 
-// Mock data for active sessions
-const mockSessions: ActiveSession[] = [
-  { id: '1', device: 'MacBook Pro - Chrome', location: 'San Francisco, CA', lastActive: 'Active now', isCurrent: true },
-  { id: '2', device: 'iPhone 15 - Safari', location: 'San Francisco, CA', lastActive: '2 hours ago', isCurrent: false },
-  { id: '3', device: 'iPad Pro - Safari', location: 'Oakland, CA', lastActive: '1 day ago', isCurrent: false },
-];
+// Active sessions will be fetched from API
 
 // Mock pending invitations
 const mockPendingInvitations = [
@@ -179,8 +174,9 @@ export default function SettingsPage() {
 
 
   // Active sessions state
-  const [activeSessions, setActiveSessions] = useState<ActiveSession[]>(mockSessions);
+  const [activeSessions, setActiveSessions] = useState<ActiveSession[]>([]);
   const [sessionToRevoke, setSessionToRevoke] = useState<string | null>(null);
+  const [isLoadingSessions, setIsLoadingSessions] = useState(false);
 
   // Notification preferences state
   const [notificationPrefs, setNotificationPrefs] = useState({
@@ -548,6 +544,55 @@ export default function SettingsPage() {
     loadPrivacySettings();
   }, []);
 
+  // Fetch active sessions when security tab is active
+  useEffect(() => {
+    if (activeTab === 'security') {
+      fetchActiveSessions();
+    }
+  }, [activeTab]);
+
+  const fetchActiveSessions = async () => {
+    try {
+      setIsLoadingSessions(true);
+      const response = await fetch('/api/user/sessions');
+      const result = await response.json();
+
+      if (result.success) {
+        setActiveSessions(result.sessions);
+      } else {
+        console.error('Failed to load sessions:', result.error);
+      }
+    } catch (error) {
+      console.error('Error loading sessions:', error);
+    } finally {
+      setIsLoadingSessions(false);
+    }
+  };
+
+  const handleRevokeSession = async () => {
+    if (!sessionToRevoke) return;
+
+    try {
+      const response = await fetch(`/api/user/sessions/${sessionToRevoke}`, {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Remove the session from the list
+        setActiveSessions(activeSessions.filter(s => s.id !== sessionToRevoke));
+        setShowRevokeSessionModal(false);
+        setSessionToRevoke(null);
+      } else {
+        alert('Failed to revoke session');
+      }
+    } catch (error) {
+      console.error('Error revoking session:', error);
+      alert('Failed to revoke session');
+    }
+  };
+
   const handleRequestPasswordReset = async () => {
     if (!user?.email) return;
     setIsRequestingReset(true);
@@ -868,32 +913,44 @@ export default function SettingsPage() {
                     {/* Active Sessions */}
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Active Sessions</h3>
-                      <div className="space-y-3">
-                        {activeSessions.map((session) => (
-                          <div key={session.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
-                            <div className="flex items-center gap-3">
-                              <Monitor className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                              <div>
-                                <p className="text-sm font-medium text-gray-900 dark:text-white">{session.device}</p>
-                                <p className="text-xs text-gray-600 dark:text-gray-400">{session.location} • {session.lastActive}</p>
+                      {isLoadingSessions ? (
+                        <div className="space-y-3">
+                          {[...Array(3)].map((_, i) => (
+                            <div key={i} className="h-20 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl animate-pulse" />
+                          ))}
+                        </div>
+                      ) : activeSessions.length === 0 ? (
+                        <div className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl text-center">
+                          <p className="text-sm text-gray-600 dark:text-gray-400">No active sessions found</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {activeSessions.map((session) => (
+                            <div key={session.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
+                              <div className="flex items-center gap-3">
+                                <Monitor className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                                <div>
+                                  <p className="text-sm font-medium text-gray-900 dark:text-white">{session.device}</p>
+                                  <p className="text-xs text-gray-600 dark:text-gray-400">{session.location} • {session.lastActive}</p>
+                                </div>
                               </div>
+                              {session.isCurrent ? (
+                                <span className="text-xs text-green-600 dark:text-green-400 font-medium">Current</span>
+                              ) : (
+                                <button
+                                  onClick={() => {
+                                    setSessionToRevoke(session.id);
+                                    setShowRevokeSessionModal(true);
+                                  }}
+                                  className="text-xs text-red-600 dark:text-red-400 hover:underline"
+                                >
+                                  Revoke
+                                </button>
+                              )}
                             </div>
-                            {session.isCurrent ? (
-                              <span className="text-xs text-green-600 dark:text-green-400 font-medium">Current</span>
-                            ) : (
-                              <button
-                                onClick={() => {
-                                  setSessionToRevoke(session.id);
-                                  setShowRevokeSessionModal(true);
-                                }}
-                                className="text-xs text-red-600 dark:text-red-400 hover:underline"
-                              >
-                                Revoke
-                              </button>
-                            )}
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -1773,7 +1830,7 @@ export default function SettingsPage() {
                 Cancel
               </button>
               <button
-                onClick={() => handleRevokeSession(sessionToRevoke)}
+                onClick={handleRevokeSession}
                 className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors"
               >
                 Revoke Session
