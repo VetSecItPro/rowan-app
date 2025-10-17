@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Bell, Mail, Smartphone, Clock, Moon, Save, ArrowLeft } from 'lucide-react';
 import { reminderNotificationsService, NotificationPreferences } from '@/lib/services/reminder-notifications-service';
+import { pushSubscriptionService } from '@/lib/services/push-subscription-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { Toggle } from '@/components/ui/Toggle';
 import Link from 'next/link';
@@ -32,6 +33,27 @@ export default function NotificationSettingsPage() {
   const [quietHoursEnabled, setQuietHoursEnabled] = useState(false);
   const [quietHoursStart, setQuietHoursStart] = useState('22:00');
   const [quietHoursEnd, setQuietHoursEnd] = useState('08:00');
+
+  // Push subscription state
+  const [isPushSupported, setIsPushSupported] = useState(false);
+  const [isPushSubscribed, setIsPushSubscribed] = useState(false);
+  const [isSubscribing, setIsSubscribing] = useState(false);
+
+  // Check push support and subscription status
+  useEffect(() => {
+    const checkPushSupport = async () => {
+      const supported = pushSubscriptionService.isSupported();
+      setIsPushSupported(supported);
+
+      if (supported && user) {
+        const subscribed = await pushSubscriptionService.isSubscribed(user.id);
+        setIsPushSubscribed(subscribed);
+        setInAppEnabled(subscribed);
+      }
+    };
+
+    checkPushSupport();
+  }, [user]);
 
   // Fetch preferences
   useEffect(() => {
@@ -70,6 +92,32 @@ export default function NotificationSettingsPage() {
 
     fetchPreferences();
   }, [user, currentSpace]);
+
+  // Handle push subscription toggle
+  const handlePushToggle = async (enabled: boolean) => {
+    if (!user) return;
+
+    try {
+      setIsSubscribing(true);
+
+      if (enabled) {
+        // Subscribe to push
+        await pushSubscriptionService.subscribe(user.id, currentSpace?.id);
+        setIsPushSubscribed(true);
+        setInAppEnabled(true);
+      } else {
+        // Unsubscribe from push
+        await pushSubscriptionService.unsubscribe(user.id);
+        setIsPushSubscribed(false);
+        setInAppEnabled(false);
+      }
+    } catch (error) {
+      console.error('Error toggling push subscription:', error);
+      alert('Failed to update push notification settings. Please try again.');
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
 
   // Save preferences
   const handleSave = async () => {
@@ -281,19 +329,23 @@ export default function NotificationSettingsPage() {
                     <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
                       <div>
                         <div className="font-medium text-gray-900 dark:text-white">Enable push notifications</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">Allow browser notifications for real-time alerts</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          {isPushSupported
+                            ? 'Allow browser notifications for real-time alerts'
+                            : 'Push notifications not supported in this browser'}
+                        </div>
                       </div>
                       <Toggle
                         id="push-enabled"
-                        checked={inAppEnabled}
-                        onChange={setInAppEnabled}
+                        checked={isPushSubscribed}
+                        onChange={handlePushToggle}
                         color="purple"
-                        disabled={true}
+                        disabled={!isPushSupported || isSubscribing}
                       />
                     </div>
 
                     {/* Type-specific toggles */}
-                    {inAppEnabled && (
+                    {isPushSubscribed && (
                       <div className="pl-4 space-y-3 border-l-2 border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
@@ -306,7 +358,6 @@ export default function NotificationSettingsPage() {
                             onChange={setInAppAssignments}
                             color="purple"
                             size="sm"
-                            disabled={true}
                           />
                         </div>
                         <div className="flex items-center justify-between">
@@ -320,7 +371,6 @@ export default function NotificationSettingsPage() {
                             onChange={setInAppDueReminders}
                             color="purple"
                             size="sm"
-                            disabled={true}
                           />
                         </div>
                         <div className="flex items-center justify-between">
@@ -334,12 +384,11 @@ export default function NotificationSettingsPage() {
                             onChange={setInAppMentions}
                             color="purple"
                             size="sm"
-                            disabled={true}
                           />
                         </div>
-                        <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                          <p className="text-xs text-blue-700 dark:text-blue-300">
-                            <strong>Coming soon:</strong> Push notifications are currently being developed. Email notifications are fully functional.
+                        <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                          <p className="text-xs text-green-700 dark:text-green-300">
+                            <strong>Active:</strong> You'll receive push notifications based on your preferences and quiet hours settings.
                           </p>
                         </div>
                       </div>

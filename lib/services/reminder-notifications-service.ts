@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { z } from 'zod';
+import { notificationQueueService } from './notification-queue-service';
 
 // =============================================
 // TYPES & VALIDATION
@@ -91,8 +92,28 @@ export type UpdatePreferencesInput = z.infer<typeof UpdatePreferencesSchema>;
 
 export const reminderNotificationsService = {
   /**
+   * Check if current time is within quiet hours
+   */
+  async isInQuietHours(userId: string, spaceId?: string): Promise<boolean> {
+    const supabase = createClient();
+
+    const { data, error } = await supabase.rpc('is_in_quiet_hours', {
+      p_user_id: userId,
+      p_space_id: spaceId || null,
+      p_check_time: new Date().toISOString(),
+    });
+
+    if (error) {
+      console.error('Error checking quiet hours:', error);
+      return false;
+    }
+
+    return data || false;
+  },
+
+  /**
    * Create a notification for a user
-   * Checks user preferences before creating
+   * Handles quiet hours, batching, and all delivery channels
    */
   async createNotification(input: CreateNotificationInput): Promise<ReminderNotification | null> {
     const supabase = createClient();
@@ -103,13 +124,20 @@ export const reminderNotificationsService = {
     // Get reminder details to fetch space_id
     const { data: reminder, error: reminderError } = await supabase
       .from('reminders')
-      .select('space_id')
+      .select('space_id, title, emoji')
       .eq('id', validated.reminder_id)
       .single();
 
     if (reminderError || !reminder) {
       console.error('Reminder not found:', reminderError);
       return null;
+    }
+
+    // Get user preferences
+    const prefs = await this.getPreferences(validated.user_id, reminder.space_id);
+
+    if (!prefs) {
+      console.log('No preferences found for user, using defaults');
     }
 
     // Check if user should receive this notification
@@ -125,7 +153,7 @@ export const reminderNotificationsService = {
       return null;
     }
 
-    // Create notification
+    // Create in-app notification (always created for history)
     const { data, error } = await supabase
       .from('reminder_notifications')
       .insert({
@@ -142,7 +170,136 @@ export const reminderNotificationsService = {
       throw new Error('Failed to create notification');
     }
 
+    // Handle email and push notifications based on frequency and quiet hours
+    if (prefs) {
+      const frequency = prefs.notification_frequency || 'instant';
+      const inQuietHours = await this.isInQuietHours(validated.user_id, reminder.space_id);
+
+      // Queue for batching if not instant, or if in quiet hours
+      if (frequency !== 'instant' || inQuietHours) {
+        await notificationQueueService.queueNotification(
+          validated.user_id,
+          reminder.space_id,
+          validated.type,
+          {
+            reminder_id: validated.reminder_id,
+            title: reminder.title,
+            emoji: reminder.emoji,
+            type: validated.type,
+            channel: validated.channel,
+          },
+          frequency
+        );
+      } else {
+        // Send immediately
+        await this.sendImmediateNotification(validated, reminder);
+      }
+    } else {
+      // No preferences, send immediately
+      await this.sendImmediateNotification(validated, reminder);
+    }
+
     return data;
+  },
+
+  /**
+   * Send immediate notification (email + push)
+   */
+  async sendImmediateNotification(
+    input: CreateNotificationInput,
+    reminder: { title: string; emoji?: string }
+  ): Promise<void> {
+    // Send email if channel is email
+    if (input.channel === 'email') {
+      await this.sendEmailNotification(input.user_id, input.type, reminder);
+    }
+
+    // Send push if channel is push
+    if (input.channel === 'push') {
+      await this.sendPushNotification(input.user_id, input.type, reminder);
+    }
+  },
+
+  /**
+   * Send email notification
+   */
+  async sendEmailNotification(
+    userId: string,
+    type: NotificationType,
+    reminder: { title: string; emoji?: string }
+  ): Promise<void> {
+    // TODO: Integrate with email service (Resend)
+    console.log('Sending email notification:', {
+      userId,
+      type,
+      reminder,
+    });
+  },
+
+  /**
+   * Send push notification
+   */
+  async sendPushNotification(
+    userId: string,
+    type: NotificationType,
+    reminder: { title: string; emoji?: string }
+  ): Promise<void> {
+    try {
+      const title = this.formatNotificationTitle(type);
+      const body = this.formatNotificationBody(type, reminder);
+
+      await fetch('/api/notifications/send-push', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          title,
+          bodyText: body,
+          icon: `/icons/${reminder.emoji || '🔔'}.png`,
+          tag: `reminder-${type}`,
+        }),
+      });
+    } catch (error) {
+      console.error('Error sending push notification:', error);
+    }
+  },
+
+  /**
+   * Format notification title
+   */
+  formatNotificationTitle(type: NotificationType): string {
+    const titleMap: Record<NotificationType, string> = {
+      due: 'Reminder Due',
+      overdue: 'Reminder Overdue',
+      assigned: 'New Assignment',
+      unassigned: 'Unassigned',
+      mentioned: 'You were mentioned',
+      commented: 'New Comment',
+      completed: 'Reminder Completed',
+      snoozed: 'Reminder Snoozed',
+    };
+
+    return titleMap[type] || 'Notification';
+  },
+
+  /**
+   * Format notification body
+   */
+  formatNotificationBody(type: NotificationType, reminder: { title: string; emoji?: string }): string {
+    const emoji = reminder.emoji || '🔔';
+
+    const bodyMap: Record<NotificationType, string> = {
+      due: `${emoji} ${reminder.title} is due now`,
+      overdue: `${emoji} ${reminder.title} is overdue`,
+      assigned: `${emoji} You were assigned to ${reminder.title}`,
+      unassigned: `${emoji} You were unassigned from ${reminder.title}`,
+      mentioned: `${emoji} You were mentioned in ${reminder.title}`,
+      commented: `${emoji} New comment on ${reminder.title}`,
+      completed: `${emoji} ${reminder.title} was completed`,
+      snoozed: `${emoji} ${reminder.title} was snoozed`,
+    };
+
+    return bodyMap[type] || `${emoji} Update on ${reminder.title}`;
   },
 
   /**

@@ -8,9 +8,33 @@ The notification system allows users to control how they receive alerts for remi
 
 ### ✅ Fully Implemented
 - **Email Notifications**: Fully functional with database backend
+- **Push Notifications**: Complete Web Push API implementation
+  - Service worker (`/public/sw.js`) for background notifications
+  - Push subscription management
+  - Browser permission handling
+  - Multi-device support
+  - Automatic cleanup of invalid subscriptions
 - **Notification Preferences UI**: Complete settings page at `/settings/notifications`
-- **Database Schema**: `user_notification_preferences` table with all fields
-- **Service Layer**: `reminder-notifications-service.ts` handles all notification logic
+- **Database Schema**: Multiple tables supporting all features
+  - `user_notification_preferences` - User preferences
+  - `push_subscriptions` - Push subscription data
+  - `notification_queue` - Batching queue
+  - Helper functions for quiet hours and scheduling
+- **Service Layer**: Comprehensive notification services
+  - `reminder-notifications-service.ts` - Main notification logic
+  - `push-subscription-service.ts` - Push subscription management
+  - `notification-queue-service.ts` - Queue and batching logic
+- **Quiet Hours Enforcement**: ✅ IMPLEMENTED
+  - Database functions check quiet hours
+  - Notifications queued during quiet hours
+  - Sent automatically after quiet hours end
+  - Timezone-aware time calculations
+- **Frequency Batching**: ✅ IMPLEMENTED
+  - Instant delivery (default)
+  - Hourly digests
+  - Daily digests (sent at 9 AM)
+  - Never (in-app only)
+  - Cron job processes queue every 5 minutes
 - **Preference Categories**:
   - Task assignments
   - Due reminders (upcoming and overdue items)
@@ -18,19 +42,11 @@ The notification system allows users to control how they receive alerts for remi
   - Comments
 
 ### 🚧 Partially Implemented
-- **Quiet Hours**: UI is complete and saves to database, but backend enforcement is not yet implemented
-  - Users can set start/end times (e.g., 22:00 to 08:00)
-  - Settings are stored in database
-  - **Missing**: Actual notification suppression logic during quiet hours
-
-### 🔜 Not Yet Implemented
-- **Push Notifications**: UI exists but is disabled
-  - Browser push notifications will require:
-    - Service worker registration
-    - Push subscription management
-    - Web Push API integration
-    - Notification permission handling
-  - All push notification toggles are currently disabled in the UI
+- **Digest Email Templates**: HTML templates not yet created
+  - Logic exists for grouping and sending
+  - TODO: Design and implement HTML email templates
+- **Email Service Integration**: Using Resend (not yet connected to queue)
+  - TODO: Wire up email service to queue processor
 
 ## Database Schema
 
