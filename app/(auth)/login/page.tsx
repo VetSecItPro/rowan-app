@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { RestoreAccountModal } from '@/components/settings/RestoreAccountModal';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -15,6 +16,11 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showRestoreModal, setShowRestoreModal] = useState(false);
+  const [deletionInfo, setDeletionInfo] = useState<{
+    deletionRequestedAt: string;
+    permanentDeletionAt: string;
+  } | null>(null);
   const { signIn } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -51,11 +57,32 @@ export default function LoginPage() {
         setError('Invalid email or password. Please try again.');
         setIsLoading(false);
       } else {
-        // Login successful - wait for cookies to be written, then full page reload
-        // Give Supabase time to write session cookies before redirecting
-        setTimeout(() => {
-          window.location.href = '/dashboard';
-        }, 500);
+        // Login successful - check if account is marked for deletion
+        try {
+          const response = await fetch('/api/user/cancel-deletion');
+          const data = await response.json();
+
+          if (data.markedForDeletion) {
+            // Account is marked for deletion - show restoration modal
+            setDeletionInfo({
+              deletionRequestedAt: data.deletionRequestedAt,
+              permanentDeletionAt: data.permanentDeletionAt,
+            });
+            setShowRestoreModal(true);
+            setIsLoading(false);
+          } else {
+            // Account is not marked for deletion - proceed to dashboard
+            setTimeout(() => {
+              window.location.href = '/dashboard';
+            }, 500);
+          }
+        } catch (checkError) {
+          console.error('Error checking deletion status:', checkError);
+          // If check fails, proceed to dashboard anyway (don't block login)
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 500);
+        }
       }
     } catch (error) {
       setError('An unexpected error occurred. Please try again.');
@@ -250,6 +277,20 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      {/* Restore Account Modal */}
+      {deletionInfo && (
+        <RestoreAccountModal
+          isOpen={showRestoreModal}
+          onClose={() => {
+            setShowRestoreModal(false);
+            // Allow user to continue to dashboard if they dismiss the modal
+            router.push('/dashboard');
+          }}
+          deletionRequestedAt={deletionInfo.deletionRequestedAt}
+          permanentDeletionAt={deletionInfo.permanentDeletionAt}
+        />
+      )}
     </div>
   );
 }
