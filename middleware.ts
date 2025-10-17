@@ -122,7 +122,7 @@ export async function middleware(req: NextRequest) {
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://vercel.live; " +
     "style-src 'self' 'unsafe-inline'; " +
     "img-src 'self' data: https: blob:; " +
-    "font-src 'self' data:; " +
+    "font-src 'self' data: https:; " +
     "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live; " +
     "frame-ancestors 'none'; " +
     "base-uri 'self'; " +
