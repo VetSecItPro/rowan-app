@@ -53,10 +53,11 @@ import {
   MessageSquare,
   DollarSign,
   Target,
-  Clock
+  Clock,
+  BookOpen
 } from 'lucide-react';
 
-type SettingsTab = 'profile' | 'security' | 'notifications' | 'appearance' | 'privacy' | 'spaces' | 'analytics' | 'data' | 'help';
+type SettingsTab = 'profile' | 'security' | 'notifications' | 'appearance' | 'privacy' | 'documentation' | 'spaces' | 'analytics' | 'data' | 'help';
 type UserRole = 'Admin' | 'Member' | 'Viewer';
 type ExportStatus = 'idle' | 'pending' | 'processing' | 'ready';
 
@@ -573,11 +574,12 @@ export default function SettingsPage() {
 
   const tabs = [
     { id: 'profile' as SettingsTab, name: 'Profile', icon: User, description: 'Manage your personal information' },
+    { id: 'spaces' as SettingsTab, name: 'Spaces', icon: Users, description: 'Manage your spaces and members' },
     { id: 'security' as SettingsTab, name: 'Security', icon: Shield, description: 'Password and authentication' },
     { id: 'notifications' as SettingsTab, name: 'Notifications', icon: Bell, description: 'Email and push notifications' },
     { id: 'appearance' as SettingsTab, name: 'Appearance', icon: Palette, description: 'Theme and display settings' },
     { id: 'privacy' as SettingsTab, name: 'Privacy', icon: Lock, description: 'Data and visibility settings' },
-    { id: 'spaces' as SettingsTab, name: 'Spaces', icon: Users, description: 'Manage your spaces and members' },
+    { id: 'documentation' as SettingsTab, name: 'Documentation', icon: BookOpen, description: 'Browse our guides and tutorials' },
     { id: 'analytics' as SettingsTab, name: 'Analytics', icon: BarChart3, description: 'Track productivity trends' },
     { id: 'data' as SettingsTab, name: 'Data & Storage', icon: Database, description: 'Export and delete your data' },
     { id: 'help' as SettingsTab, name: 'Help & Support', icon: HelpCircle, description: 'Get help and contact us' },
@@ -1500,6 +1502,87 @@ export default function SettingsPage() {
                   </div>
                 )}
 
+                {/* Documentation Tab */}
+                {activeTab === 'documentation' && (
+                  <div className="space-y-6 sm:space-y-8">
+                    <div>
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Documentation</h2>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Browse our guides and tutorials</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                      <Link href="/settings/documentation" className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg transition-shadow">
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                            <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">User Guides</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Step-by-step tutorials for all features</p>
+                          </div>
+                        </div>
+                      </Link>
+
+                      <Link href="/settings/documentation" className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg transition-shadow">
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                            <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Quick Start</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Get up and running in minutes</p>
+                          </div>
+                        </div>
+                      </Link>
+
+                      <Link href="/settings/documentation" className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg transition-shadow">
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                            <Target className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Best Practices</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Tips and tricks for productivity</p>
+                          </div>
+                        </div>
+                      </Link>
+
+                      <Link href="/settings/documentation" className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg transition-shadow">
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                            <AlertTriangle className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Troubleshooting</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Solutions to common issues</p>
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+
+                    <div className="p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                          <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Need More Help?</h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                            Can't find what you're looking for? Our comprehensive documentation covers everything from basic setup to advanced features.
+                          </p>
+                          <Link
+                            href="/settings/documentation"
+                            className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm"
+                          >
+                            Browse Full Documentation
+                            <ArrowRight className="w-4 h-4" />
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Help & Support Tab */}
                 {activeTab === 'help' && (
                   <div className="space-y-6 sm:space-y-8">
@@ -1509,11 +1592,6 @@ export default function SettingsPage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                      <Link href="/settings/documentation" className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg transition-shadow">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Documentation</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Browse our guides and tutorials</p>
-                      </Link>
-
                       <a href="#" className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg transition-shadow">
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Contact Support</h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400">Get help from our team</p>
