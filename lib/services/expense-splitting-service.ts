@@ -440,7 +440,7 @@ export async function getSettlementSummary(spaceId: string): Promise<SettlementS
 /**
  * Calculates fair split based on income ratio
  */
-export function calculateIncomeBased Split(
+export function calculateIncomeBasedSplit(
   totalAmount: number,
   user1Income: number,
   user2Income: number
