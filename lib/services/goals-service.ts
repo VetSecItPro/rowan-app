@@ -266,6 +266,42 @@ export interface CreateActivityInput {
   activity_data?: Record<string, any>;
 }
 
+export interface GoalCheckInSettings {
+  id: string;
+  goal_id: string;
+  user_id: string;
+  frequency: 'daily' | 'weekly' | 'biweekly' | 'monthly';
+  day_of_week?: number; // 0 = Sunday
+  day_of_month?: number; // 1-31
+  reminder_time: string; // HH:MM format
+  enable_reminders: boolean;
+  reminder_days_before: number;
+  auto_schedule: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateCheckInSettingsInput {
+  goal_id: string;
+  frequency: 'daily' | 'weekly' | 'biweekly' | 'monthly';
+  day_of_week?: number | null;
+  day_of_month?: number | null;
+  reminder_time: string;
+  enable_reminders: boolean;
+  reminder_days_before: number;
+  auto_schedule: boolean;
+}
+
+export interface UpdateCheckInSettingsInput {
+  frequency?: 'daily' | 'weekly' | 'biweekly' | 'monthly';
+  day_of_week?: number | null;
+  day_of_month?: number | null;
+  reminder_time?: string;
+  enable_reminders?: boolean;
+  reminder_days_before?: number;
+  auto_schedule?: boolean;
+}
+
 export const goalsService = {
   async getGoals(spaceId: string): Promise<Goal[]> {
     const supabase = createClient();
@@ -1243,5 +1279,98 @@ export const goalsService = {
       .eq('id', mentionId);
 
     if (error) throw error;
+  },
+
+  // Check-in Settings Methods
+  async getCheckInSettings(goalId: string): Promise<GoalCheckInSettings | null> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase
+      .from('goal_check_in_settings')
+      .select('*')
+      .eq('goal_id', goalId)
+      .eq('user_id', user.id)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "not found"
+    return data || null;
+  },
+
+  async createCheckInSettings(input: CreateCheckInSettingsInput): Promise<GoalCheckInSettings> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase
+      .from('goal_check_in_settings')
+      .insert([{
+        ...input,
+        user_id: user.id,
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async updateCheckInSettings(goalId: string, input: UpdateCheckInSettingsInput): Promise<GoalCheckInSettings> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase
+      .from('goal_check_in_settings')
+      .update(input)
+      .eq('goal_id', goalId)
+      .eq('user_id', user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteCheckInSettings(goalId: string): Promise<void> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('User not authenticated');
+
+    const { error } = await supabase
+      .from('goal_check_in_settings')
+      .delete()
+      .eq('goal_id', goalId)
+      .eq('user_id', user.id);
+
+    if (error) throw error;
+  },
+
+  async getGoalCheckInSettings(spaceId: string): Promise<GoalCheckInSettings[]> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase
+      .from('goal_check_in_settings')
+      .select(`
+        *,
+        goal:goals!goal_check_in_settings_goal_id_fkey(
+          id,
+          title,
+          space_id
+        )
+      `)
+      .eq('user_id', user.id)
+      .eq('goal.space_id', spaceId);
+
+    if (error) throw error;
+    return data || [];
   },
 };

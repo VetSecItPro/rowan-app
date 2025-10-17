@@ -1,6 +1,6 @@
 'use client';
 
-import { Target, MoreVertical, Check, History } from 'lucide-react';
+import { Target, MoreVertical, Check, History, Settings } from 'lucide-react';
 import { Goal } from '@/lib/services/goals-service';
 import { formatDate } from '@/lib/utils/date-utils';
 import { useState } from 'react';
@@ -11,10 +11,11 @@ interface GoalCardProps {
   onDelete: (goalId: string) => void;
   onCheckIn?: (goal: Goal) => void;
   onShowHistory?: (goal: Goal) => void;
+  onFrequencySettings?: (goal: Goal) => void;
   onStatusChange?: (goalId: string, status: 'not-started' | 'in-progress' | 'completed') => void;
 }
 
-export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onStatusChange }: GoalCardProps) {
+export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onFrequencySettings, onStatusChange }: GoalCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   // Determine status based on goal.status and progress
@@ -120,6 +121,15 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onS
                   >
                     <History className="w-4 h-4" />
                     Check-In History
+                  </button>
+                )}
+                {onFrequencySettings && goal.status === 'active' && (
+                  <button
+                    onClick={() => { onFrequencySettings(goal); setShowMenu(false); }}
+                    className="w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors flex items-center gap-2 active:scale-[0.98]"
+                  >
+                    <Settings className="w-4 h-4" />
+                    Check-In Settings
                   </button>
                 )}
                 <button
