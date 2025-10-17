@@ -8,6 +8,8 @@ import { useAuth } from '@/lib/contexts/auth-context';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
 import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { PasswordConfirmModal } from '@/components/settings/PasswordConfirmModal';
+import { AccountDeletionModal } from '@/components/settings/AccountDeletionModal';
 import { createClient } from '@/lib/supabase/client';
 import {
   Settings,
@@ -1384,54 +1386,50 @@ export default function SettingsPage() {
                       <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Export your data or delete your account</p>
                     </div>
 
-                    {/* Export Data */}
-                    <div className="p-4 sm:p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl">
+                    {/* Export Data - GDPR Compliant */}
+                    <div className="p-4 sm:p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg sm:rounded-xl">
                       <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                           <Download className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div className="flex-1 w-full">
                           <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Export Your Data</h3>
-                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">Download a copy of all your data in JSON format</p>
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
+                            Download a complete copy of all your data in JSON format. This includes expenses, budgets, tasks, messages, and more.
+                          </p>
+                          <p className="text-xs text-blue-700 dark:text-blue-300 mb-4 bg-blue-100 dark:bg-blue-900/40 p-3 rounded-lg">
+                            <strong>GDPR Compliance:</strong> This export fulfills your Right to Data Portability (Article 20).
+                            The download starts immediately and includes all personal data we hold about you.
+                          </p>
+                          <button
+                            onClick={async () => {
+                              try {
+                                const response = await fetch('/api/user/export-data');
+                                if (!response.ok) throw new Error('Export failed');
 
-                          {exportStatus === 'idle' && (
-                            <button
-                              onClick={() => setShowExportModal(true)}
-                              className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded-lg sm:rounded-xl hover:bg-blue-700 transition-colors shadow-lg flex items-center justify-center gap-2"
-                            >
-                              <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                              Request Data Export
-                            </button>
-                          )}
-
-                          {exportStatus === 'pending' && (
-                            <div className="flex items-center gap-2 text-sm text-yellow-600 dark:text-yellow-400">
-                              <div className="w-4 h-4 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
-                              Export request pending...
-                            </div>
-                          )}
-
-                          {exportStatus === 'processing' && (
-                            <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
-                              <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                              Processing your export...
-                            </div>
-                          )}
-
-                          {exportStatus === 'ready' && (
-                            <button
-                              onClick={handleDownloadExport}
-                              className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-green-600 text-white rounded-lg sm:rounded-xl hover:bg-green-700 transition-colors shadow-lg flex items-center justify-center gap-2"
-                            >
-                              <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                              Download Export
-                            </button>
-                          )}
+                                const blob = await response.blob();
+                                const url = window.URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `rowan-data-export-${new Date().toISOString().split('T')[0]}.json`;
+                                document.body.appendChild(a);
+                                a.click();
+                                window.URL.revokeObjectURL(url);
+                                document.body.removeChild(a);
+                              } catch (error) {
+                                alert('Failed to export data. Please try again.');
+                              }
+                            }}
+                            className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded-lg sm:rounded-xl hover:bg-blue-700 transition-colors shadow-lg flex items-center justify-center gap-2"
+                          >
+                            <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            Download My Data (JSON)
+                          </button>
                         </div>
                       </div>
                     </div>
 
-                    {/* Delete Account */}
+                    {/* Delete Account - GDPR Compliant */}
                     <div className="p-4 sm:p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg sm:rounded-xl">
                       <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
@@ -1439,7 +1437,13 @@ export default function SettingsPage() {
                         </div>
                         <div className="flex-1 w-full">
                           <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Delete Account</h3>
-                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">Permanently delete your account and all associated data. This action cannot be undone.</p>
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
+                            Permanently delete your account with a 30-day grace period. You can cancel anytime within 30 days.
+                          </p>
+                          <p className="text-xs text-red-700 dark:text-red-300 mb-4 bg-red-100 dark:bg-red-900/40 p-3 rounded-lg">
+                            <strong>GDPR Compliance:</strong> This fulfills your Right to Erasure (Article 17).
+                            All personal data will be deleted after a 30-day grace period with email notifications.
+                          </p>
                           <button
                             onClick={() => setShowDeleteAccountModal(true)}
                             className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-red-600 text-white rounded-lg sm:rounded-xl hover:bg-red-700 transition-colors shadow-lg flex items-center justify-center gap-2"
@@ -1829,6 +1833,12 @@ export default function SettingsPage() {
         confirmLabel="Remove"
         cancelLabel="Cancel"
         variant="danger"
+      />
+
+      {/* New GDPR Compliant Account Deletion Modal */}
+      <AccountDeletionModal
+        isOpen={showDeleteAccountModal}
+        onClose={() => setShowDeleteAccountModal(false)}
       />
     </FeatureLayout>
   );
