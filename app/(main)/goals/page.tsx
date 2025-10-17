@@ -13,6 +13,7 @@ import { TemplateSelectionModal } from '@/components/goals/TemplateSelectionModa
 import { GoalCheckInModal } from '@/components/goals/GoalCheckInModal';
 import { CheckInHistoryTimeline } from '@/components/goals/CheckInHistoryTimeline';
 import { ActivityFeed } from '@/components/goals/ActivityFeed';
+import { CheckInFrequencyModal } from '@/components/goals/CheckInFrequencyModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { GoalCardSkeleton, MilestoneCardSkeleton, StatsCardSkeleton } from '@/components/ui/Skeleton';
@@ -40,10 +41,12 @@ export default function GoalsPage() {
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
   const [isHistoryTimelineOpen, setIsHistoryTimelineOpen] = useState(false);
+  const [isFrequencyModalOpen, setIsFrequencyModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null);
   const [checkInGoal, setCheckInGoal] = useState<Goal | null>(null);
   const [historyGoal, setHistoryGoal] = useState<Goal | null>(null);
+  const [frequencyGoal, setFrequencyGoal] = useState<Goal | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
@@ -429,6 +432,16 @@ export default function GoalsPage() {
   const handleCloseHistoryTimeline = useCallback(() => {
     setIsHistoryTimelineOpen(false);
     setHistoryGoal(null);
+  }, []);
+
+  const handleOpenFrequencyModal = useCallback((goal: Goal) => {
+    setFrequencyGoal(goal);
+    setIsFrequencyModalOpen(true);
+  }, []);
+
+  const handleCloseFrequencyModal = useCallback(() => {
+    setIsFrequencyModalOpen(false);
+    setFrequencyGoal(null);
   }, []);
 
   const handleEditGoal = useCallback((goal: Goal) => {
@@ -866,6 +879,7 @@ export default function GoalsPage() {
                     onDelete={handleDeleteGoal}
                     onCheckIn={handleOpenCheckInModal}
                     onShowHistory={handleOpenHistoryTimeline}
+                    onFrequencySettings={handleOpenFrequencyModal}
                     onStatusChange={handleGoalStatusChange}
                     onPriorityChange={handlePriorityChange}
                     onTogglePin={handleTogglePin}
@@ -950,6 +964,14 @@ export default function GoalsPage() {
               goalId={historyGoal.id}
               isOpen={isHistoryTimelineOpen}
               onClose={handleCloseHistoryTimeline}
+            />
+          )}
+          {frequencyGoal && (
+            <CheckInFrequencyModal
+              isOpen={isFrequencyModalOpen}
+              onClose={handleCloseFrequencyModal}
+              goalId={frequencyGoal.id}
+              goalTitle={frequencyGoal.title}
             />
           )}
         </>

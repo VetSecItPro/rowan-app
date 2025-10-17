@@ -14,7 +14,9 @@ export type NotificationType =
   | 'mentioned'
   | 'commented'
   | 'completed'
-  | 'snoozed';
+  | 'snoozed'
+  | 'goal_checkin_due'
+  | 'goal_checkin_overdue';
 
 export type NotificationChannel = 'in_app' | 'email' | 'push';
 
@@ -22,10 +24,13 @@ export type NotificationFrequency = 'instant' | 'hourly' | 'daily' | 'never';
 
 export interface ReminderNotification {
   id: string;
-  reminder_id: string;
+  reminder_id?: string | null;
+  goal_id?: string | null;
   user_id: string;
   type: NotificationType;
   channel: NotificationChannel;
+  title?: string;
+  message?: string;
   is_read: boolean;
   sent_at?: string;
   created_at: string;
@@ -33,6 +38,11 @@ export interface ReminderNotification {
     id: string;
     title: string;
     emoji?: string;
+  };
+  goal?: {
+    id: string;
+    title: string;
+    description?: string;
   };
 }
 
@@ -60,10 +70,15 @@ export interface NotificationPreferences {
 
 // Zod schemas
 const CreateNotificationSchema = z.object({
-  reminder_id: z.string().uuid(),
+  reminder_id: z.string().uuid().optional().nullable(),
+  goal_id: z.string().uuid().optional().nullable(),
   user_id: z.string().uuid(),
-  type: z.enum(['due', 'overdue', 'assigned', 'unassigned', 'mentioned', 'commented', 'completed', 'snoozed']),
+  type: z.enum(['due', 'overdue', 'assigned', 'unassigned', 'mentioned', 'commented', 'completed', 'snoozed', 'goal_checkin_due', 'goal_checkin_overdue']),
   channel: z.enum(['in_app', 'email', 'push']),
+  title: z.string().optional(),
+  message: z.string().optional(),
+}).refine(data => data.reminder_id || data.goal_id, {
+  message: "Either reminder_id or goal_id must be provided",
 });
 
 const UpdatePreferencesSchema = z.object({
@@ -121,20 +136,49 @@ export const reminderNotificationsService = {
     // Validate input
     const validated = CreateNotificationSchema.parse(input);
 
-    // Get reminder details to fetch space_id
-    const { data: reminder, error: reminderError } = await supabase
-      .from('reminders')
-      .select('space_id, title, emoji')
-      .eq('id', validated.reminder_id)
-      .single();
+    let spaceId: string;
+    let entityTitle: string;
+    let entityEmoji: string | undefined;
 
-    if (reminderError || !reminder) {
-      console.error('Reminder not found:', reminderError);
+    if (validated.reminder_id) {
+      // Get reminder details to fetch space_id
+      const { data: reminder, error: reminderError } = await supabase
+        .from('reminders')
+        .select('space_id, title, emoji')
+        .eq('id', validated.reminder_id)
+        .single();
+
+      if (reminderError || !reminder) {
+        console.error('Reminder not found:', reminderError);
+        return null;
+      }
+
+      spaceId = reminder.space_id;
+      entityTitle = reminder.title;
+      entityEmoji = reminder.emoji;
+    } else if (validated.goal_id) {
+      // Get goal details to fetch space_id
+      const { data: goal, error: goalError } = await supabase
+        .from('goals')
+        .select('space_id, title, description')
+        .eq('id', validated.goal_id)
+        .single();
+
+      if (goalError || !goal) {
+        console.error('Goal not found:', goalError);
+        return null;
+      }
+
+      spaceId = goal.space_id;
+      entityTitle = goal.title;
+      entityEmoji = '🎯'; // Default emoji for goals
+    } else {
+      console.error('Neither reminder_id nor goal_id provided');
       return null;
     }
 
     // Get user preferences
-    const prefs = await this.getPreferences(validated.user_id, reminder.space_id);
+    const prefs = await this.getPreferences(validated.user_id, spaceId);
 
     if (!prefs) {
       console.log('No preferences found for user, using defaults');
@@ -143,7 +187,7 @@ export const reminderNotificationsService = {
     // Check if user should receive this notification
     const { data: shouldSend } = await supabase.rpc('should_send_notification', {
       p_user_id: validated.user_id,
-      p_space_id: reminder.space_id,
+      p_space_id: spaceId,
       p_notification_type: validated.type,
       p_channel: validated.channel,
     });
@@ -158,9 +202,12 @@ export const reminderNotificationsService = {
       .from('reminder_notifications')
       .insert({
         reminder_id: validated.reminder_id,
+        goal_id: validated.goal_id,
         user_id: validated.user_id,
         type: validated.type,
         channel: validated.channel,
+        title: validated.title,
+        message: validated.message,
       })
       .select()
       .single();
@@ -173,18 +220,19 @@ export const reminderNotificationsService = {
     // Handle email and push notifications based on frequency and quiet hours
     if (prefs) {
       const frequency = prefs.notification_frequency || 'instant';
-      const inQuietHours = await this.isInQuietHours(validated.user_id, reminder.space_id);
+      const inQuietHours = await this.isInQuietHours(validated.user_id, spaceId);
 
       // Queue for batching if not instant, or if in quiet hours
       if (frequency !== 'instant' || inQuietHours) {
         await notificationQueueService.queueNotification(
           validated.user_id,
-          reminder.space_id,
+          spaceId,
           validated.type,
           {
             reminder_id: validated.reminder_id,
-            title: reminder.title,
-            emoji: reminder.emoji,
+            goal_id: validated.goal_id,
+            title: entityTitle,
+            emoji: entityEmoji,
             type: validated.type,
             channel: validated.channel,
           },
@@ -192,11 +240,11 @@ export const reminderNotificationsService = {
         );
       } else {
         // Send immediately
-        await this.sendImmediateNotification(validated, reminder);
+        await this.sendImmediateNotification(validated, { title: entityTitle, emoji: entityEmoji });
       }
     } else {
       // No preferences, send immediately
-      await this.sendImmediateNotification(validated, reminder);
+      await this.sendImmediateNotification(validated, { title: entityTitle, emoji: entityEmoji });
     }
 
     return data;
@@ -277,6 +325,8 @@ export const reminderNotificationsService = {
       commented: 'New Comment',
       completed: 'Reminder Completed',
       snoozed: 'Reminder Snoozed',
+      goal_checkin_due: 'Goal Check-In Due',
+      goal_checkin_overdue: 'Goal Check-In Overdue',
     };
 
     return titleMap[type] || 'Notification';
@@ -285,21 +335,23 @@ export const reminderNotificationsService = {
   /**
    * Format notification body
    */
-  formatNotificationBody(type: NotificationType, reminder: { title: string; emoji?: string }): string {
-    const emoji = reminder.emoji || '🔔';
+  formatNotificationBody(type: NotificationType, entity: { title: string; emoji?: string }): string {
+    const emoji = entity.emoji || (type.startsWith('goal_') ? '🎯' : '🔔');
 
     const bodyMap: Record<NotificationType, string> = {
-      due: `${emoji} ${reminder.title} is due now`,
-      overdue: `${emoji} ${reminder.title} is overdue`,
-      assigned: `${emoji} You were assigned to ${reminder.title}`,
-      unassigned: `${emoji} You were unassigned from ${reminder.title}`,
-      mentioned: `${emoji} You were mentioned in ${reminder.title}`,
-      commented: `${emoji} New comment on ${reminder.title}`,
-      completed: `${emoji} ${reminder.title} was completed`,
-      snoozed: `${emoji} ${reminder.title} was snoozed`,
+      due: `${emoji} ${entity.title} is due now`,
+      overdue: `${emoji} ${entity.title} is overdue`,
+      assigned: `${emoji} You were assigned to ${entity.title}`,
+      unassigned: `${emoji} You were unassigned from ${entity.title}`,
+      mentioned: `${emoji} You were mentioned in ${entity.title}`,
+      commented: `${emoji} New comment on ${entity.title}`,
+      completed: `${emoji} ${entity.title} was completed`,
+      snoozed: `${emoji} ${entity.title} was snoozed`,
+      goal_checkin_due: `${emoji} Time to check in on "${entity.title}"`,
+      goal_checkin_overdue: `${emoji} Overdue check-in for "${entity.title}"`,
     };
 
-    return bodyMap[type] || `${emoji} Update on ${reminder.title}`;
+    return bodyMap[type] || `${emoji} Update on ${entity.title}`;
   },
 
   /**
@@ -320,6 +372,11 @@ export const reminderNotificationsService = {
           id,
           title,
           emoji
+        ),
+        goal:goal_id (
+          id,
+          title,
+          description
         )
       `)
       .eq('user_id', userId)
@@ -485,36 +542,52 @@ export const reminderNotificationsService = {
    * Format notification message for display
    */
   formatNotificationMessage(notification: ReminderNotification): string {
-    const reminderTitle = notification.reminder?.title || 'A reminder';
-    const emoji = notification.reminder?.emoji || '🔔';
+    // Use custom title/message if provided, otherwise derive from entity
+    if (notification.title || notification.message) {
+      return notification.message || notification.title || 'Notification';
+    }
+
+    const isGoalNotification = notification.type.startsWith('goal_');
+    const entityTitle = isGoalNotification
+      ? (notification.goal?.title || 'A goal')
+      : (notification.reminder?.title || 'A reminder');
+    const emoji = isGoalNotification
+      ? '🎯'
+      : (notification.reminder?.emoji || '🔔');
 
     switch (notification.type) {
       case 'due':
-        return `${emoji} ${reminderTitle} is due now`;
+        return `${emoji} ${entityTitle} is due now`;
 
       case 'overdue':
-        return `${emoji} ${reminderTitle} is overdue`;
+        return `${emoji} ${entityTitle} is overdue`;
 
       case 'assigned':
-        return `${emoji} You were assigned to ${reminderTitle}`;
+        return `${emoji} You were assigned to ${entityTitle}`;
 
       case 'unassigned':
-        return `${emoji} You were unassigned from ${reminderTitle}`;
+        return `${emoji} You were unassigned from ${entityTitle}`;
 
       case 'mentioned':
-        return `${emoji} You were mentioned in ${reminderTitle}`;
+        return `${emoji} You were mentioned in ${entityTitle}`;
 
       case 'commented':
-        return `${emoji} New comment on ${reminderTitle}`;
+        return `${emoji} New comment on ${entityTitle}`;
 
       case 'completed':
-        return `${emoji} ${reminderTitle} was completed`;
+        return `${emoji} ${entityTitle} was completed`;
 
       case 'snoozed':
-        return `${emoji} ${reminderTitle} was snoozed`;
+        return `${emoji} ${entityTitle} was snoozed`;
+
+      case 'goal_checkin_due':
+        return `${emoji} Time to check in on "${entityTitle}"`;
+
+      case 'goal_checkin_overdue':
+        return `${emoji} Overdue check-in for "${entityTitle}"`;
 
       default:
-        return `${emoji} Update on ${reminderTitle}`;
+        return `${emoji} Update on ${entityTitle}`;
     }
   },
 
@@ -531,6 +604,8 @@ export const reminderNotificationsService = {
       commented: 'MessageSquare',
       completed: 'CheckCircle',
       snoozed: 'Clock',
+      goal_checkin_due: 'Target',
+      goal_checkin_overdue: 'AlertTriangle',
     };
 
     return iconMap[type] || 'Bell';
@@ -549,6 +624,8 @@ export const reminderNotificationsService = {
       commented: 'text-pink-600 dark:text-pink-400',
       completed: 'text-green-600 dark:text-green-400',
       snoozed: 'text-purple-600 dark:text-purple-400',
+      goal_checkin_due: 'text-indigo-600 dark:text-indigo-400',
+      goal_checkin_overdue: 'text-red-600 dark:text-red-400',
     };
 
     return colorMap[type] || 'text-gray-600 dark:text-gray-400';
