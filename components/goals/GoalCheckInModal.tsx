@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { X, Mic, MicOff, Upload, Camera, Plus, Trash2 } from 'lucide-react';
+import { X, Camera, Plus, Trash2 } from 'lucide-react';
 import { CreateCheckInInput } from '@/lib/services/goals-service';
+import { AdvancedVoiceRecorder } from './AdvancedVoiceRecorder';
+import { voiceTranscriptionService } from '@/lib/services/voice-transcription-service';
 
 // Mood emoji options
 const MOOD_OPTIONS = [
@@ -38,58 +40,44 @@ export function GoalCheckInModal({
     photos: [],
   });
 
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordingDuration, setRecordingDuration] = useState(0);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [voiceNoteBlob, setVoiceNoteBlob] = useState<Blob | null>(null);
+  const [voiceNoteDuration, setVoiceNoteDuration] = useState(0);
+  const [voiceNoteMetadata, setVoiceNoteMetadata] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
 
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
+  const handleVoiceNoteSent = async (audioBlob: Blob, duration: number, metadata?: any) => {
+    setVoiceNoteBlob(audioBlob);
+    setVoiceNoteDuration(duration);
+    setVoiceNoteMetadata(metadata);
+    setShowVoiceRecorder(false);
 
-      const chunks: Blob[] = [];
-      mediaRecorder.ondataavailable = (event) => {
-        chunks.push(event.data);
-      };
-
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'audio/webm' });
-        setAudioBlob(blob);
-        stream.getTracks().forEach(track => track.stop());
-      };
-
-      mediaRecorder.start();
-      setIsRecording(true);
-      setRecordingDuration(0);
-
-      intervalRef.current = setInterval(() => {
-        setRecordingDuration(prev => prev + 1);
-      }, 1000);
-    } catch (error) {
-      console.error('Error starting recording:', error);
-      alert('Could not access microphone. Please check permissions.');
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+    // Automatically transcribe if metadata is available
+    if (metadata && audioBlob) {
+      try {
+        const transcriptionResult = await voiceTranscriptionService.transcribeAudio(audioBlob);
+        setVoiceNoteMetadata(prev => ({
+          ...prev,
+          transcription: transcriptionResult.transcription,
+          confidence: transcriptionResult.confidence,
+          keywords: transcriptionResult.keywords
+        }));
+      } catch (error) {
+        console.error('Failed to transcribe voice note:', error);
       }
     }
   };
 
-  const removeRecording = () => {
-    setAudioBlob(null);
-    setRecordingDuration(0);
+  const handleVoiceNoteCancel = () => {
+    setShowVoiceRecorder(false);
+  };
+
+  const removeVoiceNote = () => {
+    setVoiceNoteBlob(null);
+    setVoiceNoteDuration(0);
+    setVoiceNoteMetadata(null);
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,11 +113,19 @@ export function GoalCheckInModal({
     setIsSubmitting(true);
 
     try {
-      // For now, we'll pass the data as-is
-      // In a real implementation, we'd upload the voice note and photos first
+      // Include voice note metadata in the check-in data
       const checkInData = {
         ...formData,
-        voice_note_duration: audioBlob ? recordingDuration : undefined,
+        voice_note_duration: voiceNoteBlob ? voiceNoteDuration : undefined,
+        voice_note_category: voiceNoteMetadata?.category || 'general',
+        voice_note_template_id: voiceNoteMetadata?.template || null,
+        voice_note_metadata: voiceNoteMetadata ? {
+          transcription: voiceNoteMetadata.transcription,
+          confidence: voiceNoteMetadata.confidence,
+          keywords: voiceNoteMetadata.keywords,
+          category: voiceNoteMetadata.category,
+          tags: voiceNoteMetadata.tags || []
+        } : {},
       };
 
       await onSave(checkInData);
@@ -280,54 +276,86 @@ export function GoalCheckInModal({
               Voice Note (Optional)
             </label>
 
-            {!audioBlob ? (
-              <div className="space-y-3">
-                <button
-                  type="button"
-                  onClick={isRecording ? stopRecording : startRecording}
-                  className={`w-full p-4 rounded-xl border-2 border-dashed transition-all flex items-center justify-center gap-3 ${
-                    isRecording
-                      ? 'border-red-300 bg-red-50 dark:bg-red-900/20 text-red-600'
-                      : 'border-gray-300 dark:border-gray-600 hover:border-blue-400 text-gray-600 dark:text-gray-400'
-                  }`}
-                >
-                  {isRecording ? (
-                    <>
-                      <MicOff className="w-5 h-5" />
-                      <span className="font-medium">Stop Recording ({formatDuration(recordingDuration)})</span>
-                    </>
-                  ) : (
-                    <>
-                      <Mic className="w-5 h-5" />
-                      <span>Record Voice Note</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            ) : (
-              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+            {!showVoiceRecorder && !voiceNoteBlob && (
+              <button
+                type="button"
+                onClick={() => setShowVoiceRecorder(true)}
+                className="w-full p-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-400 transition-all flex items-center justify-center gap-3 text-gray-600 dark:text-gray-400"
+              >
+                <Plus className="w-5 h-5" />
+                <span>Add Voice Check-In</span>
+              </button>
+            )}
+
+            {showVoiceRecorder && (
+              <AdvancedVoiceRecorder
+                onSendVoice={handleVoiceNoteSent}
+                onCancel={handleVoiceNoteCancel}
+                goalTitle={goalTitle}
+              />
+            )}
+
+            {voiceNoteBlob && !showVoiceRecorder && (
+              <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                      <Mic className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
+                      <Camera className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        Voice note recorded
+                      <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                        Advanced Voice Check-In
+                        {voiceNoteMetadata?.category && voiceNoteMetadata.category !== 'general' && (
+                          <span className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-md capitalize">
+                            {voiceNoteMetadata.category}
+                          </span>
+                        )}
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        Duration: {formatDuration(recordingDuration)}
+                      <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                        Duration: {formatDuration(voiceNoteDuration)}
+                        {voiceNoteMetadata?.transcription && (
+                          <>
+                            <span>•</span>
+                            <span>Transcribed</span>
+                          </>
+                        )}
+                        {voiceNoteMetadata?.template && (
+                          <>
+                            <span>•</span>
+                            <span>Template used</span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
                   <button
                     type="button"
-                    onClick={removeRecording}
+                    onClick={removeVoiceNote}
                     className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
+
+                {voiceNoteMetadata?.transcription && (
+                  <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-200 dark:border-blue-700">
+                    <div className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-1">
+                      Transcription ({Math.round((voiceNoteMetadata.confidence || 0) * 100)}% confidence):
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      {voiceNoteMetadata.transcription}
+                    </p>
+                    {voiceNoteMetadata.keywords && voiceNoteMetadata.keywords.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {voiceNoteMetadata.keywords.slice(0, 5).map((keyword: string, index: number) => (
+                          <span key={index} className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded">
+                            {keyword}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
