@@ -13,6 +13,7 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { SafeToSpendIndicator } from '@/components/projects/SafeToSpendIndicator';
 import { BillCard } from '@/components/projects/BillCard';
 import { NewBillModal } from '@/components/projects/NewBillModal';
+import { BillsList } from '@/components/budget/BillsList';
 import { BudgetTemplateModal } from '@/components/projects/BudgetTemplateModal';
 import { SpendingInsightsCard } from '@/components/projects/SpendingInsightsCard';
 import { ReceiptUploadModal } from '@/components/projects/ReceiptUploadModal';
@@ -555,29 +556,14 @@ export default function ProjectsPage() {
                 </div>
               )
             ) : activeTab === 'bills' ? (
-              filteredBills.length === 0 ? (
-                <div className="text-center py-12">
-                  <FileCheck className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No bills found</p>
-                  <button onClick={() => setIsBillModalOpen(true)} className="btn-touch shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
-                    <Plus className="w-5 h-5" />
-                    Create Bill
-                  </button>
-                </div>
-              ) : (
-                <div className="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                    {filteredBills.map((bill) => (
-                      <BillCard
-                        key={bill.id}
-                        bill={bill}
-                        onEdit={(b) => { setEditingBill(b); setIsBillModalOpen(true); }}
-                        onDelete={handleDeleteBill}
-                        onMarkPaid={handleMarkBillPaid}
-                      />
-                    ))}
-                  </div>
-                </div>
+              currentSpace && (
+                <BillsList
+                  spaceId={currentSpace.id}
+                  onEdit={(b) => { setEditingBill(b); setIsBillModalOpen(true); }}
+                  onDelete={handleDeleteBill}
+                  onMarkPaid={handleMarkBillPaid}
+                  onCreateNew={() => setIsBillModalOpen(true)}
+                />
               )
             ) : activeTab === 'expenses' ? (
               filteredExpenses.length === 0 ? (
