@@ -54,7 +54,10 @@ import {
   DollarSign,
   Target,
   Clock,
-  BookOpen
+  BookOpen,
+  ShoppingBag,
+  Home,
+  Heart
 } from 'lucide-react';
 
 type SettingsTab = 'profile' | 'security' | 'notifications' | 'privacy' | 'documentation' | 'spaces' | 'analytics' | 'data' | 'help';
@@ -104,6 +107,109 @@ const mockSpaceMembers: SpaceMember[] = [
 // Mock pending invitations
 const mockPendingInvitations = [
   { email: 'newuser@example.com', role: 'Member', sentAt: '2 days ago' },
+];
+
+// Documentation features array
+const documentationFeatures = [
+  {
+    id: 'tasks',
+    name: 'Tasks & Chores',
+    description: 'Manage daily tasks and household chores with smart features',
+    icon: CheckSquare,
+    color: 'from-blue-500 to-blue-600',
+    hoverBorder: 'hover:border-blue-500',
+    hoverShadow: 'hover:shadow-blue-500/50',
+    href: '/settings/documentation/tasks-chores',
+    available: true,
+  },
+  {
+    id: 'calendar',
+    name: 'Calendar & Events',
+    description: 'Master your schedule with shared calendar features',
+    icon: Calendar,
+    color: 'from-purple-500 to-purple-600',
+    hoverBorder: 'hover:border-purple-500',
+    hoverShadow: 'hover:shadow-purple-500/50',
+    href: '/settings/documentation/calendar',
+    available: true,
+  },
+  {
+    id: 'reminders',
+    name: 'Reminders',
+    description: 'Set up and manage reminders for important tasks',
+    icon: Bell,
+    color: 'from-pink-500 to-pink-600',
+    hoverBorder: 'hover:border-pink-500',
+    hoverShadow: 'hover:shadow-pink-500/50',
+    href: '/settings/documentation/reminders',
+    available: true,
+  },
+  {
+    id: 'messages',
+    name: 'Messages',
+    description: 'Communicate effectively with your partner',
+    icon: MessageSquare,
+    color: 'from-green-500 to-green-600',
+    hoverBorder: 'hover:border-green-500',
+    hoverShadow: 'hover:shadow-green-500/50',
+    href: '/settings/documentation/messages',
+    available: true,
+  },
+  {
+    id: 'shopping',
+    name: 'Shopping Lists',
+    description: 'Create and share shopping lists with ease',
+    icon: ShoppingBag,
+    color: 'from-emerald-500 to-emerald-600',
+    hoverBorder: 'hover:border-emerald-500',
+    hoverShadow: 'hover:shadow-emerald-500/50',
+    href: '/settings/documentation/shopping',
+    available: true,
+  },
+  {
+    id: 'meals',
+    name: 'Meal Planning',
+    description: 'Plan meals, discover recipes, and generate shopping lists',
+    icon: UtensilsCrossed,
+    color: 'from-orange-500 to-orange-600',
+    hoverBorder: 'hover:border-orange-500',
+    hoverShadow: 'hover:shadow-orange-500/50',
+    href: '/settings/documentation/meals',
+    available: true,
+  },
+  {
+    id: 'goals',
+    name: 'Goals & Planning',
+    description: 'Set and track your shared goals and milestones',
+    icon: Target,
+    color: 'from-indigo-500 to-indigo-600',
+    hoverBorder: 'hover:border-indigo-500',
+    hoverShadow: 'hover:shadow-indigo-500/50',
+    href: '/settings/documentation/goals',
+    available: true,
+  },
+  {
+    id: 'checkin',
+    name: 'Daily Check-In',
+    description: 'Track emotional wellness and connect with your partner',
+    icon: Heart,
+    color: 'from-pink-500 to-purple-500',
+    hoverBorder: 'hover:border-pink-500',
+    hoverShadow: 'hover:shadow-pink-500/50',
+    href: '/settings/documentation/checkin',
+    available: true,
+  },
+  {
+    id: 'household',
+    name: 'Household Management',
+    description: 'Manage chores, maintenance, and household tasks',
+    icon: Home,
+    color: 'from-amber-500 to-amber-600',
+    hoverBorder: 'hover:border-amber-500',
+    hoverShadow: 'hover:shadow-amber-500/50',
+    href: '/settings/documentation/household',
+    available: false,
+  },
 ];
 
 export default function SettingsPage() {
@@ -1535,82 +1641,79 @@ export default function SettingsPage() {
                   </div>
                 )}
 
-                {/* Documentation Tab */}
+                {/* Documentation Tab - Direct Feature Cards */}
                 {activeTab === 'documentation' && (
                   <div className="space-y-6 sm:space-y-8">
                     <div>
                       <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Documentation</h2>
-                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Browse our guides and tutorials</p>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Choose a feature to learn about. Comprehensive guides for all Rowan features.</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                      <Link href="/settings/documentation" className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg transition-shadow">
-                        <div className="flex items-start gap-3 mb-3">
-                          <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                            <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">User Guides</h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Step-by-step tutorials for all features</p>
-                          </div>
-                        </div>
-                      </Link>
+                    {/* Features Grid - Optimized for 9 cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                      {documentationFeatures.map((feature) => {
+                        const Icon = feature.icon;
+                        const isAvailable = feature.available;
 
-                      <Link href="/settings/documentation" className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg transition-shadow">
-                        <div className="flex items-start gap-3 mb-3">
-                          <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                            <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Quick Start</h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Get up and running in minutes</p>
-                          </div>
-                        </div>
-                      </Link>
-
-                      <Link href="/settings/documentation" className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg transition-shadow">
-                        <div className="flex items-start gap-3 mb-3">
-                          <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                            <Target className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Best Practices</h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Tips and tricks for productivity</p>
-                          </div>
-                        </div>
-                      </Link>
-
-                      <Link href="/settings/documentation" className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg transition-shadow">
-                        <div className="flex items-start gap-3 mb-3">
-                          <div className="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-                            <AlertTriangle className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Troubleshooting</h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Solutions to common issues</p>
-                          </div>
-                        </div>
-                      </Link>
+                        if (isAvailable) {
+                          return (
+                            <Link
+                              key={feature.id}
+                              href={feature.href}
+                              className={`group relative p-6 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-2 border-gray-200/60 dark:border-gray-700/60 ${feature.hoverBorder} ${feature.hoverShadow} rounded-2xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 hover:scale-105`}
+                            >
+                              <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4 shadow-lg`}>
+                                <Icon className="w-7 h-7 text-white" />
+                              </div>
+                              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                                {feature.name}
+                              </h3>
+                              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                                {feature.description}
+                              </p>
+                              <div className="flex items-center text-sm font-semibold text-purple-600 dark:text-purple-400">
+                                Read guides
+                                <span className="ml-2 group-hover:translate-x-2 transition-transform duration-300">→</span>
+                              </div>
+                            </Link>
+                          );
+                        } else {
+                          return (
+                            <div
+                              key={feature.id}
+                              className="relative p-6 bg-white/40 dark:bg-gray-900/40 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-2xl opacity-60"
+                            >
+                              <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} opacity-50 flex items-center justify-center mb-4`}>
+                                <Icon className="w-7 h-7 text-white" />
+                              </div>
+                              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                                {feature.name}
+                              </h3>
+                              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                                {feature.description}
+                              </p>
+                              <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+                                Coming Soon
+                              </div>
+                            </div>
+                          );
+                        }
+                      })}
                     </div>
 
-                    <div className="p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                          <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Need More Help?</h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                            Can't find what you're looking for? Our comprehensive documentation covers everything from basic setup to advanced features.
-                          </p>
-                          <Link
-                            href="/settings/documentation"
-                            className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm"
-                          >
-                            Browse Full Documentation
-                            <ArrowRight className="w-4 h-4" />
-                          </Link>
-                        </div>
+                    {/* Help Section */}
+                    <div className="mt-16 max-w-2xl mx-auto text-center">
+                      <div className="p-8 bg-purple-50/80 dark:bg-purple-900/50 backdrop-blur-sm border border-purple-200/60 dark:border-purple-800/60 rounded-2xl shadow-lg">
+                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Need More Help?</h3>
+                        <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+                          Can't find what you're looking for? Our support team is here to help you get the most out of Rowan.
+                        </p>
+                        <Link
+                          href="/settings/support"
+                          className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-colors text-sm font-semibold shadow-lg hover:shadow-xl"
+                        >
+                          Contact Support
+                        </Link>
                       </div>
                     </div>
                   </div>
