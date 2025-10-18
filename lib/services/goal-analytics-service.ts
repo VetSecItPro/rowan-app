@@ -57,11 +57,11 @@ export async function getGoalAnalytics(
     // Fetch goal check-ins for activity analysis
     const { data: checkIns, error: checkInsError } = await supabase
       .from('goal_check_ins')
-      .select('*, goals!inner(space_id)')
-      .eq('goals.space_id', spaceId)
-      .gte('check_in_date', startDate.toISOString())
-      .lte('check_in_date', endDate.toISOString())
-      .order('check_in_date', { ascending: true });
+      .select('*, goal:goals!inner(space_id)')
+      .eq('goal.space_id', spaceId)
+      .gte('created_at', startDate.toISOString())
+      .lte('created_at', endDate.toISOString())
+      .order('created_at', { ascending: true });
 
     if (checkInsError) throw checkInsError;
 
@@ -179,7 +179,7 @@ function calculateActivityHeatmap(checkIns: any[], startDate: Date, endDate: Dat
 
   // Count check-ins per day
   checkIns.forEach(checkIn => {
-    const dateStr = format(new Date(checkIn.check_in_date), 'yyyy-MM-dd');
+    const dateStr = format(new Date(checkIn.created_at), 'yyyy-MM-dd');
     if (dailyActivity[dateStr] !== undefined) {
       dailyActivity[dateStr]++;
     }
@@ -269,7 +269,7 @@ function calculateProgressTrend(checkIns: any[], startDate: Date, endDate: Date)
 
   // Group check-ins by week
   checkIns.forEach(checkIn => {
-    const weekStart = startOfWeek(new Date(checkIn.check_in_date));
+    const weekStart = startOfWeek(new Date(checkIn.created_at));
     const weekStr = format(weekStart, 'MMM dd');
 
     if (!weeklyProgress[weekStr]) {

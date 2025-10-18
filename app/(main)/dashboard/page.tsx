@@ -1015,9 +1015,6 @@ export default function DashboardPage() {
               <CTAButton
                 onClick={() => setShowCreateSpaceModal(true)}
                 feature="dashboard"
-                breathing
-                magnetic
-                ripple
                 animationLevel="premium"
                 icon={<Plus className="w-4 h-4" />}
                 size="md"

@@ -120,6 +120,7 @@ export interface CreateVendorInput {
   rating?: number;
   notes?: string;
   is_preferred?: boolean;
+  is_active?: boolean;
   created_by: string;
 }
 

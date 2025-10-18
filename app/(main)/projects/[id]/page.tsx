@@ -33,7 +33,7 @@ type TabType = 'overview' | 'expenses' | 'photos';
 export default function ProjectDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const projectId = params.id as string;
+  const projectId = params?.id as string | undefined;
 
   const [project, setProject] = useState<Project | null>(null);
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -47,6 +47,8 @@ export default function ProjectDetailPage() {
   }, [projectId]);
 
   const loadProjectData = async () => {
+    if (!projectId) return;
+
     try {
       setLoading(true);
       setError(null);
@@ -72,6 +74,8 @@ export default function ProjectDetailPage() {
     if (!confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
       return;
     }
+
+    if (!projectId) return;
 
     try {
       await deleteProject(projectId);
@@ -368,7 +372,7 @@ export default function ProjectDetailPage() {
                         <div className="flex-1">
                           <p className="font-medium text-gray-900 dark:text-white">{expense.description}</p>
                           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                            {new Date(expense.date).toLocaleDateString()} • {expense.category}
+                            {expense.date ? new Date(expense.date).toLocaleDateString() : 'N/A'} • {expense.category}
                           </p>
                         </div>
                         <p className="text-lg font-bold text-gray-900 dark:text-white">

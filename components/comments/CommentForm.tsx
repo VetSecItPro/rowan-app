@@ -216,8 +216,6 @@ export default function CommentForm({
             disabled={!content.trim() || isSubmitting}
             feature="messages"
             size="sm"
-            breathing
-            ripple
             icon={<Send className="w-4 h-4" />}
           >
             {isSubmitting ? 'Posting...' : 'Post'}

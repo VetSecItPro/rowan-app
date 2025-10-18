@@ -276,10 +276,11 @@ export async function getMentionableUsers(
     .from('space_members')
     .select(`
       user_id,
-      users!user_id (
+      users!inner (
         id,
+        name,
         email,
-        raw_user_meta_data
+        color_theme
       )
     `)
     .eq('space_id', spaceId);
@@ -297,7 +298,7 @@ export async function getMentionableUsers(
 
       return {
         user_id: user.id,
-        display_name: user.raw_user_meta_data?.full_name || user.email.split('@')[0],
+        display_name: user.name || user.email.split('@')[0],
         email: user.email,
       };
     })

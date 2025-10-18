@@ -394,8 +394,6 @@ export default function RemindersPage(): JSX.Element {
                   <CTAButton
                     onClick={handleOpenModal}
                     feature="reminders"
-                    breathing
-                    ripple
                     icon={<Plus className="w-5 h-5" />}
                     className="flex-1 sm:flex-none px-4 py-2 sm:px-6 sm:py-3"
                   >
@@ -884,8 +882,6 @@ export default function RemindersPage(): JSX.Element {
                     <CTAButton
                       onClick={handleOpenModal}
                       feature="reminders"
-                      breathing
-                      ripple
                       icon={<Plus className="w-5 h-5" />}
                     >
                       Create Reminder

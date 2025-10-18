@@ -315,7 +315,7 @@ export default function VendorManagementPage() {
                 >
                   <option value="all">All Trades</option>
                   {trades.map((trade) => (
-                    <option key={trade} value={trade}>
+                    <option key={trade} value={trade || ''}>
                       {trade}
                     </option>
                   ))}
