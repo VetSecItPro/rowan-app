@@ -52,14 +52,8 @@ export function BillsList({
       setLoading(true);
       setError(null);
 
-      // Service layer automatically enforces RLS via space_id filter
-      let fetchedBills: Bill[];
-      if (statusFilter === 'all') {
-        fetchedBills = await getBills(spaceId);
-      } else {
-        fetchedBills = await getBillsByStatus(spaceId, statusFilter);
-      }
-
+      // Always fetch all bills and filter locally for optimistic UI
+      const fetchedBills = await getBills(spaceId);
       setBills(fetchedBills);
     } catch (err) {
       console.error('Error fetching bills:', err);
@@ -78,7 +72,7 @@ export function BillsList({
     }
 
     fetchBills();
-  }, [spaceId, statusFilter]);
+  }, [spaceId]);
 
   // Real-time subscription with RLS security
   useEffect(() => {
@@ -104,11 +98,16 @@ export function BillsList({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [spaceId, statusFilter]);
+  }, [spaceId]);
 
   // Filter and sort bills
   const processedBills = useMemo(() => {
     let filtered = [...bills];
+
+    // Status filter (optimistic - no refetch)
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter((bill) => bill.status === statusFilter);
+    }
 
     // Search filter (case-insensitive, sanitized)
     if (searchQuery.trim()) {
@@ -141,7 +140,7 @@ export function BillsList({
     });
 
     return filtered;
-  }, [bills, searchQuery, sortBy, sortDirection]);
+  }, [bills, statusFilter, searchQuery, sortBy, sortDirection]);
 
   // Toggle sort direction
   const toggleSort = (option: SortOption) => {
@@ -206,85 +205,88 @@ export function BillsList({
           />
         </div>
 
-        {/* Status Filter */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            <Filter className="w-4 h-4 inline mr-1" />
-            Filter by Status
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {statusOptions.map((option) => (
+        {/* Filter and Sort Controls - Same Line */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+          {/* Status Filter */}
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <Filter className="w-4 h-4 inline mr-1" />
+              Filter by Status
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {statusOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => setStatusFilter(option.value)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    statusFilter === option.value
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Sort Options - Right Justified */}
+          <div className="flex-shrink-0">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Sort By
+            </label>
+            <div className="flex flex-wrap gap-2">
               <button
-                key={option.value}
-                onClick={() => setStatusFilter(option.value)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  statusFilter === option.value
+                onClick={() => toggleSort('due_date')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+                  sortBy === 'due_date'
                     ? 'bg-blue-500 text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
-                {option.label}
+                <Calendar className="w-4 h-4" />
+                Due Date
+                {sortBy === 'due_date' &&
+                  (sortDirection === 'asc' ? (
+                    <SortAsc className="w-4 h-4" />
+                  ) : (
+                    <SortDesc className="w-4 h-4" />
+                  ))}
               </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Sort Options */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Sort By
-          </label>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => toggleSort('due_date')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-                sortBy === 'due_date'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
-            >
-              <Calendar className="w-4 h-4" />
-              Due Date
-              {sortBy === 'due_date' &&
-                (sortDirection === 'asc' ? (
-                  <SortAsc className="w-4 h-4" />
-                ) : (
-                  <SortDesc className="w-4 h-4" />
-                ))}
-            </button>
-            <button
-              onClick={() => toggleSort('amount')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-                sortBy === 'amount'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
-            >
-              <DollarSign className="w-4 h-4" />
-              Amount
-              {sortBy === 'amount' &&
-                (sortDirection === 'asc' ? (
-                  <SortAsc className="w-4 h-4" />
-                ) : (
-                  <SortDesc className="w-4 h-4" />
-                ))}
-            </button>
-            <button
-              onClick={() => toggleSort('name')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-                sortBy === 'name'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
-            >
-              Name
-              {sortBy === 'name' &&
-                (sortDirection === 'asc' ? (
-                  <SortAsc className="w-4 h-4" />
-                ) : (
-                  <SortDesc className="w-4 h-4" />
-                ))}
-            </button>
+              <button
+                onClick={() => toggleSort('amount')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+                  sortBy === 'amount'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                <DollarSign className="w-4 h-4" />
+                Amount
+                {sortBy === 'amount' &&
+                  (sortDirection === 'asc' ? (
+                    <SortAsc className="w-4 h-4" />
+                  ) : (
+                    <SortDesc className="w-4 h-4" />
+                  ))}
+              </button>
+              <button
+                onClick={() => toggleSort('name')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+                  sortBy === 'name'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                Name
+                {sortBy === 'name' &&
+                  (sortDirection === 'asc' ? (
+                    <SortAsc className="w-4 h-4" />
+                  ) : (
+                    <SortDesc className="w-4 h-4" />
+                  ))}
+              </button>
+            </div>
           </div>
         </div>
       </div>
