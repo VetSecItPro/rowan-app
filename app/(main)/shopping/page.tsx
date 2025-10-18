@@ -24,6 +24,7 @@ export default function ShoppingPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingList, setEditingList] = useState<ShoppingList | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed'>('active');
   const [timeFilter, setTimeFilter] = useState<'all' | 'week'>('all');
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
@@ -349,12 +350,23 @@ export default function ShoppingPage() {
 
   // Memoized callback for search input change
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    // Handle typing animation
+    if (value.length > 0) {
+      setIsSearchTyping(true);
+      const timeoutId = setTimeout(() => setIsSearchTyping(false), 1000);
+      return () => clearTimeout(timeoutId);
+    } else {
+      setIsSearchTyping(false);
+    }
   }, []);
 
   // Memoized callback for clearing search
   const handleClearSearch = useCallback(() => {
     setSearchQuery('');
+    setIsSearchTyping(false);
   }, []);
 
   // Memoized callbacks for stat card clicks
@@ -689,11 +701,11 @@ export default function ShoppingPage() {
             />
           )}
 
-          {/* Search Bar - Only show when NOT in guided flow */}
+          {/* Apple-Inspired Search Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <div className="apple-search-container">
+              <Search className="apple-search-icon" />
               <input
                 type="search"
                 inputMode="search"
@@ -706,15 +718,15 @@ export default function ShoppingPage() {
                 value={searchQuery}
                 onChange={handleSearchChange}
 
-                className="w-full pl-10 pr-10 py-3 text-base md:pl-10 md:pr-10 md:py-2 md:text-sm bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-lg focus:ring-2 focus:ring-emerald-500/50 focus:border-transparent text-gray-900 dark:text-white"
+                className={`apple-search-input w-full ${isSearchTyping ? 'typing' : ''}`}
               />
               {searchQuery && (
                 <button
                   onClick={handleClearSearch}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-12 h-12 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
+                  className={`apple-search-clear ${searchQuery ? 'visible' : ''}`}
                   aria-label="Clear search"
                 >
-                  <X className="w-5 h-5 md:w-4 md:h-4 text-gray-400" />
+                  <X className="w-4 h-4" />
                 </button>
               )}
             </div>

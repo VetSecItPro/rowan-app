@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, Home, Filter, Download, Repeat, FileText, Zap, TrendingUp, TrendingDown, Minus, ChevronDown } from 'lucide-react';
+import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, Home, Filter, Download, Repeat, FileText, Zap, TrendingUp, TrendingDown, Minus, ChevronDown, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { TaskCard } from '@/components/tasks/TaskCard';
@@ -46,6 +46,7 @@ export default function TasksPage() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [editingChore, setEditingChore] = useState<Chore | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [activeTab, setActiveTab] = useState<TaskType>('task');
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
@@ -303,7 +304,17 @@ export default function TasksPage() {
   }, []);
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    // Handle typing animation
+    if (value.length > 0) {
+      setIsSearchTyping(true);
+      const timeoutId = setTimeout(() => setIsSearchTyping(false), 1000);
+      return () => clearTimeout(timeoutId);
+    } else {
+      setIsSearchTyping(false);
+    }
   }, []);
 
   const handleStatusFilterChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -522,11 +533,11 @@ export default function TasksPage() {
           </div>
           )}
 
-          {/* Search Bar - Only show when NOT in guided flow */}
+          {/* Apple-Inspired Search Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <div className="apple-search-container">
+              <Search className="apple-search-icon" />
               <input
                 type="search"
                 inputMode="search"
@@ -539,8 +550,20 @@ export default function TasksPage() {
                 value={searchQuery}
                 onChange={handleSearchChange}
 
-                className="w-full pl-10 pr-4 py-3 text-base md:pl-10 md:pr-4 md:py-2 md:text-sm bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg focus:ring-2 focus:ring-purple-500/50 focus:border-transparent text-gray-900 dark:text-white shadow-lg"
+                className={`apple-search-input w-full ${isSearchTyping ? 'typing' : ''}`}
               />
+              {searchQuery && (
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setIsSearchTyping(false);
+                  }}
+                  className={`apple-search-clear ${searchQuery ? 'visible' : ''}`}
+                  aria-label="Clear search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
             </div>
           </div>
           )}

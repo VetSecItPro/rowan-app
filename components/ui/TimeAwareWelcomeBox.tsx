@@ -112,14 +112,57 @@ export function TimeAwareWelcomeBox({
         </div>
       </div>
 
-      {/* Subtle particle effect overlay */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-white/30 rounded-full animate-ping"
-             style={{ animationDelay: '0s', animationDuration: '3s' }} />
-        <div className="absolute top-3/4 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-ping"
-             style={{ animationDelay: '1s', animationDuration: '4s' }} />
-        <div className="absolute bottom-1/4 left-3/4 w-1 h-1 bg-white/25 rounded-full animate-ping"
-             style={{ animationDelay: '2s', animationDuration: '5s' }} />
+      {/* Magical Time-Aware Animation Effects */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Morning - Flying Birds */}
+        {timePeriod === 'morning' && (
+          <>
+            <div className="flying-bird" />
+            <div className="flying-bird" />
+            <div className="flying-bird" />
+          </>
+        )}
+
+        {/* Night - Twinkling Stars */}
+        {timePeriod === 'night' && (
+          <>
+            <div className="twinkling-star" />
+            <div className="twinkling-star" />
+            <div className="twinkling-star" />
+            <div className="twinkling-star" />
+            <div className="twinkling-star" />
+          </>
+        )}
+
+        {/* Afternoon - Floating Clouds */}
+        {timePeriod === 'afternoon' && (
+          <>
+            <div className="floating-cloud" />
+            <div className="floating-cloud" />
+          </>
+        )}
+
+        {/* Evening - Dancing Fireflies */}
+        {timePeriod === 'evening' && (
+          <>
+            <div className="dancing-firefly" />
+            <div className="dancing-firefly" />
+            <div className="dancing-firefly" />
+            <div className="dancing-firefly" />
+          </>
+        )}
+
+        {/* Family Love Hearts (Always Present) */}
+        <div className="floating-heart" />
+        <div className="floating-heart" />
+
+        {/* Enhanced Magical Particles */}
+        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white/30 rounded-full magical-particle"
+             style={{ animationDelay: '0s' }} />
+        <div className="absolute top-3/4 right-1/3 w-1 h-1 bg-white/40 rounded-full magical-particle"
+             style={{ animationDelay: '2s' }} />
+        <div className="absolute bottom-1/4 left-3/4 w-1.5 h-1.5 bg-white/35 rounded-full magical-particle"
+             style={{ animationDelay: '4s' }} />
       </div>
     </div>
   );
