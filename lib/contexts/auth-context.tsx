@@ -52,9 +52,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function trackUserSession() {
     try {
-      await fetch('/api/user/track-session', {
+      console.log('Tracking user session...');
+      const response = await fetch('/api/user/track-session', {
         method: 'POST',
       });
+      const result = await response.json();
+      console.log('Session tracking response:', result);
     } catch (error) {
       console.error('Error tracking session:', error);
     }
