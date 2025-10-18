@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle, GitBranch, X, BarChart3 } from 'lucide-react';
+import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle, GitBranch, X, BarChart3, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -687,6 +687,13 @@ export default function GoalsPage() {
               >
                 <BarChart3 className="w-5 h-5" />
                 <span>Analytics</span>
+              </Link>
+              <Link
+                href="/goals/calendar"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+              >
+                <Calendar className="w-5 h-5" />
+                <span>Calendar</span>
               </Link>
               <button
                 onClick={handleNewButtonClick}
