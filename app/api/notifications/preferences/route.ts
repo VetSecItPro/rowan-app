@@ -7,31 +7,33 @@ import { z } from 'zod';
 
 /**
  * Notification Preferences Schema
- * Validates all notification preference fields
+ * Validates all notification preference fields - Updated for comprehensive notification system
  */
 const NotificationPreferencesSchema = z.object({
-  // Email preferences
-  email_enabled: z.boolean().optional(),
-  email_reminders: z.boolean().optional(),
+  // Email Notifications
   email_task_assignments: z.boolean().optional(),
-  email_events: z.boolean().optional(),
+  email_event_reminders: z.boolean().optional(),
+  email_new_messages: z.boolean().optional(),
   email_shopping_lists: z.boolean().optional(),
   email_meal_reminders: z.boolean().optional(),
-  email_messages: z.boolean().optional(),
-  email_digest_frequency: z.enum(['realtime', 'daily', 'weekly', 'never']).optional(),
+  email_general_reminders: z.boolean().optional(),
 
-  // Push preferences
+  // Push Notifications
   push_enabled: z.boolean().optional(),
+  push_task_updates: z.boolean().optional(),
   push_reminders: z.boolean().optional(),
-  push_tasks: z.boolean().optional(),
   push_messages: z.boolean().optional(),
   push_shopping_updates: z.boolean().optional(),
-  push_events: z.boolean().optional(),
+  push_event_alerts: z.boolean().optional(),
 
-  // Quiet hours
+  // Digest Settings
+  digest_frequency: z.enum(['realtime', 'daily', 'weekly']).optional(),
+  digest_time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/).optional(), // HH:MM:SS format
+
+  // Quiet Hours
   quiet_hours_enabled: z.boolean().optional(),
-  quiet_hours_start: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).optional(), // HH:MM format
-  quiet_hours_end: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).optional(), // HH:MM format
+  quiet_hours_start: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/).optional(), // HH:MM:SS format
+  quiet_hours_end: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/).optional(), // HH:MM:SS format
   timezone: z.string().optional(),
 });
 
@@ -72,7 +74,7 @@ export async function GET(req: NextRequest) {
 
     // Get notification preferences
     const { data: preferences, error } = await supabase
-      .from('notification_preferences')
+      .from('user_notification_preferences')
       .select('*')
       .eq('user_id', session.user.id)
       .maybeSingle();
@@ -84,7 +86,7 @@ export async function GET(req: NextRequest) {
     // If no preferences exist, create default ones
     if (!preferences) {
       const { data: newPreferences, error: createError } = await supabase
-        .from('notification_preferences')
+        .from('user_notification_preferences')
         .insert({
           user_id: session.user.id,
         })
@@ -177,7 +179,7 @@ export async function PATCH(req: NextRequest) {
 
     // Update preferences (upsert to handle if not exists)
     const { data: updatedPreferences, error } = await supabase
-      .from('notification_preferences')
+      .from('user_notification_preferences')
       .upsert(
         {
           user_id: session.user.id,
