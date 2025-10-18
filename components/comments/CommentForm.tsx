@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { Send } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 
 interface CommentFormProps {
   onSubmit: (content: string) => Promise<void>;
@@ -199,22 +201,27 @@ export default function CommentForm({
         </p>
         <div className="flex gap-2">
           {onCancel && (
-            <button
+            <SecondaryButton
               type="button"
               onClick={onCancel}
               disabled={isSubmitting}
-              className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              feature="messages"
+              size="sm"
             >
               Cancel
-            </button>
+            </SecondaryButton>
           )}
-          <button
+          <CTAButton
             type="submit"
             disabled={!content.trim() || isSubmitting}
-            className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 dark:bg-blue-500 dark:hover:bg-blue-600"
+            feature="messages"
+            size="sm"
+            breathing
+            ripple
+            icon={<Send className="w-4 h-4" />}
           >
             {isSubmitting ? 'Posting...' : 'Post'}
-          </button>
+          </CTAButton>
         </div>
       </div>
     </form>

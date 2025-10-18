@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X, Repeat } from 'lucide-react';
 import { taskRecurrenceService, RecurringTaskInput } from '@/lib/services/task-recurrence-service';
+import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 
 interface RecurringTaskModalProps {
   isOpen: boolean;
@@ -125,12 +126,22 @@ export function RecurringTaskModal({ isOpen, onClose, onSave, spaceId, userId }:
           )}
 
           <div className="flex justify-end gap-3 pt-4">
-            <button type="button" onClick={onClose} className="px-6 py-2 bg-gray-200 rounded-lg">
+            <SecondaryButton
+              type="button"
+              onClick={onClose}
+              feature="tasks"
+            >
               Cancel
-            </button>
-            <button type="submit" className="px-6 py-2 bg-blue-500 text-white rounded-lg">
+            </SecondaryButton>
+            <CTAButton
+              type="submit"
+              feature="tasks"
+              breathing
+              ripple
+              icon={<Repeat className="w-4 h-4" />}
+            >
               Create Recurring Task
-            </button>
+            </CTAButton>
           </div>
         </form>
       </div>

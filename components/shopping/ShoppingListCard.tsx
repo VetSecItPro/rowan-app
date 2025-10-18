@@ -97,7 +97,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                 className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
                   list.status === 'completed'
                     ? 'bg-green-500 border-green-500 cursor-not-allowed'
-                    : 'border-emerald-400 dark:border-emerald-500 hover:border-emerald-600 dark:hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 cursor-pointer active:scale-95'
+                    : 'border-emerald-400 dark:border-emerald-500 hover:border-emerald-600 dark:hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 cursor-pointer active:scale-95 hover:scale-110 shopping-status-toggle shopping-magnetic-hover shopping-ripple-effect'
                 }`}
               >
                 {list.status === 'completed' && <Check className="w-4 h-4 text-white" />}
@@ -150,11 +150,11 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                         <button
                           onClick={() => onToggleItem?.(item.id, !item.checked)}
                           aria-label={`Toggle item: ${item.name}`}
-                          className={`flex-shrink-0 w-4 h-4 rounded border-2 flex items-center justify-center transition-all active:scale-95 ${
+                          className={`flex-shrink-0 w-4 h-4 rounded border-2 flex items-center justify-center transition-all active:scale-95 hover:scale-110 ${
                             item.checked
                               ? 'bg-green-500 border-green-500'
                               : 'border-gray-300 dark:border-gray-600 hover:border-emerald-500'
-                          }`}
+                          } shopping-item-toggle shopping-magnetic-hover shopping-ripple-effect`}
                         >
                           {item.checked && <Check className="w-3 h-3 text-white" />}
                         </button>
@@ -173,7 +173,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                               <button
                                 onClick={() => onUpdateQuantity(item.id, Math.max(1, Number(item.quantity) - 1))}
                                 disabled={Number(item.quantity) <= 1}
-                                className="w-5 h-5 flex-shrink-0 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
+                                className="w-5 h-5 flex-shrink-0 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 hover:scale-110 shopping-quantity-btn shopping-magnetic-hover shopping-ripple-effect"
                                 aria-label="Decrease quantity"
                               >
                                 <span className="text-xs font-bold text-gray-600 dark:text-gray-300">−</span>
@@ -193,7 +193,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                               <button
                                 onClick={() => onUpdateQuantity(item.id, Math.min(200, Number(item.quantity) + 1))}
                                 disabled={Number(item.quantity) >= 200}
-                                className="w-5 h-5 flex-shrink-0 rounded bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-800/50 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
+                                className="w-5 h-5 flex-shrink-0 rounded bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-800/50 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 hover:scale-110 shopping-quantity-btn shopping-magnetic-hover shopping-ripple-effect"
                                 aria-label="Increase quantity"
                               >
                                 <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">+</span>

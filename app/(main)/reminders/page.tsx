@@ -12,6 +12,7 @@ import { useAuth } from '@/lib/contexts/auth-context';
 import { remindersService, Reminder, CreateReminderInput } from '@/lib/services/reminders-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { reminderTemplatesService, ReminderTemplate } from '@/lib/services/reminder-templates-service';
+import { CTAButton } from '@/components/ui/EnhancedButton';
 
 export default function RemindersPage(): JSX.Element {
   const { currentSpace, user } = useAuth();
@@ -387,13 +388,16 @@ export default function RemindersPage(): JSX.Element {
                       <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
                     </div>
                   </button>
-                  <button
+                  <CTAButton
                     onClick={handleOpenModal}
-                    className="flex-1 sm:flex-none px-4 py-2 sm:px-6 sm:py-3 shimmer-reminders text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                    feature="reminders"
+                    breathing
+                    ripple
+                    icon={<Plus className="w-5 h-5" />}
+                    className="flex-1 sm:flex-none px-4 py-2 sm:px-6 sm:py-3"
                   >
-                    <Plus className="w-5 h-5" />
                     New Reminder
-                  </button>
+                  </CTAButton>
                 </>
               ) : (
                 <button
@@ -874,13 +878,15 @@ export default function RemindersPage(): JSX.Element {
                 </p>
                 {!searchQuery && statusFilter === 'all' && (
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <button
+                    <CTAButton
                       onClick={handleOpenModal}
-                      className="btn-touch shimmer-reminders text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                      feature="reminders"
+                      breathing
+                      ripple
+                      icon={<Plus className="w-5 h-5" />}
                     >
-                      <Plus className="w-5 h-5" />
                       Create Reminder
-                    </button>
+                    </CTAButton>
                     {!hasCompletedGuide && (
                       <button
                         onClick={() => setShowGuidedFlow(true)}

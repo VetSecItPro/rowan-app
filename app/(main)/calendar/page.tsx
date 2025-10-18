@@ -16,6 +16,7 @@ import { TemplateLibrary } from '@/components/calendar/TemplateLibrary';
 import { WeatherBadge } from '@/components/calendar/WeatherBadge';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
+import { CTAButton } from '@/components/ui/EnhancedButton';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
 import { useCalendarShortcuts } from '@/lib/hooks/useCalendarShortcuts';
@@ -512,32 +513,35 @@ export default function CalendarPage() {
               </div>
 
               {/* Dynamic Action Button - Fixed size to accommodate longest text */}
-              <button
+              <CTAButton
                 onClick={() => {
                   if (activeAction === 'quick-add') setIsQuickAddOpen(true);
                   else if (activeAction === 'templates') setIsTemplateLibraryOpen(true);
                   else if (activeAction === 'propose') setIsProposalModalOpen(true);
                   else setIsModalOpen(true);
                 }}
-                className="px-4 sm:px-4 py-2 sm:py-3 shimmer-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 w-full sm:w-[165px]"
+                feature="calendar"
+                breathing
+                ripple
+                className="px-4 sm:px-4 py-2 sm:py-3 w-full sm:w-[165px]"
                 title={
                   activeAction === 'quick-add' ? 'Quick add with natural language (Q)' :
                   activeAction === 'templates' ? 'Create from template' :
                   activeAction === 'propose' ? 'Propose event times' :
                   'Create a new event (N)'
                 }
+                icon={
+                  activeAction === 'quick-add' ? <span className="text-lg">✨</span> :
+                  activeAction === 'templates' ? <span className="text-lg">📋</span> :
+                  activeAction === 'propose' ? <Users className="w-5 h-5" /> :
+                  <Plus className="w-5 h-5" />
+                }
               >
-                {activeAction === 'quick-add' && <span className="text-lg">✨</span>}
-                {activeAction === 'templates' && <span className="text-lg">📋</span>}
-                {activeAction === 'propose' && <Users className="w-5 h-5" />}
-                {activeAction === 'new-event' && <Plus className="w-5 h-5" />}
-                <span>
-                  {activeAction === 'quick-add' ? 'Quick Add' :
-                   activeAction === 'templates' ? 'Templates' :
-                   activeAction === 'propose' ? 'Propose Event' :
-                   'New Event'}
-                </span>
-              </button>
+                {activeAction === 'quick-add' ? 'Quick Add' :
+                 activeAction === 'templates' ? 'Templates' :
+                 activeAction === 'propose' ? 'Propose Event' :
+                 'New Event'}
+              </CTAButton>
             </div>
           </div>
 
