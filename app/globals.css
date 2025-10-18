@@ -596,6 +596,287 @@
     animation: fadeIn 0.3s ease-out forwards;
   }
 
+  /* ===== DYNAMIC BUTTON ANIMATION SYSTEM ===== */
+
+  /* Level 1: Enhanced hover/focus for all buttons */
+  @keyframes button-hover-glow {
+    0% {
+      box-shadow: 0 0 0 rgba(var(--feature-color), 0);
+    }
+    100% {
+      box-shadow: 0 0 20px rgba(var(--feature-color), 0.3);
+    }
+  }
+
+  @keyframes button-hover-scale {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(1.02);
+    }
+  }
+
+  /* Level 2: Breathing animation for primary buttons */
+  @keyframes button-breathing {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 10px rgba(var(--feature-color), 0.2);
+    }
+    50% {
+      transform: scale(1.015);
+      box-shadow: 0 0 15px rgba(var(--feature-color), 0.35);
+    }
+  }
+
+  /* Level 3: Ripple effect */
+  @keyframes button-ripple {
+    0% {
+      transform: scale(0);
+      opacity: 0.6;
+    }
+    100% {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+
+  /* Level 4: Success celebration */
+  @keyframes button-celebration {
+    0% {
+      transform: scale(1) rotate(0deg);
+    }
+    25% {
+      transform: scale(1.05) rotate(2deg);
+    }
+    50% {
+      transform: scale(1.08) rotate(-1deg);
+    }
+    75% {
+      transform: scale(1.03) rotate(1deg);
+    }
+    100% {
+      transform: scale(1) rotate(0deg);
+    }
+  }
+
+  @keyframes success-glow-burst {
+    0% {
+      box-shadow: 0 0 0 rgba(34, 197, 94, 0);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(34, 197, 94, 0.6);
+    }
+    100% {
+      box-shadow: 0 0 0 rgba(34, 197, 94, 0);
+    }
+  }
+
+  /* Feature-specific button glow colors */
+  .btn-feature-tasks {
+    --feature-color: 59, 130, 246; /* blue-500 */
+  }
+
+  .btn-feature-calendar {
+    --feature-color: 124, 58, 237; /* purple-600 */
+  }
+
+  .btn-feature-messages {
+    --feature-color: 16, 185, 129; /* emerald-500 */
+  }
+
+  .btn-feature-shopping {
+    --feature-color: 5, 150, 105; /* emerald-600 */
+  }
+
+  .btn-feature-meals {
+    --feature-color: 234, 88, 12; /* orange-600 */
+  }
+
+  .btn-feature-reminders {
+    --feature-color: 236, 72, 153; /* pink-500 */
+  }
+
+  .btn-feature-goals {
+    --feature-color: 99, 102, 241; /* indigo-500 */
+  }
+
+  .btn-feature-budget {
+    --feature-color: 245, 158, 11; /* amber-500 */
+  }
+
+  .btn-feature-projects {
+    --feature-color: 245, 158, 11; /* amber-500 */
+  }
+
+  .btn-feature-dashboard {
+    --feature-color: 124, 58, 237; /* purple-600 */
+  }
+
+  /* Button animation classes */
+  .btn-enhanced {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-enhanced:hover {
+    animation: button-hover-scale 0.3s ease-out forwards;
+  }
+
+  .btn-enhanced:focus-visible {
+    animation: button-hover-glow 0.3s ease-out forwards;
+  }
+
+  .btn-breathing {
+    animation: button-breathing 3s ease-in-out infinite;
+  }
+
+  .btn-magnetic {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .btn-celebration {
+    animation: button-celebration 0.6s ease-out;
+  }
+
+  .btn-success-burst {
+    animation: success-glow-burst 0.8s ease-out;
+  }
+
+  /* Ripple effect container */
+  .btn-ripple {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-ripple::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+  }
+
+  .btn-ripple:active::before {
+    width: 200px;
+    height: 200px;
+    animation: button-ripple 0.4s ease-out;
+  }
+
+  /* Gradient shift animations */
+  @keyframes gradient-shift-tasks {
+    0% { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+    100% { background: linear-gradient(135deg, #6366f1, #3b82f6); }
+  }
+
+  @keyframes gradient-shift-calendar {
+    0% { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
+    100% { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+  }
+
+  @keyframes gradient-shift-messages {
+    0% { background: linear-gradient(135deg, #10b981, #047857); }
+    100% { background: linear-gradient(135deg, #34d399, #10b981); }
+  }
+
+  @keyframes gradient-shift-shopping {
+    0% { background: linear-gradient(135deg, #059669, #065f46); }
+    100% { background: linear-gradient(135deg, #10b981, #059669); }
+  }
+
+  @keyframes gradient-shift-meals {
+    0% { background: linear-gradient(135deg, #ea580c, #c2410c); }
+    100% { background: linear-gradient(135deg, #f97316, #ea580c); }
+  }
+
+  @keyframes gradient-shift-reminders {
+    0% { background: linear-gradient(135deg, #ec4899, #be185d); }
+    100% { background: linear-gradient(135deg, #f472b6, #ec4899); }
+  }
+
+  @keyframes gradient-shift-goals {
+    0% { background: linear-gradient(135deg, #6366f1, #4338ca); }
+    100% { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
+  }
+
+  @keyframes gradient-shift-budget {
+    0% { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    100% { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+  }
+
+  /* Feature-specific gradient shifts */
+  .btn-gradient-shift-tasks:hover {
+    animation: gradient-shift-tasks 0.3s ease-out forwards;
+  }
+
+  .btn-gradient-shift-calendar:hover {
+    animation: gradient-shift-calendar 0.3s ease-out forwards;
+  }
+
+  .btn-gradient-shift-messages:hover {
+    animation: gradient-shift-messages 0.3s ease-out forwards;
+  }
+
+  .btn-gradient-shift-shopping:hover {
+    animation: gradient-shift-shopping 0.3s ease-out forwards;
+  }
+
+  .btn-gradient-shift-meals:hover {
+    animation: gradient-shift-meals 0.3s ease-out forwards;
+  }
+
+  .btn-gradient-shift-reminders:hover {
+    animation: gradient-shift-reminders 0.3s ease-out forwards;
+  }
+
+  .btn-gradient-shift-goals:hover {
+    animation: gradient-shift-goals 0.3s ease-out forwards;
+  }
+
+  .btn-gradient-shift-budget:hover {
+    animation: gradient-shift-budget 0.3s ease-out forwards;
+  }
+
+  /* Accessibility: Respect motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .btn-enhanced,
+    .btn-breathing,
+    .btn-magnetic,
+    .btn-celebration,
+    .btn-success-burst,
+    .btn-ripple::before {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    .btn-enhanced:hover,
+    .btn-enhanced:focus-visible {
+      transform: none !important;
+      animation: none !important;
+    }
+  }
+
+  /* Loading state animations */
+  @keyframes btn-loading-pulse {
+    0%, 100% {
+      opacity: 0.7;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .btn-loading {
+    animation: btn-loading-pulse 1.5s ease-in-out infinite;
+    pointer-events: none;
+  }
+
   /* ===== MOBILE OPTIMIZATION UTILITIES ===== */
 
   /* Mobile-optimized form inputs (48px height minimum) */

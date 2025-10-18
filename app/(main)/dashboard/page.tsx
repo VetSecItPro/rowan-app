@@ -50,6 +50,7 @@ import { SpaceSelector } from '@/components/spaces/SpaceSelector';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
 import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import { TimeAwareWelcomeBox } from '@/components/ui/TimeAwareWelcomeBox';
+import { CTAButton } from '@/components/ui/EnhancedButton';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { format, isToday, isThisWeek, isPast, parseISO, startOfWeek, subWeeks } from 'date-fns';
@@ -1011,13 +1012,16 @@ export default function DashboardPage() {
                 userColorTheme={user?.color_theme}
               />
             ) : (
-              <button
+              <CTAButton
                 onClick={() => setShowCreateSpaceModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl transition-all font-medium"
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+                feature="dashboard"
+                magnetic
+                icon={<Plus className="w-4 h-4" />}
+                size="md"
               >
-                <Plus className="w-4 h-4" />
                 Create Your Space
-              </button>
+              </CTAButton>
             )}
           </TimeAwareWelcomeBox>
 
