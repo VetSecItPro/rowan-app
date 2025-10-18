@@ -420,10 +420,11 @@ const GoalsProgressSection: React.FC<{ data: ReportData }> = ({ data }) => {
           <View key={index} style={styles.tableRow}>
             <Text style={styles.tableCell}>{goal.title}</Text>
             <Text style={styles.tableCell}>{goal.category || 'N/A'}</Text>
-            <Text style={[
-              styles.tableCell,
-              goal.status === 'completed' ? styles.positive : undefined
-            ]}>
+            <Text style={
+              goal.status === 'completed'
+                ? [styles.tableCell, styles.positive]
+                : styles.tableCell
+            }>
               {goal.status}
             </Text>
             <Text style={styles.tableCell}>{formatPercentage(goal.progress)}</Text>

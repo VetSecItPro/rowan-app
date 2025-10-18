@@ -522,8 +522,6 @@ export default function CalendarPage() {
                   else setIsModalOpen(true);
                 }}
                 feature="calendar"
-                breathing
-                ripple
                 className="px-4 sm:px-4 py-2 sm:py-3 w-full sm:w-[165px]"
                 title={
                   activeAction === 'quick-add' ? 'Quick add with natural language (Q)' :

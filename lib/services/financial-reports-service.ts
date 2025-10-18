@@ -747,6 +747,62 @@ class FinancialReportsService {
       }
     };
   }
+
+  // Missing methods
+  async downloadReportPDF(reportId: string): Promise<Blob> {
+    // This would integrate with the PDF generation service
+    const report = await this.getGeneratedReport(reportId);
+    if (!report) throw new Error('Report not found');
+
+    // For now, return a placeholder - this should integrate with pdf-generation-service
+    throw new Error('PDF download not implemented yet');
+  }
+
+  async getReportShareUrl(reportId: string): Promise<string> {
+    const report = await this.getGeneratedReport(reportId);
+    if (!report || !report.is_shared || !report.share_token) {
+      throw new Error('Report is not shared or does not exist');
+    }
+
+    // Construct share URL based on your app's domain
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    return `${baseUrl}/reports/shared/${report.share_token}`;
+  }
+
+  async updateReportViews(reportId: string): Promise<void> {
+    const report = await this.getGeneratedReport(reportId);
+    if (!report) throw new Error('Report not found');
+
+    const { error } = await this.supabase
+      .from('generated_reports')
+      .update({
+        view_count: (report.view_count || 0) + 1,
+        last_viewed_at: new Date().toISOString()
+      })
+      .eq('id', reportId);
+
+    if (error) throw error;
+  }
+
+  async toggleReportFavorite(reportId: string, userId: string): Promise<boolean> {
+    // Check if already favorited
+    const { data: existing } = await this.supabase
+      .from('report_favorites')
+      .select('id')
+      .eq('report_id', reportId)
+      .eq('user_id', userId)
+      .single();
+
+    if (existing) {
+      // Remove from favorites
+      await this.removeFromFavorites(userId, existing.id);
+      return false;
+    } else {
+      // Add to favorites
+      await this.addToFavorites(userId, reportId);
+      return true;
+    }
+  }
 }
 
 export const financialReportsService = new FinancialReportsService();
@@ -758,11 +814,11 @@ export const getReportTemplates = (spaceId?: string, category?: string) =>
 export const getReportTemplate = (id: string) =>
   financialReportsService.getReportTemplate(id);
 
-export const createReportTemplate = (input: CreateTemplateInput) =>
-  financialReportsService.createReportTemplate(input);
+export const createReportTemplate = (userId: string, input: CreateTemplateInput) =>
+  financialReportsService.createReportTemplate(userId, input);
 
 export const generateReport = (templateId: string, spaceId: string, title: string, description: string, startDate: Date, endDate: Date) =>
-  financialReportsService.generateReport('user-id', { templateId, spaceId, title, description, startDate, endDate });
+  financialReportsService.generateReport('user-id', { template_id: templateId, space_id: spaceId, title, description, date_range_start: startDate.toISOString(), date_range_end: endDate.toISOString() });
 
 export const getGeneratedReports = (spaceId: string, limit?: number) =>
   financialReportsService.getGeneratedReports(spaceId, limit);

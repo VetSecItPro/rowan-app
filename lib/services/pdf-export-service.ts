@@ -347,8 +347,8 @@ export async function exportMonthlyExpenseSummary(
               .map(
                 (expense) => `
               <tr>
-                <td>${format(new Date(expense.date), 'MMM dd')}</td>
-                <td>${expense.description}</td>
+                <td>${expense.date ? format(new Date(expense.date), 'MMM dd') : '-'}</td>
+                <td>${expense.description || expense.title}</td>
                 <td>${expense.payment_method || '-'}</td>
                 <td class="text-right amount">$${parseFloat(expense.amount.toString()).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
               </tr>
@@ -512,8 +512,8 @@ export async function exportProjectCostReport(projectId: string): Promise<void> 
             ?.map(
               (expense) => `
           <tr>
-            <td>${format(new Date(expense.date), 'MMM dd, yyyy')}</td>
-            <td>${expense.description}</td>
+            <td>${expense.date ? format(new Date(expense.date), 'MMM dd, yyyy') : '-'}</td>
+            <td>${expense.description || expense.title}</td>
             <td>${expense.category || '-'}</td>
             <td>${expense.payment_method || '-'}</td>
             <td class="text-right amount">$${parseFloat(expense.amount.toString()).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
