@@ -453,3 +453,16 @@ export async function verifyEmailService(): Promise<EmailResult> {
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
+
+// Export emailService object for compatibility
+export const emailService = {
+  sendTaskAssignmentEmail,
+  sendEventReminderEmail,
+  sendNewMessageEmail,
+  sendShoppingListEmail,
+  sendMealReminderEmail,
+  sendGeneralReminderEmail,
+  sendDailyDigestEmail,
+  sendBatchEmails,
+  verifyEmailService,
+};
