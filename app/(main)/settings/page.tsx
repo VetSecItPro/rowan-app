@@ -277,8 +277,6 @@ export default function SettingsPage() {
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
 
-  // Password reset state
-  const [resetEmail, setResetEmail] = useState('');
 
   // Active sessions state
   const [activeSessions, setActiveSessions] = useState<ActiveSession[]>([]);
@@ -647,12 +645,6 @@ export default function SettingsPage() {
     loadPrivacySettings();
   }, []);
 
-  // Initialize reset email with user's current email
-  useEffect(() => {
-    if (user?.email && !resetEmail) {
-      setResetEmail(user.email);
-    }
-  }, [user?.email, resetEmail]);
 
   // Fetch active sessions when security tab is active
   useEffect(() => {
@@ -707,13 +699,14 @@ export default function SettingsPage() {
   };
 
   const handleRequestPasswordReset = async () => {
-    if (!resetEmail) return;
+    if (!user?.email) return;
     setIsRequestingReset(true);
 
     const supabase = createClient();
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      // SECURITY: Only allow password reset for current user's email
+      const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
 
@@ -977,20 +970,12 @@ export default function SettingsPage() {
                             </div>
                           ) : (
                             <>
-                              <div className="mb-4">
-                                <label htmlFor="resetEmail" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                  Email address for password reset
-                                </label>
-                                <input
-                                  id="resetEmail"
-                                  type="email"
-                                  value={resetEmail}
-                                  onChange={(e) => setResetEmail(e.target.value)}
-                                  placeholder="Enter email address"
-                                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-900/50 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                />
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                  Current account email: {user?.email}
+                              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg mb-4">
+                                <p className="text-xs text-blue-700 dark:text-blue-300">
+                                  <strong>Reset link will be sent to:</strong> {user?.email}
+                                </p>
+                                <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                                  For security, password reset is only allowed for your current email address.
                                 </p>
                               </div>
                               <button
