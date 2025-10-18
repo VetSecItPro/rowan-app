@@ -121,7 +121,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors"
+            className="btn-touch w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors active-press hover-lift"
             disabled={isExporting}
           >
             <X className="w-4 h-4 text-gray-500" />
@@ -137,7 +137,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
               {/* JSON Option */}
               <button
                 onClick={() => setSelectedFormat('json')}
-                className={`p-4 rounded-xl border-2 transition-all text-left ${
+                className={`btn-touch p-4 rounded-xl border-2 transition-all text-left hover-lift active-press shimmer-blue ${
                   selectedFormat === 'json'
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
@@ -168,7 +168,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
               {/* CSV Option */}
               <button
                 onClick={() => setSelectedFormat('csv')}
-                className={`p-4 rounded-xl border-2 transition-all text-left ${
+                className={`btn-touch p-4 rounded-xl border-2 transition-all text-left hover-lift active-press shimmer-green ${
                   selectedFormat === 'csv'
                     ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
@@ -199,7 +199,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
               {/* PDF Option */}
               <button
                 onClick={() => setSelectedFormat('pdf')}
-                className={`p-4 rounded-xl border-2 transition-all text-left ${
+                className={`btn-touch p-4 rounded-xl border-2 transition-all text-left hover-lift active-press shimmer-purple ${
                   selectedFormat === 'pdf'
                     ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
@@ -238,7 +238,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
                   <button
                     key={type.value}
                     onClick={() => setSelectedDataType(type.value)}
-                    className={`w-full p-3 rounded-lg border transition-all text-left ${
+                    className={`btn-touch w-full p-3 rounded-lg border transition-all text-left hover-lift active-press shimmer-green ${
                       selectedDataType === type.value
                         ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
                         : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
@@ -281,14 +281,14 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
           <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <button
               onClick={onClose}
-              className="flex-1 px-6 py-3 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl font-medium transition-colors"
+              className="btn-touch flex-1 px-6 py-3 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl font-medium transition-colors active-press hover-lift"
               disabled={isExporting}
             >
               Cancel
             </button>
             <button
               onClick={handleExport}
-              className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="btn-touch flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active-press hover-lift shimmer-blue"
               disabled={isExporting}
             >
               {isExporting ? (

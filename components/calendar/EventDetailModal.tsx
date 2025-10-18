@@ -77,7 +77,7 @@ export function EventDetailModal({ isOpen, onClose, event }: EventDetailModalPro
             </div>
             <button
               onClick={onClose}
-              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95"
+              className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active-press hover-lift shimmer-purple"
               aria-label="Close modal"
             >
               <X className="w-5 h-5 sm:w-4 sm:h-4" />
@@ -124,7 +124,7 @@ export function EventDetailModal({ isOpen, onClose, event }: EventDetailModalPro
           <div className="flex gap-4">
             <button
               onClick={() => setActiveTab('comments')}
-              className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
+              className={`btn-touch px-4 py-3 font-medium text-sm border-b-2 transition-colors active-press hover-lift shimmer-purple ${
                 activeTab === 'comments'
                   ? 'border-purple-600 text-purple-600 dark:text-purple-400'
                   : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
@@ -137,7 +137,7 @@ export function EventDetailModal({ isOpen, onClose, event }: EventDetailModalPro
             </button>
             <button
               onClick={() => setActiveTab('attachments')}
-              className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
+              className={`btn-touch px-4 py-3 font-medium text-sm border-b-2 transition-colors active-press hover-lift shimmer-purple ${
                 activeTab === 'attachments'
                   ? 'border-purple-600 text-purple-600 dark:text-purple-400'
                   : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'

@@ -148,7 +148,7 @@ export function BulkActionsToolbar({
           <button
             onClick={() => setShowCompleteConfirm(true)}
             disabled={isProcessing}
-            className="flex items-center gap-2 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors disabled:opacity-50"
+            className="btn-touch flex items-center gap-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors disabled:opacity-50 hover-lift active-press"
           >
             <CheckCircle2 className="w-4 h-4" />
             <span className="text-sm font-medium">Complete</span>
@@ -159,7 +159,7 @@ export function BulkActionsToolbar({
             <button
               onClick={() => setShowPriorityMenu(!showPriorityMenu)}
               disabled={isProcessing}
-              className="flex items-center gap-2 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors disabled:opacity-50"
+              className="btn-touch flex items-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors disabled:opacity-50 hover-lift active-press"
             >
               <Flag className="w-4 h-4" />
               <span className="text-sm font-medium">Priority</span>
@@ -177,7 +177,7 @@ export function BulkActionsToolbar({
                     <button
                       key={priority}
                       onClick={() => handleChangePriority(priority)}
-                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg capitalize"
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg capitalize active-press"
                     >
                       {priority}
                     </button>
@@ -192,7 +192,7 @@ export function BulkActionsToolbar({
             <button
               onClick={() => setShowCategoryMenu(!showCategoryMenu)}
               disabled={isProcessing}
-              className="flex items-center gap-2 px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors disabled:opacity-50"
+              className="btn-touch flex items-center gap-2 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors disabled:opacity-50 hover-lift active-press"
             >
               <Tag className="w-4 h-4" />
               <span className="text-sm font-medium">Category</span>
@@ -211,7 +211,7 @@ export function BulkActionsToolbar({
                       <button
                         key={category}
                         onClick={() => handleChangeCategory(category)}
-                        className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg capitalize"
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg capitalize active-press"
                       >
                         {category}
                       </button>
@@ -226,7 +226,7 @@ export function BulkActionsToolbar({
           <div className="relative group">
             <button
               disabled={isProcessing}
-              className="flex items-center gap-2 px-3 py-1.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors disabled:opacity-50"
+              className="btn-touch flex items-center gap-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors disabled:opacity-50 hover-lift active-press"
             >
               <Download className="w-4 h-4" />
               <span className="text-sm font-medium">Export</span>
@@ -236,13 +236,13 @@ export function BulkActionsToolbar({
             <div className="absolute bottom-full mb-2 left-0 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto z-20">
               <button
                 onClick={handleExportJSON}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg active-press"
               >
                 JSON
               </button>
               <button
                 onClick={handleExportCSV}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg active-press"
               >
                 CSV
               </button>
@@ -256,7 +256,7 @@ export function BulkActionsToolbar({
           <button
             onClick={() => setShowDeleteConfirm(true)}
             disabled={isProcessing}
-            className="flex items-center gap-2 px-3 py-1.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors disabled:opacity-50"
+            className="btn-touch flex items-center gap-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors disabled:opacity-50 hover-lift active-press"
           >
             <Trash2 className="w-4 h-4" />
             <span className="text-sm font-medium">Delete</span>
@@ -266,7 +266,7 @@ export function BulkActionsToolbar({
           <button
             onClick={onClearSelection}
             disabled={isProcessing}
-            className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
+            className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50 active-press"
           >
             <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
           </button>
@@ -291,14 +291,14 @@ export function BulkActionsToolbar({
               <button
                 onClick={() => setShowCompleteConfirm(false)}
                 disabled={isProcessing}
-                className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+                className="btn-touch flex-1 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 active-press"
               >
                 Cancel
               </button>
               <button
                 onClick={handleBulkComplete}
                 disabled={isProcessing}
-                className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50"
+                className="btn-touch flex-1 shimmer-green text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 hover-lift active-press"
               >
                 {isProcessing ? 'Processing...' : 'Complete'}
               </button>
@@ -325,14 +325,14 @@ export function BulkActionsToolbar({
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={isProcessing}
-                className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+                className="btn-touch flex-1 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 active-press"
               >
                 Cancel
               </button>
               <button
                 onClick={handleBulkDelete}
                 disabled={isProcessing}
-                className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
+                className="btn-touch flex-1 shimmer-red text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 hover-lift active-press"
               >
                 {isProcessing ? 'Deleting...' : 'Delete'}
               </button>

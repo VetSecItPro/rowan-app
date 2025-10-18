@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Folder, Plus, Search, Wallet, Receipt, DollarSign, CheckCircle, Clock, FileText, FileCheck } from 'lucide-react';
+import { Folder, Plus, Search, Wallet, Receipt, DollarSign, CheckCircle, Clock, FileText, FileCheck, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { CTAButton } from '@/components/ui/EnhancedButton';
@@ -46,6 +46,7 @@ export default function ProjectsPage() {
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [editingBill, setEditingBill] = useState<Bill | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [currentBudget, setCurrentBudget] = useState<number>(0);
   const [budgetStats, setBudgetStats] = useState({ monthlyBudget: 0, spentThisMonth: 0, remaining: 0, pendingBills: 0 });
   const [budgetTemplates, setBudgetTemplates] = useState<BudgetTemplate[]>([]);
@@ -365,15 +366,39 @@ export default function ProjectsPage() {
           )}
 
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <div className="apple-search-container">
+              <Search className="apple-search-icon" />
               <input
-                type="text"
+                type="search"
                 placeholder={`Search ${activeTab}...`}
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 input-mobile bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-lg focus:ring-2 focus:ring-amber-500/50 focus:border-transparent text-gray-900 dark:text-white"
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setSearchQuery(value);
+
+                  // Handle typing animation
+                  if (value.length > 0) {
+                    setIsSearchTyping(true);
+                    const timeoutId = setTimeout(() => setIsSearchTyping(false), 1000);
+                    return () => clearTimeout(timeoutId);
+                  } else {
+                    setIsSearchTyping(false);
+                  }
+                }}
+                className={`apple-search-input w-full ${isSearchTyping ? 'typing' : ''}`}
               />
+              {searchQuery && (
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setIsSearchTyping(false);
+                  }}
+                  className={`apple-search-clear ${searchQuery ? 'visible' : ''}`}
+                  aria-label="Clear search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
             </div>
           </div>
 

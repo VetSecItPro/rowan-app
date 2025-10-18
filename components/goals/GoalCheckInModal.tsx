@@ -154,7 +154,7 @@ export function GoalCheckInModal({
             </div>
             <button
               onClick={onClose}
-              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95"
+              className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active-press"
               aria-label="Close modal"
             >
               <X className="w-5 h-5 sm:w-4 sm:h-4" />
@@ -203,9 +203,9 @@ export function GoalCheckInModal({
                   key={mood.value}
                   type="button"
                   onClick={() => setFormData({ ...formData, mood: mood.value })}
-                  className={`p-4 rounded-xl border-2 transition-all text-center ${
+                  className={`btn-touch p-4 rounded-xl border-2 transition-all text-center active-press hover-lift ${
                     formData.mood === mood.value
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 shimmer-indigo'
                       : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                   }`}
                 >
@@ -257,9 +257,9 @@ export function GoalCheckInModal({
             <button
               type="button"
               onClick={() => setFormData({ ...formData, need_help_from_partner: !formData.need_help_from_partner })}
-              className={`relative w-12 h-6 rounded-full transition-colors ${
+              className={`btn-touch relative w-12 h-6 rounded-full transition-colors active-press hover-lift ${
                 formData.need_help_from_partner
-                  ? 'bg-blue-600'
+                  ? 'bg-blue-600 shimmer-indigo'
                   : 'bg-gray-300 dark:bg-gray-600'
               }`}
             >
@@ -281,7 +281,7 @@ export function GoalCheckInModal({
               <button
                 type="button"
                 onClick={() => setShowVoiceRecorder(true)}
-                className="w-full p-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-400 transition-all flex items-center justify-center gap-3 text-gray-600 dark:text-gray-400"
+                className="btn-touch w-full p-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-400 transition-all flex items-center justify-center gap-3 text-gray-600 dark:text-gray-400 active-press hover-lift"
               >
                 <Plus className="w-5 h-5" />
                 <span>Add Voice Check-In</span>
@@ -332,7 +332,7 @@ export function GoalCheckInModal({
                   <button
                     type="button"
                     onClick={removeVoiceNote}
-                    className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                    className="btn-touch p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors active-press"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -380,7 +380,7 @@ export function GoalCheckInModal({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full p-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-400 transition-all flex items-center justify-center gap-3 text-gray-600 dark:text-gray-400"
+                className="btn-touch w-full p-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-400 transition-all flex items-center justify-center gap-3 text-gray-600 dark:text-gray-400 active-press hover-lift"
               >
                 <Camera className="w-5 h-5" />
                 <span>Add Progress Photos</span>
@@ -398,7 +398,7 @@ export function GoalCheckInModal({
                       <button
                         type="button"
                         onClick={() => removePhoto(index)}
-                        className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="btn-touch absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity active-press"
                       >
                         <X className="w-3 h-3" />
                       </button>
