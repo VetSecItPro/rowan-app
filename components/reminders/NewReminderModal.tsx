@@ -170,7 +170,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
             {!editReminder && !showTemplatePicker && (
               <button
                 onClick={() => setShowTemplatePicker(true)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 rounded-lg hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors text-sm font-medium"
+                className="btn-touch flex items-center gap-2 bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 rounded-lg hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors text-sm font-medium hover-lift active-press shimmer-pink"
               >
                 <Sparkles className="w-4 h-4" />
                 Use Template
@@ -179,7 +179,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
           </div>
           <button
             onClick={onClose}
-            className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95"
+            className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active-press hover-lift shimmer-pink"
             aria-label="Close modal"
           >
             <X className="w-5 h-5 sm:w-4 sm:h-4 text-gray-600 dark:text-gray-400" />
@@ -213,7 +213,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
               <button
                 type="button"
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors z-10"
+                className="btn-touch absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors z-10 active-press hover-lift shimmer-pink"
               >
                 <Smile className="w-5 h-5 text-gray-400" />
               </button>
@@ -236,7 +236,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                             setFormData({ ...formData, emoji });
                             setShowEmojiPicker(false);
                           }}
-                          className="w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          className="btn-touch w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active-press hover-lift shimmer-pink"
                         >
                           {emoji}
                         </button>
@@ -299,10 +299,10 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                   key={category.value}
                   type="button"
                   onClick={() => setFormData({ ...formData, category: category.value as any })}
-                  className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all ${
+                  className={`btn-touch flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all active-press ${
                     formData.category === category.value
-                      ? `${category.color} border-transparent text-white shadow-lg`
-                      : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                      ? `${category.color} border-transparent text-white shadow-lg shimmer-pink hover-lift`
+                      : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover-lift shimmer-pink'
                   }`}
                 >
                   <span className="text-2xl mb-1">{category.icon}</span>
@@ -424,10 +424,10 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                           : [...prev, index]
                       );
                     }}
-                    className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    className={`btn-touch flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all active-press ${
                       selectedWeekdays.includes(index)
-                        ? 'bg-pink-500 text-white shadow-lg'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                        ? 'bg-pink-500 text-white shadow-lg shimmer-pink hover-lift'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover-lift shimmer-pink'
                     }`}
                   >
                     {day}
@@ -455,10 +455,10 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                           : [...prev, day]
                       );
                     }}
-                    className={`px-2 py-2 rounded-lg text-sm font-medium transition-all ${
+                    className={`btn-touch px-2 py-2 rounded-lg text-sm font-medium transition-all active-press ${
                       selectedMonthDays.includes(day)
-                        ? 'bg-pink-500 text-white shadow-lg'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                        ? 'bg-pink-500 text-white shadow-lg shimmer-pink hover-lift'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover-lift shimmer-pink'
                     }`}
                   >
                     {day}
@@ -473,14 +473,14 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              className="btn-touch bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors active-press hover-lift"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!!dateError}
-              className={`px-6 py-2 shimmer-reminders text-white rounded-lg transition-all shadow-lg ${
+              className={`btn-touch shimmer-pink text-white rounded-lg transition-all shadow-lg hover-lift active-press ${
                 dateError ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
               }`}
             >

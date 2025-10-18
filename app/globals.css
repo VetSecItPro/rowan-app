@@ -1789,4 +1789,915 @@
       transform: none;
     }
   }
+
+  /* ===== FLOATING ANIMATIONS & PARTICLE EFFECTS FOR FAMILY DELIGHT ===== */
+
+  /* Floating Love Bubbles */
+  @keyframes loveBubbleFloat {
+    0% {
+      transform: translateY(100vh) translateX(0px) scale(0.8);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.8;
+    }
+    50% {
+      transform: translateY(50vh) translateX(20px) scale(1);
+      opacity: 1;
+    }
+    90% {
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateY(-10vh) translateX(-10px) scale(0.9);
+      opacity: 0;
+    }
+  }
+
+  .love-bubble {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, rgba(244, 114, 182, 0.8), rgba(219, 39, 119, 0.6));
+    border-radius: 50%;
+    animation: loveBubbleFloat 8s linear infinite;
+    pointer-events: none;
+    z-index: 5;
+    backdrop-filter: blur(2px);
+    box-shadow: 0 0 10px rgba(244, 114, 182, 0.3);
+  }
+
+  .love-bubble::before {
+    content: '💕';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    animation: gentleSparkle 2s ease-in-out infinite;
+  }
+
+  /* Floating Success Sparkles */
+  @keyframes successSparkle {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg) scale(0.8);
+      opacity: 0;
+    }
+    50% {
+      transform: translateY(-30px) rotate(180deg) scale(1.2);
+      opacity: 1;
+    }
+  }
+
+  .success-sparkle {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: linear-gradient(45deg, #10b981, #34d399);
+    border-radius: 50%;
+    animation: successSparkle 1.5s ease-out;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .success-sparkle::before {
+    content: '✨';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
+  }
+
+  /* Floating Task Completion Celebration */
+  @keyframes taskCelebration {
+    0% {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
+    25% {
+      transform: scale(1.2) rotate(5deg);
+    }
+    50% {
+      transform: scale(1.4) rotate(-5deg);
+    }
+    75% {
+      transform: scale(1.1) rotate(2deg);
+    }
+    100% {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
+  }
+
+  .task-celebration {
+    animation: taskCelebration 0.6s ease-out;
+  }
+
+  /* Floating Connection Hearts */
+  @keyframes connectionPulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+  }
+
+  .connection-heart {
+    position: absolute;
+    font-size: 14px;
+    animation: connectionPulse 2s ease-in-out infinite;
+    color: #ec4899;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .connection-heart::before {
+    content: '💖';
+  }
+
+  /* Gentle Page Entrance Animation */
+  @keyframes pageEntranceFloat {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .page-entrance {
+    animation: pageEntranceFloat 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  /* Floating Goal Achievement Animation */
+  @keyframes goalAchievement {
+    0% {
+      transform: translateY(0) scale(1);
+      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);
+    }
+    25% {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 8px 25px rgba(168, 85, 247, 0.3);
+    }
+    50% {
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: 0 12px 30px rgba(168, 85, 247, 0.4);
+    }
+    75% {
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 6px 20px rgba(168, 85, 247, 0.25);
+    }
+    100% {
+      transform: translateY(0) scale(1);
+      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);
+    }
+  }
+
+  .goal-achievement {
+    animation: goalAchievement 2s ease-in-out infinite;
+  }
+
+  /* Floating Memory Particles */
+  @keyframes memoryParticleFloat {
+    0% {
+      transform: translateY(0px) translateX(0px) rotate(0deg);
+      opacity: 0.6;
+    }
+    33% {
+      transform: translateY(-10px) translateX(5px) rotate(120deg);
+      opacity: 1;
+    }
+    66% {
+      transform: translateY(-5px) translateX(-5px) rotate(240deg);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateY(0px) translateX(0px) rotate(360deg);
+      opacity: 0.6;
+    }
+  }
+
+  .memory-particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(45deg, rgba(139, 92, 246, 0.6), rgba(168, 85, 247, 0.4));
+    border-radius: 50%;
+    animation: memoryParticleFloat 4s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  /* Family Togetherness Glow */
+  @keyframes familyGlow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(244, 114, 182, 0.1);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(244, 114, 182, 0.2);
+    }
+  }
+
+  .family-glow {
+    animation: familyGlow 3s ease-in-out infinite;
+  }
+
+  /* Shared Achievement Ripple */
+  @keyframes sharedRipple {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+
+  .shared-ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border: 2px solid rgba(16, 185, 129, 0.5);
+    border-radius: 50%;
+    animation: sharedRipple 1s ease-out;
+    pointer-events: none;
+  }
+
+  /* Floating Date Night Sparkles */
+  @keyframes dateNightSparkle {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg) scale(0.8);
+      opacity: 0.4;
+    }
+    25% {
+      transform: translateY(-8px) rotate(90deg) scale(1);
+      opacity: 0.8;
+    }
+    50% {
+      transform: translateY(-12px) rotate(180deg) scale(1.2);
+      opacity: 1;
+    }
+    75% {
+      transform: translateY(-6px) rotate(270deg) scale(1);
+      opacity: 0.6;
+    }
+  }
+
+  .date-night-sparkle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: linear-gradient(45deg, #f59e0b, #fbbf24);
+    border-radius: 50%;
+    animation: dateNightSparkle 3s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .date-night-sparkle::before {
+    content: '✨';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8px;
+  }
+
+  /* Family Calendar Joy */
+  @keyframes calendarJoy {
+    0%, 100% {
+      transform: translateY(0px) scale(1);
+    }
+    50% {
+      transform: translateY(-3px) scale(1.02);
+    }
+  }
+
+  .calendar-joy {
+    animation: calendarJoy 2s ease-in-out infinite;
+  }
+
+  /* Milestone Celebration Burst */
+  @keyframes milestoneBurst {
+    0% {
+      transform: scale(0.8) rotate(0deg);
+      opacity: 0;
+    }
+    20% {
+      transform: scale(1.2) rotate(72deg);
+      opacity: 1;
+    }
+    40% {
+      transform: scale(1.1) rotate(144deg);
+      opacity: 0.9;
+    }
+    60% {
+      transform: scale(1.15) rotate(216deg);
+      opacity: 0.8;
+    }
+    80% {
+      transform: scale(1.05) rotate(288deg);
+      opacity: 0.6;
+    }
+    100% {
+      transform: scale(1) rotate(360deg);
+      opacity: 0;
+    }
+  }
+
+  .milestone-burst {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+    background: radial-gradient(circle, rgba(244, 114, 182, 0.8), transparent 70%);
+    border-radius: 50%;
+    animation: milestoneBurst 1.5s ease-out forwards;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .milestone-burst::before {
+    content: '🎉';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+  }
+
+  /* Floating Anniversary Petals */
+  @keyframes anniversaryPetal {
+    0% {
+      transform: translateY(0px) translateX(0px) rotate(0deg);
+      opacity: 0.8;
+    }
+    25% {
+      transform: translateY(-20px) translateX(10px) rotate(90deg);
+      opacity: 1;
+    }
+    50% {
+      transform: translateY(-30px) translateX(-5px) rotate(180deg);
+      opacity: 0.9;
+    }
+    75% {
+      transform: translateY(-15px) translateX(15px) rotate(270deg);
+      opacity: 0.7;
+    }
+    100% {
+      transform: translateY(0px) translateX(0px) rotate(360deg);
+      opacity: 0.8;
+    }
+  }
+
+  .anniversary-petal {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: linear-gradient(45deg, rgba(236, 72, 153, 0.7), rgba(219, 39, 119, 0.5));
+    border-radius: 50% 0 50% 0;
+    animation: anniversaryPetal 5s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 4;
+  }
+
+  /* Reduced motion support for family effects */
+  @media (prefers-reduced-motion: reduce) {
+    .love-bubble,
+    .success-sparkle,
+    .task-celebration,
+    .connection-heart,
+    .page-entrance,
+    .goal-achievement,
+    .memory-particle,
+    .family-glow,
+    .shared-ripple,
+    .date-night-sparkle,
+    .calendar-joy,
+    .milestone-burst,
+    .anniversary-petal {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
+  /* ===== ENHANCED FORM INPUT ANIMATIONS ===== */
+
+  /* Apple-inspired form input focus animation */
+  @keyframes inputFocusGlow {
+    0% {
+      box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+      transform: scale(1.005);
+    }
+    100% {
+      box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.05),
+                  0 4px 15px -3px rgba(139, 92, 246, 0.1);
+      transform: scale(1.01);
+    }
+  }
+
+  @keyframes inputTypingBreath {
+    0%, 100% {
+      transform: scale(1.01);
+      box-shadow: 0 4px 15px -3px rgba(139, 92, 246, 0.1);
+    }
+    50% {
+      transform: scale(1.015);
+      box-shadow: 0 6px 20px -3px rgba(139, 92, 246, 0.15);
+    }
+  }
+
+  @keyframes labelFloat {
+    from {
+      transform: translateY(0px) scale(1);
+      color: rgba(107, 114, 128, 0.7);
+    }
+    to {
+      transform: translateY(-8px) scale(0.85);
+      color: rgba(139, 92, 246, 0.9);
+    }
+  }
+
+  /* Enhanced Form Input Base Classes */
+  .apple-form-input {
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    backdrop-filter: blur(10px);
+    border: 1.5px solid rgba(139, 92, 246, 0.1);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: 400;
+    color: #1f2937;
+    box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.05);
+    will-change: transform, box-shadow;
+  }
+
+  .dark .apple-form-input {
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.9) 0%, rgba(55, 65, 81, 0.7) 100%);
+    color: #f9fafb;
+    border-color: rgba(139, 92, 246, 0.2);
+    box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Focus State Enhancement */
+  .apple-form-input:focus {
+    outline: none;
+    border-color: rgba(139, 92, 246, 0.4);
+    animation: inputFocusGlow 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+  }
+
+  .dark .apple-form-input:focus {
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.95) 0%, rgba(55, 65, 81, 0.85) 100%);
+    border-color: rgba(139, 92, 246, 0.5);
+  }
+
+  /* Typing Animation */
+  .apple-form-input.typing {
+    animation: inputTypingBreath 1.5s ease-in-out infinite;
+  }
+
+  /* Floating Label Enhancement */
+  .apple-form-group {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .apple-form-label {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 15px;
+    color: rgba(107, 114, 128, 0.7);
+    pointer-events: none;
+    z-index: 1;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+    padding: 0 6px;
+    border-radius: 4px;
+  }
+
+  .dark .apple-form-label {
+    color: rgba(156, 163, 175, 0.7);
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.9), rgba(55, 65, 81, 0.7));
+  }
+
+  .apple-form-input:focus ~ .apple-form-label,
+  .apple-form-input:not(:placeholder-shown) ~ .apple-form-label {
+    animation: labelFloat 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  /* Textarea Enhancement */
+  .apple-form-textarea {
+    resize: vertical;
+    min-height: 100px;
+    padding: 16px;
+  }
+
+  /* Select Enhancement */
+  .apple-form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 40px;
+  }
+
+  .dark .apple-form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%9ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  }
+
+  /* Checkbox Enhancement */
+  @keyframes checkboxCheck {
+    0% {
+      transform: scale(0.8) rotate(-45deg);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.1) rotate(-45deg);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1) rotate(-45deg);
+      opacity: 1;
+    }
+  }
+
+  .apple-checkbox {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    appearance: none;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark .apple-checkbox {
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.9), rgba(55, 65, 81, 0.7));
+    border-color: rgba(139, 92, 246, 0.4);
+  }
+
+  .apple-checkbox:checked {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(139, 92, 246, 0.7));
+    border-color: rgba(139, 92, 246, 0.8);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  }
+
+  .apple-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    animation: checkboxCheck 0.3s ease-out;
+  }
+
+  /* Radio Button Enhancement */
+  .apple-radio {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    appearance: none;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark .apple-radio {
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.9), rgba(55, 65, 81, 0.7));
+    border-color: rgba(139, 92, 246, 0.4);
+  }
+
+  .apple-radio:checked {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(139, 92, 246, 0.7));
+    border-color: rgba(139, 92, 246, 0.8);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  }
+
+  .apple-radio:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    animation: checkboxCheck 0.3s ease-out;
+  }
+
+  /* Range Slider Enhancement */
+  .apple-range {
+    appearance: none;
+    height: 6px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.1));
+    border-radius: 3px;
+    outline: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .apple-range::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(139, 92, 246, 0.7));
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .apple-range::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  }
+
+  .apple-range::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(139, 92, 246, 0.7));
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .apple-range::-moz-range-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  }
+
+  /* Form Group with Icons */
+  .apple-form-group-with-icon {
+    position: relative;
+  }
+
+  .apple-form-group-with-icon .apple-form-input {
+    padding-left: 44px;
+  }
+
+  .apple-form-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: rgba(139, 92, 246, 0.6);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
+  }
+
+  .apple-form-input:focus ~ .apple-form-icon {
+    color: rgba(139, 92, 246, 0.9);
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  /* Error States */
+  .apple-form-input.error {
+    border-color: rgba(239, 68, 68, 0.6);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+
+  .apple-form-input.error:focus {
+    border-color: rgba(239, 68, 68, 0.8);
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.1);
+  }
+
+  /* Success States */
+  .apple-form-input.success {
+    border-color: rgba(34, 197, 94, 0.6);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+  }
+
+  .apple-form-input.success:focus {
+    border-color: rgba(34, 197, 94, 0.8);
+    box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.1);
+  }
+
+  /* Mobile-specific form enhancements */
+  @media (max-width: 640px) {
+    .apple-form-input {
+      padding: 14px 16px;
+      font-size: 16px; /* Prevents zoom on iOS */
+    }
+
+    .apple-form-textarea {
+      padding: 16px;
+    }
+  }
+
+  /* Reduced motion support for form inputs */
+  @media (prefers-reduced-motion: reduce) {
+    .apple-form-input,
+    .apple-form-label,
+    .apple-checkbox,
+    .apple-radio,
+    .apple-range,
+    .apple-form-icon {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    .apple-form-input:focus {
+      transform: none;
+    }
+  }
+
+  /* ===== ENHANCED BUTTON UTILITIES ===== */
+
+  /* Hover lift effect - subtle elevation on hover */
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .dark .hover-lift:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Active press effect - scale down on press */
+  .active-press {
+    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .active-press:active {
+    transform: scale(0.96);
+  }
+
+  /* Combined hover lift and active press */
+  .hover-lift.active-press:hover {
+    transform: translateY(-2px);
+  }
+
+  .hover-lift.active-press:active {
+    transform: translateY(0) scale(0.96);
+  }
+
+  /* Shimmer blue variant (for blue buttons) */
+  .shimmer-blue {
+    background: linear-gradient(
+      90deg,
+      #3b82f6 0%,
+      #2563eb 50%,
+      #3b82f6 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  /* Shimmer green variant (for green/success buttons) */
+  .shimmer-green {
+    background: linear-gradient(
+      90deg,
+      #22c55e 0%,
+      #16a34a 50%,
+      #22c55e 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  /* Shimmer red variant (for delete/danger buttons) */
+  .shimmer-red {
+    background: linear-gradient(
+      90deg,
+      #ef4444 0%,
+      #dc2626 50%,
+      #ef4444 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  /* Shimmer purple variant (for primary buttons) */
+  .shimmer-purple {
+    background: linear-gradient(
+      90deg,
+      #8b5cf6 0%,
+      #7c3aed 50%,
+      #8b5cf6 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  /* Shimmer amber variant (for warning/budget buttons) */
+  .shimmer-amber {
+    background: linear-gradient(
+      90deg,
+      #f59e0b 0%,
+      #d97706 50%,
+      #f59e0b 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  /* Shimmer emerald variant (for shopping buttons) */
+  .shimmer-emerald {
+    background: linear-gradient(
+      90deg,
+      #10b981 0%,
+      #059669 50%,
+      #10b981 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  /* Shimmer pink variant (for reminders buttons) */
+  .shimmer-pink {
+    background: linear-gradient(
+      90deg,
+      #ec4899 0%,
+      #db2777 50%,
+      #ec4899 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  /* Shimmer orange variant (for meals buttons) */
+  .shimmer-orange {
+    background: linear-gradient(
+      90deg,
+      #f97316 0%,
+      #ea580c 50%,
+      #f97316 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  /* Shimmer indigo variant (for goals buttons) */
+  .shimmer-indigo {
+    background: linear-gradient(
+      90deg,
+      #6366f1 0%,
+      #4f46e5 50%,
+      #6366f1 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  /* Accessibility: Respect motion preferences for button utilities */
+  @media (prefers-reduced-motion: reduce) {
+    .hover-lift,
+    .active-press,
+    .shimmer-blue,
+    .shimmer-green,
+    .shimmer-red,
+    .shimmer-purple,
+    .shimmer-amber,
+    .shimmer-emerald,
+    .shimmer-pink,
+    .shimmer-orange,
+    .shimmer-indigo {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    .hover-lift:hover,
+    .active-press:active {
+      transform: none !important;
+    }
+  }
 }

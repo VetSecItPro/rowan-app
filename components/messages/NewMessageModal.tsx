@@ -189,7 +189,7 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
           </h2>
           <button
             onClick={onClose}
-            className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95"
+            className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active-press"
             aria-label="Close modal"
           >
             <X className="w-5 h-5 sm:w-4 sm:h-4 text-gray-600 dark:text-gray-400" />
@@ -228,7 +228,7 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
                       <button
                         type="button"
                         onClick={() => removeImage(idx)}
-                        className="ml-1 hover:text-red-500"
+                        className="btn-touch ml-1 hover:text-red-500 active-press p-0.5 rounded"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -254,7 +254,7 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
                       <button
                         type="button"
                         onClick={() => removeFile(idx)}
-                        className="ml-1 hover:text-red-500"
+                        className="btn-touch ml-1 hover:text-red-500 active-press p-0.5 rounded"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -275,7 +275,7 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
                   type="button"
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                   title="Add emoji"
-                  className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="btn-touch p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors active-press hover-lift"
                 >
                   <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 </button>
@@ -290,7 +290,7 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
                           key={idx}
                           type="button"
                           onClick={() => handleEmojiClick(emoji)}
-                          className="w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          className="btn-touch w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active-press"
                           title="Click to add emoji"
                         >
                           {emoji}
@@ -306,7 +306,7 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
                 type="button"
                 onClick={() => imageInputRef.current?.click()}
                 title="Attach image"
-                className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="btn-touch p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors active-press hover-lift"
               >
                 <ImageIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               </button>
@@ -316,7 +316,7 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 title="Attach file"
-                className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="btn-touch p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors active-press hover-lift"
               >
                 <Paperclip className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               </button>
@@ -327,13 +327,13 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                className="btn-touch px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors active-press hover-lift"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 shimmer-messages text-white rounded-lg hover:opacity-90 transition-all shadow-lg"
+                className="btn-touch px-6 py-2 shimmer-messages text-white rounded-lg hover:opacity-90 transition-all shadow-lg active-press hover-lift"
               >
                 {editMessage ? 'Save Changes' : 'Send Message'}
               </button>

@@ -108,7 +108,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
         <div className="sticky top-0 z-10 bg-gradient-to-r from-orange-500 to-orange-600 px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg sm:text-xl font-bold text-white">{isEditing ? 'Edit Meal' : 'Plan New Meal'}</h2>
-            <button onClick={onClose} aria-label="Close modal" className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-orange-700 transition-all active:scale-95">
+            <button onClick={onClose} aria-label="Close modal" className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-orange-700 transition-all active-press">
               <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
             </button>
           </div>
@@ -119,7 +119,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
             <button
               type="button"
               onClick={() => setIsMealTypeOpen(!isMealTypeOpen)}
-              className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white flex items-center justify-between"
+              className="btn-touch w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white flex items-center justify-between hover-lift active-press"
             >
               <div className="flex items-center gap-2">
                 {(() => {
@@ -149,7 +149,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                         setFormData({ ...formData, meal_type: option.value as any });
                         setIsMealTypeOpen(false);
                       }}
-                      className="w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+                      className="w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left active-press"
                     >
                       <Icon className={`w-4 h-4 ${option.color}`} />
                       <span className="text-gray-900 dark:text-white">{option.label}</span>
@@ -164,7 +164,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
             <button
               type="button"
               onClick={() => setIsRecipeSelectorOpen(!isRecipeSelectorOpen)}
-              className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white flex items-center justify-between"
+              className="btn-touch w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white flex items-center justify-between hover-lift active-press"
             >
               <div className="flex items-center gap-2">
                 <ChefHat className="w-4 h-4 text-orange-500" />
@@ -205,10 +205,10 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                                 e.stopPropagation();
                                 setCuisineFilter(cuisine === cuisineFilter ? null : (cuisine || null));
                               }}
-                              className={`px-2 py-1 text-xs rounded-full transition-colors ${
+                              className={`btn-touch px-2 py-1 text-xs rounded-full transition-colors active-press ${
                                 cuisineFilter === cuisine
-                                  ? 'bg-orange-500 text-white'
-                                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900/30'
+                                  ? 'bg-orange-500 text-white shimmer-orange'
+                                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900/30 hover-lift'
                               }`}
                             >
                               {cuisine}
@@ -225,7 +225,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                             e.stopPropagation();
                             clearFilters();
                           }}
-                          className="text-xs text-orange-600 dark:text-orange-400 hover:underline"
+                          className="btn-touch text-xs text-orange-600 dark:text-orange-400 hover:underline active-press px-1 py-0.5"
                         >
                           Clear filters
                         </button>
@@ -247,7 +247,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                       setFormData({ ...formData, recipe_id: undefined });
                       setIsRecipeSelectorOpen(false);
                     }}
-                    className="w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+                    className="btn-touch w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left active-press"
                   >
                     <span className="text-gray-500 dark:text-gray-400 italic">No recipe</span>
                   </button>
@@ -262,7 +262,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                         onOpenRecipeDiscover();
                       }
                     }}
-                    className="w-full px-4 py-3 flex items-center justify-between bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-y border-orange-200 dark:border-orange-700 hover:from-orange-100 hover:to-red-100 dark:hover:from-orange-900/30 dark:hover:to-red-900/30 transition-all group"
+                    className="btn-touch w-full px-4 py-3 flex items-center justify-between bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-y border-orange-200 dark:border-orange-700 hover:from-orange-100 hover:to-red-100 dark:hover:from-orange-900/30 dark:hover:to-red-900/30 transition-all group shimmer-orange hover-lift active-press"
                   >
                     <div className="flex items-center gap-2">
                       <ChefHat className="w-4 h-4 text-orange-600 dark:text-orange-400" />
@@ -283,7 +283,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                         setIsRecipeSelectorOpen(false);
                         clearFilters();
                       }}
-                      className="w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left border-t border-gray-200 dark:border-gray-700"
+                      className="btn-touch w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left border-t border-gray-200 dark:border-gray-700 active-press"
                     >
                       <ChefHat className="w-4 h-4 text-orange-500" />
                       <div className="flex-1">
@@ -305,7 +305,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                           e.stopPropagation();
                           clearFilters();
                         }}
-                        className="text-sm text-orange-600 dark:text-orange-400 hover:underline"
+                        className="btn-touch text-sm text-orange-600 dark:text-orange-400 hover:underline active-press px-2 py-1"
                       >
                         Clear filters
                       </button>
@@ -320,7 +320,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                         href="/recipes/discover"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-orange-600 dark:text-orange-400 hover:underline inline-flex items-center gap-1"
+                        className="btn-touch text-sm text-orange-600 dark:text-orange-400 hover:underline inline-flex items-center gap-1 active-press px-2 py-1 rounded-md"
                       >
                         <ChefHat className="w-3 h-3" />
                         Discover recipes to add
