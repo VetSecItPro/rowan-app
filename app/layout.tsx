@@ -3,7 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthProvider } from "@/lib/contexts/auth-context";
 import { CookieConsent } from "@/components/gdpr/CookieConsent";
-import { CommandPaletteProvider } from "@/components/ui/command-palette";
+// import { CommandPaletteProvider } from "@/components/ui/command-palette"; // Temporarily disabled UI
 import { Toaster } from 'sonner';
 
 // Force dynamic rendering for all pages (needed for auth context)
@@ -53,9 +53,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <CommandPaletteProvider>
+            {/* <CommandPaletteProvider> // Temporarily disabled UI */}
               {children}
-            </CommandPaletteProvider>
+            {/* </CommandPaletteProvider> */}
             <CookieConsent />
             <Toaster
               position="top-center"
