@@ -7,6 +7,7 @@ export interface BackgroundCanvasProps {
   feature?: 'tasks' | 'calendar' | 'messages' | 'shopping' | 'meals' | 'reminders' | 'goals' | 'budget' | 'projects' | 'dashboard';
   timeAware?: boolean;
   className?: string;
+  contentClassName?: string;
   children?: React.ReactNode;
 }
 
@@ -35,6 +36,7 @@ export function SmartBackgroundCanvas({
   feature = 'dashboard',
   timeAware = false,
   className = '',
+  contentClassName = '',
   children
 }: BackgroundCanvasProps) {
   const [mounted, setMounted] = useState(false);
@@ -179,7 +181,7 @@ export function SmartBackgroundCanvas({
       )}
 
       {/* Content layer */}
-      <div className="relative z-10">
+      <div className={`relative z-10 ${contentClassName}`}>
         {children}
       </div>
     </div>
