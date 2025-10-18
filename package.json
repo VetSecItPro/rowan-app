@@ -19,6 +19,7 @@
     "@google/generative-ai": "^0.24.1",
     "@headlessui/react": "^2.2.9",
     "@react-email/components": "^0.5.7",
+    "@react-pdf/renderer": "^4.3.1",
     "@sentry/nextjs": "^8.34.0",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.58.0",
