@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { X, Sparkles, Trophy, TrendingUp, Target } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 interface MilestoneCelebrationProps {
   goalTitle: string;
@@ -23,11 +24,97 @@ export default function MilestoneCelebration({
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
+  // Enhanced confetti celebration functions
+  const triggerConfettiCelebration = () => {
+    if (percentageReached === 100) {
+      // Epic celebration for 100% completion
+      const end = Date.now() + 3000;
+      const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#95E1D3', '#F38181', '#AA96DA'];
+
+      function frame() {
+        confetti({
+          particleCount: 2,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: colors,
+        });
+        confetti({
+          particleCount: 2,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: colors,
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      }
+      frame();
+
+      // Additional center burst
+      setTimeout(() => {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: colors,
+        });
+      }, 500);
+    } else if (percentageReached >= 75) {
+      // Strong celebration for 75%
+      confetti({
+        particleCount: 80,
+        spread: 60,
+        origin: { y: 0.6 },
+        colors: ['#AA96DA', '#95E1D3', '#F38181'],
+      });
+      setTimeout(() => {
+        confetti({
+          particleCount: 50,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: ['#AA96DA', '#95E1D3'],
+        });
+        confetti({
+          particleCount: 50,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: ['#AA96DA', '#95E1D3'],
+        });
+      }, 300);
+    } else if (percentageReached >= 50) {
+      // Medium celebration for 50%
+      confetti({
+        particleCount: 60,
+        spread: 50,
+        origin: { y: 0.6 },
+        colors: ['#4ECDC4', '#95E1D3', '#FFD700'],
+      });
+    } else {
+      // Gentle celebration for 25%
+      confetti({
+        particleCount: 30,
+        spread: 40,
+        origin: { y: 0.6 },
+        colors: ['#AA96DA', '#F38181'],
+        gravity: 0.8,
+      });
+    }
+  };
+
   useEffect(() => {
     // Trigger entrance animation
     setTimeout(() => {
       setIsVisible(true);
       setIsAnimating(true);
+      // Trigger enhanced confetti after modal appears
+      setTimeout(() => {
+        triggerConfettiCelebration();
+      }, 300);
     }, 10);
 
     // Auto-close after delay
@@ -38,7 +125,7 @@ export default function MilestoneCelebration({
     return () => {
       clearTimeout(closeTimer);
     };
-  }, [autoCloseDelay]);
+  }, [autoCloseDelay, percentageReached]);
 
   const handleClose = () => {
     setIsAnimating(false);
@@ -67,17 +154,6 @@ export default function MilestoneCelebration({
   return (
     <>
       <style jsx>{`
-        @keyframes confetti-fall {
-          0% {
-            transform: translateY(-100vh) rotate(0deg);
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(100vh) rotate(360deg);
-            opacity: 0;
-          }
-        }
-
         @keyframes float {
           0%,
           100% {
@@ -98,14 +174,6 @@ export default function MilestoneCelebration({
           }
         }
 
-        .confetti-piece {
-          position: fixed;
-          width: 10px;
-          height: 10px;
-          z-index: 61;
-          animation: confetti-fall 3s linear forwards;
-        }
-
         .float-animation {
           animation: float 3s ease-in-out infinite;
         }
@@ -114,29 +182,6 @@ export default function MilestoneCelebration({
           animation: pulse-glow 2s ease-in-out infinite;
         }
       `}</style>
-
-      {/* Confetti */}
-      {isAnimating &&
-        Array.from({ length: 50 }).map((_, i) => (
-          <div
-            key={i}
-            className="confetti-piece"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `-20px`,
-              background: [
-                '#FFD700',
-                '#FF6B6B',
-                '#4ECDC4',
-                '#95E1D3',
-                '#F38181',
-                '#AA96DA',
-              ][Math.floor(Math.random() * 6)],
-              animationDelay: `${Math.random() * 2}s`,
-              animationDuration: `${2 + Math.random() * 2}s`,
-            }}
-          />
-        ))}
 
       {/* Backdrop */}
       <div
