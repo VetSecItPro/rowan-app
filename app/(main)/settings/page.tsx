@@ -277,6 +277,9 @@ export default function SettingsPage() {
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
 
+  // Password reset state
+  const [resetEmail, setResetEmail] = useState('');
+
   // Active sessions state
   const [activeSessions, setActiveSessions] = useState<ActiveSession[]>([]);
   const [sessionToRevoke, setSessionToRevoke] = useState<string | null>(null);
@@ -644,6 +647,13 @@ export default function SettingsPage() {
     loadPrivacySettings();
   }, []);
 
+  // Initialize reset email with user's current email
+  useEffect(() => {
+    if (user?.email && !resetEmail) {
+      setResetEmail(user.email);
+    }
+  }, [user?.email, resetEmail]);
+
   // Fetch active sessions when security tab is active
   useEffect(() => {
     if (activeTab === 'security') {
@@ -654,10 +664,13 @@ export default function SettingsPage() {
   const fetchActiveSessions = async () => {
     try {
       setIsLoadingSessions(true);
+      console.log('Fetching active sessions...');
       const response = await fetch('/api/user/sessions');
       const result = await response.json();
+      console.log('Sessions API response:', result);
 
       if (result.success) {
+        console.log('Setting active sessions:', result.sessions);
         setActiveSessions(result.sessions);
       } else {
         console.error('Failed to load sessions:', result.error);
@@ -694,13 +707,13 @@ export default function SettingsPage() {
   };
 
   const handleRequestPasswordReset = async () => {
-    if (!user?.email) return;
+    if (!resetEmail) return;
     setIsRequestingReset(true);
 
     const supabase = createClient();
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
 
@@ -964,9 +977,20 @@ export default function SettingsPage() {
                             </div>
                           ) : (
                             <>
-                              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg mb-4">
-                                <p className="text-xs text-blue-700 dark:text-blue-300">
-                                  <strong>Current email:</strong> {user?.email}
+                              <div className="mb-4">
+                                <label htmlFor="resetEmail" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                  Email address for password reset
+                                </label>
+                                <input
+                                  id="resetEmail"
+                                  type="email"
+                                  value={resetEmail}
+                                  onChange={(e) => setResetEmail(e.target.value)}
+                                  placeholder="Enter email address"
+                                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-900/50 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                />
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                  Current account email: {user?.email}
                                 </p>
                               </div>
                               <button
@@ -997,7 +1021,28 @@ export default function SettingsPage() {
 
                     {/* Active Sessions */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Active Sessions</h3>
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Active Sessions</h3>
+                        <button
+                          onClick={async () => {
+                            console.log('Manual session tracking triggered');
+                            try {
+                              const response = await fetch('/api/user/track-session', {
+                                method: 'POST',
+                              });
+                              const result = await response.json();
+                              console.log('Manual session tracking result:', result);
+                              // Refresh sessions after tracking
+                              fetchActiveSessions();
+                            } catch (error) {
+                              console.error('Manual session tracking error:', error);
+                            }
+                          }}
+                          className="text-xs bg-purple-600 text-white px-3 py-1 rounded-lg hover:bg-purple-700 transition-colors"
+                        >
+                          Create Session
+                        </button>
+                      </div>
                       {isLoadingSessions ? (
                         <div className="space-y-3">
                           {[...Array(3)].map((_, i) => (
