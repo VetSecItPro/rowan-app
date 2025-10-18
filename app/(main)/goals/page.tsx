@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle } from 'lucide-react';
+import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle, GitBranch } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { GoalCard } from '@/components/goals/GoalCard';
@@ -15,6 +15,8 @@ import { CheckInHistoryTimeline } from '@/components/goals/CheckInHistoryTimelin
 import { ActivityFeed } from '@/components/goals/ActivityFeed';
 import { CheckInFrequencyModal } from '@/components/goals/CheckInFrequencyModal';
 import { HabitTracker } from '@/components/goals/HabitTracker';
+import { DependenciesModal } from '@/components/goals/DependenciesModal';
+import { DependencyVisualization } from '@/components/goals/DependencyVisualization';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { GoalCardSkeleton, MilestoneCardSkeleton, StatsCardSkeleton } from '@/components/ui/Skeleton';
@@ -27,7 +29,7 @@ import { toast } from 'sonner';
 import { usePresence } from '@/lib/hooks/usePresence';
 import { OnlineUsersIndicator, PresenceIndicator } from '@/components/shared/PresenceIndicator';
 
-type ViewMode = 'goals' | 'milestones' | 'habits' | 'activity';
+type ViewMode = 'goals' | 'milestones' | 'habits' | 'activity' | 'dependencies';
 
 export default function GoalsPage() {
   const { currentSpace, user } = useAuth();
@@ -43,6 +45,7 @@ export default function GoalsPage() {
   const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
   const [isHistoryTimelineOpen, setIsHistoryTimelineOpen] = useState(false);
   const [isFrequencyModalOpen, setIsFrequencyModalOpen] = useState(false);
+  const [isDependenciesModalOpen, setIsDependenciesModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null);
   const [checkInGoal, setCheckInGoal] = useState<Goal | null>(null);
@@ -464,6 +467,9 @@ export default function GoalsPage() {
     } else if (viewMode === 'habits') {
       // TODO: Open habit creation modal (placeholder for now)
       toast.info('Habit creation modal coming soon!');
+    } else if (viewMode === 'dependencies') {
+      // Open dependencies modal
+      setIsDependenciesModalOpen(true);
     } else if (viewMode === 'activity') {
       // For activity view, default to creating a new goal
       setIsTemplateModalOpen(true);
@@ -640,13 +646,24 @@ export default function GoalsPage() {
                   <MessageCircle className="w-4 h-4" />
                   <span className="text-sm">Activity</span>
                 </button>
+                <button
+                  onClick={() => handleViewModeChange('dependencies')}
+                  className={`px-2 sm:px-3 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                    viewMode === 'dependencies'
+                      ? 'bg-gradient-goals text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                  }`}
+                >
+                  <GitBranch className="w-4 h-4" />
+                  <span className="text-sm">Dependencies</span>
+                </button>
               </div>
               <button
                 onClick={handleNewButtonClick}
                 className="px-4 sm:px-6 py-2 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
-                <span>New {viewMode === 'goals' ? 'Goal' : viewMode === 'milestones' ? 'Milestone' : viewMode === 'habits' ? 'Habit' : 'Goal'}</span>
+                <span>New {viewMode === 'goals' ? 'Goal' : viewMode === 'milestones' ? 'Milestone' : viewMode === 'habits' ? 'Habit' : viewMode === 'dependencies' ? 'Dependency' : 'Goal'}</span>
               </button>
             </div>
           </div>
@@ -791,6 +808,7 @@ export default function GoalsPage() {
                   {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` :
                    viewMode === 'milestones' ? `Achievement Wall (${filteredMilestones.length})` :
                    viewMode === 'habits' ? 'Habit Tracker' :
+                   viewMode === 'dependencies' ? 'Goal Dependencies' :
                    'Activity Feed'}
                 </h2>
                 <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 text-sm font-medium rounded-full">
@@ -933,6 +951,15 @@ export default function GoalsPage() {
             ) : viewMode === 'habits' ? (
               /* Habits View */
               <HabitTracker spaceId={currentSpace?.id || ''} />
+            ) : viewMode === 'dependencies' ? (
+              /* Dependencies View */
+              <div className="space-y-6">
+                <DependencyVisualization
+                  spaceId={currentSpace?.id || ''}
+                  goals={goals}
+                  className="max-h-[600px]"
+                />
+              </div>
             ) : (
               /* Activity View */
               <div className="space-y-6">
@@ -995,6 +1022,11 @@ export default function GoalsPage() {
               goalTitle={frequencyGoal.title}
             />
           )}
+          <DependenciesModal
+            isOpen={isDependenciesModalOpen}
+            onClose={() => setIsDependenciesModalOpen(false)}
+            spaceId={currentSpace.id}
+          />
         </>
       )}
 
