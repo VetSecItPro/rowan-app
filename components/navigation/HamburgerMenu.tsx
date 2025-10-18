@@ -1,16 +1,18 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Search, Command as CommandIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { NAVIGATION_ITEMS } from '@/lib/navigation';
+import { useCommandPaletteTrigger } from '@/hooks/useCommandPalette';
 
 export function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const { trigger } = useCommandPaletteTrigger();
 
   // Close menu when route changes
   useEffect(() => {
@@ -107,6 +109,33 @@ export function HamburgerMenu() {
 
             {/* Menu Content */}
             <div className="py-2">
+              {/* Command Palette Trigger */}
+              <div className="px-4 py-3 sm:py-2 border-b border-gray-200 dark:border-gray-800">
+                <button
+                  onClick={() => {
+                    trigger();
+                    setIsOpen(false);
+                  }}
+                  className="btn-touch w-full flex items-center gap-3 px-4 py-4 sm:py-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors active:scale-[0.98] group rounded-lg"
+                >
+                  <div className="w-11 h-11 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                    <Search className="w-6 h-6 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0 text-left">
+                    <p className="text-base sm:text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      Command Palette
+                    </p>
+                    <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 truncate">
+                      Quick access to all features
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs font-medium text-gray-700 dark:text-gray-300">
+                    <CommandIcon className="w-3 h-3" />
+                    K
+                  </div>
+                </button>
+              </div>
+
               <div className="px-4 py-3 sm:py-2">
                 <p className="text-sm font-semibold text-gray-900 dark:text-white">Features</p>
               </div>
