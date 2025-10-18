@@ -1014,11 +1014,14 @@ export default function DashboardPage() {
             ) : (
               <CTAButton
                 onClick={() => setShowCreateSpaceModal(true)}
-                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
                 feature="dashboard"
+                breathing
                 magnetic
+                ripple
+                animationLevel="premium"
                 icon={<Plus className="w-4 h-4" />}
                 size="md"
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
               >
                 Create Your Space
               </CTAButton>
