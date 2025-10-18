@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { SignUpSchema } from '@/lib/schemas/auth';
-import { ratelimit } from '@/lib/ratelimit';
+import { checkAuthRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 /**
  * POST /api/auth/signup
@@ -10,19 +11,15 @@ import * as Sentry from '@sentry/nextjs';
  */
 export async function POST(req: NextRequest) {
   try {
-    // Rate limiting
-    try {
-      const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
-      const { success: rateLimitSuccess } = await ratelimit.limit(ip);
+    // Rate limiting with automatic fallback (stricter for auth)
+    const ip = extractIP(req.headers);
+    const { success: rateLimitSuccess } = await checkAuthRateLimit(ip);
 
-      if (!rateLimitSuccess) {
-        return NextResponse.json(
-          { error: 'Too many requests. Please try again later.' },
-          { status: 429 }
-        );
-      }
-    } catch (rateLimitError) {
-      // Rate limiting failed, continue without it
+    if (!rateLimitSuccess) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
     }
 
     // Parse and validate request body

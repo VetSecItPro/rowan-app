@@ -1,8 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getUserSpaces } from '@/lib/services/spaces-service';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,8 +12,19 @@ export const dynamic = 'force-dynamic';
  * GET /api/spaces
  * Get all spaces the authenticated user belongs to
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    // Rate limiting with automatic fallback
+    const ip = extractIP(req.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+
+    if (!rateLimitSuccess) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const supabase = createClient();
     const { data: { session }, error: authError } = await supabase.auth.getSession();
 
