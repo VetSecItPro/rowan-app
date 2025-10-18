@@ -58,7 +58,7 @@ export function RecurringTaskModal({ isOpen, onClose, onSave, spaceId, userId }:
             <Repeat className="w-5 h-5 text-blue-500" />
             <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Create Recurring Task</h2>
           </div>
-          <button onClick={onClose} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95">
+          <button onClick={onClose} className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active-press hover-lift">
             <X className="w-5 h-5 sm:w-4 sm:h-4" />
           </button>
         </div>
@@ -114,8 +114,8 @@ export function RecurringTaskModal({ isOpen, onClose, onSave, spaceId, userId }:
                         : [...formData.daysOfWeek, idx];
                       setFormData({ ...formData, daysOfWeek: days });
                     }}
-                    className={`w-10 h-10 rounded-full ${
-                      formData.daysOfWeek.includes(idx) ? 'bg-blue-500 text-white' : 'bg-gray-200'
+                    className={`btn-touch w-10 h-10 rounded-full transition-all active-press hover-lift shimmer-blue ${
+                      formData.daysOfWeek.includes(idx) ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
                     }`}
                   >
                     {day}

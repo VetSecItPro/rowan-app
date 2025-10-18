@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, List } from 'lucide-react';
+import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, List, X } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { EventCard } from '@/components/calendar/EventCard';
 import { NewEventModal } from '@/components/calendar/NewEventModal';
@@ -35,6 +35,7 @@ export default function CalendarPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
@@ -633,8 +634,8 @@ export default function CalendarPage() {
           {/* Search Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className="relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <div className={`apple-search-container group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
+              <Search className="apple-search-icon" />
               <input
                 ref={searchInputRef}
                 type="search"
@@ -643,14 +644,28 @@ export default function CalendarPage() {
                 autoCorrect="off"
                 autoCapitalize="none"
                 spellCheck="false"
-
                 placeholder="Search events... (Press / to focus)"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-
-                className="w-full pl-10 pr-4 py-3 text-base md:pl-10 md:pr-4 md:py-2 md:text-sm bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg focus:ring-2 focus:ring-purple-500/50 focus:border-transparent text-gray-900 dark:text-white shadow-lg"
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setIsSearchTyping(true);
+                  setTimeout(() => setIsSearchTyping(false), 300);
+                }}
+                className="apple-search-input"
                 title="Search events (Press / to focus)"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    searchInputRef.current?.focus();
+                  }}
+                  className="apple-search-clear"
+                  aria-label="Clear search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
             </div>
           </div>
           )}

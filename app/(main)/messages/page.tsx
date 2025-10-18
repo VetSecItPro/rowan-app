@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as ImageIcon, Paperclip, TrendingUp } from 'lucide-react';
+import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as ImageIcon, Paperclip, TrendingUp, X } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { MessageCard } from '@/components/messages/MessageCard';
 import { NewMessageModal } from '@/components/messages/NewMessageModal';
@@ -51,6 +51,7 @@ export default function MessagesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [searchResults, setSearchResults] = useState<Message[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -488,6 +489,8 @@ export default function MessagesPage() {
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
+    setIsSearchTyping(true);
+    setTimeout(() => setIsSearchTyping(false), 300);
 
     // Clear previous timeout
     if (searchTimeoutRef.current) {
@@ -881,8 +884,8 @@ export default function MessagesPage() {
           {/* Search Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 sm:p-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+            <div className={`apple-search-container group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
+              <Search className="apple-search-icon" />
               <input
                 type="search"
                 inputMode="search"
@@ -890,15 +893,13 @@ export default function MessagesPage() {
                 autoCorrect="off"
                 autoCapitalize="none"
                 spellCheck="false"
-
                 placeholder="Search all messages across conversations..."
                 value={searchQuery}
                 onChange={handleSearchChange}
-
-                className="w-full pl-9 pr-12 py-3 text-base md:pl-10 md:pr-12 md:py-2 md:text-sm bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-lg focus:ring-2 focus:ring-green-500/50 focus:border-transparent text-gray-900 dark:text-white"
+                className="apple-search-input"
               />
               {isSearching && (
-                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                <div className="absolute right-12 top-1/2 -translate-y-1/2">
                   <div className="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
                 </div>
               )}
@@ -908,11 +909,10 @@ export default function MessagesPage() {
                     setSearchQuery('');
                     setSearchResults([]);
                   }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  className="apple-search-clear"
+                  aria-label="Clear search"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <X className="w-4 h-4" />
                 </button>
               )}
             </div>

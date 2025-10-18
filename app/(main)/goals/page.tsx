@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle, GitBranch } from 'lucide-react';
+import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle, GitBranch, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { GoalCard } from '@/components/goals/GoalCard';
@@ -54,6 +54,7 @@ export default function GoalsPage() {
   const [frequencyGoal, setFrequencyGoal] = useState<Goal | null>(null);
   const [dependenciesGoal, setDependenciesGoal] = useState<Goal | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
@@ -396,6 +397,8 @@ export default function GoalsPage() {
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+    setIsSearchTyping(true);
+    setTimeout(() => setIsSearchTyping(false), 300);
   }, []);
 
   const handleViewModeChange = useCallback((mode: ViewMode) => {
@@ -796,8 +799,8 @@ export default function GoalsPage() {
           {/* Search Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <div className={`apple-search-container group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
+              <Search className="apple-search-icon" />
               <input
                 type="search"
                 inputMode="search"
@@ -805,13 +808,20 @@ export default function GoalsPage() {
                 autoCorrect="off"
                 autoCapitalize="none"
                 spellCheck="false"
-
                 placeholder="Search goals..."
                 value={searchQuery}
                 onChange={handleSearchChange}
-
-                className="w-full pl-10 pr-4 py-3 text-base md:pl-10 md:pr-4 md:py-2 md:text-sm bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-lg focus:ring-2 focus:ring-purple-500/50 focus:border-transparent text-gray-900 dark:text-white"
+                className="apple-search-input"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="apple-search-clear"
+                  aria-label="Clear search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
             </div>
           </div>
           )}

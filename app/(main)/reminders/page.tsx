@@ -21,6 +21,7 @@ export default function RemindersPage(): JSX.Element {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [assignmentFilter, setAssignmentFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'bills' | 'health' | 'work' | 'personal' | 'household'>('all');
@@ -261,6 +262,8 @@ export default function RemindersPage(): JSX.Element {
   // Memoized callback for search query changes
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+    setIsSearchTyping(true);
+    setTimeout(() => setIsSearchTyping(false), 300);
   }, []);
 
   // Memoized callback for status filter changes
@@ -567,31 +570,31 @@ export default function RemindersPage(): JSX.Element {
                 {/* Search and Sort Row */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                   {/* Search */}
-                  <div className="flex-1 relative">
-                    <input
-                      type="search"
-                      inputMode="search"
-                      autoComplete="off"
-                      autoCorrect="off"
-                      autoCapitalize="none"
-                      spellCheck="false"
-
-                      placeholder="Search reminders..."
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-
-                      className="w-full pl-4 pr-20 py-3 text-base md:pl-4 md:pr-20 md:py-2 md:text-sm bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-lg focus:ring-2 focus:ring-pink-500/50 focus:border-transparent text-gray-900 dark:text-white"
-                    />
-                    {searchQuery && (
-                      <button
-                        onClick={() => setSearchQuery('')}
-                        className="absolute right-10 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                        aria-label="Clear search"
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                    )}
-                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  <div className="flex-1">
+                    <div className={`apple-search-container group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
+                      <Search className="apple-search-icon" />
+                      <input
+                        type="search"
+                        inputMode="search"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="none"
+                        spellCheck="false"
+                        placeholder="Search reminders..."
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        className="apple-search-input"
+                      />
+                      {searchQuery && (
+                        <button
+                          onClick={() => setSearchQuery('')}
+                          className="apple-search-clear"
+                          aria-label="Clear search"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   {/* Sort Dropdown */}

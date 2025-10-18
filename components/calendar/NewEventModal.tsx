@@ -340,7 +340,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
             </div>
             <button
               onClick={onClose}
-              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95"
+              className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active-press hover-lift"
               aria-label="Close modal"
             >
               <X className="w-5 h-5" />
@@ -371,7 +371,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                   type="button"
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                   title="Add emoji"
-                  className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  className="btn-touch p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors active-press hover-lift"
                 >
                   <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 </button>
@@ -386,7 +386,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                           key={idx}
                           type="button"
                           onClick={() => handleEmojiClick(emoji)}
-                          className="w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          className="btn-touch w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active-press hover-lift"
                           title="Click to add emoji"
                         >
                           {emoji}
@@ -416,7 +416,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
               <button
                 type="button"
                 onClick={() => imageInputRef.current?.click()}
-                className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="btn-touch p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors hover-lift active-press shimmer-purple"
                 title="Attach images"
               >
                 <ImageIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -426,7 +426,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="btn-touch p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors hover-lift active-press shimmer-purple"
                 title="Attach files"
               >
                 <Paperclip className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -449,7 +449,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                       <button
                         type="button"
                         onClick={() => removeImage(idx)}
-                        className="ml-1 hover:text-red-500"
+                        className="btn-touch ml-1 hover:text-red-500 active-press hover-lift"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -475,7 +475,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                       <button
                         type="button"
                         onClick={() => removeFile(idx)}
-                        className="ml-1 hover:text-red-500"
+                        className="btn-touch ml-1 hover:text-red-500 active-press hover-lift"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -628,7 +628,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                               : [...prev, index]
                           );
                         }}
-                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        className={`btn-touch px-3 py-2 rounded-lg text-sm font-medium transition-all hover-lift active-press shimmer-purple ${
                           selectedDaysOfWeek.includes(index)
                             ? 'bg-purple-500 text-white'
                             : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
@@ -659,7 +659,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                               : [...prev, day]
                           );
                         }}
-                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        className={`btn-touch px-3 py-2 rounded-lg text-sm font-medium transition-all hover-lift active-press shimmer-purple ${
                           selectedDaysOfMonth.includes(day)
                             ? 'bg-purple-500 text-white'
                             : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
@@ -744,7 +744,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                     key={color.value}
                     type="button"
                     onClick={() => setCustomColor(color.value)}
-                    className={`w-10 h-10 rounded-lg border-2 transition-all hover:scale-110 ${
+                    className={`btn-touch w-10 h-10 rounded-lg border-2 transition-all hover:scale-110 active-press hover-lift shimmer-purple ${
                       customColor === color.value
                         ? 'border-gray-900 dark:border-white ring-2 ring-offset-2 ring-purple-500'
                         : 'border-gray-300 dark:border-gray-600'
@@ -757,7 +757,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                   <button
                     type="button"
                     onClick={() => setCustomColor('')}
-                    className="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    className="btn-touch w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors active-press hover-lift"
                     title="Clear custom color"
                   >
                     <X className="w-4 h-4" />
@@ -784,7 +784,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                   <button
                     type="button"
                     onClick={() => setCustomColor('')}
-                    className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                    className="btn-touch px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors active-press hover-lift"
                   >
                     Clear
                   </button>
@@ -813,7 +813,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                   key={category.value}
                   type="button"
                   onClick={() => setFormData({ ...formData, category: category.value as any })}
-                  className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${
+                  className={`btn-touch flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover-lift active-press shimmer-purple ${
                     formData.category === category.value
                       ? `${category.color} border-transparent text-white`
                       : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
@@ -831,14 +831,14 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+              className="btn-touch flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium active-press hover-lift"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!!dateError || uploading}
-              className={`flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl transition-all shadow-lg font-medium ${
+              className={`btn-touch flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl transition-all shadow-lg font-medium shimmer-purple hover-lift active-press ${
                 dateError || uploading ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
               }`}
             >

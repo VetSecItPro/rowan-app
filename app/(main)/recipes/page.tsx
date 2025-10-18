@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Search, Plus, ChefHat, Clock, Users, Trash2, ExternalLink, Filter } from 'lucide-react';
+import { Search, Plus, ChefHat, Clock, Users, Trash2, ExternalLink, Filter, X } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { mealsService, type Recipe } from '@/lib/services/meals-service';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -13,6 +13,7 @@ export default function RecipesPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -150,22 +151,35 @@ export default function RecipesPage() {
           </div>
 
           {/* Search Bar */}
-          <div className="relative max-w-2xl">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="search"
-              inputMode="search"
-              autoComplete="off"
-              autoCorrect="off"
-              autoCapitalize="none"
-              spellCheck="false"
-
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search recipes..."
-
-              className="w-full pl-12 pr-4 py-3 text-base md:pl-12 md:pr-4 md:py-3 md:text-sm bg-gray-50 dark:bg-gray-800 border-0 rounded-lg shadow-lg focus:ring-2 focus:ring-orange-300 text-gray-900 dark:text-white placeholder-gray-500"
-            />
+          <div className="max-w-2xl">
+            <div className={`apple-search-container group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
+              <Search className="apple-search-icon" />
+              <input
+                type="search"
+                inputMode="search"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck="false"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setIsSearchTyping(true);
+                  setTimeout(() => setIsSearchTyping(false), 300);
+                }}
+                placeholder="Search recipes..."
+                className="apple-search-input"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="apple-search-clear"
+                  aria-label="Clear search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

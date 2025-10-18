@@ -123,7 +123,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
             <h2 className="text-lg sm:text-xl font-bold">{editGoal ? 'Edit Goal' : 'New Goal'}</h2>
             <button
               onClick={onClose}
-              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95"
+              className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active-press hover-lift shimmer-indigo"
               aria-label="Close modal"
             >
               <X className="w-5 h-5 sm:w-4 sm:h-4" />
@@ -155,7 +155,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                   title="Add emoji"
                   aria-label="Add emoji to title"
-                  className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  className="btn-touch p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors active-press hover-lift shimmer-indigo"
                 >
                   <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 </button>
@@ -170,7 +170,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
                           key={idx}
                           type="button"
                           onClick={() => handleEmojiClick(emoji)}
-                          className="w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          className="btn-touch w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active-press hover-lift shimmer-indigo"
                           title="Click to add emoji"
                         >
                           {emoji}
@@ -261,13 +261,13 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+              className="btn-touch flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium active-press hover-lift"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:opacity-90 transition-all shadow-lg font-medium"
+              className="btn-touch flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:opacity-90 transition-all shadow-lg font-medium active-press hover-lift shimmer-indigo"
             >
               {editGoal ? 'Update Goal' : 'Create Goal'}
             </button>

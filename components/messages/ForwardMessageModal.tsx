@@ -75,7 +75,7 @@ export function ForwardMessageModal({
             </h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="btn-touch p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active-press hover-lift"
               aria-label="Close modal"
             >
               <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
@@ -117,7 +117,7 @@ export function ForwardMessageModal({
                   <button
                     key={conversation.id}
                     onClick={() => handleToggleConversation(conversation.id)}
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-left ${
+                    className={`btn-touch w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-left active-press hover-lift shimmer-green ${
                       selectedConversations.has(conversation.id)
                         ? 'bg-green-50 dark:bg-green-900/20 border-2 border-green-500'
                         : 'border-2 border-transparent hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -159,14 +159,14 @@ export function ForwardMessageModal({
             <div className="flex gap-3">
               <button
                 onClick={onClose}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
+                className="btn-touch px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium active-press hover-lift"
               >
                 Cancel
               </button>
               <button
                 onClick={handleForward}
                 disabled={selectedConversations.size === 0 || isForwarding}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white rounded-lg transition-colors font-medium disabled:cursor-not-allowed flex items-center gap-2"
+                className="btn-touch px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white rounded-lg transition-colors font-medium disabled:cursor-not-allowed flex items-center gap-2 active-press hover-lift shimmer-green"
               >
                 <Send className="w-4 h-4" />
                 {isForwarding ? 'Forwarding...' : 'Forward'}

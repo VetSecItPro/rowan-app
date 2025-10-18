@@ -117,7 +117,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
             </div>
             <button
               onClick={handleClose}
-              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95"
+              className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active-press hover-lift"
             >
               <X className="w-5 h-5 sm:w-4 sm:h-4" />
             </button>
@@ -156,14 +156,14 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
                 type="button"
                 onClick={handleClose}
                 disabled={loading}
-                className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium disabled:opacity-50"
+                className="btn-touch flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium disabled:opacity-50 active-press hover-lift"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:opacity-90 transition-all shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-touch flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:opacity-90 transition-all shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed active-press hover-lift shimmer-purple"
               >
                 {loading ? 'Sending...' : 'Send Invitation'}
               </button>
@@ -199,7 +199,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
                 <button
                   type="button"
                   onClick={handleCopyUrl}
-                  className="px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors"
+                  className="btn-touch px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors active-press hover-lift shimmer-purple"
                   title="Copy link"
                 >
                   {copied ? (
@@ -218,7 +218,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
             <button
               type="button"
               onClick={handleClose}
-              className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:opacity-90 transition-all shadow-lg font-medium"
+              className="btn-touch w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:opacity-90 transition-all shadow-lg font-medium active-press hover-lift shimmer-purple"
             >
               Done
             </button>
