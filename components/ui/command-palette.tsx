@@ -34,6 +34,7 @@ import {
   Edit,
   Eye,
   ArrowRight,
+  Sparkles,
   Command as CommandIcon
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
@@ -160,6 +161,17 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       action: () => router.push('/reminders'),
       category: 'navigation',
       keywords: ['notifications', 'alerts', 'notify']
+    },
+    {
+      id: 'nav-year-in-review',
+      title: 'Year in Review',
+      description: 'View annual insights and achievements',
+      icon: Sparkles,
+      action: () => router.push('/year-in-review'),
+      shortcut: ['g', 'y'],
+      category: 'navigation',
+      keywords: ['annual', 'review', 'insights', 'achievements', 'summary'],
+      featured: true
     },
     {
       id: 'nav-settings',
