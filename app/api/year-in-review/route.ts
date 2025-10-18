@@ -91,6 +91,7 @@ export async function GET(request: NextRequest) {
 
     // Generate year in review data
     const yearInReviewData = await yearInReviewService.generateYearInReview(
+      supabase,
       session.user.id,
       spaceId,
       targetYear
@@ -205,6 +206,7 @@ export async function POST(request: NextRequest) {
 
     // Generate year in review data
     const yearInReviewData = await yearInReviewService.generateYearInReview(
+      supabase,
       session.user.id,
       space_id,
       targetYear
