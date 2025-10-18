@@ -377,7 +377,7 @@ export async function calculateCurrentBalance(spaceId: string): Promise<BalanceS
   // Get all unsettled splits for this space
   const { data: splits, error } = await supabase
     .from('expense_splits')
-    .select('*, expenses!inner(space_id), users(email)')
+    .select('*, expenses!inner(space_id), users!inner(email)')
     .eq('expenses.space_id', spaceId)
     .neq('status', 'settled');
 
