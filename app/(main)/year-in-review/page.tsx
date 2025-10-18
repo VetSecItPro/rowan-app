@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function YearInReviewPage() {
   return (
-    <div className=\"container mx-auto px-4 py-8 max-w-7xl\">
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
       <YearInReviewDashboard />
     </div>
   );
