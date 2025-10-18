@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getUserSessions, formatLastActive } from '@/lib/services/session-tracking-service';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +15,17 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: Request) {
   try {
+    // Rate limiting with automatic fallback
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+
+    if (!rateLimitSuccess) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const supabase = createClient();
 
     // Get authenticated user
@@ -21,6 +37,9 @@ export async function GET(request: Request) {
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // Set user context for Sentry error tracking
+    setSentryUser(user);
 
     // Get user sessions
     const result = await getUserSessions(user.id);
@@ -49,7 +68,19 @@ export async function GET(request: Request) {
       sessions: formattedSessions || [],
     });
   } catch (error) {
-    console.error('Error fetching sessions:', error);
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/user/sessions',
+        method: 'GET',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+    logger.error('[API] /api/user/sessions GET error', error, {
+      component: 'SessionTrackingAPI',
+      action: 'GET',
+    });
     return NextResponse.json(
       { error: 'Failed to fetch sessions' },
       { status: 500 }
