@@ -78,7 +78,7 @@ export function Header() {
                 <Tooltip content="Settings" delay={0} position="bottom">
                   <Link
                     href="/settings"
-                    className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all active:scale-95"
+                    className="hidden sm:flex items-center justify-center w-10 h-10 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors active:scale-95"
                     aria-label="Settings"
                   >
                     <svg className="w-5 h-5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
