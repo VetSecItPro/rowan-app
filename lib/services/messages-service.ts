@@ -272,7 +272,7 @@ export const messagesService = {
     const [messagesResult, conversationsResult] = await Promise.all([
       supabase
         .from('messages')
-        .select('*, conversation:conversations!inner(space_id)')
+        .select('*, conversation:conversations!conversation_id!inner(space_id)')
         .eq('conversation.space_id', spaceId),
       supabase
         .from('conversations')
@@ -309,7 +309,7 @@ export const messagesService = {
     const supabase = createClient();
     const { data, error} = await supabase
       .from('messages')
-      .select('*, conversation:conversations!inner(space_id)')
+      .select('*, conversation:conversations!conversation_id!inner(space_id)')
       .eq('conversation.space_id', spaceId)
       .ilike('content', `%${query}%`)
       .order('created_at', { ascending: false })

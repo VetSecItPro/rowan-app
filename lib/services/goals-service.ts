@@ -460,7 +460,7 @@ export const goalsService = {
       .eq('id', id)
       .select(`
         *,
-        goal:goals!inner(space_id)
+        goal:goals!goal_id!inner(space_id)
       `)
       .single();
 
@@ -797,7 +797,7 @@ export const goalsService = {
       }])
       .select(`
         *,
-        goal:goals!inner(space_id)
+        goal:goals!goal_id!inner(space_id)
       `)
       .single();
 

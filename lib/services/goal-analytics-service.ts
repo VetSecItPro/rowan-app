@@ -57,7 +57,7 @@ export async function getGoalAnalytics(
     // Fetch goal check-ins for activity analysis
     const { data: checkIns, error: checkInsError } = await supabase
       .from('goal_check_ins')
-      .select('*, goal:goals!inner(space_id)')
+      .select('*, goal:goals!goal_id!inner(space_id)')
       .eq('goal.space_id', spaceId)
       .gte('created_at', startDate.toISOString())
       .lte('created_at', endDate.toISOString())
