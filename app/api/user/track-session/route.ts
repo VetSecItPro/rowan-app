@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { parseUserAgent, getLocationFromIP } from '@/lib/services/session-tracking-service';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
+import * as Sentry from '@sentry/nextjs';
+import { setSentryUser } from '@/lib/sentry-utils';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/user/track-session
@@ -8,6 +13,17 @@ import { parseUserAgent, getLocationFromIP } from '@/lib/services/session-tracki
  */
 export async function POST(request: Request) {
   try {
+    // Rate limiting with automatic fallback
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+
+    if (!rateLimitSuccess) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const supabase = createClient();
 
     // Get authenticated user
@@ -20,13 +36,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Set user context for Sentry error tracking
+    setSentryUser(user);
+
     // Get client information from request headers
     const userAgent = request.headers.get('user-agent') || '';
-    const forwardedFor = request.headers.get('x-forwarded-for');
-    const realIp = request.headers.get('x-real-ip');
 
-    // Extract IP address (prioritize x-forwarded-for for proxy support)
-    const ipAddress = forwardedFor?.split(',')[0].trim() || realIp || '127.0.0.1';
+    // Use standardized IP extraction
+    const ipAddress = ip;
 
     // Parse device information
     const deviceInfo = parseUserAgent(userAgent);
@@ -56,7 +73,11 @@ export async function POST(request: Request) {
         .eq('id', existingSession.id);
 
       if (updateError) {
-        console.error('Error updating session:', updateError);
+        logger.error('[API] Session tracking update error', updateError, {
+          component: 'SessionTrackingAPI',
+          action: 'UPDATE',
+          userId: user.id,
+        });
         return NextResponse.json({ error: 'Failed to update session' }, { status: 500 });
       }
 
@@ -101,7 +122,11 @@ export async function POST(request: Request) {
       .single();
 
     if (insertError) {
-      console.error('Error creating session:', insertError);
+      logger.error('[API] Session tracking creation error', insertError, {
+        component: 'SessionTrackingAPI',
+        action: 'CREATE',
+        userId: user.id,
+      });
       return NextResponse.json({ error: 'Failed to create session' }, { status: 500 });
     }
 
@@ -117,7 +142,19 @@ export async function POST(request: Request) {
       sessionId: newSession.id,
     });
   } catch (error) {
-    console.error('Session tracking error:', error);
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/user/track-session',
+        method: 'POST',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+    logger.error('[API] /api/user/track-session POST error', error, {
+      component: 'SessionTrackingAPI',
+      action: 'POST',
+    });
     return NextResponse.json(
       { error: 'Failed to track session' },
       { status: 500 }
