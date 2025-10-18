@@ -34,7 +34,8 @@ import { ProjectPhotoGallery } from '@/components/budget/ProjectPhotoGallery';
 import { BudgetVarianceCard } from '@/components/budget/BudgetVarianceCard';
 
 export default function ProjectTrackingPage() {
-  const { id: projectId } = useParams();
+  const params = useParams();
+  const projectId = params?.id;
   const { currentSpace } = useAuth();
   const [project, setProject] = useState<Project | null>(null);
   const [lineItems, setLineItems] = useState<ProjectLineItem[]>([]);

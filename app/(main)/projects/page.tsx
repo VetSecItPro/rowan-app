@@ -290,8 +290,6 @@ export default function ProjectsPage() {
                     else setIsExpenseModalOpen(true);
                   }}
                   feature="projects"
-                  breathing
-                  ripple
                   icon={<Plus className="w-5 h-5 flex-shrink-0" />}
                   className="min-w-[120px] sm:min-w-[180px] px-4 py-2 sm:px-6 sm:py-3"
                 >
@@ -305,8 +303,6 @@ export default function ProjectsPage() {
                 <CTAButton
                   onClick={() => setIsReceiptModalOpen(true)}
                   feature="projects"
-                  breathing
-                  ripple
                   icon={<Plus className="w-5 h-5 flex-shrink-0" />}
                   className="min-w-[120px] sm:min-w-[180px] px-4 py-2 sm:px-6 sm:py-3"
                 >
@@ -461,8 +457,6 @@ export default function ProjectsPage() {
                   <CTAButton
                     onClick={() => setIsProjectModalOpen(true)}
                     feature="projects"
-                    breathing
-                    ripple
                     icon={<Plus className="w-5 h-5" />}
                   >
                     Create Project
@@ -487,8 +481,6 @@ export default function ProjectsPage() {
                     <CTAButton
                       onClick={() => setIsTemplateModalOpen(true)}
                       feature="projects"
-                      breathing
-                      ripple
                       icon={<FileText className="w-5 h-5" />}
                     >
                       Use Template
@@ -502,7 +494,7 @@ export default function ProjectsPage() {
               ) : (
                 <div className="space-y-6">
                   {/* Safe to Spend Indicator */}
-                  <SafeToSpendIndicator spaceId={currentSpace.id} />
+                  {currentSpace && <SafeToSpendIndicator spaceId={currentSpace.id} />}
 
                   {/* Budget Header */}
                   <div className="flex items-center justify-between">
@@ -516,8 +508,6 @@ export default function ProjectsPage() {
                       <CTAButton
                         onClick={() => setIsTemplateModalOpen(true)}
                         feature="projects"
-                        breathing
-                        ripple
                         size="sm"
                         icon={<FileText className="w-4 h-4" />}
                       >
@@ -621,8 +611,6 @@ export default function ProjectsPage() {
                   <CTAButton
                     onClick={() => setIsExpenseModalOpen(true)}
                     feature="projects"
-                    breathing
-                    ripple
                     icon={<Plus className="w-5 h-5" />}
                   >
                     Add Expense

@@ -717,8 +717,10 @@ export default function MessagesPage() {
       const newConversation = await messagesService.createConversation(conversationData);
 
       // Reload conversations list
-      const conversationsData = await messagesService.getConversationsList(currentSpace.id);
-      setConversations(conversationsData);
+      if (user?.id) {
+        const conversationsData = await messagesService.getConversationsList(currentSpace.id, user.id);
+        setConversations(conversationsData);
+      }
 
       // Switch to the new conversation
       await handleSelectConversation(newConversation.id);
@@ -1032,7 +1034,7 @@ export default function MessagesPage() {
 
                         {/* Message Card with Swipe Gestures */}
                         <SwipeableMessageCard
-                          isOwn={message.sender_id === user.id}
+                          isOwn={message.sender_id === user?.id}
                           onEdit={() => handleEditMessage(message)}
                           onDelete={() => handleDeleteMessage(message.id)}
                         >
@@ -1043,8 +1045,8 @@ export default function MessagesPage() {
                             onMarkRead={handleMarkRead}
                             onTogglePin={handleTogglePin}
                             onForward={handleForwardMessage}
-                            isOwn={message.sender_id === user.id}
-                            currentUserId={user.id}
+                            isOwn={message.sender_id === user?.id}
+                            currentUserId={user?.id || ''}
                             onReply={handleReply}
                             showReplyButton={true}
                           />

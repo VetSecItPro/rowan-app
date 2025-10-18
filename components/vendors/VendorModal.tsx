@@ -393,8 +393,6 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
               type="submit"
               disabled={saving}
               feature="projects"
-              breathing
-              ripple
               icon={editVendor ? <User className="w-4 h-4" /> : <Building2 className="w-4 h-4" />}
             >
               {saving ? 'Saving...' : editVendor ? 'Update Vendor' : 'Add Vendor'}

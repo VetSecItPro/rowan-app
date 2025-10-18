@@ -144,7 +144,7 @@ export interface DailyDigestData {
  */
 export async function sendTaskAssignmentEmail(data: TaskAssignmentData): Promise<EmailResult> {
   try {
-    const emailHtml = render(TaskAssignmentEmail(data));
+    const emailHtml = await render(TaskAssignmentEmail(data));
 
     const { data: result, error } = await resend.emails.send({
       from: FROM_EMAIL,
@@ -176,7 +176,7 @@ export async function sendTaskAssignmentEmail(data: TaskAssignmentData): Promise
  */
 export async function sendEventReminderEmail(data: EventReminderData): Promise<EmailResult> {
   try {
-    const emailHtml = render(EventReminderEmail(data));
+    const emailHtml = await render(EventReminderEmail(data));
 
     const { data: result, error } = await resend.emails.send({
       from: FROM_EMAIL,
@@ -208,7 +208,7 @@ export async function sendEventReminderEmail(data: EventReminderData): Promise<E
  */
 export async function sendNewMessageEmail(data: NewMessageData): Promise<EmailResult> {
   try {
-    const emailHtml = render(NewMessageEmail(data));
+    const emailHtml = await render(NewMessageEmail(data));
 
     const { data: result, error } = await resend.emails.send({
       from: FROM_EMAIL,
@@ -239,7 +239,7 @@ export async function sendNewMessageEmail(data: NewMessageData): Promise<EmailRe
  */
 export async function sendShoppingListEmail(data: ShoppingListData): Promise<EmailResult> {
   try {
-    const emailHtml = render(ShoppingListEmail(data));
+    const emailHtml = await render(ShoppingListEmail(data));
 
     const actionLabels = {
       shared: 'shared',
@@ -277,7 +277,7 @@ export async function sendShoppingListEmail(data: ShoppingListData): Promise<Ema
  */
 export async function sendMealReminderEmail(data: MealReminderData): Promise<EmailResult> {
   try {
-    const emailHtml = render(MealReminderEmail(data));
+    const emailHtml = await render(MealReminderEmail(data));
 
     const reminderLabels = {
       prep: 'Meal prep reminder',
@@ -316,7 +316,7 @@ export async function sendMealReminderEmail(data: MealReminderData): Promise<Ema
  */
 export async function sendGeneralReminderEmail(data: GeneralReminderData): Promise<EmailResult> {
   try {
-    const emailHtml = render(GeneralReminderEmail(data));
+    const emailHtml = await render(GeneralReminderEmail(data));
 
     const { data: result, error } = await resend.emails.send({
       from: FROM_EMAIL,
@@ -349,7 +349,7 @@ export async function sendGeneralReminderEmail(data: GeneralReminderData): Promi
  */
 export async function sendDailyDigestEmail(data: DailyDigestData): Promise<EmailResult> {
   try {
-    const emailHtml = render(DailyDigestEmail(data));
+    const emailHtml = await render(DailyDigestEmail(data));
 
     const { data: result, error } = await resend.emails.send({
       from: FROM_EMAIL,
