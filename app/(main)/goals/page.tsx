@@ -30,6 +30,7 @@ import { toast } from 'sonner';
 import { usePresence } from '@/lib/hooks/usePresence';
 import { OnlineUsersIndicator, PresenceIndicator } from '@/components/shared/PresenceIndicator';
 import { NudgeCenter } from '@/components/nudges/NudgeCenter';
+import BadgesWidget from '@/components/goals/badges/BadgesWidget';
 
 type ViewMode = 'goals' | 'milestones' | 'habits' | 'activity' | 'dependencies' | 'nudges';
 
@@ -799,6 +800,13 @@ export default function GoalsPage() {
                 )}
               </div>
             </div>
+
+            {/* Badges Widget */}
+            {user && currentSpace && (
+              <div className="sm:col-span-2 lg:col-span-1">
+                <BadgesWidget userId={user.id} spaceId={currentSpace.id} />
+              </div>
+            )}
             </>
             )}
           </div>

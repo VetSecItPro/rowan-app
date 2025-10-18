@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import { achievementBadgesService } from './achievement-badges-service';
+import { checkAndAwardBadges } from './achievement-service';
 
 export interface Milestone {
   id: string;
@@ -367,11 +367,7 @@ export const goalsService = {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           // Trigger badge checking in the background (don't await to avoid blocking)
-          achievementBadgesService.checkAndAwardBadges(
-            user.id,
-            data.space_id,
-            'goal_completed'
-          ).catch(console.error);
+          checkAndAwardBadges(user.id, data.space_id).catch(console.error);
         }
       } catch (error) {
         console.error('Failed to check for achievement badges:', error);
@@ -450,11 +446,7 @@ export const goalsService = {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           // Trigger badge checking in the background (don't await to avoid blocking)
-          achievementBadgesService.checkAndAwardBadges(
-            user.id,
-            data.goal.space_id,
-            'milestone_completed'
-          ).catch(console.error);
+          checkAndAwardBadges(user.id, data.goal.space_id).catch(console.error);
         }
       } catch (error) {
         console.error('Failed to check for achievement badges:', error);
@@ -750,7 +742,10 @@ export const goalsService = {
         user_id: user.id,
         check_in_type: input.check_in_type || 'manual',
       }])
-      .select()
+      .select(`
+        *,
+        goal:goals!inner(space_id)
+      `)
       .single();
 
     if (error) throw error;
@@ -758,6 +753,15 @@ export const goalsService = {
     // Handle photo uploads if provided
     if (photos && photos.length > 0) {
       await this.uploadCheckInPhotos(data.id, photos);
+    }
+
+    // Check for badge awards after check-in (for streak badges)
+    if (data.goal?.space_id) {
+      try {
+        checkAndAwardBadges(user.id, data.goal.space_id).catch(console.error);
+      } catch (error) {
+        console.error('Failed to check for achievement badges:', error);
+      }
     }
 
     return data;
