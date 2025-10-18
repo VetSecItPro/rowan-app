@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Lock, AlertTriangle } from 'lucide-react';
+import { X, Lock, AlertTriangle, Shield } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 
 interface PasswordConfirmModalProps {
   isOpen: boolean;
@@ -125,21 +126,26 @@ export function PasswordConfirmModal({
 
           {/* Buttons */}
           <div className="flex gap-3 pt-4">
-            <button
+            <SecondaryButton
               type="button"
               onClick={handleClose}
-              className="flex-1 px-6 py-3 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl font-medium transition-colors"
               disabled={isVerifying}
+              feature="settings"
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button
+            </SecondaryButton>
+            <CTAButton
               type="submit"
-              className="flex-1 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isVerifying || !password.trim()}
+              feature="settings"
+              breathing
+              ripple
+              icon={<Shield className="w-4 h-4" />}
+              className="flex-1"
             >
               {isVerifying ? 'Verifying...' : confirmButtonText}
-            </button>
+            </CTAButton>
           </div>
         </form>
       </div>

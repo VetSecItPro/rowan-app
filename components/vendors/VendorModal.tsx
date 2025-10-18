@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { X, Star, Shield, Building2, Phone, Mail, MapPin, ExternalLink, User } from 'lucide-react';
 import type { Vendor, CreateVendorInput } from '@/lib/services/project-tracking-service';
+import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 
 interface VendorModalProps {
   isOpen: boolean;
@@ -381,23 +382,23 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
 
           {/* Form Actions */}
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <button
+            <SecondaryButton
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+              feature="projects"
             >
               Cancel
-            </button>
-            <button
+            </SecondaryButton>
+            <CTAButton
               type="submit"
               disabled={saving}
-              className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              feature="projects"
+              breathing
+              ripple
+              icon={editVendor ? <User className="w-4 h-4" /> : <Building2 className="w-4 h-4" />}
             >
-              {saving && (
-                <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-              )}
               {saving ? 'Saving...' : editVendor ? 'Update Vendor' : 'Add Vendor'}
-            </button>
+            </CTAButton>
           </div>
         </form>
       </div>

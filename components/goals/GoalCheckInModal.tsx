@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { X, Camera, Plus, Trash2 } from 'lucide-react';
+import { X, Camera, Plus, Trash2, Target } from 'lucide-react';
 import { CreateCheckInInput } from '@/lib/services/goals-service';
 import { AdvancedVoiceRecorder } from './AdvancedVoiceRecorder';
 import { voiceTranscriptionService } from '@/lib/services/voice-transcription-service';
+import { PremiumButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 
 // Mood emoji options
 const MOOD_OPTIONS = [
@@ -410,20 +411,27 @@ export function GoalCheckInModal({
 
           {/* Actions */}
           <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <button
+            <SecondaryButton
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+              feature="goals"
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button
+            </SecondaryButton>
+            <PremiumButton
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:opacity-90 transition-all shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              feature="goals"
+              className="flex-1"
+              loading={isSubmitting}
+              magnetic
+              gradientShift
+              breathing
+              icon={<Target className="w-4 h-4" />}
             >
               {isSubmitting ? 'Saving...' : 'Save Check-In'}
-            </button>
+            </PremiumButton>
           </div>
         </form>
       </div>

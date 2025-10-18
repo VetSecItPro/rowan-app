@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Check, Plus, X, GripVertical } from 'lucide-react';
 import { taskSubtasksService, Subtask } from '@/lib/services/task-subtasks-service';
+import { CTAButton } from '@/components/ui/EnhancedButton';
 
 interface SubtasksListProps {
   taskId: string;
@@ -79,9 +80,15 @@ export function SubtasksList({ taskId, userId }: SubtasksListProps) {
           placeholder="Add a subtask..."
           className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
         />
-        <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-          <Plus className="w-4 h-4" />
-        </button>
+        <CTAButton
+          type="submit"
+          feature="tasks"
+          size="sm"
+          icon={<Plus className="w-4 h-4" />}
+          breathing
+          ripple
+        >
+        </CTAButton>
       </form>
 
       {subtasks.length > 0 && (

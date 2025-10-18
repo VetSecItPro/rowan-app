@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { X, Sunrise, Sun, Moon, Cookie, ChefHat, ShoppingCart, Search } from 'lucide-react';
+import { X, Sunrise, Sun, Moon, Cookie, ChefHat, ShoppingCart, Search, Save } from 'lucide-react';
 import { CreateMealInput, Meal, Recipe } from '@/lib/services/meals-service';
+import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 
 interface NewMealModalProps {
   isOpen: boolean;
@@ -367,8 +368,22 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
               onChange={(e) =>  setFormData({ ...formData, notes: e.target.value })} rows={3} className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white resize-none" />
           </div>
           <div className="flex items-center justify-end gap-3 pt-4">
-            <button type="button" onClick={onClose} className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg">Cancel</button>
-            <button type="submit" className="px-6 py-2 shimmer-meals text-white rounded-lg">{isEditing ? 'Save' : 'Create'}</button>
+            <SecondaryButton
+              type="button"
+              onClick={onClose}
+              feature="meals"
+            >
+              Cancel
+            </SecondaryButton>
+            <CTAButton
+              type="submit"
+              feature="meals"
+              breathing
+              ripple
+              icon={isEditing ? <Save className="w-4 h-4" /> : <ChefHat className="w-4 h-4" />}
+            >
+              {isEditing ? 'Save' : 'Create'}
+            </CTAButton>
           </div>
         </form>
       </div>

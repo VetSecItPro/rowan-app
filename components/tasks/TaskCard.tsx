@@ -116,7 +116,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
             onClick={handleStatusClick}
             title={getStatusTooltip()}
             aria-label={`Toggle task status: ${statusLabel.text}`}
-            className={`mt-0.5 flex-shrink-0 w-6 h-6 sm:w-5 sm:h-5 rounded flex items-center justify-center transition-all active:scale-95 ${getCheckboxStyle()}`}
+            className={`mt-0.5 flex-shrink-0 w-6 h-6 sm:w-5 sm:h-5 rounded flex items-center justify-center transition-all active:scale-95 hover:scale-110 ${getCheckboxStyle()} tasks-status-toggle tasks-magnetic-hover tasks-ripple-effect`}
           >
             {task.status === 'completed' && (
               <CheckSquare className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
