@@ -49,6 +49,7 @@ import {
 import { SpaceSelector } from '@/components/spaces/SpaceSelector';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
 import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
+import { TimeAwareWelcomeBox } from '@/components/ui/TimeAwareWelcomeBox';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { format, isToday, isThisWeek, isPast, parseISO, startOfWeek, subWeeks } from 'date-fns';
@@ -987,46 +988,38 @@ export default function DashboardPage() {
   }
 
   return (
-    <FeatureLayout breadcrumbItems={[{ label: 'Dashboard' }]}>
-      <div className="min-h-screen bg-gradient-to-b from-white via-purple-100/30 via-40% to-purple-200 dark:from-black dark:via-purple-900/30 dark:via-40% dark:to-purple-900 p-4 sm:p-6 md:p-8">
+    <FeatureLayout
+      breadcrumbItems={[{ label: 'Dashboard' }]}
+      backgroundVariant="vibrant"
+      enableTimeAware={true}
+    >
+      <div className="min-h-screen p-4 sm:p-6 md:p-8">
         <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
-          {/* Welcome Header */}
-          <div className="relative overflow-hidden shimmer-gradient rounded-xl sm:rounded-2xl p-6 sm:p-8 text-white shadow-2xl">
-            <div className="absolute inset-0 bg-black/10" />
-            <div className="relative z-10">
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <Hand className="w-6 h-6 sm:w-8 sm:h-8" />
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center">
-                  {greetingText}{user ? `, ${user.name}!` : '!'}
-                </h1>
-              </div>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 px-2">
-                {currentSpace ? (
-                  <>
-                    <p className="text-blue-100 text-sm sm:text-base md:text-lg text-center">
-                      {currentDate}
-                    </p>
-                    <SpaceSelector
-                      spaces={spaces}
-                      currentSpace={currentSpace}
-                      onSpaceChange={switchSpace}
-                      onCreateSpace={() => setShowCreateSpaceModal(true)}
-                      onInvitePartner={() => setShowInviteModal(true)}
-                      userColorTheme={user?.color_theme}
-                    />
-                  </>
-                ) : (
-                  <button
-                    onClick={() => setShowCreateSpaceModal(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl transition-all font-medium"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Create Your Space
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
+          {/* Enhanced Time-Aware Welcome Header */}
+          <TimeAwareWelcomeBox
+            greetingText={greetingText}
+            userName={user?.name}
+            currentDate={currentDate}
+          >
+            {currentSpace ? (
+              <SpaceSelector
+                spaces={spaces}
+                currentSpace={currentSpace}
+                onSpaceChange={switchSpace}
+                onCreateSpace={() => setShowCreateSpaceModal(true)}
+                onInvitePartner={() => setShowInviteModal(true)}
+                userColorTheme={user?.color_theme}
+              />
+            ) : (
+              <button
+                onClick={() => setShowCreateSpaceModal(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl transition-all font-medium"
+              >
+                <Plus className="w-4 h-4" />
+                Create Your Space
+              </button>
+            )}
+          </TimeAwareWelcomeBox>
 
           {/* Enhanced Feature Cards - 8 Cards */}
           <div>
