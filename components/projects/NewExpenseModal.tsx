@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X, ChevronDown, Smile } from 'lucide-react';
 import { CreateExpenseInput, Expense } from '@/lib/services/budgets-service';
+import { CategorySelector } from '@/components/categories/CategorySelector';
 
 // Expense-appropriate emojis
 const EMOJIS = ['💰', '💵', '💳', '💸', '🏦', '🛒', '🍽️', '☕', '⚡', '🏠', '🚗', '⛽', '💊', '🏥', '🎬', '🎮', '📚', '✈️', '🏨', '👕'];
@@ -101,10 +102,8 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
             amount: formData.amount,
           };
 
-          // Use custom category if "other" is selected, otherwise use dropdown value
-          if (formData.category === 'other' && customCategory.trim() !== '') {
-            cleanedData.category = customCategory;
-          } else if (formData.category && formData.category.trim() !== '' && formData.category !== 'other') {
+          // Set category from selector (which handles both custom and predefined categories)
+          if (formData.category && formData.category.trim() !== '') {
             cleanedData.category = formData.category;
           }
 
@@ -163,50 +162,20 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
             </div>
             <div>
               <label htmlFor="field-3" className="block text-sm font-medium mb-2 cursor-pointer">Category</label>
-              <div className="relative">
-                <select
-                  value={formData.category}
-                  onChange={(e) => {
-                    setFormData({ ...formData, category: e.target.value });
-                    if (e.target.value !== 'other') {
-                      setCustomCategory('');
-                    }
-                  }}
-                  className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-900 border rounded-lg appearance-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                  style={{ paddingRight: '2.5rem' }}
-                >
-                  <option value="">Select category...</option>
-                  <option value="groceries">🛒 Groceries</option>
-                  <option value="utilities">⚡ Utilities</option>
-                  <option value="transportation">🚗 Transportation</option>
-                  <option value="healthcare">🏥 Healthcare</option>
-                  <option value="entertainment">🎬 Entertainment</option>
-                  <option value="dining">🍽️ Dining</option>
-                  <option value="shopping">🛍️ Shopping</option>
-                  <option value="housing">🏠 Housing</option>
-                  <option value="insurance">🛡️ Insurance</option>
-                  <option value="education">📚 Education</option>
-                  <option value="other">📌 Other</option>
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-              </div>
+              <CategorySelector
+                value={formData.category}
+                onChange={(value) => {
+                  setFormData({ ...formData, category: value });
+                  setCustomCategory(''); // Clear custom category when using selector
+                }}
+                domain="expense"
+                placeholder="Select category..."
+                allowCustom={true}
+                showIcon={true}
+              />
             </div>
           </div>
 
-          {/* Custom Category Input - shows when "Other" is selected */}
-          {formData.category === 'other' && (
-            <div>
-              <label htmlFor="field-4" className="block text-sm font-medium mb-2 cursor-pointer">Custom Category *</label>
-              <input
-                type="text"
-                required
-                value={customCategory}
-                onChange={(e) => setCustomCategory(e.target.value)}
-                placeholder="Enter custom category..."
-                className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-              />
-            </div>
-          )}
           <div>
             <label htmlFor="field-5" className="block text-sm font-medium mb-2 cursor-pointer">Due Date</label>
             <input
