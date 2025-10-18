@@ -10,6 +10,15 @@ import { ZodError } from 'zod';
 import { extractIP, fallbackRateLimit } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 
+// Types for query options
+interface TaskQueryOptions {
+  status?: string;
+  priority?: string;
+  assigned_to?: string;
+  category?: string;
+  search?: string;
+}
+
 /**
  * GET /api/tasks
  * Get all tasks for a space with optional filtering
@@ -70,7 +79,7 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get('search');
 
     // Build query options
-    const options: any = {};
+    const options: TaskQueryOptions = {};
     if (status) options.status = status;
     if (priority) options.priority = priority;
     if (assigned_to) options.assigned_to = assigned_to;
