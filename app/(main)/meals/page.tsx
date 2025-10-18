@@ -5,6 +5,7 @@ import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, Tren
 import Link from 'next/link';
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
+import { CTAButton } from '@/components/ui/EnhancedButton';
 import { MealCard } from '@/components/meals/MealCard';
 import { MealCardSkeleton, CalendarDaySkeleton, RecipeCardSkeleton } from '@/components/ui/Skeleton';
 import { NewMealModal } from '@/components/meals/NewMealModal';
@@ -1305,13 +1306,15 @@ export default function MealsPage() {
                         💡 Tip: Link meals to recipes for automatic ingredient tracking and shopping list generation!
                       </p>
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <button
+                        <CTAButton
                           onClick={handleOpenMealModal}
-                          className="btn-touch shimmer-meals text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                          feature="meals"
+                          breathing
+                          ripple
+                          icon={<Plus className="w-5 h-5" />}
                         >
-                          <Plus className="w-5 h-5" />
                           Plan Your First Meal
-                        </button>
+                        </CTAButton>
                         {!hasCompletedGuide && (
                           <button
                             onClick={() => setShowGuidedFlow(true)}

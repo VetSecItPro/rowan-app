@@ -1,6 +1,7 @@
 'use client';
 
 import { AlertTriangle, Info, CheckCircle, XCircle } from 'lucide-react';
+import { SecondaryButton, CTAButton } from '@/components/ui/EnhancedButton';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -93,18 +94,21 @@ export function ConfirmDialog({
 
         {/* Actions */}
         <div className="px-6 py-5 sm:py-4 border-t border-gray-200 dark:border-gray-700 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-          <button
+          <SecondaryButton
             onClick={onClose}
             disabled={confirmLoading}
-            className="w-full sm:w-auto min-h-[48px] sm:min-h-[44px] px-6 py-3 sm:py-2.5 text-base sm:text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+            className="w-full sm:w-auto min-h-[48px] sm:min-h-[44px] px-6 py-3 sm:py-2.5 text-base sm:text-sm"
             aria-label={cancelLabel}
           >
             {cancelLabel}
-          </button>
-          <button
+          </SecondaryButton>
+          <CTAButton
             onClick={onConfirm}
             disabled={confirmLoading}
-            className={`w-full sm:w-auto min-h-[48px] sm:min-h-[44px] px-6 py-3 sm:py-2.5 text-base sm:text-sm font-medium text-white rounded-lg transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 ${style.confirmBg}`}
+            breathing
+            ripple
+            icon={confirmLoading ? null : <Icon className="w-4 h-4" />}
+            className={`w-full sm:w-auto min-h-[48px] sm:min-h-[44px] px-6 py-3 sm:py-2.5 text-base sm:text-sm ${style.confirmBg}`}
             aria-label={confirmLabel}
           >
             {confirmLoading ? (
@@ -118,7 +122,7 @@ export function ConfirmDialog({
             ) : (
               confirmLabel
             )}
-          </button>
+          </CTAButton>
         </div>
       </div>
     </div>

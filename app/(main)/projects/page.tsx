@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Folder, Plus, Search, Wallet, Receipt, DollarSign, CheckCircle, Clock, FileText, FileCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
+import { CTAButton } from '@/components/ui/EnhancedButton';
 import { ProjectCard } from '@/components/projects/ProjectCard';
 import { NewProjectModal } from '@/components/projects/NewProjectModal';
 import { ExpenseCard } from '@/components/projects/ExpenseCard';
@@ -280,31 +281,37 @@ export default function ProjectsPage() {
                 ))}
               </div>
               {activeTab !== 'receipts' && (
-                <button
+                <CTAButton
                   onClick={() => {
                     if (activeTab === 'projects') setIsProjectModalOpen(true);
                     else if (activeTab === 'budgets') setIsBudgetModalOpen(true);
                     else if (activeTab === 'bills') setIsBillModalOpen(true);
                     else setIsExpenseModalOpen(true);
                   }}
-                className="min-w-[120px] sm:min-w-[180px] px-4 py-2 sm:px-6 sm:py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
-              >
-                <Plus className="w-5 h-5 flex-shrink-0" />
-                <span className="hidden sm:inline whitespace-nowrap">
-                  {activeTab === 'projects' ? 'New Project' : activeTab === 'budgets' ? 'Set Budget' : activeTab === 'bills' ? 'New Bill' : 'New Expense'}
-                </span>
-                <span className="sm:hidden whitespace-nowrap">{activeTab === 'projects' ? 'Project' : activeTab === 'budgets' ? 'Budget' : activeTab === 'bills' ? 'Bill' : 'Expense'}</span>
-              </button>
+                  feature="projects"
+                  breathing
+                  ripple
+                  icon={<Plus className="w-5 h-5 flex-shrink-0" />}
+                  className="min-w-[120px] sm:min-w-[180px] px-4 py-2 sm:px-6 sm:py-3"
+                >
+                  <span className="hidden sm:inline whitespace-nowrap">
+                    {activeTab === 'projects' ? 'New Project' : activeTab === 'budgets' ? 'Set Budget' : activeTab === 'bills' ? 'New Bill' : 'New Expense'}
+                  </span>
+                  <span className="sm:hidden whitespace-nowrap">{activeTab === 'projects' ? 'Project' : activeTab === 'budgets' ? 'Budget' : activeTab === 'bills' ? 'Bill' : 'Expense'}</span>
+                </CTAButton>
               )}
               {activeTab === 'receipts' && (
-                <button
+                <CTAButton
                   onClick={() => setIsReceiptModalOpen(true)}
-                  className="min-w-[120px] sm:min-w-[180px] px-4 py-2 sm:px-6 sm:py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                  feature="projects"
+                  breathing
+                  ripple
+                  icon={<Plus className="w-5 h-5 flex-shrink-0" />}
+                  className="min-w-[120px] sm:min-w-[180px] px-4 py-2 sm:px-6 sm:py-3"
                 >
-                  <Plus className="w-5 h-5 flex-shrink-0" />
                   <span className="hidden sm:inline whitespace-nowrap">Upload Receipt</span>
                   <span className="sm:hidden whitespace-nowrap">Upload</span>
-                </button>
+                </CTAButton>
               )}
             </div>
           </div>
@@ -426,10 +433,15 @@ export default function ProjectsPage() {
                 <div className="text-center py-12">
                   <Folder className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No projects found</p>
-                  <button onClick={() => setIsProjectModalOpen(true)} className="btn-touch shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
-                    <Plus className="w-5 h-5" />
+                  <CTAButton
+                    onClick={() => setIsProjectModalOpen(true)}
+                    feature="projects"
+                    breathing
+                    ripple
+                    icon={<Plus className="w-5 h-5" />}
+                  >
                     Create Project
-                  </button>
+                  </CTAButton>
                 </div>
               ) : (
                 <div className="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
@@ -447,10 +459,15 @@ export default function ProjectsPage() {
                   <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No Budget Set</p>
                   <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">Get started quickly with a template or set a custom amount</p>
                   <div className="flex items-center gap-3 justify-center">
-                    <button onClick={() => setIsTemplateModalOpen(true)} className="btn-touch shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
-                      <FileText className="w-5 h-5" />
+                    <CTAButton
+                      onClick={() => setIsTemplateModalOpen(true)}
+                      feature="projects"
+                      breathing
+                      ripple
+                      icon={<FileText className="w-5 h-5" />}
+                    >
                       Use Template
-                    </button>
+                    </CTAButton>
                     <button onClick={() => setIsBudgetModalOpen(true)} className="btn-touch bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all shadow-lg inline-flex items-center gap-2">
                       <Plus className="w-5 h-5" />
                       Set Custom
@@ -471,10 +488,16 @@ export default function ProjectsPage() {
                       <p className="text-gray-500 dark:text-gray-400">Monthly Budget</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => setIsTemplateModalOpen(true)} className="px-4 py-2 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all inline-flex items-center gap-2">
-                        <FileText className="w-4 h-4" />
+                      <CTAButton
+                        onClick={() => setIsTemplateModalOpen(true)}
+                        feature="projects"
+                        breathing
+                        ripple
+                        size="sm"
+                        icon={<FileText className="w-4 h-4" />}
+                      >
                         Use Template
-                      </button>
+                      </CTAButton>
                       <button onClick={() => setIsBudgetModalOpen(true)} className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all">
                         Update Budget
                       </button>
@@ -570,10 +593,15 @@ export default function ProjectsPage() {
                 <div className="text-center py-12">
                   <Receipt className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No expenses found</p>
-                  <button onClick={() => setIsExpenseModalOpen(true)} className="btn-touch shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
-                    <Plus className="w-5 h-5" />
+                  <CTAButton
+                    onClick={() => setIsExpenseModalOpen(true)}
+                    feature="projects"
+                    breathing
+                    ripple
+                    icon={<Plus className="w-5 h-5" />}
+                  >
                     Add Expense
-                  </button>
+                  </CTAButton>
                 </div>
               ) : (
                 <div className="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">

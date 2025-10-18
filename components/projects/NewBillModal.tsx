@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, AlertCircle } from 'lucide-react';
+import { X, AlertCircle, DollarSign } from 'lucide-react';
 import type { Bill, CreateBillInput, BillFrequency } from '@/lib/services/bills-service';
 import {
   createBillSchema,
@@ -9,6 +9,7 @@ import {
   safeValidateCreateBill,
 } from '@/lib/validations/bills';
 import type { ZodError } from 'zod';
+import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 
 interface NewBillModalProps {
   isOpen: boolean;
@@ -376,20 +377,23 @@ export function NewBillModal({
             </div>
 
             <div className="flex items-center justify-end gap-3 pt-4">
-              <button
+              <SecondaryButton
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
+                feature="projects"
               >
                 Cancel
-              </button>
-              <button
+              </SecondaryButton>
+              <CTAButton
                 type="submit"
                 disabled={isSaving}
-                className="px-6 py-2.5 shimmer-projects text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                feature="projects"
+                breathing
+                ripple
+                icon={<DollarSign className="w-4 h-4" />}
               >
                 {isSaving ? 'Saving...' : editBill ? 'Update Bill' : 'Create Bill'}
-              </button>
+              </CTAButton>
             </div>
           </form>
         </div>

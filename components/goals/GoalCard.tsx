@@ -62,13 +62,13 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
           <button
             onClick={handleCheckboxClick}
             aria-label={`Toggle goal status: ${goalState === 'not-started' ? 'Not Started' : goalState === 'in-progress' ? 'In Progress' : 'Completed'}`}
-            className={`min-w-[44px] min-h-[44px] rounded-lg border-2 flex items-center justify-center transition-all active:scale-95 ${
+            className={`min-w-[44px] min-h-[44px] rounded-lg border-2 flex items-center justify-center transition-all active:scale-95 hover:scale-110 ${
               goalState === 'completed'
                 ? 'bg-green-500 border-green-500'
                 : goalState === 'in-progress'
                 ? 'bg-amber-500 border-amber-500'
                 : 'bg-transparent border-red-500'
-            }`}
+            } goals-status-toggle goals-magnetic-hover goals-ripple-effect`}
           >
             {goalState === 'completed' && <Check className="w-5 h-5 text-white" />}
             {goalState === 'in-progress' && <div className="w-3 h-3 bg-white rounded-full" />}
