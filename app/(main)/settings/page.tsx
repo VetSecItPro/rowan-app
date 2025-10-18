@@ -760,7 +760,7 @@ export default function SettingsPage() {
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`btn-touch flex-shrink-0 lg:w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all active:scale-95 hover-lift shimmer-purple active-press ${
+                        className={`btn-touch flex-shrink-0 lg:w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all active:scale-95 ${
                           isActive
                             ? 'bg-purple-600 text-white shadow-lg hover:bg-purple-700 hover:shadow-xl'
                             : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-md hover:scale-105'
@@ -802,7 +802,7 @@ export default function SettingsPage() {
                         )}
                         <button
                           onClick={() => profileImageInputRef.current?.click()}
-                          className="btn-touch absolute bottom-0 right-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-purple-600 flex items-center justify-center text-white hover:bg-purple-700 transition-all shadow-lg hover:shadow-xl active:scale-90 hover:scale-110 hover-lift shimmer-purple active-press"
+                          className="btn-touch absolute bottom-0 right-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-purple-600 flex items-center justify-center text-white hover:bg-purple-700 transition-all shadow-lg hover:shadow-xl active:scale-90 hover:scale-110"
                         >
                           <Camera className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </button>
@@ -812,7 +812,7 @@ export default function SettingsPage() {
                         <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{profileData.email}</p>
                         <button
                           onClick={() => profileImageInputRef.current?.click()}
-                          className="btn-touch mt-2 text-xs sm:text-sm text-purple-600 dark:text-purple-400 hover:underline transition-all active:scale-95 hover-lift shimmer-purple active-press hover:text-purple-700 dark:hover:text-purple-300"
+                          className="btn-touch mt-2 text-xs sm:text-sm text-purple-600 dark:text-purple-400 hover:underline transition-all active:scale-95 hover:text-purple-700 dark:hover:text-purple-300"
                         >
                           Change profile picture
                         </button>
@@ -842,7 +842,7 @@ export default function SettingsPage() {
                           value={profileData.name}
                           id="field-1"
               onChange={(e) =>  setProfileData({ ...profileData, name: e.target.value })}
-                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-all hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-md focus:shadow-lg hover-lift shimmer-purple"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-all"
                         />
                       </div>
 
@@ -855,7 +855,7 @@ export default function SettingsPage() {
                           value={profileData.email}
                           id="field-2"
               onChange={(e) =>  setProfileData({ ...profileData, email: e.target.value })}
-                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-all hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-md focus:shadow-lg hover-lift shimmer-purple"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-all"
                         />
                       </div>
 
@@ -870,7 +870,7 @@ export default function SettingsPage() {
                           id="field-3"
               onChange={(e) =>  setProfileData({ ...profileData, phone: e.target.value })}
                           placeholder="+1 (555) 000-0000"
-                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-all hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-md focus:shadow-lg hover-lift shimmer-purple"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-all"
                         />
                       </div>
 
@@ -884,7 +884,7 @@ export default function SettingsPage() {
                             value={profileData.timezone}
                             id="field-4"
               onChange={(e) =>  setProfileData({ ...profileData, timezone: e.target.value })}
-                            className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm pr-10 sm:pr-11 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer transition-all hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-md focus:shadow-lg hover-lift shimmer-purple"
+                            className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm pr-10 sm:pr-11 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer transition-all"
                           >
                             <option>Pacific Time (PT)</option>
                             <option>Eastern Time (ET)</option>
@@ -901,7 +901,7 @@ export default function SettingsPage() {
                     <button
                       onClick={handleSaveProfile}
                       disabled={isSavingProfile}
-                      className="btn-touch w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-purple-600 text-white rounded-lg sm:rounded-xl hover:bg-purple-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 hover-lift shimmer-purple active-press"
+                      className="btn-touch w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-purple-600 text-white rounded-lg sm:rounded-xl hover:bg-purple-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shimmer-purple"
                     >
                       {isSavingProfile ? (
                         <>
@@ -954,7 +954,7 @@ export default function SettingsPage() {
                                         setResetEmailSent(false);
                                         handleRequestPasswordReset();
                                       }}
-                                      className="btn-touch underline hover:no-underline font-medium transition-all active:scale-95 hover-lift shimmer-green active-press text-green-700 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300"
+                                      className="btn-touch underline hover:no-underline font-medium transition-all active:scale-95 text-green-700 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300"
                                     >
                                       resend the email
                                     </button>
@@ -972,7 +972,7 @@ export default function SettingsPage() {
                               <button
                                 onClick={handleRequestPasswordReset}
                                 disabled={isRequestingReset}
-                                className="btn-touch w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-purple-600 text-white rounded-lg sm:rounded-xl hover:bg-purple-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-95 hover-lift shimmer-purple active-press"
+                                className="btn-touch w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-purple-600 text-white rounded-lg sm:rounded-xl hover:bg-purple-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-95 shimmer-purple"
                               >
                                 {isRequestingReset ? (
                                   <>
@@ -1027,7 +1027,7 @@ export default function SettingsPage() {
                                     setSessionToRevoke(session.id);
                                     setShowRevokeSessionModal(true);
                                   }}
-                                  className="btn-touch text-xs text-red-600 dark:text-red-400 hover:underline transition-all active:scale-95 hover-lift shimmer-red active-press hover:text-red-700 dark:hover:text-red-300"
+                                  className="btn-touch text-xs text-red-600 dark:text-red-400 hover:underline transition-all active:scale-95 hover:text-red-700 dark:hover:text-red-300"
                                 >
                                   Revoke
                                 </button>
@@ -1099,7 +1099,7 @@ export default function SettingsPage() {
                                   <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
                                   <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">{item.desc}</p>
                                 </div>
-                                <label htmlFor="field-6" className="btn-touch relative inline-flex items-center cursor-pointer ml-auto sm:ml-0 p-2 active:scale-95 hover-lift shimmer-purple active-press">
+                                <label htmlFor="field-6" className="btn-touch relative inline-flex items-center cursor-pointer ml-auto sm:ml-0 p-2 active:scale-95">
                                   <input
                                     type="checkbox"
                                     checked={notificationPrefs[item.key as keyof typeof notificationPrefs] as boolean}
@@ -1126,7 +1126,7 @@ export default function SettingsPage() {
                                 <p className="text-sm font-medium text-gray-900 dark:text-white">Enable push notifications</p>
                                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Allow browser notifications for real-time alerts</p>
                               </div>
-                              <label htmlFor="field-7" className="btn-touch relative inline-flex items-center cursor-pointer ml-auto sm:ml-0 p-2 active:scale-95 hover-lift shimmer-purple active-press">
+                              <label htmlFor="field-7" className="btn-touch relative inline-flex items-center cursor-pointer ml-auto sm:ml-0 p-2 active:scale-95">
                                 <input
                                   type="checkbox"
                                   checked={notificationPrefs.push_enabled}
@@ -1149,7 +1149,7 @@ export default function SettingsPage() {
                                   <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
                                   <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">{item.desc}</p>
                                 </div>
-                                <label htmlFor="field-8" className="btn-touch relative inline-flex items-center cursor-pointer ml-auto sm:ml-0 p-2 active:scale-95 hover-lift shimmer-purple active-press">
+                                <label htmlFor="field-8" className="btn-touch relative inline-flex items-center cursor-pointer ml-auto sm:ml-0 p-2 active:scale-95">
                                   <input
                                     type="checkbox"
                                     checked={notificationPrefs[item.key as keyof typeof notificationPrefs] as boolean}
@@ -1447,7 +1447,7 @@ export default function SettingsPage() {
                           spaces.map((space) => (
                             <div
                               key={space.id}
-                              className={`btn-touch p-4 rounded-xl border transition-all cursor-pointer active:scale-95 hover-lift shimmer-purple active-press ${
+                              className={`btn-touch p-4 rounded-xl border transition-all cursor-pointer active:scale-95 ${
                                 currentSpace?.id === space.id
                                   ? 'bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-purple-200 dark:border-purple-800 shadow-lg hover:shadow-xl'
                                   : 'bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-800 hover:shadow-md hover:scale-105'
@@ -1488,7 +1488,7 @@ export default function SettingsPage() {
                         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                           <button
                             onClick={() => setShowInviteModal(true)}
-                            className="btn-touch px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all text-xs sm:text-sm flex items-center justify-center gap-2 active:scale-95 hover:shadow-lg hover-lift shimmer-purple active-press"
+                            className="btn-touch px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all text-xs sm:text-sm flex items-center justify-center gap-2 active:scale-95 hover:shadow-lg shimmer-purple"
                           >
                             <UserPlus className="w-4 h-4" />
                             Invite Members
@@ -1503,7 +1503,7 @@ export default function SettingsPage() {
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Start a new space for another family or team</p>
                       <button
                         onClick={() => setShowCreateSpaceModal(true)}
-                        className="btn-touch px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:opacity-90 transition-all text-sm flex items-center gap-2 active:scale-95 hover:shadow-lg hover-lift shimmer-gray active-press"
+                        className="btn-touch px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:opacity-90 transition-all text-sm flex items-center gap-2 active:scale-95 hover:shadow-lg shimmer-gray"
                       >
                         <UserPlus className="w-4 h-4" />
                         New Space
@@ -1608,7 +1608,7 @@ export default function SettingsPage() {
                           <Link
                             key={feature.id}
                             href={feature.href}
-                            className={`btn-touch bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-6 hover:shadow-xl hover:-translate-y-2 ${feature.shadowColor} transition-all duration-300 group active:scale-95 hover-lift shimmer-blue active-press`}
+                            className={`btn-touch bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-6 hover:shadow-xl hover:-translate-y-2 ${feature.shadowColor} transition-all duration-300 group active:scale-95`}
                           >
                             <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 shadow-lg`}>
                               <Icon className="w-7 h-7 text-white" />
@@ -1672,7 +1672,7 @@ export default function SettingsPage() {
                                 alert('Failed to export data. Please try again.');
                               }
                             }}
-                            className="btn-touch w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded-lg sm:rounded-xl hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 active:scale-95 hover-lift shimmer-blue active-press"
+                            className="btn-touch w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded-lg sm:rounded-xl hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 active:scale-95 shimmer-blue"
                           >
                             <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             Download My Data (JSON)
@@ -1698,7 +1698,7 @@ export default function SettingsPage() {
                           </p>
                           <button
                             onClick={() => setShowDeleteAccountModal(true)}
-                            className="btn-touch w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-red-600 text-white rounded-lg sm:rounded-xl hover:bg-red-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 active:scale-95 hover-lift shimmer-red active-press"
+                            className="btn-touch w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-red-600 text-white rounded-lg sm:rounded-xl hover:bg-red-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 active:scale-95 shimmer-red"
                           >
                             <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             Delete My Account
@@ -1716,7 +1716,7 @@ export default function SettingsPage() {
                         <div className="flex-1 w-full">
                           <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Sign Out</h3>
                           <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">Sign out from all devices and sessions</p>
-                          <button className="btn-touch w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg sm:rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 active:scale-95 hover-lift shimmer-gray active-press">
+                          <button className="btn-touch w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg sm:rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 active:scale-95 shimmer-gray">
                             <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             Sign Out Everywhere
                           </button>
@@ -1745,7 +1745,7 @@ export default function SettingsPage() {
                             <Link
                               key={feature.id}
                               href={feature.href}
-                              className={`btn-touch group relative p-6 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-2 border-gray-200/60 dark:border-gray-700/60 ${feature.hoverBorder} ${feature.hoverShadow} rounded-2xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 hover:scale-105 active:scale-95 hover-lift shimmer-purple active-press`}
+                              className={`btn-touch group relative p-6 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-2 border-gray-200/60 dark:border-gray-700/60 ${feature.hoverBorder} ${feature.hoverShadow} rounded-2xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 hover:scale-105 active:scale-95`}
                             >
                               <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4 shadow-lg`}>
                                 <Icon className="w-7 h-7 text-white" />
