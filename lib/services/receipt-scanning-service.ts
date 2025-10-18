@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { fileUploadService, FileUploadResult } from './file-upload-service';
+import { mapReceiptCategory, getDefaultCategoriesForDomain } from '@/lib/constants/default-categories';
 
 export interface ReceiptData {
   id: string;
@@ -388,22 +389,32 @@ Thank you for shopping with us!`;
 
     const merchantName = data.merchant_name?.toLowerCase() || '';
     const items = data.items?.map(item => item.name.toLowerCase()).join(' ') || '';
+    const searchText = `${merchantName} ${items}`;
 
-    // Category mapping based on merchant and items
+    // Try to map using our enhanced category mapping system
+    const mappedCategory = mapReceiptCategory(searchText);
+    if (mappedCategory && !suggestions.includes(mappedCategory)) {
+      suggestions.push(mappedCategory);
+    }
+
+    // Enhanced keyword-based mapping with our default categories
     const categoryMappings = [
-      { keywords: ['grocery', 'market', 'food', 'supermarket', 'walmart', 'target', 'milk', 'bread', 'eggs'], category: 'Groceries' },
-      { keywords: ['restaurant', 'cafe', 'coffee', 'starbucks', 'mcdonald', 'pizza', 'burger'], category: 'Dining' },
-      { keywords: ['gas', 'fuel', 'shell', 'exxon', 'chevron', 'bp'], category: 'Transportation' },
-      { keywords: ['pharmacy', 'cvs', 'walgreens', 'rite aid', 'medicine', 'prescription'], category: 'Healthcare' },
-      { keywords: ['home depot', 'lowes', 'hardware', 'tools', 'supplies'], category: 'Home & Garden' },
-      { keywords: ['clothing', 'apparel', 'shoes', 'fashion', 'mall'], category: 'Clothing' },
-      { keywords: ['uber', 'lyft', 'taxi', 'parking', 'toll'], category: 'Transportation' },
-      { keywords: ['netflix', 'spotify', 'subscription', 'software'], category: 'Subscriptions' }
+      { keywords: ['grocery', 'market', 'food', 'supermarket', 'walmart', 'target', 'kroger', 'safeway', 'whole foods', 'milk', 'bread', 'eggs'], category: 'Groceries' },
+      { keywords: ['restaurant', 'cafe', 'coffee', 'starbucks', 'dunkin', 'mcdonald', 'burger king', 'subway', 'pizza', 'domino', 'kfc', 'taco bell'], category: 'Dining' },
+      { keywords: ['gas', 'fuel', 'shell', 'exxon', 'chevron', 'bp', 'mobil', 'conoco', 'sunoco', 'arco'], category: 'Transportation' },
+      { keywords: ['pharmacy', 'cvs', 'walgreens', 'rite aid', 'medicine', 'prescription', 'drug store', 'health'], category: 'Healthcare' },
+      { keywords: ['home depot', 'lowes', 'hardware', 'tools', 'supplies', 'menards', 'ace hardware'], category: 'Housing' },
+      { keywords: ['clothing', 'apparel', 'shoes', 'fashion', 'mall', 'nike', 'adidas', 'target', 'macys', 'nordstrom'], category: 'Shopping' },
+      { keywords: ['uber', 'lyft', 'taxi', 'parking', 'toll', 'metro', 'transit', 'bus'], category: 'Transportation' },
+      { keywords: ['netflix', 'spotify', 'subscription', 'software', 'saas', 'apple music', 'disney'], category: 'Entertainment' },
+      { keywords: ['hotel', 'motel', 'airbnb', 'booking', 'expedia', 'airline', 'flight', 'airport'], category: 'Travel' },
+      { keywords: ['electric', 'electricity', 'power', 'water', 'sewer', 'internet', 'cable', 'phone', 'cellular'], category: 'Utilities' },
+      { keywords: ['insurance', 'policy', 'premium', 'coverage', 'claim'], category: 'Insurance' }
     ];
 
     for (const mapping of categoryMappings) {
       for (const keyword of mapping.keywords) {
-        if (merchantName.includes(keyword) || items.includes(keyword)) {
+        if (searchText.includes(keyword)) {
           if (!suggestions.includes(mapping.category)) {
             suggestions.push(mapping.category);
           }
@@ -412,9 +423,22 @@ Thank you for shopping with us!`;
       }
     }
 
-    // Default categories if no matches
+    // Add default expense categories as fallbacks
+    const expenseCategories = getDefaultCategoriesForDomain('expense');
+    const fallbackCategories = ['Shopping', 'Personal', 'Business'];
+
+    for (const fallback of fallbackCategories) {
+      if (suggestions.length < 3 && !suggestions.includes(fallback)) {
+        const categoryExists = expenseCategories.some(cat => cat.name === fallback);
+        if (categoryExists || fallback === 'Business') {
+          suggestions.push(fallback);
+        }
+      }
+    }
+
+    // Ensure we have at least one suggestion
     if (suggestions.length === 0) {
-      suggestions.push('Other', 'Personal', 'Business');
+      suggestions.push('Shopping');
     }
 
     return suggestions.slice(0, 3); // Return top 3 suggestions

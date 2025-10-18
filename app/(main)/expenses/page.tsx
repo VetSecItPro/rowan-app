@@ -1,10 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+// Using native HTML elements and existing components
+import { EnhancedButton } from '@/components/ui/EnhancedButton';
 import {
   Receipt,
   FileText,
@@ -16,7 +14,7 @@ import {
 } from 'lucide-react';
 import { ReceiptScanner } from '@/components/expenses/ReceiptScanner';
 import { ReceiptLibrary } from '@/components/expenses/ReceiptLibrary';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/lib/contexts/auth-context';
 import { ExtractedReceiptData, ExpenseSuggestion } from '@/lib/services/receipt-scanning-service';
 
 interface ExpenseSummary {
