@@ -52,10 +52,6 @@ export async function GET(
       );
     }
 
-
-    // Set user context for Sentry error tracking
-    setSentryUser(session.user);
-
     // Verify user has access to list's space
     try {
       await verifyResourceAccess(session.user.id, list);
@@ -133,10 +129,6 @@ export async function PATCH(
         { status: 404 }
       );
     }
-
-
-    // Set user context for Sentry error tracking
-    setSentryUser(session.user);
 
     // Verify user has access to list's space
     try {
@@ -221,10 +213,6 @@ export async function DELETE(
         { status: 404 }
       );
     }
-
-
-    // Set user context for Sentry error tracking
-    setSentryUser(session.user);
 
     // Verify user has access to list's space
     try {
