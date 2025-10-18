@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { notificationQueueService } from '@/lib/services/notification-queue-service';
-import { reminderNotificationsService } from '@/lib/services/reminder-notifications-service';
+import {
+  sendTaskAssignmentEmail,
+  sendEventReminderEmail,
+  sendNewMessageEmail,
+  sendShoppingListEmail,
+  sendMealReminderEmail,
+  sendGeneralReminderEmail,
+  sendDailyDigestEmail,
+  type DailyDigestData,
+  type DigestNotification
+} from '@/lib/services/email-service';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,17 +63,13 @@ export async function GET(request: NextRequest) {
           // Send each instant notification individually
           for (const notif of notifications) {
             try {
-              await reminderNotificationsService.sendEmailNotification(
-                userId,
-                notif.notification_data.type,
-                {
-                  title: notif.notification_data.title,
-                  emoji: notif.notification_data.emoji,
-                }
-              );
-
-              await notificationQueueService.markAsSent([notif.id]);
-              sent++;
+              const result = await sendInstantNotification(userId, notif);
+              if (result.success) {
+                await notificationQueueService.markAsSent([notif.id]);
+                sent++;
+              } else {
+                throw new Error(result.error || 'Failed to send notification');
+              }
             } catch (error) {
               console.error('Error sending instant notification:', error);
               await notificationQueueService.markAsFailed(
@@ -118,6 +124,130 @@ export async function GET(request: NextRequest) {
 }
 
 /**
+ * Send instant notification email
+ */
+async function sendInstantNotification(userId: string, notification: any): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient();
+
+  // Get user details
+  const { data: user } = await supabase
+    .from('profiles')
+    .select('email, first_name, last_name')
+    .eq('id', userId)
+    .single();
+
+  if (!user?.email) {
+    return { success: false, error: 'User email not found' };
+  }
+
+  const notificationData = notification.notification_data;
+  const notificationType = notificationData.type;
+
+  try {
+    switch (notificationType) {
+      case 'task':
+        return await sendTaskAssignmentEmail({
+          recipientEmail: user.email,
+          recipientName: user.first_name || 'Partner',
+          assignerName: notificationData.assignerName || 'System',
+          taskTitle: notificationData.title,
+          taskDescription: notificationData.description,
+          dueDate: notificationData.dueDate,
+          priority: notificationData.priority || 'normal',
+          spaceId: notificationData.spaceId || '',
+          taskId: notificationData.taskId || '',
+          spaceName: notificationData.spaceName || 'Unknown Space'
+        });
+
+      case 'event':
+        return await sendEventReminderEmail({
+          recipientEmail: user.email,
+          recipientName: user.first_name || 'Partner',
+          eventTitle: notificationData.title,
+          eventDescription: notificationData.description,
+          eventDate: notificationData.eventDate || '',
+          eventTime: notificationData.eventTime || '',
+          location: notificationData.location,
+          reminderType: notificationData.reminderType || '15min',
+          eventId: notificationData.eventId || '',
+          spaceId: notificationData.spaceId || '',
+          spaceName: notificationData.spaceName || 'Unknown Space'
+        });
+
+      case 'message':
+        return await sendNewMessageEmail({
+          recipientEmail: user.email,
+          recipientName: user.first_name || 'Partner',
+          senderName: notificationData.senderName || 'Someone',
+          senderAvatar: notificationData.senderAvatar,
+          messageContent: notificationData.content || notificationData.title,
+          conversationTitle: notificationData.conversationTitle,
+          spaceId: notificationData.spaceId || '',
+          conversationId: notificationData.conversationId || '',
+          spaceName: notificationData.spaceName || 'Unknown Space',
+          messageTimestamp: new Date(notification.created_at).toISOString()
+        });
+
+      case 'shopping':
+        return await sendShoppingListEmail({
+          recipientEmail: user.email,
+          recipientName: user.first_name || 'Partner',
+          senderName: notificationData.senderName || 'Someone',
+          listName: notificationData.title,
+          listDescription: notificationData.description,
+          items: notificationData.items || [],
+          totalItems: notificationData.totalItems || 0,
+          completedItems: notificationData.completedItems || 0,
+          actionType: notificationData.actionType || 'shared',
+          spaceId: notificationData.spaceId || '',
+          listId: notificationData.listId || '',
+          spaceName: notificationData.spaceName || 'Unknown Space'
+        });
+
+      case 'meal':
+        return await sendMealReminderEmail({
+          recipientEmail: user.email,
+          recipientName: user.first_name || 'Partner',
+          mealName: notificationData.title,
+          mealType: notificationData.mealType || 'dinner',
+          mealDate: notificationData.mealDate || '',
+          mealTime: notificationData.mealTime || '',
+          reminderType: notificationData.reminderType || 'prep',
+          ingredients: notificationData.ingredients,
+          cookingTime: notificationData.cookingTime,
+          recipeUrl: notificationData.recipeUrl,
+          spaceId: notificationData.spaceId || '',
+          mealId: notificationData.mealId || '',
+          spaceName: notificationData.spaceName || 'Unknown Space'
+        });
+
+      case 'reminder':
+        return await sendGeneralReminderEmail({
+          recipientEmail: user.email,
+          recipientName: user.first_name || 'Partner',
+          reminderTitle: notificationData.title,
+          reminderDescription: notificationData.description,
+          reminderType: notificationData.reminderType || 'personal',
+          dueDate: notificationData.dueDate,
+          dueTime: notificationData.dueTime,
+          priority: notificationData.priority || 'normal',
+          category: notificationData.category,
+          spaceId: notificationData.spaceId || '',
+          reminderId: notificationData.reminderId || '',
+          spaceName: notificationData.spaceName || 'Unknown Space',
+          createdBy: notificationData.createdBy
+        });
+
+      default:
+        return { success: false, error: `Unknown notification type: ${notificationType}` };
+    }
+  } catch (error) {
+    console.error('Error sending instant notification:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+/**
  * Send digest email
  */
 async function sendDigestEmail(
@@ -125,38 +255,50 @@ async function sendDigestEmail(
   notifications: any[],
   type: 'hourly' | 'daily'
 ): Promise<void> {
-  // Group by notification type
-  const grouped = notifications.reduce((acc, notif) => {
-    const notifType = notif.notification_data.type;
-    if (!acc[notifType]) {
-      acc[notifType] = [];
-    }
-    acc[notifType].push(notif);
-    return acc;
-  }, {} as Record<string, typeof notifications>);
+  const supabase = await createClient();
 
-  // Build digest content
-  const summary = Object.entries(grouped).map(([notifType, notifs]) => {
-    return {
-      type: notifType,
-      count: notifs.length,
-      items: notifs.map((n) => ({
-        title: n.notification_data.title,
-        emoji: n.notification_data.emoji,
-      })),
-    };
-  });
+  // Get user details
+  const { data: user } = await supabase
+    .from('profiles')
+    .select('email, first_name')
+    .eq('id', userId)
+    .single();
 
-  // TODO: Send via email service (Resend)
-  console.log(`Sending ${type} digest to user ${userId}:`, summary);
+  if (!user?.email) {
+    throw new Error('User email not found');
+  }
 
-  // For now, just log. In production, integrate with Resend:
-  /*
-  await resend.emails.send({
-    from: 'notifications@rowan.app',
-    to: userEmail,
-    subject: type === 'hourly' ? 'Hourly Notification Digest' : 'Daily Notification Summary',
-    html: generateDigestHTML(summary, type),
-  });
-  */
+  // Transform notifications to digest format
+  const digestNotifications: DigestNotification[] = notifications.map((notif) => ({
+    id: notif.id,
+    type: notif.notification_data.type,
+    title: notif.notification_data.title,
+    content: notif.notification_data.description || notif.notification_data.title,
+    priority: notif.notification_data.priority || 'normal',
+    spaceName: notif.notification_data.spaceName || 'Unknown Space',
+    url: notif.notification_data.url || 'https://rowanapp.com/dashboard',
+    timestamp: new Date(notif.scheduled_for).toLocaleString()
+  }));
+
+  // Count notifications by type
+  const taskCount = digestNotifications.filter(n => n.type === 'task').length;
+  const eventCount = digestNotifications.filter(n => n.type === 'event').length;
+  const messageCount = digestNotifications.filter(n => n.type === 'message').length;
+
+  const digestData: DailyDigestData = {
+    recipientEmail: user.email,
+    recipientName: user.first_name || 'Partner',
+    digestDate: new Date().toLocaleDateString(),
+    digestType: type === 'hourly' ? 'daily' : 'daily', // Map hourly to daily for template
+    notifications: digestNotifications,
+    totalCount: digestNotifications.length,
+    unreadTasksCount: taskCount,
+    upcomingEventsCount: eventCount,
+    unreadMessagesCount: messageCount
+  };
+
+  const result = await sendDailyDigestEmail(digestData);
+  if (!result.success) {
+    throw new Error(result.error || 'Failed to send digest email');
+  }
 }

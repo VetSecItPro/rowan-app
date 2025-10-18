@@ -954,11 +954,19 @@ export default function GoalsPage() {
             ) : viewMode === 'dependencies' ? (
               /* Dependencies View */
               <div className="space-y-6">
-                <DependencyVisualization
-                  spaceId={currentSpace?.id || ''}
-                  goals={goals}
-                  className="max-h-[600px]"
-                />
+                {currentSpace && goals.length > 0 ? (
+                  <DependencyVisualization
+                    spaceId={currentSpace.id}
+                    goals={goals.filter(goal => goal?.id)} // Filter out any undefined goals
+                    className="max-h-[600px]"
+                  />
+                ) : (
+                  <div className="text-center py-12">
+                    <GitBranch className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No goals available</p>
+                    <p className="text-gray-500 dark:text-gray-500">Create some goals first to set up dependencies</p>
+                  </div>
+                )}
               </div>
             ) : (
               /* Activity View */
