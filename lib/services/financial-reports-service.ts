@@ -750,3 +750,40 @@ class FinancialReportsService {
 }
 
 export const financialReportsService = new FinancialReportsService();
+
+// Export individual functions for direct import
+export const getReportTemplates = (spaceId?: string, category?: string) =>
+  financialReportsService.getReportTemplates(spaceId, category);
+
+export const getReportTemplate = (id: string) =>
+  financialReportsService.getReportTemplate(id);
+
+export const createReportTemplate = (input: CreateTemplateInput) =>
+  financialReportsService.createReportTemplate(input);
+
+export const generateReport = (templateId: string, spaceId: string, title: string, description: string, startDate: Date, endDate: Date) =>
+  financialReportsService.generateReport('user-id', { templateId, spaceId, title, description, startDate, endDate });
+
+export const getGeneratedReports = (spaceId: string, limit?: number) =>
+  financialReportsService.getGeneratedReports(spaceId, limit);
+
+export const getGeneratedReport = (id: string) =>
+  financialReportsService.getGeneratedReport(id);
+
+export const deleteReport = (id: string) =>
+  financialReportsService.deleteGeneratedReport(id, 'user-id');
+
+export const shareReport = (reportId: string, expiresInHours?: number) =>
+  financialReportsService.shareReport(reportId, expiresInHours);
+
+export const downloadReportPDF = (reportId: string) =>
+  financialReportsService.downloadReportPDF(reportId);
+
+export const getReportShareUrl = (reportId: string) =>
+  financialReportsService.getReportShareUrl(reportId);
+
+export const updateReportViews = (reportId: string) =>
+  financialReportsService.updateReportViews(reportId);
+
+export const toggleReportFavorite = (reportId: string) =>
+  financialReportsService.toggleReportFavorite(reportId, 'user-id');

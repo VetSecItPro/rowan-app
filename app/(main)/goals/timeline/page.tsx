@@ -10,7 +10,7 @@ import {
   Calendar,
   MessageSquare,
   Camera,
-  Milestone,
+  Milestone as MilestoneIcon,
   Flag,
   Play,
   Pause,
@@ -59,7 +59,7 @@ const EVENT_CONFIGS = {
     bgColor: 'bg-green-50 dark:bg-green-900/20'
   },
   milestone_completed: {
-    icon: Milestone,
+    icon: MilestoneIcon,
     color: 'bg-purple-500',
     borderColor: 'border-purple-200 dark:border-purple-800',
     bgColor: 'bg-purple-50 dark:bg-purple-900/20'
@@ -143,7 +143,7 @@ export default function GoalsTimelinePage() {
 
         // Load milestones
         try {
-          const milestones = await goalsService.getMilestones(goal.id);
+          const milestones = await goalsService.getAllMilestones(goal.id);
           for (const milestone of milestones) {
             if (milestone.completed && milestone.completed_at) {
               events.push({

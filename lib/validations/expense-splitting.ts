@@ -4,17 +4,11 @@ import { z } from 'zod';
 // ENUM SCHEMAS
 // =====================================================
 
-export const splitTypeSchema = z.enum(['equal', 'percentage', 'fixed', 'income-based'], {
-  errorMap: () => ({ message: 'Invalid split type' }),
-});
+export const splitTypeSchema = z.enum(['equal', 'percentage', 'fixed', 'income-based']);
 
-export const ownershipTypeSchema = z.enum(['shared', 'yours', 'theirs'], {
-  errorMap: () => ({ message: 'Invalid ownership type' }),
-});
+export const ownershipTypeSchema = z.enum(['shared', 'yours', 'theirs']);
 
-export const splitStatusSchema = z.enum(['pending', 'partially-paid', 'settled'], {
-  errorMap: () => ({ message: 'Invalid split status' }),
-});
+export const splitStatusSchema = z.enum(['pending', 'partially-paid', 'settled']);
 
 // =====================================================
 // UPDATE SPLIT EXPENSE SCHEMA

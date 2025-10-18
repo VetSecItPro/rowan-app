@@ -4,16 +4,11 @@ import { z } from 'zod';
 // ENUM SCHEMAS
 // =====================================================
 
-export const recurrenceFrequencySchema = z.enum(
-  ['daily', 'weekly', 'bi-weekly', 'monthly', 'bi-monthly', 'quarterly', 'semi-annual', 'annual'],
-  {
-    errorMap: () => ({ message: 'Invalid recurrence frequency' }),
-  }
-);
+export const recurrenceFrequencySchema = z.enum([
+  'daily', 'weekly', 'bi-weekly', 'monthly', 'bi-monthly', 'quarterly', 'semi-annual', 'annual'
+]);
 
-export const detectionMethodSchema = z.enum(['ml-analysis', 'manual', 'rule-based'], {
-  errorMap: () => ({ message: 'Invalid detection method' }),
-});
+export const detectionMethodSchema = z.enum(['ml-analysis', 'manual', 'rule-based']);
 
 // =====================================================
 // PATTERN ACTIONS SCHEMA
