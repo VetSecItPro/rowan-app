@@ -282,25 +282,29 @@ export default function SettingsPage() {
   const [sessionToRevoke, setSessionToRevoke] = useState<string | null>(null);
   const [isLoadingSessions, setIsLoadingSessions] = useState(false);
 
-  // Notification preferences state
+  // Notification preferences state - Updated for comprehensive notification system
   const [notificationPrefs, setNotificationPrefs] = useState({
-    email_enabled: true,
+    // Email notifications
     email_task_assignments: true,
-    email_events: true,
-    email_messages: true,
-    email_reminders: true,
+    email_event_reminders: true,
+    email_new_messages: true,
     email_shopping_lists: true,
     email_meal_reminders: true,
-    email_digest_frequency: 'daily' as 'realtime' | 'daily' | 'weekly' | 'never',
+    email_general_reminders: true,
+    // Push notifications
     push_enabled: false,
-    push_tasks: true,
+    push_task_updates: true,
     push_reminders: true,
     push_messages: true,
     push_shopping_updates: true,
-    push_events: true,
+    push_event_alerts: true,
+    // Digest settings
+    digest_frequency: 'daily' as 'realtime' | 'daily' | 'weekly',
+    digest_time: '08:00:00',
+    // Quiet hours
     quiet_hours_enabled: false,
-    quiet_hours_start: '22:00',
-    quiet_hours_end: '08:00',
+    quiet_hours_start: '22:00:00',
+    quiet_hours_end: '07:00:00',
     timezone: 'UTC',
   });
 
