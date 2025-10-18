@@ -357,6 +357,48 @@ export interface GoalUpdate {
   created_at: string;
 }
 
+export interface AchievementBadge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: 'milestone' | 'streak' | 'collaboration' | 'persistence' | 'variety' | 'speed';
+  requirement: BadgeRequirement;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  points: number;
+  created_at: string;
+}
+
+export interface UserBadge {
+  id: string;
+  user_id: string;
+  space_id: string;
+  badge_id: string;
+  earned_at: string;
+  progress?: BadgeProgress;
+  badge?: AchievementBadge;
+}
+
+export type BadgeRequirement =
+  | { type: 'goals_completed'; count: number }
+  | { type: 'milestones_completed'; count: number }
+  | { type: 'streak_days'; count: number }
+  | { type: 'weekly_checkins'; count: number }
+  | { type: 'shared_goals_completed'; count: number }
+  | { type: 'goal_duration_days'; min: number }
+  | { type: 'categories_completed'; count: number }
+  | { type: 'goal_completed_hours'; max: number }
+  | { type: 'fast_goals_completed'; count: number; max_days: number }
+  | { type: 'first_goal_days'; max: number }
+  | { type: 'perfect_goal_completed'; count: number };
+
+export interface BadgeProgress {
+  current: number;
+  target: number;
+  percentage: number;
+  metadata?: Record<string, unknown>;
+}
+
 // =============================================
 // DAILY CHECKIN TYPES
 // =============================================
