@@ -326,7 +326,7 @@ export async function getGoalContributors(goalId: string): Promise<ContributorSu
   // Get contributions grouped by user
   const { data: contributions, error: contribError } = await supabase
     .from('goal_contributions')
-    .select('user_id, amount, contribution_date, users(email)')
+    .select('user_id, amount, contribution_date, users!inner(email)')
     .eq('goal_id', goalId);
 
   if (contribError) throw contribError;
@@ -441,7 +441,7 @@ export async function getRecentContributions(
 
   const { data, error } = await supabase
     .from('goal_contributions')
-    .select('*, goals!inner(title, space_id), users(email)')
+    .select('*, goals!inner(title, space_id), users!inner(email)')
     .eq('goals.space_id', spaceId)
     .order('contribution_date', { ascending: false })
     .limit(limit);
