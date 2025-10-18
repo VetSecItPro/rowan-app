@@ -30,7 +30,7 @@ export function ThemeToggle() {
         onClick={handleToggle}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
-        className="btn-touch p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all cursor-pointer active:scale-95 hover-lift shimmer-purple active-press hover:shadow-md"
+        className="btn-touch p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer active:scale-95"
         aria-label="Toggle theme"
       >
         {isDark ? (

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { FileUploadResult } from './file-upload-service';
+import { enhancedNotificationService } from './enhanced-notification-service';
 
 export interface Message {
   id: string;
@@ -171,6 +172,56 @@ export const messagesService = {
       .from('conversations')
       .update({ updated_at: new Date().toISOString() })
       .eq('id', input.conversation_id);
+
+    // Send message notifications to conversation participants (except sender)
+    if (input.conversation_id && input.space_id) {
+      try {
+        // Get conversation details and participants
+        const [{ data: conversationData }, { data: senderData }, { data: spaceData }] = await Promise.all([
+          supabase
+            .from('conversations')
+            .select('title, conversation_type, participants')
+            .eq('id', input.conversation_id)
+            .single(),
+          supabase
+            .from('users')
+            .select('name, avatar_url')
+            .eq('id', input.sender_id || '')
+            .single(),
+          supabase
+            .from('spaces')
+            .select('name')
+            .eq('id', input.space_id)
+            .single()
+        ]);
+
+        if (conversationData && senderData) {
+          // Get participants excluding the sender
+          const participants = conversationData.participants?.filter(
+            (participantId: string) => participantId !== input.sender_id
+          ) || [];
+
+          if (participants.length > 0) {
+            enhancedNotificationService.sendMessageNotification(
+              participants,
+              {
+                senderName: senderData.name || 'Someone',
+                senderAvatar: senderData.avatar_url,
+                messagePreview: input.content,
+                conversationTitle: conversationData.title,
+                isDirectMessage: conversationData.conversation_type === 'direct',
+                messageCount: 1,
+                spaceName: spaceData?.name || 'Your Space',
+                messageUrl: `${process.env.NEXT_PUBLIC_APP_URL}/messages/${input.conversation_id}?space_id=${input.space_id}`,
+              }
+            ).catch(console.error);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to send message notification:', error);
+        // Don't throw here - message creation should succeed even if notification fails
+      }
+    }
 
     return data;
   },

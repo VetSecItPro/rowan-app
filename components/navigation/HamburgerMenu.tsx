@@ -119,7 +119,7 @@ export function HamburgerMenu() {
                       key={item.href}
                       href={item.href}
                       onClick={() => setIsOpen(false)}
-                      className="btn-touch flex items-center gap-3 px-4 py-4 sm:py-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all active:scale-[0.98] hover-lift shimmer-purple active-press group hover:shadow-sm"
+                      className="btn-touch flex items-center gap-3 px-4 py-4 sm:py-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors active:scale-[0.98] group"
                     >
                       <div className={`w-11 h-11 sm:w-10 sm:h-10 rounded-lg ${item.gradient} flex items-center justify-center flex-shrink-0`}>
                         <Icon className="w-6 h-6 sm:w-5 sm:h-5 text-white" />

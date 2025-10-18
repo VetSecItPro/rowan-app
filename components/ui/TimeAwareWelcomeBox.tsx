@@ -35,7 +35,7 @@ export function TimeAwareWelcomeBox({
         };
       case 'afternoon':
         return {
-          icon: Sparkles,
+          icon: Sun,
           shimmerClass: 'shimmer-time-afternoon',
           bgClass: 'bg-time-afternoon',
           iconColor: 'text-blue-200',
@@ -44,7 +44,7 @@ export function TimeAwareWelcomeBox({
         };
       case 'evening':
         return {
-          icon: Sunset,
+          icon: Sparkles,
           shimmerClass: 'shimmer-time-evening',
           bgClass: 'bg-time-evening',
           iconColor: 'text-purple-200',
@@ -53,7 +53,7 @@ export function TimeAwareWelcomeBox({
         };
       case 'night':
         return {
-          icon: Moon,
+          icon: Sparkles,
           shimmerClass: 'shimmer-time-night',
           bgClass: 'bg-time-night',
           iconColor: 'text-indigo-200',
@@ -120,10 +120,12 @@ export function TimeAwareWelcomeBox({
             <div className="flying-bird" />
             <div className="flying-bird" />
             <div className="flying-bird" />
+            <div className="flying-bird" />
+            <div className="flying-bird" />
           </>
         )}
 
-        {/* Night - Twinkling Stars */}
+        {/* Night - Twinkling Stars + Sparkles */}
         {timePeriod === 'night' && (
           <>
             <div className="twinkling-star" />
@@ -131,6 +133,9 @@ export function TimeAwareWelcomeBox({
             <div className="twinkling-star" />
             <div className="twinkling-star" />
             <div className="twinkling-star" />
+            <div className="sparkling-effect" />
+            <div className="sparkling-effect" />
+            <div className="sparkling-effect" />
           </>
         )}
 
@@ -139,16 +144,23 @@ export function TimeAwareWelcomeBox({
           <>
             <div className="floating-cloud" />
             <div className="floating-cloud" />
+            <div className="floating-cloud" />
+            <div className="floating-cloud" />
           </>
         )}
 
-        {/* Evening - Dancing Fireflies */}
+        {/* Evening - Dancing Fireflies + Sparkles */}
         {timePeriod === 'evening' && (
           <>
             <div className="dancing-firefly" />
             <div className="dancing-firefly" />
             <div className="dancing-firefly" />
             <div className="dancing-firefly" />
+            <div className="sparkling-effect" />
+            <div className="sparkling-effect" />
+            <div className="sparkling-effect" />
+            <div className="sparkling-effect" />
+            <div className="sparkling-effect" />
           </>
         )}
 
