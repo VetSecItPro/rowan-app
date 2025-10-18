@@ -63,7 +63,7 @@ export function HamburgerMenu() {
           onClick={() => setIsOpen(!isOpen)}
           onMouseEnter={() => setShowTooltip(true)}
           onMouseLeave={() => setShowTooltip(false)}
-          className="btn-touch btn-icon-mobile rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all active:scale-95 cursor-pointer flex items-center justify-center hover-lift shimmer-purple active-press hover:shadow-md"
+          className="btn-touch btn-icon-mobile rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors active:scale-95 cursor-pointer flex items-center justify-center"
           aria-label="Menu"
         >
           {isOpen ? (
