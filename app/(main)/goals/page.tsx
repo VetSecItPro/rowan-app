@@ -52,6 +52,7 @@ export default function GoalsPage() {
   const [checkInGoal, setCheckInGoal] = useState<Goal | null>(null);
   const [historyGoal, setHistoryGoal] = useState<Goal | null>(null);
   const [frequencyGoal, setFrequencyGoal] = useState<Goal | null>(null);
+  const [dependenciesGoal, setDependenciesGoal] = useState<Goal | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
@@ -146,7 +147,7 @@ export default function GoalsPage() {
           filter: `space_id=eq.${currentSpace.id}`
         },
         (payload) => {
-          const goalId = payload.new?.id || payload.old?.id;
+          const goalId = (payload.new as any)?.id || (payload.old as any)?.id;
           const isUserAction = goalId && userActionsRef.current.has(goalId);
 
           if (payload.eventType === 'INSERT') {
@@ -192,7 +193,7 @@ export default function GoalsPage() {
             return goalsRef.current.some(g => g.id === milestone.goal_id);
           };
 
-          const milestoneId = payload.new?.id || payload.old?.id;
+          const milestoneId = (payload.new as any)?.id || (payload.old as any)?.id;
           const isUserAction = milestoneId && userActionsRef.current.has(milestoneId);
 
           if (payload.eventType === 'INSERT') {
@@ -449,6 +450,11 @@ export default function GoalsPage() {
     setFrequencyGoal(null);
   }, []);
 
+  const handleOpenDependenciesModal = useCallback((goal: Goal) => {
+    setDependenciesGoal(goal);
+    setIsDependenciesModalOpen(true);
+  }, []);
+
   const handleEditGoal = useCallback((goal: Goal) => {
     setEditingGoal(goal);
     setIsGoalModalOpen(true);
@@ -469,8 +475,8 @@ export default function GoalsPage() {
       // TODO: Open habit creation modal (placeholder for now)
       toast.info('Habit creation modal coming soon!');
     } else if (viewMode === 'dependencies') {
-      // Open dependencies modal
-      setIsDependenciesModalOpen(true);
+      // Dependencies view shows the DependencyVisualization component
+      // Modal is opened from there for specific goals
     } else if (viewMode === 'activity') {
       // For activity view, default to creating a new goal
       setIsTemplateModalOpen(true);
@@ -972,6 +978,7 @@ export default function GoalsPage() {
                     spaceId={currentSpace.id}
                     goals={goals.filter(goal => goal?.id)} // Filter out any undefined goals
                     className="max-h-[600px]"
+                    onGoalClick={handleOpenDependenciesModal}
                   />
                 ) : (
                   <div className="text-center py-12">
@@ -1058,11 +1065,19 @@ export default function GoalsPage() {
               goalTitle={frequencyGoal.title}
             />
           )}
-          <DependenciesModal
-            isOpen={isDependenciesModalOpen}
-            onClose={() => setIsDependenciesModalOpen(false)}
-            spaceId={currentSpace.id}
-          />
+          {dependenciesGoal && (
+            <DependenciesModal
+              isOpen={isDependenciesModalOpen}
+              onClose={() => {
+                setIsDependenciesModalOpen(false);
+                setDependenciesGoal(null);
+              }}
+              goal={dependenciesGoal}
+              spaceId={currentSpace.id}
+              userId={user?.id || ''}
+              onRefresh={loadData}
+            />
+          )}
         </>
       )}
 

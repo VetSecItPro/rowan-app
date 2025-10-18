@@ -31,10 +31,8 @@ export default function BudgetAnalyticsPage() {
 
     try {
       setLoadingReports(true);
-      const result = await getGeneratedReports(spaceId, 3); // Get 3 most recent reports
-      if (result.success) {
-        setRecentReports(result.data || []);
-      }
+      const reports = await getGeneratedReports(spaceId, 3); // Get 3 most recent reports
+      setRecentReports(reports || []);
     } catch (error) {
       console.error('Error loading recent reports:', error);
     } finally {

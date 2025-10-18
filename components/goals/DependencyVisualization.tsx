@@ -25,6 +25,7 @@ interface DependencyVisualizationProps {
   spaceId: string;
   goals: Goal[];
   className?: string;
+  onGoalClick?: (goal: Goal) => void;
 }
 
 interface GoalNode extends Goal {
@@ -47,7 +48,7 @@ const DEPENDENCY_ICONS = {
   blocking: Ban
 };
 
-export function DependencyVisualization({ spaceId, goals, className = '' }: DependencyVisualizationProps) {
+export function DependencyVisualization({ spaceId, goals, className = '', onGoalClick }: DependencyVisualizationProps) {
   const [stats, setStats] = useState<GoalDependencyStats | null>(null);
   const [goalNodes, setGoalNodes] = useState<GoalNode[]>([]);
   const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
@@ -359,7 +360,12 @@ export function DependencyVisualization({ spaceId, goals, className = '' }: Depe
                     stroke={node.status === 'completed' ? '#10b981' : '#6b7280'}
                     strokeWidth="2"
                     className="cursor-pointer"
-                    onClick={() => setSelectedGoalId(selectedGoalId === node.id ? null : node.id)}
+                    onClick={() => {
+                      setSelectedGoalId(selectedGoalId === node.id ? null : node.id);
+                      if (onGoalClick) {
+                        onGoalClick(node);
+                      }
+                    }}
                   />
 
                   {/* Goal Icon */}
