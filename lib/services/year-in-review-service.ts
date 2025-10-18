@@ -133,12 +133,11 @@ export interface ProductivityMetrics {
 // =====================================================
 
 export class YearInReviewService {
-  private supabase = createClient();
-
   /**
    * Generate comprehensive year in review for a user and space
    */
   async generateYearInReview(
+    supabase: ReturnType<typeof createClient>,
     userId: string,
     spaceId: string,
     year: number = new Date().getFullYear()
@@ -197,7 +196,7 @@ export class YearInReviewService {
     yearEnd: Date
   ): Promise<OverviewStats> {
     // Get completed tasks count
-    const { count: tasksCompleted } = await this.supabase
+    const { count: tasksCompleted } = await supabase
       .from('tasks')
       .select('id', { count: 'exact' })
       .eq('space_id', spaceId)
@@ -206,7 +205,7 @@ export class YearInReviewService {
       .lte('completed_at', yearEnd.toISOString());
 
     // Get achieved goals count
-    const { count: goalsAchieved } = await this.supabase
+    const { count: goalsAchieved } = await supabase
       .from('goals')
       .select('id', { count: 'exact' })
       .eq('space_id', spaceId)
@@ -215,7 +214,7 @@ export class YearInReviewService {
       .lte('completed_at', yearEnd.toISOString());
 
     // Get total expenses
-    const { data: expensesData } = await this.supabase
+    const { data: expensesData } = await supabase
       .from('expenses')
       .select('amount')
       .eq('space_id', spaceId)
@@ -228,7 +227,7 @@ export class YearInReviewService {
     const badgesEarned = Math.floor((tasksCompleted || 0) / 10); // Placeholder logic
 
     // Calculate active days (days with any activity)
-    const { data: activeDaysData } = await this.supabase
+    const { data: activeDaysData } = await supabase
       .from('tasks')
       .select('created_at')
       .eq('space_id', spaceId)
@@ -244,7 +243,7 @@ export class YearInReviewService {
     const averageTasksPerDay = (tasksCompleted || 0) / daysInYear;
 
     // Calculate goal completion rate
-    const { count: totalGoals } = await this.supabase
+    const { count: totalGoals } = await supabase
       .from('goals')
       .select('id', { count: 'exact' })
       .eq('space_id', spaceId)
@@ -283,7 +282,7 @@ export class YearInReviewService {
         const monthEnd = endOfMonth(month);
 
         // Tasks completed this month
-        const { count: tasksCompleted } = await this.supabase
+        const { count: tasksCompleted } = await supabase
           .from('tasks')
           .select('id', { count: 'exact' })
           .eq('space_id', spaceId)
@@ -292,7 +291,7 @@ export class YearInReviewService {
           .lte('completed_at', monthEnd.toISOString());
 
         // Goals achieved this month
-        const { count: goalsAchieved } = await this.supabase
+        const { count: goalsAchieved } = await supabase
           .from('goals')
           .select('id', { count: 'exact' })
           .eq('space_id', spaceId)
@@ -301,7 +300,7 @@ export class YearInReviewService {
           .lte('completed_at', monthEnd.toISOString());
 
         // Expenses this month
-        const { data: expensesData } = await this.supabase
+        const { data: expensesData } = await supabase
           .from('expenses')
           .select('amount')
           .eq('space_id', spaceId)
@@ -311,7 +310,7 @@ export class YearInReviewService {
         const expensesAmount = expensesData?.reduce((sum, expense) => sum + expense.amount, 0) || 0;
 
         // Active days this month
-        const { data: activeDaysData } = await this.supabase
+        const { data: activeDaysData } = await supabase
           .from('tasks')
           .select('created_at')
           .eq('space_id', spaceId)
@@ -349,7 +348,7 @@ export class YearInReviewService {
     // This would integrate with the actual badges system
     // For now, generating sample achievements based on activity
 
-    const { count: tasksCompleted } = await this.supabase
+    const { count: tasksCompleted } = await supabase
       .from('tasks')
       .select('id', { count: 'exact' })
       .eq('space_id', spaceId)
@@ -357,7 +356,7 @@ export class YearInReviewService {
       .gte('completed_at', yearStart.toISOString())
       .lte('completed_at', yearEnd.toISOString());
 
-    const { count: goalsAchieved } = await this.supabase
+    const { count: goalsAchieved } = await supabase
       .from('goals')
       .select('id', { count: 'exact' })
       .eq('space_id', spaceId)
@@ -447,7 +446,7 @@ export class YearInReviewService {
     ).monthName;
 
     // Get favorite task category
-    const { data: taskCategories } = await this.supabase
+    const { data: taskCategories } = await supabase
       .from('tasks')
       .select('category')
       .eq('space_id', spaceId)
@@ -480,7 +479,7 @@ export class YearInReviewService {
 
   // Placeholder methods for additional data
   private async getTasksForYear(spaceId: string, yearStart: Date, yearEnd: Date) {
-    const { data } = await this.supabase
+    const { data } = await supabase
       .from('tasks')
       .select('*')
       .eq('space_id', spaceId)
@@ -490,7 +489,7 @@ export class YearInReviewService {
   }
 
   private async getGoalsForYear(spaceId: string, yearStart: Date, yearEnd: Date) {
-    const { data } = await this.supabase
+    const { data } = await supabase
       .from('goals')
       .select('*')
       .eq('space_id', spaceId)
@@ -500,7 +499,7 @@ export class YearInReviewService {
   }
 
   private async getExpensesForYear(spaceId: string, yearStart: Date, yearEnd: Date) {
-    const { data } = await this.supabase
+    const { data } = await supabase
       .from('expenses')
       .select('*')
       .eq('space_id', spaceId)
@@ -524,14 +523,14 @@ export class YearInReviewService {
   }
 
   private async generateGoalsSummary(spaceId: string, yearStart: Date, yearEnd: Date): Promise<GoalsSummary> {
-    const { count: totalGoals } = await this.supabase
+    const { count: totalGoals } = await supabase
       .from('goals')
       .select('id', { count: 'exact' })
       .eq('space_id', spaceId)
       .gte('created_at', yearStart.toISOString())
       .lte('created_at', yearEnd.toISOString());
 
-    const { count: completedGoals } = await this.supabase
+    const { count: completedGoals } = await supabase
       .from('goals')
       .select('id', { count: 'exact' })
       .eq('space_id', spaceId)
@@ -551,7 +550,7 @@ export class YearInReviewService {
   }
 
   private async generateExpensesSummary(spaceId: string, yearStart: Date, yearEnd: Date): Promise<ExpensesSummary> {
-    const { data: expenses } = await this.supabase
+    const { data: expenses } = await supabase
       .from('expenses')
       .select('amount')
       .eq('space_id', spaceId)
@@ -571,7 +570,7 @@ export class YearInReviewService {
   }
 
   private async calculateProductivityMetrics(spaceId: string, yearStart: Date, yearEnd: Date): Promise<ProductivityMetrics> {
-    const { count: totalTasks } = await this.supabase
+    const { count: totalTasks } = await supabase
       .from('tasks')
       .select('id', { count: 'exact' })
       .eq('space_id', spaceId)
