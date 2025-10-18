@@ -67,17 +67,12 @@ export function FeatureLayout({
       feature={currentFeature}
       timeAware={enableTimeAware}
       className="min-h-screen"
+      contentClassName="min-h-screen flex flex-col"
     >
-      {/* Base background layer for fallback */}
-      <div className="absolute inset-0 bg-gray-50 dark:bg-black -z-10" />
-
-      {/* Content wrapper with proper flex layout */}
-      <div className="min-h-screen flex flex-col relative z-10">
-        <Header />
-        <Breadcrumb items={breadcrumbItems} />
-        <main className="flex-1">{children}</main>
-        <Footer />
-      </div>
+      <Header />
+      <Breadcrumb items={breadcrumbItems} />
+      <main className="flex-1">{children}</main>
+      <Footer />
     </SmartBackgroundCanvas>
   );
 }
