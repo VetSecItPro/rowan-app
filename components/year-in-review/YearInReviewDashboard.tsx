@@ -66,7 +66,11 @@ export function YearInReviewDashboard({ year, className }: YearInReviewDashboard
 
   // Fetch year in review data
   useEffect(() => {
-    if (!currentSpace?.id) return;
+    if (!currentSpace?.id) {
+      setLoading(false);
+      setError('Please select a space to view your year in review');
+      return;
+    }
 
     const fetchData = async () => {
       try {
@@ -133,21 +137,7 @@ export function YearInReviewDashboard({ year, className }: YearInReviewDashboard
     );
   }
 
-  if (error || !data) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center space-y-4">
-          <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center mx-auto">
-            <Activity className="w-6 h-6 text-red-600" />
-          </div>
-          <div>
-            <h3 className="font-medium text-gray-900 dark:text-white">Unable to generate review</h3>
-            <p className="text-sm text-muted-foreground">{error || 'Please try again later'}</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Show the full UI even if there's an error or no data, but with appropriate empty states
 
   return (
     <div className={cn("space-y-8", className)}>
@@ -159,15 +149,43 @@ export function YearInReviewDashboard({ year, className }: YearInReviewDashboard
             Your {selectedYear} Year in Review
           </h1>
         </div>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Celebrating your achievements, growth, and incredible journey this year
-        </p>
+        {error ? (
+          <div className="max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground mb-2">
+              {error}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {error.includes('space') ?
+                'Select a space from the sidebar to view your personalized year in review.' :
+                'Here\'s a preview of what your year in review will look like once you have some data.'
+              }
+            </p>
+          </div>
+        ) : !data ? (
+          <div className="max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground mb-2">
+              Getting ready to load your year in review...
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Here's a preview of what your year in review will look like once you have some data.
+            </p>
+          </div>
+        ) : (
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Celebrating your achievements, growth, and incredible journey this year
+          </p>
+        )}
         <div className="flex items-center justify-center gap-4">
-          <Button onClick={handleExport} variant="outline" className="gap-2">
+          <Button
+            onClick={handleExport}
+            variant="outline"
+            className="gap-2"
+            disabled={!data || error}
+          >
             <Download className="w-4 h-4" />
             Export Report
           </Button>
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2" disabled={!data || error}>
             <Share2 className="w-4 h-4" />
             Share
           </Button>
@@ -179,29 +197,29 @@ export function YearInReviewDashboard({ year, className }: YearInReviewDashboard
         <OverviewCard
           icon={CheckCircle2}
           title="Tasks Completed"
-          value={data.overview.tasksCompleted}
-          subtitle={`${data.overview.averageTasksPerDay.toFixed(1)} per day`}
+          value={data?.overview.tasksCompleted ?? 0}
+          subtitle={data ? `${data.overview.averageTasksPerDay.toFixed(1)} per day` : 'No data yet'}
           color="blue"
         />
         <OverviewCard
           icon={Target}
           title="Goals Achieved"
-          value={data.overview.goalsAchieved}
-          subtitle={`${data.overview.goalCompletionRate.toFixed(1)}% completion rate`}
+          value={data?.overview.goalsAchieved ?? 0}
+          subtitle={data ? `${data.overview.goalCompletionRate.toFixed(1)}% completion rate` : 'No data yet'}
           color="green"
         />
         <OverviewCard
           icon={DollarSign}
           title="Total Expenses"
-          value={`$${data.overview.totalExpenses.toLocaleString()}`}
-          subtitle={`${data.overview.activeDays} active days`}
+          value={data ? `$${data.overview.totalExpenses.toLocaleString()}` : '$0'}
+          subtitle={data ? `${data.overview.activeDays} active days` : 'No data yet'}
           color="purple"
         />
         <OverviewCard
           icon={Award}
           title="Badges Earned"
-          value={data.overview.badgesEarned}
-          subtitle={`${data.achievements.milestones.length} milestones`}
+          value={data?.overview.badgesEarned ?? 0}
+          subtitle={data ? `${data.achievements.milestones.length} milestones` : 'No data yet'}
           color="yellow"
         />
       </div>
@@ -277,10 +295,37 @@ function OverviewCard({ icon: Icon, title, value, subtitle, color }: OverviewCar
 }
 
 // =====================================================
+// EMPTY STATE COMPONENT
+// =====================================================
+function EmptyStateCard({ title, description, icon: Icon }: { title: string; description: string; icon: React.ComponentType<any> }) {
+  return (
+    <Card className="text-center py-12">
+      <CardContent>
+        <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
+          <Icon className="w-8 h-8 text-gray-400" />
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">{title}</h3>
+        <p className="text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+// =====================================================
 // TAB COMPONENTS
 // =====================================================
 
-function OverviewTab({ data }: { data: YearInReviewData }) {
+function OverviewTab({ data }: { data: YearInReviewData | null }) {
+  if (!data) {
+    return (
+      <EmptyStateCard
+        title="No Overview Data Available"
+        description="Once you start using Rowan, you'll see beautiful charts and insights about your productivity here."
+        icon={Activity}
+      />
+    );
+  }
+
   const chartColors = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b'];
 
   return (
@@ -377,7 +422,16 @@ function OverviewTab({ data }: { data: YearInReviewData }) {
   );
 }
 
-function AchievementsTab({ data }: { data: YearInReviewData }) {
+function AchievementsTab({ data }: { data: YearInReviewData | null }) {
+  if (!data) {
+    return (
+      <EmptyStateCard
+        title="No Achievements Yet"
+        description="Start completing tasks and achieving goals to earn badges and unlock milestones!"
+        icon={Trophy}
+      />
+    );
+  }
   return (
     <div className="space-y-6">
       {/* Badges Earned */}
@@ -467,7 +521,16 @@ function AchievementsTab({ data }: { data: YearInReviewData }) {
   );
 }
 
-function GoalsTab({ data }: { data: YearInReviewData }) {
+function GoalsTab({ data }: { data: YearInReviewData | null }) {
+  if (!data) {
+    return (
+      <EmptyStateCard
+        title="No Goals Data Available"
+        description="Set some goals to see your progress and achievements throughout the year."
+        icon={Target}
+      />
+    );
+  }
   return (
     <div className="space-y-6">
       {/* Goals Summary */}
@@ -524,7 +587,16 @@ function GoalsTab({ data }: { data: YearInReviewData }) {
   );
 }
 
-function ExpensesTab({ data }: { data: YearInReviewData }) {
+function ExpensesTab({ data }: { data: YearInReviewData | null }) {
+  if (!data) {
+    return (
+      <EmptyStateCard
+        title="No Expense Data Available"
+        description="Track your expenses to see spending patterns and financial insights in your year in review."
+        icon={DollarSign}
+      />
+    );
+  }
   return (
     <div className="space-y-6">
       {/* Expense Summary */}
@@ -566,7 +638,16 @@ function ExpensesTab({ data }: { data: YearInReviewData }) {
   );
 }
 
-function InsightsTab({ data }: { data: YearInReviewData }) {
+function InsightsTab({ data }: { data: YearInReviewData | null }) {
+  if (!data) {
+    return (
+      <EmptyStateCard
+        title="No Insights Available"
+        description="Once you have some activity data, we'll provide personalized insights about your patterns and productivity."
+        icon={TrendingUp}
+      />
+    );
+  }
   return (
     <div className="space-y-6">
       {/* Key Insights */}
