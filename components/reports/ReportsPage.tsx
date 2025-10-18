@@ -1,0 +1,221 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import {
+  DocumentTextIcon,
+  ChartBarIcon,
+  CalendarIcon,
+  FolderIcon,
+  PlusIcon
+} from '@heroicons/react/24/outline';
+import { ReportTemplateSelector } from './ReportTemplateSelector';
+import { ReportLibrary } from './ReportLibrary';
+import { ReportGenerator } from './ReportGenerator';
+import { ReportViewer } from './ReportViewer';
+import {
+  getReportTemplates,
+  getGeneratedReports,
+  type ReportTemplate,
+  type GeneratedReport
+} from '@/lib/services/financial-reports-service';
+
+type TabType = 'templates' | 'library' | 'generate' | 'viewer';
+
+interface ReportsPageProps {
+  className?: string;
+}
+
+export function ReportsPage({ className = '' }: ReportsPageProps) {
+  const params = useParams();
+  const spaceId = params.spaceId as string;
+
+  const [activeTab, setActiveTab] = useState<TabType>('templates');
+  const [templates, setTemplates] = useState<ReportTemplate[]>([]);
+  const [reports, setReports] = useState<GeneratedReport[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<ReportTemplate | null>(null);
+  const [selectedReport, setSelectedReport] = useState<GeneratedReport | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadData();
+  }, [spaceId]);
+
+  const loadData = async () => {
+    if (!spaceId) return;
+
+    try {
+      setLoading(true);
+      const [templatesResult, reportsResult] = await Promise.all([
+        getReportTemplates(spaceId),
+        getGeneratedReports(spaceId)
+      ]);
+
+      if (templatesResult.success) {
+        setTemplates(templatesResult.data || []);
+      }
+
+      if (reportsResult.success) {
+        setReports(reportsResult.data || []);
+      }
+    } catch (error) {
+      console.error('Error loading reports data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGenerateReport = (template: ReportTemplate) => {
+    setSelectedTemplate(template);
+    setActiveTab('generate');
+  };
+
+  const handleViewReport = (report: GeneratedReport) => {
+    setSelectedReport(report);
+    setActiveTab('viewer');
+  };
+
+  const tabs = [
+    {
+      id: 'templates' as TabType,
+      name: 'Templates',
+      icon: DocumentTextIcon,
+      description: 'Choose from pre-built report templates'
+    },
+    {
+      id: 'library' as TabType,
+      name: 'Report Library',
+      icon: FolderIcon,
+      description: 'View and manage generated reports'
+    },
+    {
+      id: 'generate' as TabType,
+      name: 'Generate',
+      icon: ChartBarIcon,
+      description: 'Create new reports',
+      hidden: !selectedTemplate
+    },
+    {
+      id: 'viewer' as TabType,
+      name: 'View Report',
+      icon: CalendarIcon,
+      description: 'View report details',
+      hidden: !selectedReport
+    }
+  ];
+
+  if (loading) {
+    return (
+      <div className={`space-y-6 ${className}`}>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`space-y-6 ${className}`}>
+      {/* Header */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              Financial Reports
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">
+              Generate detailed financial reports and insights
+            </p>
+          </div>
+          <button
+            onClick={() => setActiveTab('templates')}
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <PlusIcon className="h-4 w-4 mr-2" />
+            New Report
+          </button>
+        </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="border-b border-gray-200 dark:border-gray-700">
+          <nav className="flex space-x-8 px-6" aria-label="Tabs">
+            {tabs.filter(tab => !tab.hidden).map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`
+                    py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap
+                    ${isActive
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                    }
+                  `}
+                >
+                  <Icon className="h-5 w-5 inline-block mr-2" />
+                  {tab.name}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Tab Content */}
+        <div className="p-6">
+          {activeTab === 'templates' && (
+            <ReportTemplateSelector
+              templates={templates}
+              onSelectTemplate={handleGenerateReport}
+            />
+          )}
+
+          {activeTab === 'library' && (
+            <ReportLibrary
+              reports={reports}
+              onViewReport={handleViewReport}
+              onReportUpdated={loadData}
+            />
+          )}
+
+          {activeTab === 'generate' && selectedTemplate && (
+            <ReportGenerator
+              template={selectedTemplate}
+              spaceId={spaceId}
+              onReportGenerated={(report) => {
+                setReports(prev => [report, ...prev]);
+                handleViewReport(report);
+              }}
+              onCancel={() => {
+                setSelectedTemplate(null);
+                setActiveTab('templates');
+              }}
+            />
+          )}
+
+          {activeTab === 'viewer' && selectedReport && (
+            <ReportViewer
+              report={selectedReport}
+              onClose={() => {
+                setSelectedReport(null);
+                setActiveTab('library');
+              }}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
