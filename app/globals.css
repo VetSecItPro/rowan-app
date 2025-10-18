@@ -1230,13 +1230,13 @@
   .flying-bird {
     position: absolute;
     font-size: 16px;
-    animation: flyAcross 12s linear infinite;
+    animation: flyAcross 45s linear infinite;
     z-index: 1;
   }
 
   .flying-bird::before {
     content: '🐦';
-    animation: birdWings 0.3s ease-in-out infinite;
+    animation: birdWings 0.8s ease-in-out infinite;
     display: inline-block;
   }
 
@@ -1245,12 +1245,20 @@
     top: 20%;
   }
   .flying-bird:nth-child(2) {
-    animation-delay: 4s;
+    animation-delay: 15s;
     top: 35%;
   }
   .flying-bird:nth-child(3) {
-    animation-delay: 8s;
+    animation-delay: 30s;
     top: 25%;
+  }
+  .flying-bird:nth-child(4) {
+    animation-delay: 10s;
+    top: 40%;
+  }
+  .flying-bird:nth-child(5) {
+    animation-delay: 25s;
+    top: 15%;
   }
 
   /* Twinkling Stars Animation (Night) */
@@ -1277,7 +1285,7 @@
   .twinkling-star {
     position: absolute;
     font-size: 12px;
-    animation: twinkle 2s ease-in-out infinite, starShimmer 3s ease-in-out infinite;
+    animation: twinkle 6s ease-in-out infinite, starShimmer 8s ease-in-out infinite;
     z-index: 1;
   }
 
@@ -1330,7 +1338,7 @@
   .floating-cloud {
     position: absolute;
     font-size: 20px;
-    animation: cloudFloat 20s linear infinite;
+    animation: cloudFloat 80s linear infinite;
     z-index: 1;
     filter: blur(0.5px);
   }
@@ -1344,9 +1352,19 @@
     top: 20%;
   }
   .floating-cloud:nth-child(2) {
-    animation-delay: 10s;
+    animation-delay: 40s;
     top: 30%;
     font-size: 16px;
+  }
+  .floating-cloud:nth-child(3) {
+    animation-delay: 20s;
+    top: 45%;
+    font-size: 18px;
+  }
+  .floating-cloud:nth-child(4) {
+    animation-delay: 60s;
+    top: 15%;
+    font-size: 14px;
   }
 
   /* Dancing Fireflies Animation (Evening) */
@@ -1381,7 +1399,7 @@
   .dancing-firefly {
     position: absolute;
     font-size: 8px;
-    animation: fireflyDance 4s ease-in-out infinite, fireflyGlow 2s ease-in-out infinite;
+    animation: fireflyDance 12s ease-in-out infinite, fireflyGlow 6s ease-in-out infinite;
     z-index: 1;
   }
 
@@ -1434,7 +1452,7 @@
   }
 
   .magical-particle {
-    animation: magicalFloat 6s ease-in-out infinite, gentleSparkle 3s ease-in-out infinite;
+    animation: magicalFloat 18s ease-in-out infinite, gentleSparkle 9s ease-in-out infinite;
   }
 
   /* Heart Animation for Family Love */
@@ -1456,7 +1474,7 @@
   .floating-heart {
     position: absolute;
     font-size: 14px;
-    animation: heartFloat 4s ease-out infinite;
+    animation: heartFloat 12s ease-out infinite;
     z-index: 1;
     pointer-events: none;
   }
@@ -1474,6 +1492,82 @@
     animation-delay: 2s;
     bottom: 15%;
     right: 20%;
+  }
+
+  /* Sparkling Effects Animation (Evening & Night) */
+  @keyframes sparkleShine {
+    0%, 100% {
+      opacity: 0.2;
+      transform: scale(0.6) rotate(0deg);
+      filter: brightness(0.8) drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));
+    }
+    25% {
+      opacity: 0.8;
+      transform: scale(1.2) rotate(90deg);
+      filter: brightness(1.8) drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.4) rotate(180deg);
+      filter: brightness(2.2) drop-shadow(0 0 12px rgba(255, 255, 255, 1));
+    }
+    75% {
+      opacity: 0.6;
+      transform: scale(1.0) rotate(270deg);
+      filter: brightness(1.5) drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+    }
+  }
+
+  @keyframes sparkleFloat {
+    0%, 100% {
+      transform: translateY(0px) translateX(0px);
+    }
+    25% {
+      transform: translateY(-8px) translateX(4px);
+    }
+    50% {
+      transform: translateY(-15px) translateX(-2px);
+    }
+    75% {
+      transform: translateY(-5px) translateX(6px);
+    }
+  }
+
+  .sparkling-effect {
+    position: absolute;
+    font-size: 10px;
+    animation: sparkleShine 4s ease-in-out infinite, sparkleFloat 8s ease-in-out infinite;
+    z-index: 2;
+  }
+
+  .sparkling-effect::before {
+    content: '✨';
+  }
+
+  .sparkling-effect:nth-child(1) {
+    animation-delay: 0s;
+    top: 20%;
+    left: 15%;
+  }
+  .sparkling-effect:nth-child(2) {
+    animation-delay: 1.5s;
+    top: 35%;
+    right: 20%;
+  }
+  .sparkling-effect:nth-child(3) {
+    animation-delay: 3s;
+    top: 50%;
+    left: 25%;
+  }
+  .sparkling-effect:nth-child(4) {
+    animation-delay: 4.5s;
+    top: 25%;
+    right: 35%;
+  }
+  .sparkling-effect:nth-child(5) {
+    animation-delay: 6s;
+    top: 45%;
+    left: 35%;
   }
 
   /* ===== APPLE-INSPIRED SEARCH ENHANCEMENTS ===== */

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { checkAndAwardBadges } from './achievement-service';
+import { enhancedNotificationService } from './enhanced-notification-service';
 
 export interface Milestone {
   id: string;
@@ -361,16 +362,41 @@ export const goalsService = {
 
     if (error) throw error;
 
-    // Check for badge awards when goal is completed
+    // Check for badge awards and send notifications when goal is completed
     if (isBeingCompleted && data.space_id) {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           // Trigger badge checking in the background (don't await to avoid blocking)
           checkAndAwardBadges(user.id, data.space_id).catch(console.error);
+
+          // Get user name and space info for notifications
+          const [{ data: userData }, { data: spaceData }] = await Promise.all([
+            supabase.from('users').select('name').eq('id', user.id).single(),
+            supabase.from('spaces').select('name').eq('id', data.space_id).single()
+          ]);
+
+          // Get space members to notify
+          const spaceMembers = await enhancedNotificationService.getSpaceMembers(data.space_id);
+
+          // Send goal completion notifications
+          if (spaceMembers.length > 0) {
+            enhancedNotificationService.sendGoalAchievementNotification(
+              spaceMembers,
+              {
+                goalTitle: data.title,
+                goalId: data.id,
+                goalUrl: `${process.env.NEXT_PUBLIC_APP_URL}/goals/${data.id}?space_id=${data.space_id}`,
+                achievementType: 'goal_completed',
+                completedBy: userData?.name || 'Someone',
+                completionDate: finalUpdates.completed_at,
+                spaceName: spaceData?.name || 'Your Space',
+              }
+            ).catch(console.error);
+          }
         }
       } catch (error) {
-        console.error('Failed to check for achievement badges:', error);
+        console.error('Failed to check for achievement badges or send notifications:', error);
       }
     }
 
@@ -440,16 +466,43 @@ export const goalsService = {
 
     if (error) throw error;
 
-    // Check for badge awards when milestone is completed
+    // Check for badge awards and send notifications when milestone is completed
     if (isBeingCompleted && data.goal?.space_id) {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           // Trigger badge checking in the background (don't await to avoid blocking)
           checkAndAwardBadges(user.id, data.goal.space_id).catch(console.error);
+
+          // Get goal details, user name and space info for notifications
+          const [{ data: goalData }, { data: userData }, { data: spaceData }] = await Promise.all([
+            supabase.from('goals').select('title').eq('id', data.goal_id).single(),
+            supabase.from('users').select('name').eq('id', user.id).single(),
+            supabase.from('spaces').select('name').eq('id', data.goal.space_id).single()
+          ]);
+
+          // Get space members to notify
+          const spaceMembers = await enhancedNotificationService.getSpaceMembers(data.goal.space_id);
+
+          // Send milestone completion notifications
+          if (spaceMembers.length > 0 && goalData) {
+            enhancedNotificationService.sendGoalAchievementNotification(
+              spaceMembers,
+              {
+                goalTitle: goalData.title,
+                goalId: data.goal_id,
+                goalUrl: `${process.env.NEXT_PUBLIC_APP_URL}/goals/${data.goal_id}?space_id=${data.goal.space_id}`,
+                achievementType: 'milestone_reached',
+                completedBy: userData?.name || 'Someone',
+                completionDate: finalUpdates.completed_at,
+                spaceName: spaceData?.name || 'Your Space',
+                milestoneTitle: data.title,
+              }
+            ).catch(console.error);
+          }
         }
       } catch (error) {
-        console.error('Failed to check for achievement badges:', error);
+        console.error('Failed to check for achievement badges or send notifications:', error);
       }
     }
 

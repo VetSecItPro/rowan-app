@@ -23,8 +23,8 @@ export function MessageNotificationBell({
     try {
       const { count, error } = await supabase
         .from('messages')
-        .select('*', { count: 'exact', head: true })
-        .eq('space_id', spaceId)
+        .select('*, conversations!inner(space_id)', { count: 'exact', head: true })
+        .eq('conversations.space_id', spaceId)
         .eq('read', false)
         .neq('sender_id', userId);
 

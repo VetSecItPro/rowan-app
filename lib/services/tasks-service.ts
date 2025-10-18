@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
+import { enhancedNotificationService } from './enhanced-notification-service';
 import type {
   Task,
   CreateTaskInput,
@@ -266,6 +267,43 @@ export const tasksService = {
 
       if (error) {
         throw new Error(`Failed to create task: ${error.message}`);
+      }
+
+      // Send task assignment notifications if task is assigned to someone
+      if (task.assigned_to && task.space_id) {
+        try {
+          // Get current user, assigned user, and space info for notifications
+          const { data: { user } } = await supabase.auth.getUser();
+
+          if (user) {
+            const [{ data: creatorData }, { data: assigneeData }, { data: spaceData }] = await Promise.all([
+              supabase.from('users').select('name').eq('id', user.id).single(),
+              supabase.from('users').select('name').eq('id', task.assigned_to).single(),
+              supabase.from('spaces').select('name').eq('id', task.space_id).single()
+            ]);
+
+            // Only send notification if task is assigned to someone other than the creator
+            if (task.assigned_to !== user.id) {
+              enhancedNotificationService.sendTaskAssignmentNotification(
+                [task.assigned_to],
+                {
+                  taskTitle: task.title,
+                  taskId: task.id,
+                  taskUrl: `${process.env.NEXT_PUBLIC_APP_URL}/tasks/${task.id}?space_id=${task.space_id}`,
+                  assignedBy: creatorData?.name || 'Someone',
+                  assignedTo: assigneeData?.name || 'You',
+                  priority: task.priority || 'medium',
+                  dueDate: task.due_date,
+                  spaceName: spaceData?.name || 'Your Space',
+                  description: task.description,
+                }
+              ).catch(console.error);
+            }
+          }
+        } catch (error) {
+          console.error('Failed to send task assignment notification:', error);
+          // Don't throw here - task creation should succeed even if notification fails
+        }
       }
 
       return task;
