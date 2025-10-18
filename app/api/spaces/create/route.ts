@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createSpace } from '@/lib/services/spaces-service';
-import { ratelimit } from '@/lib/ratelimit';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 /**
  * POST /api/spaces/create
@@ -11,19 +12,15 @@ import { setSentryUser } from '@/lib/sentry-utils';
  */
 export async function POST(req: NextRequest) {
   try {
-    // Rate limiting (with graceful fallback)
-    try {
-      const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
-      const { success: rateLimitSuccess } = await ratelimit.limit(ip);
+    // Rate limiting with automatic fallback
+    const ip = extractIP(req.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
 
-      if (!rateLimitSuccess) {
-        return NextResponse.json(
-          { error: 'Too many requests. Please try again later.' },
-          { status: 429 }
-        );
-      }
-    } catch (rateLimitError) {
-      // Log rate limit error but continue with request
+    if (!rateLimitSuccess) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
     }
 
     // Verify authentication
