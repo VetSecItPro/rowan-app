@@ -92,7 +92,7 @@ export function SortableGoalCard({
         {...listeners}
         className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-2 opacity-0 group-hover/sortable:opacity-100 transition-opacity cursor-grab active:cursor-grabbing z-10"
       >
-        <div className="w-11 h-11 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
+        <div className="btn-touch w-11 h-11 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all active:scale-95 hover-lift shimmer-indigo active-press hover:shadow-md">
           <GripVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
         </div>
       </div>
@@ -103,10 +103,10 @@ export function SortableGoalCard({
         {onTogglePin && (
           <button
             onClick={handlePinClick}
-            className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all active:scale-95 ${
+            className={`btn-touch min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all active:scale-95 hover-lift shimmer-indigo active-press ${
               goal.is_pinned
-                ? 'bg-yellow-500 text-white'
-                : 'bg-gray-200/50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'
+                ? 'bg-yellow-500 text-white hover:bg-yellow-600 hover:shadow-lg'
+                : 'bg-gray-200/50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:shadow-md'
             }`}
             title={goal.is_pinned ? 'Unpin goal' : 'Pin goal'}
           >
@@ -118,8 +118,10 @@ export function SortableGoalCard({
         {onPriorityChange && (
           <button
             onClick={handlePriorityClick}
-            className={`px-4 py-3 min-h-[44px] rounded-lg font-bold text-xs transition-all active:scale-95 ${
-              priorityInfo.color || 'bg-gray-200/50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'
+            className={`btn-touch px-4 py-3 min-h-[44px] rounded-lg font-bold text-xs transition-all active:scale-95 hover-lift shimmer-indigo active-press ${
+              priorityInfo.color
+                ? `${priorityInfo.color} hover:shadow-lg`
+                : 'bg-gray-200/50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:shadow-md'
             }`}
             title="Click to change priority"
           >

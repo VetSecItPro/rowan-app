@@ -141,7 +141,7 @@ export function SpaceSelector({
                 onSpaceChange(space);
                 setIsOpen(false);
               }}
-              className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="btn-touch flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-[0.98] hover-lift shimmer-emerald active-press hover:shadow-sm"
             >
               <div className="flex items-center gap-3">
                 <Home className="w-4 h-4 text-gray-400" />
@@ -174,7 +174,7 @@ export function SpaceSelector({
             onCreateSpace();
             setIsOpen(false);
           }}
-          className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="btn-touch flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-[0.98] hover-lift shimmer-emerald active-press hover:shadow-sm"
         >
           <Plus className="w-4 h-4" />
           Create New Space
@@ -185,7 +185,7 @@ export function SpaceSelector({
               onInvitePartner();
               setIsOpen(false);
             }}
-            className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="btn-touch flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-[0.98] hover-lift shimmer-emerald active-press hover:shadow-sm"
           >
             <UserPlus className="w-4 h-4" />
             Invite to Space
@@ -213,7 +213,7 @@ export function SpaceSelector({
       <button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+        className="btn-touch flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95 hover-lift shimmer-emerald active-press hover:shadow-md"
       >
         <Home className="w-4 h-4 text-gray-600 dark:text-gray-400" />
         <span className={`text-sm font-bold ${currentSpace ? getThemeColorClass(userColorTheme) : 'text-gray-900 dark:text-white'}`}>
