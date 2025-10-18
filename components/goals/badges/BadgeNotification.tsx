@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import type { UserBadge } from '@/lib/services/achievement-service';
 import { format } from 'date-fns';
+import confetti from 'canvas-confetti';
 
 interface BadgeNotificationProps {
   badge: UserBadge;
@@ -38,31 +39,109 @@ export default function BadgeNotification({
   }, [autoClose, autoCloseDelay]);
 
   function triggerConfetti() {
-    // Create confetti effect using emoji particles
-    const colors = ['#FFD700', '#FFA500', '#FF6347', '#9370DB', '#4169E1'];
-    const emojis = ['🎉', '🎊', '⭐', '✨', '🏆', '👏'];
+    if (!badge.badge) return;
 
-    // Create multiple confetti bursts
-    for (let i = 0; i < 50; i++) {
-      setTimeout(() => {
-        const particle = document.createElement('div');
-        particle.className = 'confetti-particle';
-        particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-        particle.style.cssText = `
-          position: fixed;
-          top: 50%;
-          left: 50%;
-          font-size: ${Math.random() * 20 + 10}px;
-          pointer-events: none;
-          z-index: 9999;
-          animation: confetti-fall ${Math.random() * 2 + 2}s ease-out forwards;
-          transform: translate(-50%, -50%) rotate(${Math.random() * 360}deg);
-        `;
+    const rarity = badge.badge.rarity;
 
-        document.body.appendChild(particle);
+    // Define confetti patterns based on badge rarity
+    switch (rarity) {
+      case 'legendary':
+        // Epic legendary celebration - golden rain effect
+        const legendaryEnd = Date.now() + 4000;
+        const legendaryColors = ['#FFD700', '#FFA500', '#FF8C00', '#FFFF00'];
 
-        setTimeout(() => particle.remove(), 4000);
-      }, i * 30);
+        function legendaryFrame() {
+          confetti({
+            particleCount: 3,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            colors: legendaryColors,
+            shapes: ['star'],
+          });
+          confetti({
+            particleCount: 3,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            colors: legendaryColors,
+            shapes: ['star'],
+          });
+
+          if (Date.now() < legendaryEnd) {
+            requestAnimationFrame(legendaryFrame);
+          }
+        }
+        legendaryFrame();
+
+        // Multiple center bursts for legendary
+        setTimeout(() => {
+          confetti({
+            particleCount: 150,
+            spread: 80,
+            origin: { y: 0.6 },
+            colors: legendaryColors,
+            shapes: ['star', 'circle'],
+          });
+        }, 500);
+        break;
+
+      case 'epic':
+        // Epic celebration with purple/pink theme
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#9370DB', '#8A2BE2', '#FF69B4', '#DA70D6'],
+        });
+        setTimeout(() => {
+          confetti({
+            particleCount: 60,
+            angle: 60,
+            spread: 50,
+            origin: { x: 0 },
+            colors: ['#9370DB', '#8A2BE2'],
+          });
+          confetti({
+            particleCount: 60,
+            angle: 120,
+            spread: 50,
+            origin: { x: 1 },
+            colors: ['#9370DB', '#8A2BE2'],
+          });
+        }, 300);
+        break;
+
+      case 'rare':
+        // Strong blue celebration
+        confetti({
+          particleCount: 80,
+          spread: 60,
+          origin: { y: 0.6 },
+          colors: ['#4169E1', '#1E90FF', '#87CEEB', '#6495ED'],
+        });
+        break;
+
+      case 'uncommon':
+        // Green celebration
+        confetti({
+          particleCount: 60,
+          spread: 50,
+          origin: { y: 0.6 },
+          colors: ['#32CD32', '#90EE90', '#98FB98', '#00FF7F'],
+        });
+        break;
+
+      case 'common':
+      default:
+        // Simple gray celebration
+        confetti({
+          particleCount: 40,
+          spread: 40,
+          origin: { y: 0.6 },
+          colors: ['#808080', '#A9A9A9', '#C0C0C0', '#D3D3D3'],
+        });
+        break;
     }
   }
 
@@ -72,6 +151,53 @@ export default function BadgeNotification({
       setIsVisible(false);
       onClose();
     }, 300);
+  }
+
+  async function handleShare() {
+    if (!badge.badge) return;
+
+    const shareText = `🎉 Achievement Unlocked! 🎉\n\n${badge.badge.icon} ${badge.badge.name}\n"${badge.badge.description}"\n\n${badge.badge.rarity.charAt(0).toUpperCase() + badge.badge.rarity.slice(1)} Badge • +${badge.badge.points} points\n\nEarned on ${format(new Date(badge.earned_at), 'MMMM d, yyyy')}\n\n#RowanApp #Achievement #Goals`;
+
+    try {
+      // Try Web Share API first (mobile/modern browsers)
+      if (navigator.share) {
+        await navigator.share({
+          title: '🎉 Achievement Unlocked!',
+          text: shareText,
+          url: window.location.origin,
+        });
+        return;
+      }
+
+      // Fallback to clipboard
+      await navigator.clipboard.writeText(shareText);
+
+      // Show success message using toast
+      const { showSuccess } = await import('@/lib/utils/toast');
+      showSuccess('Achievement copied to clipboard! 📋', {
+        action: {
+          label: 'Close',
+          onClick: () => {},
+        },
+      });
+    } catch (error) {
+      // Final fallback - create a temporary textarea
+      const textArea = document.createElement('textarea');
+      textArea.value = shareText;
+      document.body.appendChild(textArea);
+      textArea.select();
+
+      try {
+        document.execCommand('copy');
+        const { showSuccess } = await import('@/lib/utils/toast');
+        showSuccess('Achievement copied to clipboard! 📋');
+      } catch (fallbackError) {
+        const { showError } = await import('@/lib/utils/toast');
+        showError('Unable to share achievement. Please try again.');
+      } finally {
+        document.body.removeChild(textArea);
+      }
+    }
   }
 
   if (!badge.badge) return null;
@@ -86,24 +212,6 @@ export default function BadgeNotification({
 
   return (
     <>
-      {/* Confetti animation styles */}
-      <style jsx global>{`
-        @keyframes confetti-fall {
-          0% {
-            transform: translate(-50%, -50%) rotate(0deg);
-            opacity: 1;
-          }
-          100% {
-            transform: translate(
-                ${Math.random() * 200 - 100}vw,
-                ${Math.random() * 100 + 50}vh
-              )
-              rotate(${Math.random() * 720}deg);
-            opacity: 0;
-          }
-        }
-      `}</style>
-
       {/* Backdrop */}
       <div
         className={`
@@ -218,10 +326,7 @@ export default function BadgeNotification({
               </button>
 
               <button
-                onClick={() => {
-                  // Share functionality (could be extended)
-                  handleClose();
-                }}
+                onClick={handleShare}
                 className="flex-1 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-medium hover:from-indigo-700 hover:to-purple-700 transition-colors"
               >
                 Share Achievement
