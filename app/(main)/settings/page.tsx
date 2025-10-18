@@ -1088,11 +1088,11 @@ export default function SettingsPage() {
                           <div className="space-y-3 sm:space-y-4">
                             {[
                               { key: 'email_task_assignments', label: 'Task assignments', desc: 'Get notified when someone assigns you a task' },
-                              { key: 'email_events', label: 'Event reminders', desc: 'Receive email reminders for upcoming events' },
-                              { key: 'email_messages', label: 'New messages', desc: 'Get notified about new messages' },
+                              { key: 'email_event_reminders', label: 'Event reminders', desc: 'Receive email reminders for upcoming events' },
+                              { key: 'email_new_messages', label: 'New messages', desc: 'Get notified about new messages' },
                               { key: 'email_shopping_lists', label: 'Shopping lists', desc: 'Notifications when shopping lists are ready' },
                               { key: 'email_meal_reminders', label: 'Meal reminders', desc: 'Reminders for meal prep and cooking' },
-                              { key: 'email_reminders', label: 'General reminders', desc: 'All other reminder notifications' },
+                              { key: 'email_general_reminders', label: 'General reminders', desc: 'All other reminder notifications' },
                             ].map((item) => (
                               <div key={item.key} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl gap-2 sm:gap-0">
                                 <div className="flex-1">
@@ -1138,11 +1138,11 @@ export default function SettingsPage() {
                               </label>
                             </div>
                             {[
-                              { key: 'push_tasks', label: 'Task updates', desc: 'Task assignments and status changes' },
+                              { key: 'push_task_updates', label: 'Task updates', desc: 'Task assignments and status changes' },
                               { key: 'push_reminders', label: 'Reminders', desc: 'Upcoming reminders and deadlines' },
                               { key: 'push_messages', label: 'Messages', desc: 'New message notifications' },
                               { key: 'push_shopping_updates', label: 'Shopping updates', desc: 'Shopping list changes and completions' },
-                              { key: 'push_events', label: 'Event alerts', desc: 'Upcoming events and calendar updates' },
+                              { key: 'push_event_alerts', label: 'Event alerts', desc: 'Upcoming events and calendar updates' },
                             ].map((item) => (
                               <div key={item.key} className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl gap-2 sm:gap-0 transition-opacity ${!notificationPrefs.push_enabled ? 'opacity-50' : ''}`}>
                                 <div className="flex-1">
@@ -1162,6 +1162,87 @@ export default function SettingsPage() {
                                 </label>
                               </div>
                             ))}
+                          </div>
+                        </div>
+
+                        {/* Digest Settings */}
+                        <div>
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                            <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
+                            Digest Settings
+                          </h3>
+                          <div className="space-y-3 sm:space-y-4">
+                            {/* Digest Frequency */}
+                            <div className="p-3 sm:p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg sm:rounded-xl">
+                              <div className="flex flex-col gap-3">
+                                <div>
+                                  <p className="text-sm font-medium text-gray-900 dark:text-white">Notification Frequency</p>
+                                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Choose how often to receive email notifications</p>
+                                </div>
+                                <div className="relative">
+                                  <select
+                                    value={notificationPrefs.digest_frequency}
+                                    onChange={async (e) => {
+                                      const newValue = e.target.value as 'realtime' | 'daily' | 'weekly';
+                                      setNotificationPrefs(prev => ({ ...prev, digest_frequency: newValue }));
+                                      setIsSavingPrefs(true);
+                                      try {
+                                        await fetch('/api/notifications/preferences', {
+                                          method: 'PATCH',
+                                          headers: { 'Content-Type': 'application/json' },
+                                          body: JSON.stringify({ digest_frequency: newValue }),
+                                        });
+                                      } catch (error) {
+                                        console.error('Failed to update digest frequency:', error);
+                                      } finally {
+                                        setIsSavingPrefs(false);
+                                      }
+                                    }}
+                                    className="w-full px-3 sm:px-4 py-3 text-base min-h-[48px] bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer"
+                                  >
+                                    <option value="realtime">Real-time (Immediate)</option>
+                                    <option value="daily">Daily Digest</option>
+                                    <option value="weekly">Weekly Digest</option>
+                                  </select>
+                                  <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                                    <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Digest Time - Only show for daily/weekly */}
+                            {(notificationPrefs.digest_frequency === 'daily' || notificationPrefs.digest_frequency === 'weekly') && (
+                              <div className="p-3 sm:p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl">
+                                <div className="flex flex-col gap-3">
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-900 dark:text-white">Digest Delivery Time</p>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">When to send your {notificationPrefs.digest_frequency} digest</p>
+                                  </div>
+                                  <input
+                                    type="time"
+                                    value={notificationPrefs.digest_time.substring(0, 5)} // Convert HH:MM:SS to HH:MM
+                                    onChange={async (e) => {
+                                      const newValue = e.target.value + ':00'; // Convert HH:MM to HH:MM:SS
+                                      setNotificationPrefs(prev => ({ ...prev, digest_time: newValue }));
+                                      setIsSavingPrefs(true);
+                                      try {
+                                        await fetch('/api/notifications/preferences', {
+                                          method: 'PATCH',
+                                          headers: { 'Content-Type': 'application/json' },
+                                          body: JSON.stringify({ digest_time: newValue }),
+                                        });
+                                      } catch (error) {
+                                        console.error('Failed to update digest time:', error);
+                                      } finally {
+                                        setIsSavingPrefs(false);
+                                      }
+                                    }}
+                                    className="w-full px-3 sm:px-4 py-3 text-base min-h-[48px] bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 dark:text-white"
+                                  />
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -1197,10 +1278,10 @@ export default function SettingsPage() {
                                   </label>
                                   <input
                                     type="time"
-                                    value={notificationPrefs.quiet_hours_start}
+                                    value={notificationPrefs.quiet_hours_start.substring(0, 5)} // Convert HH:MM:SS to HH:MM
                                     id="field-10"
                                     onChange={async (e) => {
-                                      const newValue = e.target.value;
+                                      const newValue = e.target.value + ':00'; // Convert HH:MM to HH:MM:SS
                                       setNotificationPrefs(prev => ({ ...prev, quiet_hours_start: newValue }));
                                       setIsSavingPrefs(true);
                                       try {
@@ -1224,10 +1305,10 @@ export default function SettingsPage() {
                                   </label>
                                   <input
                                     type="time"
-                                    value={notificationPrefs.quiet_hours_end}
+                                    value={notificationPrefs.quiet_hours_end.substring(0, 5)} // Convert HH:MM:SS to HH:MM
                                     id="field-11"
                                     onChange={async (e) => {
-                                      const newValue = e.target.value;
+                                      const newValue = e.target.value + ':00'; // Convert HH:MM to HH:MM:SS
                                       setNotificationPrefs(prev => ({ ...prev, quiet_hours_end: newValue }));
                                       setIsSavingPrefs(true);
                                       try {
