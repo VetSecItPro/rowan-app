@@ -20,7 +20,7 @@ export type NotificationPriority = 'low' | 'normal' | 'high' | 'urgent';
 export interface InAppNotification {
   id: string;
   user_id: string;
-  partnership_id: string;
+  partnership_id?: string;
   type: NotificationType;
   title: string;
   content: string;
