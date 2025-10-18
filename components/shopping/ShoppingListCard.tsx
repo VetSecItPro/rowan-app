@@ -94,10 +94,10 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                 onClick={() => onCompleteList?.(list.id)}
                 disabled={list.status === 'completed'}
                 aria-label={`Mark entire shopping list as ${list.status === 'completed' ? 'completed' : 'complete'}`}
-                className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                className={`btn-touch flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
                   list.status === 'completed'
                     ? 'bg-green-500 border-green-500 cursor-not-allowed'
-                    : 'border-emerald-400 dark:border-emerald-500 hover:border-emerald-600 dark:hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 cursor-pointer active:scale-95 hover:scale-110 shopping-status-toggle shopping-magnetic-hover shopping-ripple-effect'
+                    : 'border-emerald-400 dark:border-emerald-500 hover:border-emerald-600 dark:hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 cursor-pointer active:scale-95 hover:scale-110 shopping-status-toggle shopping-magnetic-hover shopping-ripple-effect shimmer-emerald hover-lift'
                 }`}
               >
                 {list.status === 'completed' && <Check className="w-4 h-4 text-white" />}
@@ -150,11 +150,11 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                         <button
                           onClick={() => onToggleItem?.(item.id, !item.checked)}
                           aria-label={`Toggle item: ${item.name}`}
-                          className={`flex-shrink-0 w-4 h-4 rounded border-2 flex items-center justify-center transition-all active:scale-95 hover:scale-110 ${
+                          className={`btn-touch flex-shrink-0 w-4 h-4 rounded border-2 flex items-center justify-center transition-all active:scale-95 hover:scale-110 ${
                             item.checked
                               ? 'bg-green-500 border-green-500'
                               : 'border-gray-300 dark:border-gray-600 hover:border-emerald-500'
-                          } shopping-item-toggle shopping-magnetic-hover shopping-ripple-effect`}
+                          } shopping-item-toggle shopping-magnetic-hover shopping-ripple-effect shimmer-emerald hover-lift`}
                         >
                           {item.checked && <Check className="w-3 h-3 text-white" />}
                         </button>
@@ -173,7 +173,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                               <button
                                 onClick={() => onUpdateQuantity(item.id, Math.max(1, Number(item.quantity) - 1))}
                                 disabled={Number(item.quantity) <= 1}
-                                className="w-5 h-5 flex-shrink-0 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 hover:scale-110 shopping-quantity-btn shopping-magnetic-hover shopping-ripple-effect"
+                                className="btn-touch w-5 h-5 flex-shrink-0 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 hover:scale-110 shopping-quantity-btn shopping-magnetic-hover shopping-ripple-effect hover-lift shimmer-gray"
                                 aria-label="Decrease quantity"
                               >
                                 <span className="text-xs font-bold text-gray-600 dark:text-gray-300">−</span>
@@ -193,7 +193,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                               <button
                                 onClick={() => onUpdateQuantity(item.id, Math.min(200, Number(item.quantity) + 1))}
                                 disabled={Number(item.quantity) >= 200}
-                                className="w-5 h-5 flex-shrink-0 rounded bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-800/50 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 hover:scale-110 shopping-quantity-btn shopping-magnetic-hover shopping-ripple-effect"
+                                className="btn-touch w-5 h-5 flex-shrink-0 rounded bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-800/50 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 hover:scale-110 shopping-quantity-btn shopping-magnetic-hover shopping-ripple-effect hover-lift shimmer-emerald"
                                 aria-label="Increase quantity"
                               >
                                 <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">+</span>
@@ -209,7 +209,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
               {(Object.keys(itemsByCategory).length > 2 || list.items.length > 6) && (
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="text-xs text-emerald-600 dark:text-emerald-400 ml-7 hover:underline active:opacity-80"
+                  className="btn-touch text-xs text-emerald-600 dark:text-emerald-400 ml-7 hover:underline active:opacity-80 hover-lift shimmer-emerald active-press"
                 >
                   {isExpanded ? 'Show less' : `+${list.items.length - 6} more items`}
                 </button>
@@ -223,7 +223,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
           <button
             onClick={() => setShowMenu(!showMenu)}
             aria-label="Shopping list options menu"
-            className="w-12 h-12 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95"
+            className="btn-touch w-12 h-12 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95 hover-lift shimmer-emerald active-press"
           >
             <MoreVertical className="w-5 h-5 md:w-4 md:h-4 text-gray-600 dark:text-gray-400" />
           </button>
@@ -240,7 +240,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                     onEdit(list);
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg active:scale-[0.98]"
+                  className="btn-touch w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg active:scale-[0.98] hover-lift shimmer-emerald active-press"
                 >
                   Edit List
                 </button>
@@ -250,7 +250,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                       onScheduleTrip(list);
                       setShowMenu(false);
                     }}
-                    className="w-full px-4 py-2 text-left text-purple-600 dark:text-purple-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 active:scale-[0.98]"
+                    className="btn-touch w-full px-4 py-2 text-left text-purple-600 dark:text-purple-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 active:scale-[0.98] hover-lift shimmer-purple active-press"
                   >
                     📅 Schedule Shopping Trip
                   </button>
@@ -261,7 +261,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                       onCreateTask(list);
                       setShowMenu(false);
                     }}
-                    className="w-full px-4 py-2 text-left text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 active:scale-[0.98]"
+                    className="btn-touch w-full px-4 py-2 text-left text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 active:scale-[0.98] hover-lift shimmer-blue active-press"
                   >
                     ✓ Create Task
                   </button>
@@ -272,7 +272,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                       onSaveAsTemplate(list);
                       setShowMenu(false);
                     }}
-                    className="w-full px-4 py-2 text-left text-emerald-600 dark:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-[0.98]"
+                    className="btn-touch w-full px-4 py-2 text-left text-emerald-600 dark:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-[0.98] hover-lift shimmer-emerald active-press"
                   >
                     Save as Template
                   </button>
@@ -282,7 +282,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                     onDelete(list.id);
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg active:scale-[0.98]"
+                  className="btn-touch w-full px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg active:scale-[0.98] hover-lift shimmer-red active-press"
                 >
                   Delete List
                 </button>

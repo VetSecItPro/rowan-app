@@ -183,7 +183,7 @@ export function MessageCard({
               <div className="mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 <button
                   onClick={() => onReply(message)}
-                  className="flex items-center gap-1.5 px-2 py-1 rounded-full text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all duration-200 active:scale-95"
+                  className="btn-touch flex items-center gap-1.5 px-2 py-1 rounded-full text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all duration-200 active:scale-95 hover-lift shimmer-green active-press"
                 >
                   <MessageSquare className="w-3 h-3" />
                   {('reply_count' in message && message.reply_count) ? (
@@ -201,7 +201,7 @@ export function MessageCard({
                     key={reaction.emoji}
                     onClick={() => handleAddReaction(reaction.emoji)}
                     disabled={loadingReaction}
-                    className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs border transition-all active:scale-95 ${
+                    className={`btn-touch flex items-center gap-1 px-2 py-1 rounded-full text-xs border transition-all active:scale-95 hover-lift shimmer-green active-press ${
                       reaction.reacted_by_current_user
                         ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700'
                         : 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -233,7 +233,7 @@ export function MessageCard({
                   onClick={() => setShowMenu(!showMenu)}
                   title="Edit or Delete"
                   aria-label="Message options menu"
-                  className="w-12 h-12 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all opacity-0 group-hover:opacity-100 active:scale-95"
+                  className="btn-touch w-12 h-12 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all opacity-0 group-hover:opacity-100 active:scale-95 hover-lift shimmer-green active-press"
                 >
                   <MoreVertical className="w-5 h-5 md:w-4 md:h-4 text-gray-600 dark:text-gray-400" />
                 </button>
@@ -250,7 +250,7 @@ export function MessageCard({
                           onEdit(message);
                           setShowMenu(false);
                         }}
-                        className="w-full px-4 py-2 text-left text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg active:scale-[0.98]"
+                        className="btn-touch w-full px-4 py-2 text-left text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg active:scale-[0.98] hover-lift shimmer-green active-press"
                       >
                         Edit
                       </button>
@@ -260,7 +260,7 @@ export function MessageCard({
                             onTogglePin(message.id);
                             setShowMenu(false);
                           }}
-                          className="w-full px-4 py-2 text-left text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-[0.98] flex items-center gap-2"
+                          className="btn-touch w-full px-4 py-2 text-left text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-[0.98] flex items-center gap-2 hover-lift shimmer-green active-press"
                         >
                           <Pin className={`w-3.5 h-3.5 ${message.is_pinned ? 'rotate-45' : ''}`} />
                           {message.is_pinned ? 'Unpin' : 'Pin'}
@@ -272,7 +272,7 @@ export function MessageCard({
                             onForward(message);
                             setShowMenu(false);
                           }}
-                          className="w-full px-4 py-2 text-left text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-[0.98] flex items-center gap-2"
+                          className="btn-touch w-full px-4 py-2 text-left text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-[0.98] flex items-center gap-2 hover-lift shimmer-green active-press"
                         >
                           <Forward className="w-3.5 h-3.5" />
                           Forward
@@ -283,7 +283,7 @@ export function MessageCard({
                           onDelete(message.id);
                           setShowMenu(false);
                         }}
-                        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg active:scale-[0.98]"
+                        className="btn-touch w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg active:scale-[0.98] hover-lift shimmer-red active-press"
                       >
                         Delete
                       </button>
