@@ -884,8 +884,8 @@ export default function MessagesPage() {
           {/* Search Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 sm:p-4">
-            <div className={`apple-search-container group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
-              <Search className="apple-search-icon" />
+            <div className={`relative flex items-center w-full group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
               <input
                 type="search"
                 inputMode="search"
@@ -896,7 +896,7 @@ export default function MessagesPage() {
                 placeholder="Search all messages across conversations..."
                 value={searchQuery}
                 onChange={handleSearchChange}
-                className="apple-search-input"
+                className="w-full pl-10 pr-12 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
               />
               {isSearching && (
                 <div className="absolute right-12 top-1/2 -translate-y-1/2">
@@ -909,7 +909,7 @@ export default function MessagesPage() {
                     setSearchQuery('');
                     setSearchResults([]);
                   }}
-                  className="apple-search-clear"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 flex items-center justify-center transition-colors"
                   aria-label="Clear search"
                 >
                   <X className="w-4 h-4" />

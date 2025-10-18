@@ -114,23 +114,6 @@ export const messagesService = {
     return data || [];
   },
 
-  async createConversation(input: { space_id: string; title?: string; participants: string[] }): Promise<Conversation> {
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from('conversations')
-      .insert([{
-        space_id: input.space_id,
-        title: input.title,
-        participants: input.participants,
-        unread_count: 0,
-      }])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  },
-
   async getMessages(conversationId: string): Promise<Message[]> {
     const supabase = createClient();
     const { data, error } = await supabase

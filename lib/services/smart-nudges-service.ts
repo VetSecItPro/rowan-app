@@ -296,13 +296,23 @@ class SmartNudgesService {
 
   // Record nudge sent (called when nudge is sent)
   async recordNudgeSent(goalId: string, userId: string): Promise<void> {
+    // First, get the current nudge count
+    const { data: existing } = await this.supabase
+      .from('goal_nudge_tracking')
+      .select('nudge_count')
+      .eq('goal_id', goalId)
+      .eq('user_id', userId)
+      .single();
+
+    const newNudgeCount = (existing?.nudge_count || 0) + 1;
+
     const { error } = await this.supabase
       .from('goal_nudge_tracking')
       .upsert({
         goal_id: goalId,
         user_id: userId,
         last_nudge_sent_at: new Date().toISOString(),
-        nudge_count: this.supabase.sql`COALESCE(nudge_count, 0) + 1`,
+        nudge_count: newNudgeCount,
         updated_at: new Date().toISOString()
       }, {
         onConflict: 'goal_id,user_id'
