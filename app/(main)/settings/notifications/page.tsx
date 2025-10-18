@@ -178,7 +178,7 @@ export default function NotificationSettingsPage() {
           <div className="mb-8">
             <Link
               href="/settings"
-              className="btn-touch inline-flex items-center gap-2 py-2 px-3 text-gray-600 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 mb-4 rounded-md active:scale-95 hover-lift shimmer-pink active-press"
+              className="btn-touch inline-flex items-center gap-2 py-2 px-3 text-gray-600 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 mb-4 rounded-md active:scale-95"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Settings
@@ -407,14 +407,14 @@ export default function NotificationSettingsPage() {
 
                   <div className="space-y-3">
                     {(['instant', 'hourly', 'daily', 'never'] as const).map((freq) => (
-                      <label key={freq} className="btn-touch flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer active:scale-[0.98] hover-lift shimmer-pink active-press">
+                      <label key={freq} className="btn-touch flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer active:scale-[0.98]">
                         <input
                           type="radio"
                           name="frequency"
                           value={freq}
                           checked={notificationFrequency === freq}
                           onChange={() => setNotificationFrequency(freq)}
-                          className="w-4 h-4 text-pink-600 focus:ring-pink-500 focus:ring-2 notification-radio notification-magnetic-hover notification-ripple-effect"
+                          className="w-4 h-4 text-pink-600 focus:ring-pink-500 focus:ring-2"
                         />
                         <div>
                           <div className="font-medium text-gray-900 dark:text-white capitalize">{freq}</div>
@@ -464,7 +464,7 @@ export default function NotificationSettingsPage() {
                             type="time"
                             value={quietHoursStart}
                             onChange={(e) => setQuietHoursStart(e.target.value)}
-                            className="w-full px-3 sm:px-4 py-3 text-base min-h-[48px] bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 notification-time-input notification-magnetic-hover notification-ripple-effect hover-lift shimmer-pink"
+                            className="w-full px-3 sm:px-4 py-3 text-base min-h-[48px] bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500"
                           />
                         </div>
                         <div>
@@ -476,7 +476,7 @@ export default function NotificationSettingsPage() {
                             type="time"
                             value={quietHoursEnd}
                             onChange={(e) => setQuietHoursEnd(e.target.value)}
-                            className="w-full px-3 sm:px-4 py-3 text-base min-h-[48px] bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 notification-time-input notification-magnetic-hover notification-ripple-effect hover-lift shimmer-pink"
+                            className="w-full px-3 sm:px-4 py-3 text-base min-h-[48px] bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500"
                           />
                         </div>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -492,7 +492,7 @@ export default function NotificationSettingsPage() {
                   <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="btn-touch flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 active:scale-95 hover-lift shimmer-pink active-press focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
+                    className="btn-touch flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
                   >
                     <Save className="w-5 h-5" />
                     {saving ? 'Saving...' : 'Save Preferences'}
