@@ -116,7 +116,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
             onClick={handleStatusClick}
             title={getStatusTooltip()}
             aria-label={`Toggle task status: ${statusLabel.text}`}
-            className={`mt-0.5 flex-shrink-0 w-6 h-6 sm:w-5 sm:h-5 rounded flex items-center justify-center transition-all active:scale-95 hover:scale-110 ${getCheckboxStyle()} tasks-status-toggle tasks-magnetic-hover tasks-ripple-effect`}
+            className={`btn-touch mt-0.5 flex-shrink-0 w-6 h-6 sm:w-5 sm:h-5 rounded flex items-center justify-center transition-all active:scale-95 hover:scale-110 ${getCheckboxStyle()} tasks-status-toggle tasks-magnetic-hover tasks-ripple-effect shimmer-blue hover-lift`}
           >
             {task.status === 'completed' && (
               <CheckSquare className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
@@ -163,7 +163,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
             onClick={() => setShowMenu(!showMenu)}
             title="Edit or Delete"
             aria-label="Task options menu"
-            className="w-12 h-12 md:w-10 md:h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95"
+            className="btn-touch w-12 h-12 md:w-10 md:h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95 hover-lift shimmer-blue active-press"
           >
             <MoreVertical className="w-5 h-5 md:w-4 md:h-4 text-gray-600 dark:text-gray-400" />
           </button>
@@ -181,7 +181,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
                       onViewDetails(task);
                       setShowMenu(false);
                     }}
-                    className="w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg transition-colors active:scale-[0.98]"
+                    className="btn-touch w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg transition-colors active:scale-[0.98] shimmer-blue active-press hover-lift"
                   >
                     View Details
                   </button>
@@ -191,7 +191,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
                     onEdit(task);
                     setShowMenu(false);
                   }}
-                  className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-[0.98] ${!onViewDetails || task.type !== 'task' ? 'rounded-t-lg' : ''}`}
+                  className={`btn-touch w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-[0.98] shimmer-blue active-press hover-lift ${!onViewDetails || task.type !== 'task' ? 'rounded-t-lg' : ''}`}
                 >
                   Edit
                 </button>
@@ -200,7 +200,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
                     onDelete(task.id, task.type);
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg active:scale-[0.98]"
+                  className="btn-touch w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg active:scale-[0.98] shimmer-red active-press hover-lift"
                 >
                   Delete
                 </button>
@@ -245,7 +245,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
       {linkedShoppingList && (
         <Link
           href="/shopping"
-          className="mt-3 inline-flex items-center gap-2 py-2 px-3 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors text-sm active:opacity-80"
+          className="btn-touch mt-3 inline-flex items-center gap-2 py-2 px-3 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors text-sm active:opacity-80 shimmer-emerald hover-lift active-press"
         >
           <ShoppingCart className="w-4 h-4 flex-shrink-0" />
           <span className="font-medium truncate">

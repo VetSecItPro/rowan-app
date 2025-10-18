@@ -85,7 +85,7 @@ export function SwipeableMessageCard({
         <div className="absolute inset-y-0 left-0 w-16 flex items-center justify-center">
           <button
             onClick={handleEdit}
-            className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white shadow-lg active:bg-blue-600"
+            className="btn-touch w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white shadow-lg active:bg-blue-600 hover-lift shimmer-blue active-press"
           >
             <Edit2 className="w-5 h-5" />
           </button>
@@ -97,7 +97,7 @@ export function SwipeableMessageCard({
         <div className="absolute inset-y-0 right-0 w-20 flex items-center justify-center">
           <button
             onClick={handleDelete}
-            className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white shadow-lg active:bg-red-600"
+            className="btn-touch w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white shadow-lg active:bg-red-600 hover-lift shimmer-red active-press"
           >
             <Trash2 className="w-5 h-5" />
           </button>

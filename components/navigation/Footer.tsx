@@ -29,25 +29,25 @@ export function Footer() {
           <div className="flex items-center flex-wrap justify-center gap-2 sm:gap-4">
             <Link
               href="/terms"
-              className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="btn-touch px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-md active:scale-95 hover-lift shimmer-purple active-press"
             >
               Terms
             </Link>
             <Link
               href="/privacy"
-              className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="btn-touch px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-md active:scale-95 hover-lift shimmer-purple active-press"
             >
               Privacy
             </Link>
             <Link
               href="/settings/documentation"
-              className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="btn-touch px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-md active:scale-95 hover-lift shimmer-purple active-press"
             >
               Documentation
             </Link>
             <Link
               href="/settings/support"
-              className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="btn-touch px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-md active:scale-95 hover-lift shimmer-purple active-press"
             >
               Support
             </Link>

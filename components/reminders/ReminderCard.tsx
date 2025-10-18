@@ -67,7 +67,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
             <button
               onClick={() => onSelectionChange?.(reminder.id, !selected)}
               aria-label={`Select reminder: ${reminder.title}`}
-              className={`mt-1 w-6 h-6 sm:w-5 sm:h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 active:scale-95 ${
+              className={`btn-touch mt-1 w-6 h-6 sm:w-5 sm:h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 active:scale-95 hover:scale-110 hover-lift shimmer-pink ${
                 selected
                   ? 'bg-pink-500 border-pink-500'
                   : 'bg-transparent border-gray-400 dark:border-gray-500 hover:border-pink-500'
@@ -82,7 +82,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
             <button
               onClick={handleCheckboxClick}
               aria-label={`Toggle reminder status: ${reminder.status === 'active' ? 'Active' : reminder.status === 'snoozed' ? 'Snoozed' : 'Completed'}`}
-              className={`mt-1 w-6 h-6 sm:w-5 sm:h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 active:scale-95 ${
+              className={`btn-touch mt-1 w-6 h-6 sm:w-5 sm:h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 active:scale-95 hover:scale-110 hover-lift shimmer-pink ${
                 reminder.status === 'completed'
                   ? 'bg-green-500 border-green-500'
                   : reminder.status === 'snoozed'
@@ -158,7 +158,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
           <button
             onClick={() => setShowMenu(!showMenu)}
             aria-label="Reminder options menu"
-            className="w-12 h-12 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95"
+            className="btn-touch w-12 h-12 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95 hover-lift shimmer-pink active-press"
           >
             <MoreVertical className="w-5 h-5 md:w-4 md:h-4 text-gray-600 dark:text-gray-400" />
           </button>
@@ -175,7 +175,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                     onEdit(reminder);
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-t-lg active:scale-[0.98]"
+                  className="btn-touch w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-t-lg active:scale-[0.98] hover-lift shimmer-pink active-press"
                 >
                   <Edit className="w-4 h-4" />
                   Edit Reminder
@@ -187,7 +187,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                     }
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-b-lg active:scale-[0.98]"
+                  className="btn-touch w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-b-lg active:scale-[0.98] hover-lift shimmer-red active-press"
                 >
                   <Trash2 className="w-4 h-4" />
                   Delete Reminder
@@ -220,7 +220,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
           <div className="relative">
             <button
               onClick={() => setShowSnoozeMenu(!showSnoozeMenu)}
-              className="flex items-center gap-1 px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors"
+              className="btn-touch flex items-center gap-1 px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors hover-lift shimmer-purple active-press"
             >
               <Timer className="w-3 h-3" />
               <span>Snooze</span>
@@ -240,7 +240,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                         onSnooze(reminder.id, minutes);
                         setShowSnoozeMenu(false);
                       }}
-                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg"
+                      className="btn-touch w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg hover-lift shimmer-purple active-press"
                     >
                       {minutes < 60 ? `${minutes} min` : `${minutes / 60} hr`}
                     </button>
