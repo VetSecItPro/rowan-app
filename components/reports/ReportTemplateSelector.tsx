@@ -5,10 +5,10 @@ import {
   ChartBarIcon,
   DocumentChartBarIcon,
   CurrencyDollarIcon,
-  TrendingUpIcon,
+  ArrowTrendingUpIcon,
   PresentationChartBarIcon,
   CalendarIcon,
-  FilterIcon
+  FunnelIcon
 } from '@heroicons/react/24/outline';
 import { type ReportTemplate } from '@/lib/services/financial-reports-service';
 
@@ -21,7 +21,7 @@ const categoryIcons = {
   budget: CurrencyDollarIcon,
   expenses: DocumentChartBarIcon,
   goals: PresentationChartBarIcon,
-  trends: TrendingUpIcon,
+  trends: ArrowTrendingUpIcon,
   summary: ChartBarIcon
 };
 
@@ -102,7 +102,7 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
       {/* Templates Grid */}
       {filteredTemplates.length === 0 ? (
         <div className="text-center py-12">
-          <FilterIcon className="mx-auto h-12 w-12 text-gray-400" />
+          <FunnelIcon className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
             No templates found
           </h3>
