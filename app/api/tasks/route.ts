@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { tasksService } from '@/lib/services/tasks-service';
-import { ratelimit } from '@/lib/ratelimit';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { verifySpaceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { createTaskSchema } from '@/lib/validations/task-schemas';
 import { ZodError } from 'zod';
-import { fallbackRateLimit, extractIP } from '@/lib/ratelimit-fallback';
+import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 
 /**
@@ -16,32 +16,15 @@ import { logger } from '@/lib/logger';
  */
 export async function GET(req: NextRequest) {
   try {
-    // Rate limiting with fallback protection
+    // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
 
-    try {
-      const { success: rateLimitSuccess } = await ratelimit.limit(ip);
-
-      if (!rateLimitSuccess) {
-        return NextResponse.json(
-          { error: 'Too many requests. Please try again later.' },
-          { status: 429 }
-        );
-      }
-    } catch (rateLimitError) {
-      // Fallback to in-memory rate limiting
-      Sentry.captureMessage('Rate limiting degraded (using fallback)', {
-        level: 'warning',
-        tags: { service: 'rate-limit', endpoint: '/api/tasks', method: 'GET' },
-      });
-
-      const allowed = fallbackRateLimit(ip, 10, 10 * 1000);
-      if (!allowed) {
-        return NextResponse.json(
-          { error: 'Too many requests. Please try again later.' },
-          { status: 429 }
-        );
-      }
+    if (!rateLimitSuccess) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
     }
 
     // Verify authentication
