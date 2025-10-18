@@ -5,14 +5,14 @@ import { Menu, X, Search, Command as CommandIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { NAVIGATION_ITEMS } from '@/lib/navigation';
-import { useCommandPaletteTrigger } from '@/hooks/useCommandPalette';
+// import { useCommandPaletteTrigger } from '@/hooks/useCommandPalette'; // Temporarily disabled
 
 export function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const { trigger } = useCommandPaletteTrigger();
+  // const { trigger } = useCommandPaletteTrigger(); // Temporarily disabled
 
   // Close menu when route changes
   useEffect(() => {
@@ -109,7 +109,8 @@ export function HamburgerMenu() {
 
             {/* Menu Content */}
             <div className="py-2">
-              {/* Command Palette Trigger */}
+              {/* Command Palette Trigger - Temporarily disabled */}
+              {/*
               <div className="px-4 py-3 sm:py-2 border-b border-gray-200 dark:border-gray-800">
                 <button
                   onClick={() => {
@@ -135,6 +136,7 @@ export function HamburgerMenu() {
                   </div>
                 </button>
               </div>
+              */}
 
               <div className="px-4 py-3 sm:py-2">
                 <p className="text-sm font-semibold text-gray-900 dark:text-white">Features</p>
