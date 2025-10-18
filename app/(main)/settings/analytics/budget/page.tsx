@@ -128,20 +128,20 @@ export default function BudgetAnalyticsPage() {
             <div className="inline-flex items-center bg-amber-50 dark:bg-amber-900/20 rounded-lg p-1 border border-amber-200 dark:border-amber-800">
               <button
                 onClick={() => setViewMode('analytics')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                className={`btn-touch px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap active:scale-95 hover-lift shimmer-amber active-press ${
                   viewMode === 'analytics'
-                    ? 'bg-amber-500 text-white shadow-sm'
-                    : 'text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100'
+                    ? 'bg-amber-500 text-white shadow-sm hover:bg-amber-600 hover:shadow-md'
+                    : 'text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100 hover:bg-amber-100 dark:hover:bg-amber-800/30'
                 }`}
               >
                 Analytics
               </button>
               <button
                 onClick={() => setViewMode('reports')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                className={`btn-touch px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap active:scale-95 hover-lift shimmer-amber active-press ${
                   viewMode === 'reports'
-                    ? 'bg-amber-500 text-white shadow-sm'
-                    : 'text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100'
+                    ? 'bg-amber-500 text-white shadow-sm hover:bg-amber-600 hover:shadow-md'
+                    : 'text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100 hover:bg-amber-100 dark:hover:bg-amber-800/30'
                 }`}
               >
                 Reports
@@ -159,10 +159,10 @@ export default function BudgetAnalyticsPage() {
                 <button
                   key={option.value}
                   onClick={() => setTimeRange(option.value as TimeRange)}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                  className={`btn-touch px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap active:scale-95 hover-lift shimmer-amber active-press ${
                     timeRange === option.value
-                      ? 'bg-amber-500 text-white shadow-sm'
-                      : 'text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100'
+                      ? 'bg-amber-500 text-white shadow-sm hover:bg-amber-600 hover:shadow-md'
+                      : 'text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100 hover:bg-amber-100 dark:hover:bg-amber-800/30'
                   }`}
                 >
                   {option.label}

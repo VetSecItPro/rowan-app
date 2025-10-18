@@ -113,9 +113,9 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
         <button
           onClick={handleToggleSync}
           disabled={syncing}
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-            syncStatus.isSynced ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
-          } ${syncing ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`btn-touch relative inline-flex h-6 w-11 items-center rounded-full transition-all ${
+            syncStatus.isSynced ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
+          } ${syncing ? 'opacity-50 cursor-not-allowed' : 'active:scale-95 hover-lift shimmer-blue active-press hover:shadow-md'}`}
         >
           <span
             className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -137,7 +137,7 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
               This task appears in your calendar with a 📋 prefix
             </p>
             {syncStatus.eventId && (
-              <button className="flex items-center gap-1 text-xs text-green-600 hover:text-green-700 mt-2">
+              <button className="btn-touch flex items-center gap-1 text-xs text-green-600 hover:text-green-700 mt-2 transition-all active:scale-95 hover-lift shimmer-blue active-press">
                 <ExternalLink className="w-3 h-3" />
                 View in Calendar
               </button>
@@ -174,8 +174,8 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
             </div>
             <button
               onClick={() => handleUpdatePreferences(!preferences.auto_sync_tasks)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                preferences.auto_sync_tasks ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+              className={`btn-touch relative inline-flex h-6 w-11 items-center rounded-full transition-all active:scale-95 hover-lift shimmer-blue active-press hover:shadow-md ${
+                preferences.auto_sync_tasks ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
               }`}
             >
               <span

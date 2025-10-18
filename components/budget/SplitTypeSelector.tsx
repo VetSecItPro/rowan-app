@@ -88,12 +88,12 @@ export function SplitTypeSelector({
               key={type.value}
               onClick={() => !isDisabled && onTypeChange(type.value)}
               disabled={isDisabled}
-              className={`relative p-4 rounded-lg border-2 text-left transition-all ${
+              className={`btn-touch relative p-4 rounded-lg border-2 text-left transition-all ${
                 isDisabled
                   ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 opacity-50 cursor-not-allowed'
                   : isSelected
-                  ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                  ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 hover:shadow-lg'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md active:scale-[0.98] hover-lift shimmer-purple active-press'
               }`}
             >
               {/* Recommended Badge */}

@@ -145,7 +145,7 @@ export function SearchBar() {
         {query && (
           <button
             onClick={handleClear}
-            className={`apple-search-clear ${query ? 'visible' : ''}`}
+            className={`btn-touch apple-search-clear ${query ? 'visible' : ''} active:scale-90 hover-lift shimmer-purple active-press`}
             aria-label="Clear search"
           >
             <X className="w-4 h-4" />
@@ -166,7 +166,7 @@ export function SearchBar() {
                   setQuery('');
                   setIsTyping(false);
                 }}
-                className="apple-search-result-item block p-3"
+                className="btn-touch apple-search-result-item block p-3 active:scale-[0.98] hover-lift shimmer-purple active-press"
               >
                 <div className="flex items-start gap-3">
                   <div className="flex-1 min-w-0">

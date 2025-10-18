@@ -97,7 +97,7 @@ export function TemplateSelectionModal({
           </div>
           <button
             onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors active:scale-95"
+            className="btn-touch w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all active:scale-95 hover-lift shimmer-indigo active-press hover:shadow-md"
             aria-label="Close modal"
           >
             <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -113,7 +113,7 @@ export function TemplateSelectionModal({
               placeholder="Search templates..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-white/50 dark:bg-black/30 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+              className="w-full pl-12 pr-4 py-3 bg-white/50 dark:bg-black/30 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all hover:border-indigo-400 dark:hover:border-indigo-500 focus:shadow-lg hover:shadow-md hover-lift shimmer-indigo"
             />
           </div>
         </div>
@@ -123,10 +123,10 @@ export function TemplateSelectionModal({
           <div className="flex gap-2 overflow-x-auto scrollbar-hide">
             <button
               onClick={() => setSelectedCategory(null)}
-              className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all active:scale-95 ${
+              className={`btn-touch px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all active:scale-95 hover-lift shimmer-indigo active-press ${
                 selectedCategory === null
-                  ? 'bg-indigo-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  ? 'bg-indigo-500 text-white hover:bg-indigo-600 hover:shadow-lg'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:shadow-md'
               }`}
             >
               All Templates
@@ -135,10 +135,10 @@ export function TemplateSelectionModal({
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all flex items-center gap-2 active:scale-95 ${
+                className={`btn-touch px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all flex items-center gap-2 active:scale-95 hover-lift shimmer-indigo active-press ${
                   selectedCategory === category
-                    ? 'bg-indigo-500 text-white'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    ? 'bg-indigo-500 text-white hover:bg-indigo-600 hover:shadow-lg'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:shadow-md'
                 }`}
               >
                 <span>{icon}</span>
@@ -165,7 +165,7 @@ export function TemplateSelectionModal({
                 <button
                   key={template.id}
                   onClick={() => onSelectTemplate(template)}
-                  className="group relative bg-white/60 dark:bg-black/40 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-6 text-left hover:bg-white/80 dark:hover:bg-black/60 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-[0.98]"
+                  className="btn-touch group relative bg-white/60 dark:bg-black/40 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-6 text-left hover:bg-white/80 dark:hover:bg-black/60 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-[0.98] hover-lift shimmer-indigo active-press"
                 >
                   {/* Category Badge */}
                   <div className="flex items-center justify-between mb-3">
@@ -220,14 +220,14 @@ export function TemplateSelectionModal({
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-between">
             <button
               onClick={onClose}
-              className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors active:scale-[0.98] order-2 sm:order-1"
+              className="btn-touch px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-all active:scale-[0.98] hover-lift shimmer-indigo active-press hover:shadow-md order-2 sm:order-1"
             >
               Cancel
             </button>
             {onCreateFromScratch && (
               <button
                 onClick={onCreateFromScratch}
-                className="px-6 py-3 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-600 transition-colors active:scale-[0.98] order-1 sm:order-2"
+                className="btn-touch px-6 py-3 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-600 transition-all active:scale-[0.98] hover-lift shimmer-indigo active-press hover:shadow-lg order-1 sm:order-2"
               >
                 Create from Scratch
               </button>

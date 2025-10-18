@@ -60,7 +60,7 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
+        className="btn-touch flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg transition-all active:scale-95 hover-lift shimmer-blue active-press hover:shadow-md"
       >
         <Download className="w-4 h-4" />
         Export
@@ -92,7 +92,7 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="btn-touch w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95 hover-lift shimmer-blue active-press hover:shadow-md"
                   aria-label="Close"
                 >
                   <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
@@ -109,10 +109,10 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={() => setExportFormat('csv')}
-                      className={`px-4 py-3 rounded-lg border-2 transition-all flex items-center justify-center gap-2 ${
+                      className={`btn-touch px-4 py-3 rounded-lg border-2 transition-all flex items-center justify-center gap-2 active:scale-95 hover-lift shimmer-blue active-press ${
                         exportFormat === 'csv'
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:shadow-lg'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 hover:shadow-md'
                       }`}
                     >
                       <FileSpreadsheet className="w-4 h-4" />
@@ -120,10 +120,10 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                     </button>
                     <button
                       onClick={() => setExportFormat('pdf')}
-                      className={`px-4 py-3 rounded-lg border-2 transition-all flex items-center justify-center gap-2 ${
+                      className={`btn-touch px-4 py-3 rounded-lg border-2 transition-all flex items-center justify-center gap-2 active:scale-95 hover-lift shimmer-blue active-press ${
                         exportFormat === 'pdf'
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:shadow-lg'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 hover:shadow-md'
                       }`}
                     >
                       <FilePdf className="w-4 h-4" />
@@ -140,40 +140,40 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => setExportType('monthly')}
-                      className={`px-4 py-3 rounded-lg border-2 transition-all text-sm font-medium ${
+                      className={`btn-touch px-4 py-3 rounded-lg border-2 transition-all text-sm font-medium active:scale-95 hover-lift shimmer-blue active-press ${
                         exportType === 'monthly'
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:shadow-lg'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 hover:shadow-md'
                       }`}
                     >
                       This Month
                     </button>
                     <button
                       onClick={() => setExportType('yearly')}
-                      className={`px-4 py-3 rounded-lg border-2 transition-all text-sm font-medium ${
+                      className={`btn-touch px-4 py-3 rounded-lg border-2 transition-all text-sm font-medium active:scale-95 hover-lift shimmer-blue active-press ${
                         exportType === 'yearly'
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:shadow-lg'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 hover:shadow-md'
                       }`}
                     >
                       Full Year
                     </button>
                     <button
                       onClick={() => setExportType('custom')}
-                      className={`px-4 py-3 rounded-lg border-2 transition-all text-sm font-medium ${
+                      className={`btn-touch px-4 py-3 rounded-lg border-2 transition-all text-sm font-medium active:scale-95 hover-lift shimmer-blue active-press ${
                         exportType === 'custom'
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:shadow-lg'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 hover:shadow-md'
                       }`}
                     >
                       Custom Range
                     </button>
                     <button
                       onClick={() => setExportType('category')}
-                      className={`px-4 py-3 rounded-lg border-2 transition-all text-sm font-medium ${
+                      className={`btn-touch px-4 py-3 rounded-lg border-2 transition-all text-sm font-medium active:scale-95 hover-lift shimmer-blue active-press ${
                         exportType === 'category'
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:shadow-lg'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 hover:shadow-md'
                       }`}
                     >
                       By Category
@@ -316,7 +316,7 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                 <button
                   onClick={() => setIsOpen(false)}
                   disabled={isExporting}
-                  className="px-6 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium disabled:opacity-50"
+                  className="btn-touch px-6 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all font-medium disabled:opacity-50 active:scale-95 hover-lift shimmer-blue active-press hover:shadow-md"
                 >
                   Cancel
                 </button>
@@ -327,7 +327,7 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                     ((exportType === 'custom' || exportType === 'category') && (!startDate || !endDate)) ||
                     (exportFormat === 'pdf' && exportType !== 'monthly')
                   }
-                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="btn-touch px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 active:scale-95 hover-lift shimmer-blue active-press hover:shadow-lg"
                 >
                   {isExporting ? (
                     <>
