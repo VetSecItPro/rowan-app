@@ -1376,3 +1376,8 @@ export const goalsService = {
     if (error) throw error;
   },
 };
+
+// Named exports for compatibility
+export const createGoal = goalsService.createGoal.bind(goalsService);
+export const updateGoal = goalsService.updateGoal.bind(goalsService);
+export const createMilestone = goalsService.createMilestone.bind(goalsService);
