@@ -276,7 +276,7 @@ export async function getMentionableUsers(
     .from('space_members')
     .select(`
       user_id,
-      users!inner (
+      users!user_id!inner (
         id,
         name,
         email,

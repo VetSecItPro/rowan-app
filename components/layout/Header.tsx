@@ -65,13 +65,13 @@ export function Header() {
           </Link>
 
           {/* Menu, Theme Toggle & Auth Buttons */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <a href="#pricing" className="hidden md:block inline-block py-3 px-4 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95">Pricing</a>
             <HamburgerMenu />
 
             {/* Only show Settings and Notifications for logged-in users */}
             {user && (
-              <>
+              <div className="flex items-center gap-1">
                 <Tooltip content="Notifications" delay={0} position="bottom">
                   <ComprehensiveNotificationCenter userId={user.id} spaceId={currentSpace?.id} />
                 </Tooltip>
@@ -87,10 +87,11 @@ export function Header() {
                     </svg>
                   </Link>
                 </Tooltip>
-              </>
+                <ThemeToggle />
+              </div>
             )}
 
-            <ThemeToggle />
+            {!user && <ThemeToggle />}
 
             {/* Show Dashboard only for logged-in users, Create Account for non-logged-in */}
             {user ? (
@@ -117,12 +118,12 @@ export function Header() {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className={`flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white font-medium transition-all hover:opacity-90 active:scale-95 ${
+                  className={`flex items-center justify-between px-4 py-2 rounded-full text-white font-medium transition-all hover:opacity-90 active:scale-95 min-w-[120px] ${
                     COLOR_THEMES[user.color_theme as keyof typeof COLOR_THEMES] || 'bg-purple-600'
                   }`}
                 >
-                  {user.name}
-                  <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                  <span className="flex-1 text-center">{user.name}</span>
+                  <ChevronDown className={`w-4 h-4 ml-2 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* Dropdown Menu */}
