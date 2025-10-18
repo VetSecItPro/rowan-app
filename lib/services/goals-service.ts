@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { achievementBadgesService } from './achievement-badges-service';
 
 export interface Milestone {
   id: string;
@@ -357,7 +358,10 @@ export const goalsService = {
     const supabase = createClient();
     const finalUpdates: any = { ...updates };
 
-    if (updates.status === 'completed' && !finalUpdates.completed_at) {
+    // Check if goal is being completed
+    const isBeingCompleted = updates.status === 'completed' && !finalUpdates.completed_at;
+
+    if (isBeingCompleted) {
       finalUpdates.completed_at = new Date().toISOString();
       finalUpdates.progress = 100;
     }
@@ -374,6 +378,24 @@ export const goalsService = {
       .single();
 
     if (error) throw error;
+
+    // Check for badge awards when goal is completed
+    if (isBeingCompleted && data.space_id) {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          // Trigger badge checking in the background (don't await to avoid blocking)
+          achievementBadgesService.checkAndAwardBadges(
+            user.id,
+            data.space_id,
+            'goal_completed'
+          ).catch(console.error);
+        }
+      } catch (error) {
+        console.error('Failed to check for achievement badges:', error);
+      }
+    }
+
     return data;
   },
 
@@ -418,6 +440,10 @@ export const goalsService = {
   async toggleMilestone(id: string, completed: boolean): Promise<Milestone> {
     const supabase = createClient();
     const finalUpdates: any = { completed };
+
+    // Check if milestone is being completed
+    const isBeingCompleted = completed && !finalUpdates.completed_at;
+
     if (completed) {
       finalUpdates.completed_at = new Date().toISOString();
     } else {
@@ -428,10 +454,31 @@ export const goalsService = {
       .from('goal_milestones')
       .update(finalUpdates)
       .eq('id', id)
-      .select()
+      .select(`
+        *,
+        goal:goals!inner(space_id)
+      `)
       .single();
 
     if (error) throw error;
+
+    // Check for badge awards when milestone is completed
+    if (isBeingCompleted && data.goal?.space_id) {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          // Trigger badge checking in the background (don't await to avoid blocking)
+          achievementBadgesService.checkAndAwardBadges(
+            user.id,
+            data.goal.space_id,
+            'milestone_completed'
+          ).catch(console.error);
+        }
+      } catch (error) {
+        console.error('Failed to check for achievement badges:', error);
+      }
+    }
+
     return data;
   },
 
