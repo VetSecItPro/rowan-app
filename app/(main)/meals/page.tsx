@@ -1323,8 +1323,6 @@ export default function MealsPage() {
                         <CTAButton
                           onClick={handleOpenMealModal}
                           feature="meals"
-                          breathing
-                          ripple
                           icon={<Plus className="w-5 h-5" />}
                         >
                           Plan Your First Meal
