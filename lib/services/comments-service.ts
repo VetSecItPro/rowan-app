@@ -133,7 +133,7 @@ export async function getComments(
 
   const { data, error } = await supabase
     .from('comments')
-    .select('*, users(email)')
+    .select('*, users!inner(email)')
     .eq('commentable_type', commentableType)
     .eq('commentable_id', commentableId)
     .eq('is_deleted', false)
@@ -213,7 +213,7 @@ export async function getComment(commentId: string): Promise<CommentWithDetails 
 
   const { data, error } = await supabase
     .from('comments')
-    .select('*, users(email)')
+    .select('*, users!inner(email)')
     .eq('id', commentId)
     .eq('is_deleted', false)
     .single();
@@ -628,7 +628,7 @@ export async function getActivityFeed(
 
   const { data, error } = await supabase
     .from('activity_logs')
-    .select('*, users(email)')
+    .select('*, users!inner(email)')
     .eq('space_id', spaceId)
     .order('created_at', { ascending: false })
     .limit(limit);
