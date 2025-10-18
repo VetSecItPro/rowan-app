@@ -83,6 +83,7 @@ export function SearchBar() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
   // Search functionality
@@ -90,8 +91,12 @@ export function SearchBar() {
     if (query.length < 2) {
       setResults([]);
       setIsOpen(false);
+      setIsTyping(false);
       return;
     }
+
+    setIsTyping(true);
+    const timeoutId = setTimeout(() => setIsTyping(false), 1000);
 
     const searchTerm = query.toLowerCase();
     const filtered = DOCUMENTATION_INDEX.filter(item =>
@@ -102,6 +107,8 @@ export function SearchBar() {
 
     setResults(filtered);
     setIsOpen(filtered.length > 0);
+
+    return () => clearTimeout(timeoutId);
   }, [query]);
 
   // Close dropdown when clicking outside
@@ -120,24 +127,25 @@ export function SearchBar() {
     setQuery('');
     setResults([]);
     setIsOpen(false);
+    setIsTyping(false);
   };
 
   return (
     <div ref={searchRef} className="relative w-full sm:w-64 md:w-80">
-      {/* Search Input */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+      {/* Apple-Inspired Search Input */}
+      <div className="apple-search-container">
+        <Search className="apple-search-icon" />
         <input
           type="search"
           placeholder="Search documentation..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full pl-10 pr-10 py-3 text-base md:py-2.5 md:text-sm bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-lg focus:ring-2 focus:ring-purple-500/50 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all"
+          className={`apple-search-input w-full ${isTyping ? 'typing' : ''}`}
         />
         {query && (
           <button
             onClick={handleClear}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all active:scale-95"
+            className={`apple-search-clear ${query ? 'visible' : ''}`}
             aria-label="Clear search"
           >
             <X className="w-4 h-4" />
@@ -145,9 +153,9 @@ export function SearchBar() {
         )}
       </div>
 
-      {/* Search Results Dropdown */}
+      {/* Apple-Inspired Search Results Dropdown */}
       {isOpen && results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-2xl max-h-96 overflow-y-auto z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute top-full left-0 right-0 mt-2 apple-search-results max-h-96 overflow-y-auto z-50">
           <div className="p-2">
             {results.map((result, index) => (
               <Link
@@ -156,8 +164,9 @@ export function SearchBar() {
                 onClick={() => {
                   setIsOpen(false);
                   setQuery('');
+                  setIsTyping(false);
                 }}
-                className="block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group"
+                className="apple-search-result-item block p-3"
               >
                 <div className="flex items-start gap-3">
                   <div className="flex-1 min-w-0">
@@ -192,9 +201,9 @@ export function SearchBar() {
         </div>
       )}
 
-      {/* No Results */}
+      {/* Apple-Inspired No Results */}
       {isOpen && query.length >= 2 && results.length === 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute top-full left-0 right-0 mt-2 apple-search-results z-50">
           <div className="p-6 text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               No results found for <span className="font-semibold text-gray-700 dark:text-gray-300">"{query}"</span>
