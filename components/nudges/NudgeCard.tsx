@@ -13,7 +13,7 @@ import {
   BarChart,
   CheckCircle,
   X,
-  Snooze,
+  Pause,
   MoreHorizontal
 } from 'lucide-react';
 import { SmartNudge } from '@/lib/services/smart-nudges-service';
@@ -192,7 +192,7 @@ export function NudgeCard({
                 }}
                 className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
               >
-                <Snooze className="w-3 h-3" />
+                <Pause className="w-3 h-3" />
                 <span>Snooze</span>
               </button>
               <button

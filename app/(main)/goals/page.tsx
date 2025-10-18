@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle, GitBranch, X } from 'lucide-react';
+import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle, GitBranch, X, BarChart3 } from 'lucide-react';
 import { format } from 'date-fns';
+import Link from 'next/link';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { GoalCard } from '@/components/goals/GoalCard';
 import { SortableGoalsList } from '@/components/goals/SortableGoalsList';
@@ -679,6 +680,13 @@ export default function GoalsPage() {
                   <span className="text-sm">Nudges</span>
                 </button>
               </div>
+              <Link
+                href="/goals/analytics"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+              >
+                <BarChart3 className="w-5 h-5" />
+                <span>Analytics</span>
+              </Link>
               <button
                 onClick={handleNewButtonClick}
                 className="px-4 sm:px-6 py-2 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
