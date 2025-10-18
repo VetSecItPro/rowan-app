@@ -119,7 +119,7 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
             return (
               <div
                 key={template.id}
-                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer"
+                className="btn-touch bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-lg transition-all cursor-pointer active:scale-[0.98] hover-lift shimmer-blue active-press"
                 onClick={() => onSelectTemplate(template)}
               >
                 {/* Header */}
@@ -167,7 +167,7 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
 
                 {/* Action */}
                 <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <button className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+                  <button className="btn-touch text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-all active:scale-95 hover-lift shimmer-blue active-press">
                     Use Template →
                   </button>
                 </div>

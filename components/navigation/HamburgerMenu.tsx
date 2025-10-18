@@ -63,7 +63,7 @@ export function HamburgerMenu() {
           onClick={() => setIsOpen(!isOpen)}
           onMouseEnter={() => setShowTooltip(true)}
           onMouseLeave={() => setShowTooltip(false)}
-          className="btn-icon-mobile rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all active:scale-95 cursor-pointer flex items-center justify-center"
+          className="btn-touch btn-icon-mobile rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all active:scale-95 cursor-pointer flex items-center justify-center hover-lift shimmer-purple active-press hover:shadow-md"
           aria-label="Menu"
         >
           {isOpen ? (
@@ -119,7 +119,7 @@ export function HamburgerMenu() {
                       key={item.href}
                       href={item.href}
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center gap-3 px-4 py-4 sm:py-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors active:scale-[0.98] group"
+                      className="btn-touch flex items-center gap-3 px-4 py-4 sm:py-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all active:scale-[0.98] hover-lift shimmer-purple active-press group hover:shadow-sm"
                     >
                       <div className={`w-11 h-11 sm:w-10 sm:h-10 rounded-lg ${item.gradient} flex items-center justify-center flex-shrink-0`}>
                         <Icon className="w-6 h-6 sm:w-5 sm:h-5 text-white" />

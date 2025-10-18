@@ -172,7 +172,7 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
-        className={`cursor-grab active:cursor-grabbing p-2 md:p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded touch-none transition-all ${
+        className={`btn-touch cursor-grab active:cursor-grabbing p-2 md:p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded touch-none transition-all active:scale-95 hover-lift shimmer-blue active-press hover:shadow-md ${
           isDragReady ? 'bg-blue-100 dark:bg-blue-900/30 scale-110' : ''
         }`}
         onClick={(e) => e.stopPropagation()}
@@ -187,7 +187,7 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
       {/* Status Checkbox */}
       <button
         onClick={handleStatusClick}
-        className={`flex-shrink-0 w-5 h-5 rounded flex items-center justify-center transition-all ${getCheckboxStyle()}`}
+        className={`btn-touch flex-shrink-0 w-5 h-5 rounded flex items-center justify-center transition-all active:scale-90 hover-lift shimmer-blue active-press hover:shadow-md ${getCheckboxStyle()}`}
       >
         {task.status === 'completed' && (
           <CheckSquare className="w-3 h-3 text-white" />
@@ -230,7 +230,7 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
             e.stopPropagation();
             setShowMenu(!showMenu);
           }}
-          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+          className="btn-touch p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95 hover-lift shimmer-blue active-press hover:shadow-md"
         >
           <MoreVertical className="w-4 h-4 text-gray-600 dark:text-gray-400" />
         </button>
@@ -249,7 +249,7 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
                     onViewDetails(task);
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
+                  className="btn-touch w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg transition-all active:scale-[0.98] hover-lift shimmer-blue active-press"
                 >
                   View Details
                 </button>
@@ -260,7 +260,7 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
                   onEdit?.(task);
                   setShowMenu(false);
                 }}
-                className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 ${!onViewDetails ? 'rounded-t-lg' : ''}`}
+                className={`btn-touch w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-[0.98] hover-lift shimmer-blue active-press ${!onViewDetails ? 'rounded-t-lg' : ''}`}
               >
                 Edit
               </button>
@@ -270,7 +270,7 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
                   onDelete?.(task.id, 'task');
                   setShowMenu(false);
                 }}
-                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg"
+                className="btn-touch w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg transition-all active:scale-[0.98] hover-lift shimmer-blue active-press"
               >
                 Delete
               </button>

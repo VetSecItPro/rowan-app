@@ -25,7 +25,7 @@ export function Breadcrumb({ items = [] }: BreadcrumbProps) {
           <li className="sm:hidden flex items-center gap-2 flex-shrink-0">
             <button
               onClick={handleBack}
-              className="flex items-center gap-1 py-2 px-3 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95"
+              className="btn-touch flex items-center gap-1 py-2 px-3 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all active:scale-95 hover-lift shimmer-blue active-press hover:shadow-sm rounded-lg"
               aria-label="Go back"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -39,7 +39,7 @@ export function Breadcrumb({ items = [] }: BreadcrumbProps) {
         <li className={items.length > 1 ? 'hidden sm:block flex-shrink-0' : 'flex-shrink-0'}>
           <Link
             href="/"
-            className="inline-block py-2 px-3 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            className="btn-touch inline-block py-2 px-3 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all active:scale-95 hover-lift shimmer-blue active-press hover:shadow-sm rounded-lg"
           >
             Home
           </Link>
@@ -62,7 +62,7 @@ export function Breadcrumb({ items = [] }: BreadcrumbProps) {
               {item.href && !isLast ? (
                 <Link
                   href={item.href}
-                  className="inline-block py-2 px-3 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors truncate max-w-[120px] sm:max-w-[200px]"
+                  className="btn-touch inline-block py-2 px-3 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all truncate max-w-[120px] sm:max-w-[200px] active:scale-95 hover-lift shimmer-blue active-press hover:shadow-sm rounded-lg"
                   title={item.label}
                 >
                   {item.label}

@@ -17,7 +17,7 @@ export function FeatureCard({ title, description, icon: Icon, gradient, shadowCo
   const [showTooltip, setShowTooltip] = useState(false);
 
   return (
-    <Link href={href} className="block relative group">
+    <Link href={href} className="btn-touch block relative group active:scale-[0.98] hover-lift shimmer-purple active-press">
       <div
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
