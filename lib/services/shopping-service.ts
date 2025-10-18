@@ -264,7 +264,7 @@ export const shoppingService = {
 
     const { data, error } = await supabase
       .from('shopping_items')
-      .select('name, category, created_at, list:shopping_lists!inner(space_id)')
+      .select('name, category, created_at, list:shopping_lists!list_id!inner(space_id)')
       .eq('list.space_id', spaceId)
       .gte('created_at', thirtyDaysAgo.toISOString());
 

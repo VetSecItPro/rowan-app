@@ -113,18 +113,18 @@ async function getCheckInRemindersNeedingNotification(supabase: any): Promise<Ch
       goal_id,
       user_id,
       scheduled_for,
-      goals!inner(
+      goals!goal_id!inner(
         id,
         title,
         description,
         status,
         space_id,
-        spaces!inner(
+        spaces!space_id!inner(
           id,
           name
         )
       ),
-      users!inner(
+      users!user_id!inner(
         id,
         email,
         name

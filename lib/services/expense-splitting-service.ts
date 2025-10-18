@@ -119,7 +119,7 @@ export async function getUserOwedExpenses(
 
   let query = supabase
     .from('expense_splits')
-    .select('*, expenses!inner(*)')
+    .select('*, expenses!expense_id!inner(*)')
     .eq('user_id', userId)
     .eq('is_payer', false)
     .neq('status', 'settled');
@@ -377,7 +377,7 @@ export async function calculateCurrentBalance(spaceId: string): Promise<BalanceS
   // Get all unsettled splits for this space
   const { data: splits, error } = await supabase
     .from('expense_splits')
-    .select('*, expenses!inner(space_id), users!inner(email)')
+    .select('*, expenses!expense_id!inner(space_id), users!user_id!inner(email)')
     .eq('expenses.space_id', spaceId)
     .neq('status', 'settled');
 
@@ -567,7 +567,7 @@ export async function getSplitExpenseStats(
   // Get unsettled splits
   const { data: splits, error: splitsError } = await supabase
     .from('expense_splits')
-    .select('amount_owed, amount_paid, expenses!inner(space_id)')
+    .select('amount_owed, amount_paid, expenses!expense_id!inner(space_id)')
     .eq('expenses.space_id', spaceId)
     .neq('status', 'settled');
 
