@@ -52,7 +52,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
 
     return (
       <div className="flex items-center gap-3">
-        <label htmlFor={id} className="relative inline-flex items-center cursor-pointer">
+        <label htmlFor={id} className="btn-touch relative inline-flex items-center cursor-pointer active:scale-95 hover-lift shimmer-purple active-press">
           <input
             ref={ref}
             type="checkbox"
@@ -73,9 +73,12 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
               rounded-full
               peer-disabled:opacity-50
               peer-disabled:cursor-not-allowed
-              transition-colors
+              transition-all
               duration-200
               ease-in-out
+              hover:shadow-lg
+              hover:scale-105
+              active:scale-95
             `}
           >
             <div
@@ -86,11 +89,13 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
                 bg-white
                 rounded-full
                 ${sizeClasses[size].thumb}
-                transition-transform
+                transition-all
                 duration-200
                 ease-in-out
                 shadow-lg
+                hover:shadow-xl
                 ${getTranslateClass()}
+                ${checked ? 'shadow-md' : 'shadow-sm'}
               `}
             />
           </div>
@@ -101,13 +106,13 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
             {label && (
               <label
                 htmlFor={id}
-                className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer"
+                className="btn-touch text-sm font-medium text-gray-900 dark:text-white cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 transition-colors active:scale-[0.98] hover-lift shimmer-purple active-press"
               >
                 {label}
               </label>
             )}
             {description && (
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5 transition-colors">
                 {description}
               </p>
             )}

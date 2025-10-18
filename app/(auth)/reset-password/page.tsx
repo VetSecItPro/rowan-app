@@ -103,7 +103,7 @@ export default function ResetPasswordPage() {
           <div className="flex justify-center">
             <Link
               href="/login"
-              className="text-purple-600 dark:text-purple-400 hover:underline text-sm font-medium"
+              className="btn-touch text-purple-600 dark:text-purple-400 hover:underline text-sm font-medium rounded-md py-2 px-3 active:scale-95 hover-lift shimmer-purple active-press"
             >
               Go to Login Now →
             </Link>
@@ -141,7 +141,7 @@ export default function ResetPasswordPage() {
                 {error.includes('Invalid or expired') && (
                   <Link
                     href="/login"
-                    className="text-sm md:text-xs text-red-600 dark:text-red-400 hover:underline mt-2 inline-block"
+                    className="btn-touch text-sm md:text-xs text-red-600 dark:text-red-400 hover:underline mt-2 inline-block rounded-md py-1 px-2 active:scale-95 hover-lift shimmer-red active-press"
                   >
                     Return to login and request a new reset link →
                   </Link>
@@ -165,13 +165,14 @@ export default function ResetPasswordPage() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Enter new password"
-                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white auth-input-field auth-magnetic-hover auth-ripple-effect hover-lift shimmer-purple"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="btn-touch absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 active:scale-95 hover-lift shimmer-purple active-press"
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -197,13 +198,14 @@ export default function ResetPasswordPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm new password"
-                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white auth-input-field auth-magnetic-hover auth-ripple-effect hover-lift shimmer-purple"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="btn-touch absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 active:scale-95 hover-lift shimmer-purple active-press"
+                aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
               >
                 {showConfirmPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -218,7 +220,7 @@ export default function ResetPasswordPage() {
           <button
             type="submit"
             disabled={isResetting || !isValidToken}
-            className="w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="btn-touch w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 active:scale-[0.98] auth-submit-button auth-magnetic-hover auth-ripple-effect hover-lift shimmer-purple active-press"
           >
             {isResetting ? (
               <>
@@ -238,7 +240,7 @@ export default function ResetPasswordPage() {
         <div className="mt-6 text-center">
           <Link
             href="/login"
-            className="inline-block py-2 px-3 text-sm text-purple-600 dark:text-purple-400 hover:underline font-medium"
+            className="btn-touch inline-block py-2 px-3 text-sm text-purple-600 dark:text-purple-400 hover:underline font-medium rounded-md active:scale-95 hover-lift shimmer-purple active-press"
           >
             ← Back to Login
           </Link>
