@@ -159,6 +159,13 @@ export async function PATCH(
     // Get expense first to verify access
     const existingExpense = await projectsService.getExpenseById(params.id);
 
+    if (!existingExpense) {
+      return NextResponse.json(
+        { error: 'Expense not found' },
+        { status: 404 }
+      );
+    }
+
     // Verify user has access to expense's space
     try {
       await verifyResourceAccess(session.user.id, existingExpense);
@@ -232,6 +239,13 @@ export async function DELETE(
 
     // Get expense first to verify access
     const existingExpense = await projectsService.getExpenseById(params.id);
+
+    if (!existingExpense) {
+      return NextResponse.json(
+        { error: 'Expense not found' },
+        { status: 404 }
+      );
+    }
 
     // Verify user has access to expense's space
     try {
