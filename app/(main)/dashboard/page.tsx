@@ -994,7 +994,7 @@ export default function DashboardPage() {
       enableTimeAware={true}
     >
       <div className="min-h-screen p-4 sm:p-6 md:p-8">
-        <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+        <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4">
           {/* Enhanced Time-Aware Welcome Header */}
           <TimeAwareWelcomeBox
             greetingText={greetingText}
@@ -1023,16 +1023,6 @@ export default function DashboardPage() {
 
           {/* Enhanced Feature Cards - 8 Cards */}
           <div>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-purple-500" />
-                Live Stats
-              </h2>
-              <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 animate-pulse" />
-                <span>Real-time updates</span>
-              </div>
-            </div>
 
             {loading ? (
               <div className="stats-grid-mobile gap-4 sm:gap-6">
@@ -1512,6 +1502,12 @@ export default function DashboardPage() {
                 </Link>
               </div>
             )}
+          </div>
+
+          {/* Real-time updates indicator */}
+          <div className="flex items-center justify-end gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400 -mt-2">
+            <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 animate-pulse" />
+            <span>Real-time updates</span>
           </div>
 
           {/* Daily Check-In Section - Compact Design */}
