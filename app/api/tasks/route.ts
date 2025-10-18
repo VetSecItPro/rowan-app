@@ -7,7 +7,7 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { createTaskSchema } from '@/lib/validations/task-schemas';
 import { ZodError } from 'zod';
-import { extractIP } from '@/lib/ratelimit-fallback';
+import { extractIP, fallbackRateLimit } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 
 /**
@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
     const ip = extractIP(req.headers);
 
     try {
-      const { success: rateLimitSuccess } = await ratelimit.limit(ip);
+      const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
 
       if (!rateLimitSuccess) {
         return NextResponse.json(
