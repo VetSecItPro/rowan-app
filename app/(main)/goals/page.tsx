@@ -28,8 +28,9 @@ import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import { usePresence } from '@/lib/hooks/usePresence';
 import { OnlineUsersIndicator, PresenceIndicator } from '@/components/shared/PresenceIndicator';
+import { NudgeCenter } from '@/components/nudges/NudgeCenter';
 
-type ViewMode = 'goals' | 'milestones' | 'habits' | 'activity' | 'dependencies';
+type ViewMode = 'goals' | 'milestones' | 'habits' | 'activity' | 'dependencies' | 'nudges';
 
 export default function GoalsPage() {
   const { currentSpace, user } = useAuth();
@@ -657,13 +658,24 @@ export default function GoalsPage() {
                   <GitBranch className="w-4 h-4" />
                   <span className="text-sm">Dependencies</span>
                 </button>
+                <button
+                  onClick={() => handleViewModeChange('nudges')}
+                  className={`px-2 sm:px-3 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                    viewMode === 'nudges'
+                      ? 'bg-gradient-goals text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                  }`}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span className="text-sm">Nudges</span>
+                </button>
               </div>
               <button
                 onClick={handleNewButtonClick}
                 className="px-4 sm:px-6 py-2 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
-                <span>New {viewMode === 'goals' ? 'Goal' : viewMode === 'milestones' ? 'Milestone' : viewMode === 'habits' ? 'Habit' : viewMode === 'dependencies' ? 'Dependency' : 'Goal'}</span>
+                <span>New {viewMode === 'goals' ? 'Goal' : viewMode === 'milestones' ? 'Milestone' : viewMode === 'habits' ? 'Habit' : viewMode === 'dependencies' ? 'Dependency' : viewMode === 'nudges' ? 'Goal' : 'Goal'}</span>
               </button>
             </div>
           </div>
@@ -809,6 +821,7 @@ export default function GoalsPage() {
                    viewMode === 'milestones' ? `Achievement Wall (${filteredMilestones.length})` :
                    viewMode === 'habits' ? 'Habit Tracker' :
                    viewMode === 'dependencies' ? 'Goal Dependencies' :
+                   viewMode === 'nudges' ? 'Smart Nudges' :
                    'Activity Feed'}
                 </h2>
                 <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 text-sm font-medium rounded-full">
@@ -967,6 +980,21 @@ export default function GoalsPage() {
                     <p className="text-gray-500 dark:text-gray-500">Create some goals first to set up dependencies</p>
                   </div>
                 )}
+              </div>
+            ) : viewMode === 'nudges' ? (
+              /* Smart Nudges View */
+              <div className="space-y-6">
+                <NudgeCenter
+                  limit={10}
+                  showHeader={false}
+                  onGoalClick={(goalId) => {
+                    // Find and edit the goal
+                    const goal = goals.find(g => g.id === goalId);
+                    if (goal) {
+                      handleEditGoal(goal);
+                    }
+                  }}
+                />
               </div>
             ) : (
               /* Activity View */

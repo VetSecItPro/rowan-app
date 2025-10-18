@@ -317,6 +317,221 @@
     animation: mood-glow-pulse 2s ease-in-out infinite;
   }
 
+  /* Apple-inspired background animations */
+  @keyframes slow-drift {
+    0%, 100% {
+      transform: translate(0, 0) rotate(0deg);
+      opacity: 0.4;
+    }
+    25% {
+      transform: translate(10px, -10px) rotate(1deg);
+      opacity: 0.6;
+    }
+    50% {
+      transform: translate(-5px, 15px) rotate(-0.5deg);
+      opacity: 0.3;
+    }
+    75% {
+      transform: translate(-10px, -5px) rotate(0.5deg);
+      opacity: 0.5;
+    }
+  }
+
+  @keyframes float-slow {
+    0%, 100% {
+      transform: translateY(0px) scale(1);
+      opacity: 0.2;
+    }
+    50% {
+      transform: translateY(-20px) scale(1.05);
+      opacity: 0.4;
+    }
+  }
+
+  @keyframes pulse-slow {
+    0%, 100% {
+      opacity: 0.1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.2;
+      transform: scale(1.1);
+    }
+  }
+
+  .animate-slow-drift {
+    animation: slow-drift 20s ease-in-out infinite;
+  }
+
+  .animate-float-slow {
+    animation: float-slow 25s ease-in-out infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 8s ease-in-out infinite;
+  }
+
+  /* Time-aware gradient variants */
+  .bg-time-morning {
+    background: linear-gradient(
+      135deg,
+      rgba(251, 146, 60, 0.1) 0%,
+      rgba(252, 211, 77, 0.05) 50%,
+      rgba(236, 72, 153, 0.03) 100%
+    );
+  }
+
+  .bg-time-afternoon {
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.1) 0%,
+      rgba(6, 182, 212, 0.05) 50%,
+      rgba(99, 102, 241, 0.03) 100%
+    );
+  }
+
+  .bg-time-evening {
+    background: linear-gradient(
+      135deg,
+      rgba(124, 58, 237, 0.1) 0%,
+      rgba(99, 102, 241, 0.05) 50%,
+      rgba(139, 92, 246, 0.03) 100%
+    );
+  }
+
+  .bg-time-night {
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.08) 0%,
+      rgba(59, 130, 246, 0.04) 50%,
+      rgba(124, 58, 237, 0.02) 100%
+    );
+  }
+
+  /* Enhanced shimmer for time-aware welcome box */
+  @keyframes time-shimmer-morning {
+    0% {
+      background-position: 0% center;
+    }
+    100% {
+      background-position: 200% center;
+    }
+  }
+
+  @keyframes time-shimmer-afternoon {
+    0% {
+      background-position: 0% center;
+    }
+    100% {
+      background-position: 200% center;
+    }
+  }
+
+  @keyframes time-shimmer-evening {
+    0% {
+      background-position: 0% center;
+    }
+    100% {
+      background-position: 200% center;
+    }
+  }
+
+  @keyframes time-shimmer-night {
+    0% {
+      background-position: 0% center;
+    }
+    100% {
+      background-position: 200% center;
+    }
+  }
+
+  .shimmer-time-morning {
+    background: linear-gradient(
+      90deg,
+      #f59e0b 0%,
+      #f97316 25%,
+      #ec4899 50%,
+      #f97316 75%,
+      #f59e0b 100%
+    );
+    background-size: 200% auto;
+    animation: time-shimmer-morning 5s linear infinite;
+  }
+
+  .shimmer-time-afternoon {
+    background: linear-gradient(
+      90deg,
+      #3b82f6 0%,
+      #06b6d4 25%,
+      #6366f1 50%,
+      #06b6d4 75%,
+      #3b82f6 100%
+    );
+    background-size: 200% auto;
+    animation: time-shimmer-afternoon 4s linear infinite;
+  }
+
+  .shimmer-time-evening {
+    background: linear-gradient(
+      90deg,
+      #7c3aed 0%,
+      #6366f1 25%,
+      #8b5cf6 50%,
+      #6366f1 75%,
+      #7c3aed 100%
+    );
+    background-size: 200% auto;
+    animation: time-shimmer-evening 4s linear infinite;
+  }
+
+  .shimmer-time-night {
+    background: linear-gradient(
+      90deg,
+      #4338ca 0%,
+      #3730a3 25%,
+      #6366f1 50%,
+      #3730a3 75%,
+      #4338ca 100%
+    );
+    background-size: 200% auto;
+    animation: time-shimmer-night 6s linear infinite;
+  }
+
+  /* Apple-style glassmorphism utilities */
+  .glass-subtle {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-medium {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(20px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* Dark mode glassmorphism */
+  .dark .glass-subtle {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .dark .glass-medium {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .dark .glass-strong {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
   @keyframes expand-smooth {
     0% {
       opacity: 0;
