@@ -239,7 +239,7 @@ export default function SignUpPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 auth-input-field auth-magnetic-hover auth-ripple-effect hover-lift shimmer-purple"
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                   placeholder="Alex Johnson"
                   disabled={isLoading}
                   autoFocus
@@ -260,7 +260,7 @@ export default function SignUpPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 auth-input-field auth-magnetic-hover auth-ripple-effect hover-lift shimmer-purple"
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                   placeholder="alex@example.com"
                   disabled={isLoading}
                   autoComplete="email"
@@ -282,7 +282,7 @@ export default function SignUpPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={8}
-                  className="w-full pl-11 pr-12 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 auth-input-field auth-magnetic-hover auth-ripple-effect hover-lift shimmer-purple"
+                  className="w-full pl-11 pr-12 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                   placeholder="••••••••"
                   disabled={isLoading}
                   autoComplete="new-password"
