@@ -1,24 +1,22 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { createClient as createServerClient } from '@/lib/supabase/server';
-import { ratelimit } from '@/lib/ratelimit';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 
 export async function POST(req: Request) {
   try {
     // SECURITY: Rate limiting to prevent abuse
-    try {
-      const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
-      const { success: rateLimitSuccess } = await ratelimit.limit(ip);
+    const ip = extractIP(req.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
 
-      if (!rateLimitSuccess) {
-        return NextResponse.json(
-          { error: 'Too many requests. Please try again later.' },
-          { status: 429 }
-        );
-      }
-    } catch (rateLimitError) {
+    if (!rateLimitSuccess) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
     }
 
     // SECURITY: Verify authentication

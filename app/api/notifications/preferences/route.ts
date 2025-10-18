@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { ratelimit } from '@/lib/ratelimit';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { z } from 'zod';
@@ -43,19 +44,15 @@ const NotificationPreferencesSchema = z.object({
  */
 export async function GET(req: NextRequest) {
   try {
-    // Rate limiting (with graceful fallback)
-    try {
-      const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
-      const { success: rateLimitSuccess } = await ratelimit.limit(ip);
+    // Rate limiting with automatic fallback
+    const ip = extractIP(req.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
 
-      if (!rateLimitSuccess) {
-        return NextResponse.json(
-          { error: 'Too many requests. Please try again later.' },
-          { status: 429 }
-        );
-      }
-    } catch (rateLimitError) {
-      // Continue if rate limiting fails
+    if (!rateLimitSuccess) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
     }
 
     // Verify authentication
@@ -131,19 +128,15 @@ export async function GET(req: NextRequest) {
  */
 export async function PATCH(req: NextRequest) {
   try {
-    // Rate limiting (with graceful fallback)
-    try {
-      const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
-      const { success: rateLimitSuccess } = await ratelimit.limit(ip);
+    // Rate limiting with automatic fallback
+    const ip = extractIP(req.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
 
-      if (!rateLimitSuccess) {
-        return NextResponse.json(
-          { error: 'Too many requests. Please try again later.' },
-          { status: 429 }
-        );
-      }
-    } catch (rateLimitError) {
-      // Continue if rate limiting fails
+    if (!rateLimitSuccess) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
     }
 
     // Verify authentication

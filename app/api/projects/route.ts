@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { projectsOnlyService } from '@/lib/services/projects-service';
-import { ratelimit } from '@/lib/ratelimit';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { verifySpaceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 /**
  * GET /api/projects
@@ -12,18 +13,15 @@ import { setSentryUser } from '@/lib/sentry-utils';
  */
 export async function GET(req: NextRequest) {
   try {
-    // Rate limiting (with graceful fallback)
-    try {
-      const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
-      const { success: rateLimitSuccess } = await ratelimit.limit(ip);
+    // Rate limiting with automatic fallback
+    const ip = extractIP(req.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
 
-      if (!rateLimitSuccess) {
-        return NextResponse.json(
-          { error: 'Too many requests. Please try again later.' },
-          { status: 429 }
-        );
-      }
-    } catch (rateLimitError) {
+    if (!rateLimitSuccess) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
     }
 
     // Verify authentication
@@ -95,18 +93,15 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    // Rate limiting (with graceful fallback)
-    try {
-      const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
-      const { success: rateLimitSuccess } = await ratelimit.limit(ip);
+    // Rate limiting with automatic fallback
+    const ip = extractIP(req.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
 
-      if (!rateLimitSuccess) {
-        return NextResponse.json(
-          { error: 'Too many requests. Please try again later.' },
-          { status: 429 }
-        );
-      }
-    } catch (rateLimitError) {
+    if (!rateLimitSuccess) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
     }
 
     // Verify authentication
