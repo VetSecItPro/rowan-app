@@ -296,11 +296,15 @@ export interface Expense {
   due_date?: string;
   paid_by?: string;
   description?: string;
+  notes?: string;
   project_id?: string;
   status?: 'pending' | 'paid' | 'overdue';
   payment_method?: string;
   paid_at?: string;
   recurring?: boolean;
+  is_recurring?: boolean;
+  recurring_frequency?: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  split_type?: 'equal' | 'percentage' | 'custom' | 'none';
   created_by?: string;
   created_at: string;
   updated_at: string;

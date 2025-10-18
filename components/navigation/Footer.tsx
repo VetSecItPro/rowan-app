@@ -29,25 +29,25 @@ export function Footer() {
           <div className="flex items-center flex-wrap justify-center gap-2 sm:gap-4">
             <Link
               href="/terms"
-              className="btn-touch px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-md active:scale-95 hover-lift shimmer-purple active-press"
+              className="btn-touch px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95"
             >
               Terms
             </Link>
             <Link
               href="/privacy"
-              className="btn-touch px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-md active:scale-95 hover-lift shimmer-purple active-press"
+              className="btn-touch px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95"
             >
               Privacy
             </Link>
             <Link
               href="/settings/documentation"
-              className="btn-touch px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-md active:scale-95 hover-lift shimmer-purple active-press"
+              className="btn-touch px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95"
             >
               Documentation
             </Link>
             <Link
               href="/settings/support"
-              className="btn-touch px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-md active:scale-95 hover-lift shimmer-purple active-press"
+              className="btn-touch px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95"
             >
               Support
             </Link>
