@@ -1,8 +1,4 @@
-import { Resend } from 'resend';
 import { createClient } from '@/lib/supabase/client';
-
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 interface User {
   id: string;
@@ -168,7 +164,7 @@ export const notificationService = {
   },
 
   /**
-   * Send email using Resend
+   * Send email using API route (client-safe)
    */
   async sendEmail(
     to: string,
@@ -176,19 +172,21 @@ export const notificationService = {
     html: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const { data, error } = await resend.emails.send({
-        from: 'Rowan <notifications@rowan.app>',
-        to: [to],
-        subject,
-        html,
+      const response = await fetch('/api/notifications/email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'custom',
+          recipient: to,
+          subject,
+          data: { html },
+        }),
       });
 
-      if (error) {
-        console.error('[notificationService] Email send error:', error);
-        return { success: false, error: error.message };
-      }
-
-      return { success: true };
+      const result = await response.json();
+      return result;
     } catch (error) {
       console.error('[notificationService] Email send exception:', error);
       return { success: false, error: String(error) };
