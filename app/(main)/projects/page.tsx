@@ -25,7 +25,7 @@ import { projectsService, type Expense, type CreateExpenseInput } from '@/lib/se
 import { budgetAlertsService } from '@/lib/services/budget-alerts-service';
 import { billsService, type Bill, type CreateBillInput } from '@/lib/services/bills-service';
 import { budgetTemplatesService, type BudgetTemplate, type BudgetTemplateCategory } from '@/lib/services/budget-templates-service';
-import type { Project } from '@/lib/types';
+import type { Project } from '@/lib/services/project-tracking-service';
 
 type TabType = 'projects' | 'budgets' | 'expenses' | 'bills' | 'receipts';
 

@@ -169,6 +169,7 @@ export default function PrivacyCompliancePage() {
                   </p>
                 </div>
                 <Toggle
+                  id="ccpa-do-not-sell"
                   checked={ccpaPreference?.do_not_sell || false}
                   onChange={handleCCPAToggle}
                   disabled={saving}
@@ -197,6 +198,7 @@ export default function PrivacyCompliancePage() {
                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Receive product updates and offers via email</p>
                   </div>
                   <Toggle
+                    id="marketing-emails"
                     checked={preferences?.marketing_emails_enabled || false}
                     onChange={(checked) => handlePreferenceChange('marketing_emails_enabled', checked)}
                     disabled={saving}
@@ -209,6 +211,7 @@ export default function PrivacyCompliancePage() {
                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Receive promotional messages via SMS</p>
                   </div>
                   <Toggle
+                    id="marketing-sms"
                     checked={preferences?.marketing_sms_enabled || false}
                     onChange={(checked) => handlePreferenceChange('marketing_sms_enabled', checked)}
                     disabled={saving}
@@ -238,6 +241,7 @@ export default function PrivacyCompliancePage() {
                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Help us understand how you use our service</p>
                   </div>
                   <Toggle
+                    id="analytics-cookies"
                     checked={preferences?.analytics_cookies_enabled || false}
                     onChange={(checked) => handlePreferenceChange('analytics_cookies_enabled', checked)}
                     disabled={saving}
@@ -250,6 +254,7 @@ export default function PrivacyCompliancePage() {
                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Improve site performance and user experience</p>
                   </div>
                   <Toggle
+                    id="performance-cookies"
                     checked={preferences?.performance_cookies_enabled || false}
                     onChange={(checked) => handlePreferenceChange('performance_cookies_enabled', checked)}
                     disabled={saving}
@@ -262,6 +267,7 @@ export default function PrivacyCompliancePage() {
                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Personalized advertising and recommendations</p>
                   </div>
                   <Toggle
+                    id="advertising-cookies"
                     checked={preferences?.advertising_cookies_enabled || false}
                     onChange={(checked) => handlePreferenceChange('advertising_cookies_enabled', checked)}
                     disabled={saving}
@@ -291,6 +297,7 @@ export default function PrivacyCompliancePage() {
                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Allow trusted partners to enhance your experience</p>
                   </div>
                   <Toggle
+                    id="share-data-with-partners"
                     checked={preferences?.share_data_with_partners || false}
                     onChange={(checked) => handlePreferenceChange('share_data_with_partners', checked)}
                     disabled={saving}
@@ -303,6 +310,7 @@ export default function PrivacyCompliancePage() {
                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Share anonymized data with analytics providers</p>
                   </div>
                   <Toggle
+                    id="allow-third-party-analytics"
                     checked={preferences?.allow_third_party_analytics || false}
                     onChange={(checked) => handlePreferenceChange('allow_third_party_analytics', checked)}
                     disabled={saving}
@@ -331,6 +339,7 @@ export default function PrivacyCompliancePage() {
                   <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Enable location-based features and services</p>
                 </div>
                 <Toggle
+                  id="location-tracking-enabled"
                   checked={preferences?.location_tracking_enabled || false}
                   onChange={(checked) => handlePreferenceChange('location_tracking_enabled', checked)}
                   disabled={saving}

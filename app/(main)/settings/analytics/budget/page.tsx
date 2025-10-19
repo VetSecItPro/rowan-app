@@ -13,7 +13,7 @@ type ViewMode = 'analytics' | 'reports';
 
 export default function BudgetAnalyticsPage() {
   const params = useParams();
-  const spaceId = params.spaceId as string;
+  const spaceId = params?.spaceId as string;
 
   const [timeRange, setTimeRange] = useState<TimeRange>('3m');
   const [viewMode, setViewMode] = useState<ViewMode>('analytics');
