@@ -48,14 +48,19 @@ export interface LocationInfo {
  * Parse User-Agent string to extract device information
  */
 export function parseUserAgent(userAgent: string): DeviceInfo {
+  console.log('parseUserAgent: input userAgent =', userAgent);
   const ua = userAgent.toLowerCase();
 
   // Detect device type
   let device_type = 'desktop';
   if (/mobile|android|iphone|ipod|blackberry|windows phone/i.test(userAgent)) {
     device_type = 'mobile';
+    console.log('parseUserAgent: detected mobile device due to userAgent containing mobile keywords');
   } else if (/ipad|tablet|kindle/i.test(userAgent)) {
     device_type = 'tablet';
+    console.log('parseUserAgent: detected tablet device');
+  } else {
+    console.log('parseUserAgent: detected desktop device');
   }
 
   // Detect browser
@@ -83,13 +88,16 @@ export function parseUserAgent(userAgent: string): DeviceInfo {
   let os = 'Unknown';
   let os_version = '';
 
+  console.log('parseUserAgent: detecting OS from ua =', ua);
   if (ua.includes('mac os x')) {
     os = 'macOS';
+    console.log('parseUserAgent: detected macOS');
     const match = userAgent.match(/mac os x ([\d_]+)/i);
     if (match) {
       os_version = match[1].replace(/_/g, '.');
     }
   } else if (ua.includes('windows nt')) {
+    console.log('parseUserAgent: detected Windows');
     os = 'Windows';
     const versionMap: Record<string, string> = {
       '10.0': '11',
@@ -109,12 +117,14 @@ export function parseUserAgent(userAgent: string): DeviceInfo {
     }
   } else if (ua.includes('android')) {
     os = 'Android';
+    console.log('parseUserAgent: detected Android');
     const match = userAgent.match(/android ([\d.]+)/i);
     if (match) {
       os_version = match[1];
     }
   } else if (ua.includes('linux')) {
     os = 'Linux';
+    console.log('parseUserAgent: detected Linux');
   }
 
   // Determine device name
@@ -136,12 +146,23 @@ export function parseUserAgent(userAgent: string): DeviceInfo {
     device_name = 'iMac';
   } else if (device_type === 'mobile') {
     device_name = `${os} Phone`;
+    console.log('parseUserAgent: mobile device, setting device_name to:', device_name);
   } else if (device_type === 'tablet') {
     device_name = `${os} Tablet`;
+    console.log('parseUserAgent: tablet device, setting device_name to:', device_name);
   }
 
   // Append browser to device name for clarity
   device_name = `${device_name} - ${browser}`;
+
+  console.log('parseUserAgent: final result:', {
+    device_type,
+    browser,
+    browser_version,
+    os,
+    os_version,
+    device_name,
+  });
 
   return {
     device_type,
