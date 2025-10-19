@@ -181,7 +181,7 @@ export function MentionInput({
           >
             {filteredMembers.map((member, index) => (
               <button
-                key={member.id}
+                key={member.user_id}
                 onClick={() => insertMention(member)}
                 className={`w-full flex items-center gap-3 p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
                   index === selectedMentionIndex
