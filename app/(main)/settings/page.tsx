@@ -808,9 +808,10 @@ export default function SettingsPage() {
                         )}
                         <button
                           onClick={() => profileImageInputRef.current?.click()}
-                          className="btn-touch absolute bottom-0 right-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-purple-600 flex items-center justify-center text-white hover:bg-purple-700 transition-all shadow-lg hover:shadow-xl active:scale-90 hover:scale-110"
+                          className="absolute bottom-1 right-1 w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white hover:bg-purple-700 transition-colors shadow-md"
+                          aria-label="Change profile picture"
                         >
-                          <Camera className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          <Camera className="w-4 h-4" />
                         </button>
                       </div>
                       <div className="text-center sm:text-left">
@@ -1007,25 +1008,15 @@ export default function SettingsPage() {
                     {/* Active Sessions */}
                     <div>
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Active Sessions</h3>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Active Sessions</h3>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">Sessions are automatically tracked when you sign in</p>
+                        </div>
                         <button
-                          onClick={async () => {
-                            console.log('Manual session tracking triggered');
-                            try {
-                              const response = await fetch('/api/user/track-session', {
-                                method: 'POST',
-                              });
-                              const result = await response.json();
-                              console.log('Manual session tracking result:', result);
-                              // Refresh sessions after tracking
-                              fetchActiveSessions();
-                            } catch (error) {
-                              console.error('Manual session tracking error:', error);
-                            }
-                          }}
-                          className="text-xs bg-purple-600 text-white px-3 py-1 rounded-lg hover:bg-purple-700 transition-colors"
+                          onClick={fetchActiveSessions}
+                          className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
                         >
-                          Create Session
+                          Refresh
                         </button>
                       </div>
                       {isLoadingSessions ? (
@@ -1057,7 +1048,7 @@ export default function SettingsPage() {
                                     setSessionToRevoke(session.id);
                                     setShowRevokeSessionModal(true);
                                   }}
-                                  className="btn-touch text-xs text-red-600 dark:text-red-400 hover:underline transition-all active:scale-95 hover:text-red-700 dark:hover:text-red-300"
+                                  className="text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
                                 >
                                   Revoke
                                 </button>
