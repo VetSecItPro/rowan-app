@@ -299,10 +299,10 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                   key={category.value}
                   type="button"
                   onClick={() => setFormData({ ...formData, category: category.value as any })}
-                  className={`btn-touch flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all active-press ${
+                  className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all ${
                     formData.category === category.value
-                      ? `${category.color} border-transparent text-white shadow-lg shimmer-pink hover-lift`
-                      : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover-lift shimmer-pink'
+                      ? `${category.color} border-transparent text-white shadow-lg`
+                      : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
                 >
                   <span className="text-2xl mb-1">{category.icon}</span>
@@ -424,10 +424,10 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                           : [...prev, index]
                       );
                     }}
-                    className={`btn-touch flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all active-press ${
+                    className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                       selectedWeekdays.includes(index)
-                        ? 'bg-pink-500 text-white shadow-lg shimmer-pink hover-lift'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover-lift shimmer-pink'
+                        ? 'bg-pink-500 text-white shadow-lg'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
                     {day}
@@ -455,10 +455,10 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                           : [...prev, day]
                       );
                     }}
-                    className={`btn-touch px-2 py-2 rounded-lg text-sm font-medium transition-all active-press ${
+                    className={`px-2 py-2 rounded-lg text-sm font-medium transition-all ${
                       selectedMonthDays.includes(day)
-                        ? 'bg-pink-500 text-white shadow-lg shimmer-pink hover-lift'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover-lift shimmer-pink'
+                        ? 'bg-pink-500 text-white shadow-lg'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
                     {day}
@@ -473,15 +473,15 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
             <button
               type="button"
               onClick={onClose}
-              className="btn-touch bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors active-press hover-lift"
+              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!!dateError}
-              className={`btn-touch shimmer-pink text-white rounded-lg transition-all shadow-lg hover-lift active-press ${
-                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
+              className={`px-4 py-2 bg-pink-600 text-white rounded-lg transition-all shadow-lg ${
+                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:bg-pink-700'
               }`}
             >
               {editReminder ? 'Save Changes' : 'Create Reminder'}

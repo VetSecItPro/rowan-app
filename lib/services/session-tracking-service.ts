@@ -192,13 +192,14 @@ export async function getLocationFromIP(ip: string): Promise<LocationInfo> {
 /**
  * Get all active sessions for a user
  */
-export async function getUserSessions(userId: string): Promise<{
+export async function getUserSessions(userId: string, supabaseClient?: any): Promise<{
   success: boolean;
   sessions?: UserSession[];
   error?: string;
 }> {
   try {
-    const supabase = createClient();
+    // Use provided client (from API route with auth context) or default client
+    const supabase = supabaseClient || createClient();
 
     console.log('getUserSessions: querying for user_id:', userId);
 
@@ -209,6 +210,11 @@ export async function getUserSessions(userId: string): Promise<{
       .limit(5);
 
     console.log('getUserSessions: table check - all sessions in DB:', { allSessions, countError });
+
+    // Test auth context - what does auth.uid() return?
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    console.log('getUserSessions: auth context check - auth.uid():', authUser?.id);
+    console.log('getUserSessions: comparing auth.uid() vs queried userId:', authUser?.id, 'vs', userId);
 
     const { data, error } = await supabase
       .from('user_sessions')
