@@ -250,13 +250,12 @@ export default function AuditLogPage() {
 
         {/* Audit Log Entries */}
         {loading ? (
-          <SkeletonLoader variant="list" count={10} />
+          <SkeletonLoader count={10} />
         ) : auditLog.length === 0 ? (
           <EmptyState
             icon={Shield}
             title="No Audit Events"
             description="No events match your filter criteria. Try selecting a different category."
-            iconColor="text-gray-400 dark:text-gray-500"
           />
         ) : (
           <div className="space-y-3">
