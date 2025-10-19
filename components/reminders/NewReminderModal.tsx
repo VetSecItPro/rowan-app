@@ -164,13 +164,13 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
         {/* Header */}
         <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-pink-600 to-pink-500 bg-clip-text text-transparent">
               {editReminder ? 'Edit Reminder' : showTemplatePicker ? 'Choose Template' : 'Create New Reminder'}
             </h2>
             {!editReminder && !showTemplatePicker && (
               <button
                 onClick={() => setShowTemplatePicker(true)}
-                className="btn-touch flex items-center gap-2 bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 rounded-lg hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors text-sm font-medium hover-lift active-press shimmer-pink"
+                className="flex items-center gap-2 px-3 py-1.5 bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 rounded-lg hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors text-sm font-medium"
               >
                 <Sparkles className="w-4 h-4" />
                 Use Template
@@ -179,7 +179,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
           </div>
           <button
             onClick={onClose}
-            className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active-press hover-lift shimmer-pink"
+            className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             aria-label="Close modal"
           >
             <X className="w-5 h-5 sm:w-4 sm:h-4 text-gray-600 dark:text-gray-400" />
@@ -213,7 +213,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
               <button
                 type="button"
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="btn-touch absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors z-10 active-press hover-lift shimmer-pink"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors z-10"
               >
                 <Smile className="w-5 h-5 text-gray-400" />
               </button>
@@ -236,7 +236,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                             setFormData({ ...formData, emoji });
                             setShowEmojiPicker(false);
                           }}
-                          className="btn-touch w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active-press hover-lift shimmer-pink"
+                          className="w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                         >
                           {emoji}
                         </button>
