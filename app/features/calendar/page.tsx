@@ -14,11 +14,11 @@ export default function CalendarFeaturePage() {
             <Calendar className="w-10 h-10 text-white" />
           </div>
 
-          <h1 className="text-6xl md:text-7xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
             Shared Calendar
           </h1>
 
-          <p className="text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
             Keep everyone in sync with a beautiful, collaborative calendar built for families and couples.
           </p>
         </div>
