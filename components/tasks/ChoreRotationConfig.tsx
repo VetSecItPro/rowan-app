@@ -70,7 +70,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
       .from('space_members')
       .select(`
         user_id,
-        users:user_id (
+        users!user_id (
           id,
           email,
           full_name

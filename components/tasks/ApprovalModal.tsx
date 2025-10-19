@@ -72,7 +72,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
       .select(`
         id,
         user_id,
-        users:user_id (
+        users!user_id (
           id,
           email,
           full_name

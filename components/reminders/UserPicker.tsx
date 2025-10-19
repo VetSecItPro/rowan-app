@@ -48,7 +48,7 @@ export function UserPicker({
           .select(`
             id,
             user_id,
-            users:user_id (
+            users!user_id (
               id,
               name,
               email,
