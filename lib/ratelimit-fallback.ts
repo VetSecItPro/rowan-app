@@ -96,22 +96,45 @@ export function fallbackRateLimit(
  * Handles proxy chains and returns first valid IP
  */
 export function extractIP(headers: Headers): string {
+  console.log('extractIP: checking headers for IP address...');
+
   // Try x-forwarded-for first (proxy chain)
   const forwardedFor = headers.get('x-forwarded-for');
+  console.log('extractIP: x-forwarded-for =', forwardedFor);
   if (forwardedFor) {
     // Take first IP in chain (client IP)
     const firstIP = forwardedFor.split(',')[0]?.trim();
-    if (firstIP) return firstIP;
+    if (firstIP) {
+      console.log('extractIP: using x-forwarded-for IP =', firstIP);
+      return firstIP;
+    }
   }
 
   // Try x-real-ip (single proxy)
   const realIP = headers.get('x-real-ip');
-  if (realIP) return realIP.trim();
+  console.log('extractIP: x-real-ip =', realIP);
+  if (realIP) {
+    console.log('extractIP: using x-real-ip =', realIP);
+    return realIP.trim();
+  }
 
   // Try cf-connecting-ip (Cloudflare)
   const cfIP = headers.get('cf-connecting-ip');
-  if (cfIP) return cfIP.trim();
+  console.log('extractIP: cf-connecting-ip =', cfIP);
+  if (cfIP) {
+    console.log('extractIP: using cf-connecting-ip =', cfIP);
+    return cfIP.trim();
+  }
+
+  // In development, try to get a public IP for testing
+  // This helps with geolocation testing in localhost
+  if (process.env.NODE_ENV === 'development') {
+    console.log('extractIP: development mode - using test IP for geolocation');
+    // Use a test IP that will return location data for development
+    return '8.8.8.8'; // Google DNS - will return Mountain View, CA
+  }
 
   // Fallback to anonymous
+  console.log('extractIP: no IP headers found, using anonymous');
   return 'anonymous';
 }

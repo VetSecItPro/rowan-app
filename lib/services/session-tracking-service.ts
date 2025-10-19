@@ -157,16 +157,37 @@ export function parseUserAgent(userAgent: string): DeviceInfo {
  * Get location information from IP address using ipapi.co
  */
 export async function getLocationFromIP(ip: string): Promise<LocationInfo> {
+  console.log('getLocationFromIP: attempting to get location for IP:', ip);
+
+  // Skip geolocation for anonymous IPs
+  if (ip === 'anonymous' || !ip) {
+    console.log('getLocationFromIP: skipping geolocation for anonymous/empty IP');
+    return {
+      ip_address: ip,
+      city: null,
+      region: null,
+      country: null,
+      country_code: null,
+      latitude: null,
+      longitude: null,
+    };
+  }
+
   try {
-    const response = await fetch(`https://ipapi.co/${ip}/json/`);
+    const url = `https://ipapi.co/${ip}/json/`;
+    console.log('getLocationFromIP: fetching from URL:', url);
+
+    const response = await fetch(url);
+    console.log('getLocationFromIP: response status:', response.status);
 
     if (!response.ok) {
-      throw new Error('Failed to fetch location');
+      throw new Error(`Failed to fetch location: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
+    console.log('getLocationFromIP: API response data:', data);
 
-    return {
+    const locationData = {
       ip_address: ip,
       city: data.city || null,
       region: data.region || null,
@@ -175,8 +196,11 @@ export async function getLocationFromIP(ip: string): Promise<LocationInfo> {
       latitude: data.latitude || null,
       longitude: data.longitude || null,
     };
+
+    console.log('getLocationFromIP: parsed location data:', locationData);
+    return locationData;
   } catch (error) {
-    console.error('Error fetching location:', error);
+    console.error('getLocationFromIP: error fetching location:', error);
     return {
       ip_address: ip,
       city: null,
