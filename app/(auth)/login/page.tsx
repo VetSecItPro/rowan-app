@@ -98,12 +98,6 @@ export default function LoginPage() {
           mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
         }`}
       >
-        {/* Animated background shimmer effect */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -inset-[10px] opacity-20">
-            <div className="shimmer-gradient w-full h-full" />
-          </div>
-        </div>
 
         {/* Logo and branding */}
         <div className="relative z-10 text-center">
@@ -114,7 +108,7 @@ export default function LoginPage() {
               alt="Rowan Logo"
               width={120}
               height={120}
-              className="w-28 h-28 drop-shadow-2xl transform hover:scale-110 transition-transform duration-300"
+              className="w-28 h-28 drop-shadow-2xl"
             />
             <h1 className="text-6xl xl:text-7xl font-bold text-white drop-shadow-lg">
               Rowan
@@ -251,7 +245,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="btn-touch w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 "
+              className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

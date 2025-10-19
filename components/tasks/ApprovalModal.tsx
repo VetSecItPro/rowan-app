@@ -14,7 +14,6 @@ interface ApprovalModalProps {
 }
 
 interface SpaceMember {
-  id: string;
   user_id: string;
   users: {
     id: string;
@@ -70,7 +69,6 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
     const { data } = await supabase
       .from('space_members')
       .select(`
-        id,
         user_id,
         users!user_id (
           id,
