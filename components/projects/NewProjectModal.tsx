@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import type { Project } from '@/lib/types';
+import type { Project } from '@/lib/services/project-tracking-service';
 import type { CreateProjectInput } from '@/lib/services/projects-service';
 
 interface NewProjectModalProps {
