@@ -41,9 +41,9 @@ export async function GET(request: Request) {
     // Set user context for Sentry error tracking
     setSentryUser(user);
 
-    // Get user sessions
+    // Get user sessions - pass the authenticated supabase client
     console.log('Fetching sessions for user ID:', user.id);
-    const result = await getUserSessions(user.id);
+    const result = await getUserSessions(user.id, supabase);
     console.log('getUserSessions result:', result);
 
     if (!result.success) {
