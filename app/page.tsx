@@ -171,10 +171,10 @@ export default function HomePage() {
             </div>
 
             {/* Links - Now visible on mobile with smaller text */}
-            <div className="flex items-center gap-2 sm:gap-6 text-sm sm:text-base">
-              <Link href="/privacy" className="inline-block py-3 px-3 sm:px-4 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Privacy</Link>
-              <Link href="/terms" className="inline-block py-3 px-3 sm:px-4 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Terms</Link>
-              <Link href="/security" className="inline-block py-3 px-3 sm:px-4 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Security</Link>
+            <div className="flex items-center gap-1 sm:gap-4 text-sm sm:text-base">
+              <Link href="/privacy" className="inline-block py-2 px-2 sm:px-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Privacy</Link>
+              <Link href="/terms" className="inline-block py-2 px-2 sm:px-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Terms</Link>
+              <Link href="/security" className="inline-block py-2 px-2 sm:px-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Security</Link>
             </div>
           </div>
         </div>
