@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/client';
-import { emailService } from './email-service';
 import { pushService } from './push-service';
 
 export interface DigestNotification {
@@ -135,19 +134,30 @@ class DigestService {
       // Send email digest
       if (preferences.email_enabled && user.email) {
         try {
-          const emailResult = await emailService.sendDigestEmail(
-            user.email,
-            user.name || 'User',
-            spaceName,
-            notifications.map(n => ({
-              type: n.type,
-              title: n.title,
-              description: n.content,
-              url: n.url,
-              timestamp: n.created_at,
-            })),
-            frequency
-          );
+          const response = await fetch('/api/notifications/email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              type: 'digest',
+              recipient: user.email,
+              subject: `Your ${frequency} digest from ${spaceName}`,
+              data: {
+                userName: user.name || 'User',
+                spaceName,
+                notifications: notifications.map(n => ({
+                  type: n.type,
+                  title: n.title,
+                  description: n.content,
+                  url: n.url,
+                  timestamp: n.created_at,
+                })),
+                frequency,
+              },
+            }),
+          });
+          const emailResult = await response.json();
           results.email = emailResult.success;
         } catch (error) {
           console.error('Error sending digest email:', error);
