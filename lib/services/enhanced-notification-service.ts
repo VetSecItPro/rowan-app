@@ -190,13 +190,12 @@ export const enhancedNotificationService = {
 
           const pushResult = await pushService.sendNotification(userId, {
             title: pushTitle,
-            content: `${data.completedBy} completed "${data.goalTitle}" in ${data.spaceName}`,
-            priority: 'medium',
-            metadata: {
+            body: `${data.completedBy} completed "${data.goalTitle}" in ${data.spaceName}`,
+            data: {
               type: 'goal_achievement',
               achievementType: data.achievementType,
               goalTitle: data.goalTitle,
-              goalUrl: data.goalUrl,
+              url: data.goalUrl,
             },
           });
 
@@ -308,12 +307,11 @@ export const enhancedNotificationService = {
         if (shouldSendPush) {
           const pushResult = await pushService.sendNotification(userId, {
             title: '📋 New Task Assigned',
-            content: `${data.assignedBy} assigned you "${data.taskTitle}" in ${data.spaceName}`,
-            priority: data.priority,
-            metadata: {
+            body: `${data.assignedBy} assigned you "${data.taskTitle}" in ${data.spaceName}`,
+            data: {
               type: 'task_assignment',
               taskTitle: data.taskTitle,
-              taskUrl: data.taskUrl,
+              url: data.taskUrl,
             },
           });
 
@@ -431,12 +429,11 @@ export const enhancedNotificationService = {
 
           const pushResult = await pushService.sendNotification(userId, {
             title: '📅 Event Reminder',
-            content: `"${data.eventTitle}" ${reminderTexts[data.reminderTime]} in ${data.spaceName}`,
-            priority: 'medium',
-            metadata: {
+            body: `"${data.eventTitle}" ${reminderTexts[data.reminderTime]} in ${data.spaceName}`,
+            data: {
               type: 'event_reminder',
               eventTitle: data.eventTitle,
-              eventUrl: data.eventUrl,
+              url: data.eventUrl,
             },
           });
 
@@ -546,12 +543,11 @@ export const enhancedNotificationService = {
         if (shouldSendPush) {
           const pushResult = await pushService.sendNotification(userId, {
             title: data.isDirectMessage ? '💬 New Direct Message' : '💬 New Message',
-            content: `${data.senderName}: ${data.messagePreview}`,
-            priority: 'medium',
-            metadata: {
+            body: `${data.senderName}: ${data.messagePreview}`,
+            data: {
               type: 'new_message',
               senderName: data.senderName,
-              messageUrl: data.messageUrl,
+              url: data.messageUrl,
             },
           });
 

@@ -104,11 +104,13 @@ export const receiptScanningService = {
       }
 
       // Upload the image
-      const uploadResult = await fileUploadService.uploadFile(file, spaceId, 'receipts');
-      if (!uploadResult.success || !uploadResult.data) {
+      let uploadResult: FileUploadResult;
+      try {
+        uploadResult = await fileUploadService.uploadFile(file, spaceId, 'receipts');
+      } catch (error) {
         return {
           success: false,
-          error: uploadResult.error || 'Failed to upload image'
+          error: error instanceof Error ? error.message : 'Failed to upload image'
         };
       }
 
@@ -127,8 +129,8 @@ export const receiptScanningService = {
         .from('receipts')
         .insert([{
           space_id: spaceId,
-          image_url: uploadResult.data.public_url,
-          image_file_id: uploadResult.data.id,
+          image_url: uploadResult.public_url,
+          image_file_id: uploadResult.id,
           raw_text: '',
           extracted_data: {},
           confidence_score: 0,
@@ -146,7 +148,7 @@ export const receiptScanningService = {
       }
 
       // Process the image with OCR
-      const ocrResult = await this.extractTextFromImage(uploadResult.data.public_url);
+      const ocrResult = await this.extractTextFromImage(uploadResult.public_url);
 
       // Parse the extracted text
       const extractedData = await this.parseReceiptText(ocrResult.text, options?.category_hint);
@@ -170,27 +172,28 @@ export const receiptScanningService = {
       const suggestion = this.generateExpenseSuggestion(extractedData);
 
       // Auto-create expense if requested and data is reliable
+      // TODO: Implement auto expense creation when expense service is available
       if (options?.auto_create_expense && confidenceScore > 0.7 && suggestion) {
         try {
-          // Import expense service for auto-creation
-          const { expenseService } = await import('./expense-service');
-          await expenseService.createExpense({
-            space_id: spaceId,
-            title: suggestion.title,
-            amount: suggestion.amount,
-            category: suggestion.category,
-            date: suggestion.date,
-            description: suggestion.description,
-            payment_method: suggestion.payment_method,
-            status: 'paid',
-            notes: `Auto-created from receipt scan (Confidence: ${Math.round(confidenceScore * 100)}%)`,
-          });
+          // TODO: Import expense service for auto-creation
+          // const { expenseService } = await import('./expense-service');
+          // await expenseService.createExpense({
+          //   space_id: spaceId,
+          //   title: suggestion.title,
+          //   amount: suggestion.amount,
+          //   category: suggestion.category,
+          //   date: suggestion.date,
+          //   description: suggestion.description,
+          //   payment_method: suggestion.payment_method,
+          //   status: 'paid',
+          //   notes: `Auto-created from receipt scan (Confidence: ${Math.round(confidenceScore * 100)}%)`,
+          // });
 
-          // Link receipt to expense
-          await supabase
-            .from('receipts')
-            .update({ expense_id: 'auto-created' })
-            .eq('id', receiptRecord.id);
+          // TODO: Link receipt to expense
+          // await supabase
+          //   .from('receipts')
+          //   .update({ expense_id: 'auto-created' })
+          //   .eq('id', receiptRecord.id);
 
         } catch (error) {
           console.error('Failed to auto-create expense:', error);
@@ -462,9 +465,9 @@ Thank you for shopping with us!`;
   /**
    * Generate expense suggestion from extracted data
    */
-  generateExpenseSuggestion(data: ExtractedReceiptData): ExpenseSuggestion | null {
+  generateExpenseSuggestion(data: ExtractedReceiptData): ExpenseSuggestion | undefined {
     if (!data.total_amount || data.total_amount <= 0) {
-      return null;
+      return undefined;
     }
 
     const title = data.merchant_name || 'Receipt Expense';
