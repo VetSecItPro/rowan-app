@@ -105,6 +105,14 @@ export function extractIP(headers: Headers): string {
     // Take first IP in chain (client IP)
     const firstIP = forwardedFor.split(',')[0]?.trim();
     if (firstIP) {
+      // Check if this is a localhost/development IP
+      if (firstIP === '::1' || firstIP === '127.0.0.1' || firstIP === 'localhost') {
+        console.log('extractIP: detected localhost IP, using development mode');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('extractIP: development mode - using test IP for geolocation');
+          return '8.8.8.8'; // Use test IP for geolocation in development
+        }
+      }
       console.log('extractIP: using x-forwarded-for IP =', firstIP);
       return firstIP;
     }

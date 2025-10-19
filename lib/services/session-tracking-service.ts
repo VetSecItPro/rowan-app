@@ -153,6 +153,9 @@ export function parseUserAgent(userAgent: string): DeviceInfo {
   };
 }
 
+// Simple in-memory cache for geolocation results (5 minute TTL)
+const locationCache = new Map<string, { data: LocationInfo; expires: number }>();
+
 /**
  * Get location information from IP address using ipapi.co
  */
@@ -171,6 +174,13 @@ export async function getLocationFromIP(ip: string): Promise<LocationInfo> {
       latitude: null,
       longitude: null,
     };
+  }
+
+  // Check cache first
+  const cached = locationCache.get(ip);
+  if (cached && cached.expires > Date.now()) {
+    console.log('getLocationFromIP: returning cached result for IP:', ip);
+    return cached.data;
   }
 
   try {
@@ -197,11 +207,17 @@ export async function getLocationFromIP(ip: string): Promise<LocationInfo> {
       longitude: data.longitude || null,
     };
 
+    // Cache the result for 5 minutes
+    locationCache.set(ip, {
+      data: locationData,
+      expires: Date.now() + 5 * 60 * 1000, // 5 minutes
+    });
+
     console.log('getLocationFromIP: parsed location data:', locationData);
     return locationData;
   } catch (error) {
     console.error('getLocationFromIP: error fetching location:', error);
-    return {
+    const errorData = {
       ip_address: ip,
       city: null,
       region: null,
@@ -210,6 +226,14 @@ export async function getLocationFromIP(ip: string): Promise<LocationInfo> {
       latitude: null,
       longitude: null,
     };
+
+    // Cache error results for 1 minute to prevent repeated failures
+    locationCache.set(ip, {
+      data: errorData,
+      expires: Date.now() + 1 * 60 * 1000, // 1 minute
+    });
+
+    return errorData;
   }
 }
 
