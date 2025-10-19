@@ -139,7 +139,7 @@ export default function BudgetAnalyticsPage() {
               <button
                 onClick={() => setViewMode('reports')}
                 className={`btn-touch px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap active:scale-95 ${
-                  viewMode === 'reports'
+                  (viewMode as ViewMode) === 'reports'
                     ? 'bg-amber-500 text-white shadow-sm hover:bg-amber-600 hover:shadow-md'
                     : 'text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100 hover:bg-amber-100 dark:hover:bg-amber-800/30'
                 }`}
