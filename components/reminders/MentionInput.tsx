@@ -53,7 +53,7 @@ export function MentionInput({
         .select(`
           id,
           user_id,
-          user:user_id (
+          user:user_id!inner (
             id,
             name,
             email,
