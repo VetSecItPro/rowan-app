@@ -382,7 +382,7 @@ export const goalsService = {
           // Send goal completion notifications
           if (spaceMembers.length > 0) {
             enhancedNotificationService.sendGoalAchievementNotification(
-              spaceMembers,
+              spaceMembers.map(member => member.user_id),
               {
                 goalTitle: data.title,
                 goalId: data.id,
@@ -487,7 +487,7 @@ export const goalsService = {
           // Send milestone completion notifications
           if (spaceMembers.length > 0 && goalData) {
             enhancedNotificationService.sendGoalAchievementNotification(
-              spaceMembers,
+              spaceMembers.map(member => member.user_id),
               {
                 goalTitle: goalData.title,
                 goalId: data.goal_id,
