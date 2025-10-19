@@ -202,7 +202,7 @@ export const messagesService = {
           ) || [];
 
           if (participants.length > 0) {
-            enhancedNotificationService.sendMessageNotification(
+            enhancedNotificationService.sendNewMessageNotification(
               participants,
               {
                 senderName: senderData.name || 'Someone',

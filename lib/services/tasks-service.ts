@@ -288,7 +288,6 @@ export const tasksService = {
                 [task.assigned_to],
                 {
                   taskTitle: task.title,
-                  taskId: task.id,
                   taskUrl: `${process.env.NEXT_PUBLIC_APP_URL}/tasks/${task.id}?space_id=${task.space_id}`,
                   assignedBy: creatorData?.name || 'Someone',
                   assignedTo: assigneeData?.name || 'You',
