@@ -200,6 +200,16 @@ export async function getUserSessions(userId: string): Promise<{
   try {
     const supabase = createClient();
 
+    console.log('getUserSessions: querying for user_id:', userId);
+
+    // First, let's check if the table exists and has any data at all
+    const { data: allSessions, error: countError } = await supabase
+      .from('user_sessions')
+      .select('id, user_id, created_at')
+      .limit(5);
+
+    console.log('getUserSessions: table check - all sessions in DB:', { allSessions, countError });
+
     const { data, error } = await supabase
       .from('user_sessions')
       .select('*')
@@ -207,11 +217,14 @@ export async function getUserSessions(userId: string): Promise<{
       .is('revoked_at', null)
       .order('last_active', { ascending: false });
 
+    console.log('getUserSessions: database query result:', { data, error });
+
     if (error) {
       console.error('Error fetching user sessions:', error);
       return { success: false, error: error.message };
     }
 
+    console.log('getUserSessions: returning sessions count:', data?.length || 0);
     return { success: true, sessions: data as UserSession[] };
   } catch (error) {
     console.error('Error fetching user sessions:', error);
