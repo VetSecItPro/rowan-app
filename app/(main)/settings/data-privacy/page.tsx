@@ -143,7 +143,10 @@ const complianceInfo = [
 
 export default function DataPrivacyPage() {
   return (
-    <FeatureLayout title="Data & Privacy" icon={Database}>
+    <FeatureLayout breadcrumbItems={[
+      { label: 'Settings', href: '/settings' },
+      { label: 'Data & Privacy' }
+    ]}>
       <div className="space-y-8">
         {/* Header */}
         <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-2xl p-6">
