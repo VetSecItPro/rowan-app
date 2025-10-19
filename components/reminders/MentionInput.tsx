@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 interface SpaceMember {
-  id: string;
   user_id: string;
   user: {
     id: string;
@@ -51,7 +50,6 @@ export function MentionInput({
       const { data, error } = await supabase
         .from('space_members')
         .select(`
-          id,
           user_id,
           user:user_id!inner (
             id,
