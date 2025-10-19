@@ -83,6 +83,55 @@ export async function POST(request: NextRequest) {
         );
         break;
 
+      case 'digest':
+        result = await emailService.sendDailyDigestEmail({
+          recipientEmail: recipient,
+          recipientName: data.userName,
+          digestDate: new Date().toISOString(),
+          digestType: data.frequency,
+          notifications: data.notifications.map((n: any) => ({
+            id: crypto.randomUUID(),
+            type: n.type,
+            title: n.title,
+            content: n.description,
+            priority: 'normal' as const,
+            spaceName: data.spaceName,
+            url: n.url,
+            timestamp: n.timestamp,
+          })),
+          totalCount: data.notifications.length,
+          unreadTasksCount: data.notifications.filter((n: any) => n.type === 'task').length,
+          upcomingEventsCount: data.notifications.filter((n: any) => n.type === 'event').length,
+          unreadMessagesCount: data.notifications.filter((n: any) => n.type === 'message').length,
+        });
+        break;
+
+      case 'custom':
+        // Handle custom HTML emails from notification-service
+        try {
+          const { Resend } = await import('resend');
+          const resend = new Resend(process.env.RESEND_API_KEY);
+
+          const { data: emailResult, error } = await resend.emails.send({
+            from: 'Rowan <notifications@rowanapp.com>',
+            to: [recipient],
+            subject,
+            html: data.html,
+          });
+
+          if (error) {
+            result = { success: false, error: error.message };
+          } else {
+            result = { success: true, messageId: emailResult?.id };
+          }
+        } catch (error) {
+          result = {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error'
+          };
+        }
+        break;
+
       default:
         return NextResponse.json(
           { success: false, error: 'Unknown email type' },
