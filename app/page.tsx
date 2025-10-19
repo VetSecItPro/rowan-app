@@ -57,7 +57,7 @@ export default function HomePage() {
               className="w-20 h-20 sm:w-32 sm:h-32 md:w-40 md:h-40 drop-shadow-2xl"
               priority
             />
-            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold text-gray-900 dark:text-white">Rowan</h1>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-gray-900 dark:text-white">Rowan</h1>
           </div>
 
           <h2 className="text-xl sm:text-2xl md:text-3xl font-medium">
