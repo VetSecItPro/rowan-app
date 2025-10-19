@@ -98,6 +98,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         loadUserProfile(session.user.id);
         loadUserSpace(session.user.id);
+
+        // Track session for existing logged-in users
+        trackUserSession().catch(err => {
+          console.error('Failed to track existing session:', err);
+        });
       }
       setLoading(false);
     });
