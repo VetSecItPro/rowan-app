@@ -130,7 +130,7 @@ export default function PrivacyCompliancePage() {
         </div>
 
         {loading ? (
-          <SkeletonLoader variant="list" count={5} />
+          <SkeletonLoader count={5} />
         ) : (
           <>
             {/* CCPA Do Not Sell */}
