@@ -5,7 +5,6 @@ import { User, Search, X, UserCheck } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 interface SpaceMember {
-  id: string;
   user_id: string;
   users: {
     id: string;
@@ -46,7 +45,6 @@ export function UserPicker({
         const { data, error } = await supabase
           .from('space_members')
           .select(`
-            id,
             user_id,
             users!user_id (
               id,
@@ -218,7 +216,7 @@ export function UserPicker({
                   {/* Member Options */}
                   {filteredMembers.map((member) => (
                     <button
-                      key={member.id}
+                      key={member.user_id}
                       onClick={() => handleSelect(member.user_id)}
                       className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
                         selectedUserId === member.user_id
