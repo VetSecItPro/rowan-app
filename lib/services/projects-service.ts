@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import type { Project } from '@/lib/types';
+import type { Project } from '@/lib/services/project-tracking-service';
 
 export interface CreateProjectInput {
   space_id: string;

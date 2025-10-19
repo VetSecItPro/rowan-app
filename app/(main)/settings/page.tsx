@@ -1365,53 +1365,6 @@ export default function SettingsPage() {
                   </div>
                 )}
 
-                {/* Appearance Tab */}
-                {activeTab === 'appearance' && (
-                  <div className="space-y-6 sm:space-y-8">
-                    <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Appearance Settings</h2>
-                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Customize how Rowan looks for you</p>
-                    </div>
-
-                    {/* Language */}
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Language & Region</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label htmlFor="field-12" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
-                            Language
-                          </label>
-                          <div className="relative">
-                            <select className="w-full px-4 py-3 pr-11 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer" id="field-12">
-                              <option>English (US)</option>
-                              <option>Español</option>
-                              <option>Français</option>
-                              <option>Deutsch</option>
-                            </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                              <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-                            </div>
-                          </div>
-                        </div>
-                        <div>
-                          <label htmlFor="field-13" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
-                            Date Format
-                          </label>
-                          <div className="relative">
-                            <select className="w-full px-4 py-3 pr-11 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none cursor-pointer" id="field-13">
-                              <option>MM/DD/YYYY</option>
-                              <option>DD/MM/YYYY</option>
-                              <option>YYYY-MM-DD</option>
-                            </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                              <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
 
                 {/* Privacy Tab */}
                 {activeTab === 'privacy' && (
