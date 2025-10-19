@@ -147,12 +147,6 @@ export default function SignUpPage() {
           mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
         }`}
       >
-        {/* Animated background shimmer effect */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -inset-[10px] opacity-20">
-            <div className="shimmer-gradient w-full h-full" />
-          </div>
-        </div>
 
         {/* Logo and branding */}
         <div className="relative z-10 text-center">
@@ -163,7 +157,7 @@ export default function SignUpPage() {
               alt="Rowan Logo"
               width={120}
               height={120}
-              className="w-28 h-28 drop-shadow-2xl transform hover:scale-110 transition-transform duration-300"
+              className="w-28 h-28 drop-shadow-2xl"
             />
             <h1 className="text-6xl xl:text-7xl font-bold text-white drop-shadow-lg">
               Rowan
@@ -356,7 +350,7 @@ export default function SignUpPage() {
                   type="button"
                   onClick={() => setShowColorDropdown(!showColorDropdown)}
                   disabled={isLoading}
-                  className="btn-touch w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 flex items-center justify-between active:scale-[0.98]"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200 flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-lg shadow-lg ${getColorClasses(colorTheme)}`} />
@@ -383,7 +377,7 @@ export default function SignUpPage() {
                           setShowColorDropdown(false);
                         }}
                         disabled={isLoading}
-                        className="btn-touch w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left active:scale-[0.98]"
+                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left"
                       >
                         <div className={`w-8 h-8 rounded-lg shadow-lg flex-shrink-0 ${getColorClasses(theme.value)}`} />
                         <span className="flex-1 font-medium text-gray-900 dark:text-white">
@@ -403,7 +397,7 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+              className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -422,7 +416,7 @@ export default function SignUpPage() {
               Already have an account?{' '}
               <Link
                 href="/login"
-                className="btn-touch inline-block py-2 px-3 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-semibold transition-colors duration-200 rounded-md active:scale-95"
+                className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-semibold transition-colors duration-200"
               >
                 Sign in
               </Link>
