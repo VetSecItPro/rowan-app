@@ -60,7 +60,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
       supabase.from('task_categories').select('id, name, color').eq('space_id', spaceId),
       supabase.from('space_members').select(`
         user_id,
-        users:user_id (
+        users!user_id (
           id,
           email,
           full_name
