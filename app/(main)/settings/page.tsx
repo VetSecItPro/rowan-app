@@ -1486,7 +1486,7 @@ export default function SettingsPage() {
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Start a new space for another family or team</p>
                       <button
                         onClick={() => setShowCreateSpaceModal(true)}
-                        className="btn-touch px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:opacity-90 transition-all text-sm flex items-center gap-2 active:scale-95 hover:shadow-lg shimmer-gray"
+                        className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:opacity-90 transition-colors text-sm flex items-center gap-2 hover:shadow-lg"
                       >
                         <UserPlus className="w-4 h-4" />
                         New Space
@@ -1655,7 +1655,7 @@ export default function SettingsPage() {
                                 alert('Failed to export data. Please try again.');
                               }
                             }}
-                            className="btn-touch w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded-lg sm:rounded-xl hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 active:scale-95 shimmer-blue"
+                            className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded-lg sm:rounded-xl hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                           >
                             <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             Download My Data (JSON)
