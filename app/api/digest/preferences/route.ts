@@ -216,19 +216,14 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    // Update preferences (upsert to handle if not exists)
+    // Update preferences (use UPDATE since record should exist)
     const { data: updatedPreferences, error } = await supabase
       .from('user_notification_preferences')
-      .upsert(
-        {
-          user_id: session.user.id,
-          digest_enabled: validation.data.digest_enabled,
-          updated_at: new Date().toISOString(),
-        },
-        {
-          onConflict: 'user_id',
-        }
-      )
+      .update({
+        digest_enabled: validation.data.digest_enabled,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', session.user.id)
       .select()
       .single();
 
