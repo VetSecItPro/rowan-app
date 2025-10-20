@@ -162,15 +162,15 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
       {/* Modal */}
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="sticky top-0 z-10 bg-gradient-reminders flex items-center justify-between px-4 sm:px-6 py-4">
           <div className="flex items-center gap-3">
-            <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-pink-600 to-pink-500 bg-clip-text text-transparent">
+            <h2 className="text-lg sm:text-xl font-bold text-white">
               {editReminder ? 'Edit Reminder' : showTemplatePicker ? 'Choose Template' : 'Create New Reminder'}
             </h2>
             {!editReminder && !showTemplatePicker && (
               <button
                 onClick={() => setShowTemplatePicker(true)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 rounded-lg hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors text-sm font-medium"
+                className="flex items-center gap-2 px-3 py-1.5 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors text-sm font-medium backdrop-blur-sm"
               >
                 <Sparkles className="w-4 h-4" />
                 Use Template
@@ -179,10 +179,10 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
           </div>
           <button
             onClick={onClose}
-            className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors backdrop-blur-sm"
             aria-label="Close modal"
           >
-            <X className="w-5 h-5 sm:w-4 sm:h-4 text-gray-600 dark:text-gray-400" />
+            <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
           </button>
         </div>
 

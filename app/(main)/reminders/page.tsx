@@ -566,9 +566,9 @@ export default function RemindersPage(): JSX.Element {
           {!showGuidedFlow && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 space-y-3">
                 {/* Search and Sort Row */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                   {/* Search */}
-                  <div className="flex-1">
+                  <div className="flex-1 max-w-none sm:max-w-lg">
                     <div className={`apple-search-container reminders-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
                       <Search className="apple-search-icon" />
                       <input
@@ -596,7 +596,7 @@ export default function RemindersPage(): JSX.Element {
                   </div>
 
                   {/* Sort Dropdown */}
-                  <div className="relative w-40 flex-shrink-0">
+                  <div className="relative w-44 flex-shrink-0">
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as any)}
