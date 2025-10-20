@@ -7,10 +7,7 @@ import {
   sendNewMessageEmail,
   sendShoppingListEmail,
   sendMealReminderEmail,
-  sendGeneralReminderEmail,
-  sendDailyDigestEmail,
-  type DailyDigestData,
-  type DigestNotification
+  sendGeneralReminderEmail
 } from '@/lib/services/email-service';
 
 export const dynamic = 'force-dynamic';
@@ -80,23 +77,17 @@ export async function GET(request: NextRequest) {
               failed++;
             }
           }
-        } else if (deliveryMethod === 'hourly' || deliveryMethod === 'daily') {
-          // Send as digest
-          try {
-            await sendDigestEmail(userId, notifications, deliveryMethod);
-            await notificationQueueService.markAsSent(notifications.map((n) => n.id));
-            sent += notifications.length;
-          } catch (error) {
-            console.error('Error sending digest:', error);
-            for (const notif of notifications) {
-              await notificationQueueService.markAsFailed(
-                notif.id,
-                error instanceof Error ? error.message : 'Unknown error',
-                notif.retry_count + 1
-              );
-            }
-            failed += notifications.length;
+        } else {
+          // Unknown delivery method - mark as failed
+          console.error('Unknown delivery method:', deliveryMethod);
+          for (const notif of notifications) {
+            await notificationQueueService.markAsFailed(
+              notif.id,
+              `Unsupported delivery method: ${deliveryMethod}`,
+              notif.retry_count + 1
+            );
           }
+          failed += notifications.length;
         }
       } catch (error) {
         console.error('Error processing notification group:', error);
@@ -247,58 +238,3 @@ async function sendInstantNotification(userId: string, notification: any): Promi
   }
 }
 
-/**
- * Send digest email
- */
-async function sendDigestEmail(
-  userId: string,
-  notifications: any[],
-  type: 'hourly' | 'daily'
-): Promise<void> {
-  const supabase = await createClient();
-
-  // Get user details
-  const { data: user } = await supabase
-    .from('profiles')
-    .select('email, first_name')
-    .eq('id', userId)
-    .single();
-
-  if (!user?.email) {
-    throw new Error('User email not found');
-  }
-
-  // Transform notifications to digest format
-  const digestNotifications: DigestNotification[] = notifications.map((notif) => ({
-    id: notif.id,
-    type: notif.notification_data.type,
-    title: notif.notification_data.title,
-    content: notif.notification_data.description || notif.notification_data.title,
-    priority: notif.notification_data.priority || 'normal',
-    spaceName: notif.notification_data.spaceName || 'Unknown Space',
-    url: notif.notification_data.url || 'https://rowanapp.com/dashboard',
-    timestamp: new Date(notif.scheduled_for).toLocaleString()
-  }));
-
-  // Count notifications by type
-  const taskCount = digestNotifications.filter(n => n.type === 'task').length;
-  const eventCount = digestNotifications.filter(n => n.type === 'event').length;
-  const messageCount = digestNotifications.filter(n => n.type === 'message').length;
-
-  const digestData: DailyDigestData = {
-    recipientEmail: user.email,
-    recipientName: user.first_name || 'Partner',
-    digestDate: new Date().toLocaleDateString(),
-    digestType: type === 'hourly' ? 'daily' : 'daily', // Map hourly to daily for template
-    notifications: digestNotifications,
-    totalCount: digestNotifications.length,
-    unreadTasksCount: taskCount,
-    upcomingEventsCount: eventCount,
-    unreadMessagesCount: messageCount
-  };
-
-  const result = await sendDailyDigestEmail(digestData);
-  if (!result.success) {
-    throw new Error(result.error || 'Failed to send digest email');
-  }
-}

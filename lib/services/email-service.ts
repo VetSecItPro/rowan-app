@@ -8,7 +8,6 @@ import NewMessageEmail from '@/lib/emails/templates/NewMessageEmail';
 import ShoppingListEmail from '@/lib/emails/templates/ShoppingListEmail';
 import MealReminderEmail from '@/lib/emails/templates/MealReminderEmail';
 import GeneralReminderEmail from '@/lib/emails/templates/GeneralReminderEmail';
-import DailyDigestEmail from '@/lib/emails/templates/DailyDigestEmail';
 
 // Initialize Resend with API key
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -116,28 +115,6 @@ export interface GeneralReminderData {
   createdBy?: string;
 }
 
-export interface DigestNotification {
-  id: string;
-  type: 'task' | 'event' | 'message' | 'shopping' | 'meal' | 'reminder';
-  title: string;
-  content: string;
-  priority: 'low' | 'normal' | 'high' | 'urgent';
-  spaceName: string;
-  url: string;
-  timestamp: string;
-}
-
-export interface DailyDigestData {
-  recipientEmail: string;
-  recipientName: string;
-  digestDate: string;
-  digestType: 'daily' | 'weekly';
-  notifications: DigestNotification[];
-  totalCount: number;
-  unreadTasksCount: number;
-  upcomingEventsCount: number;
-  unreadMessagesCount: number;
-}
 
 /**
  * Send a task assignment email notification
@@ -344,43 +321,12 @@ export async function sendGeneralReminderEmail(data: GeneralReminderData): Promi
   }
 }
 
-/**
- * Send a daily/weekly digest email notification
- */
-export async function sendDailyDigestEmail(data: DailyDigestData): Promise<EmailResult> {
-  try {
-    const emailHtml = await render(DailyDigestEmail(data));
-
-    const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
-      to: [data.recipientEmail],
-      subject: `Your ${data.digestType} digest - ${data.totalCount} notification${data.totalCount !== 1 ? 's' : ''}`,
-      html: emailHtml,
-      replyTo: REPLY_TO_EMAIL,
-      tags: [
-        { name: 'category', value: 'digest' },
-        { name: 'digest_type', value: data.digestType },
-        { name: 'notification_count', value: data.totalCount.toString() }
-      ]
-    });
-
-    if (error) {
-      console.error('Failed to send daily digest email:', error);
-      return { success: false, error: error.message };
-    }
-
-    return { success: true, messageId: result?.id };
-  } catch (error) {
-    console.error('Error sending daily digest email:', error);
-    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
-  }
-}
 
 /**
  * Send multiple emails in batch (for digest processing)
  */
 export async function sendBatchEmails(emails: Array<{
-  type: 'task' | 'event' | 'message' | 'shopping' | 'meal' | 'reminder' | 'digest';
+  type: 'task' | 'event' | 'message' | 'shopping' | 'meal' | 'reminder';
   data: any;
 }>): Promise<{ success: number; failed: number; results: EmailResult[] }> {
   const results: EmailResult[] = [];
@@ -408,9 +354,6 @@ export async function sendBatchEmails(emails: Array<{
         break;
       case 'reminder':
         result = await sendGeneralReminderEmail(email.data);
-        break;
-      case 'digest':
-        result = await sendDailyDigestEmail(email.data);
         break;
       default:
         result = { success: false, error: 'Unknown email type' };
@@ -462,7 +405,6 @@ export const emailService = {
   sendShoppingListEmail,
   sendMealReminderEmail,
   sendGeneralReminderEmail,
-  sendDailyDigestEmail,
   sendBatchEmails,
   verifyEmailService,
 };
