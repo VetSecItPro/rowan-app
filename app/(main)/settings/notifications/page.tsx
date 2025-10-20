@@ -17,21 +17,20 @@ export default function NotificationSettingsPage() {
   const [successMessage, setSuccessMessage] = useState('');
 
   // Form state - using correct database field names
-  const [emailEnabled, setEmailEnabled] = useState(true);
-  const [emailReminders, setEmailReminders] = useState(true);
   const [emailTaskAssignments, setEmailTaskAssignments] = useState(true);
-  const [emailEvents, setEmailEvents] = useState(true);
+  const [emailEventReminders, setEmailEventReminders] = useState(true);
+  const [emailNewMessages, setEmailNewMessages] = useState(true);
   const [emailShoppingLists, setEmailShoppingLists] = useState(true);
   const [emailMealReminders, setEmailMealReminders] = useState(true);
-  const [emailMessages, setEmailMessages] = useState(true);
-  const [emailDigestFrequency, setEmailDigestFrequency] = useState<'realtime' | 'daily' | 'weekly' | 'never'>('daily');
+  const [emailGeneralReminders, setEmailGeneralReminders] = useState(true);
+  const [digestFrequency, setDigestFrequency] = useState<'realtime' | 'daily' | 'weekly'>('daily');
 
   const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushTaskUpdates, setPushTaskUpdates] = useState(true);
   const [pushReminders, setPushReminders] = useState(true);
-  const [pushTasks, setPushTasks] = useState(true);
   const [pushMessages, setPushMessages] = useState(true);
   const [pushShoppingUpdates, setPushShoppingUpdates] = useState(true);
-  const [pushEvents, setPushEvents] = useState(true);
+  const [pushEventAlerts, setPushEventAlerts] = useState(true);
 
   const [quietHoursEnabled, setQuietHoursEnabled] = useState(false);
   const [quietHoursStart, setQuietHoursStart] = useState('22:00:00');
@@ -70,23 +69,22 @@ export default function NotificationSettingsPage() {
 
         if (prefs) {
           setPreferences(prefs);
-          // Email preferences
-          setEmailEnabled(prefs.email_enabled);
-          setEmailReminders(prefs.email_reminders);
+          // Email preferences - using correct database field names
           setEmailTaskAssignments(prefs.email_task_assignments);
-          setEmailEvents(prefs.email_events);
+          setEmailEventReminders(prefs.email_event_reminders);
+          setEmailNewMessages(prefs.email_new_messages);
           setEmailShoppingLists(prefs.email_shopping_lists);
           setEmailMealReminders(prefs.email_meal_reminders);
-          setEmailMessages(prefs.email_messages);
-          setEmailDigestFrequency(prefs.email_digest_frequency as any);
+          setEmailGeneralReminders(prefs.email_general_reminders);
+          setDigestFrequency(prefs.digest_frequency as any);
 
-          // Push preferences
+          // Push preferences - using correct database field names
           setPushEnabled(prefs.push_enabled);
+          setPushTaskUpdates(prefs.push_task_updates);
           setPushReminders(prefs.push_reminders);
-          setPushTasks(prefs.push_tasks);
           setPushMessages(prefs.push_messages);
           setPushShoppingUpdates(prefs.push_shopping_updates);
-          setPushEvents(prefs.push_events);
+          setPushEventAlerts(prefs.push_event_alerts);
 
           // Quiet hours
           setQuietHoursEnabled(prefs.quiet_hours_enabled);
@@ -143,23 +141,22 @@ export default function NotificationSettingsPage() {
         user.id,
         currentSpace.id,
         {
-          // Email preferences
-          email_enabled: emailEnabled,
-          email_reminders: emailReminders,
+          // Email preferences - using correct database field names
           email_task_assignments: emailTaskAssignments,
-          email_events: emailEvents,
+          email_event_reminders: emailEventReminders,
+          email_new_messages: emailNewMessages,
           email_shopping_lists: emailShoppingLists,
           email_meal_reminders: emailMealReminders,
-          email_messages: emailMessages,
-          email_digest_frequency: emailDigestFrequency,
+          email_general_reminders: emailGeneralReminders,
+          digest_frequency: digestFrequency,
 
-          // Push preferences
+          // Push preferences - using correct database field names
           push_enabled: pushEnabled,
+          push_task_updates: pushTaskUpdates,
           push_reminders: pushReminders,
-          push_tasks: pushTasks,
           push_messages: pushMessages,
           push_shopping_updates: pushShoppingUpdates,
-          push_events: pushEvents,
+          push_event_alerts: pushEventAlerts,
 
           // Quiet hours
           quiet_hours_enabled: quietHoursEnabled,
@@ -246,80 +243,67 @@ export default function NotificationSettingsPage() {
 
                 <div className="space-y-4">
                   <Toggle
-                    id="email-enabled"
-                    checked={emailEnabled}
-                    onChange={setEmailEnabled}
-                    label="Enable email notifications"
-                    description="Receive notifications via email"
+                    id="email-task-assignments"
+                    checked={emailTaskAssignments}
+                    onChange={setEmailTaskAssignments}
+                    label="Task assignments"
+                    description="Get notified when someone assigns you a task"
                   />
 
-                  {emailEnabled && (
-                    <>
-                      <Toggle
-                        id="email-reminders"
-                        checked={emailReminders}
-                        onChange={setEmailReminders}
-                        label="Task reminders"
-                        description="Get notified when tasks are due"
-                      />
+                  <Toggle
+                    id="email-event-reminders"
+                    checked={emailEventReminders}
+                    onChange={setEmailEventReminders}
+                    label="Event reminders"
+                    description="Receive email reminders for upcoming events"
+                  />
 
-                      <Toggle
-                        id="email-task-assignments"
-                        checked={emailTaskAssignments}
-                        onChange={setEmailTaskAssignments}
-                        label="Task assignments"
-                        description="Get notified when someone assigns you a task"
-                      />
+                  <Toggle
+                    id="email-new-messages"
+                    checked={emailNewMessages}
+                    onChange={setEmailNewMessages}
+                    label="New messages"
+                    description="Get notified about new messages"
+                  />
 
-                      <Toggle
-                        id="email-events"
-                        checked={emailEvents}
-                        onChange={setEmailEvents}
-                        label="Event reminders"
-                        description="Receive email reminders for upcoming events"
-                      />
+                  <Toggle
+                    id="email-shopping-lists"
+                    checked={emailShoppingLists}
+                    onChange={setEmailShoppingLists}
+                    label="Shopping lists"
+                    description="Notifications when shopping lists are ready"
+                  />
 
-                      <Toggle
-                        id="email-messages"
-                        checked={emailMessages}
-                        onChange={setEmailMessages}
-                        label="New messages"
-                        description="Get notified about new messages"
-                      />
+                  <Toggle
+                    id="email-meal-reminders"
+                    checked={emailMealReminders}
+                    onChange={setEmailMealReminders}
+                    label="Meal reminders"
+                    description="Reminders for meal prep and cooking"
+                  />
 
-                      <Toggle
-                        id="email-shopping-lists"
-                        checked={emailShoppingLists}
-                        onChange={setEmailShoppingLists}
-                        label="Shopping lists"
-                        description="Notifications when shopping lists are ready"
-                      />
+                  <Toggle
+                    id="email-general-reminders"
+                    checked={emailGeneralReminders}
+                    onChange={setEmailGeneralReminders}
+                    label="General reminders"
+                    description="Get notified about general tasks and reminders"
+                  />
 
-                      <Toggle
-                        id="email-meal-reminders"
-                        checked={emailMealReminders}
-                        onChange={setEmailMealReminders}
-                        label="Meal reminders"
-                        description="Reminders for meal prep and cooking"
-                      />
-
-                      <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Email digest frequency
-                        </label>
-                        <select
-                          value={emailDigestFrequency}
-                          onChange={(e) => setEmailDigestFrequency(e.target.value as any)}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                        >
-                          <option value="realtime">Real-time</option>
-                          <option value="daily">Daily digest</option>
-                          <option value="weekly">Weekly digest</option>
-                          <option value="never">Never</option>
-                        </select>
-                      </div>
-                    </>
-                  )}
+                  <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Email digest frequency
+                    </label>
+                    <select
+                      value={digestFrequency}
+                      onChange={(e) => setDigestFrequency(e.target.value as any)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    >
+                      <option value="realtime">Real-time</option>
+                      <option value="daily">Daily digest</option>
+                      <option value="weekly">Weekly digest</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
@@ -357,9 +341,9 @@ export default function NotificationSettingsPage() {
                           />
 
                           <Toggle
-                            id="push-tasks"
-                            checked={pushTasks}
-                            onChange={setPushTasks}
+                            id="push-task-updates"
+                            checked={pushTaskUpdates}
+                            onChange={setPushTaskUpdates}
                             label="Task updates"
                             description="Get notified about task changes"
                           />
@@ -381,9 +365,9 @@ export default function NotificationSettingsPage() {
                           />
 
                           <Toggle
-                            id="push-events"
-                            checked={pushEvents}
-                            onChange={setPushEvents}
+                            id="push-event-alerts"
+                            checked={pushEventAlerts}
+                            onChange={setPushEventAlerts}
                             label="Event alerts"
                             description="Push notifications for upcoming events"
                           />
