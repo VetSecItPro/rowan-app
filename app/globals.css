@@ -2860,7 +2860,8 @@
 
 /* Shopping Feature - Emerald Brand Color Search Input */
 .apple-search-container.shopping-search .apple-search-input {
-  border-color: rgba(16, 185, 129, 0.4); /* emerald-500 - increased visibility */
+  border: 3px solid red !important; /* TEST: Make it super obvious */
+  border-color: rgba(16, 185, 129, 0.4) !important; /* emerald-500 - increased visibility */
 }
 .apple-search-container.shopping-search .apple-search-input:hover {
   border-color: rgba(16, 185, 129, 0.5); /* emerald-500 with higher opacity */

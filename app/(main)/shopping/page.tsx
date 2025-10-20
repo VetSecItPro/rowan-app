@@ -718,7 +718,7 @@ export default function ShoppingPage() {
                 value={searchQuery}
                 onChange={handleSearchChange}
 
-                className={`apple-search-input w-full ${isSearchTyping ? 'typing' : ''}`}
+                className="apple-search-input"
               />
               {searchQuery && (
                 <button
