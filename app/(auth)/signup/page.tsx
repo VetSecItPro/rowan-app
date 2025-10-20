@@ -20,6 +20,7 @@ export default function SignUpPage() {
   const [accountCreated, setAccountCreated] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showColorDropdown, setShowColorDropdown] = useState(false);
+  const [emailOptIn, setEmailOptIn] = useState(false);
   const { signUp, signOut } = useAuth();
   const router = useRouter();
 
@@ -116,6 +117,7 @@ export default function SignUpPage() {
       pronouns: pronouns || undefined,
       color_theme: colorTheme,
       space_name: spaceName || undefined,
+      marketing_emails_enabled: emailOptIn,
     });
 
     if (error) {
@@ -391,6 +393,27 @@ export default function SignUpPage() {
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Email Opt-in */}
+            <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+              <input
+                type="checkbox"
+                id="emailOptIn"
+                checked={emailOptIn}
+                onChange={(e) => setEmailOptIn(e.target.checked)}
+                disabled={isLoading}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 mt-1"
+              />
+              <label htmlFor="emailOptIn" className="text-sm text-blue-900 dark:text-blue-100">
+                <span className="font-medium">Stay updated with Rowan</span>
+                <p className="text-blue-700 dark:text-blue-300 mt-1">
+                  Receive occasional updates about new features and tips. You can unsubscribe anytime.
+                  <span className="block text-xs mt-1 text-blue-600 dark:text-blue-400">
+                    From Rowan only • Never shared with third parties
+                  </span>
+                </p>
+              </label>
             </div>
 
             {/* Submit Button */}
