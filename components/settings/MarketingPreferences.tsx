@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MessageSquare, Bell, Shield, Check, AlertCircle, ExternalLink, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/contexts/auth-context';
 
 interface MarketingPreferences {
