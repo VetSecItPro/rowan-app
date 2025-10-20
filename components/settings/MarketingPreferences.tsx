@@ -56,7 +56,12 @@ export function MarketingPreferences() {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch('/api/privacy/marketing-subscription');
+      const response = await fetch('/api/privacy/marketing-subscription', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (!response.ok) {
         throw new Error('Failed to load marketing preferences');
       }
@@ -85,6 +90,7 @@ export function MarketingPreferences() {
 
       const response = await fetch('/api/privacy/marketing-subscription', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
       });
