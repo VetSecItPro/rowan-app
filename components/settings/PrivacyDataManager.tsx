@@ -314,7 +314,11 @@ export function PrivacyDataManager() {
 
         <div className="space-y-6">
           {/* CCPA Do Not Sell */}
-          <div className="p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl">
+          <div className={`p-4 border border-orange-200 dark:border-orange-800 rounded-xl ${
+            preferences.ccpa_do_not_sell
+              ? 'bg-gray-50 dark:bg-gray-900/20'
+              : 'bg-orange-50 dark:bg-orange-900/20'
+          }`}>
             <div className="flex items-center justify-between mb-3">
               <div>
                 <p className="font-medium text-gray-900 dark:text-white">CCPA: Do Not Sell My Personal Information</p>
