@@ -165,23 +165,19 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
       style={style}
       className={`flex items-center gap-3 p-4 rounded-lg border-l-4 ${getStatusColor(task.status)} border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow`}
     >
-      {/* Drag Handle - Optimized for touch */}
+      {/* Drag Handle */}
       <button
         {...attributes}
         {...listeners}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
-        className={`btn-touch cursor-grab active:cursor-grabbing p-2 md:p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded touch-none transition-all active:scale-95 hover-lift shimmer-blue active-press hover:shadow-md ${
-          isDragReady ? 'bg-blue-100 dark:bg-blue-900/30 scale-110' : ''
-        }`}
+        className="cursor-grab active:cursor-grabbing p-1 touch-none"
         onClick={(e) => e.stopPropagation()}
-        aria-label="Drag to reorder (long-press on mobile)"
-        title="Drag to reorder (long-press on mobile)"
+        aria-label="Drag to reorder"
+        title="Drag to reorder"
       >
-        <GripVertical className={`w-6 h-6 md:w-5 md:h-5 transition-colors ${
-          isDragReady ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'
-        }`} />
+        <GripVertical className="w-4 h-4 text-gray-400" />
       </button>
 
       {/* Status Checkbox */}
@@ -403,7 +399,7 @@ export function DraggableTaskList({
       <DragOverlay>
         {activeTask ? (
           <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-2xl opacity-90">
-            <GripVertical className="w-5 h-5 text-gray-400" />
+            <GripVertical className="w-4 h-4 text-gray-400" />
             <div className="flex-1 min-w-0">
               <h3 className="font-medium text-gray-900 dark:text-white truncate">
                 {activeTask.title}
