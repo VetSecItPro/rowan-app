@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Force dynamic rendering for this route since it uses request.url
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -16,7 +19,7 @@ export async function GET(request: NextRequest) {
 
     // Clean up location string for better geocoding results
     // Convert "New York, New York, United States" to "New York"
-    // Convert "Dallas, Texas, United States" to "Dallas, Texas"
+    // Convert "Dallas, Texas, United States" to "Dallas"
     let cleanLocation = location;
 
     // Remove "United States" if present
@@ -26,6 +29,13 @@ export async function GET(request: NextRequest) {
     const parts = cleanLocation.split(',').map(part => part.trim());
     if (parts.length === 2 && parts[0] === parts[1]) {
       cleanLocation = parts[0];
+    }
+
+    // For major US cities, use just the city name for better geocoding
+    const majorCities = ['Dallas', 'New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Austin'];
+    const cityName = parts[0];
+    if (majorCities.includes(cityName)) {
+      cleanLocation = cityName;
     }
 
     console.log('[Weather Geocode API] Cleaned location for search:', cleanLocation);
