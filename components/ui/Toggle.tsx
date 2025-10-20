@@ -8,7 +8,7 @@ interface ToggleProps {
   onChange: (checked: boolean) => void;
   disabled?: boolean;
   size?: 'sm' | 'md' | 'lg';
-  color?: 'purple' | 'blue' | 'green' | 'red';
+  color?: 'purple' | 'blue' | 'green' | 'red' | 'orange';
   label?: string;
   description?: string;
 }
@@ -42,6 +42,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
       blue: 'bg-blue-600',
       green: 'bg-green-600',
       red: 'bg-red-600',
+      orange: 'bg-orange-600',
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
