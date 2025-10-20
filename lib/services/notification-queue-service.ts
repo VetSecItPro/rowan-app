@@ -126,67 +126,6 @@ export const notificationQueueService = {
     return data || [];
   },
 
-  /**
-   * Get notifications for hourly digest
-   */
-  async getHourlyDigest(userId: string, spaceId?: string): Promise<QueuedNotification[]> {
-    const supabase = createClient();
-    const now = new Date();
-    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-
-    let query = supabase
-      .from('notification_queue')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('delivery_method', 'hourly')
-      .eq('status', 'pending')
-      .gte('created_at', oneHourAgo.toISOString())
-      .lte('scheduled_for', now.toISOString());
-
-    if (spaceId) {
-      query = query.eq('space_id', spaceId);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('Error fetching hourly digest:', error);
-      return [];
-    }
-
-    return data || [];
-  },
-
-  /**
-   * Get notifications for daily digest
-   */
-  async getDailyDigest(userId: string, spaceId?: string): Promise<QueuedNotification[]> {
-    const supabase = createClient();
-    const now = new Date();
-    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-
-    let query = supabase
-      .from('notification_queue')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('delivery_method', 'daily')
-      .eq('status', 'pending')
-      .gte('created_at', oneDayAgo.toISOString())
-      .lte('scheduled_for', now.toISOString());
-
-    if (spaceId) {
-      query = query.eq('space_id', spaceId);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('Error fetching daily digest:', error);
-      return [];
-    }
-
-    return data || [];
-  },
 
   /**
    * Mark notification as sent
