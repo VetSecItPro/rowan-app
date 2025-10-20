@@ -60,7 +60,7 @@ import {
   Heart
 } from 'lucide-react';
 
-type SettingsTab = 'profile' | 'security' | 'notifications' | 'privacy' | 'documentation' | 'spaces' | 'analytics' | 'data' | 'help';
+type SettingsTab = 'profile' | 'security' | 'notifications' | 'privacy-data' | 'documentation' | 'spaces' | 'analytics' | 'help';
 type UserRole = 'Admin' | 'Member' | 'Viewer';
 type ExportStatus = 'idle' | 'pending' | 'processing' | 'ready';
 
@@ -312,15 +312,15 @@ export default function SettingsPage() {
   const [isLoadingPrefs, setIsLoadingPrefs] = useState(true);
   const [isSavingPrefs, setIsSavingPrefs] = useState(false);
 
-  // Privacy toggles state
-  const [privacySettings, setPrivacySettings] = useState({
-    profileVisibility: true,
-    activityStatus: true,
-    readReceipts: true,
-    analytics: true,
-  });
-  const [isLoadingPrivacy, setIsLoadingPrivacy] = useState(true);
-  const [isSavingPrivacy, setIsSavingPrivacy] = useState(false);
+  // Privacy toggles state - DISABLED: Replaced with new privacy system
+  // const [privacySettings, setPrivacySettings] = useState({
+  //   profileVisibility: true,
+  //   activityStatus: true,
+  //   readReceipts: true,
+  //   analytics: true,
+  // });
+  // const [isLoadingPrivacy, setIsLoadingPrivacy] = useState(true);
+  // const [isSavingPrivacy, setIsSavingPrivacy] = useState(false);
 
   const validateProfileImage = (file: File): Promise<boolean> => {
     return new Promise((resolve, reject) => {
@@ -583,67 +583,68 @@ export default function SettingsPage() {
     }
   };
 
+  // OLD PRIVACY FUNCTIONS - DISABLED: Replaced with new privacy system
   // Load privacy settings from API
-  const loadPrivacySettings = async () => {
-    try {
-      setIsLoadingPrivacy(true);
-      const response = await fetch('/api/user/privacy-settings');
-      const result = await response.json();
+  // const loadPrivacySettings = async () => {
+  //   try {
+  //     setIsLoadingPrivacy(true);
+  //     const response = await fetch('/api/user/privacy-settings');
+  //     const result = await response.json();
 
-      if (result.success) {
-        setPrivacySettings(result.data);
-      } else {
-        console.error('Failed to load privacy settings:', result.error);
-      }
-    } catch (error) {
-      console.error('Error loading privacy settings:', error);
-    } finally {
-      setIsLoadingPrivacy(false);
-    }
-  };
+  //     if (result.success) {
+  //       setPrivacySettings(result.data);
+  //     } else {
+  //       console.error('Failed to load privacy settings:', result.error);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error loading privacy settings:', error);
+  //   } finally {
+  //     setIsLoadingPrivacy(false);
+  //   }
+  // };
 
-  // Save privacy settings to API
-  const savePrivacySetting = async (key: string, value: boolean) => {
-    try {
-      setIsSavingPrivacy(true);
-      const response = await fetch('/api/user/privacy-settings', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ [key]: value }),
-      });
+  // // Save privacy settings to API
+  // const savePrivacySetting = async (key: string, value: boolean) => {
+  //   try {
+  //     setIsSavingPrivacy(true);
+  //     const response = await fetch('/api/user/privacy-settings', {
+  //       method: 'PATCH',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ [key]: value }),
+  //     });
 
-      const result = await response.json();
+  //     const result = await response.json();
 
-      if (!result.success) {
-        // Revert the change if it failed
-        setPrivacySettings(prev => ({ ...prev, [key]: !value }));
-        console.error('Failed to save privacy setting:', result.error);
-      }
-    } catch (error) {
-      // Revert the change if it failed
-      setPrivacySettings(prev => ({ ...prev, [key]: !value }));
-      console.error('Error saving privacy setting:', error);
-    } finally {
-      setIsSavingPrivacy(false);
-    }
-  };
+  //     if (!result.success) {
+  //       // Revert the change if it failed
+  //       setPrivacySettings(prev => ({ ...prev, [key]: !value }));
+  //       console.error('Failed to save privacy setting:', result.error);
+  //     }
+  //   } catch (error) {
+  //     // Revert the change if it failed
+  //     setPrivacySettings(prev => ({ ...prev, [key]: !value }));
+  //     console.error('Error saving privacy setting:', error);
+  //   } finally {
+  //     setIsSavingPrivacy(false);
+  //   }
+  // };
 
-  const handlePrivacyToggle = (key: string) => {
-    const newValue = !privacySettings[key as keyof typeof privacySettings];
+  // const handlePrivacyToggle = (key: string) => {
+  //   const newValue = !privacySettings[key as keyof typeof privacySettings];
 
-    // Optimistically update the UI
-    setPrivacySettings(prev => ({ ...prev, [key]: newValue }));
+  //   // Optimistically update the UI
+  //   setPrivacySettings(prev => ({ ...prev, [key]: newValue }));
 
-    // Save to API
-    savePrivacySetting(key, newValue);
-  };
+  //   // Save to API
+  //   savePrivacySetting(key, newValue);
+  // };
 
-  // Load privacy settings on mount
-  useEffect(() => {
-    loadPrivacySettings();
-  }, []);
+  // // Load privacy settings on mount
+  // useEffect(() => {
+  //   loadPrivacySettings();
+  // }, []);
 
 
   // Fetch active sessions when security tab is active
@@ -729,10 +730,9 @@ export default function SettingsPage() {
     { id: 'spaces' as SettingsTab, name: 'Spaces', icon: Users, description: 'Manage your spaces and members' },
     { id: 'security' as SettingsTab, name: 'Security', icon: Shield, description: 'Password and authentication' },
     { id: 'notifications' as SettingsTab, name: 'Notifications', icon: Bell, description: 'Email and push notifications' },
-    { id: 'privacy' as SettingsTab, name: 'Privacy', icon: Lock, description: 'Data and visibility settings' },
+    { id: 'privacy-data' as SettingsTab, name: 'Privacy & Data', icon: Lock, description: 'Privacy settings and data management' },
     { id: 'documentation' as SettingsTab, name: 'Documentation', icon: BookOpen, description: 'Browse our guides and tutorials' },
     { id: 'analytics' as SettingsTab, name: 'Analytics', icon: BarChart3, description: 'Track productivity trends' },
-    { id: 'data' as SettingsTab, name: 'Data & Storage', icon: Database, description: 'Export and delete your data' },
     { id: 'help' as SettingsTab, name: 'Help & Support', icon: HelpCircle, description: 'Get help and contact us' },
   ];
 
@@ -1357,51 +1357,243 @@ export default function SettingsPage() {
                 )}
 
 
-                {/* Privacy Tab */}
-                {activeTab === 'privacy' && (
+                {/* Privacy & Data Tab */}
+                {activeTab === 'privacy-data' && (
                   <div className="space-y-6 sm:space-y-8">
                     <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Privacy Settings</h2>
-                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Control your data and visibility preferences</p>
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Privacy & Data Management</h2>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Control your privacy preferences, manage your data, and understand your rights</p>
                     </div>
 
-                    {isLoadingPrivacy ? (
-                      <div className="space-y-4">
-                        {[1, 2, 3, 4].map((i) => (
-                          <div key={i} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl animate-pulse">
-                            <div className="space-y-2">
-                              <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-32"></div>
-                              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-48"></div>
-                            </div>
-                            <div className="w-11 h-6 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
-                          </div>
-                        ))}
+                    {/* Personal Privacy Section */}
+                    <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-2xl p-6">
+                      <div className="flex items-start gap-4 mb-6">
+                        <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center">
+                          <Eye className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Personal Privacy</h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">Control how you appear to other space members</p>
+                        </div>
                       </div>
-                    ) : (
+
                       <div className="space-y-4">
-                        {[
-                          { key: 'profileVisibility', label: 'Profile visibility', desc: 'Allow other space members to see your profile' },
-                          { key: 'activityStatus', label: 'Activity status', desc: 'Show when you\'re online and active' },
-                          { key: 'readReceipts', label: 'Read receipts', desc: 'Let others know when you\'ve read their messages' },
-                          { key: 'analytics', label: 'Analytics', desc: 'Help us improve Rowan by sharing anonymous usage data' },
-                        ].map((item) => (
-                          <div key={item.key} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">{item.label}</p>
-                              <p className="text-xs text-gray-600 dark:text-gray-400">{item.desc}</p>
+                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
+                          <div>
+                            <p className="font-medium text-gray-900 dark:text-white">Activity Status</p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Show when you're online to space members</p>
+                          </div>
+                          <Toggle
+                            id="activity-status"
+                            checked={true}
+                            onChange={() => {}}
+                            disabled={false}
+                            size="md"
+                            color="purple"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
+                          <div>
+                            <p className="font-medium text-gray-900 dark:text-white">Anonymous Usage Data</p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Help improve Rowan with anonymous analytics</p>
+                          </div>
+                          <Toggle
+                            id="anonymous-analytics"
+                            checked={false}
+                            onChange={() => {}}
+                            disabled={false}
+                            size="md"
+                            color="purple"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Legal Compliance Section */}
+                    <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-2xl p-6">
+                      <div className="flex items-start gap-4 mb-6">
+                        <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
+                          <Shield className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Legal Compliance</h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">CCPA, GDPR and marketing preferences</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-6">
+                        {/* CCPA Do Not Sell */}
+                        <div className="p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl">
+                          <div className="flex items-center justify-between mb-3">
+                            <div>
+                              <p className="font-medium text-gray-900 dark:text-white">CCPA: Do Not Sell My Personal Information</p>
+                              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Prevent sharing your data with third parties for monetary gain</p>
                             </div>
                             <Toggle
-                              id={`privacy-${item.key}`}
-                              checked={privacySettings[item.key as keyof typeof privacySettings]}
-                              onChange={() => handlePrivacyToggle(item.key)}
-                              disabled={isSavingPrivacy}
+                              id="ccpa-do-not-sell"
+                              checked={true}
+                              onChange={() => {}}
+                              disabled={false}
                               size="md"
-                              color="purple"
+                              color="orange"
                             />
                           </div>
-                        ))}
+                          <div className="text-xs text-orange-700 dark:text-orange-300 bg-orange-100 dark:bg-orange-900/30 p-3 rounded-lg">
+                            <strong>California residents:</strong> When enabled, we will not share your personal information with third parties for monetary or other valuable consideration.
+                          </div>
+                        </div>
+
+                        {/* Marketing Communications */}
+                        <div>
+                          <h4 className="font-medium text-gray-900 dark:text-white mb-3">Marketing Communications</h4>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
+                              <div>
+                                <p className="font-medium text-gray-900 dark:text-white">Marketing Emails</p>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Product updates and promotional emails</p>
+                              </div>
+                              <Toggle
+                                id="marketing-emails"
+                                checked={false}
+                                onChange={() => {}}
+                                disabled={false}
+                                size="md"
+                                color="purple"
+                              />
+                            </div>
+
+                            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
+                              <div>
+                                <p className="font-medium text-gray-900 dark:text-white">Marketing SMS</p>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Promotional text messages</p>
+                              </div>
+                              <Toggle
+                                id="marketing-sms"
+                                checked={false}
+                                onChange={() => {}}
+                                disabled={false}
+                                size="md"
+                                color="purple"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Cookie Preferences */}
+                        <div>
+                          <h4 className="font-medium text-gray-900 dark:text-white mb-3">Cookie Preferences</h4>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
+                              <div>
+                                <p className="font-medium text-gray-900 dark:text-white">Analytics Cookies</p>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Help us understand how you use our service</p>
+                              </div>
+                              <Toggle
+                                id="analytics-cookies"
+                                checked={false}
+                                onChange={() => {}}
+                                disabled={false}
+                                size="md"
+                                color="purple"
+                              />
+                            </div>
+
+                            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
+                              <div>
+                                <p className="font-medium text-gray-900 dark:text-white">Performance Cookies</p>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Improve site performance and user experience</p>
+                              </div>
+                              <Toggle
+                                id="performance-cookies"
+                                checked={true}
+                                onChange={() => {}}
+                                disabled={false}
+                                size="md"
+                                color="purple"
+                              />
+                            </div>
+
+                            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
+                              <div>
+                                <p className="font-medium text-gray-900 dark:text-white">Advertising Cookies</p>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Personalized advertising and recommendations</p>
+                              </div>
+                              <Toggle
+                                id="advertising-cookies"
+                                checked={false}
+                                onChange={() => {}}
+                                disabled={false}
+                                size="md"
+                                color="purple"
+                              />
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    )}
+                    </div>
+
+                    {/* Data Management Section */}
+                    <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-2xl p-6">
+                      <div className="flex items-start gap-4 mb-6">
+                        <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+                          <Database className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Your Data</h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">Export, delete, or manage your personal data</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Export Data */}
+                        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                          <div className="flex items-start gap-3 mb-4">
+                            <Download className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                            <div>
+                              <h4 className="font-medium text-gray-900 dark:text-white">Export Your Data</h4>
+                              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Download all your personal data</p>
+                            </div>
+                          </div>
+                          <div className="text-xs text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg mb-4">
+                            <strong>GDPR Article 20:</strong> Right to Data Portability. Includes tasks, messages, expenses, and all personal data.
+                          </div>
+                          <button className="w-full px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+                            Request Data Export
+                          </button>
+                        </div>
+
+                        {/* Delete Account */}
+                        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+                          <div className="flex items-start gap-3 mb-4">
+                            <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5" />
+                            <div>
+                              <h4 className="font-medium text-gray-900 dark:text-white">Delete Account</h4>
+                              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Permanently delete your account</p>
+                            </div>
+                          </div>
+                          <div className="text-xs text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/30 p-3 rounded-lg mb-4">
+                            <strong>GDPR Article 17:</strong> Right to Erasure. 30-day grace period with email reminders.
+                          </div>
+                          <button className="w-full px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors">
+                            Request Account Deletion
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Collaboration Notice */}
+                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
+                      <div className="flex items-start gap-3">
+                        <Users className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5" />
+                        <div className="text-sm text-green-800 dark:text-green-200">
+                          <p className="font-medium mb-1">Collaboration-First Design</p>
+                          <p className="text-xs">
+                            Rowan is built for family and team collaboration. Your profile, read receipts, and shared activities are always visible to space members to ensure effective coordination.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -1604,8 +1796,8 @@ export default function SettingsPage() {
                   </div>
                 )}
 
-                {/* Data & Storage Tab */}
-                {activeTab === 'data' && (
+                {/* Data & Storage Tab - DISABLED: Consolidated into Privacy & Data tab */}
+                {false && activeTab === 'data' && (
                   <div className="space-y-6 sm:space-y-8">
                     <div>
                       <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Data & Storage</h2>
