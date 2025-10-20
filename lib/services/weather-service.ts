@@ -71,7 +71,7 @@ export const weatherService = {
   },
 
   /**
-   * Fetch weather from Open-Meteo API (internal method)
+   * Fetch weather from our server-side API routes (internal method)
    */
   async fetchWeatherFromAPI(
     location: string,
@@ -86,50 +86,39 @@ export const weatherService = {
 
       if (!coords) return null;
 
-      // Step 2: Get weather forecast from Open-Meteo
+      // Step 2: Get weather forecast from our server-side API
       const eventDate = parseISO(eventTime);
       const dateStr = format(eventDate, 'yyyy-MM-dd');
 
-      // Open-Meteo API (FREE, no API key needed!)
-      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,windspeed_10m_max&timezone=auto`;
+      // Determine if we need current weather or specific date forecast
+      const today = format(new Date(), 'yyyy-MM-dd');
+      const isToday = dateStr === today;
+
+      let weatherUrl = `/api/weather/forecast?lat=${coords.lat}&lon=${coords.lon}`;
+      if (!isToday) {
+        weatherUrl += `&date=${dateStr}`;
+      }
 
       const weatherResponse = await fetch(weatherUrl);
 
       if (!weatherResponse.ok) {
-        throw new Error('Weather fetch failed');
+        throw new Error(`Weather fetch failed: ${weatherResponse.status}`);
       }
 
-      const weatherData = await weatherResponse.json();
+      const forecast = await weatherResponse.json();
 
-      // Find the forecast for the event date
-      const dateIndex = weatherData.daily.time.indexOf(dateStr);
-
-      if (dateIndex === -1) {
-        console.log(`[Weather] No forecast available for ${dateStr}`);
-        return null;
+      if (forecast.error) {
+        throw new Error(forecast.error);
       }
-
-      // Map Open-Meteo weather codes to our conditions
-      const weatherCode = weatherData.daily.weathercode[dateIndex];
-      const condition = this.mapWeatherCode(weatherCode);
-
-      // Calculate average temperature and feels like
-      const tempMax = weatherData.daily.temperature_2m_max[dateIndex];
-      const tempMin = weatherData.daily.temperature_2m_min[dateIndex];
-      const temp = Math.round((tempMax + tempMin) / 2);
-
-      const feelsLikeMax = weatherData.daily.apparent_temperature_max[dateIndex];
-      const feelsLikeMin = weatherData.daily.apparent_temperature_min[dateIndex];
-      const feelsLike = Math.round((feelsLikeMax + feelsLikeMin) / 2);
 
       return {
-        condition,
-        temp,
-        feelsLike,
-        description: this.getWeatherDescription(weatherCode),
-        humidity: 0, // Open-Meteo daily API doesn't include humidity
-        windSpeed: Math.round(weatherData.daily.windspeed_10m_max[dateIndex]),
-        icon: weatherCode.toString(),
+        condition: forecast.condition,
+        temp: forecast.temp,
+        feelsLike: forecast.feelsLike,
+        description: forecast.description,
+        humidity: forecast.humidity,
+        windSpeed: forecast.windSpeed,
+        icon: forecast.icon,
         timestamp: eventTime,
       };
     } catch (error) {
@@ -139,29 +128,28 @@ export const weatherService = {
   },
 
   /**
-   * Geocode location using Open-Meteo Geocoding API (FREE)
+   * Geocode location using our server-side API route
    */
   async geocodeLocation(location: string): Promise<{ lat: number; lon: number } | null> {
     try {
-      const geocodeUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1&language=en&format=json`;
+      const geocodeUrl = `/api/weather/geocode?location=${encodeURIComponent(location)}`;
 
       const response = await fetch(geocodeUrl);
 
       if (!response.ok) {
-        throw new Error('Geocoding failed');
+        throw new Error(`Geocoding failed: ${response.status}`);
       }
 
       const data = await response.json();
 
-      if (!data.results || data.results.length === 0) {
+      if (data.error) {
         console.log(`[Weather] Location not found: ${location}`);
         return null;
       }
 
-      const result = data.results[0];
       return {
-        lat: result.latitude,
-        lon: result.longitude,
+        lat: data.lat,
+        lon: data.lon,
       };
     } catch (error) {
       console.error('[Weather] Geocoding error:', error);

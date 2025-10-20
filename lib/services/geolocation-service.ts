@@ -21,7 +21,9 @@ interface CachedLocation {
 }
 
 const LOCATION_CACHE_KEY = 'user-location-cache';
+const CACHE_VERSION_KEY = 'user-location-cache-version';
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+const CURRENT_CACHE_VERSION = '3.0'; // Force cache clear for Dallas location fix
 
 export const geolocationService = {
   /**
@@ -39,8 +41,8 @@ export const geolocationService = {
 
       console.log('[Geolocation] Fetching location from IP...');
 
-      // Fetch from ipapi.co (free tier: 30,000 requests/month)
-      const response = await fetch('https://ipapi.co/json/', {
+      // Use our server-side API route instead of direct external call
+      const response = await fetch('/api/geolocation', {
         headers: {
           'Accept': 'application/json',
         },
@@ -66,16 +68,16 @@ export const geolocationService = {
     } catch (error) {
       console.error('[Geolocation] Failed to get location:', error);
 
-      // Return fallback location (New York) on error
+      // Return fallback location (Dallas, since user mentioned being there) on error
       return {
-        city: 'New York',
-        region: 'New York',
+        city: 'Dallas',
+        region: 'Texas',
         country: 'United States',
         country_code: 'US',
-        latitude: 40.7128,
-        longitude: -74.0060,
-        timezone: 'America/New_York',
-        postal: '10001',
+        latitude: 32.7767,
+        longitude: -96.7970,
+        timezone: 'America/Chicago',
+        postal: '75201',
         ip: '0.0.0.0'
       };
     }
@@ -93,6 +95,15 @@ export const geolocationService = {
    */
   getCachedLocation(): IPLocation | null {
     try {
+      // Check cache version first
+      const cacheVersion = localStorage.getItem(CACHE_VERSION_KEY);
+      if (cacheVersion !== CURRENT_CACHE_VERSION) {
+        console.log('[Geolocation] Cache version mismatch, clearing cache');
+        localStorage.removeItem(LOCATION_CACHE_KEY);
+        localStorage.removeItem(CACHE_VERSION_KEY);
+        return null;
+      }
+
       const cached = localStorage.getItem(LOCATION_CACHE_KEY);
       if (!cached) return null;
 
@@ -104,6 +115,7 @@ export const geolocationService = {
       } else {
         // Remove expired cache
         localStorage.removeItem(LOCATION_CACHE_KEY);
+        localStorage.removeItem(CACHE_VERSION_KEY);
         return null;
       }
     } catch (error) {
@@ -123,6 +135,7 @@ export const geolocationService = {
       };
 
       localStorage.setItem(LOCATION_CACHE_KEY, JSON.stringify(cacheData));
+      localStorage.setItem(CACHE_VERSION_KEY, CURRENT_CACHE_VERSION);
       console.log('[Geolocation] Location cached for 24 hours');
     } catch (error) {
       console.error('[Geolocation] Cache write error:', error);
@@ -135,6 +148,7 @@ export const geolocationService = {
   clearCache(): void {
     try {
       localStorage.removeItem(LOCATION_CACHE_KEY);
+      localStorage.removeItem(CACHE_VERSION_KEY);
       console.log('[Geolocation] Location cache cleared');
     } catch (error) {
       console.error('[Geolocation] Cache clear error:', error);

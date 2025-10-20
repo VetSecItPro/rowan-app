@@ -820,73 +820,6 @@ export default function CalendarPage() {
               </div>
             </div>
 
-            {/* Status Filter - Only show in List View */}
-            {viewMode === 'list' && (
-              <div className="mb-4">
-                <label htmlFor="status-filter-mobile" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300 md:hidden">
-                  Filter by status:
-                </label>
-                <span className="hidden md:inline text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">Filter by status:</span>
-
-                {/* Mobile: Dropdown Select */}
-                <select
-                  id="status-filter-mobile"
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value as 'all' | 'not-started' | 'in-progress' | 'completed')}
-                  className="md:hidden w-full px-4 py-3 text-base bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white font-medium appearance-none cursor-pointer"
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
-                >
-                  <option value="all">All Events</option>
-                  <option value="not-started">Not Started</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                </select>
-
-                {/* Desktop: Button Filters */}
-                <div className="hidden md:inline-flex gap-1">
-                  <button
-                    onClick={() => setStatusFilter('all')}
-                    className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${
-                      statusFilter === 'all'
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                  >
-                    All
-                  </button>
-                  <button
-                    onClick={() => setStatusFilter('not-started')}
-                    className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${
-                      statusFilter === 'not-started'
-                        ? 'bg-red-500 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                  >
-                    Not Started
-                  </button>
-                  <button
-                    onClick={() => setStatusFilter('in-progress')}
-                    className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${
-                      statusFilter === 'in-progress'
-                        ? 'bg-amber-500 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                  >
-                    In Progress
-                  </button>
-                  <button
-                    onClick={() => setStatusFilter('completed')}
-                    className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${
-                      statusFilter === 'completed'
-                        ? 'bg-green-500 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                  >
-                    Completed
-                  </button>
-                </div>
-              </div>
-            )}
 
             {/* Calendar Content with Sidebar */}
             <div className="flex gap-6">
@@ -1431,15 +1364,85 @@ export default function CalendarPage() {
                 <div>
                   {/* List Header */}
                   <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                      All Events
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      {statusFilter === 'all' ? 'Showing all events' :
-                       statusFilter === 'not-started' ? 'Showing not started events' :
-                       statusFilter === 'in-progress' ? 'Showing in-progress events' :
-                       'Showing completed events'}
-                    </p>
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                          All Events
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                          {statusFilter === 'all' ? 'Showing all events' :
+                           statusFilter === 'not-started' ? 'Showing not started events' :
+                           statusFilter === 'in-progress' ? 'Showing in-progress events' :
+                           'Showing completed events'}
+                        </p>
+                      </div>
+
+                      {/* Status Filter - Inside List View */}
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <label htmlFor="status-filter-mobile" className="text-sm font-medium text-gray-700 dark:text-gray-300 sm:hidden">
+                          Filter by status:
+                        </label>
+                        <span className="hidden sm:inline text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">Filter:</span>
+
+                        {/* Mobile: Dropdown Select */}
+                        <select
+                          id="status-filter-mobile"
+                          value={statusFilter}
+                          onChange={(e) => setStatusFilter(e.target.value as 'all' | 'not-started' | 'in-progress' | 'completed')}
+                          className="sm:hidden w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white font-medium appearance-none cursor-pointer"
+                          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
+                        >
+                          <option value="all">All Events</option>
+                          <option value="not-started">Not Started</option>
+                          <option value="in-progress">In Progress</option>
+                          <option value="completed">Completed</option>
+                        </select>
+
+                        {/* Desktop: Button Filters */}
+                        <div className="hidden sm:flex gap-1">
+                          <button
+                            onClick={() => setStatusFilter('all')}
+                            className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${
+                              statusFilter === 'all'
+                                ? 'bg-purple-600 text-white'
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                            }`}
+                          >
+                            All
+                          </button>
+                          <button
+                            onClick={() => setStatusFilter('not-started')}
+                            className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${
+                              statusFilter === 'not-started'
+                                ? 'bg-red-500 text-white'
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                            }`}
+                          >
+                            Not Started
+                          </button>
+                          <button
+                            onClick={() => setStatusFilter('in-progress')}
+                            className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${
+                              statusFilter === 'in-progress'
+                                ? 'bg-amber-500 text-white'
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                            }`}
+                          >
+                            In Progress
+                          </button>
+                          <button
+                            onClick={() => setStatusFilter('completed')}
+                            className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${
+                              statusFilter === 'completed'
+                                ? 'bg-green-500 text-white'
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                            }`}
+                          >
+                            Completed
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Event List */}
