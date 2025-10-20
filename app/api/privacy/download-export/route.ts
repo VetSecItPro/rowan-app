@@ -1,0 +1,296 @@
+// Data Export Download API
+// Secure download endpoint for user data exports with authentication and access control
+
+import { NextRequest, NextResponse } from 'next/server';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+import { z } from 'zod';
+import { ratelimit } from '@/lib/ratelimit';
+
+// Validation schema
+const DownloadRequestSchema = z.object({
+  file: z.string().min(1),
+  token: z.string().optional(), // For token-based access
+});
+
+// GET - Download export file
+export async function GET(request: NextRequest) {
+  try {
+    const url = new URL(request.url);
+    const file = url.searchParams.get('file');
+    const token = url.searchParams.get('token');
+
+    if (!file) {
+      return NextResponse.json(
+        { success: false, error: 'File parameter is required' },
+        { status: 400 }
+      );
+    }
+
+    const supabase = createRouteHandlerClient({ cookies });
+    let userId: string | null = null;
+
+    // Determine authentication method
+    if (token) {
+      // Token-based access (from email links)
+      userId = await validateDownloadToken(token);
+      if (!userId) {
+        return NextResponse.json(
+          { success: false, error: 'Invalid or expired download token' },
+          { status: 401 }
+        );
+      }
+    } else {
+      // Session-based access
+      const { data: { session }, error: authError } = await supabase.auth.getSession();
+      if (authError || !session?.user) {
+        return NextResponse.json(
+          { success: false, error: 'Authentication required' },
+          { status: 401 }
+        );
+      }
+      userId = session.user.id;
+    }
+
+    // Rate limiting
+    const identifier = `download-export-${userId}`;
+    const { success: rateLimitSuccess } = await ratelimit.limit(identifier);
+    if (!rateLimitSuccess) {
+      return NextResponse.json(
+        { success: false, error: 'Rate limit exceeded' },
+        { status: 429 }
+      );
+    }
+
+    // Find the export request
+    const { data: exportRequest, error: exportError } = await supabase
+      .from('data_export_requests')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('status', 'completed')
+      .like('file_url', `%${file}`)
+      .single();
+
+    if (exportError || !exportRequest) {
+      console.error('Export request not found:', exportError);
+      return NextResponse.json(
+        { success: false, error: 'Export file not found or access denied' },
+        { status: 404 }
+      );
+    }
+
+    // Check if export has expired
+    const expiresAt = new Date(exportRequest.expires_at);
+    const now = new Date();
+    if (now > expiresAt) {
+      return NextResponse.json(
+        { success: false, error: 'Download link has expired' },
+        { status: 410 } // Gone
+      );
+    }
+
+    // Log the download
+    await supabase
+      .from('privacy_email_notifications')
+      .insert({
+        user_id: userId,
+        notification_type: 'data_export_downloaded',
+        email_address: file,
+      });
+
+    // In a real implementation, you would:
+    // 1. Fetch the file from cloud storage (S3, GCS, etc.)
+    // 2. Stream the file content to the response
+    // 3. Set appropriate headers for download
+
+    // For this mock implementation, we'll return a redirect to a generated file
+    return generateMockFileResponse(exportRequest, file);
+  } catch (error) {
+    console.error('Download export API error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+// Validate download token
+async function validateDownloadToken(token: string): Promise<string | null> {
+  try {
+    const supabase = createRouteHandlerClient({ cookies });
+
+    // Look for token in notifications table
+    const { data: tokenRecord, error } = await supabase
+      .from('privacy_email_notifications')
+      .select('user_id, created_at')
+      .eq('email_address', token)
+      .eq('notification_type', 'download_token')
+      .single();
+
+    if (error || !tokenRecord) {
+      return null;
+    }
+
+    // Check if token is expired (24 hours)
+    const tokenDate = new Date(tokenRecord.created_at);
+    const now = new Date();
+    const hoursDiff = (now.getTime() - tokenDate.getTime()) / (1000 * 60 * 60);
+
+    if (hoursDiff > 24) {
+      return null;
+    }
+
+    return tokenRecord.user_id;
+  } catch (error) {
+    console.error('Error validating download token:', error);
+    return null;
+  }
+}
+
+// Generate mock file response (in production this would fetch from storage)
+async function generateMockFileResponse(exportRequest: any, fileName: string) {
+  try {
+    const supabase = createRouteHandlerClient({ cookies });
+
+    // Get user data to generate the file
+    const userData = await gatherUserDataForDownload(exportRequest.user_id);
+
+    let fileContent: string;
+    let mimeType: string;
+    let downloadFileName: string;
+
+    // Determine format from file name
+    if (fileName.endsWith('.json')) {
+      fileContent = JSON.stringify({
+        ...userData,
+        _format: 'json',
+        _version: '1.0',
+        _generated: new Date().toISOString(),
+        _gdpr_compliance: 'Article 20 - Right to Data Portability'
+      }, null, 2);
+      mimeType = 'application/json';
+      downloadFileName = fileName;
+    } else if (fileName.endsWith('.csv')) {
+      fileContent = generateCSVContent(userData);
+      mimeType = 'text/csv';
+      downloadFileName = fileName;
+    } else if (fileName.endsWith('.pdf')) {
+      fileContent = generatePDFContent(userData);
+      mimeType = 'application/pdf';
+      downloadFileName = fileName;
+    } else {
+      throw new Error('Unsupported file format');
+    }
+
+    // Return file as download
+    return new NextResponse(fileContent, {
+      headers: {
+        'Content-Type': mimeType,
+        'Content-Disposition': `attachment; filename="${downloadFileName}"`,
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
+    });
+  } catch (error) {
+    console.error('Error generating file response:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to generate file' },
+      { status: 500 }
+    );
+  }
+}
+
+// Simplified data gathering for download (reusing logic from generate-export)
+async function gatherUserDataForDownload(userId: string) {
+  const supabase = createRouteHandlerClient({ cookies });
+
+  // Get essential user data
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+
+  const { data: privacyPrefs } = await supabase
+    .from('user_privacy_preferences')
+    .select('*')
+    .eq('user_id', userId)
+    .single();
+
+  const { data: privacyHistory } = await supabase
+    .from('privacy_preference_history')
+    .select('*')
+    .eq('user_id', userId)
+    .order('changed_at', { ascending: false })
+    .limit(50);
+
+  return {
+    exportMetadata: {
+      userId,
+      exportDate: new Date().toISOString(),
+      gdprCompliance: 'Article 20 - Right to Data Portability',
+    },
+    profile: profile || null,
+    privacyPreferences: privacyPrefs || null,
+    privacyHistory: privacyHistory || [],
+  };
+}
+
+// Generate CSV content
+function generateCSVContent(userData: any): string {
+  let csvContent = 'Rowan Data Export\n';
+  csvContent += `Export Date: ${new Date().toISOString()}\n`;
+  csvContent += `User ID: ${userData.exportMetadata.userId}\n`;
+  csvContent += 'GDPR Article 20 - Right to Data Portability\n\n';
+
+  if (userData.profile) {
+    csvContent += 'PROFILE INFORMATION\n';
+    csvContent += 'Field,Value\n';
+    Object.entries(userData.profile).forEach(([key, value]) => {
+      csvContent += `"${key}","${value || ''}"\n`;
+    });
+    csvContent += '\n';
+  }
+
+  if (userData.privacyPreferences) {
+    csvContent += 'PRIVACY PREFERENCES\n';
+    csvContent += 'Setting,Value\n';
+    Object.entries(userData.privacyPreferences).forEach(([key, value]) => {
+      csvContent += `"${key}","${value || ''}"\n`;
+    });
+    csvContent += '\n';
+  }
+
+  return csvContent;
+}
+
+// Generate PDF content (simplified text format)
+function generatePDFContent(userData: any): string {
+  let pdfContent = 'ROWAN DATA EXPORT\n';
+  pdfContent += '==================\n\n';
+  pdfContent += `Export Date: ${new Date().toISOString()}\n`;
+  pdfContent += `User ID: ${userData.exportMetadata.userId}\n`;
+  pdfContent += 'GDPR Article 20 - Right to Data Portability\n\n';
+
+  if (userData.profile) {
+    pdfContent += 'PROFILE INFORMATION\n';
+    pdfContent += '-------------------\n';
+    Object.entries(userData.profile).forEach(([key, value]) => {
+      pdfContent += `${key}: ${value || 'N/A'}\n`;
+    });
+    pdfContent += '\n';
+  }
+
+  if (userData.privacyPreferences) {
+    pdfContent += 'PRIVACY PREFERENCES\n';
+    pdfContent += '-------------------\n';
+    Object.entries(userData.privacyPreferences).forEach(([key, value]) => {
+      pdfContent += `${key}: ${value || 'N/A'}\n`;
+    });
+    pdfContent += '\n';
+  }
+
+  pdfContent += 'END OF EXPORT\n';
+  return pdfContent;
+}
