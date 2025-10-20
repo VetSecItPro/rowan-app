@@ -209,12 +209,12 @@ export function MarketingPreferences() {
               <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="flex-1">
-              <h4 className="font-medium text-gray-900 dark:text-white">Email Marketing</h4>
+              <h4 className="font-medium text-gray-900 dark:text-white">Rowan Email Updates</h4>
               <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                Receive product updates, tips, and promotional offers via email
+                Receive product updates, tips, and occasional offers directly from Rowan
               </p>
               <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                CAN-SPAM compliant • You can unsubscribe at any time
+                From Rowan only • Never shared with third parties • CAN-SPAM compliant • Unsubscribe anytime
               </div>
             </div>
           </div>
@@ -291,11 +291,11 @@ export function MarketingPreferences() {
         <div className="flex items-start gap-2">
           <Bell className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
           <div className="text-sm text-amber-700 dark:text-amber-300">
-            <p className="font-medium mb-1">Marketing Communication Policy</p>
+            <p className="font-medium mb-1">Our Email Privacy Promise</p>
             <p>
-              We respect your privacy and communication preferences. You can update these settings at any time.
-              Security alerts and account notifications will continue regardless of marketing preferences.
-              All emails include unsubscribe links as required by CAN-SPAM regulations.
+              Your email is used only by Rowan for our own communications - we never sell, rent, or share your email with third parties.
+              You can update these settings anytime. Security alerts and account notifications will continue regardless of marketing preferences.
+              All emails include one-click unsubscribe links as required by law.
             </p>
           </div>
         </div>
