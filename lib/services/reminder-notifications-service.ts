@@ -234,8 +234,13 @@ export const reminderNotificationsService = {
 
     // Handle email and push notifications based on frequency and quiet hours
     if (prefs) {
-      const frequency = prefs.notification_frequency || 'instant';
+      const digestFrequency = prefs.digest_frequency || 'realtime';
       const inQuietHours = await this.isInQuietHours(validated.user_id, spaceId);
+
+      // Map digest frequency to notification frequency
+      const frequency: NotificationFrequency = digestFrequency === 'realtime' ? 'instant' :
+                                               digestFrequency === 'weekly' ? 'daily' :
+                                               digestFrequency; // 'daily' maps directly
 
       // Queue for batching if not instant, or if in quiet hours
       if (frequency !== 'instant' || inQuietHours) {
