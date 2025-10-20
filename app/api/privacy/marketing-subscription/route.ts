@@ -180,8 +180,6 @@ export async function GET(request: NextRequest) {
         .insert({
           user_id: userId,
           marketing_emails_enabled: false,
-          third_party_analytics_enabled: false,
-          share_data_with_partners: false,
           ccpa_do_not_sell: true,
         })
         .select('marketing_emails_enabled')

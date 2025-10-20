@@ -6,38 +6,24 @@ export interface UserPrivacyPreferences {
   user_id: string;
 
   // Personal Privacy
-  activity_status_visible: boolean;
   share_anonymous_analytics: boolean;
 
   // Legal Compliance
   ccpa_do_not_sell: boolean;
   marketing_emails_enabled: boolean;
-  marketing_sms_enabled: boolean;
 
   // Cookie Preferences
   analytics_cookies_enabled: boolean;
-  performance_cookies_enabled: boolean;
-  advertising_cookies_enabled: boolean;
-
-  // Data Sharing
-  share_data_with_partners: boolean;
-  third_party_analytics_enabled: boolean;
 
   created_at: string;
   updated_at: string;
 }
 
 export interface PrivacyPreferenceUpdate {
-  activity_status_visible?: boolean;
   share_anonymous_analytics?: boolean;
   ccpa_do_not_sell?: boolean;
   marketing_emails_enabled?: boolean;
-  marketing_sms_enabled?: boolean;
   analytics_cookies_enabled?: boolean;
-  performance_cookies_enabled?: boolean;
-  advertising_cookies_enabled?: boolean;
-  share_data_with_partners?: boolean;
-  third_party_analytics_enabled?: boolean;
 }
 
 export interface AccountDeletionRequest {
@@ -126,22 +112,14 @@ export interface DataExportData {
 // Form types for UI components
 export interface PrivacySettingsForm {
   personalPrivacy: {
-    activityStatusVisible: boolean;
     shareAnonymousAnalytics: boolean;
   };
   legalCompliance: {
     ccpaDoNotSell: boolean;
     marketingEmailsEnabled: boolean;
-    marketingSmsEnabled: boolean;
   };
   cookiePreferences: {
     analyticsCookiesEnabled: boolean;
-    performanceCookiesEnabled: boolean;
-    advertisingCookiesEnabled: boolean;
-  };
-  dataSharing: {
-    shareDataWithPartners: boolean;
-    thirdPartyAnalyticsEnabled: boolean;
   };
 }
 
