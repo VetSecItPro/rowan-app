@@ -47,10 +47,10 @@ export async function GET(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(session.user);
 
-    // Get or create digest preferences
+    // Get or create digest preferences - handle both old and new schema
     let { data: preferences, error } = await supabase
       .from('user_notification_preferences')
-      .select('id, user_id, digest_enabled, digest_time, timezone, created_at, updated_at')
+      .select('id, user_id, digest_enabled, digest_frequency, digest_time, timezone, created_at, updated_at')
       .eq('user_id', session.user.id)
       .single();
 
@@ -76,9 +76,26 @@ export async function GET(req: NextRequest) {
       throw error;
     }
 
+    // Handle backwards compatibility for digest_enabled field
+    if (!preferences) {
+      throw new Error('No preferences found');
+    }
+
+    // Transform data for backwards compatibility
+    const digestEnabled = preferences.digest_enabled !== undefined
+      ? preferences.digest_enabled
+      : (preferences.digest_frequency !== 'disabled' && preferences.digest_frequency !== null);
+
+    const transformedPreferences = {
+      ...preferences,
+      digest_enabled: digestEnabled,
+      digest_time: preferences.digest_time || '07:00:00',
+      timezone: preferences.timezone || 'America/New_York'
+    };
+
     return NextResponse.json({
       success: true,
-      data: preferences,
+      data: transformedPreferences,
     });
 
   } catch (error) {

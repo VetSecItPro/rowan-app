@@ -114,39 +114,102 @@ ALTER TABLE data_export_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE privacy_email_notifications ENABLE ROW LEVEL SECURITY;
 
 -- Users can only access their own privacy data
-CREATE POLICY "Users can view own privacy preferences" ON user_privacy_preferences
-  FOR SELECT USING (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'user_privacy_preferences'
+    AND policyname = 'Users can view own privacy preferences'
+  ) THEN
+    CREATE POLICY "Users can view own privacy preferences" ON user_privacy_preferences
+      FOR SELECT USING (auth.uid() = user_id);
+  END IF;
 
-CREATE POLICY "Users can update own privacy preferences" ON user_privacy_preferences
-  FOR UPDATE USING (auth.uid() = user_id);
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'user_privacy_preferences'
+    AND policyname = 'Users can update own privacy preferences'
+  ) THEN
+    CREATE POLICY "Users can update own privacy preferences" ON user_privacy_preferences
+      FOR UPDATE USING (auth.uid() = user_id);
+  END IF;
 
-CREATE POLICY "Users can insert own privacy preferences" ON user_privacy_preferences
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'user_privacy_preferences'
+    AND policyname = 'Users can insert own privacy preferences'
+  ) THEN
+    CREATE POLICY "Users can insert own privacy preferences" ON user_privacy_preferences
+      FOR INSERT WITH CHECK (auth.uid() = user_id);
+  END IF;
 
--- Account deletion policies
-CREATE POLICY "Users can view own deletion requests" ON account_deletion_requests
-  FOR SELECT USING (auth.uid() = user_id);
+  -- Account deletion policies
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'account_deletion_requests'
+    AND policyname = 'Users can view own deletion requests'
+  ) THEN
+    CREATE POLICY "Users can view own deletion requests" ON account_deletion_requests
+      FOR SELECT USING (auth.uid() = user_id);
+  END IF;
 
-CREATE POLICY "Users can create own deletion requests" ON account_deletion_requests
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'account_deletion_requests'
+    AND policyname = 'Users can create own deletion requests'
+  ) THEN
+    CREATE POLICY "Users can create own deletion requests" ON account_deletion_requests
+      FOR INSERT WITH CHECK (auth.uid() = user_id);
+  END IF;
 
-CREATE POLICY "Users can update own deletion requests" ON account_deletion_requests
-  FOR UPDATE USING (auth.uid() = user_id);
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'account_deletion_requests'
+    AND policyname = 'Users can update own deletion requests'
+  ) THEN
+    CREATE POLICY "Users can update own deletion requests" ON account_deletion_requests
+      FOR UPDATE USING (auth.uid() = user_id);
+  END IF;
 
--- Privacy history policies (read-only for users)
-CREATE POLICY "Users can view own privacy history" ON privacy_preference_history
-  FOR SELECT USING (auth.uid() = user_id);
+  -- Privacy history policies (read-only for users)
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'privacy_preference_history'
+    AND policyname = 'Users can view own privacy history'
+  ) THEN
+    CREATE POLICY "Users can view own privacy history" ON privacy_preference_history
+      FOR SELECT USING (auth.uid() = user_id);
+  END IF;
 
--- Data export policies
-CREATE POLICY "Users can view own export requests" ON data_export_requests
-  FOR SELECT USING (auth.uid() = user_id);
+  -- Data export policies
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'data_export_requests'
+    AND policyname = 'Users can view own export requests'
+  ) THEN
+    CREATE POLICY "Users can view own export requests" ON data_export_requests
+      FOR SELECT USING (auth.uid() = user_id);
+  END IF;
 
-CREATE POLICY "Users can create own export requests" ON data_export_requests
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'data_export_requests'
+    AND policyname = 'Users can create own export requests'
+  ) THEN
+    CREATE POLICY "Users can create own export requests" ON data_export_requests
+      FOR INSERT WITH CHECK (auth.uid() = user_id);
+  END IF;
 
--- Email notification policies (read-only for users)
-CREATE POLICY "Users can view own email notifications" ON privacy_email_notifications
-  FOR SELECT USING (auth.uid() = user_id);
+  -- Email notification policies (read-only for users)
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'privacy_email_notifications'
+    AND policyname = 'Users can view own email notifications'
+  ) THEN
+    CREATE POLICY "Users can view own email notifications" ON privacy_email_notifications
+      FOR SELECT USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
 -- Trigger to automatically create privacy preferences for new users
 CREATE OR REPLACE FUNCTION create_default_privacy_preferences()
@@ -182,17 +245,35 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Add updated_at triggers
-CREATE TRIGGER update_user_privacy_preferences_updated_at
-  BEFORE UPDATE ON user_privacy_preferences
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger
+    WHERE tgname = 'update_user_privacy_preferences_updated_at'
+  ) THEN
+    CREATE TRIGGER update_user_privacy_preferences_updated_at
+      BEFORE UPDATE ON user_privacy_preferences
+      FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+  END IF;
 
-CREATE TRIGGER update_account_deletion_requests_updated_at
-  BEFORE UPDATE ON account_deletion_requests
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger
+    WHERE tgname = 'update_account_deletion_requests_updated_at'
+  ) THEN
+    CREATE TRIGGER update_account_deletion_requests_updated_at
+      BEFORE UPDATE ON account_deletion_requests
+      FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+  END IF;
 
-CREATE TRIGGER update_data_export_requests_updated_at
-  BEFORE UPDATE ON data_export_requests
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger
+    WHERE tgname = 'update_data_export_requests_updated_at'
+  ) THEN
+    CREATE TRIGGER update_data_export_requests_updated_at
+      BEFORE UPDATE ON data_export_requests
+      FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+  END IF;
+END $$;
 
 -- Function to log privacy preference changes
 CREATE OR REPLACE FUNCTION log_privacy_preference_change()
@@ -231,9 +312,17 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Create trigger for privacy preference change logging
-CREATE TRIGGER log_privacy_preference_changes
-  AFTER UPDATE ON user_privacy_preferences
-  FOR EACH ROW EXECUTE FUNCTION log_privacy_preference_change();
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger
+    WHERE tgname = 'log_privacy_preference_changes'
+  ) THEN
+    CREATE TRIGGER log_privacy_preference_changes
+      AFTER UPDATE ON user_privacy_preferences
+      FOR EACH ROW EXECUTE FUNCTION log_privacy_preference_change();
+  END IF;
+END $$;
 
 -- Create default privacy preferences for existing users
 INSERT INTO user_privacy_preferences (user_id)
