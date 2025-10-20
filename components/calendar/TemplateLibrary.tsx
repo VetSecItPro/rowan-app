@@ -91,14 +91,14 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-calendar p-6 flex items-center justify-between">
+        <div className="bg-purple-600 p-6 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-white">Event Templates</h2>
             <p className="text-purple-100 text-sm mt-1">Choose a template to create an event quickly</p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            className="p-2 hover:bg-purple-700 rounded-lg transition-colors"
           >
             <X className="w-6 h-6 text-white" />
           </button>
@@ -111,9 +111,9 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
               <button
                 key={cat.value}
                 onClick={() => setSelectedCategory(cat.value)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   selectedCategory === cat.value
-                    ? 'bg-gradient-calendar text-white shadow-md'
+                    ? 'bg-purple-600 text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
