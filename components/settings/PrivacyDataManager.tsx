@@ -22,6 +22,7 @@ import type {
   DeletionWorkflowStatus,
   ExportWorkflowStatus,
 } from '@/lib/types/privacy';
+import { CookiePreferences } from '@/components/cookies/CookiePreferences';
 
 export function PrivacyDataManager() {
   const { user } = useAuth();
@@ -510,6 +511,9 @@ export function PrivacyDataManager() {
           </div>
         </div>
       </div>
+
+      {/* Cookie Preferences */}
+      <CookiePreferences />
 
       {/* Collaboration Notice */}
       <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
