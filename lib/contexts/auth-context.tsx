@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { getUserTimezone } from '@/lib/utils/timezone';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Space } from '@/lib/types';
 
@@ -12,7 +11,6 @@ interface UserProfile {
   name: string;
   pronouns?: string;
   color_theme: string;
-  timezone: string;
   avatar_url?: string;
 }
 
@@ -33,7 +31,6 @@ interface ProfileData {
   name: string;
   pronouns?: string;
   color_theme?: string;
-  timezone?: string;
   space_name?: string;
 }
 
@@ -205,8 +202,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) return { error };
       if (!data.user) return { error: new Error('User creation failed') };
 
-      const timezone = profile.timezone || getUserTimezone();
-
       // Create user profile
       const { error: profileError } = await supabase.from('users').insert({
         id: data.user.id,
@@ -214,7 +209,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         name: profile.name,
         pronouns: profile.pronouns,
         color_theme: profile.color_theme || 'emerald',
-        timezone,
       });
 
       if (profileError) {

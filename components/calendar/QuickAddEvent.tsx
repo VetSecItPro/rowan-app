@@ -78,7 +78,7 @@ export function QuickAddEvent({ onCreateEvent, isOpen, onClose, spaceId }: Quick
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-20 px-4">
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full border-2 border-purple-200 dark:border-purple-700 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
         {/* Header */}
-        <div className="bg-gradient-calendar p-4 flex items-center justify-between">
+        <div className="bg-purple-600 p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
@@ -90,7 +90,7 @@ export function QuickAddEvent({ onCreateEvent, isOpen, onClose, spaceId }: Quick
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            className="p-2 hover:bg-purple-700 rounded-lg transition-colors"
           >
             <X className="w-5 h-5 text-white" />
           </button>
@@ -201,7 +201,7 @@ export function QuickAddEvent({ onCreateEvent, isOpen, onClose, spaceId }: Quick
             <button
               type="submit"
               disabled={!input.trim()}
-              className="flex-1 px-6 py-3 bg-gradient-calendar text-white rounded-xl hover:opacity-90 transition-all font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               <Sparkles className="w-4 h-4" />
               Create Event

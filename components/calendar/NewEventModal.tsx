@@ -330,7 +330,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
+        <div className="sticky top-0 z-10 bg-purple-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Calendar className="w-6 h-6" />
@@ -340,10 +340,10 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
             </div>
             <button
               onClick={onClose}
-              className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active-press hover-lift"
+              className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-purple-700 transition-colors"
               aria-label="Close modal"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -371,22 +371,21 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                   type="button"
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                   title="Add emoji"
-                  className="btn-touch p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors active-press hover-lift"
+                  className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                 >
                   <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 </button>
 
                 {/* Emoji Picker Popup */}
                 {showEmojiPicker && (
-                  <div className="absolute top-full mt-2 right-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 z-10 w-full sm:w-80 max-w-[calc(100vw-2rem)]">
-                    <h4 className="text-base sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Select an emoji</h4>
+                  <div className="absolute top-full mt-2 right-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-3 z-50 w-full sm:w-80 max-w-[calc(100vw-2rem)]">
                     <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-1.5">
                       {EMOJIS.map((emoji, idx) => (
                         <button
                           key={idx}
                           type="button"
                           onClick={() => handleEmojiClick(emoji)}
-                          className="btn-touch w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active-press hover-lift"
+                          className="w-10 h-10 text-xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
                           title="Click to add emoji"
                         >
                           {emoji}
@@ -416,7 +415,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
               <button
                 type="button"
                 onClick={() => imageInputRef.current?.click()}
-                className="btn-touch p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors hover-lift active-press shimmer-purple"
+                className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 title="Attach images"
               >
                 <ImageIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -426,7 +425,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="btn-touch p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors hover-lift active-press shimmer-purple"
+                className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 title="Attach files"
               >
                 <Paperclip className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -449,7 +448,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                       <button
                         type="button"
                         onClick={() => removeImage(idx)}
-                        className="btn-touch ml-1 hover:text-red-500 active-press hover-lift"
+                        className="ml-1 hover:text-red-500 transition-colors"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -475,7 +474,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                       <button
                         type="button"
                         onClick={() => removeFile(idx)}
-                        className="btn-touch ml-1 hover:text-red-500 active-press hover-lift"
+                        className="ml-1 hover:text-red-500 transition-colors"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -628,7 +627,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                               : [...prev, index]
                           );
                         }}
-                        className={`btn-touch px-3 py-2 rounded-lg text-sm font-medium transition-all hover-lift active-press shimmer-purple ${
+                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                           selectedDaysOfWeek.includes(index)
                             ? 'bg-purple-500 text-white'
                             : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
@@ -659,7 +658,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                               : [...prev, day]
                           );
                         }}
-                        className={`btn-touch px-3 py-2 rounded-lg text-sm font-medium transition-all hover-lift active-press shimmer-purple ${
+                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                           selectedDaysOfMonth.includes(day)
                             ? 'bg-purple-500 text-white'
                             : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
@@ -744,7 +743,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                     key={color.value}
                     type="button"
                     onClick={() => setCustomColor(color.value)}
-                    className={`btn-touch w-10 h-10 rounded-lg border-2 transition-all hover:scale-110 active-press hover-lift shimmer-purple ${
+                    className={`w-10 h-10 rounded-lg border-2 transition-colors ${
                       customColor === color.value
                         ? 'border-gray-900 dark:border-white ring-2 ring-offset-2 ring-purple-500'
                         : 'border-gray-300 dark:border-gray-600'
@@ -757,7 +756,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                   <button
                     type="button"
                     onClick={() => setCustomColor('')}
-                    className="btn-touch w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors active-press hover-lift"
+                    className="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                     title="Clear custom color"
                   >
                     <X className="w-4 h-4" />
@@ -784,7 +783,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                   <button
                     type="button"
                     onClick={() => setCustomColor('')}
-                    className="btn-touch px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors active-press hover-lift"
+                    className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                   >
                     Clear
                   </button>
@@ -813,7 +812,7 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                   key={category.value}
                   type="button"
                   onClick={() => setFormData({ ...formData, category: category.value as any })}
-                  className={`btn-touch flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover-lift active-press shimmer-purple ${
+                  className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors ${
                     formData.category === category.value
                       ? `${category.color} border-transparent text-white`
                       : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
@@ -831,15 +830,15 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
             <button
               type="button"
               onClick={onClose}
-              className="btn-touch flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium active-press hover-lift"
+              className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!!dateError || uploading}
-              className={`btn-touch flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl transition-all shadow-lg font-medium shimmer-purple hover-lift active-press ${
-                dateError || uploading ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
+              className={`flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg transition-colors font-medium ${
+                dateError || uploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-purple-700'
               }`}
             >
               {uploading ? 'Saving...' : editEvent ? 'Update Event' : 'Create Event'}

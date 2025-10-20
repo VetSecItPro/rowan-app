@@ -174,7 +174,7 @@ export function EventProposalModal({
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-2xl sm:max-w-3xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
+        <div className="sticky top-0 z-10 bg-purple-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Calendar className="w-6 h-6" />
@@ -184,10 +184,10 @@ export function EventProposalModal({
             </div>
             <button
               onClick={onClose}
-              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95"
+              className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-purple-700 transition-colors"
               aria-label="Close modal"
             >
-              <X className="w-5 h-5 sm:w-4 sm:h-4" />
+              <X className="w-4 h-4" />
             </button>
           </div>
           {mode === 'vote' && proposal && (
@@ -331,7 +331,7 @@ export function EventProposalModal({
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:opacity-90 transition-all shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <Send className="w-4 h-4" />
                 {loading ? 'Creating...' : 'Send Proposal'}
@@ -355,7 +355,7 @@ export function EventProposalModal({
               </div>
 
               {/* Voting Instructions */}
-              <div className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border border-purple-200 dark:border-purple-700 rounded-xl p-4">
+              <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                   <span className="font-medium text-gray-900 dark:text-white">Vote on your availability</span>
@@ -457,7 +457,7 @@ export function EventProposalModal({
                         <button
                           onClick={() => handleApproveProposal(index)}
                           disabled={loading}
-                          className="w-full px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:opacity-90 transition-all shadow-md font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           ✓ Finalize & Create Event
                         </button>

@@ -75,7 +75,7 @@ export function MiniCalendar({ currentDate, onDateSelect, events }: MiniCalendar
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={handlePrevMonth}
-          className="btn-touch p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95 hover-lift shimmer-purple active-press hover:shadow-sm"
+          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           title="Previous month"
         >
           <ChevronLeft className="w-4 h-4 text-gray-600 dark:text-gray-400" />
@@ -87,7 +87,7 @@ export function MiniCalendar({ currentDate, onDateSelect, events }: MiniCalendar
 
         <button
           onClick={handleNextMonth}
-          className="btn-touch p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95 hover-lift shimmer-purple active-press hover:shadow-sm"
+          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           title="Next month"
         >
           <ChevronRight className="w-4 h-4 text-gray-600 dark:text-gray-400" />
@@ -121,11 +121,11 @@ export function MiniCalendar({ currentDate, onDateSelect, events }: MiniCalendar
               onClick={() => handleDayClick(day)}
               disabled={!isCurrentMonth}
               className={`
-                btn-touch relative aspect-square rounded-lg text-xs font-medium transition-all active:scale-95 hover-lift shimmer-purple active-press
+                relative aspect-square rounded-lg text-xs font-medium transition-colors
                 ${!isCurrentMonth ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' : ''}
-                ${isCurrentMonth && !isSelected && !isTodayDate ? 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-sm' : ''}
-                ${isTodayDate && !isSelected ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 ring-2 ring-purple-500 hover:shadow-md' : ''}
-                ${isSelected ? 'bg-gradient-calendar text-white shadow-md hover:shadow-lg' : ''}
+                ${isCurrentMonth && !isSelected && !isTodayDate ? 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' : ''}
+                ${isTodayDate && !isSelected ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 ring-2 ring-purple-500' : ''}
+                ${isSelected ? 'bg-purple-600 text-white' : ''}
               `}
               title={format(day, 'MMMM d, yyyy')}
             >
@@ -170,7 +170,7 @@ export function MiniCalendar({ currentDate, onDateSelect, events }: MiniCalendar
       {/* Today Button */}
       <button
         onClick={handleToday}
-        className="btn-touch w-full mt-4 px-3 py-2 bg-gradient-calendar text-white text-xs font-medium rounded-lg hover:opacity-90 transition-all shadow-sm flex items-center justify-center gap-2 active:scale-95 hover-lift shimmer-purple active-press hover:shadow-md"
+        className="w-full mt-4 px-3 py-2 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
       >
         <CalendarIcon className="w-3.5 h-3.5" />
         Jump to Today
@@ -185,7 +185,7 @@ export function MiniCalendar({ currentDate, onDateSelect, events }: MiniCalendar
           <span>Today</span>
         </div>
         <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-          <div className="w-5 h-5 rounded bg-gradient-calendar flex items-center justify-center">
+          <div className="w-5 h-5 rounded bg-purple-600 flex items-center justify-center">
             <span className="text-[10px] font-medium text-white">1</span>
           </div>
           <span>Selected</span>
