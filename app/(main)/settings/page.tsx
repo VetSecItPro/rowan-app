@@ -750,7 +750,7 @@ export default function SettingsPage() {
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Settings' }]}>
-      <div className="min-h-screen bg-gradient-to-t from-purple-200 via-purple-100/50 to-white dark:from-purple-900 dark:via-purple-900/50 dark:to-black p-4 sm:p-8">
+      <div className="min-h-screen p-4 sm:p-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-4 sm:mb-8">
