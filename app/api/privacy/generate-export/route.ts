@@ -2,8 +2,7 @@
 // Generates comprehensive user data exports in JSON/CSV/PDF formats for GDPR Article 20 compliance
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
 import { Resend } from 'resend';
@@ -33,7 +32,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { exportId, userId, format } = ExportRequestSchema.parse(body);
 
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
 
     // Update export status to processing
     await supabase
@@ -143,7 +142,7 @@ export async function POST(request: NextRequest) {
 
 // Gather comprehensive user data from all relevant tables
 async function gatherUserData(userId: string) {
-  const supabase = createRouteHandlerClient({ cookies });
+  const supabase = createClient();
 
   console.log(`📊 Gathering data for user ${userId}...`);
 
@@ -403,7 +402,7 @@ async function sendExportCompletionEmail(
   expiresAt: Date
 ) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
 
     // Get user email
     const { data: profile } = await supabase
@@ -488,7 +487,7 @@ async function sendExportCompletionEmail(
 // Send export failure email
 async function sendExportFailureEmail(userId: string) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
 
     // Get user email
     const { data: profile } = await supabase

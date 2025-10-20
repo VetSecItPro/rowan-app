@@ -633,7 +633,6 @@ export async function resetCookieConsentViaAPI(): Promise<PrivacyServiceResponse
 // Export all functions
 export {
   applyPrivacyPreferences,
-  updateCookieConsent,
   updateMarketingSubscription,
   updateDataSharingConsent,
   updateThirdPartyAnalytics,

@@ -2,8 +2,7 @@
 // Secure download endpoint for user data exports with authentication and access control
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
 
@@ -27,7 +26,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
     let userId: string | null = null;
 
     // Determine authentication method
@@ -117,7 +116,7 @@ export async function GET(request: NextRequest) {
 // Validate download token
 async function validateDownloadToken(token: string): Promise<string | null> {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
 
     // Look for token in notifications table
     const { data: tokenRecord, error } = await supabase
@@ -150,7 +149,7 @@ async function validateDownloadToken(token: string): Promise<string | null> {
 // Generate mock file response (in production this would fetch from storage)
 async function generateMockFileResponse(exportRequest: any, fileName: string) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
 
     // Get user data to generate the file
     const userData = await gatherUserDataForDownload(exportRequest.user_id);
@@ -203,7 +202,7 @@ async function generateMockFileResponse(exportRequest: any, fileName: string) {
 
 // Simplified data gathering for download (reusing logic from generate-export)
 async function gatherUserDataForDownload(userId: string) {
-  const supabase = createRouteHandlerClient({ cookies });
+  const supabase = createClient();
 
   // Get essential user data
   const { data: profile } = await supabase

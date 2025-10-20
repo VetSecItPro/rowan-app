@@ -2,8 +2,7 @@
 // Handles account deletion requests with 30-day grace period
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
 import { Resend } from 'resend';
@@ -23,7 +22,7 @@ const CancelDeletionSchema = z.object({
 // POST - Request account deletion
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -138,7 +137,7 @@ export async function POST(request: NextRequest) {
 // DELETE - Cancel account deletion
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -258,7 +257,7 @@ export async function DELETE(request: NextRequest) {
 // GET - Get deletion status
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();

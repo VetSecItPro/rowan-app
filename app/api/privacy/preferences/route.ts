@@ -2,8 +2,7 @@
 // Handles getting and updating user privacy preferences
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
 
@@ -24,7 +23,7 @@ const PrivacyPreferenceUpdateSchema = z.object({
 // GET - Fetch user's privacy preferences
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -108,7 +107,7 @@ export async function GET(request: NextRequest) {
 // PATCH - Update user's privacy preferences
 export async function PATCH(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -276,7 +275,7 @@ async function updateExternalCookieConsent(cookieType: string, enabled: boolean)
 async function updateMarketingSubscription(userId: string, type: 'email' | 'sms', enabled: boolean) {
   try {
     // Get user profile for email/phone
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
     const { data: profile } = await supabase
       .from('profiles')
       .select('email, phone_number')
