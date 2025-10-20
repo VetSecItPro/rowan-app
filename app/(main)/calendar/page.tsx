@@ -14,6 +14,7 @@ import { EnhancedDayView } from '@/components/calendar/EnhancedDayView';
 import { EnhancedWeekView } from '@/components/calendar/EnhancedWeekView';
 import { TemplateLibrary } from '@/components/calendar/TemplateLibrary';
 import { WeatherBadge } from '@/components/calendar/WeatherBadge';
+import { geolocationService } from '@/lib/services/geolocation-service';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
@@ -47,6 +48,10 @@ export default function CalendarPage() {
   const [activeAction, setActiveAction] = useState<'quick-add' | 'templates' | 'propose' | 'new-event'>('new-event');
   const [statusFilter, setStatusFilter] = useState<'all' | 'not-started' | 'in-progress' | 'completed'>('all');
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, eventId: '' });
+
+  // Location state for weather display
+  const [userLocation, setUserLocation] = useState<string | null>(null);
+  const [locationLoading, setLocationLoading] = useState(true);
 
   // Ref for search input
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -384,6 +389,29 @@ export default function CalendarPage() {
     }
   }, [viewMode, currentSpace?.id]);
 
+  // Fetch user's location for weather display
+  useEffect(() => {
+    const fetchUserLocation = async () => {
+      try {
+        setLocationLoading(true);
+        const location = await geolocationService.getCurrentLocation();
+        if (location) {
+          const locationString = geolocationService.getLocationString(location);
+          setUserLocation(locationString);
+          console.log('[Calendar] User location set:', locationString);
+        }
+      } catch (error) {
+        console.error('[Calendar] Failed to get user location:', error);
+        // Set fallback location
+        setUserLocation('New York, New York, United States');
+      } finally {
+        setLocationLoading(false);
+      }
+    };
+
+    fetchUserLocation();
+  }, []); // Only run once on mount
+
   // Handler for viewing event details
   const handleViewDetails = useCallback((event: CalendarEvent) => {
     setDetailEvent(event);
@@ -697,26 +725,6 @@ export default function CalendarPage() {
 
               {/* View Mode Toggle and Today Button */}
               <div className="flex items-center gap-2">
-                {/* Weather Badge for Today's Events - Only show for calendar views */}
-                {viewMode !== 'proposal' && viewMode !== 'list' && (() => {
-                  // Find today's first event with a location
-                  const today = new Date();
-                  const todayEvents = events.filter(e => {
-                    const eventDate = parseISO(e.start_time);
-                    return isSameDay(eventDate, today) && e.location;
-                  });
-
-                  if (todayEvents.length > 0) {
-                    return (
-                      <WeatherBadge
-                        eventTime={todayEvents[0].start_time}
-                        location={todayEvents[0].location}
-                        compact={true}
-                      />
-                    );
-                  }
-                  return null;
-                })()}
 
                 {/* Today Button - Only show for calendar views */}
                 {viewMode !== 'proposal' && viewMode !== 'list' && (
@@ -883,7 +891,7 @@ export default function CalendarPage() {
             {/* Calendar Content with Sidebar */}
             <div className="flex gap-6">
               {/* Mini-Calendar Sidebar - Always visible for consistent navigation */}
-              <div className="hidden lg:block w-64 flex-shrink-0">
+              <div className="hidden lg:block w-64 flex-shrink-0 space-y-4">
                 {!loading && (
                   <MiniCalendar
                     currentDate={currentMonth}
@@ -894,6 +902,36 @@ export default function CalendarPage() {
                     events={events}
                   />
                 )}
+
+                {/* Weather Display - Below mini calendar, always visible to prevent UI shifting */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <span className="text-base">🌤️</span>
+                    Your Weather
+                  </h3>
+
+                  {locationLoading ? (
+                    <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 py-2">
+                      <div className="animate-spin rounded-full h-3 w-3 border-2 border-purple-500 border-t-transparent"></div>
+                      Getting your location...
+                    </div>
+                  ) : userLocation ? (
+                    <>
+                      <WeatherBadge
+                        eventTime={new Date().toISOString()}
+                        location={userLocation}
+                        compact={true}
+                      />
+                      <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                        {userLocation.split(',')[0]} • Today's weather
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-xs text-gray-500 dark:text-gray-400 py-2">
+                      Unable to get location
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Main Calendar Content */}
@@ -906,29 +944,6 @@ export default function CalendarPage() {
               ) : viewMode === 'month' ? (
                 /* Calendar View */
                 <div>
-                  {/* Weather Badge Header - Always reserve space for consistent layout */}
-                  <div className="mb-4">
-                    {(() => {
-                      // Find first event with location in the current month
-                      const firstEventWithLocation = filteredEvents.find(e => {
-                        const eventDate = parseISO(e.start_time);
-                        return isSameMonth(eventDate, currentMonth) && e.location;
-                      });
-
-                      if (firstEventWithLocation) {
-                        return (
-                          <div className="px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                            <WeatherBadge
-                              eventTime={firstEventWithLocation.start_time}
-                              location={firstEventWithLocation.location}
-                              compact={true}
-                            />
-                          </div>
-                        );
-                      }
-                      return <div className="h-0"></div>;
-                    })()}
-                  </div>
 
                   {/* Month Navigation */}
                   <div className="flex items-center justify-center mb-4 sm:mb-6">
@@ -1263,13 +1278,6 @@ export default function CalendarPage() {
                                             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                               <MapPin className="w-4 h-4" />
                                               {event.location}
-                                            </div>
-                                            <div className="mt-2">
-                                              <WeatherBadge
-                                                eventTime={event.start_time}
-                                                location={event.location}
-                                                compact={true}
-                                              />
                                             </div>
                                           </>
                                         )}

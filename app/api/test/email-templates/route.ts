@@ -6,15 +6,13 @@ import {
   sendShoppingListEmail,
   sendMealReminderEmail,
   sendGeneralReminderEmail,
-  sendDailyDigestEmail,
   verifyEmailService,
   type TaskAssignmentData,
   type EventReminderData,
   type NewMessageData,
   type ShoppingListData,
   type MealReminderData,
-  type GeneralReminderData,
-  type DailyDigestData
+  type GeneralReminderData
 } from '@/lib/services/email-service';
 
 export const dynamic = 'force-dynamic';
@@ -153,61 +151,6 @@ export async function POST(request: NextRequest) {
         result = await sendGeneralReminderEmail(reminderData);
         break;
 
-      case 'digest':
-        const digestData: DailyDigestData = {
-          recipientEmail: email,
-          recipientName: 'Test Partner',
-          digestDate: new Date().toLocaleDateString(),
-          digestType: 'daily',
-          notifications: [
-            {
-              id: '1',
-              type: 'task',
-              title: 'Complete quarterly review',
-              content: 'Review Q4 performance metrics',
-              priority: 'high',
-              spaceName: 'Home Office',
-              url: 'https://rowanapp.com/tasks/1',
-              timestamp: '2 hours ago'
-            },
-            {
-              id: '2',
-              type: 'event',
-              title: 'Weekly Planning Meeting',
-              content: 'Review upcoming week priorities',
-              priority: 'normal',
-              spaceName: 'Home Office',
-              url: 'https://rowanapp.com/events/2',
-              timestamp: '1 hour ago'
-            },
-            {
-              id: '3',
-              type: 'message',
-              title: 'New message from Claude',
-              content: 'About dinner plans tonight',
-              priority: 'normal',
-              spaceName: 'Home Office',
-              url: 'https://rowanapp.com/messages/3',
-              timestamp: '30 minutes ago'
-            },
-            {
-              id: '4',
-              type: 'shopping',
-              title: 'Shopping list updated',
-              content: 'Weekly Groceries list was updated',
-              priority: 'low',
-              spaceName: 'Home Office',
-              url: 'https://rowanapp.com/shopping/4',
-              timestamp: '15 minutes ago'
-            }
-          ],
-          totalCount: 4,
-          unreadTasksCount: 1,
-          upcomingEventsCount: 1,
-          unreadMessagesCount: 1
-        };
-        result = await sendDailyDigestEmail(digestData);
-        break;
 
       case 'verify':
         result = await verifyEmailService();
@@ -216,7 +159,7 @@ export async function POST(request: NextRequest) {
       default:
         return NextResponse.json({
           error: 'Invalid email type',
-          validTypes: ['task', 'event', 'message', 'shopping', 'meal', 'reminder', 'digest', 'verify']
+          validTypes: ['task', 'event', 'message', 'shopping', 'meal', 'reminder', 'verify']
         }, { status: 400 });
     }
 
@@ -240,7 +183,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json({
     message: 'Email Templates Test Endpoint',
-    usage: 'POST with { type: "task|event|message|shopping|meal|reminder|digest|verify", email: "test@example.com" }',
+    usage: 'POST with { type: "task|event|message|shopping|meal|reminder|verify", email: "test@example.com" }',
     availableTypes: [
       'task - Task assignment email',
       'event - Event reminder email',
@@ -248,7 +191,6 @@ export async function GET() {
       'shopping - Shopping list notification',
       'meal - Meal reminder email',
       'reminder - General reminder email',
-      'digest - Daily digest email',
       'verify - Verify email service'
     ]
   });
