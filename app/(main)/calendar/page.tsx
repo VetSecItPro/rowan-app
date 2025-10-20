@@ -16,7 +16,6 @@ import { TemplateLibrary } from '@/components/calendar/TemplateLibrary';
 import { WeatherBadge } from '@/components/calendar/WeatherBadge';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
-import { CTAButton } from '@/components/ui/EnhancedButton';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
 import { useCalendarShortcuts } from '@/lib/hooks/useCalendarShortcuts';
@@ -466,13 +465,13 @@ export default function CalendarPage() {
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
               {/* Segmented Toggle for Action Selection */}
-              <div className="bg-gray-50 dark:bg-gray-900 border-2 border-purple-200 dark:border-purple-700 rounded-lg p-1 flex gap-0.5 flex-wrap sm:flex-nowrap">
+              <div className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 flex gap-0.5 flex-wrap sm:flex-nowrap">
                 <button
                   onClick={() => setActiveAction('quick-add')}
-                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[95px] ${
+                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[95px] ${
                     activeAction === 'quick-add'
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                      ? 'bg-purple-600 text-white'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
                   <span className="text-base">✨</span>
@@ -480,10 +479,10 @@ export default function CalendarPage() {
                 </button>
                 <button
                   onClick={() => setActiveAction('templates')}
-                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[95px] ${
+                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[95px] ${
                     activeAction === 'templates'
-                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                      ? 'bg-purple-600 text-white'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
                   <span className="text-base">📋</span>
@@ -491,10 +490,10 @@ export default function CalendarPage() {
                 </button>
                 <button
                   onClick={() => setActiveAction('propose')}
-                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[115px] ${
+                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[115px] ${
                     activeAction === 'propose'
-                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                      ? 'bg-purple-600 text-white'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
                   <Users className="w-3.5 h-3.5" />
@@ -502,10 +501,10 @@ export default function CalendarPage() {
                 </button>
                 <button
                   onClick={() => setActiveAction('new-event')}
-                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[95px] ${
+                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[95px] ${
                     activeAction === 'new-event'
-                      ? 'bg-gradient-to-r from-purple-500 to-purple-700 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                      ? 'bg-purple-600 text-white'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -514,33 +513,32 @@ export default function CalendarPage() {
               </div>
 
               {/* Dynamic Action Button - Fixed size to accommodate longest text */}
-              <CTAButton
+              <button
                 onClick={() => {
                   if (activeAction === 'quick-add') setIsQuickAddOpen(true);
                   else if (activeAction === 'templates') setIsTemplateLibraryOpen(true);
                   else if (activeAction === 'propose') setIsProposalModalOpen(true);
                   else setIsModalOpen(true);
                 }}
-                feature="calendar"
-                className="px-4 sm:px-4 py-2 sm:py-3 w-full sm:w-[165px]"
+                className="px-4 sm:px-4 py-2 sm:py-3 w-full sm:w-[165px] bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
                 title={
                   activeAction === 'quick-add' ? 'Quick add with natural language (Q)' :
                   activeAction === 'templates' ? 'Create from template' :
                   activeAction === 'propose' ? 'Propose event times' :
                   'Create a new event (N)'
                 }
-                icon={
-                  activeAction === 'quick-add' ? <span className="text-lg">✨</span> :
-                  activeAction === 'templates' ? <span className="text-lg">📋</span> :
-                  activeAction === 'propose' ? <Users className="w-5 h-5" /> :
-                  <Plus className="w-5 h-5" />
-                }
               >
-                {activeAction === 'quick-add' ? 'Quick Add' :
-                 activeAction === 'templates' ? 'Templates' :
-                 activeAction === 'propose' ? 'Propose Event' :
-                 'New Event'}
-              </CTAButton>
+                {activeAction === 'quick-add' ? <span className="text-lg">✨</span> :
+                 activeAction === 'templates' ? <span className="text-lg">📋</span> :
+                 activeAction === 'propose' ? <Users className="w-5 h-5" /> :
+                 <Plus className="w-5 h-5" />}
+                <span>
+                  {activeAction === 'quick-add' ? 'Quick Add' :
+                   activeAction === 'templates' ? 'Templates' :
+                   activeAction === 'propose' ? 'Propose Event' :
+                   'New Event'}
+                </span>
+              </button>
             </div>
           </div>
 
@@ -631,37 +629,51 @@ export default function CalendarPage() {
 
           {/* Search Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className={`apple-search-container group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
-              <Search className="apple-search-icon" />
+          <div className="relative">
+            <div className="relative">
+              {/* Search Icon - Only show when not typing */}
+              {!searchQuery && (
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              )}
+
+              {/* Search Input */}
               <input
                 ref={searchInputRef}
-                type="search"
-                inputMode="search"
+                type="text"
                 autoComplete="off"
                 autoCorrect="off"
                 autoCapitalize="none"
                 spellCheck="false"
-                placeholder="Search events... (Press / to focus)"
+                placeholder="Search Events (Press / to focus)"
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
                   setIsSearchTyping(true);
                   setTimeout(() => setIsSearchTyping(false), 300);
                 }}
-                className="apple-search-input"
+                className={`w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 rounded-lg focus:outline-none transition-colors ${
+                  !searchQuery
+                    ? 'pl-12 border-gray-200 dark:border-gray-700'
+                    : 'pr-12 border-purple-500 dark:border-purple-500'
+                } ${
+                  searchQuery
+                    ? 'border-purple-500 dark:border-purple-500'
+                    : 'border-gray-200 dark:border-gray-700 focus:border-purple-500 dark:focus:border-purple-500'
+                } text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400`}
                 title="Search events (Press / to focus)"
               />
+
+              {/* Clear Button - Only show when typing */}
               {searchQuery && (
                 <button
                   onClick={() => {
                     setSearchQuery('');
                     searchInputRef.current?.focus();
                   }}
-                  className="apple-search-clear"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                   aria-label="Clear search"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-5 h-5" />
                 </button>
               )}
             </div>
@@ -672,14 +684,14 @@ export default function CalendarPage() {
           {!showGuidedFlow && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-              <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-3">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                   {viewMode === 'proposal' ? 'Event Proposals' : 'Event Calendar'}
                 </h2>
                 {viewMode !== 'proposal' && (
-                  <div className="text-sm font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                  <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium">
                     {format(currentMonth, 'MMMM yyyy')}
-                  </div>
+                  </span>
                 )}
               </div>
 
@@ -710,115 +722,91 @@ export default function CalendarPage() {
                 {viewMode !== 'proposal' && viewMode !== 'list' && (
                   <button
                     onClick={handleJumpToToday}
-                    className="px-3 py-1.5 bg-gradient-calendar text-white text-xs font-medium rounded-lg hover:opacity-90 transition-all shadow-sm group relative"
+                    className="px-3 py-1.5 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-700 transition-colors"
                     title="Jump to today (T)"
                   >
                     Today
-                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                      Jump to today (T)
-                    </span>
                   </button>
                 )}
 
                 {/* View Mode Toggle - Always visible */}
-                <div className="bg-gray-50 dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-lg p-0.5 flex gap-0.5">
+                <div className="bg-gray-100 dark:bg-gray-800 border border-purple-300 dark:border-purple-600 rounded-lg p-0.5 flex gap-0.5">
                   <button
                     onClick={() => setViewMode('day')}
-                    className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors ${
                       viewMode === 'day'
-                        ? 'bg-gradient-calendar text-white shadow-md'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                        ? 'bg-purple-600 text-white'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                     }`}
                     title="Day View (D)"
                   >
                     Day
-                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                      Day View (D)
-                    </span>
                   </button>
                   <button
                     onClick={() => setViewMode('week')}
-                    className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors ${
                       viewMode === 'week'
-                        ? 'bg-gradient-calendar text-white shadow-md'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                        ? 'bg-purple-600 text-white'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                     }`}
                     title="Week View (W)"
                   >
                     Week
-                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                      Week View (W)
-                    </span>
                   </button>
                   <button
                     onClick={() => setViewMode('month')}
-                    className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors ${
                       viewMode === 'month'
-                        ? 'bg-gradient-calendar text-white shadow-md'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                        ? 'bg-purple-600 text-white'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                     }`}
                     title="Month View (M)"
                   >
                     Month
-                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                      Month View (M)
-                    </span>
                   </button>
                   <button
                     onClick={() => setViewMode('agenda')}
-                    className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors ${
                       viewMode === 'agenda'
-                        ? 'bg-gradient-calendar text-white shadow-md'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                        ? 'bg-purple-600 text-white'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                     }`}
                     title="Agenda View (A)"
                   >
                     Agenda
-                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                      Agenda View (A)
-                    </span>
-                  </button>
-                  <button
-                    onClick={() => setViewMode('timeline')}
-                    className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
-                      viewMode === 'timeline'
-                        ? 'bg-gradient-calendar text-white shadow-md'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
-                    }`}
-                    title="Timeline View"
-                  >
-                    Timeline
-                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                      Timeline View
-                    </span>
-                  </button>
-                  <button
-                    onClick={() => setViewMode('proposal')}
-                    className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
-                      viewMode === 'proposal'
-                        ? 'bg-gradient-calendar text-white shadow-md'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
-                    }`}
-                    title="Proposal View (P)"
-                  >
-                    Proposal
-                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                      Proposal View (P)
-                    </span>
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`px-2 py-1.5 rounded text-xs font-medium transition-all group relative ${
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors ${
                       viewMode === 'list'
-                        ? 'bg-gradient-calendar text-white shadow-md'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                        ? 'bg-purple-600 text-white'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                     }`}
                     title="List View (L)"
                   >
                     List
-                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                      List View (L)
-                    </span>
+                  </button>
+                  <button
+                    onClick={() => setViewMode('timeline')}
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors ${
+                      viewMode === 'timeline'
+                        ? 'bg-purple-600 text-white'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    }`}
+                    title="Timeline View"
+                  >
+                    Timeline
+                  </button>
+                  <button
+                    onClick={() => setViewMode('proposal')}
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors ${
+                      viewMode === 'proposal'
+                        ? 'bg-purple-600 text-white'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    }`}
+                    title="Proposal View (P)"
+                  >
+                    Proposal
                   </button>
                 </div>
               </div>
@@ -850,9 +838,9 @@ export default function CalendarPage() {
                 <div className="hidden md:inline-flex gap-1">
                   <button
                     onClick={() => setStatusFilter('all')}
-                    className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-all ${
+                    className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${
                       statusFilter === 'all'
-                        ? 'bg-gradient-calendar text-white shadow-md'
+                        ? 'bg-purple-600 text-white'
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
@@ -860,9 +848,9 @@ export default function CalendarPage() {
                   </button>
                   <button
                     onClick={() => setStatusFilter('not-started')}
-                    className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-all ${
+                    className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${
                       statusFilter === 'not-started'
-                        ? 'bg-red-500 text-white shadow-md'
+                        ? 'bg-red-500 text-white'
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
@@ -870,9 +858,9 @@ export default function CalendarPage() {
                   </button>
                   <button
                     onClick={() => setStatusFilter('in-progress')}
-                    className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-all ${
+                    className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${
                       statusFilter === 'in-progress'
-                        ? 'bg-amber-500 text-white shadow-md'
+                        ? 'bg-amber-500 text-white'
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
@@ -880,9 +868,9 @@ export default function CalendarPage() {
                   </button>
                   <button
                     onClick={() => setStatusFilter('completed')}
-                    className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-all ${
+                    className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${
                       statusFilter === 'completed'
-                        ? 'bg-green-500 text-white shadow-md'
+                        ? 'bg-green-500 text-white'
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
@@ -894,9 +882,9 @@ export default function CalendarPage() {
 
             {/* Calendar Content with Sidebar */}
             <div className="flex gap-6">
-              {/* Mini-Calendar Sidebar - Hidden on mobile, visible on lg+ */}
-              {viewMode !== 'proposal' && viewMode !== 'list' && !loading && (
-                <div className="hidden lg:block w-64 flex-shrink-0">
+              {/* Mini-Calendar Sidebar - Always visible for consistent navigation */}
+              <div className="hidden lg:block w-64 flex-shrink-0">
+                {!loading && (
                   <MiniCalendar
                     currentDate={currentMonth}
                     onDateSelect={(date) => {
@@ -905,8 +893,8 @@ export default function CalendarPage() {
                     }}
                     events={events}
                   />
-                </div>
-              )}
+                )}
+              </div>
 
               {/* Main Calendar Content */}
               <div ref={calendarContentRef} className="flex-1 min-w-0 min-h-[600px] touch-pan-y">
@@ -918,27 +906,29 @@ export default function CalendarPage() {
               ) : viewMode === 'month' ? (
                 /* Calendar View */
                 <div>
-                  {/* Weather Badge Header */}
-                  {(() => {
-                    // Find first event with location in the current month
-                    const firstEventWithLocation = filteredEvents.find(e => {
-                      const eventDate = parseISO(e.start_time);
-                      return isSameMonth(eventDate, currentMonth) && e.location;
-                    });
+                  {/* Weather Badge Header - Always reserve space for consistent layout */}
+                  <div className="mb-4">
+                    {(() => {
+                      // Find first event with location in the current month
+                      const firstEventWithLocation = filteredEvents.find(e => {
+                        const eventDate = parseISO(e.start_time);
+                        return isSameMonth(eventDate, currentMonth) && e.location;
+                      });
 
-                    if (firstEventWithLocation) {
-                      return (
-                        <div className="px-4 py-3 mb-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                          <WeatherBadge
-                            eventTime={firstEventWithLocation.start_time}
-                            location={firstEventWithLocation.location}
-                            compact={true}
-                          />
-                        </div>
-                      );
-                    }
-                    return null;
-                  })()}
+                      if (firstEventWithLocation) {
+                        return (
+                          <div className="px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                            <WeatherBadge
+                              eventTime={firstEventWithLocation.start_time}
+                              location={firstEventWithLocation.location}
+                              compact={true}
+                            />
+                          </div>
+                        );
+                      }
+                      return <div className="h-0"></div>;
+                    })()}
+                  </div>
 
                   {/* Month Navigation */}
                   <div className="flex items-center justify-center mb-4 sm:mb-6">
@@ -1182,7 +1172,7 @@ export default function CalendarPage() {
                           <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No upcoming events</p>
                           <button
                             onClick={() => setIsModalOpen(true)}
-                            className="mt-4 px-6 py-3 bg-gradient-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                            className="mt-4 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors inline-flex items-center gap-2"
                           >
                             <Plus className="w-5 h-5" />
                             Create Event
@@ -1453,7 +1443,7 @@ export default function CalendarPage() {
                       </p>
                       <button
                         onClick={() => setIsModalOpen(true)}
-                        className="mt-4 px-6 py-3 bg-gradient-calendar text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                        className="mt-4 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors inline-flex items-center gap-2"
                       >
                         <Plus className="w-5 h-5" />
                         Create Event
