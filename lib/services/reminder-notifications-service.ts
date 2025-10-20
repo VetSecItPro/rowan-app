@@ -49,21 +49,27 @@ export interface ReminderNotification {
 export interface NotificationPreferences {
   id: string;
   user_id: string;
-  space_id?: string;
+  // Email preferences
   email_enabled: boolean;
-  email_due_reminders: boolean;
-  email_assignments: boolean;
-  email_mentions: boolean;
-  email_comments: boolean;
-  in_app_enabled: boolean;
-  in_app_due_reminders: boolean;
-  in_app_assignments: boolean;
-  in_app_mentions: boolean;
-  in_app_comments: boolean;
-  notification_frequency: NotificationFrequency;
+  email_reminders: boolean;
+  email_task_assignments: boolean;
+  email_events: boolean;
+  email_shopping_lists: boolean;
+  email_meal_reminders: boolean;
+  email_messages: boolean;
+  email_digest_frequency: string;
+  // Push preferences
+  push_enabled: boolean;
+  push_reminders: boolean;
+  push_tasks: boolean;
+  push_messages: boolean;
+  push_shopping_updates: boolean;
+  push_events: boolean;
+  // Quiet hours
   quiet_hours_enabled: boolean;
   quiet_hours_start?: string;
   quiet_hours_end?: string;
+  timezone?: string;
   created_at: string;
   updated_at: string;
 }
@@ -82,20 +88,27 @@ const CreateNotificationSchema = z.object({
 });
 
 const UpdatePreferencesSchema = z.object({
+  // Email preferences
   email_enabled: z.boolean().optional(),
-  email_due_reminders: z.boolean().optional(),
-  email_assignments: z.boolean().optional(),
-  email_mentions: z.boolean().optional(),
-  email_comments: z.boolean().optional(),
-  in_app_enabled: z.boolean().optional(),
-  in_app_due_reminders: z.boolean().optional(),
-  in_app_assignments: z.boolean().optional(),
-  in_app_mentions: z.boolean().optional(),
-  in_app_comments: z.boolean().optional(),
-  notification_frequency: z.enum(['instant', 'hourly', 'daily', 'never']).optional(),
+  email_reminders: z.boolean().optional(),
+  email_task_assignments: z.boolean().optional(),
+  email_events: z.boolean().optional(),
+  email_shopping_lists: z.boolean().optional(),
+  email_meal_reminders: z.boolean().optional(),
+  email_messages: z.boolean().optional(),
+  email_digest_frequency: z.enum(['realtime', 'daily', 'weekly', 'never']).optional(),
+  // Push preferences
+  push_enabled: z.boolean().optional(),
+  push_reminders: z.boolean().optional(),
+  push_tasks: z.boolean().optional(),
+  push_messages: z.boolean().optional(),
+  push_shopping_updates: z.boolean().optional(),
+  push_events: z.boolean().optional(),
+  // Quiet hours
   quiet_hours_enabled: z.boolean().optional(),
   quiet_hours_start: z.string().optional(),
   quiet_hours_end: z.string().optional(),
+  timezone: z.string().optional(),
 });
 
 export type CreateNotificationInput = z.infer<typeof CreateNotificationSchema>;
@@ -458,16 +471,10 @@ export const reminderNotificationsService = {
   async getPreferences(userId: string, spaceId?: string): Promise<NotificationPreferences | null> {
     const supabase = createClient();
 
-    let query = supabase
-      .from('user_notification_preferences')
+    const query = supabase
+      .from('notification_preferences')
       .select('*')
       .eq('user_id', userId);
-
-    if (spaceId) {
-      query = query.eq('space_id', spaceId);
-    } else {
-      query = query.is('space_id', null);
-    }
 
     const { data, error } = await query.single();
 
@@ -502,7 +509,7 @@ export const reminderNotificationsService = {
     if (existing) {
       // Update existing preferences
       const { data, error } = await supabase
-        .from('user_notification_preferences')
+        .from('notification_preferences')
         .update({
           ...validated,
           updated_at: new Date().toISOString(),
@@ -520,10 +527,9 @@ export const reminderNotificationsService = {
     } else {
       // Create new preferences
       const { data, error } = await supabase
-        .from('user_notification_preferences')
+        .from('notification_preferences')
         .insert({
           user_id: userId,
-          space_id: spaceId,
           ...validated,
         })
         .select()
