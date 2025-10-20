@@ -12,7 +12,6 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // Validation schemas
 const MarketingSubscriptionUpdateSchema = z.object({
   emailMarketing: z.boolean().optional(),
-  smsMarketing: z.boolean().optional(),
   productUpdates: z.boolean().optional(),
   securityAlerts: z.boolean().optional(),
   weeklyDigest: z.boolean().optional(),
@@ -21,7 +20,7 @@ const MarketingSubscriptionUpdateSchema = z.object({
 
 const UnsubscribeTokenSchema = z.object({
   token: z.string().min(32),
-  type: z.enum(['email', 'sms', 'all']).optional().default('email'),
+  type: z.enum(['email', 'all']).optional().default('email'),
 });
 
 // POST - Update marketing subscription preferences
@@ -100,9 +99,6 @@ export async function POST(request: NextRequest) {
     if (typeof validatedData.emailMarketing !== 'undefined') {
       updates.marketing_emails_enabled = validatedData.emailMarketing;
     }
-    if (typeof validatedData.smsMarketing !== 'undefined') {
-      updates.marketing_sms_enabled = validatedData.smsMarketing;
-    }
 
     // Update privacy preferences
     const { error: updateError } = await supabase
@@ -173,7 +169,7 @@ export async function GET(request: NextRequest) {
     // Get marketing preferences, create default if none exist
     let { data: preferences, error: prefsError } = await supabase
       .from('user_privacy_preferences')
-      .select('marketing_emails_enabled, marketing_sms_enabled')
+      .select('marketing_emails_enabled')
       .eq('user_id', userId)
       .maybeSingle();
 
@@ -184,12 +180,11 @@ export async function GET(request: NextRequest) {
         .insert({
           user_id: userId,
           marketing_emails_enabled: false,
-          marketing_sms_enabled: false,
           third_party_analytics_enabled: false,
           share_data_with_partners: false,
           ccpa_do_not_sell: true,
         })
-        .select('marketing_emails_enabled, marketing_sms_enabled')
+        .select('marketing_emails_enabled')
         .single();
 
       if (createError) {
@@ -237,7 +232,6 @@ export async function GET(request: NextRequest) {
       data: {
         preferences: {
           emailMarketing: preferences.marketing_emails_enabled,
-          smsMarketing: preferences.marketing_sms_enabled,
         },
         contactInfo: {
           email: profile.email,
@@ -246,7 +240,6 @@ export async function GET(request: NextRequest) {
         subscriptionHistory: history || [],
         unsubscribeLinks: {
           email: `${process.env.NEXT_PUBLIC_APP_URL}/unsubscribe?token=${await generateUnsubscribeToken(userId, 'email')}`,
-          sms: `${process.env.NEXT_PUBLIC_APP_URL}/unsubscribe?token=${await generateUnsubscribeToken(userId, 'sms')}`,
           all: `${process.env.NEXT_PUBLIC_APP_URL}/unsubscribe?token=${await generateUnsubscribeToken(userId, 'all')}`,
         },
       },
@@ -268,10 +261,7 @@ async function applyMarketingPreferences(userId: string, preferences: any, curre
       await updateResendAudience(userId, preferences.emailMarketing);
     }
 
-    // 2. Update SMS service (e.g., Twilio)
-    if (typeof preferences.smsMarketing !== 'undefined') {
-      await updateSMSSubscription(userId, preferences.smsMarketing);
-    }
+    // SMS functionality removed - app uses in-app messaging only
 
     // 3. Update email service provider (if different from Resend)
     if (typeof preferences.emailMarketing !== 'undefined') {
@@ -397,13 +387,7 @@ async function logMarketingPreferenceChange(userId: string, preferences: any) {
       });
     }
 
-    if (typeof preferences.smsMarketing !== 'undefined') {
-      notifications.push({
-        user_id: userId,
-        notification_type: preferences.smsMarketing ? 'sms_marketing_subscribed' : 'sms_marketing_unsubscribed',
-        email_address: 'sms-marketing',
-      });
-    }
+    // SMS logging removed - app uses in-app messaging only
 
     if (notifications.length > 0) {
       await supabase.from('privacy_email_notifications').insert(notifications);
@@ -480,14 +464,8 @@ async function handleTokenUnsubscribe(token: string, type: string) {
 
     switch (type) {
       case 'email':
-        updates.marketing_emails_enabled = false;
-        break;
-      case 'sms':
-        updates.marketing_sms_enabled = false;
-        break;
       case 'all':
         updates.marketing_emails_enabled = false;
-        updates.marketing_sms_enabled = false;
         break;
     }
 
@@ -513,7 +491,6 @@ async function handleTokenUnsubscribe(token: string, type: string) {
     // Apply to external services
     const preferences = {
       emailMarketing: type === 'email' || type === 'all' ? false : undefined,
-      smsMarketing: type === 'sms' || type === 'all' ? false : undefined,
     };
 
     await applyMarketingPreferences(tokenRecord.user_id, preferences, {});
