@@ -44,15 +44,9 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
       onChange(e.target.checked);
     };
 
-    // Build the translate class based on size and checked state
-    const getTranslateClass = () => {
-      if (!checked) return '';
-      return size === 'sm' ? 'translate-x-4' : size === 'lg' ? 'translate-x-7' : 'translate-x-5';
-    };
-
     return (
       <div className="flex items-center gap-3">
-        <label htmlFor={id} className="btn-touch relative inline-flex items-center cursor-pointer active:scale-95 hover-lift shimmer-purple active-press">
+        <label htmlFor={id} className="relative inline-flex items-center cursor-pointer">
           <input
             ref={ref}
             type="checkbox"
@@ -76,9 +70,6 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
               transition-all
               duration-200
               ease-in-out
-              hover:shadow-lg
-              hover:scale-105
-              active:scale-95
             `}
           >
             <div
@@ -89,13 +80,11 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
                 bg-white
                 rounded-full
                 ${sizeClasses[size].thumb}
-                transition-all
+                transition-transform
                 duration-200
                 ease-in-out
-                shadow-lg
-                hover:shadow-xl
-                ${getTranslateClass()}
-                ${checked ? 'shadow-md' : 'shadow-sm'}
+                shadow
+                ${checked ? sizeClasses[size].translate : 'translate-x-0'}
               `}
             />
           </div>
@@ -106,13 +95,13 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
             {label && (
               <label
                 htmlFor={id}
-                className="btn-touch text-sm font-medium text-gray-900 dark:text-white cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 transition-colors active:scale-[0.98] hover-lift shimmer-purple active-press"
+                className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
               >
                 {label}
               </label>
             )}
             {description && (
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5 transition-colors">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
                 {description}
               </p>
             )}
