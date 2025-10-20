@@ -2,13 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MessageSquare, Bell, Shield, Check, AlertCircle, ExternalLink, Loader2 } from 'lucide-react';
+import { Mail, Bell, Shield, Check, AlertCircle, ExternalLink, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/contexts/auth-context';
 
 interface MarketingPreferences {
   emailMarketing: boolean;
-  smsMarketing: boolean;
   productUpdates: boolean;
   securityAlerts: boolean;
   weeklyDigest: boolean;
@@ -31,7 +30,6 @@ interface MarketingPreferencesData {
   subscriptionHistory: SubscriptionHistory[];
   unsubscribeLinks: {
     email: string;
-    sms: string;
     all: string;
   };
 }
@@ -233,38 +231,6 @@ export function MarketingPreferences() {
         </div>
       </div>
 
-      {/* SMS Marketing */}
-      <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-        <div className="flex items-start justify-between">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
-              <MessageSquare className="h-4 w-4 text-green-600 dark:text-green-400" />
-            </div>
-            <div className="flex-1">
-              <h4 className="font-medium text-gray-900 dark:text-white">SMS Marketing</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                Receive important updates and occasional promotions via text message
-              </p>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                Standard rates apply • Reply STOP to opt out • Max 4 messages/month
-              </div>
-              <div className="text-xs text-amber-600 dark:text-amber-400 mt-2">
-                SMS functionality not yet available - phone number feature coming soon
-              </div>
-            </div>
-          </div>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={preferences.smsMarketing}
-              onChange={(e) => handleToggle('smsMarketing', e.target.checked)}
-              disabled={true}
-              className="sr-only peer"
-            />
-            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-          </label>
-        </div>
-      </div>
 
       {/* Unsubscribe Links */}
       <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
@@ -275,7 +241,7 @@ export function MarketingPreferences() {
             <p className="text-sm text-blue-700 dark:text-blue-300 mt-1 mb-3">
               Use these direct links to unsubscribe without logging in
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <a
                 href={data.unsubscribeLinks.email}
                 target="_blank"
@@ -284,16 +250,6 @@ export function MarketingPreferences() {
               >
                 <Mail className="h-4 w-4" />
                 Unsubscribe Email
-                <ExternalLink className="h-3 w-3 ml-auto" />
-              </a>
-              <a
-                href={data.unsubscribeLinks.sms}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-blue-300 dark:border-blue-600 rounded-lg text-sm text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
-              >
-                <MessageSquare className="h-4 w-4" />
-                Unsubscribe SMS
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </a>
               <a
