@@ -15,21 +15,25 @@ interface ToggleProps {
 
 export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
   ({ id, checked, onChange, disabled = false, size = 'md', color = 'purple', label, description }, ref) => {
+    // iOS-style toggle sizing (width should be about 2x height)
     const sizeClasses = {
       sm: {
-        container: 'w-9 h-5 p-0.5',
+        container: 'w-10 h-5',
         thumb: 'w-4 h-4',
-        translate: 'translate-x-4',
+        padding: 'p-0.5',
+        translateOn: 'translate-x-5', // Move right when ON
       },
       md: {
-        container: 'w-12 h-6 p-0.5',
+        container: 'w-12 h-6',
         thumb: 'w-5 h-5',
-        translate: 'translate-x-5',
+        padding: 'p-0.5',
+        translateOn: 'translate-x-6', // Move right when ON
       },
       lg: {
-        container: 'w-14 h-8 p-0.5',
+        container: 'w-16 h-8',
         thumb: 'w-7 h-7',
-        translate: 'translate-x-5',
+        padding: 'p-0.5',
+        translateOn: 'translate-x-8', // Move right when ON
       },
     };
 
@@ -56,14 +60,17 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
             disabled={disabled}
             className="sr-only peer"
           />
+
+          {/* Toggle container - pill background */}
           <div
             className={`
               relative
               ${sizeClasses[size].container}
+              ${sizeClasses[size].padding}
               ${checked ? colorClasses[color] : 'bg-gray-300 dark:bg-gray-600'}
               rounded-full
-              transition-colors
-              duration-200
+              transition-all
+              duration-300
               ease-in-out
               peer-disabled:opacity-50
               peer-disabled:cursor-not-allowed
@@ -71,20 +78,24 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
               peer-focus:ring-2
               peer-focus:ring-purple-500
               peer-focus:ring-offset-2
-              flex
-              items-center
+              shadow-inner
             `}
           >
+            {/* Toggle thumb - sliding circle */}
             <div
               className={`
+                absolute
+                top-0.5
+                left-0.5
                 bg-white
                 rounded-full
                 ${sizeClasses[size].thumb}
-                transition-transform
-                duration-200
+                transition-all
+                duration-300
                 ease-in-out
-                shadow-md
-                ${checked ? sizeClasses[size].translate : 'translate-x-0'}
+                shadow-lg
+                ${checked ? sizeClasses[size].translateOn : 'translate-x-0'}
+                transform
               `}
             />
           </div>

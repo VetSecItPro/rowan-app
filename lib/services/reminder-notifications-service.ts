@@ -49,24 +49,23 @@ export interface ReminderNotification {
 export interface NotificationPreferences {
   id: string;
   user_id: string;
-  // Email preferences
-  email_enabled: boolean;
-  email_reminders: boolean;
+  // Email preferences - matching database schema
   email_task_assignments: boolean;
-  email_events: boolean;
+  email_event_reminders: boolean;
+  email_new_messages: boolean;
   email_shopping_lists: boolean;
   email_meal_reminders: boolean;
-  email_messages: boolean;
-  email_digest_frequency: string;
-  // Push preferences
+  email_general_reminders: boolean;
+  // Push preferences - matching database schema
   push_enabled: boolean;
+  push_task_updates: boolean;
   push_reminders: boolean;
-  push_tasks: boolean;
   push_messages: boolean;
   push_shopping_updates: boolean;
-  push_events: boolean;
-  // Legacy compatibility
-  notification_frequency: NotificationFrequency;
+  push_event_alerts: boolean;
+  // Digest settings
+  digest_frequency: string;
+  digest_time?: string;
   // Quiet hours
   quiet_hours_enabled: boolean;
   quiet_hours_start?: string;
@@ -90,22 +89,23 @@ const CreateNotificationSchema = z.object({
 });
 
 const UpdatePreferencesSchema = z.object({
-  // Email preferences
-  email_enabled: z.boolean().optional(),
-  email_reminders: z.boolean().optional(),
+  // Email preferences - matching database schema
   email_task_assignments: z.boolean().optional(),
-  email_events: z.boolean().optional(),
+  email_event_reminders: z.boolean().optional(),
+  email_new_messages: z.boolean().optional(),
   email_shopping_lists: z.boolean().optional(),
   email_meal_reminders: z.boolean().optional(),
-  email_messages: z.boolean().optional(),
-  email_digest_frequency: z.enum(['realtime', 'daily', 'weekly', 'never']).optional(),
-  // Push preferences
+  email_general_reminders: z.boolean().optional(),
+  // Push preferences - matching database schema
   push_enabled: z.boolean().optional(),
+  push_task_updates: z.boolean().optional(),
   push_reminders: z.boolean().optional(),
-  push_tasks: z.boolean().optional(),
   push_messages: z.boolean().optional(),
   push_shopping_updates: z.boolean().optional(),
-  push_events: z.boolean().optional(),
+  push_event_alerts: z.boolean().optional(),
+  // Digest settings
+  digest_frequency: z.enum(['realtime', 'daily', 'weekly']).optional(),
+  digest_time: z.string().optional(),
   // Quiet hours
   quiet_hours_enabled: z.boolean().optional(),
   quiet_hours_start: z.string().optional(),
@@ -474,7 +474,7 @@ export const reminderNotificationsService = {
     const supabase = createClient();
 
     const query = supabase
-      .from('notification_preferences')
+      .from('user_notification_preferences')
       .select('*')
       .eq('user_id', userId);
 
@@ -511,7 +511,7 @@ export const reminderNotificationsService = {
     if (existing) {
       // Update existing preferences
       const { data, error } = await supabase
-        .from('notification_preferences')
+        .from('user_notification_preferences')
         .update({
           ...validated,
           updated_at: new Date().toISOString(),
@@ -529,7 +529,7 @@ export const reminderNotificationsService = {
     } else {
       // Create new preferences
       const { data, error } = await supabase
-        .from('notification_preferences')
+        .from('user_notification_preferences')
         .insert({
           user_id: userId,
           ...validated,
