@@ -27,39 +27,11 @@ interface CookieCategory {
 const COOKIE_CATEGORIES: CookieCategory[] = [
   {
     key: 'necessary',
-    title: 'Necessary',
-    description: 'Required for login and security',
+    title: 'Essential Cookies',
+    description: 'Required for login, security, and core app functionality',
     icon: Shield,
     color: 'green',
     required: true,
-  },
-  {
-    key: 'analytics',
-    title: 'Analytics',
-    description: 'Help improve performance',
-    icon: BarChart3,
-    color: 'blue',
-  },
-  {
-    key: 'marketing',
-    title: 'Marketing',
-    description: 'Personalized ads',
-    icon: Megaphone,
-    color: 'purple',
-  },
-  {
-    key: 'functional',
-    title: 'Functional',
-    description: 'Enhanced features',
-    icon: Settings,
-    color: 'emerald',
-  },
-  {
-    key: 'preferences',
-    title: 'Preferences',
-    description: 'Remember your settings',
-    icon: Palette,
-    color: 'orange',
   },
 ];
 
@@ -136,10 +108,10 @@ export function CookiePreferences() {
         </div>
         <div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Cookie Preferences
+            Cookie Information
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            Control how we use cookies to improve your experience
+            Rowan only uses essential cookies required for the app to function
           </p>
         </div>
       </div>
@@ -215,66 +187,46 @@ export function CookiePreferences() {
         })}
       </div>
 
-      {/* Summary */}
+      {/* Cookie Information */}
       <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <h4 className="font-medium text-gray-900 dark:text-white mb-2">
-          Current Selection Summary
+        <h4 className="font-medium text-gray-900 dark:text-white mb-3">
+          What Cookies We Use
         </h4>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 text-sm">
-          {COOKIE_CATEGORIES.map(category => (
-            <div key={category.key} className="flex items-center gap-2">
-              <div
-                className={`h-3 w-3 rounded-full ${
-                  preferences[category.key]
-                    ? 'bg-green-500'
-                    : 'bg-gray-300 dark:bg-gray-600'
-                }`}
-              />
-              <span className="text-gray-700 dark:text-gray-300">
-                {category.title.replace(' Cookies', '')}
-              </span>
+        <div className="space-y-3 text-sm">
+          <div className="flex items-start gap-3">
+            <div className="h-2 w-2 rounded-full bg-green-500 mt-2 shrink-0" />
+            <div>
+              <span className="font-medium text-gray-900 dark:text-white">Session & Authentication</span>
+              <p className="text-gray-600 dark:text-gray-300">Keeps you logged in securely</p>
             </div>
-          ))}
-        </div>
-
-        {lastUpdated && (
-          <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-            <Calendar className="h-4 w-4 text-gray-500" />
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              Last updated: {lastUpdated.toLocaleDateString()} at {lastUpdated.toLocaleTimeString()}
-            </span>
           </div>
-        )}
+          <div className="flex items-start gap-3">
+            <div className="h-2 w-2 rounded-full bg-green-500 mt-2 shrink-0" />
+            <div>
+              <span className="font-medium text-gray-900 dark:text-white">Security & CSRF Protection</span>
+              <p className="text-gray-600 dark:text-gray-300">Protects against malicious attacks</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <div className="h-2 w-2 rounded-full bg-green-500 mt-2 shrink-0" />
+            <div>
+              <span className="font-medium text-gray-900 dark:text-white">App Functionality</span>
+              <p className="text-gray-600 dark:text-gray-300">Remembers your settings and preferences</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <Button
-          onClick={handleSave}
-          disabled={isLoading}
-          className="flex-1 bg-blue-600 hover:bg-blue-700"
-        >
-          {isLoading ? 'Saving...' : 'Save Preferences'}
-        </Button>
-
-        <Button
-          variant="outline"
-          onClick={handleReset}
-          disabled={isLoading}
-          className="flex-1"
-        >
-          Reset to Defaults
-        </Button>
-      </div>
 
       {/* Legal Notice */}
       <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
         <div className="flex items-start gap-2">
           <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
           <div className="text-sm text-blue-700 dark:text-blue-300">
-            <p className="font-medium mb-1">Cookie Control</p>
+            <p className="font-medium mb-1">Simple Cookie Policy</p>
             <p>
-              Changes apply instantly. Necessary cookies are always required.
+              Rowan only uses essential cookies necessary for the app to function. No tracking, advertising, or third-party cookies.
+              These cookies are required and cannot be disabled.
             </p>
           </div>
         </div>
