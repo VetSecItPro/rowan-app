@@ -112,7 +112,7 @@ export default function NotificationSettingsPage() {
     try {
       if (enabled) {
         const result = await pushSubscriptionService.subscribe(user.id);
-        if (result.success) {
+        if (result) {
           setIsPushSubscribed(true);
           setPushEnabled(true);
         } else {
