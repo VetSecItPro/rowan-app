@@ -31,7 +31,9 @@ export default function DigestSettingsPage() {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch('/api/digest/preferences');
+      const response = await fetch('/api/digest/preferences', {
+        credentials: 'include'
+      });
       if (!response.ok) {
         throw new Error('Failed to load digest preferences');
       }
@@ -60,6 +62,7 @@ export default function DigestSettingsPage() {
       const response = await fetch('/api/digest/preferences', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ digest_enabled: enabled }),
       });
 
