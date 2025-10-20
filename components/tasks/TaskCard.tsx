@@ -70,14 +70,14 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
     onStatusChange(task.id, newStatus, task.type);
   };
 
-  // Get checkbox styling based on status
+  // Get checkbox styling based on status - simplified
   const getCheckboxStyle = () => {
     if (task.status === 'completed') {
-      return 'bg-green-500 border-green-500';
+      return 'bg-green-500 border border-green-500';
     } else if (task.status === 'in_progress') {
-      return 'bg-amber-500 border-amber-500';
+      return 'bg-blue-500 border border-blue-500';
     } else {
-      return 'border-2 border-red-500 bg-transparent';
+      return 'border border-gray-300 dark:border-gray-600 bg-transparent';
     }
   };
 
@@ -116,7 +116,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
             onClick={handleStatusClick}
             title={getStatusTooltip()}
             aria-label={`Toggle task status: ${statusLabel.text}`}
-            className={`mt-0.5 flex-shrink-0 w-6 h-6 sm:w-5 sm:h-5 rounded flex items-center justify-center transition-all active:scale-95 hover:scale-110 ${getCheckboxStyle()}`}
+            className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded flex items-center justify-center transition-colors ${getCheckboxStyle()}`}
           >
             {task.status === 'completed' && (
               <CheckSquare className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
@@ -163,7 +163,7 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
             onClick={() => setShowMenu(!showMenu)}
             title="Edit or Delete"
             aria-label="Task options menu"
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="w-8 h-8 flex items-center justify-center"
           >
             <MoreVertical className="w-5 h-5 md:w-4 md:h-4 text-gray-600 dark:text-gray-400" />
           </button>
