@@ -15,72 +15,50 @@ export async function POST(request: NextRequest) {
     let result;
 
     switch (type) {
-      case 'goal_achievement':
-        result = await emailService.sendGoalAchievementEmail(
-          recipient,
-          data.userName,
-          data.spaceName,
-          {
-            achievementType: data.achievementType,
-            goalTitle: data.goalTitle,
-            milestoneTitle: data.milestoneTitle,
-            completedBy: data.completedBy,
-            completionDate: data.completionDate,
-            streakCount: data.streakCount,
-            nextMilestone: data.nextMilestone,
-            goalUrl: data.goalUrl,
-          }
-        );
-        break;
-
       case 'task_assignment':
-        result = await emailService.sendTaskAssignmentEmail(
-          recipient,
-          data.userName,
-          data.spaceName,
-          {
-            taskTitle: data.taskTitle,
-            assignedBy: data.assignedBy,
-            assignedTo: data.assignedTo,
-            priority: data.priority,
-            dueDate: data.dueDate,
-            description: data.description,
-            taskUrl: data.taskUrl,
-          }
-        );
+        result = await emailService.sendTaskAssignmentEmail({
+          recipientEmail: recipient,
+          recipientName: data.userName,
+          assignerName: data.assignedBy,
+          taskTitle: data.taskTitle,
+          taskDescription: data.description,
+          dueDate: data.dueDate,
+          priority: data.priority || 'normal',
+          spaceId: data.spaceId,
+          taskId: data.taskId,
+          spaceName: data.spaceName,
+        });
         break;
 
       case 'event_reminder':
-        result = await emailService.sendEventReminderEmail(
-          recipient,
-          data.userName,
-          data.spaceName,
-          {
-            eventTitle: data.eventTitle,
-            eventDescription: data.description,
-            startTime: data.startTime,
-            endTime: data.endTime,
-            location: data.location,
-            reminderTime: data.reminderTime,
-            eventUrl: data.eventUrl,
-          }
-        );
+        result = await emailService.sendEventReminderEmail({
+          recipientEmail: recipient,
+          recipientName: data.userName,
+          eventTitle: data.eventTitle,
+          eventDescription: data.description,
+          eventDate: data.eventDate,
+          eventTime: data.eventTime,
+          location: data.location,
+          reminderType: data.reminderType || '15min',
+          eventId: data.eventId,
+          spaceId: data.spaceId,
+          spaceName: data.spaceName,
+        });
         break;
 
       case 'new_message':
-        result = await emailService.sendNewMessageEmail(
-          recipient,
-          data.userName,
-          data.spaceName,
-          {
-            senderName: data.senderName,
-            senderAvatar: data.senderAvatar,
-            messagePreview: data.messagePreview,
-            conversationTitle: data.conversationTitle,
-            isDirectMessage: data.isDirectMessage,
-            messageUrl: data.messageUrl,
-          }
-        );
+        result = await emailService.sendNewMessageEmail({
+          recipientEmail: recipient,
+          recipientName: data.userName,
+          senderName: data.senderName,
+          senderAvatar: data.senderAvatar,
+          messageContent: data.messageContent || data.messagePreview,
+          conversationTitle: data.conversationTitle,
+          spaceId: data.spaceId,
+          conversationId: data.conversationId,
+          spaceName: data.spaceName,
+          messageTimestamp: data.messageTimestamp || new Date().toISOString(),
+        });
         break;
 
       case 'digest':

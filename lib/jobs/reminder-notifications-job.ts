@@ -232,8 +232,8 @@ async function sendEmailNotifications(batch: NotificationBatch): Promise<{
     // Check if user has email notifications enabled
     const prefs = await reminderNotificationsService.getPreferences(batch.userId);
 
-    // If no preferences or email disabled, skip
-    if (!prefs || !prefs.email_enabled) {
+    // If no preferences, skip
+    if (!prefs) {
       return { sent: false };
     }
 
@@ -241,7 +241,7 @@ async function sendEmailNotifications(batch: NotificationBatch): Promise<{
     const hasDueReminders = batch.notifications.some((n) => n.type === 'due');
     const hasOverdueReminders = batch.notifications.some((n) => n.type === 'overdue');
 
-    if (!prefs.email_due_reminders && (hasDueReminders || hasOverdueReminders)) {
+    if (!prefs.email_general_reminders && (hasDueReminders || hasOverdueReminders)) {
       return { sent: false };
     }
 
