@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createServerClient } from '@supabase/ssr';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
@@ -8,12 +9,10 @@ import { z } from 'zod';
 
 /**
  * Simplified Digest Preferences Schema
- * Only the essential fields for daily digest delivery
+ * Only digest_enabled toggle - time/timezone fixed at 7 AM Central
  */
 const DigestPreferencesSchema = z.object({
-  digest_enabled: z.boolean().optional(),
-  digest_time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/).optional(), // HH:MM:SS format
-  timezone: z.string().optional(),
+  digest_enabled: z.boolean(),
 });
 
 /**
@@ -33,9 +32,42 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Verify authentication
-    const supabase = createClient();
+    // Verify authentication - Use direct cookie access like middleware
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            const cookieHeader = req.headers.get('cookie');
+            if (!cookieHeader) return undefined;
+
+            const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
+              const [key, value] = cookie.trim().split('=');
+              acc[key] = value;
+              return acc;
+            }, {} as Record<string, string>);
+
+            return cookies[name];
+          },
+          set() {
+            // Not needed for API routes
+          },
+          remove() {
+            // Not needed for API routes
+          },
+        },
+      }
+    );
+
     const { data: { session }, error: authError } = await supabase.auth.getSession();
+
+    console.log('[API] Direct cookie auth result:', {
+      hasSession: !!session,
+      sessionId: session?.user?.id?.substring(0, 8),
+      authError: authError?.message,
+      userEmail: session?.user?.email
+    });
 
     if (authError || !session) {
       return NextResponse.json(
@@ -47,22 +79,20 @@ export async function GET(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(session.user);
 
-    // Get or create digest preferences - handle both old and new schema
+    // Get or create digest preferences - simplified for fixed 7 AM Central
     let { data: preferences, error } = await supabase
       .from('user_notification_preferences')
-      .select('id, user_id, digest_enabled, digest_frequency, digest_time, timezone, created_at, updated_at')
+      .select('id, user_id, digest_enabled, created_at, updated_at')
       .eq('user_id', session.user.id)
       .single();
 
     if (error && error.code === 'PGRST116') { // Not found
-      // Create default preferences
+      // Create default preferences - enabled by default
       const { data: newPrefs, error: createError } = await supabase
         .from('user_notification_preferences')
         .insert({
           user_id: session.user.id,
-          digest_enabled: true,
-          digest_time: '07:00:00',
-          timezone: 'America/New_York'
+          digest_enabled: true
         })
         .select()
         .single();
@@ -76,21 +106,17 @@ export async function GET(req: NextRequest) {
       throw error;
     }
 
-    // Handle backwards compatibility for digest_enabled field
+    // Ensure preferences exist
     if (!preferences) {
       throw new Error('No preferences found');
     }
 
-    // Transform data for backwards compatibility
-    const digestEnabled = preferences.digest_enabled !== undefined
-      ? preferences.digest_enabled
-      : (preferences.digest_frequency !== 'disabled' && preferences.digest_frequency !== null);
-
+    // Return simple preferences (time/timezone are fixed at 7 AM Central)
     const transformedPreferences = {
       ...preferences,
-      digest_enabled: digestEnabled,
-      digest_time: preferences.digest_time || '07:00:00',
-      timezone: preferences.timezone || 'America/New_York'
+      digest_enabled: preferences.digest_enabled ?? true,
+      digest_time: '07:00:00',
+      timezone: 'America/New_York'
     };
 
     return NextResponse.json({
@@ -133,8 +159,34 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    // Verify authentication
-    const supabase = createClient();
+    // Verify authentication - Use direct cookie access like middleware
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            const cookieHeader = req.headers.get('cookie');
+            if (!cookieHeader) return undefined;
+
+            const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
+              const [key, value] = cookie.trim().split('=');
+              acc[key] = value;
+              return acc;
+            }, {} as Record<string, string>);
+
+            return cookies[name];
+          },
+          set() {
+            // Not needed for API routes
+          },
+          remove() {
+            // Not needed for API routes
+          },
+        },
+      }
+    );
+
     const { data: { session }, error: authError } = await supabase.auth.getSession();
 
     if (authError || !session) {
@@ -170,7 +222,7 @@ export async function PATCH(req: NextRequest) {
       .upsert(
         {
           user_id: session.user.id,
-          ...validation.data,
+          digest_enabled: validation.data.digest_enabled,
           updated_at: new Date().toISOString(),
         },
         {
