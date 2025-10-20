@@ -21,13 +21,16 @@ export function WeatherBadge({ eventTime, location, compact = false }: WeatherBa
 
   const loadWeather = async () => {
     if (!location) {
+      console.log('[WeatherBadge] No location provided');
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
+      console.log('[WeatherBadge] Loading weather for location:', location);
       const forecast = await weatherService.getWeatherForEvent(location, eventTime);
+      console.log('[WeatherBadge] Weather forecast received:', forecast);
       setWeather(forecast);
 
       if (forecast) {
@@ -35,7 +38,7 @@ export function WeatherBadge({ eventTime, location, compact = false }: WeatherBa
         setAlert(weatherAlert);
       }
     } catch (error) {
-      console.error('Failed to load weather:', error);
+      console.error('[WeatherBadge] Failed to load weather:', error);
     } finally {
       setLoading(false);
     }
