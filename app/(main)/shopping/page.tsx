@@ -704,7 +704,7 @@ export default function ShoppingPage() {
           {/* Apple-Inspired Search Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className="apple-search-container">
+            <div className={`apple-search-container shopping-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
               <Search className="apple-search-icon" />
               <input
                 type="search"
