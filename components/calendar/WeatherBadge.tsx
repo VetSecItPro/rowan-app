@@ -41,15 +41,35 @@ export function WeatherBadge({ eventTime, location, compact = false }: WeatherBa
     }
   };
 
-  if (loading || !weather) return null;
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 py-2">
+        <div className="animate-spin rounded-full h-3 w-3 border-2 border-purple-500 border-t-transparent"></div>
+        Loading weather...
+      </div>
+    );
+  }
+
+  if (!weather) {
+    return (
+      <div className="text-xs text-gray-500 dark:text-gray-400 py-2">
+        Weather unavailable
+      </div>
+    );
+  }
 
   const emoji = weatherService.getWeatherEmoji(weather.condition);
+
+  // Convert Celsius to Fahrenheit for US users
+  const toFahrenheit = (celsius: number) => Math.round((celsius * 9/5) + 32);
+  const tempF = toFahrenheit(weather.temp);
+  const feelsLikeF = toFahrenheit(weather.feelsLike);
 
   if (compact) {
     return (
       <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
         <span className="text-sm">{emoji}</span>
-        <span>{weather.temp}°C</span>
+        <span>{tempF}°F</span>
         {alert && (
           <AlertTriangle
             className={`w-3 h-3 ${
@@ -73,10 +93,10 @@ export function WeatherBadge({ eventTime, location, compact = false }: WeatherBa
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-gray-900 dark:text-white">
-              {weather.temp}°C
+              {tempF}°F
             </span>
             <span className="text-xs text-gray-600 dark:text-gray-400">
-              Feels like {weather.feelsLike}°C
+              Feels like {feelsLikeF}°F
             </span>
           </div>
           <p className="text-xs text-gray-600 dark:text-gray-400 capitalize">

@@ -403,7 +403,7 @@ export default function CalendarPage() {
       } catch (error) {
         console.error('[Calendar] Failed to get user location:', error);
         // Set fallback location
-        setUserLocation('New York, New York, United States');
+        setUserLocation('Dallas, Texas, United States');
       } finally {
         setLocationLoading(false);
       }
