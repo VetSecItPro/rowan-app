@@ -27,37 +27,37 @@ interface CookieCategory {
 const COOKIE_CATEGORIES: CookieCategory[] = [
   {
     key: 'necessary',
-    title: 'Necessary Cookies',
-    description: 'Essential for authentication, security, and core functionality',
+    title: 'Necessary',
+    description: 'Required for login and security',
     icon: Shield,
     color: 'green',
     required: true,
   },
   {
     key: 'analytics',
-    title: 'Analytics Cookies',
-    description: 'Help us understand how you use our app to improve performance',
+    title: 'Analytics',
+    description: 'Help improve performance',
     icon: BarChart3,
     color: 'blue',
   },
   {
     key: 'marketing',
-    title: 'Marketing Cookies',
-    description: 'Used for advertising personalization and campaign effectiveness',
+    title: 'Marketing',
+    description: 'Personalized ads',
     icon: Megaphone,
     color: 'purple',
   },
   {
     key: 'functional',
-    title: 'Functional Cookies',
-    description: 'Enable enhanced features and personalized content',
+    title: 'Functional',
+    description: 'Enhanced features',
     icon: Settings,
     color: 'emerald',
   },
   {
     key: 'preferences',
-    title: 'Preference Cookies',
-    description: 'Remember your language, timezone, and personalization settings',
+    title: 'Preferences',
+    description: 'Remember your settings',
     icon: Palette,
     color: 'orange',
   },
@@ -187,27 +187,7 @@ export function CookiePreferences() {
                         </span>
                       )}
                     </div>
-                    <p className="text-sm opacity-90 mb-3">{category.description}</p>
-
-                    {/* Cookie Details */}
-                    <div className="space-y-1">
-                      {COOKIE_CATALOG
-                        .filter(cookie => cookie.category === category.key)
-                        .slice(0, 3) // Show first 3 cookies
-                        .map(cookie => (
-                          <div key={cookie.name} className="text-xs opacity-75">
-                            <span className="font-mono">{cookie.name}</span>
-                            {cookie.provider && (
-                              <span className="ml-2">({cookie.provider})</span>
-                            )}
-                          </div>
-                        ))}
-                      {COOKIE_CATALOG.filter(cookie => cookie.category === category.key).length > 3 && (
-                        <div className="text-xs opacity-75">
-                          +{COOKIE_CATALOG.filter(cookie => cookie.category === category.key).length - 3} more...
-                        </div>
-                      )}
-                    </div>
+                    <p className="text-sm opacity-90">{category.description}</p>
                   </div>
                 </div>
 
@@ -292,10 +272,9 @@ export function CookiePreferences() {
         <div className="flex items-start gap-2">
           <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
           <div className="text-sm text-blue-700 dark:text-blue-300">
-            <p className="font-medium mb-1">About Cookie Control</p>
+            <p className="font-medium mb-1">Cookie Control</p>
             <p>
-              Changes take effect immediately. Disabling certain cookies may affect functionality.
-              Necessary cookies cannot be disabled as they are essential for security and authentication.
+              Changes apply instantly. Necessary cookies are always required.
             </p>
           </div>
         </div>
