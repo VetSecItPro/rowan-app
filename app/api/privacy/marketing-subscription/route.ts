@@ -54,14 +54,37 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = MarketingSubscriptionUpdateSchema.parse(body);
 
-    // Get current preferences
-    const { data: currentPrefs, error: prefsError } = await supabase
+    // Get current preferences, create default if none exist
+    let { data: currentPrefs, error: prefsError } = await supabase
       .from('user_privacy_preferences')
       .select('*')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
-    if (prefsError) {
+    // Create default preferences if user doesn't have any
+    if (!currentPrefs && !prefsError) {
+      const { data: newPrefs, error: createError } = await supabase
+        .from('user_privacy_preferences')
+        .insert({
+          user_id: userId,
+          marketing_emails_enabled: false,
+          marketing_sms_enabled: false,
+          third_party_analytics_enabled: false,
+          share_data_with_partners: false,
+          ccpa_do_not_sell: true,
+        })
+        .select('*')
+        .single();
+
+      if (createError) {
+        console.error('Error creating default privacy preferences:', createError);
+        return NextResponse.json(
+          { success: false, error: 'Failed to initialize preferences' },
+          { status: 500 }
+        );
+      }
+      currentPrefs = newPrefs;
+    } else if (prefsError) {
       console.error('Error fetching privacy preferences:', prefsError);
       return NextResponse.json(
         { success: false, error: 'Failed to fetch current preferences' },
@@ -147,14 +170,37 @@ export async function GET(request: NextRequest) {
 
     const userId = session.user.id;
 
-    // Get marketing preferences
-    const { data: preferences, error: prefsError } = await supabase
+    // Get marketing preferences, create default if none exist
+    let { data: preferences, error: prefsError } = await supabase
       .from('user_privacy_preferences')
       .select('marketing_emails_enabled, marketing_sms_enabled')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
-    if (prefsError) {
+    // Create default preferences if user doesn't have any
+    if (!preferences && !prefsError) {
+      const { data: newPrefs, error: createError } = await supabase
+        .from('user_privacy_preferences')
+        .insert({
+          user_id: userId,
+          marketing_emails_enabled: false,
+          marketing_sms_enabled: false,
+          third_party_analytics_enabled: false,
+          share_data_with_partners: false,
+          ccpa_do_not_sell: true,
+        })
+        .select('marketing_emails_enabled, marketing_sms_enabled')
+        .single();
+
+      if (createError) {
+        console.error('Error creating default privacy preferences:', createError);
+        return NextResponse.json(
+          { success: false, error: 'Failed to initialize preferences' },
+          { status: 500 }
+        );
+      }
+      preferences = newPrefs;
+    } else if (prefsError) {
       console.error('Error fetching marketing preferences:', prefsError);
       return NextResponse.json(
         { success: false, error: 'Failed to fetch preferences' },
