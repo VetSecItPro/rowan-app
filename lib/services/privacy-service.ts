@@ -430,7 +430,10 @@ async function initiateDataExport(exportId: string, userId: string, request: Req
   try {
     const response = await fetch('/api/privacy/generate-export', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.INTERNAL_API_SECRET}`,
+      },
       body: JSON.stringify({ exportId, userId, format: request.format }),
     });
 

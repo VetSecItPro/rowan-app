@@ -284,34 +284,6 @@ export default function SettingsPage() {
   const [sessionToRevoke, setSessionToRevoke] = useState<string | null>(null);
   const [isLoadingSessions, setIsLoadingSessions] = useState(false);
 
-  // Notification preferences state - Updated for comprehensive notification system
-  const [notificationPrefs, setNotificationPrefs] = useState({
-    // Email notifications
-    email_task_assignments: true,
-    email_event_reminders: true,
-    email_new_messages: true,
-    email_shopping_lists: true,
-    email_meal_reminders: true,
-    email_general_reminders: true,
-    // Push notifications
-    push_enabled: false,
-    push_task_updates: true,
-    push_reminders: true,
-    push_messages: true,
-    push_shopping_updates: true,
-    push_event_alerts: true,
-    // Digest settings
-    digest_frequency: 'daily' as 'realtime' | 'daily' | 'weekly',
-    digest_time: '08:00:00',
-    // Quiet hours
-    quiet_hours_enabled: false,
-    quiet_hours_start: '22:00:00',
-    quiet_hours_end: '07:00:00',
-    timezone: 'UTC',
-  });
-
-  const [isLoadingPrefs, setIsLoadingPrefs] = useState(true);
-  const [isSavingPrefs, setIsSavingPrefs] = useState(false);
 
   // Privacy toggles state - DISABLED: Replaced with new privacy system
   // const [privacySettings, setPrivacySettings] = useState({
@@ -535,54 +507,7 @@ export default function SettingsPage() {
     setShowDeleteAccountModal(false);
   };
 
-  // Load notification preferences on mount
-  useEffect(() => {
-    const loadPreferences = async () => {
-      try {
-        const response = await fetch('/api/notifications/preferences');
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success && result.data) {
-            setNotificationPrefs(prev => ({ ...prev, ...result.data }));
-          }
-        }
-      } catch (error) {
-        console.error('Failed to load notification preferences:', error);
-      } finally {
-        setIsLoadingPrefs(false);
-      }
-    };
 
-    loadPreferences();
-  }, []);
-
-  const handleNotificationToggle = async (key: string) => {
-    const newValue = !notificationPrefs[key as keyof typeof notificationPrefs];
-
-    // Optimistically update UI
-    setNotificationPrefs(prev => ({ ...prev, [key]: newValue }));
-    setIsSavingPrefs(true);
-
-    try {
-      const response = await fetch('/api/notifications/preferences', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ [key]: newValue }),
-      });
-
-      if (!response.ok) {
-        // Revert on error
-        setNotificationPrefs(prev => ({ ...prev, [key]: !newValue }));
-        alert('Failed to update notification preferences');
-      }
-    } catch (error) {
-      // Revert on error
-      setNotificationPrefs(prev => ({ ...prev, [key]: !newValue }));
-      console.error('Failed to update notification preferences:', error);
-    } finally {
-      setIsSavingPrefs(false);
-    }
-  };
 
   // OLD PRIVACY FUNCTIONS - DISABLED: Replaced with new privacy system
   // Load privacy settings from API
