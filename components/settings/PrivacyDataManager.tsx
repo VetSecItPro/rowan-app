@@ -446,7 +446,7 @@ export function PrivacyDataManager() {
               </div>
             </div>
             <div className="text-xs text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg mb-4">
-              <strong>GDPR Article 20:</strong> Right to Data Portability. Includes tasks, messages, expenses, and all personal data.
+              Includes your profile, tasks, messages, calendar events, and all personal data. You'll receive an email when your export is ready.
             </div>
             {exportStatus?.hasActiveRequest ? (
               <div className="text-xs text-blue-700 dark:text-blue-300 mb-4">
@@ -477,7 +477,7 @@ export function PrivacyDataManager() {
               </div>
             </div>
             <div className="text-xs text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/30 p-3 rounded-lg mb-4">
-              <strong>GDPR Article 17:</strong> Right to Erasure. 30-day grace period with email reminders.
+              <strong>Important:</strong> Account deletion has a 30-day grace period. You'll receive email reminders and can cancel anytime before the final deletion.
             </div>
             {deletionStatus?.hasActiveRequest ? (
               <div className="mb-4">

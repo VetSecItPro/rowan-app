@@ -19,128 +19,82 @@ export interface CookieDetails {
   provider?: string;
 }
 
-// Define all cookies used by the application
+// Define cookie categories (generic descriptions without revealing tech stack)
 export const COOKIE_CATALOG: CookieDetails[] = [
   // Necessary cookies (cannot be disabled)
   {
-    name: 'sb-access-token',
+    name: 'Authentication cookies',
     category: 'necessary',
-    purpose: 'User authentication and session management',
-    duration: '1 hour',
-    provider: 'Supabase',
+    purpose: 'Keep you logged in and maintain your session',
+    duration: 'Session to 7 days',
   },
   {
-    name: 'sb-refresh-token',
+    name: 'Security tokens',
     category: 'necessary',
-    purpose: 'Authentication token refresh',
-    duration: '7 days',
-    provider: 'Supabase',
-  },
-  {
-    name: 'space-id',
-    category: 'necessary',
-    purpose: 'Current workspace context',
+    purpose: 'Protect against security threats and unauthorized access',
     duration: 'Session',
-    provider: 'Rowan',
   },
   {
-    name: 'theme-preference',
+    name: 'Theme settings',
     category: 'necessary',
-    purpose: 'Dark/light mode preference',
+    purpose: 'Remember your dark/light mode preference',
     duration: '1 year',
-    provider: 'Rowan',
   },
   {
-    name: 'cookie-consent',
+    name: 'Cookie consent',
     category: 'necessary',
-    purpose: 'Cookie consent status tracking',
+    purpose: 'Remember your cookie choices',
     duration: '1 year',
-    provider: 'Rowan',
   },
 
   // Analytics cookies
   {
-    name: '_ga',
+    name: 'Usage analytics',
     category: 'analytics',
-    purpose: 'Google Analytics - distinguish users',
-    duration: '2 years',
-    provider: 'Google Analytics',
+    purpose: 'Help us understand how you use the app to improve performance',
+    duration: 'Up to 2 years',
   },
   {
-    name: '_ga_*',
+    name: 'Performance tracking',
     category: 'analytics',
-    purpose: 'Google Analytics - session state',
-    duration: '2 years',
-    provider: 'Google Analytics',
-  },
-  {
-    name: 'vercel-analytics',
-    category: 'analytics',
-    purpose: 'Vercel Analytics - page views and performance',
-    duration: '1 year',
-    provider: 'Vercel',
+    purpose: 'Monitor app performance and identify issues',
+    duration: 'Up to 1 year',
   },
 
   // Marketing cookies
   {
-    name: '_fbp',
+    name: 'Advertising tracking',
     category: 'marketing',
-    purpose: 'Facebook Pixel - user tracking for advertising',
-    duration: '3 months',
-    provider: 'Facebook',
+    purpose: 'Show you relevant ads and measure campaign effectiveness',
+    duration: 'Up to 3 months',
   },
   {
-    name: '_fbc',
+    name: 'Conversion tracking',
     category: 'marketing',
-    purpose: 'Facebook Pixel - conversion tracking',
-    duration: '1 week',
-    provider: 'Facebook',
-  },
-  {
-    name: 'google-ads',
-    category: 'marketing',
-    purpose: 'Google Ads - remarketing and conversion tracking',
-    duration: '90 days',
-    provider: 'Google Ads',
+    purpose: 'Track conversions and improve our marketing',
+    duration: 'Up to 90 days',
   },
 
   // Functional cookies
   {
-    name: 'tour-completed',
+    name: 'Feature preferences',
     category: 'functional',
-    purpose: 'Track completed product tours',
-    duration: '1 year',
-    provider: 'Rowan',
+    purpose: 'Remember your app preferences and settings',
+    duration: 'Up to 1 year',
   },
   {
-    name: 'sidebar-collapsed',
+    name: 'UI state',
     category: 'functional',
-    purpose: 'Remember sidebar state',
-    duration: '30 days',
-    provider: 'Rowan',
-  },
-  {
-    name: 'notification-permission',
-    category: 'functional',
-    purpose: 'Browser notification permission state',
-    duration: '1 year',
-    provider: 'Rowan',
+    purpose: 'Remember interface settings like sidebar state',
+    duration: 'Up to 30 days',
   },
 
   // Preference cookies
   {
-    name: 'language',
+    name: 'Personalization',
     category: 'preferences',
-    purpose: 'User language preference',
-    duration: '1 year',
-    provider: 'Rowan',
-  },
-  {
-    name: 'timezone',
-    category: 'preferences',
-    purpose: 'User timezone for scheduling',
-    duration: '1 year',
-    provider: 'Rowan',
+    purpose: 'Remember your language, timezone, and personalization settings',
+    duration: 'Up to 1 year',
   },
 ];
 
