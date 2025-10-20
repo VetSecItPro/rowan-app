@@ -990,39 +990,32 @@ export default function SettingsPage() {
                 {/* Daily Digest Tab */}
                 {activeTab === 'notifications' && (
                   <div className="space-y-6 sm:space-y-8">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Daily Digest</h2>
-                        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Get a personalized AI-powered summary of your day delivered each morning</p>
+                    {/* Main Daily Digest Card */}
+                    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+                          <Mail className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Daily Digest</h2>
+                          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4">
+                            Get a personalized AI-powered summary of your day delivered to your email every morning at <strong>7:00 AM Eastern</strong>.
+                          </p>
+
+                          <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 mb-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                              <span className="text-sm font-medium text-purple-900 dark:text-purple-200">Delivery Schedule</span>
+                            </div>
+                            <p className="text-xs text-purple-800 dark:text-purple-300">
+                              Your digest arrives daily at 7:00 AM Eastern Time (12:00 PM UTC) with fresh, relevant content for your day.
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <Link
-                        href="/settings/digest"
-                        className="flex-1 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-600 transition-colors group"
-                      >
-                        <div className="flex items-start gap-4">
-                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center group-hover:scale-105 transition-transform">
-                            <Mail className="w-6 h-6 text-white" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                              Configure Daily Digest
-                            </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                              Set your delivery time, timezone, and test the digest functionality
-                            </p>
-                            <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 text-sm font-medium">
-                              Manage Settings
-                              <ArrowRight className="w-4 h-4" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-
-                    {/* What's Included Preview */}
+                    {/* What's Included */}
                     <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                         What's Included in Your Daily Digest
@@ -1065,7 +1058,7 @@ export default function SettingsPage() {
                         <li>• Only includes items that are relevant for your day</li>
                         <li>• Automatically prioritizes urgent and overdue items</li>
                         <li>• Clean, mobile-friendly format for easy reading</li>
-                        <li>• Delivered at your preferred time in your timezone</li>
+                        <li>• Delivered consistently at 7:00 AM Eastern every day</li>
                       </ul>
                     </div>
                   </div>
