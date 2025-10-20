@@ -65,6 +65,8 @@ export interface NotificationPreferences {
   push_messages: boolean;
   push_shopping_updates: boolean;
   push_events: boolean;
+  // Legacy compatibility
+  notification_frequency: NotificationFrequency;
   // Quiet hours
   quiet_hours_enabled: boolean;
   quiet_hours_start?: string;
