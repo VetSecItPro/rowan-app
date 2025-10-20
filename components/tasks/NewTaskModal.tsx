@@ -115,17 +115,17 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId }: New
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
+        <div className="sticky top-0 z-10 bg-blue-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
             <h2 className="text-lg sm:text-xl font-bold">
               {editTask ? 'Edit Task' : 'Create New Task'}
             </h2>
             <button
               onClick={onClose}
-              className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active-press hover-lift shimmer-blue"
+              className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-blue-700 transition-colors"
               aria-label="Close modal"
             >
-              <X className="w-5 h-5 sm:w-4 sm:h-4" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -153,7 +153,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId }: New
                   type="button"
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                   title="Add emoji"
-                  className="btn-touch p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors active-press hover-lift shimmer-blue"
+                  className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                 >
                   <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 </button>
@@ -168,7 +168,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId }: New
                           key={idx}
                           type="button"
                           onClick={() => handleEmojiClick(emoji)}
-                          className="btn-touch w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active-press hover-lift shimmer-blue"
+                          className="w-10 h-10 text-xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
                           title="Click to add emoji"
                         >
                           {emoji}
@@ -314,15 +314,15 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId }: New
             <button
               type="button"
               onClick={onClose}
-              className="btn-touch flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium active-press hover-lift"
+              className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!!dateError}
-              className={`btn-touch flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl transition-all shadow-lg font-medium active-press hover-lift ${
-                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90 shimmer-blue'
+              className={`flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg transition-colors font-medium ${
+                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
               }`}
             >
               {editTask ? 'Update Task' : 'Create Task'}
