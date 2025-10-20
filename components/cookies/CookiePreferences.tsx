@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Cookie, Shield, BarChart3, Megaphone, Settings, Palette, Calendar, AlertCircle, Check } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import {
   getCookiePreferences,
   updateCookiePreferences,
