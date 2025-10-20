@@ -58,12 +58,20 @@ import {
   BookOpen,
   ShoppingBag,
   Home,
-  Heart
+  Heart,
+  AlertCircle,
+  Loader2
 } from 'lucide-react';
 
 type SettingsTab = 'profile' | 'security' | 'notifications' | 'privacy-data' | 'documentation' | 'spaces' | 'analytics' | 'help';
 type UserRole = 'Admin' | 'Member' | 'Viewer';
 type ExportStatus = 'idle' | 'pending' | 'processing' | 'ready';
+
+interface DigestPreferences {
+  digest_enabled: boolean;
+  digest_time: string;
+  timezone: string;
+}
 
 interface SpaceMember {
   id: string;
@@ -259,6 +267,13 @@ export default function SettingsPage() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<UserRole>('Member');
   const [isSendingInvite, setIsSendingInvite] = useState(false);
+
+  // Digest preferences state
+  const [digestPreferences, setDigestPreferences] = useState<DigestPreferences | null>(null);
+  const [isLoadingDigest, setIsLoadingDigest] = useState(true);
+  const [isSavingDigest, setIsSavingDigest] = useState(false);
+  const [showDigestSuccess, setShowDigestSuccess] = useState(false);
+  const [digestError, setDigestError] = useState<string | null>(null);
 
   // Space members state
   const [spaceMembers, setSpaceMembers] = useState<SpaceMember[]>(mockSpaceMembers);
@@ -580,6 +595,13 @@ export default function SettingsPage() {
     }
   }, [activeTab]);
 
+  // Fetch digest preferences when notifications tab is active
+  useEffect(() => {
+    if (activeTab === 'notifications' && user) {
+      loadDigestPreferences();
+    }
+  }, [activeTab, user]);
+
   const fetchActiveSessions = async () => {
     try {
       setIsLoadingSessions(true);
@@ -623,6 +645,67 @@ export default function SettingsPage() {
       console.error('Error revoking session:', error);
       alert('Failed to revoke session');
     }
+  };
+
+  const loadDigestPreferences = async () => {
+    try {
+      setIsLoadingDigest(true);
+      setDigestError(null);
+
+      const response = await fetch('/api/digest/preferences');
+      if (!response.ok) {
+        throw new Error('Failed to load digest preferences');
+      }
+
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to load preferences');
+      }
+
+      setDigestPreferences(result.data);
+    } catch (error) {
+      console.error('Error loading digest preferences:', error);
+      setDigestError('Failed to load digest preferences');
+    } finally {
+      setIsLoadingDigest(false);
+    }
+  };
+
+  const updateDigestEnabled = async (enabled: boolean) => {
+    if (!digestPreferences) return;
+
+    try {
+      setIsSavingDigest(true);
+      setDigestError(null);
+
+      const response = await fetch('/api/digest/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ digest_enabled: enabled }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update digest preference');
+      }
+
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to update preference');
+      }
+
+      setDigestPreferences(prev => ({ ...prev!, digest_enabled: enabled }));
+      setShowDigestSuccess(true);
+      setTimeout(() => setShowDigestSuccess(false), 3000);
+    } catch (error) {
+      console.error('Error updating digest preference:', error);
+      setDigestError('Failed to update digest preference');
+    } finally {
+      setIsSavingDigest(false);
+    }
+  };
+
+  const handleToggleDigest = (enabled: boolean) => {
+    updateDigestEnabled(enabled);
   };
 
   const handleRequestPasswordReset = async () => {
@@ -990,30 +1073,103 @@ export default function SettingsPage() {
                 {/* Daily Digest Tab */}
                 {activeTab === 'notifications' && (
                   <div className="space-y-6 sm:space-y-8">
-                    {/* Main Daily Digest Card */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
-                          <Mail className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Daily Digest</h2>
-                          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4">
-                            Get a personalized AI-powered summary of your day delivered to your email every morning at <strong>7:00 AM Eastern</strong>.
-                          </p>
+                    {/* Success Message */}
+                    {showDigestSuccess && (
+                      <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg">
+                        <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
+                        <span className="text-sm text-green-700 dark:text-green-300">
+                          Daily Digest preference updated successfully
+                        </span>
+                      </div>
+                    )}
 
-                          <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 mb-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                              <span className="text-sm font-medium text-purple-900 dark:text-purple-200">Delivery Schedule</span>
+                    {/* Error Message */}
+                    {digestError && (
+                      <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                        <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                        <span className="text-sm text-red-700 dark:text-red-300">{digestError}</span>
+                      </div>
+                    )}
+
+                    {/* Loading State */}
+                    {isLoadingDigest ? (
+                      <div className="flex items-center justify-center p-8">
+                        <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
+                        <span className="ml-2 text-gray-600 dark:text-gray-300">Loading digest preferences...</span>
+                      </div>
+                    ) : digestPreferences ? (
+                      <>
+                        {/* Main Daily Digest Card */}
+                        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+                              <Mail className="w-6 h-6 text-white" />
                             </div>
-                            <p className="text-xs text-purple-800 dark:text-purple-300">
-                              Your digest arrives daily at 7:00 AM Eastern Time (12:00 PM UTC) with fresh, relevant content for your day.
-                            </p>
+                            <div className="flex-1">
+                              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                                Daily Digest {digestPreferences.digest_enabled ? 'is Active' : 'is Disabled'}
+                              </h2>
+                              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4">
+                                {digestPreferences.digest_enabled
+                                  ? "Get a personalized AI-powered summary of your day delivered to your email every morning at 7:00 AM Eastern."
+                                  : "Enable Daily Digest to receive a personalized AI-powered summary of your day delivered to your email every morning at 7:00 AM Eastern."
+                                }
+                              </p>
+
+                              <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 mb-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                                  <span className="text-sm font-medium text-purple-900 dark:text-purple-200">Delivery Schedule</span>
+                                </div>
+                                <p className="text-xs text-purple-800 dark:text-purple-300">
+                                  Your digest arrives daily at 7:00 AM Eastern Time (12:00 PM UTC) with fresh, relevant content for your day.
+                                </p>
+                              </div>
+
+                              {/* Digest Opt-in Toggle */}
+                              <div className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex-1">
+                                    <h4 className="text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
+                                      Enable Daily Digest
+                                    </h4>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                                      Choose whether you want to receive daily digest emails. You can change this setting at any time.
+                                    </p>
+                                  </div>
+                                  <label className="relative inline-flex items-center cursor-pointer ml-4">
+                                    <input
+                                      type="checkbox"
+                                      checked={digestPreferences.digest_enabled}
+                                      onChange={(e) => handleToggleDigest(e.target.checked)}
+                                      disabled={isSavingDigest}
+                                      className="sr-only peer"
+                                    />
+                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                                    {isSavingDigest && (
+                                      <Loader2 className="h-4 w-4 animate-spin text-purple-600 ml-2" />
+                                    )}
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
+                      </>
+                    ) : (
+                      <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+                        <div className="flex items-center gap-2">
+                          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                          <span className="text-red-700 dark:text-red-300">Failed to load digest preferences</span>
+                        </div>
+                        <button
+                          onClick={loadDigestPreferences}
+                          className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                        >
+                          Try Again
+                        </button>
                       </div>
-                    </div>
+                    )}
 
                     {/* What's Included */}
                     <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
