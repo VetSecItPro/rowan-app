@@ -1,8 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { Cloud, AlertTriangle, Info } from 'lucide-react';
 import { weatherService, WeatherForecast, WeatherAlert } from '@/lib/services/weather-service';
+
+// Global cache to persist across component re-mounts
+const weatherCache = new Map<string, {
+  data: WeatherForecast;
+  alert: WeatherAlert | null;
+  timestamp: number;
+}>();
+
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 
 interface WeatherBadgeProps {
   eventTime: string;
@@ -13,32 +22,85 @@ interface WeatherBadgeProps {
 export function WeatherBadge({ eventTime, location, compact = false }: WeatherBadgeProps) {
   const [weather, setWeather] = useState<WeatherForecast | null>(null);
   const [alert, setAlert] = useState<WeatherAlert | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     loadWeather();
+    return () => {
+      // Cleanup on unmount
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [eventTime, location]);
 
   const loadWeather = async () => {
     if (!location) {
       console.log('[WeatherBadge] No location provided');
-      setLoading(false);
       return;
     }
 
-    try {
+    // Create cache key
+    const cacheKey = `${location}-${eventTime.split('T')[0]}`;
+    const now = Date.now();
+    const cached = weatherCache.get(cacheKey);
+
+    // Check if we have valid cached data
+    if (cached && (now - cached.timestamp) < CACHE_DURATION) {
+      console.log('[WeatherBadge] Using cached weather data');
+      setWeather(cached.data);
+      setAlert(cached.alert);
+      return;
+    }
+
+    // If we have stale cache data, show it immediately (optimistic UI)
+    if (cached) {
+      console.log('[WeatherBadge] Using stale cache while fetching fresh data');
+      setWeather(cached.data);
+      setAlert(cached.alert);
+    } else {
+      // Only show loading if we have no cached data at all
       setLoading(true);
-      console.log('[WeatherBadge] Loading weather for location:', location);
+    }
+
+    try {
+      // Cancel any previous request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      abortControllerRef.current = new AbortController();
+
+      console.log('[WeatherBadge] Fetching fresh weather for:', location);
       const forecast = await weatherService.getWeatherForEvent(location, eventTime);
-      console.log('[WeatherBadge] Weather forecast received:', forecast);
-      setWeather(forecast);
 
       if (forecast) {
         const weatherAlert = weatherService.shouldWarnAboutWeather(forecast, location);
+
+        // Update cache
+        weatherCache.set(cacheKey, {
+          data: forecast,
+          alert: weatherAlert,
+          timestamp: now
+        });
+
+        // Update state
+        setWeather(forecast);
         setAlert(weatherAlert);
+        console.log('[WeatherBadge] Fresh weather data loaded and cached');
       }
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('[WeatherBadge] Weather request cancelled');
+        return;
+      }
       console.error('[WeatherBadge] Failed to load weather:', error);
+
+      // If we had no cached data and fetch failed, show error
+      if (!cached) {
+        setWeather(null);
+        setAlert(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -178,3 +240,5 @@ export function WeatherBadge({ eventTime, location, compact = false }: WeatherBa
     </div>
   );
 }
+
+// Force recompilation to clear cache
