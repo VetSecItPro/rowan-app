@@ -7,12 +7,10 @@ import { useState, useEffect } from 'react';
 import { Toggle } from '@/components/ui/Toggle';
 import { useAuth } from '@/lib/contexts/auth-context';
 import {
-  Eye,
   Shield,
   Database,
   Download,
   Trash2,
-  Users,
   Loader2,
   CheckCircle,
   AlertCircle,
@@ -22,8 +20,6 @@ import type {
   DeletionWorkflowStatus,
   ExportWorkflowStatus,
 } from '@/lib/types/privacy';
-import { CookiePreferences } from '@/components/cookies/CookiePreferences';
-import { MarketingPreferences } from '@/components/settings/MarketingPreferences';
 
 export function PrivacyDataManager() {
   const { user } = useAuth();
@@ -255,50 +251,6 @@ export function PrivacyDataManager() {
         </div>
       )}
 
-      {/* Personal Privacy Section */}
-      <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-2xl p-6">
-        <div className="flex items-start gap-4 mb-6">
-          <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center">
-            <Eye className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Personal Privacy</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Control how you appear to other space members</p>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">Activity Status</p>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Show when you're online to space members</p>
-            </div>
-            <Toggle
-              id="activity-status"
-              checked={preferences.activity_status_visible}
-              onChange={(value) => updatePreference('activity_status_visible', value)}
-              disabled={saving === 'activity_status_visible'}
-              size="md"
-              color="purple"
-            />
-          </div>
-
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">Anonymous Usage Data</p>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Help improve Rowan with anonymous analytics</p>
-            </div>
-            <Toggle
-              id="anonymous-analytics"
-              checked={preferences.share_anonymous_analytics}
-              onChange={(value) => updatePreference('share_anonymous_analytics', value)}
-              disabled={saving === 'share_anonymous_analytics'}
-              size="md"
-              color="purple"
-            />
-          </div>
-        </div>
-      </div>
 
       {/* Legal Compliance Section */}
       <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-2xl p-6">
@@ -307,8 +259,8 @@ export function PrivacyDataManager() {
             <Shield className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Legal Compliance</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">CCPA, GDPR and marketing preferences</p>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Privacy Rights</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">CCPA and GDPR privacy controls</p>
           </div>
         </div>
 
@@ -338,92 +290,6 @@ export function PrivacyDataManager() {
             </div>
           </div>
 
-          {/* Marketing Communications */}
-          <div>
-            <h4 className="font-medium text-gray-900 dark:text-white mb-3">Marketing Communications</h4>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">Marketing Emails</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Product updates and promotional emails</p>
-                </div>
-                <Toggle
-                  id="marketing-emails"
-                  checked={preferences.marketing_emails_enabled}
-                  onChange={(value) => updatePreference('marketing_emails_enabled', value)}
-                  disabled={saving === 'marketing_emails_enabled'}
-                  size="md"
-                  color="purple"
-                />
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">Marketing SMS</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Promotional text messages</p>
-                </div>
-                <Toggle
-                  id="marketing-sms"
-                  checked={preferences.marketing_sms_enabled}
-                  onChange={(value) => updatePreference('marketing_sms_enabled', value)}
-                  disabled={saving === 'marketing_sms_enabled'}
-                  size="md"
-                  color="purple"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Cookie Preferences */}
-          <div>
-            <h4 className="font-medium text-gray-900 dark:text-white mb-3">Cookie Preferences</h4>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">Analytics Cookies</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Help us understand how you use our service</p>
-                </div>
-                <Toggle
-                  id="analytics-cookies"
-                  checked={preferences.analytics_cookies_enabled}
-                  onChange={(value) => updatePreference('analytics_cookies_enabled', value)}
-                  disabled={saving === 'analytics_cookies_enabled'}
-                  size="md"
-                  color="purple"
-                />
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">Performance Cookies</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Improve site performance and user experience</p>
-                </div>
-                <Toggle
-                  id="performance-cookies"
-                  checked={preferences.performance_cookies_enabled}
-                  onChange={(value) => updatePreference('performance_cookies_enabled', value)}
-                  disabled={saving === 'performance_cookies_enabled'}
-                  size="md"
-                  color="purple"
-                />
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">Advertising Cookies</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Personalized advertising and recommendations</p>
-                </div>
-                <Toggle
-                  id="advertising-cookies"
-                  checked={preferences.advertising_cookies_enabled}
-                  onChange={(value) => updatePreference('advertising_cookies_enabled', value)}
-                  disabled={saving === 'advertising_cookies_enabled'}
-                  size="md"
-                  color="purple"
-                />
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -517,24 +383,6 @@ export function PrivacyDataManager() {
         </div>
       </div>
 
-      {/* Cookie Preferences */}
-      <CookiePreferences />
-
-      {/* Marketing Preferences */}
-      <MarketingPreferences />
-
-      {/* Collaboration Notice */}
-      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-        <div className="flex items-start gap-3">
-          <Users className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5" />
-          <div className="text-sm text-green-800 dark:text-green-200">
-            <p className="font-medium mb-1">Collaboration-First Design</p>
-            <p className="text-xs">
-              Rowan is built for family and team collaboration. Your profile, read receipts, and shared activities are always visible to space members to ensure effective coordination.
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

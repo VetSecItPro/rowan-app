@@ -402,13 +402,13 @@ export default function TasksPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <div className="flex items-center gap-3 sm:gap-2 p-1.5 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 rounded-xl border border-blue-200 dark:border-blue-700">
+              <div className="flex items-center gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                 <button
                   onClick={() => handleTabChange('task')}
-                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
+                  className={`px-3 sm:px-4 py-2 rounded-md flex items-center justify-center gap-2 transition-colors font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
                     activeTab === 'task'
-                      ? 'bg-gradient-tasks text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
                   <CheckSquare className="w-4 h-4" />
@@ -416,10 +416,10 @@ export default function TasksPage() {
                 </button>
                 <button
                   onClick={() => handleTabChange('chore')}
-                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
+                  className={`px-3 sm:px-4 py-2 rounded-md flex items-center justify-center gap-2 transition-colors font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
                     activeTab === 'chore'
-                      ? 'bg-gradient-tasks text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
                   <Home className="w-4 h-4" />
@@ -429,7 +429,7 @@ export default function TasksPage() {
 
               <button
                 onClick={handleOpenModal}
-                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-tasks text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
                 <span>New {activeTab === 'task' ? 'Task' : 'Chore'}</span>
@@ -533,35 +533,47 @@ export default function TasksPage() {
           </div>
           )}
 
-          {/* Apple-Inspired Search Bar - Only show when NOT in guided flow */}
+          {/* Search Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className="apple-search-container">
-              <Search className="apple-search-icon" />
+          <div className="relative">
+            <div className="relative">
+              {/* Search Icon - Only show when not typing */}
+              {!searchQuery && (
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              )}
+
+              {/* Search Input */}
               <input
-                type="search"
-                inputMode="search"
+                type="text"
                 autoComplete="off"
                 autoCorrect="off"
                 autoCapitalize="none"
                 spellCheck="false"
-
-                placeholder="Search tasks and chores..."
+                placeholder="Search Tasks and Chores"
                 value={searchQuery}
                 onChange={handleSearchChange}
-
-                className={`apple-search-input w-full ${isSearchTyping ? 'typing' : ''}`}
+                className={`w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 rounded-lg focus:outline-none transition-colors ${
+                  !searchQuery
+                    ? 'pl-12 border-gray-200 dark:border-gray-700'
+                    : 'pr-12 border-blue-500 dark:border-blue-500'
+                } ${
+                  searchQuery
+                    ? 'border-blue-500 dark:border-blue-500'
+                    : 'border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-500'
+                } text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400`}
               />
+
+              {/* Clear Button - Only show when typing */}
               {searchQuery && (
                 <button
                   onClick={() => {
                     setSearchQuery('');
                     setIsSearchTyping(false);
                   }}
-                  className={`apple-search-clear ${searchQuery ? 'visible' : ''}`}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                   aria-label="Clear search"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-5 h-5" />
                 </button>
               )}
             </div>
@@ -609,43 +621,43 @@ export default function TasksPage() {
                     </select>
 
                     {/* Desktop: Segmented Buttons */}
-                    <div className="hidden md:flex bg-gray-50 dark:bg-gray-900 border-2 border-blue-200 dark:border-blue-700 rounded-lg p-1 gap-1 w-fit">
+                    <div className="hidden md:flex bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 gap-1 w-fit">
                       <button
                         onClick={() => setStatusFilter('all')}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                           statusFilter === 'all'
-                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                            ? 'bg-blue-600 text-white'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                         }`}
                       >
                         All
                       </button>
                       <button
                         onClick={() => setStatusFilter('pending')}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                           statusFilter === 'pending'
-                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                            ? 'bg-blue-600 text-white'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                         }`}
                       >
                         Pending
                       </button>
                       <button
                         onClick={() => setStatusFilter('in_progress')}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                           statusFilter === 'in_progress'
-                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                            ? 'bg-blue-600 text-white'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                         }`}
                       >
                         In Progress
                       </button>
                       <button
                         onClick={() => setStatusFilter('completed')}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                           statusFilter === 'completed'
-                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                            ? 'bg-blue-600 text-white'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                         }`}
                       >
                         Completed
@@ -686,7 +698,7 @@ export default function TasksPage() {
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                         <button
                           onClick={handleOpenModal}
-                          className="btn-touch shimmer-tasks text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                          className="btn-touch bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center gap-2 px-6 py-3"
                         >
                           <Plus className="w-5 h-5" />
                           Create {activeTab === 'task' ? 'Task' : 'Chore'}
@@ -740,14 +752,14 @@ export default function TasksPage() {
                         <div className="flex gap-3">
                           <button
                             onClick={handleLoadMore}
-                            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:opacity-90 transition-all shadow-md inline-flex items-center gap-2 font-medium"
+                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center gap-2 font-medium"
                           >
                             Load {remainingItemsCount > ITEMS_PER_PAGE ? ITEMS_PER_PAGE : remainingItemsCount} More
                             <ChevronDown className="w-4 h-4" />
                           </button>
                           <button
                             onClick={handleShowAll}
-                            className="px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all inline-flex items-center gap-2 font-medium"
+                            className="px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors inline-flex items-center gap-2 font-medium"
                           >
                             Show All ({remainingItemsCount})
                           </button>
