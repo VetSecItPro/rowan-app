@@ -822,7 +822,7 @@ export default function GoalsPage() {
           {/* Search Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className={`apple-search-container group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
+            <div className={`apple-search-container goals-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
               <Search className="apple-search-icon" />
               <input
                 type="search"
