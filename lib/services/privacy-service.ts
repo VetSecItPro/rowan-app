@@ -17,6 +17,13 @@ import type {
   RequestAccountDeletionRequest,
   CancelAccountDeletionRequest,
 } from '@/lib/types/privacy';
+import {
+  CookiePreferences,
+  updateCookiePreferences as updateCookiePreferencesUtil,
+  getCookiePreferences,
+  privacyToCookiePreferences,
+  cookieToPrivacyUpdates,
+} from '@/lib/utils/cookies';
 
 const supabase = createClientComponentClient();
 
@@ -495,6 +502,128 @@ async function sendDeletionCancellationEmail(userId: string) {
     });
   } catch (error) {
     console.error('Error sending deletion cancellation email:', error);
+  }
+}
+
+// Cookie Preferences Management (New unified system)
+export async function getCookiePreferencesForUser(userId: string): Promise<PrivacyServiceResponse<CookiePreferences>> {
+  try {
+    // Get privacy preferences and convert to cookie preferences
+    const privacyResult = await getPrivacyPreferences(userId);
+    if (!privacyResult.success || !privacyResult.data) {
+      throw new Error('Failed to fetch privacy preferences');
+    }
+
+    const cookiePrefs = privacyToCookiePreferences(privacyResult.data);
+    return { success: true, data: cookiePrefs };
+  } catch (error) {
+    console.error('Error getting cookie preferences for user:', error);
+    return { success: false, error: 'Failed to get cookie preferences' };
+  }
+}
+
+export async function updateCookiePreferencesForUser(
+  userId: string,
+  cookiePrefs: CookiePreferences
+): Promise<PrivacyServiceResponse<UserPrivacyPreferences>> {
+  try {
+    // Convert cookie preferences to privacy updates
+    const privacyUpdates = cookieToPrivacyUpdates(cookiePrefs);
+
+    // Update privacy preferences in database
+    const result = await updatePrivacyPreferences(userId, privacyUpdates);
+    if (!result.success) {
+      throw new Error('Failed to update privacy preferences');
+    }
+
+    // Apply cookie preferences locally
+    updateCookiePreferencesUtil(cookiePrefs);
+
+    return result;
+  } catch (error) {
+    console.error('Error updating cookie preferences for user:', error);
+    return { success: false, error: 'Failed to update cookie preferences' };
+  }
+}
+
+export async function syncCookiePreferencesWithPrivacy(userId: string): Promise<PrivacyServiceResponse<boolean>> {
+  try {
+    // Get current privacy preferences
+    const privacyResult = await getPrivacyPreferences(userId);
+    if (!privacyResult.success || !privacyResult.data) {
+      throw new Error('Failed to fetch privacy preferences');
+    }
+
+    // Convert to cookie preferences and apply locally
+    const cookiePrefs = privacyToCookiePreferences(privacyResult.data);
+    updateCookiePreferencesUtil(cookiePrefs);
+
+    return { success: true, data: true };
+  } catch (error) {
+    console.error('Error syncing cookie preferences with privacy:', error);
+    return { success: false, error: 'Failed to sync cookie preferences' };
+  }
+}
+
+// Cookie Consent API Integration
+export async function updateCookieConsentViaAPI(cookiePrefs: CookiePreferences): Promise<PrivacyServiceResponse<CookiePreferences>> {
+  try {
+    const response = await fetch('/api/cookies/preferences', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(cookiePrefs),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to update cookie preferences');
+    }
+
+    const result = await response.json();
+    return { success: true, data: result.data.preferences };
+  } catch (error) {
+    console.error('Error updating cookie consent via API:', error);
+    return { success: false, error: 'Failed to update cookie preferences' };
+  }
+}
+
+export async function getCookieConsentViaAPI(): Promise<PrivacyServiceResponse<CookiePreferences>> {
+  try {
+    const response = await fetch('/api/cookies/preferences', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to get cookie preferences');
+    }
+
+    const result = await response.json();
+    return { success: true, data: result.data.preferences };
+  } catch (error) {
+    console.error('Error getting cookie consent via API:', error);
+    return { success: false, error: 'Failed to get cookie preferences' };
+  }
+}
+
+export async function resetCookieConsentViaAPI(): Promise<PrivacyServiceResponse<CookiePreferences>> {
+  try {
+    const response = await fetch('/api/cookies/preferences', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to reset cookie preferences');
+    }
+
+    const result = await response.json();
+    return { success: true, data: result.data.preferences };
+  } catch (error) {
+    console.error('Error resetting cookie consent via API:', error);
+    return { success: false, error: 'Failed to reset cookie preferences' };
   }
 }
 
