@@ -6,6 +6,24 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  safelist: [
+    // Ensure feature gradient classes are always included in production
+    'bg-gradient-tasks',
+    'bg-gradient-calendar',
+    'bg-gradient-reminders',
+    'bg-gradient-messages',
+    'bg-gradient-shopping',
+    'bg-gradient-meals',
+    'bg-gradient-projects',
+    'bg-gradient-goals',
+    // Gradient text utilities
+    'bg-clip-text',
+    'text-transparent',
+    // Button touch utilities
+    'btn-touch',
+    // Stats grid
+    'stats-grid-mobile',
+  ],
   theme: {
     extend: {
       colors: {

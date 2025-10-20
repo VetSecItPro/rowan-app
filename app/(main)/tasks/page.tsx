@@ -698,7 +698,7 @@ export default function TasksPage() {
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                         <button
                           onClick={handleOpenModal}
-                          className="btn-touch bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center gap-2 px-6 py-3"
+                          className="btn-touch bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center gap-2"
                         >
                           <Plus className="w-5 h-5" />
                           Create {activeTab === 'task' ? 'Task' : 'Chore'}
