@@ -1,7 +1,7 @@
 // Privacy & Data Management Service
 // Handles all privacy-related database operations and business logic
 
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@/lib/supabase/client';
 import type {
   UserPrivacyPreferences,
   PrivacyPreferenceUpdate,
@@ -25,7 +25,7 @@ import {
   cookieToPrivacyUpdates,
 } from '@/lib/utils/cookies';
 
-const supabase = createClientComponentClient();
+const supabase = createClient();
 
 // Privacy Preferences Management
 export async function getPrivacyPreferences(userId: string): Promise<PrivacyServiceResponse<UserPrivacyPreferences>> {
