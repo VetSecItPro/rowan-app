@@ -535,47 +535,30 @@ export default function TasksPage() {
 
           {/* Search Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
-          <div className="relative">
-            <div className="relative">
-              {/* Search Icon - Only show when not typing */}
-              {!searchQuery && (
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              )}
-
-              {/* Search Input */}
-              <input
-                type="text"
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="none"
-                spellCheck="false"
-                placeholder="Search Tasks and Chores"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                className={`w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 rounded-lg focus:outline-none transition-colors ${
-                  !searchQuery
-                    ? 'pl-12 border-gray-200 dark:border-gray-700'
-                    : 'pr-12 border-blue-500 dark:border-blue-500'
-                } ${
-                  searchQuery
-                    ? 'border-blue-500 dark:border-blue-500'
-                    : 'border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-500'
-                } text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400`}
-              />
-
-              {/* Clear Button - Only show when typing */}
-              {searchQuery && (
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setIsSearchTyping(false);
-                  }}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                  aria-label="Clear search"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              )}
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <div className={`apple-search-container tasks-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
+                <Search className="apple-search-icon" />
+                <input
+                  type="search"
+                  placeholder="Search tasks and chores..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  className="apple-search-input"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setIsSearchTyping(false);
+                    }}
+                    className="apple-search-clear"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
           )}
@@ -620,48 +603,26 @@ export default function TasksPage() {
                       <option value="completed">Completed</option>
                     </select>
 
-                    {/* Desktop: Segmented Buttons */}
-                    <div className="hidden md:flex bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 gap-1 w-fit">
-                      <button
-                        onClick={() => setStatusFilter('all')}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
-                          statusFilter === 'all'
-                            ? 'bg-blue-600 text-white'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                        }`}
-                      >
-                        All
-                      </button>
-                      <button
-                        onClick={() => setStatusFilter('pending')}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
-                          statusFilter === 'pending'
-                            ? 'bg-blue-600 text-white'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                        }`}
-                      >
-                        Pending
-                      </button>
-                      <button
-                        onClick={() => setStatusFilter('in_progress')}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
-                          statusFilter === 'in_progress'
-                            ? 'bg-blue-600 text-white'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                        }`}
-                      >
-                        In Progress
-                      </button>
-                      <button
-                        onClick={() => setStatusFilter('completed')}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
-                          statusFilter === 'completed'
-                            ? 'bg-blue-600 text-white'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                        }`}
-                      >
-                        Completed
-                      </button>
+                    {/* Desktop: Clean Filter Buttons */}
+                    <div className="hidden md:flex gap-2">
+                      {[
+                        { value: 'all', label: 'All' },
+                        { value: 'pending', label: 'Pending' },
+                        { value: 'in_progress', label: 'In Progress' },
+                        { value: 'completed', label: 'Completed' }
+                      ].map(({ value, label }) => (
+                        <button
+                          key={value}
+                          onClick={() => setStatusFilter(value)}
+                          className={`px-3 py-2 text-sm rounded-lg transition-colors ${
+                            statusFilter === value
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
