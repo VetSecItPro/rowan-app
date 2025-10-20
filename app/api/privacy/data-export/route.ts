@@ -2,8 +2,7 @@
 // Handles user data export requests for GDPR Article 20 compliance
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
 import { Resend } from 'resend';
@@ -30,7 +29,7 @@ const DataExportRequestSchema = z.object({
 // POST - Request data export
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -125,7 +124,7 @@ export async function POST(request: NextRequest) {
 // GET - Get export status
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -207,7 +206,7 @@ async function generateDataExport(
   userId: string,
   request: z.infer<typeof DataExportRequestSchema>
 ) {
-  const supabase = createRouteHandlerClient({ cookies });
+  const supabase = createClient();
 
   try {
     // Update status to processing
@@ -439,7 +438,7 @@ async function uploadExportFile(
   expiresAt.setHours(expiresAt.getHours() + 24); // 24-hour expiration
 
   // Simulate file upload to Supabase Storage
-  const supabase = createRouteHandlerClient({ cookies });
+  const supabase = createClient();
 
   try {
     const { data, error } = await supabase.storage
@@ -479,7 +478,7 @@ async function sendExportReadyEmail(
   format: string,
   fileSize: number
 ) {
-  const supabase = createRouteHandlerClient({ cookies });
+  const supabase = createClient();
 
   try {
     // Get user profile

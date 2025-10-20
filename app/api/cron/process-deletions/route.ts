@@ -2,8 +2,7 @@
 // Processes account deletion reminders and executions on a daily schedule
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -20,7 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
     const today = new Date();
     const results = {
       sevenDayReminders: 0,
@@ -328,7 +327,7 @@ async function send1DayDeletionReminder(
 
 // Execute the actual account deletion
 async function executeAccountDeletion(userId: string, email: string, userName: string) {
-  const supabase = createRouteHandlerClient({ cookies });
+  const supabase = createClient();
 
   try {
     // 1. Delete user data from all tables
@@ -400,7 +399,7 @@ async function sendDeletionCompletedEmail(email: string, userName: string) {
     });
 
     // Log the final email notification
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
     await supabase
       .from('privacy_email_notifications')
       .insert({

@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { pushService } from './push-service';
 import { digestService } from './digest-service';
-import { notificationPreferencesService } from './notification-preferences-service';
+// Removed notification-preferences-service dependency - using digest-only system
 
 export interface NotificationPayload {
   type: 'task' | 'event' | 'message' | 'goal' | 'shopping' | 'expense' | 'reminder';
@@ -131,12 +131,8 @@ export const enhancedNotificationService = {
           continue;
         }
 
-        // Check preferences and send email
-        const shouldSendEmail = await notificationPreferencesService.shouldSendNotification(
-          userId,
-          'reminder', // Using reminder as closest category for goals
-          'email'
-        );
+        // Individual notifications disabled - using digest-only system
+        const shouldSendEmail = false;
 
         if (shouldSendEmail && user.email) {
           const emailResult = await this.sendEmailNotification(
@@ -163,23 +159,11 @@ export const enhancedNotificationService = {
             results.errors.push(`Email failed for ${userId}: ${emailResult.error}`);
           }
 
-          // Log notification
-          await notificationPreferencesService.logNotification(
-            userId,
-            'email',
-            'goal_achievement',
-            `Goal achievement: ${data.goalTitle}`,
-            emailResult.success ? 'sent' : 'failed',
-            emailResult.error
-          );
+          // Notification logging removed - using digest-only system
         }
 
-        // Check preferences and send push
-        const shouldSendPush = await notificationPreferencesService.shouldSendNotification(
-          userId,
-          'reminder',
-          'push'
-        );
+        // Individual notifications disabled - using digest-only system
+        const shouldSendPush = false;
 
         if (shouldSendPush) {
           const pushTitle = data.achievementType === 'goal_completed'
@@ -255,12 +239,8 @@ export const enhancedNotificationService = {
           continue;
         }
 
-        // Check preferences and send email
-        const shouldSendEmail = await notificationPreferencesService.shouldSendNotification(
-          userId,
-          'task',
-          'email'
-        );
+        // Individual notifications disabled - using digest-only system
+        const shouldSendEmail = false;
 
         if (shouldSendEmail && user.email) {
           const emailResult = await this.sendEmailNotification(
@@ -286,23 +266,11 @@ export const enhancedNotificationService = {
             results.errors.push(`Email failed for ${userId}: ${emailResult.error}`);
           }
 
-          // Log notification
-          await notificationPreferencesService.logNotification(
-            userId,
-            'email',
-            'task',
-            `Task assigned: ${data.taskTitle}`,
-            emailResult.success ? 'sent' : 'failed',
-            emailResult.error
-          );
+          // Notification logging removed - using digest-only system
         }
 
-        // Check preferences and send push
-        const shouldSendPush = await notificationPreferencesService.shouldSendNotification(
-          userId,
-          'task',
-          'push'
-        );
+        // Individual notifications disabled - using digest-only system
+        const shouldSendPush = false;
 
         if (shouldSendPush) {
           const pushResult = await pushService.sendNotification(userId, {
@@ -371,12 +339,8 @@ export const enhancedNotificationService = {
           continue;
         }
 
-        // Check preferences and send email
-        const shouldSendEmail = await notificationPreferencesService.shouldSendNotification(
-          userId,
-          'event',
-          'email'
-        );
+        // Individual notifications disabled - using digest-only system
+        const shouldSendEmail = false;
 
         if (shouldSendEmail && user.email) {
           const emailResult = await this.sendEmailNotification(
@@ -402,23 +366,11 @@ export const enhancedNotificationService = {
             results.errors.push(`Email failed for ${userId}: ${emailResult.error}`);
           }
 
-          // Log notification
-          await notificationPreferencesService.logNotification(
-            userId,
-            'email',
-            'event',
-            `Event reminder: ${data.eventTitle}`,
-            emailResult.success ? 'sent' : 'failed',
-            emailResult.error
-          );
+          // Notification logging removed - using digest-only system
         }
 
-        // Check preferences and send push
-        const shouldSendPush = await notificationPreferencesService.shouldSendNotification(
-          userId,
-          'event',
-          'push'
-        );
+        // Individual notifications disabled - using digest-only system
+        const shouldSendPush = false;
 
         if (shouldSendPush) {
           const reminderTexts = {
@@ -492,12 +444,8 @@ export const enhancedNotificationService = {
           continue;
         }
 
-        // Check preferences and send email
-        const shouldSendEmail = await notificationPreferencesService.shouldSendNotification(
-          userId,
-          'message',
-          'email'
-        );
+        // Individual notifications disabled - using digest-only system
+        const shouldSendEmail = false;
 
         if (shouldSendEmail && user.email) {
           const emailResult = await this.sendEmailNotification(
@@ -522,23 +470,11 @@ export const enhancedNotificationService = {
             results.errors.push(`Email failed for ${userId}: ${emailResult.error}`);
           }
 
-          // Log notification
-          await notificationPreferencesService.logNotification(
-            userId,
-            'email',
-            'message',
-            `New message from ${data.senderName}`,
-            emailResult.success ? 'sent' : 'failed',
-            emailResult.error
-          );
+          // Notification logging removed - using digest-only system
         }
 
-        // Check preferences and send push
-        const shouldSendPush = await notificationPreferencesService.shouldSendNotification(
-          userId,
-          'message',
-          'push'
-        );
+        // Individual notifications disabled - using digest-only system
+        const shouldSendPush = false;
 
         if (shouldSendPush) {
           const pushResult = await pushService.sendNotification(userId, {

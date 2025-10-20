@@ -2,8 +2,7 @@
 // Manages cookie consent and preference settings with privacy system integration
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
 
@@ -19,7 +18,7 @@ const CookiePreferencesSchema = z.object({
 // GET - Get current cookie preferences for authenticated user
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -97,7 +96,7 @@ export async function GET(request: NextRequest) {
 // POST - Update cookie preferences for authenticated user
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -223,7 +222,7 @@ async function applyCookiePreferences(userId: string, preferences: any) {
 // DELETE - Reset cookie preferences to defaults
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
