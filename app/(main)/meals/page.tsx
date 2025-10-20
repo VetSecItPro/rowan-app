@@ -1040,7 +1040,7 @@ export default function MealsPage() {
           {/* Search Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className="apple-search-container">
+            <div className="apple-search-container meals-search">
               <Search className="apple-search-icon" />
               <input
                 ref={searchInputRef}
