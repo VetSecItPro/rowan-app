@@ -22,12 +22,16 @@ export default function NotificationSettingsPage() {
   const [emailAssignments, setEmailAssignments] = useState(true);
   const [emailMentions, setEmailMentions] = useState(true);
   const [emailComments, setEmailComments] = useState(false);
+  const [emailShopping, setEmailShopping] = useState(true);
+  const [emailMeals, setEmailMeals] = useState(true);
+  const [emailGeneral, setEmailGeneral] = useState(true);
 
   const [inAppEnabled, setInAppEnabled] = useState(true);
   const [inAppDueReminders, setInAppDueReminders] = useState(true);
   const [inAppAssignments, setInAppAssignments] = useState(true);
   const [inAppMentions, setInAppMentions] = useState(true);
   const [inAppComments, setInAppComments] = useState(true);
+  const [inAppShopping, setInAppShopping] = useState(true);
 
   const [notificationFrequency, setNotificationFrequency] = useState<'instant' | 'hourly' | 'daily' | 'never'>('instant');
   const [quietHoursEnabled, setQuietHoursEnabled] = useState(false);
@@ -242,73 +246,113 @@ export default function NotificationSettingsPage() {
 
                   <div className="space-y-4">
                     {/* Master Toggle */}
-                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                      <div>
+                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                      <div className="flex-1 pr-4">
                         <div className="font-medium text-gray-900 dark:text-white">Enable Email Notifications</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">Receive notifications via email</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Receive notifications via email</div>
                       </div>
-                      <Toggle
-                        id="email-enabled"
-                        checked={emailEnabled}
-                        onChange={setEmailEnabled}
-                        color="purple"
-                      />
+                      <div className="flex-shrink-0">
+                        <Toggle
+                          id="email-enabled"
+                          checked={emailEnabled}
+                          onChange={setEmailEnabled}
+                          color="purple"
+                        />
+                      </div>
                     </div>
 
                     {/* Type-specific toggles */}
                     {emailEnabled && (
-                      <div className="pl-4 space-y-3 border-l-2 border-gray-200 dark:border-gray-700">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="text-gray-700 dark:text-gray-300">Task assignments</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">Get notified when someone assigns you a task</div>
+                      <div className="ml-4 space-y-3 border-l-2 border-gray-200 dark:border-gray-700 pl-4">
+                        <div className="flex items-center justify-between py-2">
+                          <div className="flex-1 pr-4">
+                            <div className="font-medium text-gray-700 dark:text-gray-300">Task assignments</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Get notified when someone assigns you a task</div>
                           </div>
-                          <Toggle
-                            id="email-assignments"
-                            checked={emailAssignments}
-                            onChange={setEmailAssignments}
-                            color="purple"
-                            size="sm"
-                          />
+                          <div className="flex-shrink-0">
+                            <Toggle
+                              id="email-assignments"
+                              checked={emailAssignments}
+                              onChange={setEmailAssignments}
+                              color="purple"
+                              size="sm"
+                            />
+                          </div>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="text-gray-700 dark:text-gray-300">Due reminders</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">Reminders for upcoming and overdue items</div>
+                        <div className="flex items-center justify-between py-2">
+                          <div className="flex-1 pr-4">
+                            <div className="font-medium text-gray-700 dark:text-gray-300">Event reminders</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Receive email reminders for upcoming events</div>
                           </div>
-                          <Toggle
-                            id="email-due-reminders"
-                            checked={emailDueReminders}
-                            onChange={setEmailDueReminders}
-                            color="purple"
-                            size="sm"
-                          />
+                          <div className="flex-shrink-0">
+                            <Toggle
+                              id="email-due-reminders"
+                              checked={emailDueReminders}
+                              onChange={setEmailDueReminders}
+                              color="purple"
+                              size="sm"
+                            />
+                          </div>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="text-gray-700 dark:text-gray-300">@Mentions</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">When someone mentions you in a comment</div>
+                        <div className="flex items-center justify-between py-2">
+                          <div className="flex-1 pr-4">
+                            <div className="font-medium text-gray-700 dark:text-gray-300">New messages</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Get notified about new messages</div>
                           </div>
-                          <Toggle
-                            id="email-mentions"
-                            checked={emailMentions}
-                            onChange={setEmailMentions}
-                            color="purple"
-                            size="sm"
-                          />
+                          <div className="flex-shrink-0">
+                            <Toggle
+                              id="email-mentions"
+                              checked={emailMentions}
+                              onChange={setEmailMentions}
+                              color="purple"
+                              size="sm"
+                            />
+                          </div>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="text-gray-700 dark:text-gray-300">Comments</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">New comments on items you're following</div>
+                        <div className="flex items-center justify-between py-2">
+                          <div className="flex-1 pr-4">
+                            <div className="font-medium text-gray-700 dark:text-gray-300">Shopping lists</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Notifications when shopping lists are ready</div>
                           </div>
-                          <Toggle
-                            id="email-comments"
-                            checked={emailComments}
-                            onChange={setEmailComments}
-                            color="purple"
-                            size="sm"
-                          />
+                          <div className="flex-shrink-0">
+                            <Toggle
+                              id="email-shopping"
+                              checked={emailShopping}
+                              onChange={setEmailShopping}
+                              color="purple"
+                              size="sm"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between py-2">
+                          <div className="flex-1 pr-4">
+                            <div className="font-medium text-gray-700 dark:text-gray-300">Meal reminders</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Reminders for meal prep and cooking</div>
+                          </div>
+                          <div className="flex-shrink-0">
+                            <Toggle
+                              id="email-meals"
+                              checked={emailMeals}
+                              onChange={setEmailMeals}
+                              color="purple"
+                              size="sm"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between py-2">
+                          <div className="flex-1 pr-4">
+                            <div className="font-medium text-gray-700 dark:text-gray-300">General reminders</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">All other reminder notifications</div>
+                          </div>
+                          <div className="flex-shrink-0">
+                            <Toggle
+                              id="email-general"
+                              checked={emailGeneral}
+                              onChange={setEmailGeneral}
+                              color="purple"
+                              size="sm"
+                            />
+                          </div>
                         </div>
                       </div>
                     )}
@@ -326,68 +370,92 @@ export default function NotificationSettingsPage() {
 
                   <div className="space-y-4">
                     {/* Master Toggle */}
-                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                      <div>
+                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                      <div className="flex-1 pr-4">
                         <div className="font-medium text-gray-900 dark:text-white">Enable push notifications</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                        <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                           {isPushSupported
                             ? 'Allow browser notifications for real-time alerts'
                             : 'Push notifications not supported in this browser'}
                         </div>
                       </div>
-                      <Toggle
-                        id="push-enabled"
-                        checked={isPushSubscribed}
-                        onChange={handlePushToggle}
-                        color="purple"
-                        disabled={!isPushSupported || isSubscribing}
-                      />
+                      <div className="flex-shrink-0">
+                        <Toggle
+                          id="push-enabled"
+                          checked={isPushSubscribed}
+                          onChange={handlePushToggle}
+                          color="purple"
+                          disabled={!isPushSupported || isSubscribing}
+                        />
+                      </div>
                     </div>
 
                     {/* Type-specific toggles */}
                     {isPushSubscribed && (
-                      <div className="pl-4 space-y-3 border-l-2 border-gray-200 dark:border-gray-700">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="text-gray-700 dark:text-gray-300">Task assignments</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">Browser notifications for task updates</div>
+                      <div className="ml-4 space-y-3 border-l-2 border-gray-200 dark:border-gray-700 pl-4">
+                        <div className="flex items-center justify-between py-2">
+                          <div className="flex-1 pr-4">
+                            <div className="font-medium text-gray-700 dark:text-gray-300">Task updates</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Task assignments and status changes</div>
                           </div>
-                          <Toggle
-                            id="push-assignments"
-                            checked={inAppAssignments}
-                            onChange={setInAppAssignments}
-                            color="purple"
-                            size="sm"
-                          />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="text-gray-700 dark:text-gray-300">Due reminders</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">Push notifications for upcoming items</div>
+                          <div className="flex-shrink-0">
+                            <Toggle
+                              id="push-assignments"
+                              checked={inAppAssignments}
+                              onChange={setInAppAssignments}
+                              color="purple"
+                              size="sm"
+                            />
                           </div>
-                          <Toggle
-                            id="push-due-reminders"
-                            checked={inAppDueReminders}
-                            onChange={setInAppDueReminders}
-                            color="purple"
-                            size="sm"
-                          />
                         </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="text-gray-700 dark:text-gray-300">@Mentions & comments</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">Notifications for mentions and comments</div>
+                        <div className="flex items-center justify-between py-2">
+                          <div className="flex-1 pr-4">
+                            <div className="font-medium text-gray-700 dark:text-gray-300">Reminders</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Upcoming reminders and deadlines</div>
                           </div>
-                          <Toggle
-                            id="push-mentions"
-                            checked={inAppMentions}
-                            onChange={setInAppMentions}
-                            color="purple"
-                            size="sm"
-                          />
+                          <div className="flex-shrink-0">
+                            <Toggle
+                              id="push-due-reminders"
+                              checked={inAppDueReminders}
+                              onChange={setInAppDueReminders}
+                              color="purple"
+                              size="sm"
+                            />
+                          </div>
                         </div>
-                        <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                          <p className="text-xs text-green-700 dark:text-green-300">
+                        <div className="flex items-center justify-between py-2">
+                          <div className="flex-1 pr-4">
+                            <div className="font-medium text-gray-700 dark:text-gray-300">Messages</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">New message notifications</div>
+                          </div>
+                          <div className="flex-shrink-0">
+                            <Toggle
+                              id="push-mentions"
+                              checked={inAppMentions}
+                              onChange={setInAppMentions}
+                              color="purple"
+                              size="sm"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between py-2">
+                          <div className="flex-1 pr-4">
+                            <div className="font-medium text-gray-700 dark:text-gray-300">Shopping updates</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Shopping list updates and reminders</div>
+                          </div>
+                          <div className="flex-shrink-0">
+                            <Toggle
+                              id="push-shopping"
+                              checked={inAppShopping}
+                              onChange={setInAppShopping}
+                              color="purple"
+                              size="sm"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                          <p className="text-sm text-green-700 dark:text-green-300">
                             <strong>Active:</strong> You'll receive push notifications based on your preferences and quiet hours settings.
                           </p>
                         </div>
@@ -440,48 +508,54 @@ export default function NotificationSettingsPage() {
                   </div>
 
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                      <div>
+                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                      <div className="flex-1 pr-4">
                         <div className="font-medium text-gray-900 dark:text-white">Enable Quiet Hours</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">Pause notifications during specific hours</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Pause notifications during specific hours</div>
                       </div>
-                      <Toggle
-                        id="quiet-hours-enabled"
-                        checked={quietHoursEnabled}
-                        onChange={setQuietHoursEnabled}
-                        color="purple"
-                      />
+                      <div className="flex-shrink-0">
+                        <Toggle
+                          id="quiet-hours-enabled"
+                          checked={quietHoursEnabled}
+                          onChange={setQuietHoursEnabled}
+                          color="purple"
+                        />
+                      </div>
                     </div>
 
                     {quietHoursEnabled && (
-                      <div className="pl-4 space-y-3 border-l-2 border-gray-200 dark:border-gray-700">
-                        <div>
-                          <label htmlFor="quiet-hours-start" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">
-                            Start Time
-                          </label>
-                          <input
-                            id="quiet-hours-start"
-                            type="time"
-                            value={quietHoursStart}
-                            onChange={(e) => setQuietHoursStart(e.target.value)}
-                            className="w-full px-3 sm:px-4 py-3 text-base min-h-[48px] bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500"
-                          />
+                      <div className="ml-4 space-y-4 border-l-2 border-gray-200 dark:border-gray-700 pl-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label htmlFor="quiet-hours-start" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                              Start Time
+                            </label>
+                            <input
+                              id="quiet-hours-start"
+                              type="time"
+                              value={quietHoursStart}
+                              onChange={(e) => setQuietHoursStart(e.target.value)}
+                              className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="quiet-hours-end" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                              End Time
+                            </label>
+                            <input
+                              id="quiet-hours-end"
+                              type="time"
+                              value={quietHoursEnd}
+                              onChange={(e) => setQuietHoursEnd(e.target.value)}
+                              className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            />
+                          </div>
                         </div>
-                        <div>
-                          <label htmlFor="quiet-hours-end" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">
-                            End Time
-                          </label>
-                          <input
-                            id="quiet-hours-end"
-                            type="time"
-                            value={quietHoursEnd}
-                            onChange={(e) => setQuietHoursEnd(e.target.value)}
-                            className="w-full px-3 sm:px-4 py-3 text-base min-h-[48px] bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500"
-                          />
+                        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                          <p className="text-sm text-blue-700 dark:text-blue-300">
+                            <strong>Note:</strong> Notifications won't be sent during quiet hours, but will still appear in your notification center.
+                          </p>
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Notifications won't be sent during quiet hours, but will still appear in your notification center.
-                        </p>
                       </div>
                     )}
                   </div>
