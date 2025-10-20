@@ -210,8 +210,8 @@ export async function GET(request: NextRequest) {
 
     // Get user profile for contact information
     const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('email, phone')
+      .from('users')
+      .select('email, name')
       .eq('id', userId)
       .single();
 
@@ -241,7 +241,7 @@ export async function GET(request: NextRequest) {
         },
         contactInfo: {
           email: profile.email,
-          phone: profile.phone,
+          name: profile.name,
         },
         subscriptionHistory: history || [],
         unsubscribeLinks: {
@@ -297,8 +297,8 @@ async function updateResendAudience(userId: string, enableMarketing: boolean) {
 
     // Get user email
     const { data: profile } = await supabase
-      .from('profiles')
-      .select('email, full_name')
+      .from('users')
+      .select('email, name')
       .eq('id', userId)
       .single();
 
@@ -314,7 +314,7 @@ async function updateResendAudience(userId: string, enableMarketing: boolean) {
       // await resend.audiences.add({
       //   audienceId: 'marketing-audience-id',
       //   email: profile.email,
-      //   firstName: profile.full_name?.split(' ')[0],
+      //   firstName: profile.name?.split(' ')[0],
       // });
     } else {
       // Remove from marketing audience
@@ -333,33 +333,34 @@ async function updateResendAudience(userId: string, enableMarketing: boolean) {
 // Update SMS subscription (Twilio or similar)
 async function updateSMSSubscription(userId: string, enableSMS: boolean) {
   try {
-    const supabase = createClient();
+    // Note: Phone column doesn't exist in users table yet
+    // This is a placeholder for future SMS functionality
+    console.log(`📱 SMS marketing ${enableSMS ? 'enabled' : 'disabled'} for user ${userId}`);
+    console.log('📱 Phone number feature not yet implemented - users table needs phone column');
 
-    // Get user phone
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('phone')
-      .eq('id', userId)
-      .single();
+    // TODO: Add phone column to users table or create separate phone_numbers table
+    // Then implement actual SMS subscription logic here
 
-    if (!profile?.phone) {
-      console.log('📱 No phone number found for user, skipping SMS update');
-      return;
-    }
-
-    if (enableSMS) {
-      console.log(`📱 Enabling SMS marketing for ${profile.phone}`);
-      // In a real implementation, you would:
-      // await twilioClient.messages.create({
-      //   body: 'You have subscribed to Rowan SMS updates. Reply STOP to unsubscribe.',
-      //   from: process.env.TWILIO_PHONE_NUMBER,
-      //   to: profile.phone,
-      // });
-    } else {
-      console.log(`📱 Disabling SMS marketing for ${profile.phone}`);
-      // In a real implementation, you would:
-      // Add phone to unsubscribe list in Twilio or SMS provider
-    }
+    // Example future implementation:
+    // const supabase = createClient();
+    // const { data: profile } = await supabase
+    //   .from('users')
+    //   .select('phone')
+    //   .eq('id', userId)
+    //   .single();
+    //
+    // if (!profile?.phone) {
+    //   console.log('📱 No phone number found for user, skipping SMS update');
+    //   return;
+    // }
+    //
+    // if (enableSMS) {
+    //   console.log(`📱 Enabling SMS marketing for ${profile.phone}`);
+    //   // await twilioClient.messages.create({...});
+    // } else {
+    //   console.log(`📱 Disabling SMS marketing for ${profile.phone}`);
+    //   // Add phone to unsubscribe list
+    // }
   } catch (error) {
     console.error('Error updating SMS subscription:', error);
   }

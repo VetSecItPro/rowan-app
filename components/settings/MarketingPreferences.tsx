@@ -17,7 +17,7 @@ interface MarketingPreferences {
 
 interface ContactInfo {
   email: string;
-  phone?: string;
+  name: string;
 }
 
 interface SubscriptionHistory {
@@ -196,12 +196,10 @@ export function MarketingPreferences() {
             <Mail className="h-4 w-4 text-gray-500" />
             <span className="text-gray-700 dark:text-gray-300">{data.contactInfo.email}</span>
           </div>
-          {data.contactInfo.phone && (
-            <div className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4 text-gray-500" />
-              <span className="text-gray-700 dark:text-gray-300">{data.contactInfo.phone}</span>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            <span className="h-4 w-4 text-gray-500">👤</span>
+            <span className="text-gray-700 dark:text-gray-300">{data.contactInfo.name}</span>
+          </div>
         </div>
       </div>
 
@@ -250,11 +248,9 @@ export function MarketingPreferences() {
               <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                 Standard rates apply • Reply STOP to opt out • Max 4 messages/month
               </div>
-              {!data.contactInfo.phone && (
-                <div className="text-xs text-amber-600 dark:text-amber-400 mt-2">
-                  Add a phone number to your profile to enable SMS notifications
-                </div>
-              )}
+              <div className="text-xs text-amber-600 dark:text-amber-400 mt-2">
+                SMS functionality not yet available - phone number feature coming soon
+              </div>
             </div>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
@@ -262,7 +258,7 @@ export function MarketingPreferences() {
               type="checkbox"
               checked={preferences.smsMarketing}
               onChange={(e) => handleToggle('smsMarketing', e.target.checked)}
-              disabled={isSaving || !data.contactInfo.phone}
+              disabled={true}
               className="sr-only peer"
             />
             <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
