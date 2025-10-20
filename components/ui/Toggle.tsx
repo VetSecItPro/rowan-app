@@ -17,27 +17,27 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
   ({ id, checked, onChange, disabled = false, size = 'md', color = 'purple', label, description }, ref) => {
     const sizeClasses = {
       sm: {
-        container: 'w-8 h-4',
-        thumb: 'w-3 h-3',
+        container: 'w-9 h-5 p-0.5',
+        thumb: 'w-4 h-4',
         translate: 'translate-x-4',
       },
       md: {
-        container: 'w-11 h-6',
+        container: 'w-12 h-6 p-0.5',
         thumb: 'w-5 h-5',
         translate: 'translate-x-5',
       },
       lg: {
-        container: 'w-14 h-7',
-        thumb: 'w-6 h-6',
-        translate: 'translate-x-7',
+        container: 'w-14 h-8 p-0.5',
+        thumb: 'w-7 h-7',
+        translate: 'translate-x-5',
       },
     };
 
     const colorClasses = {
-      purple: 'peer-checked:bg-purple-600 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800',
-      blue: 'peer-checked:bg-blue-600 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800',
-      green: 'peer-checked:bg-green-600 peer-focus:ring-green-300 dark:peer-focus:ring-green-800',
-      red: 'peer-checked:bg-red-600 peer-focus:ring-red-300 dark:peer-focus:ring-red-800',
+      purple: 'bg-purple-600',
+      blue: 'bg-blue-600',
+      green: 'bg-green-600',
+      red: 'bg-red-600',
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,30 +60,30 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
             className={`
               relative
               ${sizeClasses[size].container}
-              ${checked ? colorClasses[color].split(' ')[0] : 'bg-gray-200 dark:bg-gray-700'}
-              peer-focus:outline-none
-              peer-focus:ring-4
-              ${colorClasses[color].split(' ').slice(1).join(' ')}
+              ${checked ? colorClasses[color] : 'bg-gray-300 dark:bg-gray-600'}
               rounded-full
-              peer-disabled:opacity-50
-              peer-disabled:cursor-not-allowed
-              transition-all
+              transition-colors
               duration-200
               ease-in-out
+              peer-disabled:opacity-50
+              peer-disabled:cursor-not-allowed
+              peer-focus:outline-none
+              peer-focus:ring-2
+              peer-focus:ring-purple-500
+              peer-focus:ring-offset-2
+              flex
+              items-center
             `}
           >
             <div
               className={`
-                absolute
-                top-0.5
-                left-0.5
                 bg-white
                 rounded-full
                 ${sizeClasses[size].thumb}
                 transition-transform
                 duration-200
                 ease-in-out
-                shadow
+                shadow-md
                 ${checked ? sizeClasses[size].translate : 'translate-x-0'}
               `}
             />
