@@ -31,14 +31,37 @@ export function Footer() {
               href="/terms"
               className="btn-touch px-2 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95"
             >
-              Terms
+              Terms of Service
             </Link>
             <Link
               href="/privacy"
               className="btn-touch px-2 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95"
             >
-              Privacy
+              Privacy Policy
             </Link>
+            <Link
+              href="/cookies"
+              className="btn-touch px-2 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95"
+            >
+              Cookie Policy
+            </Link>
+            <Link
+              href="/settings/privacy-data"
+              className="btn-touch px-2 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95"
+            >
+              Privacy Settings
+            </Link>
+            <button
+              onClick={() => {
+                // Trigger cookie consent dialog
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('show-cookie-consent'));
+                }
+              }}
+              className="btn-touch px-2 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95"
+            >
+              Cookie Preferences
+            </button>
             <Link
               href="/settings/documentation"
               className="btn-touch px-2 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95"
