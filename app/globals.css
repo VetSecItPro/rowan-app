@@ -2799,16 +2799,16 @@
 
 /* Reminders Feature - Pink Brand Color Search Input */
 .apple-search-container.reminders-search .apple-search-input {
-  border-color: rgba(236, 72, 153, 0.15); /* pink-500 */
+  border-color: rgba(236, 72, 153, 0.4); /* pink-500 - increased visibility */
 }
 
 .apple-search-container.reminders-search .apple-search-input:hover {
-  border-color: rgba(236, 72, 153, 0.25); /* pink-500 with higher opacity */
+  border-color: rgba(236, 72, 153, 0.5); /* pink-500 with higher opacity */
   box-shadow: 0 2px 12px -2px rgba(236, 72, 153, 0.1);
 }
 
 .apple-search-container.reminders-search .apple-search-input:focus {
-  border-color: rgba(236, 72, 153, 0.4); /* pink-500 */
+  border-color: rgba(236, 72, 153, 0.6); /* pink-500 - more visible focus */
   box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1), 0 4px 16px -4px rgba(236, 72, 153, 0.2);
 }
 

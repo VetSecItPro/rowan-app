@@ -568,7 +568,7 @@ export default function RemindersPage(): JSX.Element {
                 {/* Search and Sort Row */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                   {/* Search */}
-                  <div className="flex-1 max-w-none sm:max-w-lg">
+                  <div className="flex-1 max-w-none">
                     <div className={`apple-search-container reminders-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
                       <Search className="apple-search-icon" />
                       <input
@@ -596,7 +596,7 @@ export default function RemindersPage(): JSX.Element {
                   </div>
 
                   {/* Sort Dropdown */}
-                  <div className="relative w-44 flex-shrink-0">
+                  <div className="relative w-40 flex-shrink-0">
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as any)}
@@ -621,9 +621,9 @@ export default function RemindersPage(): JSX.Element {
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => setCategoryFilter('all')}
-                        className={`px-4 py-2.5 md:px-3 md:py-1.5 text-sm font-medium rounded-full transition-all min-h-[44px] md:min-h-0 ${
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                           categoryFilter === 'all'
-                            ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
+                            ? 'bg-pink-500 text-white'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-pink-100 dark:hover:bg-pink-900/20'
                         }`}
                       >
@@ -631,50 +631,50 @@ export default function RemindersPage(): JSX.Element {
                       </button>
                       <button
                         onClick={() => setCategoryFilter('bills')}
-                        className={`px-4 py-2.5 md:px-3 md:py-1.5 text-sm font-medium rounded-full transition-all flex items-center gap-1 min-h-[44px] md:min-h-0 ${
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
                           categoryFilter === 'bills'
-                            ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md'
-                            : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/30'
+                            ? 'bg-green-500 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-green-900/20'
                         }`}
                       >
                         <span>💰</span> Bills
                       </button>
                       <button
                         onClick={() => setCategoryFilter('health')}
-                        className={`px-4 py-2.5 md:px-3 md:py-1.5 text-sm font-medium rounded-full transition-all flex items-center gap-1 min-h-[44px] md:min-h-0 ${
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
                           categoryFilter === 'health'
-                            ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md'
-                            : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30'
+                            ? 'bg-red-500 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/20'
                         }`}
                       >
                         <span>❤️</span> Health
                       </button>
                       <button
                         onClick={() => setCategoryFilter('work')}
-                        className={`px-4 py-2.5 md:px-3 md:py-1.5 text-sm font-medium rounded-full transition-all flex items-center gap-1 min-h-[44px] md:min-h-0 ${
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
                           categoryFilter === 'work'
-                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                            : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30'
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/20'
                         }`}
                       >
                         <span>💼</span> Work
                       </button>
                       <button
                         onClick={() => setCategoryFilter('personal')}
-                        className={`px-4 py-2.5 md:px-3 md:py-1.5 text-sm font-medium rounded-full transition-all flex items-center gap-1 min-h-[44px] md:min-h-0 ${
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
                           categoryFilter === 'personal'
-                            ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md'
-                            : 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/30'
+                            ? 'bg-purple-500 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-purple-900/20'
                         }`}
                       >
                         <span>✨</span> Personal
                       </button>
                       <button
                         onClick={() => setCategoryFilter('household')}
-                        className={`px-4 py-2.5 md:px-3 md:py-1.5 text-sm font-medium rounded-full transition-all flex items-center gap-1 min-h-[44px] md:min-h-0 ${
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
                           categoryFilter === 'household'
-                            ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md'
-                            : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/30'
+                            ? 'bg-amber-500 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-amber-100 dark:hover:bg-amber-900/20'
                         }`}
                       >
                         <span>🏠</span> Household
@@ -690,9 +690,9 @@ export default function RemindersPage(): JSX.Element {
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => setPriorityFilter('all')}
-                        className={`px-4 py-2.5 md:px-3 md:py-1.5 text-sm font-medium rounded-full transition-all min-h-[44px] md:min-h-0 ${
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                           priorityFilter === 'all'
-                            ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-md'
+                            ? 'bg-pink-500 text-white'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-pink-100 dark:hover:bg-pink-900/20'
                         }`}
                       >
@@ -700,40 +700,40 @@ export default function RemindersPage(): JSX.Element {
                       </button>
                       <button
                         onClick={() => setPriorityFilter('urgent')}
-                        className={`px-4 py-2.5 md:px-3 md:py-1.5 text-sm font-medium rounded-full transition-all flex items-center gap-1 min-h-[44px] md:min-h-0 ${
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
                           priorityFilter === 'urgent'
-                            ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md'
-                            : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-2 border-red-300 dark:border-red-700 hover:bg-red-200 dark:hover:bg-red-900/40'
+                            ? 'bg-red-600 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/20'
                         }`}
                       >
                         🔴 Urgent
                       </button>
                       <button
                         onClick={() => setPriorityFilter('high')}
-                        className={`px-4 py-2.5 md:px-3 md:py-1.5 text-sm font-medium rounded-full transition-all flex items-center gap-1 min-h-[44px] md:min-h-0 ${
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
                           priorityFilter === 'high'
-                            ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
-                            : 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-900/30'
+                            ? 'bg-orange-500 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900/20'
                         }`}
                       >
                         🟠 High
                       </button>
                       <button
                         onClick={() => setPriorityFilter('medium')}
-                        className={`px-4 py-2.5 md:px-3 md:py-1.5 text-sm font-medium rounded-full transition-all flex items-center gap-1 min-h-[44px] md:min-h-0 ${
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
                           priorityFilter === 'medium'
-                            ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white shadow-md'
-                            : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-800 hover:bg-yellow-100 dark:hover:bg-yellow-900/30'
+                            ? 'bg-yellow-500 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-yellow-100 dark:hover:bg-yellow-900/20'
                         }`}
                       >
                         🟡 Medium
                       </button>
                       <button
                         onClick={() => setPriorityFilter('low')}
-                        className={`px-4 py-2.5 md:px-3 md:py-1.5 text-sm font-medium rounded-full transition-all flex items-center gap-1 min-h-[44px] md:min-h-0 ${
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
                           priorityFilter === 'low'
-                            ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-md'
-                            : 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
+                            ? 'bg-gray-500 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                         }`}
                       >
                         ⚪ Low
