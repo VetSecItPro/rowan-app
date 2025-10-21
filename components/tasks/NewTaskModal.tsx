@@ -28,9 +28,10 @@ interface NewTaskModalProps {
   onSave: (task: CreateTaskInput) => void;
   editTask?: Task | null;
   spaceId: string;
+  userId?: string;
 }
 
-export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId }: NewTaskModalProps) {
+export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTaskModalProps) {
   const [formData, setFormData] = useState<CreateTaskInput>({
     space_id: spaceId,
     title: '',
@@ -77,6 +78,12 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId }: New
     }
     setShowEmojiPicker(false);
     setDateError('');
+    setIsRecurring(false);
+    setRecurringData({
+      pattern: 'weekly',
+      interval: 1,
+      daysOfWeek: [],
+    });
   }, [editTask, spaceId, isOpen]);
 
   const handleEmojiClick = (emoji: string) => {
@@ -84,7 +91,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId }: New
     setShowEmojiPicker(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validate due date is not in the past
@@ -102,7 +109,33 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId }: New
     // Clear any previous errors
     setDateError('');
 
-    // Clean up form data - remove empty strings for optional fields
+    // Handle recurring tasks
+    if (isRecurring && !editTask && userId) {
+      try {
+        await taskRecurrenceService.createRecurringTask({
+          space_id: spaceId,
+          title: formData.title,
+          description: formData.description || undefined,
+          category: formData.category || undefined,
+          priority: formData.priority,
+          created_by: userId,
+          recurrence: {
+            pattern: recurringData.pattern,
+            interval: recurringData.interval,
+            days_of_week: recurringData.daysOfWeek,
+          },
+        });
+        onSave(formData); // Call onSave to refresh the task list
+        onClose();
+        return;
+      } catch (error) {
+        console.error('Error creating recurring task:', error);
+        setDateError('Failed to create recurring task');
+        return;
+      }
+    }
+
+    // Handle regular tasks (create or edit)
     const cleanedData: CreateTaskInput = {
       ...formData,
       description: formData.description || undefined,
@@ -313,6 +346,109 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId }: New
                 </p>
               )}
             </div>
+          </div>
+
+          {/* Recurring Task Section */}
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <button
+                type="button"
+                onClick={() => setIsRecurring(!isRecurring)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                  isRecurring
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                }`}
+              >
+                <Repeat className="w-4 h-4" />
+                <span>Repeat</span>
+              </button>
+              {isRecurring && (
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Create recurring task
+                </span>
+              )}
+            </div>
+
+            {/* Recurring Options - Collapsible */}
+            {isRecurring && (
+              <div className="space-y-4 p-4 bg-gray-100 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                {/* Pattern and Interval Row */}
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Pattern */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Pattern
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={recurringData.pattern}
+                        onChange={(e) => setRecurringData({
+                          ...recurringData,
+                          pattern: e.target.value as any,
+                          daysOfWeek: [] // Reset days when pattern changes
+                        })}
+                        className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
+                      >
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  {/* Interval */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Every
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="365"
+                      value={recurringData.interval}
+                      onChange={(e) => setRecurringData({
+                        ...recurringData,
+                        interval: Math.max(1, parseInt(e.target.value) || 1)
+                      })}
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+
+                {/* Days of Week - Only show for weekly pattern */}
+                {recurringData.pattern === 'weekly' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                      Days of Week
+                    </label>
+                    <div className="flex gap-2 flex-wrap">
+                      {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => {
+                            const days = recurringData.daysOfWeek.includes(idx)
+                              ? recurringData.daysOfWeek.filter(d => d !== idx)
+                              : [...recurringData.daysOfWeek, idx];
+                            setRecurringData({ ...recurringData, daysOfWeek: days });
+                          }}
+                          className={`w-10 h-10 rounded-full transition-colors text-sm font-medium ${
+                            recurringData.daysOfWeek.includes(idx)
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          {day}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Actions */}
