@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 
     // Rate limiting
     const identifier = `cookie-preferences-get-${userId}`;
-    const { success: rateLimitSuccess } = await ratelimit.limit(identifier);
+    const { success: rateLimitSuccess } = await ratelimit?.limit(identifier) ?? { success: true };
     if (!rateLimitSuccess) {
       return NextResponse.json(
         { success: false, error: 'Rate limit exceeded' },
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
 
     // Rate limiting
     const identifier = `cookie-preferences-post-${userId}`;
-    const { success: rateLimitSuccess } = await ratelimit.limit(identifier);
+    const { success: rateLimitSuccess } = await ratelimit?.limit(identifier) ?? { success: true };
     if (!rateLimitSuccess) {
       return NextResponse.json(
         { success: false, error: 'Rate limit exceeded' },
@@ -237,7 +237,7 @@ export async function DELETE(request: NextRequest) {
 
     // Rate limiting
     const identifier = `cookie-preferences-delete-${userId}`;
-    const { success: rateLimitSuccess } = await ratelimit.limit(identifier);
+    const { success: rateLimitSuccess } = await ratelimit?.limit(identifier) ?? { success: true };
     if (!rateLimitSuccess) {
       return NextResponse.json(
         { success: false, error: 'Rate limit exceeded' },

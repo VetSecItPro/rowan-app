@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 
     // Rate limiting
     const identifier = `privacy-get-${userId}`;
-    const { success: rateLimitSuccess } = await ratelimit.limit(identifier);
+    const { success: rateLimitSuccess } = await ratelimit?.limit(identifier) ?? { success: true };
     if (!rateLimitSuccess) {
       return NextResponse.json(
         { success: false, error: 'Rate limit exceeded' },
@@ -122,7 +122,7 @@ export async function PATCH(request: NextRequest) {
 
     // Rate limiting
     const identifier = `privacy-update-${userId}`;
-    const { success: rateLimitSuccess } = await ratelimit.limit(identifier);
+    const { success: rateLimitSuccess } = await ratelimit?.limit(identifier) ?? { success: true };
     if (!rateLimitSuccess) {
       return NextResponse.json(
         { success: false, error: 'Rate limit exceeded' },

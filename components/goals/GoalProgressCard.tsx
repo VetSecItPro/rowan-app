@@ -37,9 +37,10 @@ export default function GoalProgressCard({ goal, onClick }: GoalProgressCardProp
     return null; // Only show for financial goals
   }
 
-  const progress = Math.min(100, (goal.current_amount / goal.target_amount) * 100);
-  const remaining = Math.max(0, goal.target_amount - goal.current_amount);
-  const isComplete = goal.current_amount >= goal.target_amount;
+  const currentAmount = goal.current_amount ?? 0;
+  const progress = Math.min(100, (currentAmount / goal.target_amount) * 100);
+  const remaining = Math.max(0, goal.target_amount - currentAmount);
+  const isComplete = currentAmount >= goal.target_amount;
 
   // Milestone markers at 25%, 50%, 75%, 100%
   const milestones = [

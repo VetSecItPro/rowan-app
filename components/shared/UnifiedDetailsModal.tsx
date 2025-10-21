@@ -7,6 +7,8 @@ import {
   Upload, Send, Trash2, Edit3, AlertCircle, Users
 } from 'lucide-react';
 import { Task, Chore } from '@/lib/types';
+
+type TaskOrChore = (Task & { type: 'task' }) | (Chore & { type: 'chore' });
 import {
   TASK_CATEGORIES,
   CHORE_CATEGORIES,
@@ -18,12 +20,15 @@ import {
 type ItemType = Task | Chore;
 
 interface UnifiedDetailsModalProps {
-  item: ItemType & { type?: 'task' | 'chore' };
+  item: (ItemType & { type?: 'task' | 'chore' }) | null;
   isOpen: boolean;
   onClose: () => void;
   spaceId: string;
   userId: string;
-  onUpdate: () => void;
+  onEdit?: (item: TaskOrChore) => void;
+  onDelete?: (itemId: string, type?: 'task' | 'chore') => void;
+  onSave?: (item: any) => void;
+  onUpdate?: () => void;
 }
 
 interface TabConfig {
@@ -40,6 +45,9 @@ export function UnifiedDetailsModal({
   onClose,
   spaceId,
   userId,
+  onEdit,
+  onDelete,
+  onSave,
   onUpdate
 }: UnifiedDetailsModalProps) {
   // State management

@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     // Rate limiting
     const identifier = `data-sharing-${userId}`;
-    const { success: rateLimitSuccess } = await ratelimit.limit(identifier);
+    const { success: rateLimitSuccess } = await ratelimit?.limit(identifier) ?? { success: true };
     if (!rateLimitSuccess) {
       return NextResponse.json(
         { success: false, error: 'Rate limit exceeded' },
