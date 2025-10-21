@@ -152,7 +152,9 @@ USING (space_id IN (
 7. Create PR: `gh pr create --title "Title" --body "Description"`
 8. Monitor Vercel deployment preview
 9. If tests fail: fix on feature branch, push again
-10. **ASK USER**: "Ready to merge PR?" before merging
+10. **When everything runs fine with no errors and no more work needed:**
+    - Confidently advise: "This feature is complete and ready to merge"
+    - **ASK USER**: "Ready to merge PR into main?" before merging
 
 **Standard commit format:**
 ```bash
