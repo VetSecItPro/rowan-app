@@ -4,7 +4,7 @@ import { CheckSquare, Clock, Flag, User, Calendar as CalendarIcon, MoreVertical,
 import { Task } from '@/lib/types';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
-import { TASK_CATEGORIES } from './NewTaskModal';
+import { TASK_CATEGORIES } from '@/lib/constants/item-categories';
 import Link from 'next/link';
 
 interface LinkedShoppingList {
