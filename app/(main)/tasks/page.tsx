@@ -6,8 +6,8 @@ import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { TaskCard } from '@/components/tasks/TaskCard';
 import { DraggableTaskList } from '@/components/tasks/DraggableTaskList';
-import { NewTaskModal } from '@/components/tasks/NewTaskModal';
-import { NewChoreModal } from '@/components/projects/NewChoreModal';
+import { UnifiedItemModal } from '@/components/shared/UnifiedItemModal';
+import { UnifiedDetailsModal } from '@/components/shared/UnifiedDetailsModal';
 import GuidedTaskCreation from '@/components/guided/GuidedTaskCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { tasksService } from '@/lib/services/tasks-service';
@@ -19,10 +19,6 @@ import { useTaskRealtime } from '@/hooks/useTaskRealtime';
 import { TaskFilterPanel, TaskFilters } from '@/components/tasks/TaskFilterPanel';
 import { BulkActionsBar } from '@/components/tasks/BulkActionsBar';
 import { TemplatePickerModal } from '@/components/tasks/TemplatePickerModal';
-import { ExportModal } from '@/components/tasks/ExportModal';
-import { AttachmentsModal } from '@/components/tasks/AttachmentsModal';
-import { DependenciesModal } from '@/components/tasks/DependenciesModal';
-import { ApprovalModal } from '@/components/tasks/ApprovalModal';
 import { SnoozeModal } from '@/components/tasks/SnoozeModal';
 import { SubtasksList } from '@/components/tasks/SubtasksList';
 import { TimeTracker } from '@/components/tasks/TimeTracker';
@@ -30,7 +26,6 @@ import { TaskComments } from '@/components/tasks/TaskComments';
 import { TaskQuickActions } from '@/components/tasks/TaskQuickActions';
 import { CalendarSyncToggle } from '@/components/tasks/CalendarSyncToggle';
 import { ChoreRotationConfig } from '@/components/tasks/ChoreRotationConfig';
-import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 
 type TaskType = 'task' | 'chore';
 type TaskOrChore = (Task & { type: 'task' }) | (Chore & { type: 'chore' });
@@ -41,9 +36,6 @@ export default function TasksPage() {
   // Basic state
   const [chores, setChores] = useState<Chore[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [editingChore, setEditingChore] = useState<Chore | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -51,8 +43,15 @@ export default function TasksPage() {
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, any>>({});
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<{ id: string; type: 'task' | 'chore' } | null>(null);
+
+  // Unified modal state (replacing separate task/chore modals)
+  const [isUnifiedModalOpen, setIsUnifiedModalOpen] = useState(false);
+  const [modalDefaultType, setModalDefaultType] = useState<'task' | 'chore'>('task');
+  const [editingItem, setEditingItem] = useState<(Task & {type: 'task'}) | (Chore & {type: 'chore'}) | null>(null);
+
+  // Unified details modal state
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<(Task & {type: 'task'}) | (Chore & {type: 'chore'}) | null>(null);
 
   // Advanced features state
   const [showFilters, setShowFilters] = useState(false);
@@ -60,13 +59,8 @@ export default function TasksPage() {
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
   const [enableDragDrop, setEnableDragDrop] = useState(true);
 
-  // Modal states for advanced features
+  // Remaining modal states for features not yet unified
   const [isTemplatePickerOpen, setIsTemplatePickerOpen] = useState(false);
-  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
-  const [activeDetailModal, setActiveDetailModal] = useState<
-    'attachments' | 'dependencies' | 'approval' | 'snooze' | 'details' | null
-  >(null);
 
   // Pagination state
   const [displayLimit, setDisplayLimit] = useState(20);
@@ -209,38 +203,30 @@ export default function TasksPage() {
     loadData();
   }, [loadData]);
 
-  // Memoized handlers with useCallback
-  const handleCreateTask = useCallback(async (taskData: CreateTaskInput) => {
+  // Unified modal handlers
+  const handleSaveItem = useCallback(async (itemData: CreateTaskInput | CreateChoreInput) => {
     try {
-      if (editingTask) {
-        // Update existing task
-        await tasksService.updateTask(editingTask.id, taskData);
+      if (editingItem) {
+        // Update existing item
+        if (editingItem.type === 'task') {
+          await tasksService.updateTask(editingItem.id, itemData as CreateTaskInput);
+        } else {
+          await choresService.updateChore(editingItem.id, itemData as CreateChoreInput);
+        }
       } else {
-        // Create new task
-        await tasksService.createTask(taskData);
+        // Create new item based on current modal type
+        if (modalDefaultType === 'task') {
+          await tasksService.createTask(itemData as CreateTaskInput);
+        } else {
+          await choresService.createChore(itemData as CreateChoreInput);
+        }
       }
       loadData();
-      setEditingTask(null);
+      setEditingItem(null);
     } catch (error) {
-      console.error('Failed to save task:', error);
+      console.error('Failed to save item:', error);
     }
-  }, [editingTask, loadData]);
-
-  const handleCreateChore = useCallback(async (choreData: CreateChoreInput) => {
-    try {
-      if (editingChore) {
-        // Update existing chore
-        await choresService.updateChore(editingChore.id, choreData);
-      } else {
-        // Create new chore
-        await choresService.createChore(choreData);
-      }
-      loadData();
-      setEditingChore(null);
-    } catch (error) {
-      console.error('Failed to save chore:', error);
-    }
-  }, [editingChore, loadData]);
+  }, [editingItem, modalDefaultType, loadData]);
 
   const handleStatusChange = useCallback(async (itemId: string, status: string, type?: 'task' | 'chore') => {
     try {
@@ -260,45 +246,37 @@ export default function TasksPage() {
     }
   }, [loadData]);
 
-  const handleDeleteItem = useCallback((itemId: string, type?: 'task' | 'chore') => {
-    const itemType = type === 'chore' ? 'chore' : 'task';
-    setItemToDelete({ id: itemId, type: itemType });
-    setShowDeleteConfirm(true);
-  }, []);
-
-  const confirmDeleteItem = useCallback(async () => {
-    if (!itemToDelete) return;
-
+  const handleDeleteItem = useCallback(async (itemId: string, type?: 'task' | 'chore') => {
     try {
-      if (itemToDelete.type === 'chore') {
-        await choresService.deleteChore(itemToDelete.id);
+      if (type === 'chore') {
+        await choresService.deleteChore(itemId);
       } else {
-        await tasksService.deleteTask(itemToDelete.id);
+        await tasksService.deleteTask(itemId);
       }
       loadData();
     } catch (error) {
-      console.error(`Failed to delete ${itemToDelete.type}:`, error);
-    } finally {
-      setShowDeleteConfirm(false);
-      setItemToDelete(null);
+      console.error(`Failed to delete ${type || 'task'}:`, error);
     }
-  }, [itemToDelete, loadData]);
+  }, [loadData]);
 
   const handleEditItem = useCallback((item: TaskOrChore) => {
-    if (item.type === 'chore') {
-      setEditingChore(item as Chore);
-      setActiveTab('chore');
-    } else {
-      setEditingTask(item as Task);
-      setActiveTab('task');
-    }
-    setIsModalOpen(true);
+    setEditingItem({...item, type: item.type} as (Task & {type: 'task'}) | (Chore & {type: 'chore'}));
+    setIsUnifiedModalOpen(true);
+  }, []);
+
+  const handleViewDetails = useCallback((item: TaskOrChore) => {
+    setSelectedItem({...item, type: item.type} as (Task & {type: 'task'}) | (Chore & {type: 'chore'}));
+    setIsDetailsModalOpen(true);
   }, []);
 
   const handleCloseModal = useCallback(() => {
-    setIsModalOpen(false);
-    setEditingTask(null);
-    setEditingChore(null);
+    setIsUnifiedModalOpen(false);
+    setEditingItem(null);
+  }, []);
+
+  const handleCloseDetailsModal = useCallback(() => {
+    setIsDetailsModalOpen(false);
+    setSelectedItem(null);
   }, []);
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -323,8 +301,9 @@ export default function TasksPage() {
     setActiveTab(tab);
   }, []);
 
-  const handleOpenModal = useCallback(() => {
-    setIsModalOpen(true);
+  const handleOpenModal = useCallback((type: 'task' | 'chore') => {
+    setModalDefaultType(type);
+    setIsUnifiedModalOpen(true);
   }, []);
 
   const handleGuidedFlowComplete = useCallback(() => {
@@ -347,32 +326,16 @@ export default function TasksPage() {
   }, [user]);
 
   // Advanced feature handlers
-  const handleViewDetails = useCallback((task: any) => {
-    setSelectedTaskId(task.id);
-    setActiveDetailModal('details');
-  }, []);
-
   const handleQuickAction = useCallback((action: string) => {
     switch (action) {
-      case 'attach':
-        setActiveDetailModal('attachments');
-        break;
-      case 'snooze':
-        setActiveDetailModal('snooze');
-        break;
       case 'repeat':
-        // Recurring functionality is now integrated into NewTaskModal
+        // Recurring functionality is now integrated into UnifiedItemModal
         setActiveTab('task');
-        handleOpenModal();
+        handleOpenModal('task');
         break;
       default:
         break;
     }
-  }, []);
-
-  const closeDetailModals = useCallback(() => {
-    setActiveDetailModal(null);
-    setSelectedTaskId(null);
   }, []);
 
   const handleBulkActionComplete = useCallback(() => {
@@ -427,13 +390,22 @@ export default function TasksPage() {
                 </button>
               </div>
 
-              <button
-                onClick={handleOpenModal}
-                className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-              >
-                <Plus className="w-5 h-5" />
-                <span>New {activeTab === 'task' ? 'Task' : 'Chore'}</span>
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleOpenModal('task')}
+                  className="px-3 sm:px-4 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                >
+                  <CheckSquare className="w-4 h-4" />
+                  <span className="text-sm">New Task</span>
+                </button>
+                <button
+                  onClick={() => handleOpenModal('chore')}
+                  className="px-3 sm:px-4 py-2 sm:py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Home className="w-4 h-4" />
+                  <span className="text-sm">New Chore</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -734,27 +706,30 @@ export default function TasksPage() {
         </div>
       </div>
 
-      {/* New/Edit Modal - conditionally render based on activeTab */}
+      {/* Unified Modals */}
       {currentSpace && user && (
         <>
-          {activeTab === 'task' ? (
-            <NewTaskModal
-              isOpen={isModalOpen}
-              onClose={handleCloseModal}
-              onSave={handleCreateTask}
-              editTask={editingTask}
-              spaceId={currentSpace.id}
-              userId={user?.id}
-            />
-          ) : (
-            <NewChoreModal
-              isOpen={isModalOpen}
-              onClose={handleCloseModal}
-              onSave={handleCreateChore}
-              editChore={editingChore}
-              spaceId={currentSpace.id}
-            />
-          )}
+          <UnifiedItemModal
+            isOpen={isUnifiedModalOpen}
+            onClose={handleCloseModal}
+            onSave={handleSaveItem}
+            editItem={editingItem}
+            spaceId={currentSpace.id}
+            userId={user.id}
+            defaultType={modalDefaultType}
+            mode={editingItem ? "quickEdit" : "create"}
+          />
+
+          <UnifiedDetailsModal
+            isOpen={isDetailsModalOpen}
+            onClose={handleCloseDetailsModal}
+            item={selectedItem}
+            onEdit={handleEditItem as any}
+            onDelete={handleDeleteItem}
+            onSave={handleSaveItem}
+            spaceId={currentSpace.id}
+            userId={user.id}
+          />
 
           {/* Advanced Feature Modals */}
 
@@ -769,105 +744,7 @@ export default function TasksPage() {
             spaceId={currentSpace.id}
           />
 
-          <ExportModal
-            isOpen={isExportModalOpen}
-            onClose={() => setIsExportModalOpen(false)}
-            spaceId={currentSpace.id}
-            currentFilters={filters}
-          />
 
-          {/* Task Detail Modals */}
-          {selectedTaskId && (
-            <>
-              {activeDetailModal === 'attachments' && (
-                <AttachmentsModal
-                  isOpen={true}
-                  onClose={closeDetailModals}
-                  taskId={selectedTaskId}
-                  userId={user.id}
-                />
-              )}
-
-              {activeDetailModal === 'dependencies' && (
-                <DependenciesModal
-                  isOpen={true}
-                  onClose={closeDetailModals}
-                  taskId={selectedTaskId}
-                  spaceId={currentSpace.id}
-                />
-              )}
-
-              {activeDetailModal === 'approval' && (
-                <ApprovalModal
-                  isOpen={true}
-                  onClose={closeDetailModals}
-                  taskId={selectedTaskId}
-                  currentUserId={user.id}
-                  spaceId={currentSpace.id}
-                />
-              )}
-
-              {activeDetailModal === 'snooze' && (
-                <SnoozeModal
-                  isOpen={true}
-                  onClose={closeDetailModals}
-                  taskId={selectedTaskId}
-                  userId={user.id}
-                  onSnooze={() => {
-                    closeDetailModals();
-                    refreshTasks();
-                    loadData();
-                  }}
-                />
-              )}
-
-              {/* Task Details Panel */}
-              {activeDetailModal === 'details' && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                  <div className="absolute inset-0 bg-black/50" onClick={closeDetailModals} />
-                  <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                    {/* Blue Header */}
-                    <div className="bg-blue-600 dark:bg-blue-700 rounded-t-xl px-6 py-4">
-                      <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-bold text-white">Edit Task Details</h2>
-                        <button
-                          onClick={closeDetailModals}
-                          className="p-2 hover:bg-blue-700 dark:hover:bg-blue-800 rounded-lg text-white"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </div>
-                    <div className="p-6 space-y-6">
-
-                      {/* Quick Actions */}
-                      <TaskQuickActions
-                        taskId={selectedTaskId}
-                        spaceId={currentSpace.id}
-                        userId={user.id}
-                        onAction={handleQuickAction}
-                      />
-
-                      {/* Time Tracker */}
-                      <TimeTracker taskId={selectedTaskId} userId={user.id} />
-
-                      {/* Calendar Sync */}
-                      <CalendarSyncToggle taskId={selectedTaskId} userId={user.id} />
-
-                      {/* Chore Rotation */}
-                      <ChoreRotationConfig taskId={selectedTaskId} spaceId={currentSpace.id} />
-
-                      {/* Subtasks */}
-                      <SubtasksList taskId={selectedTaskId} userId={user.id} />
-
-                      {/* Comments */}
-                      <TaskComments taskId={selectedTaskId} userId={user.id} />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
         </>
       )}
 
@@ -880,20 +757,6 @@ export default function TasksPage() {
         />
       )}
 
-      {/* Delete Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={showDeleteConfirm}
-        onClose={() => {
-          setShowDeleteConfirm(false);
-          setItemToDelete(null);
-        }}
-        onConfirm={confirmDeleteItem}
-        title={`Delete ${itemToDelete?.type || 'Item'}`}
-        message={`Are you sure you want to delete this ${itemToDelete?.type || 'item'}? This action cannot be undone.`}
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
-        variant="danger"
-      />
     </FeatureLayout>
   );
 }

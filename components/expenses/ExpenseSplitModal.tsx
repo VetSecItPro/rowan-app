@@ -86,7 +86,7 @@ export function ExpenseSplitModal({
     const validation = safeValidateUpdateSplitExpense(splitData);
 
     if (!validation.success) {
-      setError(validation.error.errors[0]?.message || 'Invalid split data');
+      setError(validation.error.issues[0]?.message || 'Invalid split data');
       return;
     }
 
