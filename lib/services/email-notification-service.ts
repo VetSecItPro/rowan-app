@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 import { accountDeletionService } from './account-deletion-service';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 /**
  * Email Notification Service for Account Deletion
@@ -27,6 +27,11 @@ export async function sendDeletionInitiatedEmail(
   userName?: string
 ): Promise<EmailResult> {
   try {
+    if (!resend) {
+      console.warn('Resend API key not configured, skipping email notification');
+      return { success: false, error: 'Email service not configured' };
+    }
+
     const deletionDate = new Date();
     deletionDate.setDate(deletionDate.getDate() + 30);
 
@@ -132,6 +137,11 @@ export async function send30DayWarningEmail(
   deletionDate?: Date
 ): Promise<EmailResult> {
   try {
+    if (!resend) {
+      console.warn('Resend API key not configured, skipping warning email notification');
+      return { success: false, error: 'Email service not configured' };
+    }
+
     const finalDate = deletionDate || new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
 
     const { data, error } = await resend.emails.send({
@@ -230,6 +240,11 @@ export async function sendPermanentDeletionConfirmationEmail(
   userName?: string
 ): Promise<EmailResult> {
   try {
+    if (!resend) {
+      console.warn('Resend API key not configured, skipping deletion confirmation email');
+      return { success: false, error: 'Email service not configured' };
+    }
+
     const { data, error } = await resend.emails.send({
       from: 'Rowan <noreply@rowan-app.com>',
       to: userEmail,
