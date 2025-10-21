@@ -284,7 +284,7 @@ export function UnifiedItemModal({
                     <select
                       value={formData.category}
                       onChange={(e) => handleInputChange('category', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                      className="w-full pl-4 pr-10 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                     >
                       <option value="">Select a category</option>
                       {Object.entries(getCurrentCategories()).map(([key, category]) => (
@@ -303,7 +303,7 @@ export function UnifiedItemModal({
                     <select
                       value={formData.priority}
                       onChange={(e) => handleInputChange('priority', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                      className="w-full pl-4 pr-10 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                     >
                       {Object.entries(PRIORITY_LEVELS).map(([key, priority]) => (
                         <option key={key} value={key}>
