@@ -133,8 +133,12 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
               </h3>
               {/* Task/Chore Type Badge */}
               {task.type && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border-2 border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20">
-                  {task.type === 'task' ? 'Task' : 'Chore'}
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border-2 ${
+                  task.type === 'task'
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                    : 'border-amber-500 text-amber-600 dark:text-amber-400 dark:border-amber-400 bg-amber-50 dark:bg-amber-900/20'
+                }`}>
+                  {task.type === 'task' ? '📋 Task' : '🏠 Chore'}
                 </span>
               )}
               {/* Category Badge */}

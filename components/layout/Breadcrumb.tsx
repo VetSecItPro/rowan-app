@@ -39,7 +39,7 @@ export function Breadcrumb({ items = [] }: BreadcrumbProps) {
         <li className={items.length > 1 ? 'hidden sm:block flex-shrink-0' : 'flex-shrink-0'}>
           <Link
             href="/"
-            className="btn-touch inline-block py-1 px-0.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all active:scale-95"
+            className="btn-touch inline-block py-1 px-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all active:scale-95"
           >
             Home
           </Link>
@@ -56,20 +56,20 @@ export function Breadcrumb({ items = [] }: BreadcrumbProps) {
           return (
             <li
               key={index}
-              className={`flex items-center gap-0.5 ${shouldHideOnMobile ? 'hidden sm:flex' : 'flex'}`}
+              className={`flex items-center gap-0 ${shouldHideOnMobile ? 'hidden sm:flex' : 'flex'}`}
             >
               <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
               {item.href && !isLast ? (
                 <Link
                   href={item.href}
-                  className="btn-touch inline-block py-1 px-0.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all truncate max-w-[120px] sm:max-w-[200px] active:scale-95"
+                  className="btn-touch inline-block py-1 px-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all truncate max-w-[120px] sm:max-w-[200px] active:scale-95"
                   title={item.label}
                 >
                   {item.label}
                 </Link>
               ) : (
                 <span
-                  className="text-sm text-gray-900 dark:text-white font-medium truncate max-w-[180px] sm:max-w-none py-1 px-0.5"
+                  className="text-sm text-gray-900 dark:text-white font-medium truncate max-w-[180px] sm:max-w-none py-1 px-1"
                   title={item.label}
                 >
                   {item.label}
