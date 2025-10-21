@@ -299,7 +299,7 @@ export function UnifiedDetailsModal({
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
-                          <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900">
+                          <select className="w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900">
                             {Object.entries(STATUS_TYPES).map(([key, status]) => (
                               <option key={key} value={key} selected={key === item.status}>
                                 {status.emoji} {status.label}
@@ -309,7 +309,7 @@ export function UnifiedDetailsModal({
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Priority</label>
-                          <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900">
+                          <select className="w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900">
                             {Object.entries(PRIORITY_LEVELS).map(([key, priority]) => (
                               <option key={key} value={key}>
                                 {priority.emoji} {priority.label}
@@ -500,7 +500,7 @@ export function UnifiedDetailsModal({
                       <select
                         value={exportOptions.scope}
                         onChange={(e) => setExportOptions(prev => ({ ...prev, scope: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900"
+                        className="w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900"
                       >
                         <option value="this_item">This {itemType} only</option>
                         <option value="related">This {itemType} + related items</option>

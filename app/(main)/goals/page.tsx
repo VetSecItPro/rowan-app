@@ -325,15 +325,23 @@ export default function GoalsPage() {
     const { action, id } = confirmDialog;
     setConfirmDialog({ isOpen: false, action: 'delete-goal', id: '' });
 
+    // Optimistic update - remove from UI immediately
+    if (action === 'delete-goal') {
+      setGoals(prev => prev.filter(goal => goal.id !== id));
+    } else if (action === 'delete-milestone') {
+      setMilestones(prev => prev.filter(milestone => milestone.id !== id));
+    }
+
     try {
       if (action === 'delete-goal') {
         await goalsService.deleteGoal(id);
       } else if (action === 'delete-milestone') {
         await goalsService.deleteMilestone(id);
       }
-      loadData();
     } catch (error) {
       console.error(`Failed to ${action}:`, error);
+      // Revert optimistic update on error
+      loadData();
     }
   }, [confirmDialog, loadData]);
 

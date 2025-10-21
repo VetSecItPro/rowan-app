@@ -67,7 +67,7 @@ export default function TasksPage() {
   const ITEMS_PER_PAGE = 20;
 
   // Real-time tasks with filters (always enabled now)
-  const { tasks: realtimeTasks, loading: realtimeLoading, refreshTasks } = useTaskRealtime({
+  const { tasks: realtimeTasks, loading: realtimeLoading, refreshTasks, setTasks } = useTaskRealtime({
     spaceId: currentSpace?.id || '',
     filters: filters,
     onTaskAdded: (task) => console.log('Task added:', task.title),
@@ -247,17 +247,31 @@ export default function TasksPage() {
   }, [loadData]);
 
   const handleDeleteItem = useCallback(async (itemId: string, type?: 'task' | 'chore') => {
+    // Optimistic update - remove from UI immediately
+    if (type === 'chore') {
+      setChores(prev => prev.filter(chore => chore.id !== itemId));
+    } else {
+      setTasks(prev => prev.filter(task => task.id !== itemId));
+    }
+
     try {
       if (type === 'chore') {
         await choresService.deleteChore(itemId);
       } else {
         await tasksService.deleteTask(itemId);
       }
-      loadData();
+      // Real-time subscription will handle the actual removal,
+      // but optimistic update already did it
     } catch (error) {
       console.error(`Failed to delete ${type || 'task'}:`, error);
+      // Revert optimistic update on error
+      if (type === 'chore') {
+        loadData(); // Reload to restore the chore
+      } else {
+        loadData(); // Reload to restore the task
+      }
     }
-  }, [loadData]);
+  }, [setTasks, setChores, loadData]);
 
   const handleEditItem = useCallback((item: TaskOrChore) => {
     setEditingItem({...item, type: item.type} as (Task & {type: 'task'}) | (Chore & {type: 'chore'}));
@@ -532,7 +546,7 @@ export default function TasksPage() {
                   <div>
                     {/* Mobile: Dropdown Select */}
                     <div className="relative">
-                      <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400 pointer-events-none" />
+                      <Filter className="absolute left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400 pointer-events-none" />
                       <select
                         id="status-filter-tasks-mobile"
                         value={statusFilter}
