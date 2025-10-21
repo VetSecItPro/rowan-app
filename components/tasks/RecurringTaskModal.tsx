@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Repeat } from 'lucide-react';
+import { X, Repeat, ChevronDown } from 'lucide-react';
 import { taskRecurrenceService, RecurringTaskInput } from '@/lib/services/task-recurrence-service';
 import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 
@@ -77,16 +77,19 @@ export function RecurringTaskModal({ isOpen, onClose, onSave, spaceId, userId }:
 
           <div>
             <label htmlFor="field-2" className="block text-sm font-medium mb-2 cursor-pointer">Pattern</label>
-            <select
-              value={formData.pattern}
-              onChange={(e) => setFormData({ ...formData, pattern: e.target.value as any })}
-              className="w-full px-4 py-2 border rounded-lg dark:bg-gray-900"
-            >
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-              <option value="yearly">Yearly</option>
-            </select>
+            <div className="relative">
+              <select
+                value={formData.pattern}
+                onChange={(e) => setFormData({ ...formData, pattern: e.target.value as any })}
+                className="w-full px-4 py-2 pr-10 border rounded-lg dark:bg-gray-900 appearance-none"
+              >
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            </div>
           </div>
 
           <div>
@@ -114,8 +117,8 @@ export function RecurringTaskModal({ isOpen, onClose, onSave, spaceId, userId }:
                         : [...formData.daysOfWeek, idx];
                       setFormData({ ...formData, daysOfWeek: days });
                     }}
-                    className={`btn-touch w-10 h-10 rounded-full transition-all active-press hover-lift shimmer-blue ${
-                      formData.daysOfWeek.includes(idx) ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
+                    className={`w-10 h-10 rounded-full transition-colors ${
+                      formData.daysOfWeek.includes(idx) ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700'
                     }`}
                   >
                     {day}

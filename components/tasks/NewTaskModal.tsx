@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Smile, ChevronDown } from 'lucide-react';
+import { X, Smile, ChevronDown, Repeat } from 'lucide-react';
 import { CreateTaskInput, Task } from '@/lib/types';
+import { taskRecurrenceService } from '@/lib/services/task-recurrence-service';
 
 // 20 family-friendly universal emojis
 const EMOJIS = ['😊', '😂', '❤️', '👍', '🎉', '🙏', '👏', '🤝', '💪', '🌟', '✨', '🎈', '🌸', '🌈', '☀️', '🍕', '☕', '📅', '✅', '🏠'];
@@ -42,6 +43,12 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId }: New
   });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [dateError, setDateError] = useState<string>('');
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurringData, setRecurringData] = useState({
+    pattern: 'weekly' as 'daily' | 'weekly' | 'monthly' | 'yearly',
+    interval: 1,
+    daysOfWeek: [] as number[],
+  });
 
   // Populate form when editing
   useEffect(() => {
