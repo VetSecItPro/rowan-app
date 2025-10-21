@@ -246,14 +246,14 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                   value={formData.priority}
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
-                  style={{ paddingRight: '2.5rem' }}
+                  style={{ paddingRight: '3rem' }}
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
                   <option value="high">High</option>
                   <option value="urgent">Urgent</option>
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
             </div>
 
@@ -267,14 +267,14 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
-                  style={{ paddingRight: '2.5rem' }}
+                  style={{ paddingRight: '3rem' }}
                 >
                   <option value="pending">Pending</option>
                   <option value="in_progress">In Progress</option>
                   <option value="completed">Completed</option>
                   <option value="cancelled">Cancelled</option>
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
             </div>
           </div>
@@ -291,7 +291,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
-                  style={{ paddingRight: '2.5rem' }}
+                  style={{ paddingRight: '3rem' }}
                 >
                   <option value="">Select category...</option>
                   <option value="work">💼 Work</option>
@@ -305,7 +305,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                   <option value="social">🎉 Social</option>
                   <option value="other">📌 Other</option>
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
             </div>
 
@@ -354,10 +354,10 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
               <button
                 type="button"
                 onClick={() => setIsRecurring(!isRecurring)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all border-2 ${
                   isRecurring
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                    ? 'bg-blue-600 text-white border-blue-500'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
                 }`}
               >
                 <Repeat className="w-4 h-4" />
@@ -395,7 +395,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                         <option value="monthly">Monthly</option>
                         <option value="yearly">Yearly</option>
                       </select>
-                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                     </div>
                   </div>
 
@@ -435,10 +435,10 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                               : [...recurringData.daysOfWeek, idx];
                             setRecurringData({ ...recurringData, daysOfWeek: days });
                           }}
-                          className={`w-10 h-10 rounded-full transition-colors text-sm font-medium ${
+                          className={`w-10 h-10 rounded-full transition-all text-sm font-medium border-2 ${
                             recurringData.daysOfWeek.includes(idx)
-                              ? 'bg-blue-500 text-white'
-                              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                              ? 'bg-blue-500 text-white border-blue-400'
+                              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-300 dark:hover:bg-gray-600'
                           }`}
                         >
                           {day}
