@@ -39,7 +39,7 @@ export default function TasksPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
-  const [activeTab, setActiveTab] = useState<TaskType>('task');
+  // Removed activeTab state - now showing all items together
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, any>>({});
@@ -66,17 +66,17 @@ export default function TasksPage() {
   const [displayLimit, setDisplayLimit] = useState(20);
   const ITEMS_PER_PAGE = 20;
 
-  // Real-time tasks with filters (only for task tab, not chores)
+  // Real-time tasks with filters (always enabled now)
   const { tasks: realtimeTasks, loading: realtimeLoading, refreshTasks } = useTaskRealtime({
     spaceId: currentSpace?.id || '',
-    filters: activeTab === 'task' ? filters : {},
+    filters: filters,
     onTaskAdded: (task) => console.log('Task added:', task.title),
     onTaskUpdated: (task) => console.log('Task updated:', task.title),
     onTaskDeleted: (taskId) => console.log('Task deleted:', taskId),
   });
 
-  // Use realtime tasks when on task tab, otherwise use local state
-  const tasks = activeTab === 'task' ? realtimeTasks : [];
+  // Always use realtime tasks
+  const tasks = realtimeTasks;
 
   // Combine tasks and chores for unified display
   const allItems = useMemo((): TaskOrChore[] => {
@@ -93,10 +93,10 @@ export default function TasksPage() {
     pending: allItems.filter(item => item.status === 'pending').length,
   }), [allItems]);
 
-  // Memoized filtered items - filter combined tasks and chores
+  // Memoized filtered items - show all tasks and chores together
   const filteredItems = useMemo(() => {
-    // Filter by active tab first
-    let filtered = allItems.filter(item => item.type === activeTab);
+    // Start with all items (no tab filtering)
+    let filtered = allItems;
 
     // Hide completed items by default
     filtered = filtered.filter(item => item.status !== 'completed');
@@ -116,7 +116,7 @@ export default function TasksPage() {
     }
 
     return filtered;
-  }, [allItems, statusFilter, searchQuery, activeTab]);
+  }, [allItems, statusFilter, searchQuery]);
 
   // Paginated items for performance with large lists
   const paginatedItems = useMemo(() => {
@@ -138,7 +138,7 @@ export default function TasksPage() {
   // Reset pagination when filters change
   useEffect(() => {
     setDisplayLimit(ITEMS_PER_PAGE);
-  }, [statusFilter, searchQuery, activeTab, ITEMS_PER_PAGE]);
+  }, [statusFilter, searchQuery, ITEMS_PER_PAGE]);
 
   // Memoized loadData function to fetch both tasks and chores
   const loadData = useCallback(async () => {
@@ -297,10 +297,6 @@ export default function TasksPage() {
     setStatusFilter(e.target.value);
   }, []);
 
-  const handleTabChange = useCallback((tab: TaskType) => {
-    setActiveTab(tab);
-  }, []);
-
   const handleOpenModal = useCallback((type: 'task' | 'chore') => {
     setModalDefaultType(type);
     setIsUnifiedModalOpen(true);
@@ -365,31 +361,6 @@ export default function TasksPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <div className="flex items-center gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                <button
-                  onClick={() => handleTabChange('task')}
-                  className={`px-3 sm:px-4 py-2 rounded-md flex items-center justify-center gap-2 transition-colors font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
-                    activeTab === 'task'
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <CheckSquare className="w-4 h-4" />
-                  <span className="text-sm">Tasks</span>
-                </button>
-                <button
-                  onClick={() => handleTabChange('chore')}
-                  className={`px-3 sm:px-4 py-2 rounded-md flex items-center justify-center gap-2 transition-colors font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
-                    activeTab === 'chore'
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <Home className="w-4 h-4" />
-                  <span className="text-sm">Chores</span>
-                </button>
-              </div>
-
               <div className="flex gap-2">
                 <button
                   onClick={() => handleOpenModal('task')}
@@ -537,14 +508,14 @@ export default function TasksPage() {
           {!showGuidedFlow && (
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Filters Sidebar - Only show when filters are enabled */}
-            {showFilters && activeTab === 'task' && currentSpace && (
+            {showFilters && currentSpace && (
               <div className="lg:col-span-1">
                 <TaskFilterPanel spaceId={currentSpace.id} onFilterChange={setFilters} />
               </div>
             )}
 
             {/* Main Content */}
-            <div className={showFilters && activeTab === 'task' ? 'lg:col-span-3' : 'lg:col-span-4'}>
+            <div className={showFilters ? 'lg:col-span-3' : 'lg:col-span-4'}>
               <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
                 {/* Header with Month Badge and Status Filter */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
@@ -560,18 +531,21 @@ export default function TasksPage() {
                   {/* Status Filter - Mobile Dropdown + Desktop Buttons */}
                   <div>
                     {/* Mobile: Dropdown Select */}
-                    <select
-                      id="status-filter-tasks-mobile"
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      className="w-full max-w-xs px-4 py-3 text-base bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-blue-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white font-medium appearance-none cursor-pointer mb-4"
-                      style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
-                    >
-                      <option value="all">All {activeTab === 'task' ? 'Tasks' : 'Chores'}</option>
+                    <div className="relative">
+                      <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400 pointer-events-none" />
+                      <select
+                        id="status-filter-tasks-mobile"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="w-full max-w-xs pl-10 pr-10 py-3 text-base bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white font-medium appearance-none cursor-pointer mb-4"
+                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1.5em 1.5em' }}
+                      >
+                        <option value="all">All Tasks & Chores</option>
                       <option value="pending">Pending</option>
                       <option value="in_progress">In Progress</option>
                       <option value="completed">Completed</option>
                     </select>
+                    </div>
 
                     {/* Desktop: Clean Filter Buttons */}
                     <div className="hidden gap-2">
@@ -597,7 +571,7 @@ export default function TasksPage() {
                   </div>
                 </div>
 
-                {loading || (activeTab === 'task' && realtimeLoading) ? (
+                {loading || realtimeLoading ? (
                   <div className="space-y-4">
                     {[...Array(6)].map((_, i) => (
                       <div key={i} className="bg-white dark:bg-gray-700 rounded-xl p-6 shadow-lg animate-pulse">
@@ -628,11 +602,11 @@ export default function TasksPage() {
                     {!searchQuery && statusFilter === 'all' && (
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                         <button
-                          onClick={handleOpenModal}
+                          onClick={() => handleOpenModal('task')}
                           className="btn-touch bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center gap-2"
                         >
                           <Plus className="w-5 h-5" />
-                          Create {activeTab === 'task' ? 'Task' : 'Chore'}
+                          Create Task or Chore
                         </button>
                         {!hasCompletedGuide && (
                           <button
@@ -646,7 +620,7 @@ export default function TasksPage() {
                       </div>
                     )}
                   </div>
-                ) : activeTab === 'task' && enableDragDrop && currentSpace ? (
+                ) : enableDragDrop && currentSpace ? (
                   /* Drag-and-drop for tasks */
                   <DraggableTaskList
                     spaceId={currentSpace.id}
@@ -677,7 +651,7 @@ export default function TasksPage() {
                     {hasMoreItems && (
                       <div className="flex flex-col items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Showing {paginatedItems.length} of {filteredItems.length} {activeTab === 'task' ? 'tasks' : 'chores'}
+                          Showing {paginatedItems.length} of {filteredItems.length} items
                           <span className="ml-1 text-gray-500">({remainingItemsCount} more)</span>
                         </p>
                         <div className="flex gap-3">
@@ -749,7 +723,7 @@ export default function TasksPage() {
       )}
 
       {/* Bulk Actions Bar */}
-      {currentSpace && activeTab === 'task' && (
+      {currentSpace && (
         <BulkActionsBar
           selectedTaskIds={selectedTaskIds}
           onClearSelection={() => setSelectedTaskIds([])}
