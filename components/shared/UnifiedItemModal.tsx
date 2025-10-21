@@ -87,7 +87,8 @@ export function UnifiedItemModal({
         tags: (editItem as any).tags || '',
       });
     } else {
-      // Reset for new items
+      // Reset for new items and set to defaultType
+      setItemType(defaultType);
       setFormData({
         space_id: spaceId,
         title: '',
@@ -102,7 +103,7 @@ export function UnifiedItemModal({
       });
     }
     setActiveSection('basic');
-  }, [editItem, spaceId, isOpen]);
+  }, [editItem, spaceId, isOpen, defaultType]);
 
   // Form handlers
   const handleInputChange = (field: string, value: string) => {
@@ -169,26 +170,26 @@ export function UnifiedItemModal({
         {/* Elegant Header with Gradient */}
         <div className="sticky top-0 z-10 bg-gradient-tasks text-white px-6 py-5 border-b border-blue-500/20">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                  {itemType === 'task' ? '✅' : '🏠'}
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold">
-                    {mode === 'create' ? 'Create New' : 'Edit'} {itemType === 'task' ? 'Task' : 'Chore'}
-                  </h2>
-                  <p className="text-blue-100 text-sm">Family collaboration made easy</p>
-                </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                {itemType === 'task' ? '✅' : '🏠'}
               </div>
+              <div>
+                <h2 className="text-2xl font-bold">
+                  {mode === 'create' ? 'Create New' : 'Edit'} {itemType === 'task' ? 'Task' : 'Chore'}
+                </h2>
+                <p className="text-blue-100 text-sm">Family collaboration made easy</p>
+              </div>
+            </div>
 
-              {/* Type Toggle */}
+            <div className="flex items-center gap-3">
+              {/* Type Toggle - Styled for brand color background */}
               <div className="flex items-center gap-1 p-1 bg-white/10 rounded-lg border border-white/20">
                 <button
                   onClick={() => handleTypeSwitch('task')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
                     itemType === 'task'
-                      ? 'bg-white text-blue-600 shadow-sm'
+                      ? 'bg-white text-blue-600 shadow-sm font-semibold'
                       : 'text-white/80 hover:text-white hover:bg-white/10'
                   }`}
                 >
@@ -196,23 +197,23 @@ export function UnifiedItemModal({
                 </button>
                 <button
                   onClick={() => handleTypeSwitch('chore')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
                     itemType === 'chore'
-                      ? 'bg-white text-blue-600 shadow-sm'
+                      ? 'bg-white text-blue-600 shadow-sm font-semibold'
                       : 'text-white/80 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   🏠 Chore
                 </button>
               </div>
-            </div>
 
-            <button
-              onClick={onClose}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+              <button
+                onClick={onClose}
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -283,7 +284,7 @@ export function UnifiedItemModal({
                     <select
                       value={formData.category}
                       onChange={(e) => handleInputChange('category', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                      className="w-full pl-4 pr-10 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                     >
                       <option value="">Select a category</option>
                       {Object.entries(getCurrentCategories()).map(([key, category]) => (
@@ -302,7 +303,7 @@ export function UnifiedItemModal({
                     <select
                       value={formData.priority}
                       onChange={(e) => handleInputChange('priority', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                      className="w-full pl-4 pr-10 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                     >
                       {Object.entries(PRIORITY_LEVELS).map(([key, priority]) => (
                         <option key={key} value={key}>

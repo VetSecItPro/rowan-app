@@ -21,11 +21,11 @@ function UnsubscribeContent() {
   const [type, setType] = useState<string | null>(null);
 
   useEffect(() => {
-    const tokenParam = searchParams.get('token');
-    const typeParam = searchParams.get('type') || 'email';
+    const tokenParam = searchParams?.get('token');
+    const typeParam = searchParams?.get('type') || 'email';
 
     setToken(tokenParam);
-    setType(typeParam);
+    setType(typeParam || null);
 
     if (tokenParam) {
       processUnsubscribe(tokenParam, typeParam);

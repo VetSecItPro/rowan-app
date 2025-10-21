@@ -2,15 +2,17 @@ interface SkeletonLoaderProps {
   count?: number;
   className?: string;
   height?: string;
+  width?: string;
+  variant?: string;
 }
 
-export function SkeletonLoader({ count = 1, className = '', height = 'h-20' }: SkeletonLoaderProps) {
+export function SkeletonLoader({ count = 1, className = '', height = 'h-20', width = '', variant }: SkeletonLoaderProps) {
   return (
     <div className={`space-y-4 ${className}`}>
       {Array.from({ length: count }).map((_, index) => (
         <div
           key={index}
-          className={`${height} bg-white/20 dark:bg-gray-800/20 backdrop-blur-xl border border-white/10 dark:border-gray-700/10 rounded-2xl animate-pulse`}
+          className={`${height} ${width} bg-white/20 dark:bg-gray-800/20 backdrop-blur-xl border border-white/10 dark:border-gray-700/10 rounded-2xl animate-pulse`}
         />
       ))}
     </div>
