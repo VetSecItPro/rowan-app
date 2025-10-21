@@ -65,9 +65,9 @@ export function Header() {
           </Link>
 
           {/* Menu, Theme Toggle & Auth Buttons */}
-          <div className="flex items-center gap-2">
-            {/* Grouped: Hamburger Menu and Notifications */}
-            <div className="flex items-center -space-x-2">
+          <div className="flex items-center gap-0">
+            {/* Grouped: Hamburger Menu, Notifications, Settings, and Theme */}
+            <div className="flex items-center -space-x-4">
               <HamburgerMenu />
 
               {/* Only show Settings and Notifications for logged-in users */}
@@ -90,9 +90,9 @@ export function Header() {
                   </Tooltip>
                 </>
               )}
-            </div>
 
-            <ThemeToggle />
+              <ThemeToggle />
+            </div>
 
             {/* Pricing Link */}
             <a href="#pricing" className="hidden md:block inline-block py-2 px-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95">Pricing</a>
