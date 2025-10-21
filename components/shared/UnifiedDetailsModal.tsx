@@ -48,6 +48,11 @@ export function UnifiedDetailsModal({
   onSave,
   onUpdate
 }: UnifiedDetailsModalProps) {
+  // Early return if no item
+  if (!item) {
+    return null;
+  }
+
   // State management
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(false);
