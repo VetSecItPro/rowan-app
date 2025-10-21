@@ -20,15 +20,21 @@ export const Command = React.forwardRef<HTMLDivElement, CommandProps>(
 
 Command.displayName = 'Command';
 
-interface CommandInputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+interface CommandInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  onValueChange?: (value: string) => void;
+}
 
 export const CommandInput = React.forwardRef<HTMLInputElement, CommandInputProps>(
-  ({ className = '', ...props }, ref) => {
+  ({ className = '', onValueChange, ...props }, ref) => {
     return (
       <div className="flex items-center border-b px-3">
         <input
           ref={ref}
           className={`flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+          onChange={(e) => {
+            onValueChange?.(e.target.value);
+            props.onChange?.(e);
+          }}
           {...props}
         />
       </div>

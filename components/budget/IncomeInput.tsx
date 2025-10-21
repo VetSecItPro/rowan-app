@@ -57,7 +57,7 @@ export function IncomeInput({
     const validation = safeValidateMonthlyIncome(numValue);
 
     if (!validation.success) {
-      const errorMessage = validation.error.errors[0]?.message || 'Invalid income value';
+      const errorMessage = validation.error.issues[0]?.message || 'Invalid income value';
       setError(errorMessage);
       return false;
     }
