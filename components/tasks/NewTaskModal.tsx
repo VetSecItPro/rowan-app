@@ -122,10 +122,10 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId }: New
             </h2>
             <button
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-blue-700 transition-colors"
+              className="p-1 -mr-1"
               aria-label="Close modal"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
           </div>
         </div>
