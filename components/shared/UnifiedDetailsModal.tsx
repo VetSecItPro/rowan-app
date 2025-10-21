@@ -23,7 +23,10 @@ interface UnifiedDetailsModalProps {
   onClose: () => void;
   spaceId: string;
   userId: string;
-  onUpdate: () => void;
+  onEdit?: (item: (Task & { type: 'task' }) | (Chore & { type: 'chore' })) => void;
+  onDelete?: (itemId: string, type?: 'task' | 'chore') => void;
+  onSave?: (item: any) => void;
+  onUpdate?: () => void;
 }
 
 interface TabConfig {
@@ -40,8 +43,16 @@ export function UnifiedDetailsModal({
   onClose,
   spaceId,
   userId,
+  onEdit,
+  onDelete,
+  onSave,
   onUpdate
 }: UnifiedDetailsModalProps) {
+  // Early return if no item
+  if (!item) {
+    return null;
+  }
+
   // State management
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(false);

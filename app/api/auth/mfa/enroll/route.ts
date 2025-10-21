@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       success: true,
       data: {
         id: data.id,
-        type: data.factor_type,
+        type: data.type,
         qr_code: data.totp?.qr_code,
         secret: data.totp?.secret,
         uri: data.totp?.uri,
