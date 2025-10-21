@@ -192,7 +192,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
                   <select
                     value={selectedApprover}
                     onChange={(e) => setSelectedApprover(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800"
+                    className="flex-1 pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800"
                   >
                     <option value="">Select approver...</option>
                     {spaceMembers.map((member) => (

@@ -223,11 +223,15 @@ export default function RemindersPage(): JSX.Element {
 
   // Memoized callback for deleting reminders
   const handleDeleteReminder = useCallback(async (reminderId: string) => {
+    // Optimistic update - remove from UI immediately
+    setReminders(prev => prev.filter(reminder => reminder.id !== reminderId));
+
     try {
       await remindersService.deleteReminder(reminderId);
-      loadReminders();
     } catch (error) {
       console.error('Failed to delete reminder:', error);
+      // Revert optimistic update on error
+      loadReminders();
     }
   }, [loadReminders]);
 
