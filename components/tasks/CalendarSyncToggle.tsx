@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Calendar, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react';
 import { taskCalendarService } from '@/lib/services/task-calendar-service';
+import { useRouter } from 'next/navigation';
 
 interface CalendarSyncToggleProps {
   taskId: string;
@@ -17,6 +18,7 @@ interface SyncStatus {
 }
 
 export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) {
+  const router = useRouter();
   const [syncStatus, setSyncStatus] = useState<SyncStatus>({ isSynced: false });
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -137,7 +139,10 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
               This task appears in your calendar with a 📋 prefix
             </p>
             {syncStatus.eventId && (
-              <button className="flex items-center gap-1 text-xs text-green-600 hover:text-green-700 mt-2 transition-colors">
+              <button
+                onClick={() => router.push('/calendar')}
+                className="flex items-center gap-1 text-xs text-green-600 hover:text-green-700 mt-2 transition-colors"
+              >
                 <ExternalLink className="w-3 h-3" />
                 View in Calendar
               </button>
