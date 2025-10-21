@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
 
     // Rate limiting
     const identifier = `download-export-${userId}`;
-    const { success: rateLimitSuccess } = await ratelimit.limit(identifier);
+    const { success: rateLimitSuccess } = await ratelimit?.limit(identifier) ?? { success: true };
     if (!rateLimitSuccess) {
       return NextResponse.json(
         { success: false, error: 'Rate limit exceeded' },

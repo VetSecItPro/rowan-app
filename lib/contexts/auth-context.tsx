@@ -32,6 +32,7 @@ interface ProfileData {
   pronouns?: string;
   color_theme?: string;
   space_name?: string;
+  marketing_emails_enabled?: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

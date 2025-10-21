@@ -19,6 +19,7 @@ import { useTaskRealtime } from '@/hooks/useTaskRealtime';
 import { TaskFilterPanel, TaskFilters } from '@/components/tasks/TaskFilterPanel';
 import { BulkActionsBar } from '@/components/tasks/BulkActionsBar';
 import { TemplatePickerModal } from '@/components/tasks/TemplatePickerModal';
+import { SnoozeModal } from '@/components/tasks/SnoozeModal';
 import { SubtasksList } from '@/components/tasks/SubtasksList';
 import { TimeTracker } from '@/components/tasks/TimeTracker';
 import { TaskComments } from '@/components/tasks/TaskComments';
@@ -35,6 +36,13 @@ export default function TasksPage() {
   // Basic state
   const [chores, setChores] = useState<Chore[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchTyping, setIsSearchTyping] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [activeTab, setActiveTab] = useState<TaskType>('task');
+  const [showGuidedFlow, setShowGuidedFlow] = useState(false);
+  const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
+  const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, any>>({});
 
   // Unified modal state (replacing separate task/chore modals)
   const [isUnifiedModalOpen, setIsUnifiedModalOpen] = useState(false);
@@ -44,13 +52,6 @@ export default function TasksPage() {
   // Unified details modal state
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<(Task & {type: 'task'}) | (Chore & {type: 'chore'}) | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchTyping, setIsSearchTyping] = useState(false);
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [activeTab, setActiveTab] = useState<TaskType>('task');
-  const [showGuidedFlow, setShowGuidedFlow] = useState(false);
-  const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
-  const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, any>>({});
 
   // Advanced features state
   const [showFilters, setShowFilters] = useState(false);
@@ -58,7 +59,7 @@ export default function TasksPage() {
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
   const [enableDragDrop, setEnableDragDrop] = useState(true);
 
-  // Modal states for advanced features
+  // Remaining modal states for features not yet unified
   const [isTemplatePickerOpen, setIsTemplatePickerOpen] = useState(false);
 
   // Pagination state
@@ -202,7 +203,7 @@ export default function TasksPage() {
     loadData();
   }, [loadData]);
 
-  // Unified save handler for both tasks and chores
+  // Unified modal handlers
   const handleSaveItem = useCallback(async (itemData: CreateTaskInput | CreateChoreInput) => {
     try {
       if (editingItem) {
@@ -259,16 +260,23 @@ export default function TasksPage() {
   }, [loadData]);
 
   const handleEditItem = useCallback((item: TaskOrChore) => {
-    // Set the editing item with type annotation
     setEditingItem({...item, type: item.type} as (Task & {type: 'task'}) | (Chore & {type: 'chore'}));
-    setModalDefaultType(item.type);
-    setActiveTab(item.type);
     setIsUnifiedModalOpen(true);
+  }, []);
+
+  const handleViewDetails = useCallback((item: TaskOrChore) => {
+    setSelectedItem({...item, type: item.type} as (Task & {type: 'task'}) | (Chore & {type: 'chore'}));
+    setIsDetailsModalOpen(true);
   }, []);
 
   const handleCloseModal = useCallback(() => {
     setIsUnifiedModalOpen(false);
     setEditingItem(null);
+  }, []);
+
+  const handleCloseDetailsModal = useCallback(() => {
+    setIsDetailsModalOpen(false);
+    setSelectedItem(null);
   }, []);
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -293,10 +301,10 @@ export default function TasksPage() {
     setActiveTab(tab);
   }, []);
 
-  const handleOpenModal = useCallback(() => {
-    setModalDefaultType(activeTab);
+  const handleOpenModal = useCallback((type: 'task' | 'chore') => {
+    setModalDefaultType(type);
     setIsUnifiedModalOpen(true);
-  }, [activeTab]);
+  }, []);
 
   const handleGuidedFlowComplete = useCallback(() => {
     setShowGuidedFlow(false);
@@ -318,27 +326,16 @@ export default function TasksPage() {
   }, [user]);
 
   // Advanced feature handlers
-  const handleViewDetails = useCallback((item: TaskOrChore) => {
-    setSelectedItem({...item, type: item.type} as (Task & {type: 'task'}) | (Chore & {type: 'chore'}));
-    setIsDetailsModalOpen(true);
-  }, []);
-
   const handleQuickAction = useCallback((action: string) => {
     switch (action) {
       case 'repeat':
         // Recurring functionality is now integrated into UnifiedItemModal
         setActiveTab('task');
-        handleOpenModal();
+        handleOpenModal('task');
         break;
       default:
-        // Other actions like 'attach' and 'snooze' are now handled by UnifiedDetailsModal
         break;
     }
-  }, []);
-
-  const handleCloseDetailsModal = useCallback(() => {
-    setIsDetailsModalOpen(false);
-    setSelectedItem(null);
   }, []);
 
   const handleBulkActionComplete = useCallback(() => {
@@ -393,13 +390,22 @@ export default function TasksPage() {
                 </button>
               </div>
 
-              <button
-                onClick={handleOpenModal}
-                className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-              >
-                <Plus className="w-5 h-5" />
-                <span>New {activeTab === 'task' ? 'Task' : 'Chore'}</span>
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleOpenModal('task')}
+                  className="px-3 sm:px-4 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                >
+                  <CheckSquare className="w-4 h-4" />
+                  <span className="text-sm">New Task</span>
+                </button>
+                <button
+                  onClick={() => handleOpenModal('chore')}
+                  className="px-3 sm:px-4 py-2 sm:py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Home className="w-4 h-4" />
+                  <span className="text-sm">New Chore</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -700,7 +706,7 @@ export default function TasksPage() {
         </div>
       </div>
 
-      {/* Unified Modal for Tasks and Chores */}
+      {/* Unified Modals */}
       {currentSpace && user && (
         <>
           <UnifiedItemModal
@@ -711,25 +717,22 @@ export default function TasksPage() {
             spaceId={currentSpace.id}
             userId={user.id}
             defaultType={modalDefaultType}
-            mode={editingItem ? "edit" : "create"}
+            mode={editingItem ? "quickEdit" : "create"}
           />
 
           <UnifiedDetailsModal
             isOpen={isDetailsModalOpen}
             onClose={handleCloseDetailsModal}
             item={selectedItem}
-            onEdit={handleEditItem}
+            onEdit={handleEditItem as any}
             onDelete={handleDeleteItem}
             onSave={handleSaveItem}
             spaceId={currentSpace.id}
             userId={user.id}
           />
-        </>
-      )}
 
-      {/* Advanced Feature Modals */}
-      {currentSpace && user && (
-        <>
+          {/* Advanced Feature Modals */}
+
           <TemplatePickerModal
             isOpen={isTemplatePickerOpen}
             onClose={() => setIsTemplatePickerOpen(false)}
