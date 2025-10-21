@@ -364,33 +364,7 @@ export default function TasksPage() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <div className="flex items-center gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                <button
-                  onClick={() => handleTabChange('task')}
-                  className={`px-3 sm:px-4 py-2 rounded-md flex items-center justify-center gap-2 transition-colors font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
-                    activeTab === 'task'
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <CheckSquare className="w-4 h-4" />
-                  <span className="text-sm">Tasks</span>
-                </button>
-                <button
-                  onClick={() => handleTabChange('chore')}
-                  className={`px-3 sm:px-4 py-2 rounded-md flex items-center justify-center gap-2 transition-colors font-medium flex-1 sm:flex-initial sm:min-w-[110px] ${
-                    activeTab === 'chore'
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <Home className="w-4 h-4" />
-                  <span className="text-sm">Chores</span>
-                </button>
-              </div>
-
-              <div className="flex gap-2">
+            <div className="flex gap-2">
                 <button
                   onClick={() => handleOpenModal('task')}
                   className="px-3 sm:px-4 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
@@ -505,10 +479,10 @@ export default function TasksPage() {
           </div>
           )}
 
-          {/* Search Bar - Full Width (spans same width as stats cards above) */}
+          {/* Search Bar + Status Filter - Same Line */}
           {!showGuidedFlow && (
-          <div className="w-full">
-            <div className={`apple-search-container tasks-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
+          <div className="w-full flex gap-4 items-center">
+            <div className={`apple-search-container tasks-search group flex-1 ${isSearchTyping ? 'apple-search-typing' : ''}`}>
               <Search className="apple-search-icon" />
               <input
                 type="search"
@@ -530,6 +504,20 @@ export default function TasksPage() {
                 </button>
               )}
             </div>
+
+            {/* Status Filter Dropdown */}
+            <select
+              id="status-filter"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-4 py-3 text-base bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white font-medium appearance-none cursor-pointer min-w-[140px]"
+              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em 1.5em', paddingRight: '3rem' }}
+            >
+              <option value="all">All {activeTab === 'task' ? 'Tasks' : 'Chores'}</option>
+              <option value="pending">Pending</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
           </div>
           )}
 
@@ -557,44 +545,6 @@ export default function TasksPage() {
                     </span>
                   </div>
 
-                  {/* Status Filter - Mobile Dropdown + Desktop Buttons */}
-                  <div>
-                    {/* Mobile: Dropdown Select */}
-                    <select
-                      id="status-filter-tasks-mobile"
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      className="w-full max-w-xs px-4 py-3 text-base bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-blue-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white font-medium appearance-none cursor-pointer mb-4"
-                      style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
-                    >
-                      <option value="all">All {activeTab === 'task' ? 'Tasks' : 'Chores'}</option>
-                      <option value="pending">Pending</option>
-                      <option value="in_progress">In Progress</option>
-                      <option value="completed">Completed</option>
-                    </select>
-
-                    {/* Desktop: Clean Filter Buttons */}
-                    <div className="hidden gap-2">
-                      {[
-                        { value: 'all', label: 'All' },
-                        { value: 'pending', label: 'Pending' },
-                        { value: 'in_progress', label: 'In Progress' },
-                        { value: 'completed', label: 'Completed' }
-                      ].map(({ value, label }) => (
-                        <button
-                          key={value}
-                          onClick={() => setStatusFilter(value)}
-                          className={`px-3 py-2 text-sm rounded-lg transition-colors ${
-                            statusFilter === value
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                          }`}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
                 </div>
 
                 {loading || (activeTab === 'task' && realtimeLoading) ? (
