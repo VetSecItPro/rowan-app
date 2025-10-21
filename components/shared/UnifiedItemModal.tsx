@@ -137,12 +137,19 @@ export function UnifiedItemModal({
       // Handle recurring tasks
       if (itemType === 'task' && isRecurring && userId) {
         await taskRecurrenceService.createRecurringTask({
-          ...submissionData,
-          user_id: userId,
-          recurrence_pattern: recurringData.pattern,
-          recurrence_interval: recurringData.interval,
-          recurrence_days: recurringData.days_of_week,
-          recurrence_end_date: recurringData.end_date || null,
+          space_id: submissionData.space_id,
+          title: submissionData.title,
+          description: submissionData.description,
+          category: submissionData.category,
+          priority: submissionData.priority,
+          assigned_to: submissionData.assigned_to,
+          created_by: userId,
+          recurrence: {
+            pattern: recurringData.pattern,
+            interval: recurringData.interval,
+            days_of_week: recurringData.days_of_week,
+            end_date: recurringData.end_date || undefined,
+          }
         });
       } else {
         await onSave(submissionData);
