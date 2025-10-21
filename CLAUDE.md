@@ -150,8 +150,8 @@ USING (space_id IN (
 5. When work is complete: Test `npm run build && npx tsc --noEmit`
 6. **ASK USER**: "Ready to create PR for this feature?" (don't auto-create)
 7. Create PR: `gh pr create --title "Title" --body "Description"`
-8. Monitor Vercel deployment preview
-9. If tests fail: fix on feature branch, push again
+8. **Note**: Vercel only deploys main branch (per vercel.json config)
+9. If local tests fail: fix on feature branch, push again
 10. **When everything runs fine with no errors and no more work needed:**
     - Confidently advise: "This feature is complete and ready to merge"
     - **ASK USER**: "Ready to merge PR into main?" before merging
