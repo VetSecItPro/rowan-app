@@ -564,7 +564,7 @@ export default function TasksPage() {
                       id="status-filter-tasks-mobile"
                       value={statusFilter}
                       onChange={(e) => setStatusFilter(e.target.value)}
-                      className="md:hidden w-full max-w-xs px-4 py-3 text-base bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-blue-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white font-medium appearance-none cursor-pointer"
+                      className="w-full max-w-xs px-4 py-3 text-base bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-blue-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white font-medium appearance-none cursor-pointer mb-4"
                       style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
                     >
                       <option value="all">All {activeTab === 'task' ? 'Tasks' : 'Chores'}</option>
@@ -574,7 +574,7 @@ export default function TasksPage() {
                     </select>
 
                     {/* Desktop: Clean Filter Buttons */}
-                    <div className="hidden md:flex gap-2">
+                    <div className="hidden gap-2">
                       {[
                         { value: 'all', label: 'All' },
                         { value: 'pending', label: 'Pending' },
