@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // This should be called by a cron job (Vercel Cron or external)
 export async function POST(request: NextRequest) {
@@ -201,6 +201,11 @@ async function send7DayDeletionReminder(
 ) {
   const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/settings/privacy-data?cancel-deletion=${requestId}`;
 
+  if (!resend) {
+    console.warn('Resend API key not configured, skipping email');
+    return;
+  }
+
   await resend.emails.send({
     from: 'Rowan <noreply@rowan.app>',
     to: email,
@@ -261,6 +266,11 @@ async function send1DayDeletionReminder(
   requestId: string
 ) {
   const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/settings/privacy-data?cancel-deletion=${requestId}`;
+
+  if (!resend) {
+    console.warn('Resend API key not configured, skipping email');
+    return;
+  }
 
   await resend.emails.send({
     from: 'Rowan <noreply@rowan.app>',
@@ -361,7 +371,12 @@ async function executeAccountDeletion(userId: string, email: string, userName: s
 
 async function sendDeletionCompletedEmail(email: string, userName: string) {
   try {
-    await resend.emails.send({
+    if (!resend) {
+    console.warn('Resend API key not configured, skipping email');
+    return;
+  }
+
+  await resend.emails.send({
       from: 'Rowan <noreply@rowan.app>',
       to: email,
       subject: 'Account Successfully Deleted',
