@@ -101,7 +101,7 @@ export function NewBillModal({
     if (!validation.success) {
       // Extract and display validation errors
       const fieldErrors: Record<string, string> = {};
-      validation.error.errors.forEach((err) => {
+      validation.error.issues.forEach((err) => {
         const field = err.path[0] as string;
         fieldErrors[field] = err.message;
       });
