@@ -301,7 +301,8 @@ export default function TasksPage() {
     setActiveTab(tab);
   }, []);
 
-  const handleOpenModal = useCallback(() => {
+  const handleOpenModal = useCallback((type: 'task' | 'chore') => {
+    setModalDefaultType(type);
     setIsUnifiedModalOpen(true);
   }, []);
 
@@ -330,7 +331,7 @@ export default function TasksPage() {
       case 'repeat':
         // Recurring functionality is now integrated into UnifiedItemModal
         setActiveTab('task');
-        handleOpenModal();
+        handleOpenModal('task');
         break;
       default:
         break;
@@ -389,13 +390,22 @@ export default function TasksPage() {
                 </button>
               </div>
 
-              <button
-                onClick={handleOpenModal}
-                className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-              >
-                <Plus className="w-5 h-5" />
-                <span>New {activeTab === 'task' ? 'Task' : 'Chore'}</span>
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleOpenModal('task')}
+                  className="px-3 sm:px-4 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                >
+                  <CheckSquare className="w-4 h-4" />
+                  <span className="text-sm">New Task</span>
+                </button>
+                <button
+                  onClick={() => handleOpenModal('chore')}
+                  className="px-3 sm:px-4 py-2 sm:py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Home className="w-4 h-4" />
+                  <span className="text-sm">New Chore</span>
+                </button>
+              </div>
             </div>
           </div>
 
