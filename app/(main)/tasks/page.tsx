@@ -533,29 +533,31 @@ export default function TasksPage() {
           </div>
           )}
 
-          {/* Search Bar - Only show when NOT in guided flow */}
+          {/* Search Bar - Full Width (spans same width as stats cards above) */}
           {!showGuidedFlow && (
-          <div className={`apple-search-container tasks-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
-            <Search className="apple-search-icon" />
-            <input
-              type="search"
-              placeholder="Search tasks and chores..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="apple-search-input"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => {
-                  setSearchQuery('');
-                  setIsSearchTyping(false);
-                }}
-                className="apple-search-clear"
-                aria-label="Clear search"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
+          <div className="w-full">
+            <div className={`apple-search-container tasks-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
+              <Search className="apple-search-icon" />
+              <input
+                type="search"
+                placeholder="Search tasks and chores..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                className="apple-search-input"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setIsSearchTyping(false);
+                  }}
+                  className="apple-search-clear"
+                  aria-label="Clear search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
           )}
 
