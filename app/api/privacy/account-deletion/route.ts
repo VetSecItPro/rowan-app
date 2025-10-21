@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     // Rate limiting - more restrictive for deletion requests
     const identifier = `deletion-request-${userId}`;
-    const { success: rateLimitSuccess } = await ratelimit.limit(identifier);
+    const { success: rateLimitSuccess } = await ratelimit?.limit(identifier) ?? { success: true };
     if (!rateLimitSuccess) {
       return NextResponse.json(
         { success: false, error: 'Too many deletion requests. Please try again later.' },
@@ -152,7 +152,7 @@ export async function DELETE(request: NextRequest) {
 
     // Rate limiting
     const identifier = `deletion-cancel-${userId}`;
-    const { success: rateLimitSuccess } = await ratelimit.limit(identifier);
+    const { success: rateLimitSuccess } = await ratelimit?.limit(identifier) ?? { success: true };
     if (!rateLimitSuccess) {
       return NextResponse.json(
         { success: false, error: 'Rate limit exceeded' },
