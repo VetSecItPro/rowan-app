@@ -707,7 +707,7 @@ export default function TasksPage() {
             spaceId={currentSpace.id}
             userId={user.id}
             defaultType={modalDefaultType}
-            mode={editingItem ? "edit" : "create"}
+            mode={editingItem ? "quickEdit" : "create"}
           />
 
           <UnifiedDetailsModal
