@@ -836,7 +836,7 @@ export default function TasksPage() {
                   <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
                     <div className="p-6 space-y-6">
                       <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Task Details</h2>
+                        <h2 className="text-2xl font-bold text-blue-600 dark:text-blue-400">Edit Task Details</h2>
                         <button
                           onClick={closeDetailModals}
                           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
