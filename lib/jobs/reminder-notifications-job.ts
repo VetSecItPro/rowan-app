@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { reminderNotificationsService } from '@/lib/services/reminder-notifications-service';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // =============================================
 // TYPES
@@ -262,6 +262,11 @@ async function sendEmailNotifications(batch: NotificationBatch): Promise<{
     // Send email via Resend
     const emailHtml = generateEmailHtml(batch);
     const emailSubject = generateEmailSubject(batch);
+
+    if (!resend) {
+      console.warn('Resend API key not configured, skipping reminder email');
+      return { sent: false };
+    }
 
     await resend.emails.send({
       from: 'Rowan <reminders@rowan.app>',
