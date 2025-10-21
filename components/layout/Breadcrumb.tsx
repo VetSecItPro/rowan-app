@@ -18,20 +18,20 @@ export function Breadcrumb({ items = [] }: BreadcrumbProps) {
   };
 
   return (
-    <nav className="px-4 sm:px-8 py-4">
-      <ol className="max-w-7xl mx-auto flex items-center gap-0 overflow-x-auto scrollbar-hide">
+    <nav className="px-4 sm:px-8 py-2">
+      <ol className="max-w-7xl mx-auto flex items-center -space-x-1 overflow-x-auto scrollbar-hide">
         {/* Mobile: Back Button (only show if we have items to navigate back to) */}
         {items.length > 1 && (
           <li className="sm:hidden flex items-center gap-2 flex-shrink-0">
             <button
               onClick={handleBack}
-              className="btn-touch flex items-center gap-1 py-2 px-3 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all active:scale-95"
+              className="btn-touch flex items-center gap-0 py-1 px-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all active:scale-95"
               aria-label="Go back"
             >
               <ChevronLeft className="w-4 h-4" />
               <span>Back</span>
             </button>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
+            <ChevronRight className="w-3 h-3 text-gray-400 -ml-1" />
           </li>
         )}
 
@@ -39,7 +39,7 @@ export function Breadcrumb({ items = [] }: BreadcrumbProps) {
         <li className={items.length > 1 ? 'hidden sm:block flex-shrink-0' : 'flex-shrink-0'}>
           <Link
             href="/"
-            className="btn-touch inline-block py-1 px-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all active:scale-95"
+            className="btn-touch inline-block py-0.5 px-0.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all active:scale-95"
           >
             Home
           </Link>
@@ -56,20 +56,20 @@ export function Breadcrumb({ items = [] }: BreadcrumbProps) {
           return (
             <li
               key={index}
-              className={`flex items-center gap-0 ${shouldHideOnMobile ? 'hidden sm:flex' : 'flex'}`}
+              className={`flex items-center -space-x-0.5 ${shouldHideOnMobile ? 'hidden sm:flex' : 'flex'}`}
             >
-              <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <ChevronRight className="w-3 h-3 text-gray-400 flex-shrink-0" />
               {item.href && !isLast ? (
                 <Link
                   href={item.href}
-                  className="btn-touch inline-block py-1 px-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all truncate max-w-[120px] sm:max-w-[200px] active:scale-95"
+                  className="btn-touch inline-block py-0.5 px-0.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all truncate max-w-[120px] sm:max-w-[200px] active:scale-95"
                   title={item.label}
                 >
                   {item.label}
                 </Link>
               ) : (
                 <span
-                  className="text-sm text-gray-900 dark:text-white font-medium truncate max-w-[180px] sm:max-w-none py-1 px-1"
+                  className="text-sm text-gray-900 dark:text-white font-medium truncate max-w-[180px] sm:max-w-none py-0.5 px-0.5"
                   title={item.label}
                 >
                   {item.label}
