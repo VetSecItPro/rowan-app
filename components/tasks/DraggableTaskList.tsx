@@ -294,9 +294,9 @@ export function DraggableTaskList({
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // 8px movement required before drag starts
-        delay: 200, // 200ms delay for touch devices to prevent scroll conflict
-        tolerance: 5,
+        distance: 3, // Reduced from 8px to 3px for more responsive dragging
+        delay: 100, // Reduced from 200ms to 100ms for better responsiveness
+        tolerance: 3, // Reduced tolerance for more precise activation
       },
     }),
     useSensor(KeyboardSensor, {
