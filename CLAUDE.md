@@ -109,8 +109,28 @@ USING (space_id IN (
 - Error messages: user-friendly, no technical details
 
 ## Git Workflow & Deployment
+
+### CRITICAL: Branching Strategy
+**NEVER commit directly to main branch. Always use feature branches.**
+
+**Required workflow:**
+1. **Start new work:** `git checkout -b feature/description`
+2. **Push branch:** `git push -u origin feature/description`
+3. **Work and commit** on feature branch normally
+4. **Test before PR:** `npm run build && npx tsc --noEmit`
+5. **Create PR:** `gh pr create --title "Title" --body "Description"`
+6. **Merge via GitHub UI** after review
+
+**Branch naming conventions:**
+- `feature/task-improvements` - new features
+- `fix/authentication-bug` - bug fixes
+- `refactor/service-layer` - code refactoring
+- `experiment/ui-redesign` - experimental/risky changes
+
 **Pre-approved tasks (no permission needed):**
-- Git commits and pushes
+- Git commits and pushes **on feature branches**
+- Feature branch creation and management
+- Pull request creation and merging
 - Database migrations (`npx supabase db push`)
 - Vercel deployments and monitoring
 - Deployment troubleshooting and fixes
@@ -119,18 +139,34 @@ USING (space_id IN (
 - **Running any commands (cd, npm, npx, bash, git, etc.) during audits**
 - **Systematic codebase review without approval requests**
 
-Format: `type(scope): description`
+**Commit message format:** `type(scope): description`
 - feat, fix, docs, style, refactor, test, chore
 
-Commit flow:
-1. `git add .`
-2. `git commit -m "message\n\n🤖 Generated with Claude Code\n\nCo-Authored-By: Claude <noreply@anthropic.com>"`
-3. `git push`
-4. Monitor Vercel deployment with `vercel ls`
-5. If deployment fails: check logs, fix issues, retry until successful
-6. If migration fails: analyze error, fix, retry until successful
+**Feature branch workflow:**
+1. `git checkout -b feature/description`
+2. `git push -u origin feature/description`
+3. Work and commit normally: `git add . && git commit -m "message"`
+4. `git push` (to feature branch)
+5. When work is complete: Test `npm run build && npx tsc --noEmit`
+6. **ASK USER**: "Ready to create PR for this feature?" (don't auto-create)
+7. Create PR: `gh pr create --title "Title" --body "Description"`
+8. **Note**: Vercel only deploys main branch (per vercel.json config)
+9. If local tests fail: fix on feature branch, push again
+10. **When everything runs fine with no errors and no more work needed:**
+    - Confidently advise: "This feature is complete and ready to merge"
+    - **ASK USER**: "Ready to merge PR into main?" before merging
 
-If commit fails: fix issue and retry until successful
+**Standard commit format:**
+```bash
+git commit -m "$(cat <<'EOF'
+feat(scope): description
+
+🤖 Generated with Claude Code
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+EOF
+)"
+```
 
 ## Feature Colors
 ```typescript
@@ -142,6 +178,7 @@ const COLORS = {
 ```
 
 ## Common Mistakes to Avoid
+- ❌ **Committing directly to main** → ✅ **Always use feature branches**
 - ❌ Direct Supabase calls in components → ✅ Use service layer
 - ❌ Missing subscription cleanup → ✅ Return cleanup in useEffect
 - ❌ Hardcoded IDs → ✅ From context/session
@@ -149,8 +186,12 @@ const COLORS = {
 - ❌ Missing space_id filter → ✅ Always filter
 - ❌ `any` types → ✅ Proper interfaces
 - ❌ Missing loading/empty states → ✅ Always include
+- ❌ Skipping build/type tests before PR → ✅ Always test before PR
 
 ## Review Checklist
+- [ ] **Working on feature branch (not main)**
+- [ ] **Build passes: npm run build**
+- [ ] **TypeScript compiles: npx tsc --noEmit**
 - [ ] RLS policies on new tables
 - [ ] Zod validation
 - [ ] Rate limiting on APIs
@@ -159,3 +200,4 @@ const COLORS = {
 - [ ] Real-time cleanup
 - [ ] Dark mode tested
 - [ ] Mobile responsive
+- [ ] **PR created with proper title/description**

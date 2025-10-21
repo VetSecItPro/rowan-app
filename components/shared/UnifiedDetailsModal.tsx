@@ -85,6 +85,11 @@ export function UnifiedDetailsModal({
     columns: ['title', 'status', 'priority', 'due_date']
   });
 
+  // Early return if no item
+  if (!item) {
+    return null;
+  }
+
   // Get item type and categories
   const itemType = item.type || 'task';
   const categories = itemType === 'task' ? TASK_CATEGORIES : CHORE_CATEGORIES;
