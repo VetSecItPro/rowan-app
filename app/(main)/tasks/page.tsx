@@ -533,35 +533,34 @@ export default function TasksPage() {
           </div>
           )}
 
-          {/* Search Bar - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
-          <div className={`apple-search-container tasks-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
-            <Search className="apple-search-icon" />
-            <input
-              type="search"
-              placeholder="Search tasks and chores..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="apple-search-input"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => {
-                  setSearchQuery('');
-                  setIsSearchTyping(false);
-                }}
-                className="apple-search-clear"
-                aria-label="Clear search"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-          )}
-
           {/* Tasks List - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Search Bar - Full Width Above Content */}
+            <div className="lg:col-span-4 mb-6">
+              <div className={`apple-search-container tasks-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
+                <Search className="apple-search-icon" />
+                <input
+                  type="search"
+                  placeholder="Search tasks and chores..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  className="apple-search-input"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setIsSearchTyping(false);
+                    }}
+                    className="apple-search-clear"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            </div>
             {/* Filters Sidebar - Only show when filters are enabled */}
             {showFilters && activeTab === 'task' && currentSpace && (
               <div className="lg:col-span-1">
