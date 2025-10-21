@@ -18,7 +18,6 @@ import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-s
 import { useTaskRealtime } from '@/hooks/useTaskRealtime';
 import { TaskFilterPanel, TaskFilters } from '@/components/tasks/TaskFilterPanel';
 import { BulkActionsBar } from '@/components/tasks/BulkActionsBar';
-import { RecurringTaskModal } from '@/components/tasks/RecurringTaskModal';
 import { TemplatePickerModal } from '@/components/tasks/TemplatePickerModal';
 import { ExportModal } from '@/components/tasks/ExportModal';
 import { AttachmentsModal } from '@/components/tasks/AttachmentsModal';
@@ -62,7 +61,6 @@ export default function TasksPage() {
   const [enableDragDrop, setEnableDragDrop] = useState(true);
 
   // Modal states for advanced features
-  const [isRecurringModalOpen, setIsRecurringModalOpen] = useState(false);
   const [isTemplatePickerOpen, setIsTemplatePickerOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
@@ -363,7 +361,8 @@ export default function TasksPage() {
         setActiveDetailModal('snooze');
         break;
       case 'repeat':
-        setIsRecurringModalOpen(true);
+        // Recurring functionality is now integrated into NewTaskModal
+        handleOpenModal('task');
         break;
       default:
         break;
@@ -744,6 +743,7 @@ export default function TasksPage() {
               onSave={handleCreateTask}
               editTask={editingTask}
               spaceId={currentSpace.id}
+              userId={user?.id}
             />
           ) : (
             <NewChoreModal
@@ -756,17 +756,6 @@ export default function TasksPage() {
           )}
 
           {/* Advanced Feature Modals */}
-          <RecurringTaskModal
-            isOpen={isRecurringModalOpen}
-            onClose={() => setIsRecurringModalOpen(false)}
-            onSave={() => {
-              setIsRecurringModalOpen(false);
-              refreshTasks();
-              loadData();
-            }}
-            spaceId={currentSpace.id}
-            userId={user.id}
-          />
 
           <TemplatePickerModal
             isOpen={isTemplatePickerOpen}
