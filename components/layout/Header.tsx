@@ -65,9 +65,9 @@ export function Header() {
           </Link>
 
           {/* Menu, Theme Toggle & Auth Buttons */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             {/* Grouped: Hamburger Menu and Notifications */}
-            <div className="flex items-center gap-0">
+            <div className="flex items-center -space-x-2">
               <HamburgerMenu />
 
               {/* Only show Settings and Notifications for logged-in users */}
