@@ -375,7 +375,7 @@ export default function TasksPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <button
                   onClick={() => handleOpenModal('task')}
                   className="px-3 sm:px-4 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
@@ -546,7 +546,7 @@ export default function TasksPage() {
                   <div>
                     {/* Mobile: Dropdown Select */}
                     <div className="relative">
-                      <Filter className="absolute left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400 pointer-events-none" />
+                      <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400 pointer-events-none" />
                       <select
                         id="status-filter-tasks-mobile"
                         value={statusFilter}
