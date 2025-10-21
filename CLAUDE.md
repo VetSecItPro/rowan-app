@@ -147,11 +147,12 @@ USING (space_id IN (
 2. `git push -u origin feature/description`
 3. Work and commit normally: `git add . && git commit -m "message"`
 4. `git push` (to feature branch)
-5. Test: `npm run build && npx tsc --noEmit`
-6. Create PR: `gh pr create --title "Title" --body "Description"`
-7. Monitor Vercel deployment preview
-8. If tests fail: fix on feature branch, push again
-9. Merge PR when ready
+5. When work is complete: Test `npm run build && npx tsc --noEmit`
+6. **ASK USER**: "Ready to create PR for this feature?" (don't auto-create)
+7. Create PR: `gh pr create --title "Title" --body "Description"`
+8. Monitor Vercel deployment preview
+9. If tests fail: fix on feature branch, push again
+10. **ASK USER**: "Ready to merge PR?" before merging
 
 **Standard commit format:**
 ```bash
