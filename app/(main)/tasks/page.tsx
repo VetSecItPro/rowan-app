@@ -362,7 +362,8 @@ export default function TasksPage() {
         break;
       case 'repeat':
         // Recurring functionality is now integrated into NewTaskModal
-        handleOpenModal('task');
+        setActiveTab('task');
+        handleOpenModal();
         break;
       default:
         break;
