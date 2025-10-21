@@ -1,14 +1,21 @@
-name: CI/CD - Migrations & Checks
+name: CI/CD - Migrations, Checks & Deploy
 
 on:
   push:
     branches:
       - main
 
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
 jobs:
-  migrations-and-checks:
-    name: Run Migrations & Checks
+  migrations-checks-deploy:
+    name: Run Migrations, Checks & Deploy
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
 
     steps:
       - name: Checkout code
@@ -99,13 +106,29 @@ jobs:
       - name: Run Type Check
         run: npm run type-check || echo "⚠️ Type check had warnings (non-blocking due to Next.js 15 issue)"
 
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project Artifacts to Vercel
+        id: deploy
+        run: |
+          url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$url" >> $GITHUB_OUTPUT
+          echo "### 🚀 Production Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 **Production URL:** $url" >> $GITHUB_STEP_SUMMARY
+
       - name: Summary
         run: |
           echo "### ✅ CI/CD Pipeline Complete" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Migrations checked and applied (if needed)" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Type checking completed" >> $GITHUB_STEP_SUMMARY
-          echo "- 🚀 Vercel will auto-deploy via native GitHub integration" >> $GITHUB_STEP_SUMMARY
+          echo "- 🚀 Production deployment complete: ${{ steps.deploy.outputs.url }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Note:** This workflow handles migrations and checks only." >> $GITHUB_STEP_SUMMARY
-          echo "Deployment is handled by Vercel's native GitHub integration for speed and reliability." >> $GITHUB_STEP_SUMMARY
+          echo "**Note:** This workflow handles migrations, checks, and deployment via GitHub Actions." >> $GITHUB_STEP_SUMMARY

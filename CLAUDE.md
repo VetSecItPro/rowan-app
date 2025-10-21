@@ -119,7 +119,9 @@ USING (space_id IN (
 3. **Work and commit** on feature branch normally
 4. **Test before PR:** `npm run build && npx tsc --noEmit`
 5. **Create PR:** `gh pr create --title "Title" --body "Description"`
-6. **Merge via GitHub UI** after review
+6. **GitHub Actions automatically:** Creates preview deployment and posts URL in PR
+7. **Merge via GitHub UI** after review
+8. **GitHub Actions automatically:** Runs migrations, checks, and deploys to production
 
 **Branch naming conventions:**
 - `feature/task-improvements` - new features
@@ -131,9 +133,7 @@ USING (space_id IN (
 - Git commits and pushes **on feature branches**
 - Feature branch creation and management
 - Pull request creation and merging
-- Database migrations (`npx supabase db push`)
-- Vercel deployments and monitoring
-- Deployment troubleshooting and fixes
+- All GitHub Actions operations (deployments, migrations, checks)
 - **Complete security audits and code reviews**
 - **Implementing security fixes and optimizations**
 - **Running any commands (cd, npm, npx, bash, git, etc.) during audits**
@@ -141,6 +141,13 @@ USING (space_id IN (
 
 **Commit message format:** `type(scope): description`
 - feat, fix, docs, style, refactor, test, chore
+
+**Automated CI/CD Pipeline:**
+- **PR Created:** GitHub Actions deploys to Vercel preview, posts URL in PR comments
+- **PR Merged to Main:** GitHub Actions runs migrations → type checks → deploys to production
+- **No manual Vercel commands needed** - everything is automated via GitHub Actions
+- **Database migrations** are automatically applied when detected in commits
+- **Build failures** are caught in CI before deployment
 
 **Feature branch workflow:**
 1. `git checkout -b feature/description`
@@ -150,11 +157,12 @@ USING (space_id IN (
 5. When work is complete: Test `npm run build && npx tsc --noEmit`
 6. **ASK USER**: "Ready to create PR for this feature?" (don't auto-create)
 7. Create PR: `gh pr create --title "Title" --body "Description"`
-8. **Note**: Vercel only deploys main branch (per vercel.json config)
+8. GitHub Actions creates preview deployment automatically
 9. If local tests fail: fix on feature branch, push again
 10. **When everything runs fine with no errors and no more work needed:**
     - Confidently advise: "This feature is complete and ready to merge"
     - **ASK USER**: "Ready to merge PR into main?" before merging
+    - After merge: GitHub Actions automatically deploys to production
 
 **Standard commit format:**
 ```bash
