@@ -834,16 +834,19 @@ export default function TasksPage() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                   <div className="absolute inset-0 bg-black/50" onClick={closeDetailModals} />
                   <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <div className="p-6 space-y-6">
+                    {/* Blue Header */}
+                    <div className="bg-blue-600 dark:bg-blue-700 rounded-t-xl px-6 py-4">
                       <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-bold text-blue-600 dark:text-blue-400">Edit Task Details</h2>
+                        <h2 className="text-2xl font-bold text-white">Edit Task Details</h2>
                         <button
                           onClick={closeDetailModals}
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                          className="p-2 hover:bg-blue-700 dark:hover:bg-blue-800 rounded-lg text-white"
                         >
                           ✕
                         </button>
                       </div>
+                    </div>
+                    <div className="p-6 space-y-6">
 
                       {/* Quick Actions */}
                       <TaskQuickActions

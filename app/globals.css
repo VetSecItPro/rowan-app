@@ -2917,8 +2917,9 @@
 }
 
 .apple-search-container.tasks-search .apple-search-input:focus {
-  border-color: rgba(59, 130, 246, 0.6); /* blue-500 - more visible focus */
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 4px 16px -4px rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.8); /* blue-500 - more prominent focus */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15), 0 4px 20px -4px rgba(59, 130, 246, 0.3);
+  outline: none;
 }
 
 .apple-search-container.tasks-search.apple-search-typing .apple-search-input {
@@ -2956,7 +2957,9 @@
 }
 
 .dark .apple-search-container.tasks-search .apple-search-input:focus {
-  border-color: rgba(59, 130, 246, 0.5); /* blue-500 */
+  border-color: rgba(59, 130, 246, 0.7); /* blue-500 - more prominent in dark mode */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15), 0 4px 20px -4px rgba(59, 130, 246, 0.25);
+  outline: none;
 }
 
 .dark .apple-search-container.tasks-search .apple-search-input::placeholder {

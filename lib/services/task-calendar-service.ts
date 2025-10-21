@@ -42,14 +42,16 @@ export const taskCalendarService = {
     const supabase = createClient();
     const { data, error } = await supabase.from('users').select('show_tasks_on_calendar, calendar_task_filter').eq('id', userId).single();
     if (error) throw error;
-    return data;
+    return {
+      auto_sync_tasks: data?.show_tasks_on_calendar || false,
+      calendar_task_filter: data?.calendar_task_filter
+    };
   },
 
-  async updateCalendarPreferences(userId: string, showTasks: boolean, filter?: any): Promise<void> {
+  async updateCalendarPreferences(userId: string, autoSync: boolean): Promise<void> {
     const supabase = createClient();
     await supabase.from('users').update({
-      show_tasks_on_calendar: showTasks,
-      calendar_task_filter: filter,
+      show_tasks_on_calendar: autoSync,
     }).eq('id', userId);
   },
 };
