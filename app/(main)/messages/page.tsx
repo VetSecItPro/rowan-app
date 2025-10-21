@@ -302,11 +302,15 @@ export default function MessagesPage() {
     const messageId = confirmDialog.messageId;
     setConfirmDialog({ isOpen: false, messageId: '' });
 
+    // Optimistic update - remove from UI immediately
+    setMessages(prev => prev.filter(message => message.id !== messageId));
+
     try {
       await messagesService.deleteMessage(messageId);
-      loadMessages();
     } catch (error) {
       console.error('Failed to delete message:', error);
+      // Revert optimistic update on error
+      loadMessages();
     }
   }, [confirmDialog, loadMessages]);
 
@@ -679,35 +683,40 @@ export default function MessagesPage() {
   const handleDeleteConversation = useCallback(async (conversationIdToDelete: string) => {
     if (!currentSpace || !user) return;
 
+    // Optimistic update - remove conversation from UI immediately
+    setConversations(prev => prev.filter(conv => conv.id !== conversationIdToDelete));
+
+    // If we're deleting the active conversation, switch to first remaining conversation
+    if (conversationIdToDelete === conversationId) {
+      const remainingConversations = conversations.filter(c => c.id !== conversationIdToDelete);
+      if (remainingConversations.length > 0) {
+        setConversationId(remainingConversations[0].id);
+        setMessages([]); // Clear messages while loading new conversation
+      } else {
+        setConversationId(null);
+        setMessages([]);
+      }
+    }
+
     try {
       await messagesService.deleteConversation(conversationIdToDelete);
 
-      // If we're deleting the active conversation, switch to first available conversation
-      if (conversationIdToDelete === conversationId) {
-        const conversationsData = await messagesService.getConversationsList(currentSpace.id, user.id);
-        setConversations(conversationsData);
-
-        const firstConv = conversationsData.find((c) => c.id !== conversationIdToDelete);
-        if (firstConv) {
-          setConversationId(firstConv.id);
-          const messagesData = await messagesService.getMessages(firstConv.id);
-          setMessages(messagesData);
-        } else {
-          setConversationId(null);
-          setMessages([]);
-        }
-      } else {
-        // Just reload conversations list
-        const conversationsData = await messagesService.getConversationsList(currentSpace.id, user.id);
-        setConversations(conversationsData);
+      // If we switched to a new conversation, load its messages
+      if (conversationIdToDelete === conversationId && conversations.filter(c => c.id !== conversationIdToDelete).length > 0) {
+        const newActiveConversation = conversations.filter(c => c.id !== conversationIdToDelete)[0];
+        const messagesData = await messagesService.getMessages(newActiveConversation.id);
+        setMessages(messagesData);
       }
 
       toast.success('Conversation deleted');
     } catch (error) {
       console.error('Failed to delete conversation:', error);
       toast.error('Failed to delete conversation');
+      // Revert optimistic update on error
+      const conversationsData = await messagesService.getConversationsList(currentSpace.id, user.id);
+      setConversations(conversationsData);
     }
-  }, [currentSpace, user, conversationId]);
+  }, [currentSpace, user, conversationId, conversations]);
 
   // Handle creating a new conversation
   const handleCreateConversation = useCallback(async (conversationData: CreateConversationInput) => {

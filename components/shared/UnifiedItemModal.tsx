@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Smile, ChevronDown, Repeat, Calendar, User, Clock, MessageSquare, Tag, Star, Users } from 'lucide-react';
+import { X, Smile, ChevronDown, Repeat, Calendar, User, Clock, MessageSquare, Tag, Star, Users, CheckSquare, Home } from 'lucide-react';
 import { CreateTaskInput, CreateChoreInput, Task, Chore } from '@/lib/types';
 import { taskRecurrenceService } from '@/lib/services/task-recurrence-service';
 import {
@@ -179,7 +179,11 @@ export function UnifiedItemModal({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                {itemType === 'task' ? '✅' : '🏠'}
+                {itemType === 'task' ? (
+                  <CheckSquare className="w-5 h-5 text-white" />
+                ) : (
+                  <Home className="w-5 h-5 text-white" />
+                )}
               </div>
               <div>
                 <h2 className="text-2xl font-bold">
@@ -288,18 +292,21 @@ export function UnifiedItemModal({
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Category
                     </label>
-                    <select
-                      value={formData.category}
-                      onChange={(e) => handleInputChange('category', e.target.value)}
-                      className="w-full pl-4 pr-12 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                    >
-                      <option value="">Select a category</option>
-                      {Object.entries(getCurrentCategories()).map(([key, category]) => (
-                        <option key={key} value={key}>
-                          {category.emoji} {category.label}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <select
+                        value={formData.category}
+                        onChange={(e) => handleInputChange('category', e.target.value)}
+                        className="w-full pl-4 pr-12 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white appearance-none"
+                      >
+                        <option value="">Select a category</option>
+                        {Object.entries(getCurrentCategories()).map(([key, category]) => (
+                          <option key={key} value={key}>
+                            {category.emoji} {category.label}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    </div>
                   </div>
 
                   {/* Priority */}
@@ -307,17 +314,20 @@ export function UnifiedItemModal({
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Priority
                     </label>
-                    <select
-                      value={formData.priority}
-                      onChange={(e) => handleInputChange('priority', e.target.value)}
-                      className="w-full pl-4 pr-12 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                    >
-                      {Object.entries(PRIORITY_LEVELS).map(([key, priority]) => (
-                        <option key={key} value={key}>
-                          {priority.emoji} {priority.label} - {priority.description}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <select
+                        value={formData.priority}
+                        onChange={(e) => handleInputChange('priority', e.target.value)}
+                        className="w-full pl-4 pr-12 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white appearance-none"
+                      >
+                        {Object.entries(PRIORITY_LEVELS).map(([key, priority]) => (
+                          <option key={key} value={key}>
+                            {priority.emoji} {priority.label} - {priority.description}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -332,17 +342,20 @@ export function UnifiedItemModal({
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Status
                     </label>
-                    <select
-                      value={formData.status}
-                      onChange={(e) => handleInputChange('status', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                    >
+                    <div className="relative">
+                      <select
+                        value={formData.status}
+                        onChange={(e) => handleInputChange('status', e.target.value)}
+                        className="w-full pl-4 pr-12 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white appearance-none"
+                      >
                       {Object.entries(STATUS_TYPES).map(([key, status]) => (
                         <option key={key} value={key}>
                           {status.emoji} {status.label} - {status.description}
                         </option>
                       ))}
-                    </select>
+                      </select>
+                      <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    </div>
                   </div>
 
                   {/* Estimated Hours */}
@@ -406,17 +419,20 @@ export function UnifiedItemModal({
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Assign to Family Member
                     </label>
-                    <select
-                      value={familyAssignment}
-                      onChange={(e) => setFamilyAssignment(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                    >
+                    <div className="relative">
+                      <select
+                        value={familyAssignment}
+                        onChange={(e) => setFamilyAssignment(e.target.value)}
+                        className="w-full pl-4 pr-12 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white appearance-none"
+                      >
                       {Object.entries(FAMILY_ROLES).map(([key, role]) => (
                         <option key={key} value={key}>
                           {role.emoji} {role.label} - {role.description}
                         </option>
                       ))}
-                    </select>
+                      </select>
+                      <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    </div>
                   </div>
 
                   {/* Custom Assignment */}
@@ -503,17 +519,20 @@ export function UnifiedItemModal({
                               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Repeat Pattern
                               </label>
-                              <select
-                                value={recurringData.pattern}
-                                onChange={(e) => setRecurringData(prev => ({ ...prev, pattern: e.target.value as keyof typeof RECURRING_PATTERNS }))}
-                                className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                              >
+                              <div className="relative">
+                                <select
+                                  value={recurringData.pattern}
+                                  onChange={(e) => setRecurringData(prev => ({ ...prev, pattern: e.target.value as keyof typeof RECURRING_PATTERNS }))}
+                                  className="w-full pl-3 pr-10 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white appearance-none"
+                                >
                                 {Object.entries(RECURRING_PATTERNS).map(([key, pattern]) => (
                                   <option key={key} value={key}>
                                     {pattern.emoji} {pattern.label} - {pattern.description}
                                   </option>
                                 ))}
-                              </select>
+                                </select>
+                                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                              </div>
                             </div>
 
                             <div>

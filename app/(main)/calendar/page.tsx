@@ -240,11 +240,15 @@ export default function CalendarPage() {
     const eventId = confirmDialog.eventId;
     setConfirmDialog({ isOpen: false, eventId: '' });
 
+    // Optimistic update - remove from UI immediately
+    setEvents(prev => prev.filter(event => event.id !== eventId));
+
     try {
       await calendarService.deleteEvent(eventId);
-      loadEvents();
     } catch (error) {
       console.error('Failed to delete event:', error);
+      // Revert optimistic update on error
+      loadEvents();
     }
   }, [confirmDialog, loadEvents]);
 
