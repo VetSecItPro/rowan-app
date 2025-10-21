@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     // Rate limiting
     const identifier = `marketing-subscription-${userId}`;
-    const { success: rateLimitSuccess } = await ratelimit.limit(identifier);
+    const { success: rateLimitSuccess } = await ratelimit?.limit(identifier) ?? { success: true };
     if (!rateLimitSuccess) {
       return NextResponse.json(
         { success: false, error: 'Rate limit exceeded' },
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, error: 'Invalid request data', details: error.errors },
+        { success: false, error: 'Invalid request data', details: error.issues },
         { status: 400 }
       );
     }
@@ -229,7 +229,7 @@ export async function GET(request: NextRequest) {
       success: true,
       data: {
         preferences: {
-          emailMarketing: preferences.marketing_emails_enabled,
+          emailMarketing: preferences?.marketing_emails_enabled ?? false,
         },
         contactInfo: {
           email: profile.email,
