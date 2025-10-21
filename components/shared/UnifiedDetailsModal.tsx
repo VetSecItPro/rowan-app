@@ -7,8 +7,6 @@ import {
   Upload, Send, Trash2, Edit3, AlertCircle, Users
 } from 'lucide-react';
 import { Task, Chore } from '@/lib/types';
-
-type TaskOrChore = (Task & { type: 'task' }) | (Chore & { type: 'chore' });
 import {
   TASK_CATEGORIES,
   CHORE_CATEGORIES,
@@ -25,7 +23,7 @@ interface UnifiedDetailsModalProps {
   onClose: () => void;
   spaceId: string;
   userId: string;
-  onEdit?: (item: TaskOrChore) => void;
+  onEdit?: (item: (Task & { type: 'task' }) | (Chore & { type: 'chore' })) => void;
   onDelete?: (itemId: string, type?: 'task' | 'chore') => void;
   onSave?: (item: any) => void;
   onUpdate?: () => void;

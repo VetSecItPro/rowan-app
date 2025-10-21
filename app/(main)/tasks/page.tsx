@@ -714,7 +714,7 @@ export default function TasksPage() {
             isOpen={isDetailsModalOpen}
             onClose={handleCloseDetailsModal}
             item={selectedItem}
-            onEdit={handleEditItem}
+            onEdit={handleEditItem as any}
             onDelete={handleDeleteItem}
             onSave={handleSaveItem}
             spaceId={currentSpace.id}

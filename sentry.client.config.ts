@@ -44,7 +44,7 @@ if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_SENTRY_DSN) {
       // Session Replay integration with proper configuration
       Sentry.replayIntegration({
         // Capture 10% of all sessions
-        sessionSampleRate: 0.1,
+        sampleRate: 0.1,
         // Capture 100% of sessions with an error
         errorSampleRate: 1.0,
         // Mask text content to protect user privacy
