@@ -18,7 +18,7 @@ import {
 type ItemType = Task | Chore;
 
 interface UnifiedDetailsModalProps {
-  item: ItemType & { type?: 'task' | 'chore' };
+  item: (ItemType & { type?: 'task' | 'chore' }) | null;
   isOpen: boolean;
   onClose: () => void;
   spaceId: string;
