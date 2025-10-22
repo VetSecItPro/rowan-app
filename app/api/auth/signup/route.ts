@@ -1,16 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { ratelimit } from '@/lib/ratelimit';
+import { authRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { z } from 'zod';
 import DOMPurify from 'isomorphic-dompurify';
-
-// Rate limiting: 3 signup attempts per hour per IP (more restrictive than signin)
-const signupRateLimit = ratelimit({
-  name: 'auth_signup',
-  limit: 3,
-  windowMs: 60 * 60 * 1000, // 1 hour
-});
 
 // Strong password validation schema
 const SignUpSchema = z.object({
@@ -52,21 +45,23 @@ export async function POST(request: NextRequest) {
     // Extract IP for rate limiting
     const ip = extractIP(request.headers);
 
-    // Apply rate limiting
-    const { success, limit, remaining, resetTime } = await signupRateLimit(ip);
+    // Apply rate limiting (more restrictive for signup: 3 attempts per hour)
+    const { success, limit, remaining, reset } = authRateLimit
+      ? await authRateLimit.limit(ip)
+      : { success: true, limit: 3, remaining: 2, reset: Date.now() + 3600000 };
 
     if (!success) {
       return NextResponse.json(
         {
           error: 'Too many signup attempts. Please try again later.',
-          resetTime
+          resetTime: reset
         },
         {
           status: 429,
           headers: {
             'X-RateLimit-Limit': limit.toString(),
             'X-RateLimit-Remaining': '0',
-            'X-RateLimit-Reset': resetTime.toString(),
+            'X-RateLimit-Reset': reset.toString(),
           }
         }
       );
@@ -151,7 +146,7 @@ export async function POST(request: NextRequest) {
         headers: {
           'X-RateLimit-Limit': limit.toString(),
           'X-RateLimit-Remaining': remaining.toString(),
-          'X-RateLimit-Reset': resetTime.toString(),
+          'X-RateLimit-Reset': reset.toString(),
         }
       }
     );
@@ -162,7 +157,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'Invalid input',
-          details: error.errors[0].message
+          details: error.issues[0].message
         },
         { status: 400 }
       );

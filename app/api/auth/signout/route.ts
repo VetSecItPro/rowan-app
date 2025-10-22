@@ -1,35 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { ratelimit } from '@/lib/ratelimit';
+import { apiRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
-
-// Rate limiting: 10 signout attempts per minute (generous, but prevents abuse)
-const signoutRateLimit = ratelimit({
-  name: 'auth_signout',
-  limit: 10,
-  windowMs: 60 * 1000, // 1 minute
-});
 
 export async function POST(request: NextRequest) {
   try {
     // Extract IP for rate limiting
     const ip = extractIP(request.headers);
 
-    // Apply rate limiting
-    const { success, limit, remaining, resetTime } = await signoutRateLimit(ip);
+    // Apply rate limiting (10 signout attempts per 10 seconds - generous but prevents abuse)
+    const { success, limit, remaining, reset } = apiRateLimit
+      ? await apiRateLimit.limit(ip)
+      : { success: true, limit: 10, remaining: 9, reset: Date.now() + 600000 };
 
     if (!success) {
       return NextResponse.json(
         {
           error: 'Too many signout requests. Please try again later.',
-          resetTime
+          resetTime: reset
         },
         {
           status: 429,
           headers: {
             'X-RateLimit-Limit': limit.toString(),
             'X-RateLimit-Remaining': '0',
-            'X-RateLimit-Reset': resetTime.toString(),
+            'X-RateLimit-Reset': reset.toString(),
           }
         }
       );
@@ -56,7 +51,7 @@ export async function POST(request: NextRequest) {
         headers: {
           'X-RateLimit-Limit': limit.toString(),
           'X-RateLimit-Remaining': remaining.toString(),
-          'X-RateLimit-Reset': resetTime.toString(),
+          'X-RateLimit-Reset': reset.toString(),
         }
       }
     );
