@@ -75,10 +75,15 @@ export default function TasksPage() {
   const [displayLimit, setDisplayLimit] = useState(20);
   const ITEMS_PER_PAGE = 20;
 
-  // Real-time tasks with filters (always enabled now)
+  // Real-time tasks with filters (always enabled now) - exclude chore-specific fields
   const { tasks: realtimeTasks, loading: realtimeLoading, refreshTasks, setTasks } = useTaskRealtime({
     spaceId: currentSpace?.id || '',
-    filters: filters,
+    filters: {
+      status: filters.status,
+      priority: filters.priority,
+      assignedTo: filters.assignees?.[0], // Take first assignee for simplicity
+      // Exclude frequency and other chore-specific filters
+    },
     onTaskAdded: (task) => console.log('Task added:', task.title),
     onTaskUpdated: (task) => console.log('Task updated:', task.title),
     onTaskDeleted: (taskId) => console.log('Task deleted:', taskId),
