@@ -3,18 +3,19 @@ import { z } from 'zod';
 // Base chore schema
 export const choreBaseSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters').trim(),
-  description: z.string().max(2000, 'Description must be less than 2000 characters').trim().optional().nullable(),
+  description: z.string().max(2000, 'Description must be less than 2000 characters').trim().optional().nullable()
+    .transform(val => val === '' ? null : val),
   space_id: z.string().uuid('Invalid space ID'),
-  status: z.enum(['pending', 'in_progress', 'completed']).default('pending'),
-  priority: z.enum(['low', 'medium', 'high', 'urgent']).default('medium'),
-  assigned_to: z.string().uuid('Invalid user ID').optional().nullable(),
-  due_date: z.string().datetime().optional().nullable(),
-  estimated_minutes: z.number().int().min(0).max(10000).optional().nullable(),
-  category: z.string().max(100).trim().optional().nullable(),
-  recurrence_pattern: z.enum(['daily', 'weekly', 'biweekly', 'monthly']).optional().nullable(),
-  recurrence_interval: z.number().int().min(1).max(365).optional().nullable(),
-  location: z.string().max(100).trim().optional().nullable(),
-  difficulty: z.enum(['easy', 'medium', 'hard']).optional().nullable(),
+  status: z.enum(['pending', 'in-progress', 'blocked', 'on-hold', 'completed']).default('pending'),
+  frequency: z.enum(['daily', 'weekly', 'monthly', 'once'], 'Frequency is required'),
+  assigned_to: z.string().max(255, 'Assigned to must be less than 255 characters').optional().nullable()
+    .transform(val => val === '' ? null : val),
+  due_date: z.string().optional().nullable()
+    .transform(val => val === '' ? null : val)
+    .refine(val => val === null || z.string().datetime().safeParse(val).success, 'Invalid date format'),
+  notes: z.string().max(1000, 'Notes must be less than 1000 characters').trim().optional().nullable()
+    .transform(val => val === '' ? null : val),
+  sort_order: z.number().int().min(0).optional().nullable(),
 });
 
 // Create chore schema
@@ -87,12 +88,12 @@ export const choreCompletionSchema = z.object({
 
 // Bulk chore operations
 export const bulkUpdateChoresSchema = z.object({
-  chore_ids: z.array(z.string().uuid()).min(1).max(100),
+  chore_ids: z.array(z.string().uuid()).min(1).max(50),
   updates: z.object({
-    status: z.enum(['pending', 'in_progress', 'completed']).optional(),
-    priority: z.enum(['low', 'medium', 'high', 'urgent']).optional(),
+    status: z.enum(['pending', 'in-progress', 'blocked', 'on-hold', 'completed']).optional(),
+    frequency: z.enum(['daily', 'weekly', 'monthly', 'once']).optional(),
     assigned_to: z.string().uuid().optional().nullable(),
-    category: z.string().max(100).trim().optional().nullable(),
+    due_date: z.string().datetime().optional().nullable(),
   }),
 });
 
@@ -119,8 +120,7 @@ export function validateAndSanitizeChore(data: unknown): z.infer<typeof createCh
     ...parsed,
     title: sanitizeString(parsed.title),
     description: parsed.description ? sanitizeString(parsed.description) : null,
-    category: parsed.category ? sanitizeString(parsed.category) : null,
-    location: parsed.location ? sanitizeString(parsed.location) : null,
+    notes: parsed.notes ? sanitizeString(parsed.notes) : null,
   };
 }
 

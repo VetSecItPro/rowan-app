@@ -10,8 +10,10 @@ export interface CreateChoreInput {
   description?: string;
   frequency: 'daily' | 'weekly' | 'monthly' | 'once';
   assigned_to?: string;
-  status?: 'pending' | 'completed' | 'skipped';
+  status?: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed';
   due_date?: string;
+  notes?: string;
+  sort_order?: number;
   created_by: string; // Required field that was missing!
 }
 
@@ -20,8 +22,16 @@ export interface UpdateChoreInput {
   description?: string;
   frequency?: 'daily' | 'weekly' | 'monthly' | 'once';
   assigned_to?: string;
-  status?: 'pending' | 'completed' | 'skipped';
+  status?: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed';
   due_date?: string;
+  completed_at?: string | null;
+}
+
+export interface ChoreQueryOptions {
+  status?: string;
+  frequency?: string;
+  assigned_to?: string;
+  search?: string;
 }
 
 export interface ChoreStats {
@@ -44,20 +54,41 @@ export interface ChoreStats {
  */
 export const choresService = {
   /**
-   * Get all chores for a space
+   * Get all chores for a space with optional filtering
    *
    * @param spaceId - The space ID to fetch chores from
+   * @param options - Optional query options for filtering
    * @returns Promise<Chore[]> - Array of chores
    */
-  async getChores(spaceId: string): Promise<Chore[]> {
+  async getChores(spaceId: string, options?: ChoreQueryOptions): Promise<Chore[]> {
     const supabase = createClient();
 
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('chores')
         .select('*')
-        .eq('space_id', spaceId)
-        .order('created_at', { ascending: false });
+        .eq('space_id', spaceId);
+
+      // Apply filters if provided
+      if (options?.status) {
+        query = query.eq('status', options.status);
+      }
+      if (options?.frequency) {
+        query = query.eq('frequency', options.frequency);
+      }
+      if (options?.assigned_to) {
+        query = query.eq('assigned_to', options.assigned_to);
+      }
+      if (options?.search) {
+        // Search in title and description
+        query = query.or(`title.ilike.%${options.search}%,description.ilike.%${options.search}%`);
+      }
+
+      // Order by sort_order first, then by created_at
+      query = query.order('sort_order', { ascending: true, nullsFirst: false })
+                  .order('created_at', { ascending: false });
+
+      const { data, error } = await query;
 
       if (error) {
         console.error('❌ getChores Supabase error:', error);
@@ -107,23 +138,48 @@ export const choresService = {
    * @returns Promise<Chore> - Created chore
    */
   async createChore(data: CreateChoreInput): Promise<Chore> {
+    console.log('=== ENHANCED DEBUG LOGGING - PHASE 1.3 ===');
+    console.log('🏠 choresService.createChore called with data:', JSON.stringify(data, null, 2));
+    console.log('🏠 Validating input data...');
+    console.log('🏠 space_id:', data.space_id);
+    console.log('🏠 title:', data.title);
+    console.log('🏠 created_by:', data.created_by);
+    console.log('🏠 status:', data.status);
+    console.log('🏠 frequency:', data.frequency);
+
     const supabase = createClient();
+    console.log('🏠 Supabase client created successfully');
 
     try {
+      console.log('🏠 About to call supabase.from("chores").insert()...');
+
       const { data: chore, error } = await supabase
         .from('chores')
         .insert(data)
         .select()
         .single();
 
+      console.log('🏠 Supabase insert completed');
+      console.log('🏠 Supabase response - error:', error);
+      console.log('🏠 Supabase response - data:', chore);
+
       if (error) {
-        console.error('❌ Supabase error:', error);
+        console.error('🏠 ❌ Supabase error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
         throw new Error(`Failed to create chore: ${error.message}`);
       }
 
+      console.log('🏠 ✅ Chore created successfully:', JSON.stringify(chore, null, 2));
+      console.log('🏠 Returning created chore to caller');
       return chore;
     } catch (error) {
-      console.error('❌ Error in createChore:', error);
+      console.error('🏠 ❌ Error in createChore:', error);
+      console.error('🏠 ❌ Error type:', typeof error);
+      console.error('🏠 ❌ Error constructor:', error?.constructor?.name);
       throw error;
     }
   },
