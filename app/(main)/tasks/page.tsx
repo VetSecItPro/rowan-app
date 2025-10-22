@@ -11,9 +11,10 @@ import { UnifiedDetailsModal } from '@/components/shared/UnifiedDetailsModal';
 import GuidedTaskCreation from '@/components/guided/GuidedTaskCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { tasksService } from '@/lib/services/tasks-service';
-import { choresService, Chore, CreateChoreInput } from '@/lib/services/chores-service';
+import { choresService, CreateChoreInput } from '@/lib/services/chores-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
-import { Task, CreateTaskInput } from '@/lib/types';
+import { Task, Chore } from '@/lib/types';
+import type { CreateTaskInput, UpdateTaskInput } from '@/lib/validations/task-schemas';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { useTaskRealtime } from '@/hooks/useTaskRealtime';
 import { TaskFilterPanel, TaskFilters } from '@/components/tasks/TaskFilterPanel';
@@ -36,6 +37,7 @@ export default function TasksPage() {
   // Basic state
   const [chores, setChores] = useState<Chore[]>([]);
   const [loading, setLoading] = useState(true);
+  const [choreLoading, setChoreLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -209,69 +211,127 @@ export default function TasksPage() {
       if (editingItem) {
         // Update existing item
         if (editingItem.type === 'task') {
-          await tasksService.updateTask(editingItem.id, itemData as CreateTaskInput);
+          await tasksService.updateTask(editingItem.id, itemData as UpdateTaskInput);
         } else {
           await choresService.updateChore(editingItem.id, itemData as CreateChoreInput);
         }
+        // Real-time subscription will handle the update
       } else {
-        // Create new item based on current modal type
+        // Create new item with optimistic updates
         if (modalDefaultType === 'task') {
-          await tasksService.createTask(itemData as CreateTaskInput);
+          // Optimistic update - add to UI immediately
+          const taskData = itemData as CreateTaskInput;
+          const optimisticTask: Task = {
+            id: `temp-${Date.now()}`, // Temporary ID
+            title: taskData.title,
+            status: taskData.status || 'pending',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            space_id: taskData.space_id,
+            assigned_to: taskData.assigned_to || undefined,
+            description: taskData.description || undefined,
+            category: (taskData as any).category || undefined,
+            due_date: taskData.due_date || undefined,
+            tags: (taskData as any).tags,
+            estimated_hours: (taskData as any).estimated_hours,
+            priority: taskData.priority || 'medium',
+            calendar_sync: (taskData as any).calendar_sync || false,
+            quick_note: (taskData as any).quick_note,
+            created_by: (taskData as any).created_by || user?.id || '',
+            sort_order: Date.now(), // Use timestamp for unique sort order
+          };
+
+          setTasks(prev => [optimisticTask, ...prev]);
+
+          try {
+            // Create task on server
+            await tasksService.createTask(itemData as CreateTaskInput);
+            // Real-time subscription will replace the optimistic task with the real one
+          } catch (error) {
+            // Revert optimistic update on error
+            setTasks(prev => prev.filter(task => task.id !== optimisticTask.id));
+            throw error;
+          }
         } else {
-          await choresService.createChore(itemData as CreateChoreInput);
+          // For chores, use simple reliable approach
+          setChoreLoading(true);
+
+          try {
+            // Create chore on server
+            await choresService.createChore(itemData as CreateChoreInput);
+
+            // Reload chores data reliably
+            if (currentSpace?.id) {
+              const choresData = await choresService.getChores(currentSpace.id);
+              setChores(choresData);
+            }
+          } catch (error) {
+            console.error('Failed to create chore:', error);
+            throw error;
+          } finally {
+            setChoreLoading(false);
+          }
         }
       }
-      loadData();
       setEditingItem(null);
     } catch (error) {
       console.error('Failed to save item:', error);
     }
-  }, [editingItem, modalDefaultType, loadData]);
+  }, [editingItem, modalDefaultType, setTasks, setChores, user, currentSpace]);
 
   const handleStatusChange = useCallback(async (itemId: string, status: string, type?: 'task' | 'chore') => {
     try {
       if (type === 'chore') {
+        setChoreLoading(true);
         // When marking chore as completed, set completed_at timestamp
         const updateData: any = { status };
         if (status === 'completed') {
           updateData.completed_at = new Date().toISOString();
         }
         await choresService.updateChore(itemId, updateData);
+
+        // Reload chores reliably
+        if (currentSpace?.id) {
+          const choresData = await choresService.getChores(currentSpace.id);
+          setChores(choresData);
+        }
+        setChoreLoading(false);
       } else {
         await tasksService.updateTask(itemId, { status });
       }
-      loadData();
     } catch (error) {
       console.error('Failed to update item status:', error);
+      setChoreLoading(false);
     }
-  }, [loadData]);
+  }, [currentSpace]);
 
   const handleDeleteItem = useCallback(async (itemId: string, type?: 'task' | 'chore') => {
-    // Optimistic update - remove from UI immediately
-    if (type === 'chore') {
-      setChores(prev => prev.filter(chore => chore.id !== itemId));
-    } else {
-      setTasks(prev => prev.filter(task => task.id !== itemId));
-    }
-
     try {
       if (type === 'chore') {
+        setChoreLoading(true);
         await choresService.deleteChore(itemId);
+
+        // Reload chores reliably
+        if (currentSpace?.id) {
+          const choresData = await choresService.getChores(currentSpace.id);
+          setChores(choresData);
+        }
+        setChoreLoading(false);
       } else {
+        // Optimistic update for tasks (real-time will handle the actual removal)
+        setTasks(prev => prev.filter(task => task.id !== itemId));
         await tasksService.deleteTask(itemId);
       }
-      // Real-time subscription will handle the actual removal,
-      // but optimistic update already did it
     } catch (error) {
       console.error(`Failed to delete ${type || 'task'}:`, error);
-      // Revert optimistic update on error
       if (type === 'chore') {
-        loadData(); // Reload to restore the chore
+        setChoreLoading(false);
       } else {
-        loadData(); // Reload to restore the task
+        // Reload tasks to restore on error
+        refreshTasks();
       }
     }
-  }, [setTasks, setChores, loadData]);
+  }, [setTasks, setChores, currentSpace, refreshTasks]);
 
   const handleEditItem = useCallback((item: TaskOrChore) => {
     setEditingItem({...item, type: item.type} as (Task & {type: 'task'}) | (Chore & {type: 'chore'}));
@@ -340,7 +400,6 @@ export default function TasksPage() {
     switch (action) {
       case 'repeat':
         // Recurring functionality is now integrated into UnifiedItemModal
-        setActiveTab('task');
         handleOpenModal('task');
         break;
       default:
@@ -385,10 +444,15 @@ export default function TasksPage() {
                 </button>
                 <button
                   onClick={() => handleOpenModal('chore')}
-                  className="px-3 sm:px-4 py-2 sm:py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center justify-center gap-2"
+                  disabled={choreLoading}
+                  className="px-3 sm:px-4 py-2 sm:py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Home className="w-4 h-4" />
-                  <span className="text-sm">New Chore</span>
+                  {choreLoading ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Home className="w-4 h-4" />
+                  )}
+                  <span className="text-sm">{choreLoading ? 'Creating...' : 'New Chore'}</span>
                 </button>
               </div>
             </div>
@@ -546,12 +610,12 @@ export default function TasksPage() {
                   <div>
                     {/* Mobile: Dropdown Select */}
                     <div className="relative">
-                      <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400 pointer-events-none" />
+                      <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400 pointer-events-none z-10" />
                       <select
                         id="status-filter-tasks-mobile"
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="w-full max-w-xs pl-10 pr-12 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white font-medium appearance-none cursor-pointer mb-3"
+                        className="w-full max-w-xs pl-10 pr-12 py-2.5 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white font-medium appearance-none cursor-pointer mb-3 flex items-center"
                         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1.5em 1.5em' }}
                       >
                         <option value="all">All Tasks & Chores</option>
@@ -585,7 +649,7 @@ export default function TasksPage() {
                   </div>
                 </div>
 
-                {loading || realtimeLoading ? (
+                {loading || realtimeLoading || choreLoading ? (
                   <div className="space-y-4">
                     {[...Array(6)].map((_, i) => (
                       <div key={i} className="bg-white dark:bg-gray-700 rounded-xl p-6 shadow-lg animate-pulse">
@@ -634,8 +698,8 @@ export default function TasksPage() {
                       </div>
                     )}
                   </div>
-                ) : enableDragDrop && currentSpace ? (
-                  /* Drag-and-drop for tasks */
+                ) : enableDragDrop && currentSpace && filteredItems.some(item => item.type === 'task') ? (
+                  /* Drag-and-drop for tasks (only if there are tasks) */
                   <DraggableTaskList
                     spaceId={currentSpace.id}
                     initialTasks={filteredItems.filter(item => item.type === 'task') as any}

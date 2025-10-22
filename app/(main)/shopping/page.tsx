@@ -169,44 +169,66 @@ export default function ShoppingPage() {
             }
           }
         }
+        // Real-time subscription will handle the update
       } else {
         // Extract items before creating the list
         const { items, ...listDataOnly } = listData;
 
-        console.log('Creating list with data:', listDataOnly);
-        const newList = await shoppingService.createList(listDataOnly);
-        console.log('List created:', newList);
+        // Optimistic update - add to UI immediately
+        const optimisticList: ShoppingList = {
+          id: `temp-${Date.now()}`, // Temporary ID
+          title: listDataOnly.title,
+          status: listDataOnly.status || 'active',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          space_id: listDataOnly.space_id,
+          description: listDataOnly.description || undefined,
+          store_name: (listDataOnly as any).store_name || undefined,
+          budget: (listDataOnly as any).budget || undefined,
+          // items_count property doesn't exist in ShoppingList interface, removing
+          // total_amount property doesn't exist in ShoppingList interface, removing
+          completed_at: undefined,
+        };
 
-        // Add items if provided
-        if (items && items.length > 0) {
-          console.log('Adding items:', items);
-          for (const item of items) {
-            const createdItem = await shoppingService.createItem({
-              list_id: newList.id,
-              name: item.name,
-              quantity: item.quantity || 1,
-            } as any);
-            console.log('Item created:', createdItem);
+        setLists(prev => [optimisticList, ...prev]);
 
-            // Update assigned_to if provided
-            if (item.assigned_to) {
-              await shoppingService.updateItem(createdItem.id, { assigned_to: item.assigned_to } as any);
+        try {
+          console.log('Creating list with data:', listDataOnly);
+          const newList = await shoppingService.createList(listDataOnly);
+          console.log('List created:', newList);
+
+          // Add items if provided
+          if (items && items.length > 0) {
+            console.log('Adding items:', items);
+            for (const item of items) {
+              const createdItem = await shoppingService.createItem({
+                list_id: newList.id,
+                name: item.name,
+                quantity: item.quantity || 1,
+              } as any);
+              console.log('Item created:', createdItem);
+
+              // Update assigned_to if provided
+              if (item.assigned_to) {
+                await shoppingService.updateItem(createdItem.id, { assigned_to: item.assigned_to } as any);
+              }
             }
           }
+
+          // Real-time subscription will replace the optimistic list with the real one
+        } catch (error) {
+          // Revert optimistic update on error
+          setLists(prev => prev.filter(list => list.id !== optimisticList.id));
+          throw error;
         }
       }
-
-      // Reload lists immediately after creation
-      console.log('Reloading lists...');
-      await loadLists();
-      console.log('Lists reloaded');
 
       setEditingList(null);
     } catch (error) {
       console.error('Failed to save list:', error);
       alert('Failed to save shopping list. Please try again.');
     }
-  }, [editingList]);
+  }, [editingList, setLists, user]);
 
   // Memoized callback for deleting lists
   const handleDeleteList = useCallback(async (listId: string) => {
@@ -534,7 +556,15 @@ export default function ShoppingPage() {
         title: `Complete shopping: ${list.title}`,
         description: `Shopping list with ${list.items?.length || 0} items${list.store_name ? ` at ${list.store_name}` : ''}`,
         priority: 'medium',
-        status: 'todo',
+        status: 'pending',
+        assigned_to: null,
+        due_date: null,
+        category: 'shopping',
+        calendar_sync: false,
+        quick_note: null,
+        tags: null,
+        estimated_hours: null,
+        created_by: user?.id || '',
       });
 
       // Link the task to the shopping list

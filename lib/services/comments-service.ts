@@ -63,6 +63,12 @@ export interface CommentReaction {
   created_at: string;
 }
 
+export interface ReactionSummary {
+  emoji: string;
+  count: number;
+  userReacted: boolean;
+}
+
 export interface ActivityLog {
   id: string;
   space_id: string;
