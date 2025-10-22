@@ -50,12 +50,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function trackUserSession() {
     try {
-      console.log('Tracking user session...');
       const response = await fetch('/api/user/track-session', {
         method: 'POST',
       });
       const result = await response.json();
-      console.log('Session tracking response:', result);
     } catch (error) {
       console.error('Error tracking session:', error);
     }
@@ -90,12 +88,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
+    let hasLoadedInitialData = false;
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session?.user) {
         loadUserProfile(session.user.id);
         loadUserSpace(session.user.id);
+        hasLoadedInitialData = true;
 
         // Track session for existing logged-in users
         trackUserSession().catch(err => {
@@ -108,20 +109,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
-      if (session?.user) {
-        loadUserProfile(session.user.id);
-        loadUserSpace(session.user.id);
 
-        // Track session on sign in
+      if (session?.user) {
+        // Load user data if we don't have it or if user ID changed
+        if (!hasLoadedInitialData || !user || user.id !== session.user.id) {
+          loadUserProfile(session.user.id);
+          loadUserSpace(session.user.id);
+          hasLoadedInitialData = true;
+        }
+
+        // Track session on actual sign-in events
         if (event === 'SIGNED_IN') {
           trackUserSession().catch(err => {
             console.error('Failed to track session:', err);
             // Don't block login if session tracking fails
           });
         }
-      } else {
+        // TOKEN_REFRESHED and other events: keep existing data, don't track
+      } else if (event === 'SIGNED_OUT') {
         setUser(null);
         setCurrentSpace(null);
+        hasLoadedInitialData = false;
       }
       setLoading(false);
     });
@@ -191,26 +199,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, profile: ProfileData) => {
     try {
-      // Create auth user with profile data in metadata (handled by database trigger)
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : 'https://rowan-app.vercel.app/dashboard',
-          data: {
-            name: profile.name,
-            pronouns: profile.pronouns,
-            color_theme: profile.color_theme || 'emerald',
-            space_name: profile.space_name,
+      // Call secure, rate-limited signup API
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          profile: {
+            ...profile,
+            color_theme: profile.color_theme || 'purple',
           },
-        }
+        }),
       });
 
-      if (error) return { error };
-      if (!data.user) return { error: new Error('User creation failed') };
+      const result = await response.json();
+
+      if (!response.ok) {
+        // Handle specific error cases
+        if (response.status === 429) {
+          return { error: new Error(result.error || 'Too many signup attempts. Please try again later.') };
+        }
+        return { error: new Error(result.error || 'Signup failed') };
+      }
 
       // Database trigger handles profile and space creation automatically
-      // No need to manually create anything or wait
       return { error: null };
     } catch (error) {
       console.error('Sign up error:', error);
@@ -220,14 +235,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      // Call secure, rate-limited signin API
+      const response = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
 
-      if (error) {
-        // Provide user-friendly error messages
-        if (error.message.includes('Invalid login credentials')) {
+      const result = await response.json();
+
+      if (!response.ok) {
+        // Handle specific error cases
+        if (response.status === 429) {
+          return { error: new Error(result.error || 'Too many signin attempts. Please try again later.') };
+        }
+        if (response.status === 401) {
           return { error: new Error('Invalid email or password') };
         }
-        return { error };
+        return { error: new Error(result.error || 'Signin failed') };
       }
 
       return { error: null };
@@ -239,11 +269,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
+      // Call secure, rate-limited signout API
+      const response = await fetch('/api/auth/signout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      // Clear local state regardless of API response (for better UX)
       setSpaces([]);
       setCurrentSpace(null);
+
+      if (!response.ok) {
+        const result = await response.json();
+        console.warn('Signout API warning:', result.error);
+        // Don't throw error - user is effectively signed out locally
+      }
     } catch (error) {
       console.error('Sign out error:', error);
+      // Clear local state even if API call fails
+      setSpaces([]);
+      setCurrentSpace(null);
     }
   };
 

@@ -95,17 +95,6 @@ export async function POST(request: Request) {
     }
 
     // Create new session
-    console.log('Creating new session with data:', {
-      user_id: user.id,
-      session_token: sessionToken,
-      device_type: deviceInfo.device_type,
-      browser: deviceInfo.browser,
-      device_name: deviceInfo.device_name,
-      ip_address: locationInfo.ip_address,
-      city: locationInfo.city,
-      country: locationInfo.country,
-    });
-
     const { data: newSession, error: insertError } = await supabase
       .from('user_sessions')
       .insert({
