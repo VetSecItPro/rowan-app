@@ -138,48 +138,22 @@ export const choresService = {
    * @returns Promise<Chore> - Created chore
    */
   async createChore(data: CreateChoreInput): Promise<Chore> {
-    console.log('=== ENHANCED DEBUG LOGGING - PHASE 1.3 ===');
-    console.log('🏠 choresService.createChore called with data:', JSON.stringify(data, null, 2));
-    console.log('🏠 Validating input data...');
-    console.log('🏠 space_id:', data.space_id);
-    console.log('🏠 title:', data.title);
-    console.log('🏠 created_by:', data.created_by);
-    console.log('🏠 status:', data.status);
-    console.log('🏠 frequency:', data.frequency);
-
     const supabase = createClient();
-    console.log('🏠 Supabase client created successfully');
 
     try {
-      console.log('🏠 About to call supabase.from("chores").insert()...');
-
       const { data: chore, error } = await supabase
         .from('chores')
         .insert(data)
         .select()
         .single();
 
-      console.log('🏠 Supabase insert completed');
-      console.log('🏠 Supabase response - error:', error);
-      console.log('🏠 Supabase response - data:', chore);
-
       if (error) {
-        console.error('🏠 ❌ Supabase error details:', {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
-        });
         throw new Error(`Failed to create chore: ${error.message}`);
       }
 
-      console.log('🏠 ✅ Chore created successfully:', JSON.stringify(chore, null, 2));
-      console.log('🏠 Returning created chore to caller');
       return chore;
     } catch (error) {
-      console.error('🏠 ❌ Error in createChore:', error);
-      console.error('🏠 ❌ Error type:', typeof error);
-      console.error('🏠 ❌ Error constructor:', error?.constructor?.name);
+      console.error('Error in createChore:', error);
       throw error;
     }
   },

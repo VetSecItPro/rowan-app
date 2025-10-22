@@ -88,7 +88,6 @@ export async function POST(request: Request) {
       .select()
       .single();
 
-    console.log('Session creation result:', { newSession: sessionResult, insertError: sessionError });
 
     if (sessionError) {
       logger.error('[API] Session tracking creation error', sessionError, {
