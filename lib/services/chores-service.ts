@@ -1,23 +1,8 @@
 import { createClient } from '@/lib/supabase/client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import type { Chore } from '@/lib/types';
 
-// Chore Types
-export interface Chore {
-  id: string;
-  space_id: string;
-  title: string;
-  description?: string;
-  frequency: 'daily' | 'weekly' | 'monthly' | 'once';
-  assigned_to?: string;
-  status: 'pending' | 'completed' | 'skipped';
-  due_date?: string;
-  completed_at?: string;
-  completion_percentage?: number;
-  notes?: string;
-  created_by: string;
-  created_at: string;
-  updated_at: string;
-}
+// Chore Types - using main types file interface
 
 export interface CreateChoreInput {
   space_id: string;
@@ -27,6 +12,7 @@ export interface CreateChoreInput {
   assigned_to?: string;
   status?: 'pending' | 'completed' | 'skipped';
   due_date?: string;
+  created_by: string; // Required field that was missing!
 }
 
 export interface UpdateChoreInput {
@@ -65,6 +51,7 @@ export const choresService = {
    */
   async getChores(spaceId: string): Promise<Chore[]> {
     const supabase = createClient();
+
     try {
       const { data, error } = await supabase
         .from('chores')
@@ -73,12 +60,13 @@ export const choresService = {
         .order('created_at', { ascending: false });
 
       if (error) {
+        console.error('❌ getChores Supabase error:', error);
         throw new Error(`Failed to fetch chores: ${error.message}`);
       }
 
       return data || [];
     } catch (error) {
-      console.error('Error in getChores:', error);
+      console.error('❌ Error in getChores:', error);
       throw error;
     }
   },
@@ -120,6 +108,7 @@ export const choresService = {
    */
   async createChore(data: CreateChoreInput): Promise<Chore> {
     const supabase = createClient();
+
     try {
       const { data: chore, error } = await supabase
         .from('chores')
@@ -128,12 +117,13 @@ export const choresService = {
         .single();
 
       if (error) {
+        console.error('❌ Supabase error:', error);
         throw new Error(`Failed to create chore: ${error.message}`);
       }
 
       return chore;
     } catch (error) {
-      console.error('Error in createChore:', error);
+      console.error('❌ Error in createChore:', error);
       throw error;
     }
   },

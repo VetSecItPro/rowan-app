@@ -316,7 +316,7 @@ async function collectUserData(supabase: any, userId: string, includeData: any =
         .from('space_members')
         .select('spaces(*)')
         .eq('user_id', userId);
-      data.spaces = spaces?.map(sm => sm.spaces) || [];
+      data.spaces = spaces?.map((sm: any) => sm.spaces) || [];
     }
 
     // Reminders
@@ -493,6 +493,11 @@ async function sendExportReadyEmail(
     const userName = profile.full_name || 'User';
     const fileSizeFormatted = (fileSize / 1024 / 1024).toFixed(2) + ' MB';
     const expirationDate = new Date(expiresAt).toLocaleDateString();
+
+    if (!resend) {
+      console.error('Resend API key not configured');
+      throw new Error('Email service not available');
+    }
 
     await resend.emails.send({
       from: 'Rowan <noreply@rowan.app>',

@@ -3,21 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { RealtimeChannel } from '@supabase/supabase-js';
-
-interface Task {
-  id: string;
-  title: string;
-  description?: string;
-  status: string;
-  priority: string;
-  sort_order: number;
-  due_date?: string;
-  assigned_to?: string;
-  space_id: string;
-  created_at: string;
-  updated_at: string;
-  completed_at?: string;
-}
+import type { Task } from '@/lib/types';
 
 interface UseTaskRealtimeOptions {
   spaceId: string;

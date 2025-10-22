@@ -197,6 +197,20 @@ export async function getLocationFromIP(ip: string): Promise<LocationInfo> {
     };
   }
 
+  // In development mode, return mock data to avoid rate limiting
+  if (process.env.NODE_ENV === 'development' && ip === '8.8.8.8') {
+    console.log('getLocationFromIP: returning mock data for development');
+    return {
+      ip_address: ip,
+      city: 'Mountain View',
+      region: 'California',
+      country: 'United States',
+      country_code: 'US',
+      latitude: 37.4056,
+      longitude: -122.0775,
+    };
+  }
+
   // Check cache first
   const cached = locationCache.get(ip);
   if (cached && cached.expires > Date.now()) {

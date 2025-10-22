@@ -44,40 +44,30 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
   const statusColor = statusColors[task.status as keyof typeof statusColors] || 'bg-gray-500';
 
   // Handle status rotation
-  // Tasks: pending → in_progress → completed → pending
-  // Chores: pending → completed → pending
+  // Both Tasks & Chores: pending → in_progress → completed → pending
   const handleStatusClick = () => {
     let newStatus = 'pending';
 
-    if (task.type === 'chore') {
-      // Chores only have: pending, completed, skipped
-      if (task.status === 'pending') {
-        newStatus = 'completed';
-      } else if (task.status === 'completed') {
-        newStatus = 'pending';
-      }
-    } else {
-      // Tasks have: pending, in_progress, completed, cancelled
-      if (task.status === 'pending') {
-        newStatus = 'in_progress';
-      } else if (task.status === 'in_progress') {
-        newStatus = 'completed';
-      } else if (task.status === 'completed') {
-        newStatus = 'pending';
-      }
+    // Same cycling for both tasks and chores
+    if (task.status === 'pending') {
+      newStatus = 'in_progress';
+    } else if (task.status === 'in_progress') {
+      newStatus = 'completed';
+    } else if (task.status === 'completed') {
+      newStatus = 'pending';
     }
 
     onStatusChange(task.id, newStatus, task.type);
   };
 
-  // Get checkbox styling based on status - simplified
+  // Get checkbox styling based on status with better colors
   const getCheckboxStyle = () => {
     if (task.status === 'completed') {
-      return 'bg-green-500 border border-green-500';
+      return 'bg-green-500 border-2 border-green-500 hover:bg-green-600';
     } else if (task.status === 'in_progress') {
-      return 'bg-blue-500 border border-blue-500';
+      return 'bg-amber-500 border-2 border-amber-500 hover:bg-amber-600';
     } else {
-      return 'border border-gray-300 dark:border-gray-600 bg-transparent';
+      return 'border-2 border-gray-300 dark:border-gray-600 bg-transparent hover:border-amber-400 dark:hover:border-amber-400';
     }
   };
 
@@ -86,20 +76,20 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
     if (task.status === 'completed') {
       return { text: 'Completed', color: 'text-green-600 dark:text-green-400' };
     } else if (task.status === 'in_progress') {
-      return { text: 'Pending', color: 'text-amber-600 dark:text-amber-400' };
+      return { text: 'In Progress', color: 'text-amber-600 dark:text-amber-400' };
     } else {
-      return { text: 'Not Started', color: 'text-red-600 dark:text-red-400' };
+      return { text: 'Pending', color: 'text-gray-600 dark:text-gray-400' };
     }
   };
 
   // Get tooltip text for next status
   const getStatusTooltip = () => {
     if (task.status === 'pending') {
-      return 'Click for Pending';
+      return 'Click to start (In Progress)';
     } else if (task.status === 'in_progress') {
-      return 'Click for Completed';
+      return 'Click to complete';
     } else if (task.status === 'completed') {
-      return 'Click to reset';
+      return 'Click to reset to pending';
     }
     return 'Click to update status';
   };
@@ -120,6 +110,9 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
           >
             {task.status === 'completed' && (
               <CheckSquare className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
+            )}
+            {task.status === 'in_progress' && (
+              <Clock className="w-3 h-3 text-white" />
             )}
           </button>
 
