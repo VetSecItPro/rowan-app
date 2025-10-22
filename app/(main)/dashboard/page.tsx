@@ -1002,16 +1002,7 @@ export default function DashboardPage() {
             userName={user?.name}
             currentDate={currentDate}
           >
-            {currentSpace ? (
-              <SpaceSelector
-                spaces={spaces}
-                currentSpace={currentSpace}
-                onSpaceChange={switchSpace}
-                onCreateSpace={() => setShowCreateSpaceModal(true)}
-                onInvitePartner={() => setShowInviteModal(true)}
-                userColorTheme={user?.color_theme}
-              />
-            ) : (
+            {!currentSpace && (
               <CTAButton
                 onClick={() => setShowCreateSpaceModal(true)}
                 feature="dashboard"
