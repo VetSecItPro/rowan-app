@@ -120,7 +120,7 @@ export async function middleware(req: NextRequest) {
     'Content-Security-Policy',
     "default-src 'self'; " +
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://vercel.live; " +
-    "style-src 'self' 'unsafe-inline'; " +
+    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
     "img-src 'self' data: https: blob:; " +
     "font-src 'self' data: https:; " +
     "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live; " +
