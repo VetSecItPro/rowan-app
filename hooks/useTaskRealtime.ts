@@ -29,6 +29,14 @@ export function useTaskRealtime({
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    // Guard against invalid spaceId to prevent empty query parameters
+    if (!spaceId || spaceId.trim() === '' || spaceId === 'undefined' || spaceId === 'null') {
+      setTasks([]);
+      setLoading(false);
+      setError(new Error('Invalid space ID provided'));
+      return;
+    }
+
     const supabase = createClient();
     let channel: RealtimeChannel;
     let accessCheckInterval: NodeJS.Timeout;
