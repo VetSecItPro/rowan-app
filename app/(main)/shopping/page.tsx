@@ -193,20 +193,16 @@ export default function ShoppingPage() {
         setLists(prev => [optimisticList, ...prev]);
 
         try {
-          console.log('Creating list with data:', listDataOnly);
           const newList = await shoppingService.createList(listDataOnly);
-          console.log('List created:', newList);
 
           // Add items if provided
           if (items && items.length > 0) {
-            console.log('Adding items:', items);
             for (const item of items) {
               const createdItem = await shoppingService.createItem({
                 list_id: newList.id,
                 name: item.name,
                 quantity: item.quantity || 1,
               } as any);
-              console.log('Item created:', createdItem);
 
               // Update assigned_to if provided
               if (item.assigned_to) {
@@ -232,6 +228,12 @@ export default function ShoppingPage() {
 
   // Memoized callback for deleting lists
   const handleDeleteList = useCallback(async (listId: string) => {
+    // Prevent actions on optimistic lists (temp IDs)
+    if (listId.startsWith('temp-')) {
+      alert('Please wait for the list to finish saving before deleting.');
+      return;
+    }
+
     setConfirmDialog({ isOpen: true, listId });
   }, []);
 
@@ -254,6 +256,12 @@ export default function ShoppingPage() {
 
   // Memoized callback for completing lists
   const handleCompleteList = useCallback(async (listId: string) => {
+    // Prevent actions on optimistic lists (temp IDs)
+    if (listId.startsWith('temp-')) {
+      alert('Please wait for the list to finish saving before completing.');
+      return;
+    }
+
     try {
       // Optimistically update list status
       setLists(prevLists =>
@@ -338,6 +346,12 @@ export default function ShoppingPage() {
 
   // Memoized callback for editing lists
   const handleEditList = useCallback((list: ShoppingList) => {
+    // Prevent actions on optimistic lists (temp IDs)
+    if (list.id.startsWith('temp-')) {
+      alert('Please wait for the list to finish saving before editing.');
+      return;
+    }
+
     setEditingList(list);
     setIsModalOpen(true);
   }, []);
@@ -437,6 +451,12 @@ export default function ShoppingPage() {
   }, [user]);
 
   const handleSaveAsTemplate = useCallback((list: ShoppingList) => {
+    // Prevent actions on optimistic lists (temp IDs)
+    if (list.id.startsWith('temp-')) {
+      alert('Please wait for the list to finish saving before creating a template.');
+      return;
+    }
+
     setListForTemplate(list);
     setShowTemplateModal(true);
   }, []);
@@ -467,6 +487,12 @@ export default function ShoppingPage() {
   }, [currentSpace, listForTemplate]);
 
   const handleScheduleTrip = useCallback((list: ShoppingList) => {
+    // Prevent actions on optimistic lists (temp IDs)
+    if (list.id.startsWith('temp-')) {
+      alert('Please wait for the list to finish saving before scheduling a trip.');
+      return;
+    }
+
     setListToSchedule(list);
     setShowScheduleTripModal(true);
   }, []);
@@ -546,6 +572,12 @@ export default function ShoppingPage() {
 
   const handleCreateTask = useCallback(async (list: ShoppingList) => {
     if (!currentSpace) return;
+
+    // Prevent actions on optimistic lists (temp IDs)
+    if (list.id.startsWith('temp-')) {
+      alert('Please wait for the list to finish saving before creating a task.');
+      return;
+    }
 
     try {
       // Create a task linked to the shopping list

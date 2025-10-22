@@ -162,17 +162,9 @@ export function UnifiedItemModal({
   };
 
   const handleSubmit = async () => {
-    console.log('=== CHORE CREATION DEBUG ===');
-    console.log('Title:', formData.title);
-    console.log('Title trimmed:', formData.title.trim());
-    console.log('Title check passed:', !!formData.title.trim());
-
     if (!formData.title.trim()) {
-      console.log('❌ FAILED: Empty title - handleSubmit returning early');
       return;
     }
-
-    console.log('✅ Title validation passed, continuing...');
 
     try {
       // Validate due date
@@ -214,21 +206,8 @@ export function UnifiedItemModal({
         // Don't send: calendar_sync, category, tags, estimated_hours, quick_note, priority
       };
 
-      console.log('=== ENHANCED DEBUG LOGGING - PHASE 1.1 ===');
-      console.log('🎯 Item type:', itemType);
-      console.log('📝 Submission data:', JSON.stringify(submissionData, null, 2));
-      console.log('👤 Family assignment:', familyAssignment);
-      console.log('👤 User ID:', userId);
-      console.log('🏠 Space ID:', spaceId);
-      console.log('🔧 Mode:', mode);
-      console.log('📦 Edit Item:', editItem ? 'Editing existing' : 'Creating new');
-      console.log('📋 Original form data:', JSON.stringify(formData, null, 2));
-      console.log('💾 About to call onSave function...');
-      console.log('💾 onSave function type:', typeof onSave);
-
       // Handle recurring tasks
       if (itemType === 'task' && isRecurring && userId) {
-        console.log('🔄 Creating recurring task...');
         await taskRecurrenceService.createRecurringTask({
           space_id: submissionData.space_id,
           title: submissionData.title,
