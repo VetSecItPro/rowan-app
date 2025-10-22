@@ -77,7 +77,7 @@ export default function TasksPage() {
 
   // Real-time tasks with filters (always enabled now) - exclude chore-specific fields
   const { tasks: realtimeTasks, loading: realtimeLoading, refreshTasks, setTasks } = useTaskRealtime({
-    spaceId: currentSpace?.id || '',
+    spaceId: currentSpace?.id || 'placeholder',
     filters: {
       status: filters.status,
       priority: filters.priority,
@@ -91,7 +91,7 @@ export default function TasksPage() {
 
   // Real-time chores with enhanced filters
   const { chores: realtimeChores, loading: choreRealtimeLoading, refreshChores, setChores } = useChoreRealtime({
-    spaceId: currentSpace?.id || '',
+    spaceId: currentSpace?.id || 'placeholder',
     filters: {
       status: filters.status,
       frequency: filters.frequency, // Add frequency filter for chores
