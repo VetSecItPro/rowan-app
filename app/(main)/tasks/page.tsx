@@ -5,7 +5,7 @@ import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, Home, Filt
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { TaskCard } from '@/components/tasks/TaskCard';
-import { DraggableTaskList } from '@/components/tasks/DraggableTaskList';
+import { DraggableItemList } from '@/components/tasks/DraggableItemList';
 import { UnifiedItemModal } from '@/components/shared/UnifiedItemModal';
 import { UnifiedDetailsModal } from '@/components/shared/UnifiedDetailsModal';
 import GuidedTaskCreation from '@/components/guided/GuidedTaskCreation';
@@ -17,6 +17,7 @@ import { Task, Chore } from '@/lib/types';
 import type { CreateTaskInput, UpdateTaskInput } from '@/lib/validations/task-schemas';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { useTaskRealtime } from '@/hooks/useTaskRealtime';
+import { useChoreRealtime } from '@/hooks/useChoreRealtime';
 import { TaskFilterPanel, TaskFilters } from '@/components/tasks/TaskFilterPanel';
 import { BulkActionsBar } from '@/components/tasks/BulkActionsBar';
 import { TemplatePickerModal } from '@/components/tasks/TemplatePickerModal';
@@ -35,9 +36,15 @@ export default function TasksPage() {
   const { currentSpace, user } = useAuth();
 
   // Basic state
-  const [chores, setChores] = useState<Chore[]>([]);
   const [loading, setLoading] = useState(true);
   const [choreLoading, setChoreLoading] = useState(false);
+
+  // Individual item loading states
+  const [itemLoadingStates, setItemLoadingStates] = useState<Record<string, {
+    updating?: boolean;
+    deleting?: boolean;
+    statusChanging?: boolean;
+  }>>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -77,48 +84,110 @@ export default function TasksPage() {
     onTaskDeleted: (taskId) => console.log('Task deleted:', taskId),
   });
 
-  // Always use realtime tasks
+  // Real-time chores with enhanced filters
+  const { chores: realtimeChores, loading: choreRealtimeLoading, refreshChores, setChores } = useChoreRealtime({
+    spaceId: currentSpace?.id || '',
+    filters: {
+      status: filters.status,
+      frequency: filters.frequency, // Add frequency filter for chores
+      // Map task filters to chore equivalents
+      assignedTo: filters.assignees?.[0], // Take first assignee for simplicity
+      search: filters.search, // Add search filter at hook level
+    },
+    onChoreAdded: (chore) => console.log('Chore added:', chore.title),
+    onChoreUpdated: (chore) => console.log('Chore updated:', chore.title),
+    onChoreDeleted: (choreId) => console.log('Chore deleted:', choreId),
+  });
+
+  // Always use realtime data
   const tasks = realtimeTasks;
+  const chores = realtimeChores;
 
   // Combine tasks and chores for unified display
   const allItems = useMemo((): TaskOrChore[] => {
     const tasksWithType = tasks.map(t => ({ ...t, type: 'task' as const }));
-    const choresWithType = chores.map(c => ({ ...c, type: 'chore' as const }));
+    // Add missing fields for chores to match TaskCard expectations
+    const choresWithType = chores.map((c, index) => ({
+      ...c,
+      type: 'chore' as const,
+      priority: 'medium' as const, // Default priority for chores
+      category: 'household' as const, // Default category for chores
+      sort_order: c.sort_order ?? (1000 + index) // Default sort order for chores
+    }));
     return [...tasksWithType, ...choresWithType];
   }, [tasks, chores]);
 
-  // Memoized stats - calculate from combined items
+  // Memoized stats - calculate from combined items with all status types
   const stats = useMemo(() => ({
     total: allItems.length,
-    completed: allItems.filter(item => item.status === 'completed').length,
-    inProgress: allItems.filter(item => item.status === 'in_progress' || item.status === 'pending').length,
     pending: allItems.filter(item => item.status === 'pending').length,
+    inProgress: allItems.filter(item => item.status === 'in_progress').length,
+    blocked: allItems.filter(item => item.status === 'blocked').length,
+    completed: allItems.filter(item => item.status === 'completed').length,
+    // Active items = everything except completed
+    active: allItems.filter(item => item.status !== 'completed').length,
   }), [allItems]);
 
-  // Memoized filtered items - show all tasks and chores together
+  // Memoized filtered items - show all tasks and chores together with enhanced filtering
   const filteredItems = useMemo(() => {
-    // Start with all items (no tab filtering)
+    // Start with all items
     let filtered = allItems;
 
-    // Hide completed items by default
-    filtered = filtered.filter(item => item.status !== 'completed');
+    // Auto-hide completed items from main view (unless explicitly viewing completed)
+    if (statusFilter !== 'completed') {
+      filtered = filtered.filter(item => item.status !== 'completed');
+    }
 
     // Status filter
     if (statusFilter !== 'all') {
       filtered = filtered.filter(item => item.status === statusFilter);
     }
 
-    // Search filter
+    // Enhanced search filter - includes type-specific fields
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(item =>
-        item.title.toLowerCase().includes(query) ||
-        item.description?.toLowerCase().includes(query)
-      );
+      filtered = filtered.filter(item => {
+        // Common fields for both tasks and chores
+        const matchesCommon =
+          item.title.toLowerCase().includes(query) ||
+          item.description?.toLowerCase().includes(query);
+
+        // Type-specific search enhancements
+        if (item.type === 'chore') {
+          const chore = item as (Chore & { type: 'chore' });
+          const matchesChoreFields =
+            chore.frequency?.toLowerCase().includes(query) ||
+            chore.notes?.toLowerCase().includes(query);
+          return matchesCommon || matchesChoreFields;
+        } else {
+          const task = item as (Task & { type: 'task' });
+          const matchesTaskFields =
+            task.category?.toLowerCase().includes(query) ||
+            task.tags?.toLowerCase().includes(query) ||
+            task.quick_note?.toLowerCase().includes(query);
+          return matchesCommon || matchesTaskFields;
+        }
+      });
+    }
+
+    // Type filter (from advanced filters)
+    if (filters.itemType) {
+      filtered = filtered.filter(item => item.type === filters.itemType);
+    }
+
+    // Frequency filter for chores (from advanced filters)
+    if (filters.frequency) {
+      filtered = filtered.filter(item => {
+        if (item.type === 'chore') {
+          const chore = item as (Chore & { type: 'chore' });
+          return filters.frequency?.includes(chore.frequency) ?? true;
+        }
+        return true; // Tasks don't have frequency, so include them when frequency filter is active
+      });
     }
 
     return filtered;
-  }, [allItems, statusFilter, searchQuery]);
+  }, [allItems, statusFilter, searchQuery, filters]);
 
   // Paginated items for performance with large lists
   const paginatedItems = useMemo(() => {
@@ -152,9 +221,7 @@ export default function TasksPage() {
 
     try {
       setLoading(true);
-      // Fetch chores (tasks are handled by useTaskRealtime hook)
-      const choresData = await choresService.getChores(currentSpace.id);
-      setChores(choresData);
+      // Chores are now handled by useChoreRealtime hook
 
       // Get tasks from realtime hook for shopping list integration
       const tasksData = realtimeTasks;
@@ -184,7 +251,7 @@ export default function TasksPage() {
           // Show guided flow if no tasks exist, user hasn't completed the guide, AND user hasn't skipped it
           if (
             tasksData.length === 0 &&
-            choresData.length === 0 &&
+            chores.length === 0 &&
             !userProgressResult.data.first_task_created &&
             !userProgressResult.data.skipped_task_guide
           ) {
@@ -207,6 +274,13 @@ export default function TasksPage() {
 
   // Unified modal handlers
   const handleSaveItem = useCallback(async (itemData: CreateTaskInput | CreateChoreInput) => {
+    console.log('=== ENHANCED DEBUG LOGGING - PHASE 1.2 ===');
+    console.log('🎯 handleSaveItem called with:', JSON.stringify(itemData, null, 2));
+    console.log('📝 editingItem:', editingItem);
+    console.log('🎛️ modalDefaultType:', modalDefaultType);
+    console.log('🏠 currentSpace:', currentSpace?.id);
+    console.log('👤 user:', user?.id);
+
     try {
       if (editingItem) {
         // Update existing item
@@ -253,69 +327,172 @@ export default function TasksPage() {
             throw error;
           }
         } else {
-          // For chores, use simple reliable approach
-          setChoreLoading(true);
+          // Optimistic update for chores - add to UI immediately
+          const choreData = itemData as CreateChoreInput;
+          const optimisticChore: Chore = {
+            id: `temp-${Date.now()}`, // Temporary ID
+            title: choreData.title,
+            status: choreData.status || 'pending',
+            frequency: choreData.frequency,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            space_id: choreData.space_id,
+            assigned_to: choreData.assigned_to || undefined,
+            description: choreData.description || undefined,
+            due_date: choreData.due_date || undefined,
+            created_by: choreData.created_by,
+            sort_order: Date.now(), // Use timestamp for unique sort order
+          };
+
+          setChores(prev => [optimisticChore, ...prev]);
 
           try {
             // Create chore on server
             await choresService.createChore(itemData as CreateChoreInput);
-
-            // Reload chores data reliably
-            if (currentSpace?.id) {
-              const choresData = await choresService.getChores(currentSpace.id);
-              setChores(choresData);
-            }
+            // Real-time subscription will replace the optimistic chore with the real one
           } catch (error) {
-            console.error('Failed to create chore:', error);
+            // Revert optimistic update on error
+            setChores(prev => prev.filter(chore => chore.id !== optimisticChore.id));
             throw error;
-          } finally {
-            setChoreLoading(false);
           }
         }
       }
       setEditingItem(null);
     } catch (error) {
       console.error('Failed to save item:', error);
+
+      // Enhanced error handling with user-friendly messages
+      let errorMessage = `Failed to ${editingItem ? 'update' : 'create'} ${modalDefaultType}. Please try again.`;
+      if (error instanceof Error) {
+        if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = 'Network error. Check your connection and try again.';
+        } else if (error.message.includes('validation') || error.message.includes('required')) {
+          errorMessage = 'Please check that all required fields are filled correctly.';
+        } else if (error.message.includes('permission') || error.message.includes('access')) {
+          errorMessage = 'You do not have permission to perform this action.';
+        } else if (error.message.includes('duplicate') || error.message.includes('already exists')) {
+          errorMessage = `A ${modalDefaultType} with this name already exists.`;
+        }
+      }
+
+      // TODO: Replace with actual toast notification system
+      console.warn('USER ERROR:', errorMessage);
+
+      // Additional recovery actions
+      if (modalDefaultType === 'chore') {
+        // Reset chore loading state if still set
+        setChoreLoading(false);
+        // Refresh chores to ensure consistency
+        refreshChores();
+      } else {
+        // Refresh tasks to ensure consistency
+        refreshTasks();
+      }
     }
-  }, [editingItem, modalDefaultType, setTasks, setChores, user, currentSpace]);
+  }, [editingItem, modalDefaultType, setTasks, setChores, user, currentSpace, refreshChores, refreshTasks, setChoreLoading]);
 
   const handleStatusChange = useCallback(async (itemId: string, status: string, type?: 'task' | 'chore') => {
+    // Set loading state for this specific item
+    setItemLoadingStates(prev => ({
+      ...prev,
+      [itemId]: { ...prev[itemId], statusChanging: true }
+    }));
+
     try {
       if (type === 'chore') {
-        setChoreLoading(true);
-        // When marking chore as completed, set completed_at timestamp
-        const updateData: any = { status };
-        if (status === 'completed') {
-          updateData.completed_at = new Date().toISOString();
-        }
-        await choresService.updateChore(itemId, updateData);
+        // Optimistic update for chores - update UI immediately
+        setChores(prevChores =>
+          prevChores.map(chore =>
+            chore.id === itemId
+              ? {
+                  ...chore,
+                  status: status as any,
+                  completed_at: status === 'completed' ? new Date().toISOString() : chore.completed_at,
+                  updated_at: new Date().toISOString()
+                }
+              : chore
+          )
+        );
 
-        // Reload chores reliably
-        if (currentSpace?.id) {
-          const choresData = await choresService.getChores(currentSpace.id);
-          setChores(choresData);
+        try {
+          // Update on server
+          const updateData: any = { status };
+          if (status === 'completed') {
+            updateData.completed_at = new Date().toISOString();
+          }
+          await choresService.updateChore(itemId, updateData);
+          // Real-time subscription will handle the final sync
+        } catch (error) {
+          // Revert optimistic update on error - real-time will handle sync
+          refreshChores();
+          throw error;
         }
-        setChoreLoading(false);
       } else {
-        await tasksService.updateTask(itemId, { status });
+        // Optimistic update for tasks - update UI immediately
+        setTasks(prevTasks =>
+          prevTasks.map(task =>
+            task.id === itemId
+              ? {
+                  ...task,
+                  status: status as any,
+                  updated_at: new Date().toISOString()
+                }
+              : task
+          )
+        );
+
+        try {
+          // Update on server
+          await tasksService.updateTask(itemId, { status });
+          // Real-time subscription will handle the final sync
+        } catch (error) {
+          // Revert optimistic update on error
+          refreshTasks();
+          throw error;
+        }
       }
     } catch (error) {
       console.error('Failed to update item status:', error);
-      setChoreLoading(false);
+
+      // Show user-friendly error message based on error type
+      let errorMessage = 'Failed to update status. Please try again.';
+      if (error instanceof Error) {
+        if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = 'Network error. Check your connection and try again.';
+        } else if (error.message.includes('permission') || error.message.includes('access')) {
+          errorMessage = 'You do not have permission to update this item.';
+        }
+      }
+
+      // TODO: Replace with actual toast notification system
+      console.warn('USER ERROR:', errorMessage);
+
+      // Additional recovery for chores
+      if (type === 'chore') {
+        // Force refresh chores on error to ensure consistency
+        refreshChores();
+      }
+    } finally {
+      // Clear loading state for this item
+      setItemLoadingStates(prev => ({
+        ...prev,
+        [itemId]: { ...prev[itemId], statusChanging: false }
+      }));
     }
-  }, [currentSpace]);
+  }, [currentSpace, setTasks, setChores, refreshTasks, refreshChores]);
 
   const handleDeleteItem = useCallback(async (itemId: string, type?: 'task' | 'chore') => {
+    // Set loading state for this specific item
+    setItemLoadingStates(prev => ({
+      ...prev,
+      [itemId]: { ...prev[itemId], deleting: true }
+    }));
+
     try {
       if (type === 'chore') {
         setChoreLoading(true);
         await choresService.deleteChore(itemId);
-
-        // Reload chores reliably
-        if (currentSpace?.id) {
-          const choresData = await choresService.getChores(currentSpace.id);
-          setChores(choresData);
-        }
+        // Real-time subscription will handle the chore removal
         setChoreLoading(false);
       } else {
         // Optimistic update for tasks (real-time will handle the actual removal)
@@ -324,14 +501,38 @@ export default function TasksPage() {
       }
     } catch (error) {
       console.error(`Failed to delete ${type || 'task'}:`, error);
+
+      // Show user-friendly error message
+      let errorMessage = `Failed to delete ${type || 'task'}. Please try again.`;
+      if (error instanceof Error) {
+        if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = 'Network error. Check your connection and try again.';
+        } else if (error.message.includes('permission') || error.message.includes('access')) {
+          errorMessage = `You do not have permission to delete this ${type || 'task'}.`;
+        } else if (error.message.includes('foreign key') || error.message.includes('constraint')) {
+          errorMessage = `Cannot delete ${type || 'task'} because it has dependencies. Please remove related items first.`;
+        }
+      }
+
+      // TODO: Replace with actual toast notification system
+      console.warn('USER ERROR:', errorMessage);
+
       if (type === 'chore') {
         setChoreLoading(false);
+        // Force refresh chores to ensure UI consistency
+        refreshChores();
       } else {
         // Reload tasks to restore on error
         refreshTasks();
       }
+    } finally {
+      // Clear loading state for this item
+      setItemLoadingStates(prev => ({
+        ...prev,
+        [itemId]: { ...prev[itemId], deleting: false }
+      }));
     }
-  }, [setTasks, setChores, currentSpace, refreshTasks]);
+  }, [setTasks, setChores, currentSpace, refreshTasks, refreshChores]);
 
   const handleEditItem = useCallback((item: TaskOrChore) => {
     setEditingItem({...item, type: item.type} as (Task & {type: 'task'}) | (Chore & {type: 'chore'}));
@@ -473,16 +674,16 @@ export default function TasksPage() {
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Pending</h3>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-500 rounded-xl flex items-center justify-center">
                   <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
               <div className="flex items-end justify-between">
                 <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.pending}</p>
                 {stats.pending > 0 && (
-                  <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400">
+                  <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
                     <AlertCircle className="w-3 h-3" />
-                    <span className="text-xs font-medium">Needs attention</span>
+                    <span className="text-xs font-medium">To start</span>
                   </div>
                 )}
               </div>
@@ -492,14 +693,14 @@ export default function TasksPage() {
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">In Progress</h3>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-500 rounded-xl flex items-center justify-center">
                   <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
               <div className="flex items-end justify-between">
                 <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.inProgress}</p>
                 {stats.inProgress > 0 && (
-                  <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                  <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
                     <TrendingUp className="w-3 h-3" />
                     <span className="text-xs font-medium">Active</span>
                   </div>
@@ -698,18 +899,47 @@ export default function TasksPage() {
                       </div>
                     )}
                   </div>
-                ) : enableDragDrop && currentSpace && filteredItems.some(item => item.type === 'task') ? (
-                  /* Drag-and-drop for tasks (only if there are tasks) */
-                  <DraggableTaskList
-                    spaceId={currentSpace.id}
-                    initialTasks={filteredItems.filter(item => item.type === 'task') as any}
-                    onStatusChange={handleStatusChange}
-                    onEdit={handleEditItem as any}
-                    onDelete={handleDeleteItem}
-                    onViewDetails={handleViewDetails as any}
-                  />
+                ) : enableDragDrop && currentSpace ? (
+                  /* Unified drag-and-drop for all items with scrollbar */
+                  <div className="space-y-4">
+                    <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+                      <DraggableItemList
+                        spaceId={currentSpace.id}
+                        initialItems={paginatedItems as any}
+                        onStatusChange={handleStatusChange}
+                        onEdit={handleEditItem as any}
+                        onDelete={handleDeleteItem}
+                        onViewDetails={handleViewDetails as any}
+                      />
+                    </div>
+
+                    {/* Pagination Controls for Drag-and-Drop Mode */}
+                    {hasMoreItems && (
+                      <div className="flex flex-col items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Showing {paginatedItems.length} of {filteredItems.length} items
+                          <span className="ml-1 text-gray-500">({remainingItemsCount} more)</span>
+                        </p>
+                        <div className="flex gap-3">
+                          <button
+                            onClick={handleLoadMore}
+                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center gap-2 font-medium"
+                          >
+                            Load {remainingItemsCount > ITEMS_PER_PAGE ? ITEMS_PER_PAGE : remainingItemsCount} More
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={handleShowAll}
+                            className="px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors inline-flex items-center gap-2 font-medium"
+                          >
+                            Show All ({remainingItemsCount})
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 ) : (
-                  /* Regular list for chores or when drag-drop disabled */
+                  /* Regular list when drag-drop disabled */
                   <div className="space-y-4">
                     <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                       {paginatedItems.map((item) => (
