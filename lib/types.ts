@@ -281,7 +281,7 @@ export interface Chore {
   description?: string;
   frequency: 'daily' | 'weekly' | 'monthly' | 'once';
   assigned_to?: string;
-  status: 'pending' | 'completed' | 'skipped';
+  status: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed';
   due_date?: string;
   completed_at?: string;
   completion_percentage?: number;
@@ -289,6 +289,7 @@ export interface Chore {
   created_by: string;
   created_at: string;
   updated_at: string;
+  sort_order?: number;
 }
 
 export interface ChoreCompletion {
