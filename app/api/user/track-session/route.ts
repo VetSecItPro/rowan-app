@@ -55,76 +55,67 @@ export async function POST(request: Request) {
     const { data: { session } } = await supabase.auth.getSession();
     const sessionToken = session?.access_token || crypto.randomUUID();
 
-    // Check if session already exists
-    const { data: existingSession } = await supabase
-      .from('user_sessions')
-      .select('id')
-      .eq('session_token', sessionToken)
-      .single();
+    // Use upsert to handle race conditions gracefully
+    const sessionData = {
+      user_id: user.id,
+      session_token: sessionToken,
+      device_type: deviceInfo.device_type,
+      browser: deviceInfo.browser,
+      browser_version: deviceInfo.browser_version,
+      os: deviceInfo.os,
+      os_version: deviceInfo.os_version,
+      device_name: deviceInfo.device_name,
+      ip_address: locationInfo.ip_address,
+      city: locationInfo.city,
+      region: locationInfo.region,
+      country: locationInfo.country,
+      country_code: locationInfo.country_code,
+      latitude: locationInfo.latitude,
+      longitude: locationInfo.longitude,
+      is_current: true,
+      user_agent: userAgent,
+      last_active: new Date().toISOString(),
+      expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
+    };
 
-    if (existingSession) {
-      // Update existing session
-      const { error: updateError } = await supabase
+    // Try to insert, if it fails due to duplicate, update instead
+    let sessionResult;
+    let sessionError;
+
+    try {
+      const { data, error } = await supabase
         .from('user_sessions')
-        .update({
-          last_active: new Date().toISOString(),
-          is_current: true,
-        })
-        .eq('id', existingSession.id);
+        .insert(sessionData)
+        .select()
+        .single();
 
-      if (updateError) {
-        logger.error('[API] Session tracking update error', updateError, {
-          component: 'SessionTrackingAPI',
-          action: 'UPDATE',
-          userId: user.id,
-        });
-        return NextResponse.json({ error: 'Failed to update session' }, { status: 500 });
+      sessionResult = data;
+      sessionError = error;
+    } catch (error: any) {
+      // If duplicate key constraint violation, update existing session
+      if (error?.code === '23505' || error?.message?.includes('duplicate key')) {
+        const { data, error: updateError } = await supabase
+          .from('user_sessions')
+          .update({
+            last_active: new Date().toISOString(),
+            is_current: true,
+            ...sessionData // Update with latest data
+          })
+          .eq('session_token', sessionToken)
+          .select()
+          .single();
+
+        sessionResult = data;
+        sessionError = updateError;
+      } else {
+        sessionError = error;
       }
-
-      // Mark all other sessions as not current
-      await supabase
-        .from('user_sessions')
-        .update({ is_current: false })
-        .eq('user_id', user.id)
-        .neq('id', existingSession.id);
-
-      return NextResponse.json({
-        success: true,
-        sessionId: existingSession.id,
-      });
     }
 
-    // Create new session
-    const { data: newSession, error: insertError } = await supabase
-      .from('user_sessions')
-      .insert({
-        user_id: user.id,
-        session_token: sessionToken,
-        device_type: deviceInfo.device_type,
-        browser: deviceInfo.browser,
-        browser_version: deviceInfo.browser_version,
-        os: deviceInfo.os,
-        os_version: deviceInfo.os_version,
-        device_name: deviceInfo.device_name,
-        ip_address: locationInfo.ip_address,
-        city: locationInfo.city,
-        region: locationInfo.region,
-        country: locationInfo.country,
-        country_code: locationInfo.country_code,
-        latitude: locationInfo.latitude,
-        longitude: locationInfo.longitude,
-        is_current: true,
-        user_agent: userAgent,
-        last_active: new Date().toISOString(),
-        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
-      })
-      .select()
-      .single();
+    console.log('Session creation result:', { newSession: sessionResult, insertError: sessionError });
 
-    console.log('Session creation result:', { newSession, insertError });
-
-    if (insertError) {
-      logger.error('[API] Session tracking creation error', insertError, {
+    if (sessionError) {
+      logger.error('[API] Session tracking creation error', sessionError, {
         component: 'SessionTrackingAPI',
         action: 'CREATE',
         userId: user.id,
@@ -137,11 +128,11 @@ export async function POST(request: Request) {
       .from('user_sessions')
       .update({ is_current: false })
       .eq('user_id', user.id)
-      .neq('id', newSession.id);
+      .neq('id', sessionResult.id);
 
     return NextResponse.json({
       success: true,
-      sessionId: newSession.id,
+      sessionId: sessionResult.id,
     });
   } catch (error) {
     Sentry.captureException(error, {
