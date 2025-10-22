@@ -148,20 +148,28 @@ export function TimeAwareWelcomeBox({
       <div className="relative z-10 text-center">
         {/* Animated Greeting */}
         <div className="mb-6">
-          <h1 className={`text-4xl sm:text-5xl lg:text-6xl font-bold text-white ${textGlow} leading-tight`}>
-            <span className="inline-block animate-slide-in-left" style={{ animationDelay: '0.2s' }}>
+          <h1 className={`text-4xl sm:text-5xl lg:text-6xl font-black text-white ${textGlow} leading-none tracking-tight font-serif`}>
+            <span
+              className="inline-block animate-slide-in-left bg-gradient-to-r from-white via-white to-white/90 bg-clip-text text-transparent"
+              style={{
+                animationDelay: '0.2s',
+                textShadow: '0 0 40px rgba(255,255,255,0.3), 0 0 80px rgba(255,255,255,0.1)',
+                fontFamily: '"Playfair Display", "Georgia", serif'
+              }}
+            >
               {greetingText}
             </span>
             {userName && (
               <>
-                <span className="inline-block animate-slide-in-left" style={{ animationDelay: '0.4s' }}>
-                  ,{' '}
-                </span>
                 <span
-                  className="inline-block animate-slide-in-right bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent font-extrabold"
-                  style={{ animationDelay: '0.6s' }}
+                  className="inline-block animate-slide-in-right bg-gradient-to-r from-white via-white/95 to-white/85 bg-clip-text text-transparent font-black"
+                  style={{
+                    animationDelay: '0.6s',
+                    textShadow: '0 0 60px rgba(255,255,255,0.4), 0 0 120px rgba(255,255,255,0.15)',
+                    fontFamily: '"Playfair Display", "Georgia", serif'
+                  }}
                 >
-                  {userName}!
+                  ,{'\u00A0'}{userName}!
                 </span>
               </>
             )}
@@ -289,7 +297,13 @@ export function CompactTimeAwareWelcome({
       </div>
 
       <div className="relative z-10 flex items-center gap-3">
-        <span className="text-white font-semibold drop-shadow-sm">
+        <span
+          className="text-white font-black drop-shadow-lg tracking-tight bg-gradient-to-r from-white via-white to-white/90 bg-clip-text text-transparent font-serif"
+          style={{
+            textShadow: '0 0 30px rgba(255,255,255,0.4), 0 0 60px rgba(255,255,255,0.15)',
+            fontFamily: '"Playfair Display", "Georgia", serif'
+          }}
+        >
           {greetingText}{userName ? `, ${userName}!` : '!'}
         </span>
       </div>
