@@ -338,6 +338,11 @@ async function sendDeletionConfirmationEmail(
   try {
     const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/settings/privacy-data?cancel-deletion=${requestId}`;
 
+    if (!resend) {
+      console.error('Resend API key not configured');
+      throw new Error('Email service not available');
+    }
+
     await resend.emails.send({
       from: 'Rowan <noreply@rowan.app>',
       to: email,
@@ -394,6 +399,11 @@ async function sendDeletionConfirmationEmail(
 
 async function sendDeletionCancellationEmail(email: string, userName: string) {
   try {
+    if (!resend) {
+      console.error('Resend API key not configured');
+      throw new Error('Email service not available');
+    }
+
     await resend.emails.send({
       from: 'Rowan <noreply@rowan.app>',
       to: email,

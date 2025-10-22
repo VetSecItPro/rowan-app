@@ -12,6 +12,7 @@ interface SpaceSelectorProps {
   onCreateSpace: () => void;
   onInvitePartner: () => void;
   userColorTheme?: string;
+  variant?: 'default' | 'header';
 }
 
 export function SpaceSelector({
@@ -21,12 +22,28 @@ export function SpaceSelector({
   onCreateSpace,
   onInvitePartner,
   userColorTheme = 'emerald',
+  variant = 'default',
 }: SpaceSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Get header background color for user's theme
+  const getHeaderBackgroundClass = (theme: string) => {
+    switch (theme) {
+      case 'emerald': return 'bg-emerald-500';
+      case 'blue': return 'bg-blue-500';
+      case 'purple': return 'bg-purple-500';
+      case 'pink': return 'bg-pink-500';
+      case 'orange': return 'bg-orange-500';
+      case 'rose': return 'bg-rose-500';
+      case 'cyan': return 'bg-cyan-500';
+      case 'amber': return 'bg-amber-500';
+      default: return 'bg-purple-600';
+    }
+  };
 
   // Get theme color class for space name
   const getThemeColorClass = (theme: string) => {
@@ -197,10 +214,22 @@ export function SpaceSelector({
 
   // If only one space, just show the name without dropdown
   if (spaces.length === 1 && currentSpace) {
+    const singleSpaceClasses = variant === 'header'
+      ? `flex items-center gap-2 px-3 py-2 rounded-full text-white font-medium ${getHeaderBackgroundClass(userColorTheme)}`
+      : "flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl";
+
+    const iconClasses = variant === 'header'
+      ? "w-4 h-4 text-white/90"
+      : "w-4 h-4 text-gray-600 dark:text-gray-400";
+
+    const textClasses = variant === 'header'
+      ? "text-sm font-medium text-white"
+      : `text-sm font-bold ${getThemeColorClass(userColorTheme)}`;
+
     return (
-      <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
-        <Home className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-        <span className={`text-sm font-bold ${getThemeColorClass(userColorTheme)}`}>
+      <div className={singleSpaceClasses}>
+        <Home className={iconClasses} />
+        <span className={textClasses}>
           {currentSpace.name}
         </span>
       </div>
@@ -213,15 +242,21 @@ export function SpaceSelector({
       <button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
-        className="btn-touch flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95 hover-lift shimmer-emerald active-press hover:shadow-md"
+        className={variant === 'header'
+          ? `flex items-center gap-2 px-3 py-2 rounded-full text-white font-medium transition-all hover:opacity-90 active:scale-95 min-w-[120px] ${getHeaderBackgroundClass(userColorTheme)}`
+          : "btn-touch flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95 hover-lift shimmer-emerald active-press hover:shadow-md"
+        }
       >
-        <Home className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-        <span className={`text-sm font-bold ${currentSpace ? getThemeColorClass(userColorTheme) : 'text-gray-900 dark:text-white'}`}>
+        <Home className={variant === 'header' ? "w-4 h-4 text-white/90" : "w-4 h-4 text-gray-600 dark:text-gray-400"} />
+        <span className={variant === 'header'
+          ? "text-sm font-medium text-white flex-1 text-center"
+          : `text-sm font-bold ${currentSpace ? getThemeColorClass(userColorTheme) : 'text-gray-900 dark:text-white'}`
+        }>
           {currentSpace ? currentSpace.name : 'No Space'}
         </span>
         <ChevronDown
-          className={`w-4 h-4 text-gray-600 dark:text-gray-400 transition-transform ${
-            isOpen ? 'rotate-180' : ''
+          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''} ${
+            variant === 'header' ? 'text-white/90' : 'text-gray-600 dark:text-gray-400'
           }`}
         />
       </button>

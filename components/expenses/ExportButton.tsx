@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Download, FileText, X, Calendar, FileSpreadsheet, FilePdf } from 'lucide-react';
+import { Download, FileText, X, Calendar, FileSpreadsheet, File } from 'lucide-react';
 import { exportService } from '@/lib/services/export-service';
 import { pdfExportService } from '@/lib/services/pdf-export-service';
 
@@ -126,7 +126,7 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                           : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 hover:shadow-md'
                       }`}
                     >
-                      <FilePdf className="w-4 h-4" />
+                      <File className="w-4 h-4" />
                       <span className="font-medium">PDF</span>
                     </button>
                   </div>
