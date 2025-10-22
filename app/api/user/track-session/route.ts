@@ -78,39 +78,15 @@ export async function POST(request: Request) {
       expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
     };
 
-    // Try to insert, if it fails due to duplicate, update instead
-    let sessionResult;
-    let sessionError;
-
-    try {
-      const { data, error } = await supabase
-        .from('user_sessions')
-        .insert(sessionData)
-        .select()
-        .single();
-
-      sessionResult = data;
-      sessionError = error;
-    } catch (error: any) {
-      // If duplicate key constraint violation, update existing session
-      if (error?.code === '23505' || error?.message?.includes('duplicate key')) {
-        const { data, error: updateError } = await supabase
-          .from('user_sessions')
-          .update({
-            last_active: new Date().toISOString(),
-            is_current: true,
-            ...sessionData // Update with latest data
-          })
-          .eq('session_token', sessionToken)
-          .select()
-          .single();
-
-        sessionResult = data;
-        sessionError = updateError;
-      } else {
-        sessionError = error;
-      }
-    }
+    // Use Supabase's upsert functionality to handle race conditions
+    const { data: sessionResult, error: sessionError } = await supabase
+      .from('user_sessions')
+      .upsert(sessionData, {
+        onConflict: 'session_token',
+        ignoreDuplicates: false
+      })
+      .select()
+      .single();
 
     console.log('Session creation result:', { newSession: sessionResult, insertError: sessionError });
 
