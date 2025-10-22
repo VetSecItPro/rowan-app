@@ -209,17 +209,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) return { error };
       if (!data.user) return { error: new Error('User creation failed') };
 
-      // Profile creation is now handled by database trigger
-      // Wait a moment for the trigger to complete
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Space creation is now handled by database trigger if space_name was provided
-      // Load the created spaces/profile
-      if (data.user) {
-        await loadUserProfile(data.user.id);
-        await loadUserSpace(data.user.id);
-      }
-
+      // Database trigger handles profile and space creation automatically
+      // No need to manually create anything or wait
       return { error: null };
     } catch (error) {
       console.error('Sign up error:', error);
