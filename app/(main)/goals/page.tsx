@@ -278,15 +278,47 @@ export default function GoalsPage() {
     try {
       if (editingGoal) {
         await goalsService.updateGoal(editingGoal.id, goalData);
+        // Real-time subscription will handle the update
       } else {
-        await goalsService.createGoal(goalData);
+        // Optimistic update - add to UI immediately
+        const optimisticGoal: Goal = {
+          id: `temp-${Date.now()}`, // Temporary ID
+          title: goalData.title,
+          status: goalData.status || 'active',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          space_id: goalData.space_id,
+          description: goalData.description || undefined,
+          category: goalData.category || undefined,
+          // target_value property doesn't exist in Goal interface, removing
+          // current_value property doesn't exist in Goal interface, removing
+          target_date: goalData.target_date || undefined,
+          priority: (goalData as any).priority || 'medium',
+          progress_percentage: 0,
+          is_public: (goalData as any).is_public || false,
+          check_in_frequency: (goalData as any).check_in_frequency || undefined,
+          last_check_in: undefined,
+          completed_at: undefined,
+          dependencies: [],
+          milestones: [],
+        };
+
+        setGoals(prev => [optimisticGoal, ...prev]);
+
+        try {
+          await goalsService.createGoal(goalData);
+          // Real-time subscription will replace the optimistic goal with the real one
+        } catch (error) {
+          // Revert optimistic update on error
+          setGoals(prev => prev.filter(goal => goal.id !== optimisticGoal.id));
+          throw error;
+        }
       }
-      loadData();
       setEditingGoal(null);
     } catch (error) {
       console.error('Failed to save goal:', error);
     }
-  }, [editingGoal, loadData]);
+  }, [editingGoal, setGoals, user]);
 
   const handleDeleteGoal = useCallback(async (goalId: string) => {
     setConfirmDialog({ isOpen: true, action: 'delete-goal', id: goalId });

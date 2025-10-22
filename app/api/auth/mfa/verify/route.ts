@@ -52,6 +52,7 @@ export async function POST(request: NextRequest) {
       // This is for verifying during enrollment
       const { data, error } = await supabase.auth.mfa.verify({
         factorId,
+        challengeId: '', // Empty challenge ID for enrollment verification
         code,
       });
 

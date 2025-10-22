@@ -3,16 +3,35 @@ import { z } from 'zod';
 // Base task schema
 export const taskBaseSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters').trim(),
-  description: z.string().max(2000, 'Description must be less than 2000 characters').trim().optional().nullable(),
+  description: z.string().max(2000, 'Description must be less than 2000 characters').trim().optional().nullable()
+    .transform(val => val === '' ? null : val),
   space_id: z.string().uuid('Invalid space ID'),
   status: z.enum(['pending', 'in-progress', 'completed', 'blocked', 'on-hold']).default('pending'),
   priority: z.enum(['low', 'medium', 'high', 'urgent']).default('medium'),
-  assigned_to: z.string().uuid('Invalid user ID').optional().nullable(),
-  due_date: z.string().datetime().optional().nullable(),
-  start_date: z.string().datetime().optional().nullable(),
-  estimated_hours: z.number().min(0).max(1000).optional().nullable(),
-  category: z.string().max(100).trim().optional().nullable(),
-  tags: z.array(z.string().max(50).trim()).max(20).optional(),
+  assigned_to: z.string().optional().nullable()
+    .transform(val => val === '' ? null : val)
+    .refine(val => val === null || z.string().uuid().safeParse(val).success, 'Invalid user ID'),
+  due_date: z.string().optional().nullable()
+    .transform(val => val === '' ? null : val)
+    .refine(val => val === null || z.string().datetime().safeParse(val).success, 'Invalid date format'),
+  category: z.string().max(100).trim().optional().nullable()
+    .transform(val => val === '' ? null : val),
+  estimated_hours: z.union([
+    z.number().min(0, 'Estimated hours must be positive').max(999.99, 'Estimated hours must be less than 1000'),
+    z.string().transform(val => {
+      if (val === '' || val === null || val === undefined) return null;
+      const parsed = parseFloat(val);
+      return isNaN(parsed) ? null : parsed;
+    })
+  ]).optional().nullable().refine(
+    val => val === null || val === undefined || (typeof val === 'number' && val >= 0 && val <= 999.99),
+    'Estimated hours must be between 0 and 999.99'
+  ),
+  calendar_sync: z.boolean().optional().default(false),
+  quick_note: z.string().max(500, 'Quick note must be less than 500 characters').trim().optional().nullable()
+    .transform(val => val === '' ? null : val),
+  tags: z.string().max(500, 'Tags must be less than 500 characters').trim().optional().nullable()
+    .transform(val => val === '' ? null : val),
 });
 
 // Create task schema
@@ -57,7 +76,6 @@ export const createRecurringTaskSchema = z.object({
   category: z.string().max(100).trim().optional(),
   priority: z.enum(['low', 'medium', 'high', 'urgent']),
   assigned_to: z.string().uuid().optional().nullable(),
-  estimated_hours: z.number().min(0).max(1000).optional().nullable(),
   created_by: z.string().uuid(),
   recurrence: recurringPatternSchema,
 });
@@ -70,8 +88,6 @@ export const createTemplateSchema = z.object({
   description: z.string().max(2000).trim().optional(),
   category: z.string().max(100).trim().optional(),
   priority: z.enum(['low', 'medium', 'high', 'urgent']),
-  estimated_hours: z.number().min(0).max(1000).optional().nullable(),
-  tags: z.array(z.string().max(50).trim()).max(20).optional(),
   created_by: z.string().uuid(),
   is_favorite: z.boolean().default(false),
 });
@@ -239,6 +255,10 @@ export function validateAndSanitizeTask(data: unknown): z.infer<typeof createTas
     title: sanitizeString(parsed.title),
     description: parsed.description ? sanitizeString(parsed.description) : null,
     category: parsed.category ? sanitizeString(parsed.category) : null,
+    quick_note: parsed.quick_note ? sanitizeString(parsed.quick_note) : null,
+    tags: parsed.tags ? sanitizeString(parsed.tags) : null,
+    estimated_hours: parsed.estimated_hours,
+    calendar_sync: parsed.calendar_sync,
   };
 }
 

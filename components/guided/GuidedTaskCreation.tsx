@@ -50,6 +50,7 @@ export default function GuidedTaskCreation({ onComplete, onSkip }: GuidedTaskCre
         due_date: dueDate || undefined,
         priority,
         status: 'pending',
+        created_by: user.id,
       });
 
       // Mark this guided flow as complete

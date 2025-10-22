@@ -1149,7 +1149,7 @@ export default function SettingsPage() {
                 )}
 
                 {/* Data & Storage Tab - DISABLED: Consolidated into Privacy & Data tab */}
-                {false && activeTab === 'data' && (
+                {false && (
                   <div className="space-y-6 sm:space-y-8">
                     <div>
                       <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Data & Storage</h2>
