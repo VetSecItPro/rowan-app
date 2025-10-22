@@ -78,7 +78,7 @@ export function useChoreRealtime({
           .from('chores')
           .select('*')
           .eq('space_id', spaceId)
-          .order('sort_order', { ascending: true, nullsLast: true });
+          .order('sort_order', { ascending: true, nullsFirst: false });
 
         // Apply filters
         if (filters?.status) {

@@ -516,13 +516,12 @@ export function UnifiedItemModal({
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Assign to Family Member
-                      <span className="ml-2 text-xs text-yellow-600 dark:text-yellow-400">(Temporarily disabled - use manual assignment below)</span>
                     </label>
                     <div className="relative">
                       <select
                         value={familyAssignment}
                         onChange={(e) => setFamilyAssignment(e.target.value)}
-                        disabled={true}
+                        disabled={false}
                         className="w-full pl-4 pr-12 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                       {Object.entries(FAMILY_ROLES).map(([key, role]) => (
