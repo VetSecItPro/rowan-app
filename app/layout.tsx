@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthProvider } from "@/lib/contexts/auth-context";
@@ -13,20 +13,12 @@ export const metadata: Metadata = {
   title: "Rowan - Your Life, Organized",
   description: "Collaborative life management for couples and families",
   manifest: '/manifest.json',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fafafa' },
-    { media: '(prefers-color-scheme: dark)', color: '#000000' }
-  ],
   appleWebApp: {
-    capable: true,
     statusBarStyle: 'default',
     title: 'Rowan',
+  },
+  other: {
+    'mobile-web-app-capable': 'yes',
   },
   formatDetection: {
     telephone: false,
@@ -35,6 +27,17 @@ export const metadata: Metadata = {
     icon: '/rowan-logo.png',
     apple: '/rowan-logo.png',
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#fafafa' },
+    { media: '(prefers-color-scheme: dark)', color: '#000000' }
+  ],
 };
 
 export default function RootLayout({

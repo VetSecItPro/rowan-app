@@ -1,9 +1,9 @@
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 import { enhancedNotificationService } from './enhanced-notification-service';
+import type { CreateTaskInput } from '@/lib/validations/task-schemas';
 import type {
   Task,
-  CreateTaskInput,
   UpdateTaskInput,
   TaskStats,
   TaskQueryOptions,

@@ -47,6 +47,7 @@ export function BudgetGoalsDashboard({ className }: BudgetGoalsDashboardProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showLinker, setShowLinker] = useState(false);
+  const [activeTab, setActiveTab] = useState('budget');
 
   // Load data
   useEffect(() => {
@@ -153,7 +154,7 @@ export function BudgetGoalsDashboard({ className }: BudgetGoalsDashboardProps) {
         </Alert>
       )}
 
-      <Tabs defaultValue="budget" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="budget" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />

@@ -416,6 +416,16 @@ async function sendExportCompletionEmail(
       return;
     }
 
+    if (!resend) {
+      console.error('Resend API key not configured');
+      throw new Error('Email service not available');
+    }
+
+    if (!resend) {
+      console.error('Resend API key not configured');
+      throw new Error('Email service not available');
+    }
+
     await resend.emails.send({
       from: 'Rowan <noreply@rowan.app>',
       to: profile.email,
@@ -499,6 +509,11 @@ async function sendExportFailureEmail(userId: string) {
     if (!profile?.email) {
       console.log('❌ No email found for user, skipping failure notification');
       return;
+    }
+
+    if (!resend) {
+      console.error('Resend API key not configured');
+      throw new Error('Email service not available');
     }
 
     await resend.emails.send({

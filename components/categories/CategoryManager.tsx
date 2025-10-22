@@ -97,6 +97,7 @@ export function CategoryManager({ domain, showTags = true, showBudgets = true, c
   const [showNewCategoryDialog, setShowNewCategoryDialog] = useState(false);
   const [showNewTagDialog, setShowNewTagDialog] = useState(false);
   const [showDefaultsDialog, setShowDefaultsDialog] = useState(false);
+  const [activeTab, setActiveTab] = useState('categories');
 
   const [newCategoryForm, setNewCategoryForm] = useState<NewCategoryForm>({
     name: '',
@@ -325,7 +326,7 @@ export function CategoryManager({ domain, showTags = true, showBudgets = true, c
           </Alert>
         )}
 
-        <Tabs defaultValue="categories" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="categories" className="flex items-center gap-2">
               <FolderPlus className="h-4 w-4" />

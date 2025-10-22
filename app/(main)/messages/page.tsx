@@ -286,12 +286,12 @@ export default function MessagesPage() {
       } else {
         await messagesService.createMessage(messageData);
       }
-      loadMessages();
+      // Real-time subscription will handle adding the new message to the UI
       setEditingMessage(null);
     } catch (error) {
       console.error('Failed to save message:', error);
     }
-  }, [editingMessage, loadMessages]);
+  }, [editingMessage]);
 
   // Memoize handleDeleteMessage callback
   const handleDeleteMessage = useCallback(async (messageId: string) => {
@@ -318,11 +318,11 @@ export default function MessagesPage() {
   const handleMarkRead = useCallback(async (messageId: string) => {
     try {
       await messagesService.markAsRead(messageId);
-      loadMessages();
+      // Real-time subscription will handle the read status update
     } catch (error) {
       console.error('Failed to mark message as read:', error);
     }
-  }, [loadMessages]);
+  }, []);
 
   // Handle pin/unpin toggle
   const handleTogglePin = useCallback(async (messageId: string) => {

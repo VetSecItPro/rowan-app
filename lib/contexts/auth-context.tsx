@@ -191,86 +191,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, profile: ProfileData) => {
     try {
-      // Create auth user
+      // Create auth user with profile data in metadata (handled by database trigger)
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : 'https://rowan-app.vercel.app/dashboard',
+          data: {
+            name: profile.name,
+            pronouns: profile.pronouns,
+            color_theme: profile.color_theme || 'emerald',
+            space_name: profile.space_name,
+          },
         }
       });
 
       if (error) return { error };
       if (!data.user) return { error: new Error('User creation failed') };
 
-      // Create user profile
-      const { error: profileError } = await supabase.from('users').insert({
-        id: data.user.id,
-        email: data.user.email!,
-        name: profile.name,
-        pronouns: profile.pronouns,
-        color_theme: profile.color_theme || 'emerald',
-      });
+      // Profile creation is now handled by database trigger
+      // Wait a moment for the trigger to complete
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      if (profileError) {
-        console.error('Error creating user profile:', profileError);
-
-        // CRITICAL: Delete the orphaned auth user to prevent account without profile
-        try {
-          const response = await fetch('/api/auth/cleanup-orphaned-user', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: data.user.id }),
-          });
-
-          if (response.ok) {
-            console.log('Cleaned up orphaned auth user');
-          } else {
-            console.error('Failed to cleanup orphaned auth user');
-          }
-        } catch (deleteError) {
-          console.error('Failed to cleanup orphaned auth user:', deleteError);
-        }
-
-        // Return user-friendly error
-        if (profileError.message.includes('duplicate') || profileError.message.includes('unique')) {
-          return { error: new Error('An account with this email already exists') };
-        }
-        return { error: new Error('Failed to create user profile') };
-      }
-
-      // Create space if provided (optional - don't block signup if it fails)
-      if (profile.space_name) {
-        try {
-          const { data: space, error: spaceError } = await supabase
-            .from('spaces')
-            .insert({ name: profile.space_name })
-            .select()
-            .single();
-
-          if (spaceError) {
-            console.error('Error creating space:', spaceError);
-            // Don't block signup - space creation is optional
-          } else if (space) {
-            // Add user as owner of the new space
-            const { error: memberError } = await supabase.from('space_members').insert({
-              space_id: space.id,
-              user_id: data.user.id,
-              role: 'owner',
-            });
-
-            if (memberError) {
-              console.error('Error adding user to space:', memberError);
-            } else {
-              const spaceWithRole = { ...space, role: 'owner' };
-              setSpaces([spaceWithRole]);
-              setCurrentSpace(spaceWithRole);
-            }
-          }
-        } catch (error) {
-          console.error('Space creation failed (non-blocking):', error);
-          // Continue with signup even if space creation fails
-        }
+      // Space creation is now handled by database trigger if space_name was provided
+      // Load the created spaces/profile
+      if (data.user) {
+        await loadUserProfile(data.user.id);
+        await loadUserSpace(data.user.id);
       }
 
       return { error: null };
