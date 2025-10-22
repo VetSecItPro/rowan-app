@@ -1,15 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { ratelimit } from '@/lib/ratelimit';
+import { authRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { z } from 'zod';
-
-// Rate limiting: 5 signin attempts per hour per IP
-const signinRateLimit = ratelimit({
-  name: 'auth_signin',
-  limit: 5,
-  windowMs: 60 * 60 * 1000, // 1 hour
-});
 
 // Input validation schema
 const SignInSchema = z.object({
@@ -29,20 +22,22 @@ export async function POST(request: NextRequest) {
     const ip = extractIP(request.headers);
 
     // Apply rate limiting
-    const { success, limit, remaining, resetTime } = await signinRateLimit(ip);
+    const { success, limit, remaining, reset } = authRateLimit
+      ? await authRateLimit.limit(ip)
+      : { success: true, limit: 5, remaining: 4, reset: Date.now() + 3600000 };
 
     if (!success) {
       return NextResponse.json(
         {
           error: 'Too many signin attempts. Please try again later.',
-          resetTime
+          resetTime: reset
         },
         {
           status: 429,
           headers: {
             'X-RateLimit-Limit': limit.toString(),
             'X-RateLimit-Remaining': '0',
-            'X-RateLimit-Reset': resetTime.toString(),
+            'X-RateLimit-Reset': reset.toString(),
           }
         }
       );
@@ -92,7 +87,7 @@ export async function POST(request: NextRequest) {
         headers: {
           'X-RateLimit-Limit': limit.toString(),
           'X-RateLimit-Remaining': remaining.toString(),
-          'X-RateLimit-Reset': resetTime.toString(),
+          'X-RateLimit-Reset': reset.toString(),
         }
       }
     );
