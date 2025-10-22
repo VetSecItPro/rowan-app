@@ -194,7 +194,7 @@ export function UnifiedItemModal({
         priority: formData.priority || 'medium',
         status: formData.status || 'pending',
         due_date: formData.due_date || null,
-        assigned_to: familyAssignment !== 'unassigned' ? (familyAssignment || null) : (formData.assigned_to || null),
+        assigned_to: (formData.assigned_to && formData.assigned_to.trim()) || null,
         created_by: userId || null,
         estimated_hours: formData.estimated_hours || null,
         calendar_sync: calendarSync,
@@ -207,17 +207,24 @@ export function UnifiedItemModal({
         title: formData.title,
         description: formData.description || null,
         frequency: formData.frequency || 'once',
-        assigned_to: familyAssignment !== 'unassigned' ? (familyAssignment || null) : (formData.assigned_to || null),
+        assigned_to: (formData.assigned_to && formData.assigned_to.trim()) || null,
         status: formData.status || 'pending',
         due_date: formData.due_date || null,
         created_by: userId || null,
         // Don't send: calendar_sync, category, tags, estimated_hours, quick_note, priority
       };
 
-      console.log('Item type:', itemType);
-      console.log('Submission data:', submissionData);
-      console.log('Family assignment:', familyAssignment);
-      console.log('User ID:', userId);
+      console.log('=== ENHANCED DEBUG LOGGING - PHASE 1.1 ===');
+      console.log('🎯 Item type:', itemType);
+      console.log('📝 Submission data:', JSON.stringify(submissionData, null, 2));
+      console.log('👤 Family assignment:', familyAssignment);
+      console.log('👤 User ID:', userId);
+      console.log('🏠 Space ID:', spaceId);
+      console.log('🔧 Mode:', mode);
+      console.log('📦 Edit Item:', editItem ? 'Editing existing' : 'Creating new');
+      console.log('📋 Original form data:', JSON.stringify(formData, null, 2));
+      console.log('💾 About to call onSave function...');
+      console.log('💾 onSave function type:', typeof onSave);
 
       // Handle recurring tasks
       if (itemType === 'task' && isRecurring && userId) {
@@ -509,12 +516,14 @@ export function UnifiedItemModal({
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Assign to Family Member
+                      <span className="ml-2 text-xs text-yellow-600 dark:text-yellow-400">(Temporarily disabled - use manual assignment below)</span>
                     </label>
                     <div className="relative">
                       <select
                         value={familyAssignment}
                         onChange={(e) => setFamilyAssignment(e.target.value)}
-                        className="w-full pl-4 pr-12 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white appearance-none"
+                        disabled={true}
+                        className="w-full pl-4 pr-12 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                       {Object.entries(FAMILY_ROLES).map(([key, role]) => (
                         <option key={key} value={key}>

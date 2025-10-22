@@ -21,6 +21,8 @@ export interface TaskFilters {
   hasAttachments?: boolean;
   hasDependencies?: boolean;
   isPastDue?: boolean;
+  frequency?: string[];
+  itemType?: 'task' | 'chore' | 'all';
 }
 
 interface Category {
