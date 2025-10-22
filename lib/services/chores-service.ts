@@ -10,8 +10,10 @@ export interface CreateChoreInput {
   description?: string;
   frequency: 'daily' | 'weekly' | 'monthly' | 'once';
   assigned_to?: string;
-  status?: 'pending' | 'completed' | 'skipped';
+  status?: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed';
   due_date?: string;
+  notes?: string;
+  sort_order?: number;
   created_by: string; // Required field that was missing!
 }
 
@@ -20,8 +22,16 @@ export interface UpdateChoreInput {
   description?: string;
   frequency?: 'daily' | 'weekly' | 'monthly' | 'once';
   assigned_to?: string;
-  status?: 'pending' | 'completed' | 'skipped';
+  status?: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed';
   due_date?: string;
+  completed_at?: string | null;
+}
+
+export interface ChoreQueryOptions {
+  status?: string;
+  frequency?: string;
+  assigned_to?: string;
+  search?: string;
 }
 
 export interface ChoreStats {
@@ -44,20 +54,41 @@ export interface ChoreStats {
  */
 export const choresService = {
   /**
-   * Get all chores for a space
+   * Get all chores for a space with optional filtering
    *
    * @param spaceId - The space ID to fetch chores from
+   * @param options - Optional query options for filtering
    * @returns Promise<Chore[]> - Array of chores
    */
-  async getChores(spaceId: string): Promise<Chore[]> {
+  async getChores(spaceId: string, options?: ChoreQueryOptions): Promise<Chore[]> {
     const supabase = createClient();
 
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('chores')
         .select('*')
-        .eq('space_id', spaceId)
-        .order('created_at', { ascending: false });
+        .eq('space_id', spaceId);
+
+      // Apply filters if provided
+      if (options?.status) {
+        query = query.eq('status', options.status);
+      }
+      if (options?.frequency) {
+        query = query.eq('frequency', options.frequency);
+      }
+      if (options?.assigned_to) {
+        query = query.eq('assigned_to', options.assigned_to);
+      }
+      if (options?.search) {
+        // Search in title and description
+        query = query.or(`title.ilike.%${options.search}%,description.ilike.%${options.search}%`);
+      }
+
+      // Order by sort_order first, then by created_at
+      query = query.order('sort_order', { ascending: true, nullsFirst: false })
+                  .order('created_at', { ascending: false });
+
+      const { data, error } = await query;
 
       if (error) {
         console.error('❌ getChores Supabase error:', error);
@@ -117,13 +148,12 @@ export const choresService = {
         .single();
 
       if (error) {
-        console.error('❌ Supabase error:', error);
         throw new Error(`Failed to create chore: ${error.message}`);
       }
 
       return chore;
     } catch (error) {
-      console.error('❌ Error in createChore:', error);
+      console.error('Error in createChore:', error);
       throw error;
     }
   },

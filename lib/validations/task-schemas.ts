@@ -8,9 +8,8 @@ export const taskBaseSchema = z.object({
   space_id: z.string().uuid('Invalid space ID'),
   status: z.enum(['pending', 'in-progress', 'completed', 'blocked', 'on-hold']).default('pending'),
   priority: z.enum(['low', 'medium', 'high', 'urgent']).default('medium'),
-  assigned_to: z.string().optional().nullable()
-    .transform(val => val === '' ? null : val)
-    .refine(val => val === null || z.string().uuid().safeParse(val).success, 'Invalid user ID'),
+  assigned_to: z.string().max(255, 'Assigned to must be less than 255 characters').optional().nullable()
+    .transform(val => val === '' ? null : val),
   due_date: z.string().optional().nullable()
     .transform(val => val === '' ? null : val)
     .refine(val => val === null || z.string().datetime().safeParse(val).success, 'Invalid date format'),
