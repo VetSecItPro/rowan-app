@@ -81,7 +81,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
           goal_check_ins!goal_activities_check_in_id_fkey(id, progress_percentage, mood)
         `)
         .eq('space_id', spaceId)
-        .if(goalId, (query) => query.eq('goal_id', goalId))
+        .if(goalId, (query: any) => query.eq('goal_id', goalId))
         .order('created_at', { ascending: false })
         .limit(50);
 

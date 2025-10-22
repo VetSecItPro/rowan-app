@@ -51,12 +51,16 @@ export function UnifiedItemModal({
     assigned_to: '',
     estimated_hours: '',
     tags: '',
+    frequency: 'once', // Add missing frequency field for chores
   });
 
   // UI state
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [dateError, setDateError] = useState<string>('');
   const [activeSection, setActiveSection] = useState<string>('basic');
+
+  // Section navigation
+  const sections = ['basic', 'details', 'family', 'schedule'];
 
   // Enhanced features state
   const [isRecurring, setIsRecurring] = useState(false);
@@ -85,6 +89,7 @@ export function UnifiedItemModal({
         assigned_to: editItem.assigned_to || '',
         estimated_hours: (editItem as any).estimated_hours || '',
         tags: (editItem as any).tags || '',
+        frequency: (editItem as any).frequency || 'once', // Add missing frequency field for chores
       });
     } else {
       // Reset for new items and set to defaultType
@@ -100,10 +105,50 @@ export function UnifiedItemModal({
         assigned_to: '',
         estimated_hours: '',
         tags: '',
+        frequency: 'once', // Add missing frequency field for chores
       });
     }
     setActiveSection('basic');
   }, [editItem, spaceId, isOpen, defaultType]);
+
+  // Tab navigation using keyboard
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!isOpen) return;
+
+      // Check if Tab or Shift+Tab is pressed
+      if (event.key === 'Tab' && !event.ctrlKey && !event.altKey && !event.metaKey) {
+        // Only handle if we're not inside an input/textarea/select
+        const activeElement = document.activeElement;
+        const isFormControl = activeElement && (
+          activeElement.tagName === 'INPUT' ||
+          activeElement.tagName === 'TEXTAREA' ||
+          activeElement.tagName === 'SELECT' ||
+          activeElement.hasAttribute('contenteditable')
+        );
+
+        if (!isFormControl) {
+          event.preventDefault();
+
+          const currentIndex = sections.indexOf(activeSection);
+          let nextIndex;
+
+          if (event.shiftKey) {
+            // Shift+Tab: go to previous section
+            nextIndex = currentIndex > 0 ? currentIndex - 1 : sections.length - 1;
+          } else {
+            // Tab: go to next section
+            nextIndex = currentIndex < sections.length - 1 ? currentIndex + 1 : 0;
+          }
+
+          setActiveSection(sections[nextIndex]);
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, activeSection, sections]);
 
   // Form handlers
   const handleInputChange = (field: string, value: string) => {
@@ -117,25 +162,66 @@ export function UnifiedItemModal({
   };
 
   const handleSubmit = async () => {
-    if (!formData.title.trim()) return;
+    console.log('=== CHORE CREATION DEBUG ===');
+    console.log('Title:', formData.title);
+    console.log('Title trimmed:', formData.title.trim());
+    console.log('Title check passed:', !!formData.title.trim());
+
+    if (!formData.title.trim()) {
+      console.log('❌ FAILED: Empty title - handleSubmit returning early');
+      return;
+    }
+
+    console.log('✅ Title validation passed, continuing...');
 
     try {
       // Validate due date
       if (formData.due_date && new Date(formData.due_date) < new Date()) {
+        console.log('❌ FAILED: Due date in past');
         setDateError('Due date cannot be in the past');
         return;
       }
 
-      // Prepare submission data
-      const submissionData = {
-        ...formData,
-        assigned_to: familyAssignment !== 'unassigned' ? familyAssignment : formData.assigned_to,
+      console.log('✅ Date validation passed');
+
+      // Prepare submission data - different fields for tasks vs chores
+      const submissionData = itemType === 'task' ? {
+        // Task-specific data - ONLY fields that exist in tasks table
+        space_id: formData.space_id,
+        title: formData.title,
+        description: formData.description || null,
+        category: formData.category || null,
+        priority: formData.priority || 'medium',
+        status: formData.status || 'pending',
+        due_date: formData.due_date || null,
+        assigned_to: familyAssignment !== 'unassigned' ? (familyAssignment || null) : (formData.assigned_to || null),
+        created_by: userId || null,
+        estimated_hours: formData.estimated_hours || null,
         calendar_sync: calendarSync,
-        quick_note: quickNote,
+        quick_note: quickNote || null,
+        tags: formData.tags || null,
+        // Don't send: frequency (doesn't exist in tasks table)
+      } : {
+        // Chore-specific data - ONLY fields that exist in chores table
+        space_id: formData.space_id,
+        title: formData.title,
+        description: formData.description || null,
+        frequency: formData.frequency || 'once',
+        assigned_to: familyAssignment !== 'unassigned' ? (familyAssignment || null) : (formData.assigned_to || null),
+        status: formData.status || 'pending',
+        due_date: formData.due_date || null,
+        created_by: userId || null,
+        // Don't send: calendar_sync, category, tags, estimated_hours, quick_note, priority
       };
+
+      console.log('Item type:', itemType);
+      console.log('Submission data:', submissionData);
+      console.log('Family assignment:', familyAssignment);
+      console.log('User ID:', userId);
 
       // Handle recurring tasks
       if (itemType === 'task' && isRecurring && userId) {
+        console.log('🔄 Creating recurring task...');
         await taskRecurrenceService.createRecurringTask({
           space_id: submissionData.space_id,
           title: submissionData.title,
@@ -152,12 +238,17 @@ export function UnifiedItemModal({
           }
         });
       } else {
+        console.log('💾 Calling onSave with submission data...');
+        console.log('onSave function:', typeof onSave);
         await onSave(submissionData);
+        console.log('✅ onSave completed successfully');
       }
 
+      console.log('🚪 Closing modal...');
       onClose();
     } catch (error) {
-      console.error('Failed to save item:', error);
+      console.error('❌ Failed to save item:', error);
+      console.error('Error details:', error);
     }
   };
 
@@ -572,7 +663,14 @@ export function UnifiedItemModal({
                 Cancel
               </button>
               <button
-                onClick={handleSubmit}
+                onClick={() => {
+                  console.log('🔘 Submit button clicked!');
+                  console.log('Button disabled?', !formData.title.trim() || !!dateError);
+                  console.log('Title:', `"${formData.title}"`);
+                  console.log('Title trimmed:', `"${formData.title.trim()}"`);
+                  console.log('Date error:', dateError);
+                  handleSubmit();
+                }}
                 disabled={!formData.title.trim() || !!dateError}
                 className={`px-8 py-3 bg-gradient-tasks text-white rounded-lg transition-colors font-medium ${
                   !formData.title.trim() || dateError

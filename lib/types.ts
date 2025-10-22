@@ -122,6 +122,32 @@ export interface Task {
   due_date?: string;
   assigned_to?: string;
   created_by?: string;
+  estimated_hours?: number;
+  calendar_sync?: boolean;
+  quick_note?: string;
+  tags?: string;
+  color?: string;
+  sort_order?: number;
+  archived?: boolean;
+  archived_at?: string;
+  // Snooze fields
+  is_snoozed?: boolean;
+  snoozed_until?: string;
+  snoozed_by?: string;
+  snooze_count?: number;
+  // Recurrence fields
+  is_recurring?: boolean;
+  recurrence_pattern?: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  recurrence_interval?: number;
+  recurrence_days_of_week?: number[];
+  recurrence_day_of_month?: number;
+  recurrence_month?: number;
+  recurrence_end_date?: string;
+  recurrence_end_count?: number;
+  parent_recurrence_id?: string;
+  is_recurrence_template?: boolean;
+  recurrence_exceptions?: string[];
+  recurrence_metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
   completed_at?: string;
@@ -253,9 +279,14 @@ export interface Chore {
   space_id: string;
   title: string;
   description?: string;
-  frequency?: string;
+  frequency: 'daily' | 'weekly' | 'monthly' | 'once';
   assigned_to?: string;
-  created_by?: string;
+  status: 'pending' | 'completed' | 'skipped';
+  due_date?: string;
+  completed_at?: string;
+  completion_percentage?: number;
+  notes?: string;
+  created_by: string;
   created_at: string;
   updated_at: string;
 }
@@ -517,25 +548,21 @@ export interface TaskQueryOptions {
 // FORM TYPES
 // =============================================
 
-export interface CreateTaskInput {
-  space_id: string;
-  title: string;
-  description?: string;
-  category?: string;
-  priority?: string;
-  status?: string;
-  due_date?: string;
-  assigned_to?: string;
-}
+// CreateTaskInput type is now generated from Zod schema in task-schemas.ts
+// See: export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 
 export interface UpdateTaskInput {
   title?: string;
-  description?: string;
-  category?: string;
+  description?: string | null;
+  category?: string | null;
   priority?: string;
   status?: string;
-  due_date?: string;
-  assigned_to?: string;
+  due_date?: string | null;
+  assigned_to?: string | null;
+  estimated_hours?: number | null;
+  calendar_sync?: boolean;
+  quick_note?: string | null;
+  tags?: string | null;
 }
 
 export interface CreateEventInput {

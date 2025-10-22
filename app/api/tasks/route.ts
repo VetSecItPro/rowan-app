@@ -204,6 +204,10 @@ export async function POST(req: NextRequest) {
       category: validatedData.category ?? undefined,
       assigned_to: validatedData.assigned_to ?? undefined,
       due_date: validatedData.due_date ?? undefined,
+      quick_note: validatedData.quick_note ?? undefined,
+      tags: validatedData.tags ?? undefined,
+      estimated_hours: validatedData.estimated_hours ?? undefined,
+      calendar_sync: validatedData.calendar_sync ?? false,
     });
 
     return NextResponse.json({

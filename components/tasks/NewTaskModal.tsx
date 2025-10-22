@@ -41,6 +41,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
     status: 'pending',
     due_date: '',
     assigned_to: '',
+    created_by: userId || '',
   });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [dateError, setDateError] = useState<string>('');
@@ -63,6 +64,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
         status: editTask.status || 'pending',
         due_date: editTask.due_date || '',
         assigned_to: editTask.assigned_to || '',
+        created_by: editTask.created_by || userId || '',
       });
     } else {
       setFormData({
@@ -74,6 +76,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
         status: 'pending',
         due_date: '',
         assigned_to: '',
+        created_by: userId || '',
       });
     }
     setShowEmojiPicker(false);

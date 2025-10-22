@@ -59,7 +59,7 @@ export function GoalCheckInModal({
     if (metadata && audioBlob) {
       try {
         const transcriptionResult = await voiceTranscriptionService.transcribeAudio(audioBlob);
-        setVoiceNoteMetadata(prev => ({
+        setVoiceNoteMetadata((prev: any) => ({
           ...prev,
           transcription: transcriptionResult.transcription,
           confidence: transcriptionResult.confidence,

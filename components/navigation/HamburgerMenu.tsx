@@ -9,7 +9,6 @@ import { NAVIGATION_ITEMS } from '@/lib/navigation';
 
 export function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   // const { trigger } = useCommandPaletteTrigger(); // Temporarily disabled
@@ -63,10 +62,9 @@ export function HamburgerMenu() {
       <div className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          onMouseEnter={() => setShowTooltip(true)}
-          onMouseLeave={() => setShowTooltip(false)}
-          className="btn-touch btn-icon-mobile rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors active:scale-95 cursor-pointer flex items-center justify-center"
+          className="w-10 h-10 rounded-lg transition-colors active:scale-95 cursor-pointer flex items-center justify-center"
           aria-label="Menu"
+          title="Menu"
         >
           {isOpen ? (
             <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
@@ -75,13 +73,6 @@ export function HamburgerMenu() {
           )}
         </button>
 
-        {/* Tooltip */}
-        {showTooltip && !isOpen && (
-          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 bg-gray-900 dark:bg-gray-700 text-white text-sm rounded-lg whitespace-nowrap z-50 pointer-events-none">
-            Menu
-            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-gray-700 rotate-45"></div>
-          </div>
-        )}
       </div>
 
       {/* Mobile: Full-Screen Overlay | Desktop: Dropdown */}
