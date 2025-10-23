@@ -71,27 +71,37 @@ export async function DELETE(
       );
     }
 
-    // Verify the space exists and user is owner
+    // First, get the space details
     const { data: space, error: spaceError } = await supabase
       .from('spaces')
-      .select(`
-        id,
-        name,
-        space_members!inner(role)
-      `)
+      .select('id, name')
       .eq('id', spaceId)
-      .eq('space_members.user_id', session.user.id)
       .single();
 
     if (spaceError || !space) {
       return NextResponse.json(
-        { error: 'Space not found or access denied' },
+        { error: 'Space not found' },
         { status: 404 }
       );
     }
 
+    // Then, verify user is owner of this space
+    const { data: membership, error: memberError } = await supabase
+      .from('space_members')
+      .select('role')
+      .eq('space_id', spaceId)
+      .eq('user_id', session.user.id)
+      .single();
+
+    if (memberError || !membership) {
+      return NextResponse.json(
+        { error: 'Access denied - you are not a member of this space' },
+        { status: 403 }
+      );
+    }
+
     // SECURITY: Verify user is owner
-    if (space.space_members?.role !== 'owner') {
+    if (membership.role !== 'owner') {
       return NextResponse.json(
         { error: 'Only space owners can delete spaces' },
         { status: 403 }
