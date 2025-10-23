@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
-import { CheckSquare, Calendar, Bell, MessageSquare, ShoppingBag, UtensilsCrossed, Home, Target, ArrowLeft, Heart } from 'lucide-react';
+import { CheckSquare, Calendar, Bell, MessageSquare, ShoppingBag, UtensilsCrossed, Home, Target, ArrowLeft, Heart, Users } from 'lucide-react';
 
 const features = [
   {
@@ -94,15 +94,15 @@ const features = [
     available: true,
   },
   {
-    id: 'household',
-    name: 'Household Management',
-    description: 'Manage chores, maintenance, and household tasks',
-    icon: Home,
-    color: 'from-amber-500 to-amber-600',
-    hoverBorder: 'hover:border-amber-500',
-    hoverShadow: 'hover:shadow-amber-500/50',
-    href: '/settings/documentation/household',
-    available: false,
+    id: 'spaces',
+    name: 'Space & Collaboration',
+    description: 'Master space management, invitations, and team collaboration',
+    icon: Users,
+    color: 'from-teal-500 to-teal-600',
+    hoverBorder: 'hover:border-teal-500',
+    hoverShadow: 'hover:shadow-teal-500/50',
+    href: '/settings/documentation/spaces',
+    available: true,
   },
 ];
 
