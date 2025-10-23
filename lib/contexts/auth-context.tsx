@@ -26,6 +26,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   switchSpace: (space: Space & { role: string }) => void;
   refreshSpaces: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 interface ProfileData {
@@ -301,6 +302,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCurrentSpace(space);
   };
 
+  const refreshProfile = async () => {
+    if (session?.user?.id) {
+      await loadUserProfile(session.user.id);
+    }
+  };
+
   const refreshSpaces = async () => {
     if (session?.user?.id) {
       await loadUserSpace(session.user.id);
@@ -318,7 +325,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signIn,
       signOut,
       switchSpace,
-      refreshSpaces
+      refreshSpaces,
+      refreshProfile
     }}>
       {children}
     </AuthContext.Provider>
