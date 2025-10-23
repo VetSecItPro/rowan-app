@@ -1721,7 +1721,7 @@ export default function SettingsPage() {
           isOpen={showDeleteSpaceModal}
           onClose={() => setShowDeleteSpaceModal(false)}
           space={currentSpace}
-          onSuccess={() => {
+          onSpaceDeleted={() => {
             setShowDeleteSpaceModal(false);
             refreshSpaces();
           }}
