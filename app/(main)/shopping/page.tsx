@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package, X, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
+import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
 import { NewShoppingListModal } from '@/components/shopping/NewShoppingListModal';
 import { SaveTemplateModal } from '@/components/shopping/SaveTemplateModal';
@@ -643,7 +644,8 @@ export default function ShoppingPage() {
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Shopping Lists' }]}>
-      <div className="p-4 sm:p-8">
+      <PageErrorBoundary>
+        <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
@@ -916,6 +918,7 @@ export default function ShoppingPage() {
           )}
         </div>
       </div>
+      </PageErrorBoundary>
       {currentSpace && (
         <>
           <TemplatePickerModal
