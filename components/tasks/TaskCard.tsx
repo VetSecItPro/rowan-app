@@ -3,7 +3,7 @@
 import { CheckSquare, Clock, Flag, User, Calendar as CalendarIcon, MoreVertical, ShoppingCart } from 'lucide-react';
 import { Task } from '@/lib/types';
 import { formatTimestamp } from '@/lib/utils/date-utils';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { TASK_CATEGORIES } from '@/lib/constants/item-categories';
 import Link from 'next/link';
 
@@ -36,7 +36,7 @@ const statusColors = {
   cancelled: 'bg-red-500',
 };
 
-export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails, linkedShoppingList }: TaskCardProps) {
+const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails, linkedShoppingList }: TaskCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'completed';
@@ -251,4 +251,6 @@ export function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails
       )}
     </div>
   );
-}
+});
+
+export { TaskCard };

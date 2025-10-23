@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
+import Image from 'next/image';
 import { MoreVertical, Shield, Crown, User, Trash2 } from 'lucide-react';
 import { PresenceIndicator } from './PresenceIndicator';
 import type { SpaceMemberWithPresence } from '@/lib/types';
@@ -12,7 +13,7 @@ interface MemberListItemProps {
   showActions?: boolean;
 }
 
-export function MemberListItem({
+const MemberListItem = memo(function MemberListItem({
   member,
   currentUserId,
   currentUserRole,
@@ -69,10 +70,13 @@ export function MemberListItem({
         {/* Avatar with Presence Indicator */}
         <div className="relative">
           {member.avatar_url ? (
-            <img
+            <Image
               src={member.avatar_url}
               alt={member.name}
+              width={40}
+              height={40}
               className="w-10 h-10 rounded-full object-cover"
+              sizes="40px"
             />
           ) : (
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold">
@@ -160,4 +164,6 @@ export function MemberListItem({
       )}
     </div>
   );
-}
+});
+
+export { MemberListItem };
