@@ -11,13 +11,19 @@ import {
 
 export function CookieConsentBanner() {
   const [isVisible, setIsVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Show informational notice if user hasn't acknowledged essential cookies
-    if (!hasUserMadeCookieChoice()) {
+    // Mark component as mounted to prevent hydration issues
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    // Only check after component is mounted to avoid SSR mismatch
+    if (mounted && !hasUserMadeCookieChoice()) {
       setIsVisible(true);
     }
-  }, []);
+  }, [mounted]);
 
   const handleAcknowledge = () => {
     // Since we only use essential cookies, just acknowledge and dismiss
@@ -33,7 +39,8 @@ export function CookieConsentBanner() {
     setIsVisible(false);
   };
 
-  if (!isVisible) return null;
+  // Don't render during SSR or if not visible
+  if (!mounted || !isVisible) return null;
 
   return (
     <AnimatePresence>

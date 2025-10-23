@@ -8,6 +8,7 @@ import NewMessageEmail from '@/lib/emails/templates/NewMessageEmail';
 import ShoppingListEmail from '@/lib/emails/templates/ShoppingListEmail';
 import MealReminderEmail from '@/lib/emails/templates/MealReminderEmail';
 import GeneralReminderEmail from '@/lib/emails/templates/GeneralReminderEmail';
+import SpaceInvitationEmail from '@/lib/emails/templates/SpaceInvitationEmail';
 
 // Initialize Resend with API key
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -113,6 +114,14 @@ export interface GeneralReminderData {
   reminderId: string;
   spaceName: string;
   createdBy?: string;
+}
+
+export interface SpaceInvitationData {
+  recipientEmail: string;
+  inviterName: string;
+  spaceName: string;
+  invitationUrl: string;
+  expiresAt: string;
 }
 
 
@@ -321,12 +330,49 @@ export async function sendGeneralReminderEmail(data: GeneralReminderData): Promi
   }
 }
 
+/**
+ * Send a space invitation email notification
+ */
+export async function sendSpaceInvitationEmail(data: SpaceInvitationData): Promise<EmailResult> {
+  try {
+    if (!resend) {
+      console.error('Resend not initialized - missing RESEND_API_KEY');
+      return { success: false, error: 'Email service not configured' };
+    }
+
+    const emailHtml = await render(SpaceInvitationEmail(data));
+
+    const { data: result, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [data.recipientEmail],
+      subject: `You're invited to join "${data.spaceName}" on Rowan`,
+      html: emailHtml,
+      replyTo: REPLY_TO_EMAIL,
+      tags: [
+        { name: 'category', value: 'space-invitation' },
+        { name: 'inviter', value: data.inviterName },
+        { name: 'space_name', value: data.spaceName }
+      ]
+    });
+
+    if (error) {
+      console.error('Failed to send space invitation email:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, messageId: result?.id };
+  } catch (error) {
+    console.error('Error sending space invitation email:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
 
 /**
  * Send multiple emails in batch (for digest processing)
  */
 export async function sendBatchEmails(emails: Array<{
-  type: 'task' | 'event' | 'message' | 'shopping' | 'meal' | 'reminder';
+  type: 'task' | 'event' | 'message' | 'shopping' | 'meal' | 'reminder' | 'invitation';
   data: any;
 }>): Promise<{ success: number; failed: number; results: EmailResult[] }> {
   const results: EmailResult[] = [];
@@ -354,6 +400,9 @@ export async function sendBatchEmails(emails: Array<{
         break;
       case 'reminder':
         result = await sendGeneralReminderEmail(email.data);
+        break;
+      case 'invitation':
+        result = await sendSpaceInvitationEmail(email.data);
         break;
       default:
         result = { success: false, error: 'Unknown email type' };
@@ -405,6 +454,7 @@ export const emailService = {
   sendShoppingListEmail,
   sendMealReminderEmail,
   sendGeneralReminderEmail,
+  sendSpaceInvitationEmail,
   sendBatchEmails,
   verifyEmailService,
 };

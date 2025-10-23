@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createInvitation } from '@/lib/services/invitations-service';
+import { sendSpaceInvitationEmail } from '@/lib/services/email-service';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { verifySpaceAccess } from '@/lib/services/authorization-service';
@@ -10,6 +11,7 @@ import { setSentryUser } from '@/lib/sentry-utils';
 /**
  * POST /api/spaces/invite
  * Create a space invitation and send email
+ * Updated with permission fixes
  */
 export async function POST(req: NextRequest) {
   try {
@@ -41,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     // Parse request body
     const body = await req.json();
-    const { space_id, email } = body;
+    const { space_id, email, role } = body;
 
     // SECURITY: Input validation
     if (!space_id || !email || typeof space_id !== 'string' || typeof email !== 'string') {
@@ -50,6 +52,10 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Validate role parameter
+    const validRoles = ['member', 'admin'] as const;
+    const inviteRole = role && validRoles.includes(role) ? role : 'member';
 
     // SECURITY: Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -83,7 +89,8 @@ export async function POST(req: NextRequest) {
     const result = await createInvitation(
       space_id,
       email.toLowerCase().trim(),
-      session.user.id
+      session.user.id,
+      inviteRole
     );
 
     if (!result.success) {
@@ -93,19 +100,66 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // TODO: Send invitation email using Resend
-    // This will be implemented when email integration is ready
+    // Get space name and inviter name for email
+    const { data: spaceData } = await supabase
+      .from('spaces')
+      .select('name')
+      .eq('id', space_id)
+      .single();
+
+    // Try to get inviter name, but handle permission errors gracefully
+    let inviterData = null;
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('name')
+      .eq('id', session.user.id)
+      .single();
+
+    if (userError) {
+      // If we can't access user table due to RLS, use fallback
+      console.log('Could not fetch inviter name due to permissions, using fallback');
+    } else {
+      inviterData = userData;
+    }
+
     const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/invitations/accept?token=${result.data.token}`;
 
-    // SECURITY: Do not log sensitive tokens
-    // For now, just return the invitation data
-    // Later, we'll integrate Resend to send the email
+    // Format expiration date for email
+    const expiresAt = new Date(result.data.expires_at);
+    const expirationText = `${Math.ceil((expiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days`;
+
+    // Send invitation email
+    const emailResult = await sendSpaceInvitationEmail({
+      recipientEmail: email.toLowerCase().trim(),
+      inviterName: inviterData?.name || 'Someone',
+      spaceName: spaceData?.name || 'a workspace',
+      invitationUrl,
+      expiresAt: expirationText,
+    });
+
+    // Log email result but don't fail the invitation if email fails
+    if (!emailResult.success) {
+      console.error('Failed to send invitation email:', emailResult.error);
+      // Log to Sentry for monitoring
+      Sentry.captureException(new Error(`Invitation email failed: ${emailResult.error}`), {
+        tags: {
+          feature: 'space-invitation',
+          email_error: true,
+        },
+        extra: {
+          recipientEmail: email.replace(/(.{2}).*(@.*)/, '$1***$2'), // Partially mask for privacy
+          spaceId: space_id,
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
 
     return NextResponse.json({
       success: true,
       data: {
         ...result.data,
         invitation_url: invitationUrl, // Include URL in response for testing
+        email_sent: emailResult.success,
       },
     });
   } catch (error) {
