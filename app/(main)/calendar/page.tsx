@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, List, X } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
+import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { EventCard } from '@/components/calendar/EventCard';
 import { NewEventModal } from '@/components/calendar/NewEventModal';
 import { EventDetailModal } from '@/components/calendar/EventDetailModal';
@@ -469,7 +470,8 @@ export default function CalendarPage() {
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Calendar' }]}>
-      <div className="p-4 sm:p-8">
+      <PageErrorBoundary>
+        <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -1499,6 +1501,7 @@ export default function CalendarPage() {
           )}
         </div>
       </div>
+      </PageErrorBoundary>
 
       {/* New/Edit Event Modal */}
       {currentSpace && (

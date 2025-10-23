@@ -5,6 +5,7 @@ import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List
 import { format } from 'date-fns';
 import Link from 'next/link';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
+import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { GoalCard } from '@/components/goals/GoalCard';
 import { SortableGoalsList } from '@/components/goals/SortableGoalsList';
 import { MilestoneCard } from '@/components/goals/MilestoneCard';
@@ -627,8 +628,9 @@ export default function GoalsPage() {
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
-      <PullToRefresh onRefresh={loadData} disabled={loading || showGuidedFlow}>
-        <div className="p-4 sm:p-8">
+      <PageErrorBoundary>
+        <PullToRefresh onRefresh={loadData} disabled={loading || showGuidedFlow}>
+          <div className="p-4 sm:p-8">
           <div className="max-w-7xl mx-auto space-y-8">
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -1090,6 +1092,7 @@ export default function GoalsPage() {
         </div>
       </div>
       </PullToRefresh>
+      </PageErrorBoundary>
       {currentSpace && (
         <>
           <TemplateSelectionModal

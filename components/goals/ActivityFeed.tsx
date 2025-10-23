@@ -343,9 +343,9 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
 
                           <div className="flex items-start space-x-2">
                             <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300">
-                              {user?.user_metadata?.avatar_url ? (
+                              {user?.avatar_url ? (
                                 <img
-                                  src={user.user_metadata.avatar_url}
+                                  src={user.avatar_url}
                                   alt=""
                                   className="w-6 h-6 rounded-full object-cover"
                                 />

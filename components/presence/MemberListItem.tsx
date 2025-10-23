@@ -111,7 +111,7 @@ export function MemberListItem({
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+            className="btn-icon-mobile hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors flex items-center justify-center"
           >
             <MoreVertical className="w-4 h-4" />
           </button>
