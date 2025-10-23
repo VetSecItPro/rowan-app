@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import type { Task } from '@/lib/types';
@@ -17,6 +17,26 @@ interface UseTaskRealtimeOptions {
   onTaskDeleted?: (taskId: string) => void;
 }
 
+// Optimized filter function
+function taskPassesFilters(task: Task, filters?: UseTaskRealtimeOptions['filters']): boolean {
+  if (!filters) return true;
+
+  return (
+    (!filters.status || filters.status.includes(task.status)) &&
+    (!filters.priority || filters.priority.includes(task.priority)) &&
+    (!filters.assignedTo || task.assigned_to === filters.assignedTo)
+  );
+}
+
+// Debounce helper for state updates
+function debounce<T extends (...args: any[]) => void>(func: T, delay: number): T {
+  let timeoutId: NodeJS.Timeout;
+  return ((...args: Parameters<T>) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func(...args), delay);
+  }) as T;
+}
+
 export function useTaskRealtime({
   spaceId,
   filters,
@@ -27,6 +47,56 @@ export function useTaskRealtime({
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+
+  // Performance optimizations
+  const updateQueueRef = useRef<{
+    inserts: Task[];
+    updates: Task[];
+    deletes: string[];
+  }>({ inserts: [], updates: [], deletes: [] });
+
+  // Memoized filter function to avoid recalculation
+  const taskFilter = useCallback((task: Task) => taskPassesFilters(task, filters), [filters]);
+
+  // Debounced batch update function
+  const debouncedBatchUpdate = useMemo(
+    () => debounce(() => {
+      const queue = updateQueueRef.current;
+      if (queue.inserts.length === 0 && queue.updates.length === 0 && queue.deletes.length === 0) {
+        return;
+      }
+
+      setTasks(prev => {
+        let result = [...prev];
+
+        // Process deletes first
+        if (queue.deletes.length > 0) {
+          const deleteSet = new Set(queue.deletes);
+          result = result.filter(task => !deleteSet.has(task.id));
+        }
+
+        // Process updates
+        if (queue.updates.length > 0) {
+          const updateMap = new Map(queue.updates.map(task => [task.id, task]));
+          result = result.map(task => updateMap.get(task.id) || task);
+        }
+
+        // Process inserts
+        if (queue.inserts.length > 0) {
+          const existingIds = new Set(result.map(task => task.id));
+          const newTasks = queue.inserts.filter(task => !existingIds.has(task.id));
+          result = [...result, ...newTasks];
+        }
+
+        // Sort once at the end
+        return result.sort((a, b) => a.sort_order - b.sort_order);
+      });
+
+      // Clear the queue
+      updateQueueRef.current = { inserts: [], updates: [], deletes: [] };
+    }, 50), // 50ms debounce for smooth updates
+    []
+  );
 
   useEffect(() => {
     // Guard against invalid spaceId to prevent empty query parameters
@@ -130,22 +200,10 @@ export function useTaskRealtime({
           (payload) => {
             const newTask = payload.new as Task;
 
-            // Apply filters
-            const passesFilters =
-              (!filters?.status || filters.status.includes(newTask.status)) &&
-              (!filters?.priority || filters.priority.includes(newTask.priority)) &&
-              (!filters?.assignedTo || newTask.assigned_to === filters.assignedTo);
-
-            if (passesFilters) {
-              setTasks((prev) => {
-                // Check if task already exists (prevent duplicates)
-                if (prev.some((t) => t.id === newTask.id)) {
-                  return prev;
-                }
-                // Insert in sort order
-                const updated = [...prev, newTask].sort((a, b) => a.sort_order - b.sort_order);
-                return updated;
-              });
+            if (taskFilter(newTask)) {
+              // Add to batch queue instead of immediate state update
+              updateQueueRef.current.inserts.push(newTask);
+              debouncedBatchUpdate();
               onTaskAdded?.(newTask);
             }
           }
@@ -161,28 +219,15 @@ export function useTaskRealtime({
           (payload) => {
             const updatedTask = payload.new as Task;
 
-            // Apply filters
-            const passesFilters =
-              (!filters?.status || filters.status.includes(updatedTask.status)) &&
-              (!filters?.priority || filters.priority.includes(updatedTask.priority)) &&
-              (!filters?.assignedTo || updatedTask.assigned_to === filters.assignedTo);
-
-            if (passesFilters) {
-              setTasks((prev) => {
-                const index = prev.findIndex((t) => t.id === updatedTask.id);
-                if (index === -1) {
-                  // Task wasn't in list, add it
-                  return [...prev, updatedTask].sort((a, b) => a.sort_order - b.sort_order);
-                }
-                // Update existing task
-                const updated = [...prev];
-                updated[index] = updatedTask;
-                return updated.sort((a, b) => a.sort_order - b.sort_order);
-              });
+            if (taskFilter(updatedTask)) {
+              // Add to batch queue for updates
+              updateQueueRef.current.updates.push(updatedTask);
+              debouncedBatchUpdate();
               onTaskUpdated?.(updatedTask);
             } else {
-              // Task no longer passes filters, remove it
-              setTasks((prev) => prev.filter((t) => t.id !== updatedTask.id));
+              // Task no longer passes filters, add to deletes queue
+              updateQueueRef.current.deletes.push(updatedTask.id);
+              debouncedBatchUpdate();
             }
           }
         )
@@ -196,7 +241,9 @@ export function useTaskRealtime({
           },
           (payload) => {
             const deletedTaskId = (payload.old as Task).id;
-            setTasks((prev) => prev.filter((t) => t.id !== deletedTaskId));
+            // Add to batch queue for deletes
+            updateQueueRef.current.deletes.push(deletedTaskId);
+            debouncedBatchUpdate();
             onTaskDeleted?.(deletedTaskId);
           }
         )
@@ -229,8 +276,10 @@ export function useTaskRealtime({
       if (accessCheckInterval) {
         clearInterval(accessCheckInterval);
       }
+      // Clear any pending debounced updates
+      updateQueueRef.current = { inserts: [], updates: [], deletes: [] };
     };
-  }, [spaceId, filters?.status, filters?.priority, filters?.assignedTo]);
+  }, [spaceId, taskFilter, debouncedBatchUpdate]);
 
   function refreshTasks() {
     setLoading(true);

@@ -29,6 +29,7 @@ import { TaskComments } from '@/components/tasks/TaskComments';
 import { TaskQuickActions } from '@/components/tasks/TaskQuickActions';
 import { CalendarSyncToggle } from '@/components/tasks/CalendarSyncToggle';
 import { ChoreRotationConfig } from '@/components/tasks/ChoreRotationConfig';
+import { TaskCardSkeleton } from '@/components/ui/Skeleton';
 
 type TaskType = 'task' | 'chore';
 type TaskOrChore = (Task & { type: 'task' }) | (Chore & { type: 'chore' });
@@ -860,20 +861,7 @@ export default function TasksPage() {
                 {loading || realtimeLoading || choreLoading ? (
                   <div className="space-y-4">
                     {[...Array(6)].map((_, i) => (
-                      <div key={i} className="bg-white dark:bg-gray-700 rounded-xl p-6 shadow-lg animate-pulse">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-5 h-5 bg-gray-200 dark:bg-gray-600 rounded" />
-                            <div className="h-5 bg-gray-200 dark:bg-gray-600 rounded w-48" />
-                          </div>
-                          <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-20" />
-                        </div>
-                        <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-full mb-2" />
-                        <div className="flex items-center gap-2 mt-3">
-                          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-24" />
-                          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-32" />
-                        </div>
-                      </div>
+                      <TaskCardSkeleton key={i} />
                     ))}
                   </div>
                 ) : filteredItems.length === 0 ? (
