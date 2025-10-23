@@ -185,8 +185,7 @@ export default function ShoppingPage() {
           description: listDataOnly.description || undefined,
           store_name: (listDataOnly as any).store_name || undefined,
           budget: (listDataOnly as any).budget || undefined,
-          // items_count property doesn't exist in ShoppingList interface, removing
-          // total_amount property doesn't exist in ShoppingList interface, removing
+          created_by: user?.id || '', // Add required created_by field
           completed_at: undefined,
         };
 

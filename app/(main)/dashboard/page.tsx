@@ -48,6 +48,7 @@ import {
 } from 'lucide-react';
 import { SpaceSelector } from '@/components/spaces/SpaceSelector';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
+import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import { TimeAwareWelcomeBox } from '@/components/ui/TimeAwareWelcomeBox';
 import { CTAButton } from '@/components/ui/EnhancedButton';
@@ -989,11 +990,15 @@ export default function DashboardPage() {
   }
 
   return (
-    <FeatureLayout
-      breadcrumbItems={[{ label: 'Dashboard' }]}
-      backgroundVariant="vibrant"
-      enableTimeAware={true}
+    <PageErrorBoundary
+      pageName="Dashboard"
+      pageDescription="your main dashboard with tasks, stats, and check-ins"
     >
+      <FeatureLayout
+        breadcrumbItems={[{ label: 'Dashboard' }]}
+        backgroundVariant="vibrant"
+        enableTimeAware={true}
+      >
       <div className="min-h-screen p-4 sm:p-6 md:p-8">
         <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4">
           {/* Enhanced Time-Aware Welcome Header */}
@@ -2085,5 +2090,6 @@ export default function DashboardPage() {
         streak={checkInStats?.currentStreak || 0}
       />
     </FeatureLayout>
+    </PageErrorBoundary>
   );
 }
