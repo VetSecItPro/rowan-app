@@ -42,7 +42,7 @@ const SignUpSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // Extract IP for rate limiting
+    // Extract IP for rate limiting (deployment fix)
     const ip = extractIP(request.headers);
 
     // Apply rate limiting (more restrictive for signup: 3 attempts per hour)
