@@ -142,9 +142,9 @@ export function Header() {
                     COLOR_THEMES[user.color_theme as keyof typeof COLOR_THEMES] || 'bg-purple-600'
                   }`}
                 >
-                  {user.profile_image_url ? (
+                  {user.avatar_url ? (
                     <img
-                      src={user.profile_image_url}
+                      src={user.avatar_url}
                       alt={user.name}
                       className="w-6 h-6 rounded-full object-cover border border-white/20"
                     />
@@ -163,9 +163,9 @@ export function Header() {
                     {/* Profile Section */}
                     <div className="px-4 py-3 border-b border-gray-200/50 dark:border-gray-700/50">
                       <div className="flex items-center gap-3">
-                        {user.profile_image_url ? (
+                        {user.avatar_url ? (
                           <img
-                            src={user.profile_image_url}
+                            src={user.avatar_url}
                             alt={user.name}
                             className="w-8 h-8 rounded-full object-cover"
                           />
