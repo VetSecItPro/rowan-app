@@ -7,6 +7,7 @@ import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
 import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
+import { DeleteSpaceModal } from '@/components/spaces/DeleteSpaceModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PasswordConfirmModal } from '@/components/settings/PasswordConfirmModal';
 import { AccountDeletionModal } from '@/components/settings/AccountDeletionModal';
@@ -257,6 +258,7 @@ export default function SettingsPage() {
   const [showManageMembersModal, setShowManageMembersModal] = useState(false);
   const [showLeaveSpaceModal, setShowLeaveSpaceModal] = useState(false);
   const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
+  const [showDeleteSpaceModal, setShowDeleteSpaceModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const [showRevokeSessionModal, setShowRevokeSessionModal] = useState(false);
@@ -742,7 +744,7 @@ export default function SettingsPage() {
   };
 
   const tabs = [
-    { id: 'profile' as SettingsTab, name: 'Profile & Workspaces', icon: User, description: 'Manage your personal information and workspaces' },
+    { id: 'profile' as SettingsTab, name: 'Profile & Spaces', icon: User, description: 'Manage your personal information and spaces' },
     { id: 'security' as SettingsTab, name: 'Security', icon: Shield, description: 'Password and authentication' },
     { id: 'privacy-data' as SettingsTab, name: 'Privacy & Data', icon: Lock, description: 'Privacy settings and data management' },
     { id: 'documentation' as SettingsTab, name: 'Documentation', icon: BookOpen, description: 'Browse our guides and tutorials' },
@@ -802,8 +804,8 @@ export default function SettingsPage() {
                 {activeTab === 'profile' && (
                   <div className="space-y-6 sm:space-y-8">
                     <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Profile & Workspaces</h2>
-                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Update your personal information and manage your workspaces</p>
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Profile & Spaces</h2>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Update your personal information and manage your spaces</p>
                     </div>
 
                     {/* Avatar Upload */}
@@ -885,11 +887,11 @@ export default function SettingsPage() {
 
                     {/* Spaces Management Section */}
                     <div className="border-t border-gray-200 dark:border-gray-700 pt-6 sm:pt-8">
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4">Your Workspaces</h3>
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4">Your Spaces</h3>
 
                       {/* All Spaces */}
                       <div className="mb-6">
-                        <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-3">Switch Workspace</h4>
+                        <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-3">Switch Space</h4>
                         <div className="space-y-3">
                           {spaces && spaces.length > 0 ? (
                             spaces.map((space) => (
@@ -933,20 +935,28 @@ export default function SettingsPage() {
                       {currentSpace && (
                         <div className="mb-6 p-4 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-xl">
                           <div className="flex items-center justify-between mb-3">
-                            <h4 className="text-base font-semibold text-gray-900 dark:text-white">
-                              Current Workspace: {!isRenamingSpace ? currentSpace.name : 'Renaming...'}
-                            </h4>
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold">
+                                {currentSpace.name.charAt(0).toUpperCase()}
+                              </div>
+                              <div>
+                                <h4 className="text-base font-semibold text-gray-900 dark:text-white">
+                                  {!isRenamingSpace ? currentSpace.name : 'Renaming...'}
+                                </h4>
+                                <p className="text-xs text-gray-600 dark:text-gray-400">
+                                  Current Space
+                                </p>
+                              </div>
+                            </div>
                             {!isRenamingSpace && (
-                              <button
+                              <Edit
+                                className="w-5 h-5 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors cursor-pointer"
                                 onClick={() => {
                                   setIsRenamingSpace(true);
                                   setNewSpaceNameEdit(currentSpace.name);
                                 }}
-                                className="btn-touch p-2 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-all active:scale-95"
-                                title="Rename workspace"
-                              >
-                                <Edit className="w-4 h-4" />
-                              </button>
+                                title="Rename space"
+                              />
                             )}
                           </div>
 
@@ -957,7 +967,7 @@ export default function SettingsPage() {
                                   type="text"
                                   value={newSpaceNameEdit}
                                   onChange={(e) => setNewSpaceNameEdit(e.target.value)}
-                                  placeholder="Enter new workspace name"
+                                  placeholder="Enter new space name"
                                   className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-purple-300 dark:border-purple-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
                                   autoFocus
                                 />
@@ -993,27 +1003,38 @@ export default function SettingsPage() {
                               </div>
                             </div>
                           ) : (
-                            <button
-                              onClick={() => setShowInviteModal(true)}
-                              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm flex items-center gap-2 hover:shadow-lg"
-                            >
-                              <UserPlus className="w-4 h-4" />
-                              Invite Members
-                            </button>
+                            <div className="flex gap-2 flex-wrap">
+                              <button
+                                onClick={() => setShowInviteModal(true)}
+                                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm flex items-center gap-2 hover:shadow-lg"
+                              >
+                                <UserPlus className="w-4 h-4" />
+                                Invite Members
+                              </button>
+                              {currentSpace?.role === 'owner' && (
+                                <button
+                                  onClick={() => setShowDeleteSpaceModal(true)}
+                                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm flex items-center gap-2 hover:shadow-lg"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                  Delete Space
+                                </button>
+                              )}
+                            </div>
                           )}
                         </div>
                       )}
 
                       {/* Create New Space */}
                       <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
-                        <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-2">Create New Workspace</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Start a new workspace for another family or team</p>
+                        <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-2">Create New Space</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Start a new space for another family or team</p>
                         <button
                           onClick={() => setShowCreateSpaceModal(true)}
                           className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:opacity-90 transition-colors text-sm flex items-center gap-2 hover:shadow-lg"
                         >
                           <UserPlus className="w-4 h-4" />
-                          New Workspace
+                          New Space
                         </button>
                       </div>
                     </div>
@@ -1676,6 +1697,34 @@ export default function SettingsPage() {
         isOpen={showDeleteAccountModal}
         onClose={() => setShowDeleteAccountModal(false)}
       />
+
+      {/* Create Space Modal */}
+      <CreateSpaceModal
+        isOpen={showCreateSpaceModal}
+        onClose={() => setShowCreateSpaceModal(false)}
+        onSuccess={refreshSpaces}
+      />
+
+      {/* Invite Partner Modal */}
+      <InvitePartnerModal
+        isOpen={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+        spaceId={currentSpace?.id || ''}
+        spaceName={currentSpace?.name || ''}
+      />
+
+      {/* Delete Space Modal */}
+      {currentSpace && (
+        <DeleteSpaceModal
+          isOpen={showDeleteSpaceModal}
+          onClose={() => setShowDeleteSpaceModal(false)}
+          space={currentSpace}
+          onSuccess={() => {
+            setShowDeleteSpaceModal(false);
+            refreshSpaces();
+          }}
+        />
+      )}
     </FeatureLayout>
   );
 }

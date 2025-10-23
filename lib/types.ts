@@ -654,6 +654,7 @@ export interface SpaceInvitation {
   invited_by: string | null;
   token: string;
   status: InvitationStatus;
+  role: 'member' | 'admin';
   created_at: string;
   expires_at: string;
 }
