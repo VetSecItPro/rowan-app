@@ -104,9 +104,21 @@ export default function SignUpPage() {
     e.preventDefault();
     setError('');
 
-    // Validation
+    // Frontend validation matching backend requirements
     if (password.length < 8) {
       setError('Password must be at least 8 characters long');
+      return;
+    }
+    if (!/[A-Z]/.test(password)) {
+      setError('Password must contain at least one uppercase letter');
+      return;
+    }
+    if (!/[a-z]/.test(password)) {
+      setError('Password must contain at least one lowercase letter');
+      return;
+    }
+    if (!/[0-9]/.test(password)) {
+      setError('Password must contain at least one number');
       return;
     }
 
@@ -121,10 +133,22 @@ export default function SignUpPage() {
     });
 
     if (error) {
-      if (error.message.includes('already registered')) {
+      // Handle specific error cases with user-friendly messages
+      if (error.message.includes('already registered') || error.message.includes('already exists')) {
         setError('An account with this email already exists');
+      } else if (error.message.includes('Service temporarily unavailable')) {
+        setError('Service temporarily unavailable. Please try again in a few minutes.');
+      } else if (error.message.includes('Connection problem')) {
+        setError('Connection problem. Please check your internet and try again.');
+      } else if (error.message.includes('Too many requests')) {
+        setError('Too many signup attempts. Please try again later.');
+      } else if (error.message.includes('Invalid email')) {
+        setError('Please enter a valid email address.');
+      } else if (error.message.includes('Password')) {
+        setError('Password must be at least 8 characters with uppercase, lowercase, and number.');
       } else {
-        setError(error.message || 'Failed to create account');
+        // Generic fallback message - never expose technical details
+        setError('Failed to create account. Please try again.');
       }
       setIsLoading(false);
     } else {
@@ -297,7 +321,7 @@ export default function SignUpPage() {
                 </button>
               </div>
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Must be at least 8 characters
+                Must be at least 8 characters with uppercase, lowercase, and number
               </p>
             </div>
 

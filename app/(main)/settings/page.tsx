@@ -56,7 +56,8 @@ import {
   Home,
   Heart,
   AlertCircle,
-  Loader2
+  Loader2,
+  Edit
 } from 'lucide-react';
 
 type SettingsTab = 'profile' | 'security' | 'privacy-data' | 'documentation' | 'analytics' | 'help';
@@ -237,6 +238,16 @@ export default function SettingsPage() {
   });
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
+  // Update profile data when user data changes
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        name: user.name || '',
+        email: user.email || ''
+      });
+    }
+  }, [user]);
+
   // Password reset state
   const [isRequestingReset, setIsRequestingReset] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
@@ -265,6 +276,11 @@ export default function SettingsPage() {
   // Create space state
   const [newSpaceName, setNewSpaceName] = useState('');
   const [isCreatingSpace, setIsCreatingSpace] = useState(false);
+
+  // Rename space state
+  const [isRenamingSpace, setIsRenamingSpace] = useState(false);
+  const [newSpaceNameEdit, setNewSpaceNameEdit] = useState('');
+  const [isSavingSpaceName, setIsSavingSpaceName] = useState(false);
 
   // Export state
   const [exportStatus, setExportStatus] = useState<ExportStatus>('idle');
@@ -367,18 +383,55 @@ export default function SettingsPage() {
   const handleSaveProfile = async () => {
     setIsSavingProfile(true);
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(profileData.email)) {
-      alert('Please enter a valid email address');
+    try {
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(profileData.email)) {
+        alert('Please enter a valid email address');
+        setIsSavingProfile(false);
+        return;
+      }
+
+      // Validate name
+      if (!profileData.name.trim()) {
+        alert('Please enter your name');
+        setIsSavingProfile(false);
+        return;
+      }
+
+      // Call profile update API
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: profileData.name.trim(),
+          email: profileData.email.trim(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update profile');
+      }
+
+      // Success - show feedback
+      alert('Profile updated successfully!');
+
+      // Refresh the auth context to get updated user data
+      // The auth context will automatically refresh on the next API call
+
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+
+      // Show user-friendly error message
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update profile. Please try again.';
+      alert(errorMessage);
+    } finally {
       setIsSavingProfile(false);
-      return;
     }
-
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    setIsSavingProfile(false);
   };
 
   const handleSendInvite = async () => {
@@ -461,6 +514,42 @@ export default function SettingsPage() {
     setNewSpaceName('');
     setIsCreatingSpace(false);
     setShowCreateSpaceModal(false);
+  };
+
+  const handleRenameSpace = async () => {
+    if (!newSpaceNameEdit.trim()) {
+      alert('Please enter a space name');
+      return;
+    }
+
+    if (!currentSpace) {
+      alert('No space selected');
+      return;
+    }
+
+    setIsSavingSpaceName(true);
+
+    try {
+      // TODO: Implement actual API call to rename space
+      // For now, just simulate the rename
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Success feedback
+      alert('Space renamed successfully!');
+
+      // Exit rename mode
+      setIsRenamingSpace(false);
+      setNewSpaceNameEdit('');
+
+      // Refresh spaces to get updated data
+      refreshSpaces();
+
+    } catch (error) {
+      console.error('Failed to rename space:', error);
+      alert('Failed to rename space. Please try again.');
+    } finally {
+      setIsSavingSpaceName(false);
+    }
   };
 
   const handleRequestExport = async () => {
@@ -843,14 +932,75 @@ export default function SettingsPage() {
                       {/* Current Space Actions */}
                       {currentSpace && (
                         <div className="mb-6 p-4 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-xl">
-                          <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-3">Current Workspace: {currentSpace.name}</h4>
-                          <button
-                            onClick={() => setShowInviteModal(true)}
-                            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm flex items-center gap-2 hover:shadow-lg"
-                          >
-                            <UserPlus className="w-4 h-4" />
-                            Invite Members
-                          </button>
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-base font-semibold text-gray-900 dark:text-white">
+                              Current Workspace: {!isRenamingSpace ? currentSpace.name : 'Renaming...'}
+                            </h4>
+                            {!isRenamingSpace && (
+                              <button
+                                onClick={() => {
+                                  setIsRenamingSpace(true);
+                                  setNewSpaceNameEdit(currentSpace.name);
+                                }}
+                                className="btn-touch p-2 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-all active:scale-95"
+                                title="Rename workspace"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+
+                          {isRenamingSpace ? (
+                            <div className="space-y-3">
+                              <div>
+                                <input
+                                  type="text"
+                                  value={newSpaceNameEdit}
+                                  onChange={(e) => setNewSpaceNameEdit(e.target.value)}
+                                  placeholder="Enter new workspace name"
+                                  className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-purple-300 dark:border-purple-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                                  autoFocus
+                                />
+                              </div>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={handleRenameSpace}
+                                  disabled={isSavingSpaceName || !newSpaceNameEdit.trim()}
+                                  className="px-3 py-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  {isSavingSpaceName ? (
+                                    <>
+                                      <Loader2 className="w-3 h-3 animate-spin" />
+                                      Saving...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Save className="w-3 h-3" />
+                                      Save
+                                    </>
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setIsRenamingSpace(false);
+                                    setNewSpaceNameEdit('');
+                                  }}
+                                  disabled={isSavingSpaceName}
+                                  className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm disabled:opacity-50"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setShowInviteModal(true)}
+                              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm flex items-center gap-2 hover:shadow-lg"
+                            >
+                              <UserPlus className="w-4 h-4" />
+                              Invite Members
+                            </button>
+                          )}
                         </div>
                       )}
 

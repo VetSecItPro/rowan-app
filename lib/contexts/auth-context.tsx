@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect, useMemo, ReactNode } fr
 import { createClient } from '@/lib/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Space } from '@/lib/types';
+import { createSecureError, handleApiResponse, AUTH_ERROR_MESSAGES, logSecurityEvent } from '@/lib/utils/secure-error-handling';
 
 interface UserProfile {
   id: string;
@@ -215,21 +216,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }),
       });
 
-      const result = await response.json();
+      // Use secure API response handler
+      const result = await handleApiResponse(response, 'signup');
 
-      if (!response.ok) {
-        // Handle specific error cases
-        if (response.status === 429) {
-          return { error: new Error(result.error || 'Too many signup attempts. Please try again later.') };
-        }
-        return { error: new Error(result.error || 'Signup failed') };
-      }
-
-      // Database trigger handles profile and space creation automatically
+      // If we reach here, the response was successful
       return { error: null };
     } catch (error) {
-      console.error('Sign up error:', error);
-      return { error: error as Error };
+      // Log security event for monitoring
+      logSecurityEvent('signup_error', {
+        email: email.replace(/(.{2}).*(@.*)/, '$1***$2'), // Partially mask email for privacy
+        errorType: error instanceof Error ? error.constructor.name : 'Unknown',
+        timestamp: new Date().toISOString(),
+      }, 'medium');
+
+      // Create secure error for user display
+      const secureError = createSecureError(error, 'signup', AUTH_ERROR_MESSAGES.SIGNUP_FAILED);
+
+      return { error: new Error(secureError.userMessage) };
     }
   };
 
@@ -247,23 +250,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }),
       });
 
-      const result = await response.json();
+      // Use secure API response handler
+      const result = await handleApiResponse(response, 'signin');
 
-      if (!response.ok) {
-        // Handle specific error cases
-        if (response.status === 429) {
-          return { error: new Error(result.error || 'Too many signin attempts. Please try again later.') };
-        }
-        if (response.status === 401) {
-          return { error: new Error('Invalid email or password') };
-        }
-        return { error: new Error(result.error || 'Signin failed') };
-      }
-
+      // If we reach here, the response was successful
       return { error: null };
     } catch (error) {
-      console.error('Sign in error:', error);
-      return { error: error as Error };
+      // Log security event for monitoring
+      logSecurityEvent('signin_error', {
+        email: email.replace(/(.{2}).*(@.*)/, '$1***$2'), // Partially mask email for privacy
+        errorType: error instanceof Error ? error.constructor.name : 'Unknown',
+        timestamp: new Date().toISOString(),
+      }, 'medium');
+
+      // Create secure error for user display
+      const secureError = createSecureError(error, 'signin', AUTH_ERROR_MESSAGES.SIGNIN_FAILED);
+
+      return { error: new Error(secureError.userMessage) };
     }
   };
 
