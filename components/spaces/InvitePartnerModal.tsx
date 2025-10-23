@@ -13,6 +13,7 @@ interface InvitePartnerModalProps {
 
 export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: InvitePartnerModalProps) {
   const [email, setEmail] = useState('');
+  const [role, setRole] = useState<'member' | 'admin'>('member');
   const [loading, setLoading] = useState(false);
   const [invitationUrl, setInvitationUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -20,6 +21,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
   useEffect(() => {
     if (isOpen) {
       setEmail('');
+      setRole('member');
       setLoading(false);
       setInvitationUrl(null);
       setCopied(false);
@@ -52,6 +54,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
         body: JSON.stringify({
           space_id: spaceId,
           email: email.trim().toLowerCase(),
+          role: role,
         }),
       });
 
@@ -86,6 +89,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
 
   const handleClose = () => {
     setEmail('');
+    setRole('member');
     setInvitationUrl(null);
     setCopied(false);
     onClose();
@@ -115,12 +119,10 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
                 <p className="text-purple-100 text-sm mt-1">{spaceName}</p>
               </div>
             </div>
-            <button
+            <X
+              className="w-5 h-5 text-white cursor-pointer hover:opacity-80 transition-opacity"
               onClick={handleClose}
-              className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active-press hover-lift"
-            >
-              <X className="w-5 h-5 sm:w-4 sm:h-4" />
-            </button>
+            />
           </div>
         </div>
 
@@ -148,6 +150,33 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
               <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                 They&apos;ll receive an email with a link to join this space.
               </p>
+            </div>
+
+            {/* Role Selection */}
+            <div>
+              <label htmlFor="role-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                Role *
+              </label>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value as 'member' | 'admin')}
+                className="w-full pl-4 pr-10 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
+                disabled={loading}
+                id="role-select"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+                  backgroundPosition: 'right 12px center',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundSize: '16px'
+                }}
+              >
+                <option value="member">Member</option>
+                <option value="admin">Admin</option>
+              </select>
+              <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                <p className="mb-1"><span className="font-medium">Member:</span> Can view and collaborate on all content</p>
+                <p><span className="font-medium">Admin:</span> Can invite/remove members and manage the workspace</p>
+              </div>
             </div>
 
             {/* Actions */}
