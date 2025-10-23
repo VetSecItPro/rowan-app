@@ -127,3 +127,55 @@ export function StatsCardSkeleton() {
     </div>
   );
 }
+
+export function TaskCardSkeleton() {
+  return (
+    <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg p-4 sm:p-4">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-3 gap-3">
+        <div className="flex items-start gap-3 flex-1">
+          {/* Checkbox */}
+          <Skeleton className="w-6 h-6 rounded flex-shrink-0 mt-0.5" />
+
+          {/* Title & Description */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <Skeleton className="h-5 w-3/4 max-w-48" />
+              <Skeleton className="h-5 w-16 rounded-full" />
+              <Skeleton className="h-5 w-20 rounded-full" />
+            </div>
+            <Skeleton className="h-4 w-full max-w-80" />
+            <Skeleton className="h-4 w-2/3 max-w-60 mt-1" />
+          </div>
+        </div>
+
+        {/* More Menu */}
+        <Skeleton className="w-6 h-6 rounded flex-shrink-0" />
+      </div>
+
+      {/* Meta Information */}
+      <div className="flex items-center gap-3 flex-wrap">
+        {/* Priority */}
+        <div className="flex items-center gap-1">
+          <Skeleton className="w-3 h-3" />
+          <Skeleton className="h-3 w-12" />
+        </div>
+
+        {/* Due Date */}
+        <div className="flex items-center gap-1">
+          <Skeleton className="w-3 h-3" />
+          <Skeleton className="h-3 w-20" />
+        </div>
+
+        {/* Status Badge */}
+        <Skeleton className="h-5 w-16 rounded-full ml-auto" />
+      </div>
+
+      {/* Optional Assigned User */}
+      <div className="mt-3 flex items-center gap-2">
+        <Skeleton className="w-3 h-3" />
+        <Skeleton className="h-3 w-16" />
+      </div>
+    </div>
+  );
+}
