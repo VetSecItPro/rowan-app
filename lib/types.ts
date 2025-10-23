@@ -40,6 +40,11 @@ export enum SpaceMemberRole {
   MEMBER = 'member',
 }
 
+export enum PresenceStatus {
+  ONLINE = 'online',
+  OFFLINE = 'offline',
+}
+
 export enum GoalStatus {
   ACTIVE = 'active',
   COMPLETED = 'completed',
@@ -105,6 +110,23 @@ export interface SpaceMember {
   user_id: string;
   role: string;
   joined_at: string;
+}
+
+export interface UserPresence {
+  user_id: string;
+  space_id: string;
+  status: PresenceStatus;
+  last_activity: string;
+  updated_at: string;
+}
+
+export interface SpaceMemberWithPresence extends SpaceMember {
+  name: string;
+  email: string;
+  avatar_url?: string;
+  presence_status: PresenceStatus;
+  last_activity?: string;
+  presence_updated_at?: string;
 }
 
 // =============================================
