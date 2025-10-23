@@ -49,7 +49,7 @@ export async function PUT(request: Request) {
       );
     }
 
-    const { name, email } = body;
+    const { name, email, avatar_url } = body;
 
     // Validate input
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
@@ -62,6 +62,14 @@ export async function PUT(request: Request) {
     if (!email || typeof email !== 'string') {
       return NextResponse.json(
         { error: 'Email is required and must be a string' },
+        { status: 400 }
+      );
+    }
+
+    // Validate avatar_url if provided
+    if (avatar_url !== undefined && avatar_url !== null && typeof avatar_url !== 'string') {
+      return NextResponse.json(
+        { error: 'Avatar URL must be a string' },
         { status: 400 }
       );
     }
@@ -79,14 +87,22 @@ export async function PUT(request: Request) {
     const sanitizedName = name.trim();
     const sanitizedEmail = email.trim().toLowerCase();
 
+    // Prepare update data
+    const updateData: any = {
+      name: sanitizedName,
+      email: sanitizedEmail,
+      updated_at: new Date().toISOString(),
+    };
+
+    // Include avatar_url if provided
+    if (avatar_url !== undefined) {
+      updateData.avatar_url = avatar_url;
+    }
+
     // Update user profile in database
     const { data: updatedUser, error: updateError } = await supabase
       .from('users')
-      .update({
-        name: sanitizedName,
-        email: sanitizedEmail,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updateData)
       .eq('id', user.id)
       .select()
       .single();
