@@ -215,7 +215,7 @@ const documentationFeatures = [
 ];
 
 export default function SettingsPage() {
-  const { user, currentSpace, spaces, switchSpace, refreshSpaces } = useAuth();
+  const { user, currentSpace, spaces, switchSpace, refreshSpaces, refreshProfile } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -246,6 +246,7 @@ export default function SettingsPage() {
         name: user.name || '',
         email: user.email || ''
       });
+      setProfileImage(user.avatar_url || null);
     }
   }, [user]);
 
@@ -410,6 +411,7 @@ export default function SettingsPage() {
         body: JSON.stringify({
           name: profileData.name.trim(),
           email: profileData.email.trim(),
+          avatar_url: profileImage, // Include profile picture
         }),
       });
 
@@ -423,7 +425,7 @@ export default function SettingsPage() {
       alert('Profile updated successfully!');
 
       // Refresh the auth context to get updated user data
-      // The auth context will automatically refresh on the next API call
+      await refreshProfile();
 
     } catch (error) {
       console.error('Failed to update profile:', error);
