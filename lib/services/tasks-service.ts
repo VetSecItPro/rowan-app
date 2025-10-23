@@ -55,7 +55,26 @@ export const tasksService = {
     try {
       let query = supabase
         .from('tasks')
-        .select('*')
+        .select(`
+          id,
+          title,
+          description,
+          status,
+          priority,
+          category,
+          due_date,
+          assigned_to,
+          created_by,
+          sort_order,
+          created_at,
+          updated_at,
+          space_id,
+          completed_at,
+          estimated_hours,
+          quick_note,
+          tags,
+          calendar_sync
+        `)
         .eq('space_id', spaceId);
 
       // Apply filters

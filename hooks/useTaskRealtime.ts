@@ -52,7 +52,7 @@ export function useTaskRealtime({
 
         const { data: membership, error: memberError } = await supabase
           .from('space_members')
-          .select('user_id, role')
+          .select('user_id')
           .eq('space_id', spaceId)
           .eq('user_id', user.id)
           .single();
@@ -75,7 +75,21 @@ export function useTaskRealtime({
 
         let query = supabase
           .from('tasks')
-          .select('*')
+          .select(`
+            id,
+            title,
+            description,
+            status,
+            priority,
+            category,
+            due_date,
+            assigned_to,
+            created_by,
+            sort_order,
+            created_at,
+            updated_at,
+            space_id
+          `)
           .eq('space_id', spaceId)
           .order('sort_order', { ascending: true });
 
@@ -246,7 +260,15 @@ export function useSubtaskRealtime(taskId: string) {
       try {
         const { data, error } = await supabase
           .from('task_subtasks')
-          .select('*')
+          .select(`
+            id,
+            title,
+            completed,
+            sort_order,
+            parent_task_id,
+            created_at,
+            updated_at
+          `)
           .eq('parent_task_id', taskId)
           .order('sort_order', { ascending: true });
 
@@ -298,7 +320,14 @@ export function useCommentsRealtime(taskId: string) {
       try {
         const { data, error } = await supabase
           .from('task_comments')
-          .select('*')
+          .select(`
+            id,
+            content,
+            user_id,
+            task_id,
+            created_at,
+            updated_at
+          `)
           .eq('task_id', taskId)
           .order('created_at', { ascending: true });
 
