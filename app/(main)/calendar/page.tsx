@@ -5,19 +5,34 @@ import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, Ca
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { EventCard } from '@/components/calendar/EventCard';
-import { NewEventModal } from '@/components/calendar/NewEventModal';
-import { EventDetailModal } from '@/components/calendar/EventDetailModal';
-import { EventProposalModal } from '@/components/calendar/EventProposalModal';
 import { ProposalsList } from '@/components/calendar/ProposalsList';
 import { MiniCalendar } from '@/components/calendar/MiniCalendar';
 import { QuickAddEvent } from '@/components/calendar/QuickAddEvent';
-import { EnhancedDayView } from '@/components/calendar/EnhancedDayView';
-import { EnhancedWeekView } from '@/components/calendar/EnhancedWeekView';
-import { TemplateLibrary } from '@/components/calendar/TemplateLibrary';
-import { WeatherBadge } from '@/components/calendar/WeatherBadge';
+import dynamic from 'next/dynamic';
+
+// Dynamic imports for heavy components (load only when needed)
+const NewEventModal = dynamic(() => import('@/components/calendar/NewEventModal').then(mod => ({ default: mod.NewEventModal })), {
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
+});
+
+const EventDetailModal = dynamic(() => import('@/components/calendar/EventDetailModal').then(mod => ({ default: mod.EventDetailModal })), {
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
+});
+
+const EventProposalModal = dynamic(() => import('@/components/calendar/EventProposalModal').then(mod => ({ default: mod.EventProposalModal })), {
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
+});
+
+const EnhancedDayView = dynamic(() => import('@/components/calendar/EnhancedDayView').then(mod => ({ default: mod.EnhancedDayView })));
+const EnhancedWeekView = dynamic(() => import('@/components/calendar/EnhancedWeekView').then(mod => ({ default: mod.EnhancedWeekView })));
+const TemplateLibrary = dynamic(() => import('@/components/calendar/TemplateLibrary').then(mod => ({ default: mod.TemplateLibrary })));
+const WeatherBadge = dynamic(() => import('@/components/calendar/WeatherBadge').then(mod => ({ default: mod.WeatherBadge })));
 import { geolocationService } from '@/lib/services/geolocation-service';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
-import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
+const GuidedEventCreation = dynamic(() => import('@/components/guided/GuidedEventCreation'), {
+  ssr: false, // Only load on client side for new users
+  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div></div>
+});
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
 import { useCalendarShortcuts } from '@/lib/hooks/useCalendarShortcuts';
