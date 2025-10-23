@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as ImageIcon, Paperclip, TrendingUp, X } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
+import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { MessageCard } from '@/components/messages/MessageCard';
 import { NewMessageModal } from '@/components/messages/NewMessageModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -783,7 +784,8 @@ export default function MessagesPage() {
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Messages' }]}>
-      <div className="p-4 sm:p-8">
+      <PageErrorBoundary>
+        <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-4 sm:space-y-8">
           {/* Header */}
           <div className="flex items-center gap-3 sm:gap-4">
@@ -1269,6 +1271,7 @@ export default function MessagesPage() {
           )}
         </div>
       </div>
+      </PageErrorBoundary>
 
       {/* Edit Message Modal (only for editing) */}
       {currentSpace && editingMessage && (

@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown, TrendingUp, Sparkles, Zap, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
+import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { ReminderCard } from '@/components/reminders/ReminderCard';
 import { NewReminderModal } from '@/components/reminders/NewReminderModal';
 import { BulkActionsToolbar } from '@/components/reminders/BulkActionsToolbar';
@@ -360,7 +361,8 @@ export default function RemindersPage(): JSX.Element {
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Reminders' }]}>
-      <div className="p-4 sm:p-8">
+      <PageErrorBoundary>
+        <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -980,6 +982,7 @@ export default function RemindersPage(): JSX.Element {
           </div>
         )
       )}
+      </PageErrorBoundary>
 
       {/* Bulk Actions Toolbar */}
       {currentSpace && (

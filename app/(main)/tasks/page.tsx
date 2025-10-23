@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, Home, Filter, Download, Repeat, FileText, Zap, TrendingUp, TrendingDown, Minus, ChevronDown, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
+import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { TaskCard } from '@/components/tasks/TaskCard';
 import { DraggableItemList } from '@/components/tasks/DraggableItemList';
 import { UnifiedItemModal } from '@/components/shared/UnifiedItemModal';
@@ -621,7 +622,8 @@ export default function TasksPage() {
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Tasks & Chores' }]}>
-      <div className="min-h-full p-4 sm:p-8">
+      <PageErrorBoundary>
+        <div className="min-h-full p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -992,6 +994,7 @@ export default function TasksPage() {
           )}
         </div>
       </div>
+      </PageErrorBoundary>
 
       {/* Unified Modals */}
       {currentSpace && user && (

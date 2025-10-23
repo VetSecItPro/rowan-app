@@ -866,7 +866,7 @@ export default function SettingsPage() {
                           type="text"
                           value={profileData.name}
                           id="field-1"
-              onChange={(e) =>  setProfileData({ ...profileData, name: e.target.value })}
+              onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
                           className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-all"
                         />
                       </div>
@@ -879,7 +879,7 @@ export default function SettingsPage() {
                           type="email"
                           value={profileData.email}
                           id="field-2"
-              onChange={(e) =>  setProfileData({ ...profileData, email: e.target.value })}
+              onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
                           className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-all"
                         />
                       </div>
