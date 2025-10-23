@@ -9,20 +9,50 @@ import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { GoalCard } from '@/components/goals/GoalCard';
 import { SortableGoalsList } from '@/components/goals/SortableGoalsList';
 import { MilestoneCard } from '@/components/goals/MilestoneCard';
-import { NewGoalModal } from '@/components/goals/NewGoalModal';
-import { NewMilestoneModal } from '@/components/goals/NewMilestoneModal';
-import { TemplateSelectionModal } from '@/components/goals/TemplateSelectionModal';
-import { GoalCheckInModal } from '@/components/goals/GoalCheckInModal';
-import { CheckInHistoryTimeline } from '@/components/goals/CheckInHistoryTimeline';
-import { ActivityFeed } from '@/components/goals/ActivityFeed';
-import { CheckInFrequencyModal } from '@/components/goals/CheckInFrequencyModal';
-import { HabitTracker } from '@/components/goals/HabitTracker';
-import { DependenciesModal } from '@/components/goals/DependenciesModal';
-import { DependencyVisualization } from '@/components/goals/DependencyVisualization';
+import dynamic from 'next/dynamic';
+
+// Dynamic imports for heavy modal components (load only when opened)
+const NewGoalModal = dynamic(() => import('@/components/goals/NewGoalModal').then(mod => ({ default: mod.NewGoalModal })), {
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
+});
+
+const NewMilestoneModal = dynamic(() => import('@/components/goals/NewMilestoneModal').then(mod => ({ default: mod.NewMilestoneModal })), {
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
+});
+
+const TemplateSelectionModal = dynamic(() => import('@/components/goals/TemplateSelectionModal').then(mod => ({ default: mod.TemplateSelectionModal })), {
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
+});
+
+const GoalCheckInModal = dynamic(() => import('@/components/goals/GoalCheckInModal').then(mod => ({ default: mod.GoalCheckInModal })), {
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
+});
+
+const CheckInFrequencyModal = dynamic(() => import('@/components/goals/CheckInFrequencyModal').then(mod => ({ default: mod.CheckInFrequencyModal })), {
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
+});
+
+const DependenciesModal = dynamic(() => import('@/components/goals/DependenciesModal').then(mod => ({ default: mod.DependenciesModal })), {
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
+});
+
+// Dynamic imports for heavy view components (load only when active)
+const CheckInHistoryTimeline = dynamic(() => import('@/components/goals/CheckInHistoryTimeline').then(mod => ({ default: mod.CheckInHistoryTimeline })));
+const ActivityFeed = dynamic(() => import('@/components/goals/ActivityFeed').then(mod => ({ default: mod.ActivityFeed })));
+const HabitTracker = dynamic(() => import('@/components/goals/HabitTracker').then(mod => ({ default: mod.HabitTracker })));
+const DependencyVisualization = dynamic(() => import('@/components/goals/DependencyVisualization').then(mod => ({ default: mod.DependencyVisualization })));
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { GoalCardSkeleton, MilestoneCardSkeleton, StatsCardSkeleton } from '@/components/ui/Skeleton';
-import GuidedGoalCreation from '@/components/guided/GuidedGoalCreation';
+// Dynamic imports for additional heavy components
+const GuidedGoalCreation = dynamic(() => import('@/components/guided/GuidedGoalCreation'), {
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div></div>
+});
+
+const NudgeCenter = dynamic(() => import('@/components/nudges/NudgeCenter').then(mod => ({ default: mod.NudgeCenter })));
+const BadgesWidget = dynamic(() => import('@/components/goals/badges/BadgesWidget'));
+
 import { useAuth } from '@/lib/contexts/auth-context';
 import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput, GoalTemplate, CreateCheckInInput } from '@/lib/services/goals-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
@@ -30,8 +60,6 @@ import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import { usePresence } from '@/lib/hooks/usePresence';
 import { OnlineUsersIndicator, PresenceIndicator } from '@/components/shared/PresenceIndicator';
-import { NudgeCenter } from '@/components/nudges/NudgeCenter';
-import BadgesWidget from '@/components/goals/badges/BadgesWidget';
 
 type ViewMode = 'goals' | 'milestones' | 'habits' | 'activity' | 'dependencies' | 'nudges';
 

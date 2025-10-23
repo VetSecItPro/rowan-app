@@ -143,10 +143,14 @@ export function Header() {
                   }`}
                 >
                   {user.avatar_url ? (
-                    <img
+                    <Image
                       src={user.avatar_url}
                       alt={user.name}
+                      width={24}
+                      height={24}
                       className="w-6 h-6 rounded-full object-cover border border-white/20"
+                      sizes="24px"
+                      priority
                     />
                   ) : (
                     <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-semibold">
@@ -164,10 +168,13 @@ export function Header() {
                     <div className="px-4 py-3 border-b border-gray-200/50 dark:border-gray-700/50">
                       <div className="flex items-center gap-3">
                         {user.avatar_url ? (
-                          <img
+                          <Image
                             src={user.avatar_url}
                             alt={user.name}
+                            width={32}
+                            height={32}
                             className="w-8 h-8 rounded-full object-cover"
+                            sizes="32px"
                           />
                         ) : (
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold ${

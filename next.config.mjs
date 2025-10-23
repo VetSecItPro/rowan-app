@@ -1,4 +1,5 @@
 import { withSentryConfig } from '@sentry/nextjs';
+import bundleAnalyzer from '@next/bundle-analyzer';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -23,6 +24,25 @@ const nextConfig = {
   },
   experimental: {
     optimizePackageImports: ['lucide-react'],
+  },
+
+  // Image optimization settings
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '3000',
+      },
+    ],
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 60,
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
   // Security headers and CSP
@@ -99,5 +119,10 @@ const sentryWebpackPluginOptions = {
   // Source map upload enabled (org/project names verified)
 };
 
-// Export with Sentry wrapper
-export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);
+// Configure bundle analyzer
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+// Export with bundle analyzer and Sentry wrapper
+export default withBundleAnalyzer(withSentryConfig(nextConfig, sentryWebpackPluginOptions));
