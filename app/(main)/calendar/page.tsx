@@ -81,44 +81,13 @@ export default function CalendarPage() {
     user?.id
   );
 
-  // Memoize stats calculations
-  const stats = useMemo(() => {
-    const activeEvents = events.filter(e => e.status !== 'completed');
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - today.getDay());
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-
-    return {
-      total: activeEvents.length,
-      today: activeEvents.filter(e => {
-        const eventDate = new Date(e.start_time);
-        return eventDate >= today && eventDate < new Date(today.getTime() + 86400000);
-      }).length,
-      thisWeek: activeEvents.filter(e => {
-        const eventDate = new Date(e.start_time);
-        return eventDate >= weekStart;
-      }).length,
-      thisMonth: activeEvents.filter(e => {
-        const eventDate = new Date(e.start_time);
-        return eventDate >= monthStart;
-      }).length,
-    };
-  }, [events]);
-
-  // Memoize filtered events (handle list view vs calendar views differently)
+  // Memoize filtered events (consistent across all views)
   const filteredEvents = useMemo(() => {
     let filtered = events;
 
-    // For calendar views (not list), exclude completed events
-    if (viewMode !== 'list') {
-      filtered = events.filter(e => e.status !== 'completed');
-    } else {
-      // For list view, apply status filter
-      if (statusFilter !== 'all') {
-        filtered = events.filter(e => e.status === statusFilter);
-      }
+    // Apply status filter consistently across all views
+    if (statusFilter !== 'all') {
+      filtered = events.filter(e => e.status === statusFilter);
     }
 
     // Apply search filter
@@ -131,7 +100,32 @@ export default function CalendarPage() {
     }
 
     return filtered;
-  }, [events, searchQuery, viewMode, statusFilter]);
+  }, [events, searchQuery, statusFilter]);
+
+  // Memoize stats calculations - use filteredEvents to match current view
+  const stats = useMemo(() => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - today.getDay());
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    return {
+      total: filteredEvents.length,
+      today: filteredEvents.filter(e => {
+        const eventDate = parseISO(e.start_time);
+        return eventDate >= today && eventDate < new Date(today.getTime() + 86400000);
+      }).length,
+      thisWeek: filteredEvents.filter(e => {
+        const eventDate = parseISO(e.start_time);
+        return eventDate >= weekStart;
+      }).length,
+      thisMonth: filteredEvents.filter(e => {
+        const eventDate = parseISO(e.start_time);
+        return eventDate >= monthStart;
+      }).length,
+    };
+  }, [filteredEvents]);
 
   // Memoize calendar days calculation
   const calendarDays = useMemo(() => {
@@ -838,6 +832,55 @@ export default function CalendarPage() {
                     Proposal
                   </button>
                 </div>
+
+                {/* Status Filter - Available for all views except proposal */}
+                {viewMode !== 'proposal' && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Filter:</span>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => setStatusFilter('all')}
+                        className={`px-2 py-1 text-xs rounded font-medium transition-colors ${
+                          statusFilter === 'all'
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        All
+                      </button>
+                      <button
+                        onClick={() => setStatusFilter('not-started')}
+                        className={`px-2 py-1 text-xs rounded font-medium transition-colors ${
+                          statusFilter === 'not-started'
+                            ? 'bg-red-500 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        Pending
+                      </button>
+                      <button
+                        onClick={() => setStatusFilter('in-progress')}
+                        className={`px-2 py-1 text-xs rounded font-medium transition-colors ${
+                          statusFilter === 'in-progress'
+                            ? 'bg-amber-500 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        Active
+                      </button>
+                      <button
+                        onClick={() => setStatusFilter('completed')}
+                        className={`px-2 py-1 text-xs rounded font-medium transition-colors ${
+                          statusFilter === 'completed'
+                            ? 'bg-green-500 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1122,19 +1165,20 @@ export default function CalendarPage() {
                       Upcoming Events
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      Showing all future events in chronological order
+                      Showing events from today onwards in chronological order
                     </p>
                   </div>
 
                   {/* Agenda List */}
                   {(() => {
-                    // Get all future events
-                    const now = new Date();
-                    const futureEvents = filteredEvents
-                      .filter(e => parseISO(e.start_time) >= now)
+                    // Get events from today onwards (including events happening today)
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0); // Start of today
+                    const upcomingEvents = filteredEvents
+                      .filter(e => parseISO(e.start_time) >= today)
                       .sort((a, b) => parseISO(a.start_time).getTime() - parseISO(b.start_time).getTime());
 
-                    if (futureEvents.length === 0) {
+                    if (upcomingEvents.length === 0) {
                       return (
                         <div className="text-center py-12">
                           <CalendarClock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -1151,8 +1195,8 @@ export default function CalendarPage() {
                     }
 
                     // Group events by date
-                    const eventsByDate = new Map<string, typeof futureEvents>();
-                    futureEvents.forEach(event => {
+                    const eventsByDate = new Map<string, typeof upcomingEvents>();
+                    upcomingEvents.forEach(event => {
                       const dateKey = format(parseISO(event.start_time), 'yyyy-MM-dd');
                       if (!eventsByDate.has(dateKey)) {
                         eventsByDate.set(dateKey, []);
