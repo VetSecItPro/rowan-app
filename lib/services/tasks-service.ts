@@ -1,10 +1,9 @@
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 import { enhancedNotificationService } from './enhanced-notification-service';
-import type { CreateTaskInput } from '@/lib/validations/task-schemas';
+import type { CreateTaskInput, UpdateTaskInput } from '@/lib/validations/task-schemas';
 import type {
   Task,
-  UpdateTaskInput,
   TaskStats,
   TaskQueryOptions,
   PaginatedResponse,
@@ -537,9 +536,10 @@ export const tasksService = {
 
       const total = data.length;
       const completed = data.filter(t => t.status === 'completed').length;
-      const inProgress = data.filter(t => t.status === 'in_progress').length;
+      const inProgress = data.filter(t => t.status === 'in-progress').length;
       const pending = data.filter(t => t.status === 'pending').length;
-      const cancelled = data.filter(t => t.status === 'cancelled').length;
+      const blocked = data.filter(t => t.status === 'blocked').length;
+      const onHold = data.filter(t => t.status === 'on-hold').length;
 
       const byPriority = {
         low: data.filter(t => t.priority === 'low').length,
@@ -553,7 +553,8 @@ export const tasksService = {
         completed,
         inProgress,
         pending,
-        cancelled,
+        blocked,
+        onHold,
         byPriority,
       };
     } catch (error) {

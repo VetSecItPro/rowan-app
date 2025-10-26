@@ -374,8 +374,6 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
             <CTAButton
               type="submit"
               feature="shopping"
-              breathing
-              ripple
               icon={editList ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             >
               {editList ? 'Save Changes' : 'Create List'}

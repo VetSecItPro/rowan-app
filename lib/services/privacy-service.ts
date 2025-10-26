@@ -470,9 +470,9 @@ export async function getComplianceStatus(userId: string): Promise<PrivacyServic
         ccpaCompliant: preferences.ccpa_do_not_sell, // User has control over data selling
         cookieConsentGiven: true, // User has made cookie choices
         dataProcessingAgreements: {
-          marketing: preferences.marketing_emails_enabled || preferences.marketing_sms_enabled,
-          analytics: preferences.analytics_cookies_enabled || preferences.share_anonymous_analytics,
-          thirdParty: preferences.share_data_with_partners || preferences.third_party_analytics_enabled,
+          marketing: !!(preferences.marketing_emails_enabled || preferences.marketing_sms_enabled),
+          analytics: !!(preferences.analytics_cookies_enabled || preferences.share_anonymous_analytics),
+          thirdParty: !!(preferences.share_data_with_partners || preferences.third_party_analytics_enabled),
         },
         lastUpdated: preferences.updated_at,
       },

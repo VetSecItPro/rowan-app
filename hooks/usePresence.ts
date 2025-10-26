@@ -8,6 +8,7 @@ import {
   type PresenceHookData
 } from '@/lib/services/presence-service';
 import type { SpaceMemberWithPresence } from '@/lib/types';
+import { PresenceStatus } from '@/lib/types';
 
 /**
  * Simple presence hook for React components
@@ -58,7 +59,7 @@ export function usePresence(spaceId: string | null): PresenceHookData {
     const initializePresence = async () => {
       try {
         // Mark user as online
-        await updateUserPresence(spaceId, 'online');
+        await updateUserPresence(spaceId, PresenceStatus.ONLINE);
 
         // Initial data fetch
         await refreshPresence();
@@ -66,7 +67,7 @@ export function usePresence(spaceId: string | null): PresenceHookData {
         // Set up presence updates every 2 minutes
         presenceInterval = setInterval(async () => {
           try {
-            await updateUserPresence(spaceId, 'online');
+            await updateUserPresence(spaceId, PresenceStatus.ONLINE);
           } catch (err) {
             console.error('Presence update error:', err);
           }
@@ -96,7 +97,7 @@ export function usePresence(spaceId: string | null): PresenceHookData {
       } else {
         // Tab visible - mark online and refresh
         try {
-          await updateUserPresence(spaceId, 'online');
+          await updateUserPresence(spaceId, PresenceStatus.ONLINE);
           await refreshPresence();
         } catch (err) {
           console.error('Error marking user online:', err);

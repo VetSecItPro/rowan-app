@@ -118,7 +118,7 @@ const NewMessageEmail = ({
                 </Column>
               </Row>
 
-              <div style={messageContent}>
+              <div style={messageContentStyle}>
                 <Text style={messageText}>"{messageContent}"</Text>
               </div>
             </Section>
@@ -290,7 +290,7 @@ const conversationTitleText = {
   fontStyle: 'italic',
 };
 
-const messageContent = {
+const messageContentStyle = {
   marginTop: '16px',
   paddingTop: '16px',
   borderTop: '1px solid #f3f4f6',

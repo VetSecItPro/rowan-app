@@ -240,7 +240,8 @@ export const reminderNotificationsService = {
       // Map digest frequency to notification frequency
       const frequency: NotificationFrequency = digestFrequency === 'realtime' ? 'instant' :
                                                digestFrequency === 'weekly' ? 'daily' :
-                                               digestFrequency; // 'daily' maps directly
+                                               digestFrequency === 'daily' ? 'daily' :
+                                               'instant'; // default to instant for any other value
 
       // Queue for batching if not instant, or if in quiet hours
       if (frequency !== 'instant' || inQuietHours) {

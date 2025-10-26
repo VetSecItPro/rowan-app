@@ -106,7 +106,9 @@ export function CCPANoticeBanner({ onDismiss, autoDetect = true }: CCPANoticeBan
                     <span className="text-xs">
                       {location.city}, {location.state}
                       {confidence === 'low' && (
-                        <AlertCircle className="w-3 h-3 inline ml-1" title="Low confidence detection" />
+                        <span title="Low confidence detection">
+                          <AlertCircle className="w-3 h-3 inline ml-1" />
+                        </span>
                       )}
                     </span>
                   </div>

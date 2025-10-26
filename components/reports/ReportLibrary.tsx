@@ -45,10 +45,8 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
 
     try {
       setLoading(report.id);
-      const result = await downloadReportPDF(report.id);
-      if (!result.success) {
-        console.error('Failed to download report');
-      }
+      const blob = await downloadReportPDF(report.id);
+      // The function already handles the download automatically
     } catch (error) {
       console.error('Error downloading report:', error);
     } finally {
@@ -61,10 +59,8 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
 
     try {
       setLoading(report.id);
-      const result = await deleteReport(report.id);
-      if (result.success) {
-        onReportUpdated();
-      }
+      await deleteReport(report.id);
+      onReportUpdated();
     } catch (error) {
       console.error('Error deleting report:', error);
     } finally {
@@ -74,10 +70,8 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
 
   const handleToggleFavorite = async (report: GeneratedReport) => {
     try {
-      const result = await toggleReportFavorite(report.id);
-      if (result.success) {
-        onReportUpdated();
-      }
+      await toggleReportFavorite(report.id);
+      onReportUpdated();
     } catch (error) {
       console.error('Error toggling favorite:', error);
     }
@@ -209,7 +203,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                       onClick={() => handleToggleFavorite(report)}
                       className="text-gray-400 hover:text-red-500"
                     >
-                      <HeartIcon className={`h-5 w-5 ${report.is_favorite ? 'text-red-500' : ''}`} />
+                      <HeartIcon className={`h-5 w-5 ${(report as any).is_favorite ? 'text-red-500' : ''}`} />
                     </button>
                   </div>
 

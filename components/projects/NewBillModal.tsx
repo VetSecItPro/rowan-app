@@ -388,8 +388,6 @@ export function NewBillModal({
                 type="submit"
                 disabled={isSaving}
                 feature="projects"
-                breathing
-                ripple
                 icon={<DollarSign className="w-4 h-4" />}
               >
                 {isSaving ? 'Saving...' : editBill ? 'Update Bill' : 'Create Bill'}

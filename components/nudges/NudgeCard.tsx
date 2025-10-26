@@ -218,13 +218,13 @@ export function NudgeCard({
       {/* Metadata */}
       {(nudge.days_since_activity !== null || nudge.days_until_deadline !== null) && (
         <div className="flex items-center space-x-4 mb-4 text-xs text-gray-600 dark:text-gray-400">
-          {nudge.days_since_activity !== null && nudge.days_since_activity > 0 && (
+          {nudge.days_since_activity !== null && nudge.days_since_activity !== undefined && nudge.days_since_activity > 0 && (
             <div className="flex items-center space-x-1">
               <Clock className="w-3 h-3" />
               <span>{nudge.days_since_activity}d since update</span>
             </div>
           )}
-          {nudge.days_until_deadline !== null && (
+          {nudge.days_until_deadline !== null && nudge.days_until_deadline !== undefined && (
             <div className="flex items-center space-x-1">
               <Target className="w-3 h-3" />
               <span>

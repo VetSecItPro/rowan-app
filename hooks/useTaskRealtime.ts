@@ -88,8 +88,8 @@ export function useTaskRealtime({
           result = [...result, ...newTasks];
         }
 
-        // Sort once at the end
-        return result.sort((a, b) => a.sort_order - b.sort_order);
+        // Sort once at the end (provide defaults for undefined sort_order)
+        return result.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
       });
 
       // Clear the queue

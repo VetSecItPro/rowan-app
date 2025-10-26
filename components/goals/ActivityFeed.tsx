@@ -71,7 +71,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
   const loadActivities = async () => {
     try {
       setLoading(true);
-      const { data: activitiesData, error } = await supabase
+      let query = supabase
         .from('goal_activities')
         .select(`
           *,
@@ -80,8 +80,13 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
           goal_milestones!goal_activities_milestone_id_fkey(id, title),
           goal_check_ins!goal_activities_check_in_id_fkey(id, progress_percentage, mood)
         `)
-        .eq('space_id', spaceId)
-        .if(goalId, (query: any) => query.eq('goal_id', goalId))
+        .eq('space_id', spaceId);
+
+      if (goalId) {
+        query = query.eq('goal_id', goalId);
+      }
+
+      const { data: activitiesData, error } = await query
         .order('created_at', { ascending: false })
         .limit(50);
 
@@ -257,14 +262,14 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                   <div className="flex items-start space-x-3">
                     {/* Avatar */}
                     <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300">
-                      {activity.users?.avatar_url ? (
+                      {activity.user?.avatar_url ? (
                         <img
-                          src={activity.users.avatar_url}
+                          src={activity.user.avatar_url}
                           alt=""
                           className="w-8 h-8 rounded-full object-cover"
                         />
                       ) : (
-                        getUserInitials(activity.users)
+                        getUserInitials(activity.user)
                       )}
                     </div>
 
@@ -273,7 +278,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                         {getActivityIcon(activity.activity_type)}
                         <p className="text-sm">
                           <span className="font-medium">
-                            {activity.users?.full_name || activity.users?.email}
+                            {activity.user?.name}
                           </span>
                           {' '}
                           <span className="text-gray-600 dark:text-gray-400">
@@ -304,20 +309,20 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                           {comments[activity.id]?.map((comment) => (
                             <div key={comment.id} className="flex items-start space-x-2">
                               <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300">
-                                {comment.users?.avatar_url ? (
+                                {comment.user?.avatar_url ? (
                                   <img
-                                    src={comment.users.avatar_url}
+                                    src={comment.user.avatar_url}
                                     alt=""
                                     className="w-6 h-6 rounded-full object-cover"
                                   />
                                 ) : (
-                                  getUserInitials(comment.users)
+                                  getUserInitials(comment.user)
                                 )}
                               </div>
                               <div className="flex-1">
                                 <div className="bg-gray-50 dark:bg-gray-800 rounded-lg px-3 py-2">
                                   <p className="text-xs font-medium mb-1">
-                                    {comment.users?.full_name || comment.users?.email}
+                                    {comment.user?.name}
                                   </p>
                                   <p className="text-sm">{comment.content}</p>
                                 </div>

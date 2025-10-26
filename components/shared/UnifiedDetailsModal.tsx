@@ -346,10 +346,10 @@ export function UnifiedDetailsModal({
                         <div>
                           <span className="text-sm text-gray-600 dark:text-gray-400">Category:</span>
                           <div className="mt-1">
-                            {(item as any).category && categories[(item as any).category] ? (
+                            {(item as any).category && (categories as any)[(item as any).category] ? (
                               <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-md text-sm">
-                                {categories[(item as any).category].emoji}
-                                {categories[(item as any).category].label}
+                                {(categories as any)[(item as any).category].emoji}
+                                {(categories as any)[(item as any).category].label}
                               </span>
                             ) : (
                               <span className="text-gray-500">No category</span>

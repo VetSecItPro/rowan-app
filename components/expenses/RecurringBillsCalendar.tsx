@@ -58,6 +58,7 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
     const occurrences: BillOccurrence[] = [];
 
     expenses.forEach((expense) => {
+      if (!expense.date) return;
       const expenseDate = parseISO(expense.date);
       const dayOfMonth = expenseDate.getDate();
 

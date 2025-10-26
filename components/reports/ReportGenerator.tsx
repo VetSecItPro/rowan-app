@@ -24,6 +24,8 @@ interface DateRange {
   end: Date;
 }
 
+type DatePresetValue = 'current_month' | 'last_month' | 'current_quarter' | 'last_quarter' | 'current_year' | 'last_year' | 'last_30_days' | 'last_90_days' | 'custom';
+
 const datePresets = [
   { label: 'Current Month', value: 'current_month' },
   { label: 'Last Month', value: 'last_month' },
@@ -39,7 +41,7 @@ const datePresets = [
 export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel }: ReportGeneratorProps) {
   const [title, setTitle] = useState(template.name);
   const [description, setDescription] = useState(template.description || '');
-  const [datePreset, setDatePreset] = useState(template.default_date_range || 'current_month');
+  const [datePreset, setDatePreset] = useState<DatePresetValue>((template.default_date_range as DatePresetValue) || 'current_month');
   const [customDateRange, setCustomDateRange] = useState<DateRange>({
     start: new Date(),
     end: new Date()
@@ -84,7 +86,7 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
         return; // Keep custom range as is
     }
 
-    if (datePreset !== 'custom') {
+    if (datePreset !== 'custom' as DatePresetValue) {
       setCustomDateRange(range);
     }
   }, [datePreset]);
@@ -109,11 +111,7 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
         dateRange.end
       );
 
-      if (result.success && result.data) {
-        onReportGenerated(result.data);
-      } else {
-        setError(result.error || 'Failed to generate report');
-      }
+      onReportGenerated(result);
     } catch (error) {
       console.error('Error generating report:', error);
       setError('An unexpected error occurred while generating the report');
@@ -246,7 +244,7 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
               </label>
               <select
                 value={datePreset}
-                onChange={(e) => setDatePreset(e.target.value)}
+                onChange={(e) => setDatePreset(e.target.value as DatePresetValue)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
               >
                 {datePresets.map(preset => (

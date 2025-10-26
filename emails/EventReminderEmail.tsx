@@ -76,10 +76,10 @@ export const EventReminderEmail = ({
       </Text>
 
       <Section style={eventCard}>
-        <Text style={eventTitle}>{eventTitle}</Text>
+        <Text style={eventTitleStyle}>{eventTitle}</Text>
 
         {eventDescription && (
-          <Text style={eventDescription}>{eventDescription}</Text>
+          <Text style={eventDescriptionStyle}>{eventDescription}</Text>
         )}
 
         <Section style={eventDetails}>
@@ -156,7 +156,7 @@ const eventCard = {
   margin: '20px 0',
 };
 
-const eventTitle = {
+const eventTitleStyle = {
   color: '#0c4a6e',
   fontSize: '20px',
   fontWeight: 'bold',
@@ -164,7 +164,7 @@ const eventTitle = {
   margin: '0 0 12px',
 };
 
-const eventDescription = {
+const eventDescriptionStyle = {
   color: '#374151',
   fontSize: '14px',
   lineHeight: '20px',

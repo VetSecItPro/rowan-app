@@ -19,10 +19,9 @@ import {
   Target
 } from 'lucide-react';
 import { toast } from 'sonner';
-import dynamic from 'next/dynamic';
 
-// Dynamically import WaveSurfer to avoid SSR issues
-const WaveSurfer = dynamic(() => import('wavesurfer.js'), { ssr: false });
+// WaveSurfer will be imported dynamically in the component
+type WaveSurferType = typeof import('wavesurfer.js').default;
 
 interface AdvancedVoiceRecorderProps {
   onSendVoice: (audioBlob: Blob, duration: number, metadata?: VoiceNoteMetadata) => Promise<void>;
@@ -152,16 +151,16 @@ export function AdvancedVoiceRecorder({
     if (!waveformRef.current || !audioUrl) return;
 
     try {
-      const WaveSurferClass = await WaveSurfer;
+      const WaveSurferModule = await import('wavesurfer.js');
+      const WaveSurferClass = WaveSurferModule.default;
 
-      wavesurferRef.current = WaveSurferClass.default.create({
+      wavesurferRef.current = WaveSurferClass.create({
         container: waveformRef.current,
         waveColor: '#6366f1',
         progressColor: '#4338ca',
         cursorColor: '#1e40af',
         barWidth: 2,
         barRadius: 3,
-        responsive: true,
         height: 60,
         normalize: true,
         backend: 'WebAudio',

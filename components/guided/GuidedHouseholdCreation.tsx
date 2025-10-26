@@ -50,6 +50,7 @@ export default function GuidedHouseholdCreation({ onComplete, onSkip }: GuidedHo
         frequency,
         assigned_to: assignedTo || undefined,
         status: 'pending',
+        created_by: user.id,
       });
 
       // Mark this guided flow as complete

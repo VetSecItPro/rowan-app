@@ -28,6 +28,7 @@ export interface CreateExpenseInput {
   status?: 'pending' | 'paid' | 'overdue';
   due_date?: string;
   date?: string;
+  paid_at?: string;
   recurring?: boolean;
   description?: string;
 }

@@ -77,7 +77,8 @@ export async function bulkDeleteExpenses(
       }
     }
 
-    const { data, error, count } = await query.select('*', { count: 'exact' });
+    const { data, error } = await query.select('*');
+    const count = data?.length || 0;
 
     if (error) {
       console.error('Error bulk deleting expenses:', error);
@@ -135,7 +136,8 @@ export async function bulkDeleteTasks(
       }
     }
 
-    const { data, error, count } = await query.select('*', { count: 'exact' });
+    const { data, error } = await query.select('*');
+    const count = data?.length || 0;
 
     if (error) {
       console.error('Error bulk deleting tasks:', error);
@@ -184,7 +186,7 @@ export async function bulkExportByDateRange(
     // Query data within date range
     const { data, error, count } = await supabase
       .from(config.table)
-      .select('*', { count: 'exact' })
+      .select('*')
       .gte(config.dateColumn, startDate)
       .lte(config.dateColumn, endDate)
       .order(config.dateColumn, { ascending: false });
@@ -227,7 +229,7 @@ export async function archiveOldExpenses(
       .eq('partnership_id', partnershipId)
       .lt('date', olderThanDate)
       .eq('archived', false)
-      .select('*', { count: 'exact' });
+      .select('*');
 
     if (error) {
       console.error('Error archiving expenses:', error);
@@ -264,7 +266,7 @@ export async function archiveOldTasks(
       .eq('completed', true)
       .lt('completed_at', olderThanDate)
       .eq('archived', false)
-      .select('*', { count: 'exact' });
+      .select('*');
 
     if (error) {
       console.error('Error archiving tasks:', error);
@@ -300,7 +302,7 @@ export async function archiveOldCalendarEvents(
       .eq('partnership_id', partnershipId)
       .lt('end_time', olderThanDate)
       .eq('archived', false)
-      .select('*', { count: 'exact' });
+      .select('*');
 
     if (error) {
       console.error('Error archiving calendar events:', error);
@@ -339,7 +341,7 @@ export async function getExpensesBulkDeleteCount(
 
     let query = supabase
       .from('expenses')
-      .select('*', { count: 'exact', head: true })
+      .select('*')
       .eq('partnership_id', partnershipId);
 
     if (options.selectedIds && options.selectedIds.length > 0) {

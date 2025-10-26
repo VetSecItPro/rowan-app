@@ -42,7 +42,7 @@ interface DraggableItemListProps {
   initialItems: UnifiedItem[];
   onItemClick?: (item: UnifiedItem) => void;
   onItemsReorder?: (items: UnifiedItem[]) => void;
-  onStatusChange?: (itemId: string, status: string, type?: 'task' | 'chore') => void;
+  onStatusChange?: (itemId: string, status: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed', type?: 'task' | 'chore') => void;
   onEdit?: (item: UnifiedItem) => void;
   onDelete?: (itemId: string, type?: 'task' | 'chore') => void;
   onViewDetails?: (item: UnifiedItem) => void;
@@ -51,7 +51,7 @@ interface DraggableItemListProps {
 interface SortableItemProps {
   item: UnifiedItem;
   onItemClick?: (item: UnifiedItem) => void;
-  onStatusChange?: (itemId: string, status: string, type?: 'task' | 'chore') => void;
+  onStatusChange?: (itemId: string, status: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed', type?: 'task' | 'chore') => void;
   onEdit?: (item: UnifiedItem) => void;
   onDelete?: (itemId: string, type?: 'task' | 'chore') => void;
   onViewDetails?: (item: UnifiedItem) => void;
@@ -79,7 +79,7 @@ function SortableItem({ item, onItemClick, onStatusChange, onEdit, onDelete, onV
 
   // Handle status rotation - 5-step cycle
   const handleStatusClick = () => {
-    let newStatus = 'pending';
+    let newStatus: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed' = 'pending';
     if (item.status === 'pending') {
       newStatus = 'in-progress';
     } else if (item.status === 'in-progress') {

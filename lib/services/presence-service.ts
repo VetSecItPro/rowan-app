@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
-import type { SpaceMemberWithPresence, UserPresence, PresenceStatus } from '@/lib/types';
+import type { SpaceMemberWithPresence, UserPresence } from '@/lib/types';
+import { PresenceStatus } from '@/lib/types';
 
 // =============================================
 // SIMPLE PRESENCE SERVICE (CACHED, NOT REAL-TIME)
@@ -16,7 +17,7 @@ import type { SpaceMemberWithPresence, UserPresence, PresenceStatus } from '@/li
  */
 export async function updateUserPresence(
   spaceId: string,
-  status: PresenceStatus = 'online'
+  status: PresenceStatus = PresenceStatus.ONLINE
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = createClient();
@@ -99,7 +100,7 @@ export async function getSpaceMembersWithPresence(
  */
 export async function markUserOffline(spaceId: string): Promise<void> {
   try {
-    await updateUserPresence(spaceId, 'offline');
+    await updateUserPresence(spaceId, PresenceStatus.OFFLINE);
   } catch (error) {
     console.error('[presence-service] markUserOffline error:', error);
     // Don't throw - this is often called on page unload
@@ -188,12 +189,12 @@ export async function isUserOnline(userId: string): Promise<boolean> {
 export async function initializePresence(spaceId: string): Promise<void> {
   try {
     // Mark user as online
-    await updateUserPresence(spaceId, 'online');
+    await updateUserPresence(spaceId, PresenceStatus.ONLINE);
 
     // Set up periodic presence updates (every 2 minutes)
     const interval = setInterval(async () => {
       try {
-        await updateUserPresence(spaceId, 'online');
+        await updateUserPresence(spaceId, PresenceStatus.ONLINE);
       } catch (error) {
         console.error('Presence update error:', error);
       }
@@ -211,7 +212,7 @@ export async function initializePresence(spaceId: string): Promise<void> {
         if (document.hidden) {
           markUserOffline(spaceId);
         } else {
-          updateUserPresence(spaceId, 'online');
+          updateUserPresence(spaceId, PresenceStatus.ONLINE);
         }
       });
     }

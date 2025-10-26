@@ -27,6 +27,7 @@ export function FeatureLayout({
 
   // Auto-detect feature from pathname
   const currentFeature = useMemo(() => {
+    if (!pathname) return 'dashboard';
     const path = pathname.split('/').filter(Boolean);
     const featureSegment = path[0]; // Get the first segment after the base
 

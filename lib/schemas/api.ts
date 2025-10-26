@@ -27,6 +27,8 @@ export const CreateExpenseSchema = z.object({
   category: z.string().max(50).optional(),
   payment_method: z.string().max(50).optional(),
   paid_by: z.string().max(100).optional(),
+  date: z.string().datetime().optional(),
+  paid_at: z.string().datetime().optional(),
   status: z.enum(['pending', 'paid', 'overdue']).default('pending'),
   due_date: z.string().datetime().optional(),
   recurring: z.boolean().default(false),

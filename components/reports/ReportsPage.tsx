@@ -28,7 +28,7 @@ interface ReportsPageProps {
 
 export function ReportsPage({ className = '' }: ReportsPageProps) {
   const params = useParams();
-  const spaceId = params.spaceId as string;
+  const spaceId = params?.spaceId as string;
 
   const [activeTab, setActiveTab] = useState<TabType>('templates');
   const [templates, setTemplates] = useState<ReportTemplate[]>([]);
@@ -46,18 +46,13 @@ export function ReportsPage({ className = '' }: ReportsPageProps) {
 
     try {
       setLoading(true);
-      const [templatesResult, reportsResult] = await Promise.all([
+      const [templates, reports] = await Promise.all([
         getReportTemplates(spaceId),
         getGeneratedReports(spaceId)
       ]);
 
-      if (templatesResult.success) {
-        setTemplates(templatesResult.data || []);
-      }
-
-      if (reportsResult.success) {
-        setReports(reportsResult.data || []);
-      }
+      setTemplates(templates || []);
+      setReports(reports || []);
     } catch (error) {
       console.error('Error loading reports data:', error);
     } finally {

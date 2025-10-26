@@ -1,11 +1,26 @@
 import { Redis } from '@upstash/redis';
 import { WeatherForecast } from './weather-service';
 
-// Initialize Upstash Redis (already configured in project)
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
+// Initialize Upstash Redis with error handling
+let redis: Redis | null = null;
+let redisConnectionError: string | null = null;
+
+try {
+  // Check if Upstash credentials are available
+  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+    redisConnectionError = 'Upstash credentials not configured';
+    console.warn('[Weather Cache] Upstash Redis not configured - running without cache');
+  } else {
+    redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    });
+    console.log('[Weather Cache] Upstash Redis initialized successfully');
+  }
+} catch (error) {
+  redisConnectionError = error instanceof Error ? error.message : 'Unknown Redis initialization error';
+  console.warn('[Weather Cache] Failed to initialize Upstash Redis:', redisConnectionError);
+}
 
 interface CachedWeather {
   forecast: WeatherForecast;
@@ -35,6 +50,12 @@ export const weatherCacheService = {
     eventTime: string,
     fetchFn: () => Promise<WeatherForecast | null>
   ): Promise<WeatherForecast | null> {
+    // If Redis is not available, just fetch directly
+    if (!redis) {
+      console.log(`[Weather Cache] No cache available - fetching directly for ${location}`);
+      return await fetchFn();
+    }
+
     try {
       // Create cache key based on location and date (not exact time)
       const eventDate = eventTime.split('T')[0]; // Just the date part
@@ -60,21 +81,25 @@ export const weatherCacheService = {
       // Fetch fresh data
       const forecast = await fetchFn();
 
-      if (forecast) {
-        // Cache the result
-        const cacheData: CachedWeather = {
-          forecast,
-          cachedAt: new Date().toISOString(),
-          location,
-        };
+      if (forecast && redis) {
+        // Cache the result (only if Redis is available)
+        try {
+          const cacheData: CachedWeather = {
+            forecast,
+            cachedAt: new Date().toISOString(),
+            location,
+          };
 
-        await redis.setex(cacheKey, WEATHER_CACHE_TTL, cacheData);
-        console.log(`[Weather Cache] STORED for ${location} on ${eventDate} (TTL: 3hrs)`);
+          await redis.setex(cacheKey, WEATHER_CACHE_TTL, cacheData);
+          console.log(`[Weather Cache] STORED for ${location} on ${eventDate} (TTL: 3hrs)`);
+        } catch (cacheError) {
+          console.warn('[Weather Cache] Failed to store in cache:', cacheError instanceof Error ? cacheError.message : 'Unknown error');
+        }
       }
 
       return forecast;
     } catch (error) {
-      console.error('[Weather Cache] Error:', error);
+      console.warn('[Weather Cache] Cache error, falling back to direct fetch:', error instanceof Error ? error.message : 'Unknown error');
       // Fall back to fetching without cache
       return await fetchFn();
     }
@@ -87,6 +112,12 @@ export const weatherCacheService = {
     location: string,
     fetchFn: () => Promise<{ lat: number; lon: number } | null>
   ): Promise<{ lat: number; lon: number } | null> {
+    // If Redis is not available, just fetch directly
+    if (!redis) {
+      console.log(`[Geocode Cache] No cache available - fetching directly for ${location}`);
+      return await fetchFn();
+    }
+
     try {
       const cacheKey = `geocode:${location.toLowerCase().replace(/\s+/g, '-')}`;
 
@@ -103,20 +134,24 @@ export const weatherCacheService = {
       // Fetch fresh geocoding
       const coords = await fetchFn();
 
-      if (coords) {
-        // Cache for 30 days (geocoding rarely changes)
-        const cacheData: CachedGeocode = {
-          ...coords,
-          cachedAt: new Date().toISOString(),
-        };
+      if (coords && redis) {
+        // Cache for 30 days (geocoding rarely changes) - only if Redis is available
+        try {
+          const cacheData: CachedGeocode = {
+            ...coords,
+            cachedAt: new Date().toISOString(),
+          };
 
-        await redis.setex(cacheKey, GEOCODE_CACHE_TTL, cacheData);
-        console.log(`[Geocode Cache] STORED for ${location} (TTL: 30 days)`);
+          await redis.setex(cacheKey, GEOCODE_CACHE_TTL, cacheData);
+          console.log(`[Geocode Cache] STORED for ${location} (TTL: 30 days)`);
+        } catch (cacheError) {
+          console.warn('[Geocode Cache] Failed to store in cache:', cacheError instanceof Error ? cacheError.message : 'Unknown error');
+        }
       }
 
       return coords;
     } catch (error) {
-      console.error('[Geocode Cache] Error:', error);
+      console.warn('[Geocode Cache] Cache error, falling back to direct fetch:', error instanceof Error ? error.message : 'Unknown error');
       // Fall back to fetching without cache
       return await fetchFn();
     }
@@ -126,6 +161,10 @@ export const weatherCacheService = {
    * Clear all weather cache (useful for debugging or forced refresh)
    */
   async clearWeatherCache(): Promise<void> {
+    if (!redis) {
+      console.log('[Weather Cache] No cache available to clear');
+      return;
+    }
     // Note: Upstash Redis doesn't support SCAN in REST API
     // So we can't easily clear all keys matching a pattern
     // This would need to be done manually or with a different approach
@@ -136,6 +175,13 @@ export const weatherCacheService = {
    * Get cache statistics
    */
   async getCacheStats(): Promise<{ message: string }> {
+    if (!redis) {
+      return {
+        message: redisConnectionError
+          ? `Cache unavailable: ${redisConnectionError}`
+          : 'Cache not configured',
+      };
+    }
     return {
       message: 'Cache stats not available in Upstash REST API',
     };
