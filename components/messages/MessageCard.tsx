@@ -1,6 +1,6 @@
 'use client';
 
-import { Clock, Check, CheckCheck, MoreVertical, MessageSquare, Pin, Forward } from 'lucide-react';
+import { Clock, Check, CheckCheck, MoreVertical, MessageSquare, Pin, Forward, Edit3, Trash2 } from 'lucide-react';
 import { MessageWithAttachments, MessageWithReplies, MessageReactionSummary, messagesService } from '@/lib/services/messages-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState, useEffect } from 'react';
@@ -51,7 +51,6 @@ export function MessageCard({
   onReply,
   showReplyButton = true
 }: MessageCardProps) {
-  const [showMenu, setShowMenu] = useState(false);
   const [reactions, setReactions] = useState<MessageReactionSummary[]>([]);
   const [loadingReaction, setLoadingReaction] = useState(false);
 
@@ -230,70 +229,25 @@ export function MessageCard({
               </div>
             )}
 
-            {/* More Menu */}
+            {/* Message Actions */}
             {isOwn && (
-              <div className="absolute -top-1 -right-1">
+              <div className="absolute -top-1 -right-1 flex items-center gap-1 opacity-0 group-hover:opacity-60 transition-opacity">
                 <button
-                  onClick={() => setShowMenu(!showMenu)}
-                  title="Message options"
-                  aria-label="Message options menu"
-                  className="w-5 h-5 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-40 hover:opacity-70 transition-opacity"
+                  onClick={() => onEdit(message)}
+                  title="Edit message"
+                  aria-label="Edit message"
+                  className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
                 >
-                  <MoreVertical className="w-3 h-3 text-gray-400" />
+                  <Edit3 className="w-3 h-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
                 </button>
-
-                {showMenu && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-10"
-                      onClick={() => setShowMenu(false)}
-                    />
-                    <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm z-20">
-                      <button
-                        onClick={() => {
-                          onEdit(message);
-                          setShowMenu(false);
-                        }}
-                        className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                      >
-                        Edit
-                      </button>
-                      {onTogglePin && (
-                        <button
-                          onClick={() => {
-                            onTogglePin(message.id);
-                            setShowMenu(false);
-                          }}
-                          className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors flex items-center gap-2"
-                        >
-                          <Pin className={`w-3 h-3 ${message.is_pinned ? 'rotate-45' : ''}`} />
-                          {message.is_pinned ? 'Unpin' : 'Pin'}
-                        </button>
-                      )}
-                      {onForward && (
-                        <button
-                          onClick={() => {
-                            onForward(message);
-                            setShowMenu(false);
-                          }}
-                          className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors flex items-center gap-2"
-                        >
-                          <Forward className="w-3 h-3" />
-                          Forward
-                        </button>
-                      )}
-                      <button
-                        onClick={() => {
-                          onDelete(message.id);
-                          setShowMenu(false);
-                        }}
-                        className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors rounded-b-md"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </>
-                )}
+                <button
+                  onClick={() => onDelete(message.id)}
+                  title="Delete message"
+                  aria-label="Delete message"
+                  className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
+                >
+                  <Trash2 className="w-3 h-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+                </button>
               </div>
             )}
           </div>
