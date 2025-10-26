@@ -66,7 +66,7 @@ export function UnifiedItemModal({
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringData, setRecurringData] = useState({
     pattern: 'weekly' as keyof typeof RECURRING_PATTERNS,
-    interval: 1,
+    interval: 0,
     days_of_week: [] as number[],
     end_date: '',
   });
@@ -625,9 +625,9 @@ export function UnifiedItemModal({
                             </label>
                             <input
                               type="number"
-                              min="1"
+                              min="0"
                               value={recurringData.interval}
-                              onChange={(e) => setRecurringData(prev => ({ ...prev, interval: parseInt(e.target.value) || 1 }))}
+                              onChange={(e) => setRecurringData(prev => ({ ...prev, interval: parseInt(e.target.value) || 0 }))}
                               className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                             />
                           </div>
