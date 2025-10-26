@@ -28,9 +28,10 @@ interface NewChoreModalProps {
   onSave: (chore: CreateChoreInput) => void;
   editChore?: Chore | null;
   spaceId: string;
+  userId: string;
 }
 
-export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: NewChoreModalProps) {
+export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, userId }: NewChoreModalProps) {
   const [formData, setFormData] = useState<CreateChoreInput>({
     space_id: spaceId,
     title: '',
@@ -38,6 +39,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
     frequency: 'weekly',
     status: 'pending',
     due_date: '',
+    created_by: userId,
   });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [category, setCategory] = useState<string>('');
@@ -53,7 +55,8 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
         description: editChore.description || '',
         frequency: editChore.frequency,
         status: editChore.status,
-        due_date: editChore.due_date || ''
+        due_date: editChore.due_date || '',
+        created_by: userId,
       });
     } else {
       setFormData({
@@ -62,7 +65,8 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
         description: '',
         frequency: 'weekly',
         status: 'pending',
-        due_date: ''
+        due_date: '',
+        created_by: userId,
       });
       setCategory('');
     }
@@ -248,6 +252,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
                 >
                   <option value="daily">Daily</option>
                   <option value="weekly">Weekly</option>
+                  <option value="biweekly">Bi-weekly</option>
                   <option value="monthly">Monthly</option>
                   <option value="once">One-time</option>
                 </select>
@@ -256,11 +261,11 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
             </div>
           </div>
 
-          {/* Day Selection for Weekly */}
-          {formData.frequency === 'weekly' && (
+          {/* Day Selection for Weekly and Biweekly */}
+          {(formData.frequency === 'weekly' || formData.frequency === 'biweekly') && (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                Select Days of Week
+                Select Days of Week {formData.frequency === 'biweekly' && '(Every Other Week)'}
               </label>
               <div className="grid grid-cols-7 gap-2">
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
@@ -284,6 +289,11 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
                   </button>
                 ))}
               </div>
+              {formData.frequency === 'biweekly' && (
+                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                  This chore will repeat every two weeks on the selected days.
+                </p>
+              )}
             </div>
           )}
 
@@ -329,13 +339,15 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId }: N
                 <select
                   value={formData.status}
                   id="field-7"
-              onChange={(e) =>  setFormData({ ...formData, status: e.target.value as 'pending' | 'completed' | 'skipped' })}
+              onChange={(e) =>  setFormData({ ...formData, status: e.target.value as 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed' })}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
                   style={{ paddingRight: '2.5rem' }}
                 >
                   <option value="pending">Pending</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="blocked">Blocked</option>
+                  <option value="on-hold">On Hold</option>
                   <option value="completed">Completed</option>
-                  <option value="skipped">Skipped</option>
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
