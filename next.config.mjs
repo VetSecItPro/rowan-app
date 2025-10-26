@@ -52,36 +52,47 @@ const nextConfig = {
     const isDev = process.env.NODE_ENV === 'development';
     console.log('CSP Environment:', { isDev, NODE_ENV: process.env.NODE_ENV });
 
-    // Balanced CSP policy - secure but not overly restrictive
-    // Allows common third-party services while maintaining good security
+    // Balanced CSP policy - works in all environments without breaking functionality
+    // Includes 'unsafe-inline' for compatibility with modern React/Next.js applications
+    const scriptSources = [
+      "'self'",
+      "'unsafe-inline'",
+      isDev ? "'unsafe-eval'" : null,
+      "https://vercel.live",
+      "https://va.vercel-scripts.com",
+      "https://vitals.vercel-insights.com",
+      "https://cdn.vercel-insights.com",
+      "https://www.googletagmanager.com",
+      "https://www.google-analytics.com",
+      "https://cdnjs.cloudflare.com",
+      "https://unpkg.com",
+      "https://cdn.jsdelivr.net"
+    ].filter(Boolean).join(' ');
+
+    const styleSources = [
+      "'self'",
+      "'unsafe-inline'",
+      "https://fonts.googleapis.com",
+      "https://cdnjs.cloudflare.com",
+      "https://unpkg.com",
+      "https://cdn.jsdelivr.net"
+    ].join(' ');
+
     const cspPolicy = [
       "default-src 'self'",
-      // Scripts: Allow common CDNs, analytics, and necessary services
-      `script-src 'self' ${isDev ? "'unsafe-eval'" : ""} 'unsafe-inline' https://vercel.live https://va.vercel-scripts.com https://vitals.vercel-insights.com https://cdn.vercel-insights.com https://www.googletagmanager.com https://www.google-analytics.com https://cdnjs.cloudflare.com https://unpkg.com https://cdn.jsdelivr.net`,
-      // Styles: Allow inline styles (needed for modern frameworks) and common font services
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com",
-      // Fonts: Allow Google Fonts and data URIs
+      `script-src ${scriptSources}`,
+      `style-src ${styleSources}`,
       "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
-      // Images: Allow all HTTPS sources, data URIs, and blobs (good for user uploads)
       "img-src 'self' data: https: blob:",
-      // Connections: Allow secure connections, WebSockets, and data URIs
       "connect-src 'self' https: wss: data:",
-      // Frames: Allow common trusted domains for embeds
       "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://www.google.com",
-      // Workers: Allow blobs for service workers
       "worker-src 'self' blob:",
-      // Child sources: Allow blobs
       "child-src 'self' blob:",
-      // Manifest: Only self
       "manifest-src 'self'",
-      // Media: Allow secure sources, blobs, and data URIs
       "media-src 'self' blob: data: https:",
-      // Base URI: Only self (security best practice)
       "base-uri 'self'",
-      // Form actions: Only self (prevents form hijacking)
       "form-action 'self'",
-      // Objects: None (security best practice)
-      "object-src 'none'",
+      "object-src 'none'"
     ].join('; ');
 
     console.log('Generated CSP Policy:', cspPolicy);
