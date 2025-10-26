@@ -1,0 +1,162 @@
+import { createClient } from '@/lib/supabase/client';
+import { addDays, format } from 'date-fns';
+
+export const choreCalendarService = {
+  /**
+   * Sync a chore to calendar as events
+   * Creates recurring events based on chore frequency
+   */
+  async syncChoreToCalendar(choreId: string): Promise<any> {
+    const supabase = createClient();
+    const { data: chore } = await supabase.from('chores').select('*').eq('id', choreId).single();
+
+    if (!chore || !chore.due_date) return null;
+
+    // Generate recurring events based on frequency
+    const events = this.generateChoreEvents(chore);
+
+    // Insert events into calendar
+    const { data: insertedEvents, error: eventError } = await supabase
+      .from('events')
+      .insert(events)
+      .select();
+
+    if (eventError) throw eventError;
+
+    // Create sync records for tracking
+    const syncRecords = insertedEvents.map(event => ({
+      chore_id: choreId,
+      event_id: event.id,
+      is_synced: true,
+    }));
+
+    const { data, error } = await supabase
+      .from('chore_calendar_events')
+      .insert(syncRecords)
+      .select();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * Remove chore from calendar
+   */
+  async unsyncFromCalendar(choreId: string): Promise<void> {
+    const supabase = createClient();
+
+    // Get all synced events for this chore
+    const { data: syncRecords } = await supabase
+      .from('chore_calendar_events')
+      .select('event_id')
+      .eq('chore_id', choreId);
+
+    if (syncRecords && syncRecords.length > 0) {
+      // Delete the events
+      const eventIds = syncRecords.map(record => record.event_id);
+      await supabase.from('events').delete().in('id', eventIds);
+    }
+
+    // Delete sync records
+    await supabase.from('chore_calendar_events').delete().eq('chore_id', choreId);
+  },
+
+  /**
+   * Generate recurring events for a chore based on its frequency
+   */
+  generateChoreEvents(chore: any, monthsAhead: number = 3): any[] {
+    const events = [];
+    const startDate = new Date(chore.due_date);
+    const endDate = addDays(startDate, monthsAhead * 30); // Generate events for next 3 months
+
+    let currentDate = new Date(startDate);
+
+    while (currentDate <= endDate) {
+      // Create calendar event for this occurrence
+      const event = {
+        space_id: chore.space_id,
+        title: `🧹 ${chore.title}`,
+        description: chore.description,
+        event_type: 'chore',
+        start_time: currentDate.toISOString(),
+        end_time: addDays(currentDate, 0).setHours(23, 59, 59).toString(),
+        category: 'personal',
+        status: 'not-started',
+        assigned_to: chore.assigned_to,
+        created_by: chore.created_by,
+        is_recurring: chore.frequency !== 'once',
+      };
+
+      events.push(event);
+
+      // Calculate next occurrence based on frequency
+      currentDate = this.getNextOccurrence(currentDate, chore.frequency);
+
+      // Break if frequency is 'once' or if we've hit our limit
+      if (chore.frequency === 'once' || events.length >= 100) break;
+    }
+
+    return events;
+  },
+
+  /**
+   * Calculate next occurrence based on frequency
+   */
+  getNextOccurrence(currentDate: Date, frequency: string): Date {
+    const nextDate = new Date(currentDate);
+
+    switch (frequency) {
+      case 'daily':
+        nextDate.setDate(nextDate.getDate() + 1);
+        break;
+      case 'weekly':
+        nextDate.setDate(nextDate.getDate() + 7);
+        break;
+      case 'biweekly':
+        nextDate.setDate(nextDate.getDate() + 14);
+        break;
+      case 'monthly':
+        nextDate.setMonth(nextDate.getMonth() + 1);
+        break;
+      case 'once':
+      default:
+        // For 'once', return a date far in the future to break the loop
+        nextDate.setFullYear(nextDate.getFullYear() + 10);
+        break;
+    }
+
+    return nextDate;
+  },
+
+  /**
+   * Get calendar preferences for chores
+   */
+  async getCalendarPreferences(userId: string): Promise<any> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('users')
+      .select('show_chores_on_calendar, calendar_chore_filter')
+      .eq('id', userId)
+      .single();
+
+    if (error) throw error;
+
+    return {
+      auto_sync_chores: data?.show_chores_on_calendar || false,
+      calendar_chore_filter: data?.calendar_chore_filter
+    };
+  },
+
+  /**
+   * Update calendar preferences for chores
+   */
+  async updateCalendarPreferences(userId: string, autoSync: boolean): Promise<void> {
+    const supabase = createClient();
+    await supabase
+      .from('users')
+      .update({
+        show_chores_on_calendar: autoSync,
+      })
+      .eq('id', userId);
+  },
+};
