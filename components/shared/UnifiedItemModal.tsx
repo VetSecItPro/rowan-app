@@ -579,64 +579,62 @@ export function UnifiedItemModal({
                     </div>
                   </div>
 
-                  {/* Recurring Toggle (Tasks Only) */}
-                  {itemType === 'task' && (
-                    <div className="lg:col-span-2">
-                      <div className="flex items-center gap-3 mb-4">
-                        <button
-                          onClick={() => setIsRecurring(!isRecurring)}
-                          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                            isRecurring
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                          }`}
-                        >
-                          <Repeat className="w-4 h-4" />
-                          <span>Make Recurring</span>
-                        </button>
-                      </div>
+                  {/* Recurring Toggle (Tasks & Chores) */}
+                  <div className="lg:col-span-2">
+                    <div className="flex items-center gap-3 mb-4">
+                      <button
+                        onClick={() => setIsRecurring(!isRecurring)}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                          isRecurring
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                        }`}
+                      >
+                        <Repeat className="w-4 h-4" />
+                        <span>Make Recurring</span>
+                      </button>
+                    </div>
 
-                      {/* Recurring Options */}
-                      {isRecurring && (
-                        <div className="space-y-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Repeat Pattern
-                              </label>
-                              <div className="relative">
-                                <select
-                                  value={recurringData.pattern}
-                                  onChange={(e) => setRecurringData(prev => ({ ...prev, pattern: e.target.value as keyof typeof RECURRING_PATTERNS }))}
-                                  className="w-full pl-3 pr-10 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white appearance-none"
-                                >
-                                {Object.entries(RECURRING_PATTERNS).map(([key, pattern]) => (
-                                  <option key={key} value={key}>
-                                    {pattern.emoji} {pattern.label} - {pattern.description}
-                                  </option>
-                                ))}
-                                </select>
-                                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                              </div>
-                            </div>
-
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Every
-                              </label>
-                              <input
-                                type="number"
-                                min="1"
-                                value={recurringData.interval}
-                                onChange={(e) => setRecurringData(prev => ({ ...prev, interval: parseInt(e.target.value) || 1 }))}
-                                className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                              />
+                    {/* Recurring Options */}
+                    {isRecurring && (
+                      <div className="space-y-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              Repeat Pattern
+                            </label>
+                            <div className="relative">
+                              <select
+                                value={recurringData.pattern}
+                                onChange={(e) => setRecurringData(prev => ({ ...prev, pattern: e.target.value as keyof typeof RECURRING_PATTERNS }))}
+                                className="w-full pl-3 pr-10 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white appearance-none"
+                              >
+                              {Object.entries(RECURRING_PATTERNS).map(([key, pattern]) => (
+                                <option key={key} value={key}>
+                                  {pattern.emoji} {pattern.label} - {pattern.description}
+                                </option>
+                              ))}
+                              </select>
+                              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                             </div>
                           </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              Every
+                            </label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={recurringData.interval}
+                              onChange={(e) => setRecurringData(prev => ({ ...prev, interval: parseInt(e.target.value) || 1 }))}
+                              className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                            />
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
