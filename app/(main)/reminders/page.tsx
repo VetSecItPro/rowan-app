@@ -16,7 +16,7 @@ import { reminderTemplatesService, ReminderTemplate } from '@/lib/services/remin
 import { CTAButton } from '@/components/ui/EnhancedButton';
 
 export default function RemindersPage(): JSX.Element {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user, loading: authLoading } = useAuth();
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -144,7 +144,12 @@ export default function RemindersPage(): JSX.Element {
 
   // Stable reference to loadReminders
   const loadReminders = useCallback(async () => {
-    // Don't load data if user doesn't have a space yet
+    // Don't load data if auth is still loading
+    if (authLoading) {
+      return;
+    }
+
+    // Don't load data if user doesn't have a space yet (after auth has loaded)
     if (!currentSpace || !user) {
       setLoading(false);
       return;
@@ -181,7 +186,7 @@ export default function RemindersPage(): JSX.Element {
     } finally {
       setLoading(false);
     }
-  }, [currentSpace, user]);
+  }, [currentSpace, user, authLoading]);
 
   useEffect(() => {
     loadReminders();
@@ -696,7 +701,7 @@ export default function RemindersPage(): JSX.Element {
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => setPriorityFilter('all')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                        className={`w-20 px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center ${
                           priorityFilter === 'all'
                             ? 'bg-pink-500 text-white'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/20'
@@ -706,7 +711,7 @@ export default function RemindersPage(): JSX.Element {
                       </button>
                       <button
                         onClick={() => setPriorityFilter('urgent')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
+                        className={`w-24 px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-1 ${
                           priorityFilter === 'urgent'
                             ? 'bg-red-600 text-white'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/20'
@@ -716,7 +721,7 @@ export default function RemindersPage(): JSX.Element {
                       </button>
                       <button
                         onClick={() => setPriorityFilter('high')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
+                        className={`w-20 px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-1 ${
                           priorityFilter === 'high'
                             ? 'bg-orange-500 text-white'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900/20'
@@ -726,7 +731,7 @@ export default function RemindersPage(): JSX.Element {
                       </button>
                       <button
                         onClick={() => setPriorityFilter('medium')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
+                        className={`w-24 px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-1 ${
                           priorityFilter === 'medium'
                             ? 'bg-yellow-500 text-white'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-yellow-100 dark:hover:bg-yellow-900/20'
@@ -736,7 +741,7 @@ export default function RemindersPage(): JSX.Element {
                       </button>
                       <button
                         onClick={() => setPriorityFilter('low')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
+                        className={`w-16 px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-1 ${
                           priorityFilter === 'low'
                             ? 'bg-gray-500 text-white'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'

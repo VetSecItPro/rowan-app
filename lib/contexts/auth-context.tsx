@@ -93,17 +93,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let hasLoadedInitialData = false;
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       if (session?.user) {
-        loadUserProfile(session.user.id);
-        loadUserSpace(session.user.id);
-        hasLoadedInitialData = true;
+        // Load user data and wait for it to complete before setting loading to false
+        try {
+          await Promise.all([
+            loadUserProfile(session.user.id),
+            loadUserSpace(session.user.id)
+          ]);
+          hasLoadedInitialData = true;
 
-        // Track session for existing logged-in users
-        trackUserSession().catch(err => {
-          console.error('Failed to track existing session:', err);
-        });
+          // Track session for existing logged-in users
+          trackUserSession().catch(err => {
+            console.error('Failed to track existing session:', err);
+          });
+        } catch (error) {
+          console.error('Error loading initial user data:', error);
+        }
       }
       setLoading(false);
     });
