@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, Smile, ChevronDown, Repeat, Calendar, User, Clock, MessageSquare, Tag, Star, Users, CheckSquare, Home } from 'lucide-react';
 import { CreateTaskInput, CreateChoreInput, Task, Chore } from '@/lib/types';
 import { taskRecurrenceService } from '@/lib/services/task-recurrence-service';
+import { choreCalendarService } from '@/lib/services/chore-calendar-service';
 import {
   TASK_CATEGORIES,
   CHORE_CATEGORIES,
@@ -205,7 +206,8 @@ export function UnifiedItemModal({
         status: formData.status || 'pending',
         due_date: formData.due_date || null,
         created_by: userId || '',
-        // Don't send: calendar_sync, category, tags, estimated_hours, quick_note, priority
+        calendar_sync: calendarSync,
+        // Don't send: category, tags, estimated_hours, quick_note, priority
       } as CreateChoreInput;
 
       // Handle recurring tasks
@@ -231,7 +233,35 @@ export function UnifiedItemModal({
         // Handle recurring chores by setting frequency field
         (submissionData as CreateChoreInput).frequency = recurringData.pattern as 'daily' | 'weekly' | 'biweekly' | 'monthly';
         console.log('✅ Setting chore frequency to:', recurringData.pattern);
-        await onSave(submissionData);
+
+        // Save the chore first
+        const result = await onSave(submissionData);
+
+        // If chore has calendar sync enabled and result contains the chore ID, sync to calendar
+        if (calendarSync && result && typeof result === 'object' && 'id' in result) {
+          try {
+            console.log('🗓️ Syncing chore to calendar...');
+            await choreCalendarService.syncChoreToCalendar(result.id as string);
+            console.log('✅ Chore synced to calendar successfully');
+          } catch (error) {
+            console.error('❌ Failed to sync chore to calendar:', error);
+          }
+        }
+      } else if (itemType === 'chore') {
+        // Handle non-recurring chores
+        console.log('💾 Calling onSave for chore...');
+        const result = await onSave(submissionData);
+
+        // If chore has calendar sync enabled and result contains the chore ID, sync to calendar
+        if (calendarSync && result && typeof result === 'object' && 'id' in result) {
+          try {
+            console.log('🗓️ Syncing chore to calendar...');
+            await choreCalendarService.syncChoreToCalendar(result.id as string);
+            console.log('✅ Chore synced to calendar successfully');
+          } catch (error) {
+            console.error('❌ Failed to sync chore to calendar:', error);
+          }
+        }
       } else {
         console.log('💾 Calling onSave with submission data...');
         console.log('onSave function:', typeof onSave);
