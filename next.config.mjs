@@ -47,7 +47,30 @@ const nextConfig = {
 
   // Security headers and CSP
   async headers() {
+    // Always allow unsafe-inline for compatibility with Next.js and modern web features
+    // Include unsafe-eval only in development for hot reload
     const isDev = process.env.NODE_ENV === 'development';
+    console.log('CSP Environment:', { isDev, NODE_ENV: process.env.NODE_ENV });
+
+    const cspPolicy = [
+      "default-src 'self'",
+      `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ''} 'unsafe-hashes' https://cdn.jsdelivr.net https://*.jsdelivr.net https://vercel.live https://vercel.com https://*.vercel.app https://*.sentry.io https://www.google-analytics.com`,
+      "style-src 'self' 'unsafe-inline' 'unsafe-hashes' https://cdn.jsdelivr.net https://*.jsdelivr.net https://fonts.googleapis.com",
+      "font-src 'self' data: https: https://fonts.gstatic.com https://cdn.jsdelivr.net",
+      "img-src 'self' data: https: blob: https://*.supabase.co",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live https://api.gemini.google.com https://*.ingest.sentry.io https://*.upstash.io https://*.vercel.app wss://ws-*.pusher.com https://www.google-analytics.com",
+      "frame-src 'self' https://vercel.live https://*.vercel.app",
+      "worker-src 'self' blob:",
+      "child-src 'self' blob:",
+      "manifest-src 'self'",
+      "media-src 'self' blob: data:",
+      "frame-ancestors 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "object-src 'none'",
+    ].join('; ');
+
+    console.log('Generated CSP Policy:', cspPolicy);
 
     return [
       {
@@ -55,24 +78,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              // Allow unsafe-eval in development for Next.js hot reload, more restrictive in production
-              `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ''} https://cdn.jsdelivr.net https://*.jsdelivr.net https://vercel.live https://vercel.com https://*.vercel.app https://*.sentry.io`,
-              "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://*.jsdelivr.net https://fonts.googleapis.com",
-              "font-src 'self' data: https: https://fonts.gstatic.com https://cdn.jsdelivr.net",
-              "img-src 'self' data: https: blob: https://*.supabase.co",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live https://api.gemini.google.com https://*.ingest.sentry.io https://*.upstash.io https://*.vercel.app wss://ws-*.pusher.com",
-              "frame-src 'self' https://vercel.live https://*.vercel.app",
-              "worker-src 'self' blob:",
-              "child-src 'self' blob:",
-              "manifest-src 'self'",
-              "media-src 'self' blob: data:",
-              "frame-ancestors 'none'",
-              "base-uri 'self'",
-              "form-action 'self'",
-              "object-src 'none'",
-            ].join('; '),
+            value: cspPolicy,
           },
           {
             key: 'X-Content-Type-Options',

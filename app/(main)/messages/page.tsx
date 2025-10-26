@@ -190,23 +190,17 @@ export default function MessagesPage() {
   // Set up real-time subscription
   useEffect(() => {
     if (!conversationId || !user) {
-      console.warn('[DEBUG] Real-time subscription not initialized:', { conversationId, userId: user?.id });
       return;
     }
-
-    console.log('[DEBUG] Setting up real-time subscription for conversation:', conversationId);
 
     // Subscribe to real-time updates
     const channel = messagesService.subscribeToMessages(conversationId, {
       onInsert: (newMessage) => {
-        console.log('[DEBUG] Real-time INSERT received:', newMessage.id, newMessage.content.substring(0, 30));
         setMessages((prev) => {
           // Prevent duplicates
           if (prev.some((m) => m.id === newMessage.id)) {
-            console.log('[DEBUG] Duplicate message detected, skipping:', newMessage.id);
             return prev;
           }
-          console.log('[DEBUG] Adding new message to state');
           return [...prev, newMessage];
         });
 
@@ -221,13 +215,11 @@ export default function MessagesPage() {
         setTimeout(scrollToBottom, 100);
       },
       onUpdate: (updatedMessage) => {
-        console.log('[DEBUG] Real-time UPDATE received:', updatedMessage.id);
         setMessages((prev) =>
           prev.map((m) => (m.id === updatedMessage.id ? updatedMessage : m))
         );
       },
       onDelete: (messageId) => {
-        console.log('[DEBUG] Real-time DELETE received:', messageId);
         setMessages((prev) => prev.filter((m) => m.id !== messageId));
       },
     });
@@ -377,30 +369,17 @@ export default function MessagesPage() {
 
   // Memoize handleSubmitMessage for MentionInput
   const handleSubmitMessage = useCallback(async () => {
-    // Debug logging
-    console.log('[DEBUG] handleSubmitMessage called:', {
-      messageInput: messageInput.trim(),
-      isSending,
-      conversationId,
-      currentSpace: currentSpace?.id,
-      user: user?.id,
-    });
-
     if (!messageInput.trim()) {
-      console.warn('[DEBUG] Empty message input');
       return;
     }
     if (isSending) {
-      console.warn('[DEBUG] Already sending a message');
       return;
     }
     if (!conversationId) {
-      console.error('[DEBUG] No conversationId - cannot send message');
       toast.error('No conversation selected. Please refresh the page.');
       return;
     }
     if (!currentSpace || !user) {
-      console.error('[DEBUG] Missing currentSpace or user');
       toast.error('Please log in to send messages');
       return;
     }
@@ -436,14 +415,12 @@ export default function MessagesPage() {
 
     try {
       // Send to server
-      console.log('[DEBUG] Sending message to server...');
       const savedMessage = await messagesService.createMessage({
         space_id: currentSpace.id,
         conversation_id: conversationId,
         sender_id: user.id,
         content: optimisticMessage.content,
       });
-      console.log('[DEBUG] Message saved to server:', savedMessage.id);
 
       // Process @mentions
       try {
@@ -460,7 +437,6 @@ export default function MessagesPage() {
 
       // Real-time subscription will add the server message,
       // so remove the temp message to avoid duplicates
-      console.log('[DEBUG] Removing optimistic message, real-time should add server message');
       setMessages((prev) => prev.filter((m) => m.id !== tempId));
 
       toast.success('Message sent!');
@@ -960,24 +936,37 @@ export default function MessagesPage() {
             </div>
 
             {/* Chat Interface */}
-            <div className="flex-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden flex flex-col h-[400px] sm:h-[500px] md:h-[600px]">
+            <div className="flex-1 bg-gradient-to-br from-white via-emerald-50/30 to-green-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 border border-emerald-200/50 dark:border-gray-700 rounded-3xl overflow-hidden flex flex-col h-[400px] sm:h-[500px] md:h-[600px] shadow-2xl shadow-emerald-500/10 dark:shadow-gray-900/50">
             {/* Chat Header */}
-            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+            <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-emerald-200/30 dark:border-gray-700 bg-gradient-to-r from-emerald-400/10 via-green-400/10 to-teal-400/10 dark:from-gray-800 dark:to-gray-900 backdrop-blur-sm">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   {/* Mobile Menu Button */}
                   <button
                     onClick={() => setShowConversationSidebar(true)}
-                    className="md:hidden p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    className="md:hidden p-2 hover:bg-emerald-100/50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200"
                     aria-label="Open conversations"
                   >
-                    <MessageCircle className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <MessageCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   </button>
 
-                  <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-                    Conversation
-                  </h2>
-                  <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-300 text-sm font-medium rounded-full">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 bg-gradient-to-br from-emerald-400 via-green-500 to-teal-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white/50 dark:ring-gray-700">
+                      <MessageCircle className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white tracking-tight">
+                        Conversation
+                      </h2>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+                          Active now
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1.5 bg-gradient-to-r from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 border border-emerald-300/50 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-300 text-xs font-semibold rounded-full shadow-sm">
                     {format(new Date(), 'MMM yyyy')}
                   </span>
                 </div>
@@ -985,7 +974,15 @@ export default function MessagesPage() {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-3 sm:py-4 space-y-3">
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 space-y-6 bg-gradient-to-b from-emerald-50/20 via-white/50 to-green-50/30 dark:from-gray-900/80 dark:via-gray-900 dark:to-gray-800/90 relative">
+              {/* Subtle Chat Pattern Background */}
+              <div className="absolute inset-0 opacity-20 dark:opacity-10">
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-100/30 via-transparent to-green-100/20 dark:from-gray-800/20 dark:to-gray-700/10"></div>
+                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.03),transparent_50%)] dark:bg-[radial-gradient(circle_at_50%_50%,rgba(55,65,81,0.1),transparent_50%)]"></div>
+              </div>
+
+              {/* Content */}
+              <div className="relative z-10 space-y-6">
               {/* Pinned Messages Section */}
               {pinnedMessages.length > 0 && (
                 <PinnedMessages
@@ -995,31 +992,33 @@ export default function MessagesPage() {
               )}
 
               {loading ? (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {[...Array(6)].map((_, i) => (
                     <div key={i} className={`flex ${i % 2 === 0 ? 'justify-start' : 'justify-end'}`}>
-                      <div className={`max-w-[70%] ${i % 2 === 0 ? 'bg-white dark:bg-gray-700' : 'bg-green-50 dark:bg-green-900/20'} rounded-2xl p-4 shadow-sm animate-pulse`}>
-                        <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-32 mb-2" />
-                        <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-20" />
+                      <div className={`max-w-[75%] ${i % 2 === 0 ? 'bg-white/80 dark:bg-gray-700/80 shadow-lg' : 'bg-gradient-to-br from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 shadow-emerald-200/30'} rounded-3xl p-5 backdrop-blur-sm animate-pulse border ${i % 2 === 0 ? 'border-gray-200/50 dark:border-gray-600/50' : 'border-emerald-200/30 dark:border-emerald-700/30'}`}>
+                        <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded-full w-32 mb-3" />
+                        <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded-full w-20" />
                       </div>
                     </div>
                   ))}
                 </div>
               ) : filteredMessages.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-center">
-                  <MessageCircle className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
-                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">
+                <div className="flex flex-col items-center justify-center h-full text-center py-12">
+                  <div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 rounded-full flex items-center justify-center mb-6 shadow-lg">
+                    <MessageCircle className="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <p className="text-gray-700 dark:text-gray-300 text-lg font-medium mb-2">
                     {emptyStateMessage.primary}
                   </p>
-                  <p className="text-gray-400 dark:text-gray-500 text-sm mb-4">
+                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 max-w-xs">
                     {emptyStateMessage.secondary}
                   </p>
                   {!searchQuery && !hasCompletedGuide && (
                     <button
                       onClick={() => setShowGuidedFlow(true)}
-                      className="px-4 py-2 bg-gray-50 dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
+                      className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-500 text-white font-medium rounded-2xl hover:from-emerald-600 hover:to-green-600 transition-all duration-200 inline-flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                     >
-                      <MessageCircle className="w-4 h-4" />
+                      <MessageCircle className="w-5 h-5" />
                       Try Guided Creation
                     </button>
                   )}
@@ -1034,12 +1033,12 @@ export default function MessagesPage() {
                       <div key={message.id}>
                         {/* Date Separator */}
                         {showDateSeparator && (
-                          <div className="flex items-center justify-center my-6">
-                            <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
-                            <span className="px-4 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-full">
+                          <div className="flex items-center justify-center my-8">
+                            <div className="flex-grow border-t border-emerald-200/40 dark:border-gray-600/50"></div>
+                            <span className="px-5 py-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-full shadow-sm border border-emerald-200/30 dark:border-emerald-700/30 backdrop-blur-sm">
                               {getDateLabel(new Date(message.created_at))}
                             </span>
-                            <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+                            <div className="flex-grow border-t border-emerald-200/40 dark:border-gray-600/50"></div>
                           </div>
                         )}
 
@@ -1078,11 +1077,13 @@ export default function MessagesPage() {
                   <div ref={messagesEndRef} />
                 </>
               )}
+
+              </div> {/* Close Content div */}
             </div>
 
             {/* Message Input */}
-            <div className="px-3 sm:px-4 py-3 sm:py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-              <div className="flex items-center gap-1 sm:gap-2">
+            <div className="px-4 sm:px-6 py-4 sm:py-5 border-t border-emerald-200/30 dark:border-gray-700 bg-gradient-to-r from-emerald-50/50 via-white to-green-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 backdrop-blur-sm">
+              <div className="flex items-center gap-2 sm:gap-3">
                 {/* Message Input - Left */}
                 {currentSpace && (
                   <MentionInput
@@ -1193,22 +1194,27 @@ export default function MessagesPage() {
                       onClick={handleSubmitMessage}
                       disabled={isSending || !messageInput.trim()}
                       style={{ cursor: messageInput.trim() && !isSending ? 'pointer' : 'not-allowed' }}
-                      className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg ${
+                      className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg transform ${
                         isSending
-                          ? 'bg-green-600 scale-95'
+                          ? 'bg-gradient-to-r from-emerald-500 to-green-500 scale-95 animate-pulse'
                           : messageInput.trim()
-                          ? 'bg-blue-500 hover:bg-blue-600 hover:scale-105 active:scale-95'
-                          : 'bg-purple-300 dark:bg-purple-400 opacity-60'
-                      }`}
+                          ? 'bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 hover:scale-110 hover:shadow-xl active:scale-95 hover:-translate-y-1'
+                          : 'bg-gray-300 dark:bg-gray-600 opacity-50'
+                      } ring-2 ring-white/50 dark:ring-gray-700`}
                     >
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                      </svg>
+                      {isSending ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                      )}
                     </button>
                     {/* Tooltip */}
-                    {messageInput.trim() && (
-                      <div className="hidden sm:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                    {messageInput.trim() && !isSending && (
+                      <div className="hidden sm:block absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-1.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs font-medium rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none shadow-lg">
                         Send message
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-gray-100 rotate-45"></div>
                       </div>
                     )}
                   </div>
