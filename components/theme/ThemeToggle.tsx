@@ -10,7 +10,7 @@ const ThemeToggle = memo(function ThemeToggle() {
 
   useEffect(() => {
     setMounted(true);
-  }, [theme]);
+  }, []);
 
   if (!mounted) {
     return <div className="w-9 h-9" />;

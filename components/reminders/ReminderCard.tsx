@@ -52,7 +52,14 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
     const states: Array<'active' | 'snoozed' | 'completed'> = ['active', 'snoozed', 'completed'];
     const currentIndex = states.indexOf(reminder.status);
     const nextIndex = (currentIndex + 1) % states.length;
-    onStatusChange(reminder.id, states[nextIndex]);
+    const nextStatus = states[nextIndex];
+
+    // Auto-delete when completing a reminder
+    if (nextStatus === 'completed') {
+      onDelete(reminder.id);
+    } else {
+      onStatusChange(reminder.id, nextStatus);
+    }
   };
 
   return (
@@ -77,33 +84,24 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
             </button>
           )}
 
-          {/* Three-state Cycling Checkbox */}
-          <div className="relative group">
+          {/* Status Checkbox */}
+          <div className="relative group overflow-visible">
             <button
               onClick={handleCheckboxClick}
-              aria-label={`Toggle reminder status: ${reminder.status === 'active' ? 'Active' : reminder.status === 'snoozed' ? 'Snoozed' : 'Completed'}`}
-              className={`btn-touch mt-1 w-7 h-7 sm:w-6 sm:h-6 rounded-lg border-2 flex items-center justify-center transition-all flex-shrink-0 active:scale-95 hover:scale-110 hover-lift shadow-sm ${
+              aria-label={`Current status: ${reminder.status}. Click to cycle status.`}
+              className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 hover:scale-105 ${
                 reminder.status === 'completed'
-                  ? 'bg-green-500 border-green-500 shadow-green-200 dark:shadow-green-900/20'
+                  ? 'bg-green-500 border-green-500'
                   : reminder.status === 'snoozed'
-                  ? 'bg-purple-500 border-purple-500 shadow-purple-200 dark:shadow-purple-900/20'
-                  : 'bg-white dark:bg-gray-800 border-pink-400 dark:border-pink-500 hover:border-pink-500 dark:hover:border-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/10'
+                  ? 'bg-purple-500 border-purple-500'
+                  : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:border-pink-400 dark:hover:border-pink-500'
               }`}
-              title="Click to cycle: Active → Snoozed → Completed → Active"
             >
-              {reminder.status === 'completed' && <Check className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white" />}
-              {reminder.status === 'snoozed' && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
-              {reminder.status === 'active' && <div className="w-3 h-3 border-2 border-pink-400 dark:border-pink-500 rounded-full" />}
+              {reminder.status === 'completed' && <Check className="w-3 h-3 text-white" />}
+              {reminder.status === 'snoozed' && <div className="w-2 h-2 bg-white rounded-full" />}
             </button>
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
-              <div className="text-center">
-                <div className="font-medium">
-                  {reminder.status === 'active' ? '🔵 Active' : reminder.status === 'snoozed' ? '🟣 Snoozed' : '🟢 Completed'}
-                </div>
-                <div className="text-xs opacity-75 mt-0.5">Click to cycle states</div>
-              </div>
-              {/* Tooltip arrow */}
-              <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[9999] shadow-lg">
+              {reminder.status === 'active' ? 'Active - Click to snooze' : reminder.status === 'snoozed' ? 'Snoozed - Click to complete & delete' : 'Completed - Click to reactivate'}
             </div>
           </div>
 
@@ -230,41 +228,6 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
           <span className="text-gray-600 dark:text-gray-400 capitalize">{reminder.priority}</span>
         </div>
 
-        {/* Snooze Button */}
-        {reminder.status === 'active' && (
-          <div className="relative">
-            <button
-              onClick={() => setShowSnoozeMenu(!showSnoozeMenu)}
-              className="btn-touch flex items-center gap-1 px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors hover-lift shimmer-purple active-press"
-            >
-              <Timer className="w-3 h-3" />
-              <span>Snooze</span>
-            </button>
-
-            {showSnoozeMenu && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setShowSnoozeMenu(false)}
-                />
-                <div className="absolute right-0 mt-1 w-32 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
-                  {[15, 30, 60, 120].map((minutes) => (
-                    <button
-                      key={minutes}
-                      onClick={() => {
-                        onSnooze(reminder.id, minutes);
-                        setShowSnoozeMenu(false);
-                      }}
-                      className="btn-touch w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg hover-lift shimmer-purple active-press"
-                    >
-                      {minutes < 60 ? `${minutes} min` : `${minutes / 60} hr`}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Snoozed Until */}

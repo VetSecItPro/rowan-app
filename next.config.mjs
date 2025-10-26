@@ -47,106 +47,10 @@ const nextConfig = {
 
   // Security headers and CSP
   async headers() {
-    // Check if we're in development mode
-    const isDev = process.env.NODE_ENV === 'development';
-    console.log('CSP Environment:', { isDev, NODE_ENV: process.env.NODE_ENV });
-
-    // In development, use a more permissive CSP policy to allow webpack hot reload
-    if (isDev) {
-      const devScriptSources = [
-        "'self'",
-        "'unsafe-inline'",
-        "'unsafe-eval'",
-        "https://vercel.live",
-        "https://va.vercel-scripts.com",
-        "https://vitals.vercel-insights.com",
-        "https://cdn.vercel-insights.com",
-        "https://www.googletagmanager.com",
-        "https://www.google-analytics.com",
-        "https://cdnjs.cloudflare.com",
-        "https://unpkg.com",
-        "https://cdn.jsdelivr.net",
-        "webpack://*",
-        "localhost:*",
-        "127.0.0.1:*",
-        // Browser extension support
-        "chrome-extension:",
-        "safari-extension:",
-        "moz-extension:",
-        "ms-browser-extension:",
-        // Dev tools and debugging
-        "data:",
-        "blob:",
-        "'wasm-unsafe-eval'"
-      ].join(' ');
-
-      const devStyleSources = [
-        "'self'",
-        "'unsafe-inline'",
-        "https://fonts.googleapis.com",
-        "https://cdnjs.cloudflare.com",
-        "https://unpkg.com",
-        "https://cdn.jsdelivr.net",
-        // Browser extension support
-        "chrome-extension:",
-        "safari-extension:",
-        "moz-extension:",
-        "ms-browser-extension:",
-        // Dev tools and debugging
-        "data:",
-        "blob:"
-      ].join(' ');
-
-      const devCspPolicy = [
-        "default-src 'self'",
-        `script-src ${devScriptSources}`,
-        `style-src ${devStyleSources}`,
-        "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
-        "img-src 'self' data: https: blob:",
-        "connect-src 'self' https: wss: data: ws: localhost:* 127.0.0.1:*",
-        "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://www.google.com",
-        "worker-src 'self' blob:",
-        "child-src 'self' blob:",
-        "manifest-src 'self'",
-        "media-src 'self' blob: data: https:",
-        "base-uri 'self'",
-        "form-action 'self'",
-        "object-src 'none'"
-      ].join('; ');
-
-      console.log('Development CSP Policy:', devCspPolicy);
-
-      return [
-        {
-          source: '/:path*',
-          headers: [
-            {
-              key: 'Content-Security-Policy',
-              value: devCspPolicy,
-            },
-            {
-              key: 'X-Content-Type-Options',
-              value: 'nosniff',
-            },
-            {
-              key: 'X-Frame-Options',
-              value: 'SAMEORIGIN',
-            },
-            {
-              key: 'X-XSS-Protection',
-              value: '1; mode=block',
-            },
-            {
-              key: 'Referrer-Policy',
-              value: 'strict-origin-when-cross-origin',
-            },
-            {
-              key: 'Cache-Control',
-              value: 'no-cache, no-store, must-revalidate',
-            },
-          ],
-        },
-      ];
+    // COMPLETELY DISABLE CSP AND MOST HEADERS IN DEVELOPMENT
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🚀 Development mode: All CSP and restrictive headers disabled');
+      return [];
     }
 
     // Production CSP policy - permissive to match development behavior
@@ -208,7 +112,7 @@ const nextConfig = {
       "object-src 'none'"
     ].join('; ');
 
-    console.log('Generated CSP Policy:', cspPolicy);
+    console.log('🔒 Production CSP Policy applied:', cspPolicy);
 
     return [
       {
