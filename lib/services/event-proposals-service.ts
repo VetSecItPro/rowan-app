@@ -22,8 +22,8 @@ export interface EventProposal {
   // Relations
   proposer?: {
     id: string;
-    name: string;
-    avatar_url?: string;
+    email: string;
+    raw_user_meta_data?: any;
   };
   votes?: ProposalVote[];
 }
@@ -40,8 +40,8 @@ export interface ProposalVote {
   // Relations
   user?: {
     id: string;
-    name: string;
-    avatar_url?: string;
+    email: string;
+    raw_user_meta_data?: any;
   };
 }
 
@@ -77,7 +77,7 @@ export const eventProposalsService = {
       }])
       .select(`
         *,
-        proposer:users!event_proposals_proposed_by_fkey(id, name, avatar_url)
+        proposer:auth.users!event_proposals_proposed_by_fkey(id, email, raw_user_meta_data)
       `)
       .single();
 
@@ -99,7 +99,7 @@ export const eventProposalsService = {
       .from('event_proposals')
       .select(`
         *,
-        proposer:users!event_proposals_proposed_by_fkey(id, name, avatar_url)
+        proposer:auth.users!event_proposals_proposed_by_fkey(id, email, raw_user_meta_data)
       `)
       .eq('space_id', spaceId)
       .order('created_at', { ascending: false });
@@ -133,7 +133,7 @@ export const eventProposalsService = {
       .from('event_proposals')
       .select(`
         *,
-        proposer:users!event_proposals_proposed_by_fkey(id, name, avatar_url)
+        proposer:auth.users!event_proposals_proposed_by_fkey(id, email, raw_user_meta_data)
       `)
       .eq('id', proposalId)
       .single();
@@ -168,7 +168,7 @@ export const eventProposalsService = {
       })
       .select(`
         *,
-        user:users(id, name, avatar_url)
+        user:auth.users(id, email, raw_user_meta_data)
       `)
       .single();
 
@@ -187,7 +187,7 @@ export const eventProposalsService = {
       .from('event_proposal_votes')
       .select(`
         *,
-        user:users(id, name, avatar_url)
+        user:auth.users(id, email, raw_user_meta_data)
       `)
       .eq('proposal_id', proposalId)
       .order('created_at', { ascending: false });
@@ -275,7 +275,7 @@ export const eventProposalsService = {
       .eq('id', proposalId)
       .select(`
         *,
-        proposer:users!event_proposals_proposed_by_fkey(id, name, avatar_url)
+        proposer:auth.users!event_proposals_proposed_by_fkey(id, email, raw_user_meta_data)
       `)
       .single();
 
@@ -307,7 +307,7 @@ export const eventProposalsService = {
       .eq('id', proposalId)
       .select(`
         *,
-        proposer:users!event_proposals_proposed_by_fkey(id, name, avatar_url)
+        proposer:auth.users!event_proposals_proposed_by_fkey(id, email, raw_user_meta_data)
       `)
       .single();
 
@@ -341,7 +341,7 @@ export const eventProposalsService = {
       }])
       .select(`
         *,
-        proposer:users!event_proposals_proposed_by_fkey(id, name, avatar_url)
+        proposer:auth.users!event_proposals_proposed_by_fkey(id, email, raw_user_meta_data)
       `)
       .single();
 
