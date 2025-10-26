@@ -20,7 +20,7 @@ type ModalMode = 'create' | 'quickEdit';
 interface UnifiedItemModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (item: CreateTaskInput | CreateChoreInput) => void;
+  onSave: (item: CreateTaskInput | CreateChoreInput) => void | Promise<void>;
   editItem?: (Task & { type?: 'task' }) | (Chore & { type?: 'chore' }) | null;
   spaceId: string;
   userId?: string;
@@ -177,7 +177,7 @@ export function UnifiedItemModal({
       console.log('✅ Date validation passed');
 
       // Prepare submission data - different fields for tasks vs chores
-      const submissionData = itemType === 'task' ? {
+      const submissionData: CreateTaskInput | CreateChoreInput = itemType === 'task' ? {
         // Task-specific data - ONLY fields that exist in tasks table
         space_id: formData.space_id,
         title: formData.title,
@@ -187,13 +187,13 @@ export function UnifiedItemModal({
         status: formData.status || 'pending',
         due_date: formData.due_date || null,
         assigned_to: (formData.assigned_to && formData.assigned_to.trim()) || null,
-        created_by: userId || null,
+        created_by: userId || '',
         estimated_hours: formData.estimated_hours || null,
         calendar_sync: calendarSync,
         quick_note: quickNote || null,
         tags: formData.tags || null,
         // Don't send: frequency (doesn't exist in tasks table)
-      } : {
+      } as CreateTaskInput : {
         // Chore-specific data - ONLY fields that exist in chores table
         space_id: formData.space_id,
         title: formData.title,
@@ -202,27 +202,34 @@ export function UnifiedItemModal({
         assigned_to: (formData.assigned_to && formData.assigned_to.trim()) || null,
         status: formData.status || 'pending',
         due_date: formData.due_date || null,
-        created_by: userId || null,
+        created_by: userId || '',
         // Don't send: calendar_sync, category, tags, estimated_hours, quick_note, priority
-      };
+      } as CreateChoreInput;
 
       // Handle recurring tasks
       if (itemType === 'task' && isRecurring && userId) {
+        // Type cast since we know this is a task
+        const taskData = submissionData as CreateTaskInput;
         await taskRecurrenceService.createRecurringTask({
-          space_id: submissionData.space_id,
-          title: submissionData.title,
-          description: submissionData.description,
-          category: submissionData.category,
-          priority: submissionData.priority,
-          assigned_to: submissionData.assigned_to,
+          space_id: taskData.space_id,
+          title: taskData.title,
+          description: taskData.description || undefined,
+          category: taskData.category || undefined,
+          priority: taskData.priority,
+          assigned_to: taskData.assigned_to || undefined,
           created_by: userId,
           recurrence: {
-            pattern: recurringData.pattern,
+            pattern: recurringData.pattern as 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'yearly',
             interval: recurringData.interval,
             days_of_week: recurringData.days_of_week,
             end_date: recurringData.end_date || undefined,
           }
         });
+      } else if (itemType === 'chore' && isRecurring) {
+        // Handle recurring chores by setting frequency field
+        (submissionData as CreateChoreInput).frequency = recurringData.pattern as 'daily' | 'weekly' | 'biweekly' | 'monthly';
+        console.log('✅ Setting chore frequency to:', recurringData.pattern);
+        await onSave(submissionData);
       } else {
         console.log('💾 Calling onSave with submission data...');
         console.log('onSave function:', typeof onSave);
