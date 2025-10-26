@@ -47,6 +47,8 @@ const nextConfig = {
 
   // Security headers and CSP
   async headers() {
+    const isDev = process.env.NODE_ENV === 'development';
+
     return [
       {
         source: '/:path*',
@@ -55,12 +57,17 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://vercel.live https://vercel.com",
-              "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
-              "font-src 'self' data: https:",
-              "img-src 'self' data: https: blob:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live https://api.gemini.google.com https://*.ingest.sentry.io https://*.upstash.io",
-              "frame-src 'self' https://vercel.live",
+              // Allow unsafe-eval in development for Next.js hot reload, more restrictive in production
+              `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ''} https://cdn.jsdelivr.net https://*.jsdelivr.net https://vercel.live https://vercel.com https://*.vercel.app https://*.sentry.io`,
+              "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://*.jsdelivr.net https://fonts.googleapis.com",
+              "font-src 'self' data: https: https://fonts.gstatic.com https://cdn.jsdelivr.net",
+              "img-src 'self' data: https: blob: https://*.supabase.co",
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live https://api.gemini.google.com https://*.ingest.sentry.io https://*.upstash.io https://*.vercel.app wss://ws-*.pusher.com",
+              "frame-src 'self' https://vercel.live https://*.vercel.app",
+              "worker-src 'self' blob:",
+              "child-src 'self' blob:",
+              "manifest-src 'self'",
+              "media-src 'self' blob: data:",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",
