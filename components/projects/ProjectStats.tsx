@@ -2,7 +2,19 @@
 
 import { useEffect, useState } from 'react';
 import { TrendingUp, TrendingDown, DollarSign, FolderOpen, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
-import { getProjectStats, type ProjectStats } from '@/lib/services/project-tracking-service';
+import { getProjectStats } from '@/lib/services/project-tracking-service';
+
+type ProjectStats = {
+  total_projects: number;
+  active_projects: number;
+  completed_projects: number;
+  total_estimated_budget: number;
+  total_actual_cost: number;
+  total_variance: number;
+  projects_over_budget: number;
+  projects_under_budget: number;
+  avg_variance_percentage: number;
+};
 
 interface ProjectStatsProps {
   spaceId: string;

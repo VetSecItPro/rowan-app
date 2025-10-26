@@ -66,7 +66,7 @@ export function UnifiedItemModal({
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringData, setRecurringData] = useState({
     pattern: 'weekly' as keyof typeof RECURRING_PATTERNS,
-    interval: 0,
+    interval: null as number | null,
     days_of_week: [] as number[],
     end_date: '',
   });
@@ -220,7 +220,7 @@ export function UnifiedItemModal({
           created_by: userId,
           recurrence: {
             pattern: recurringData.pattern as 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'yearly',
-            interval: recurringData.interval,
+            interval: recurringData.interval || 1,
             days_of_week: recurringData.days_of_week,
             end_date: recurringData.end_date || undefined,
           }
@@ -625,10 +625,21 @@ export function UnifiedItemModal({
                             </label>
                             <input
                               type="number"
-                              min="0"
-                              value={recurringData.interval}
-                              onChange={(e) => setRecurringData(prev => ({ ...prev, interval: parseInt(e.target.value) || 0 }))}
-                              className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                              min="1"
+                              value={recurringData.interval === null ? '' : recurringData.interval}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                if (value === '') {
+                                  setRecurringData(prev => ({ ...prev, interval: null }));
+                                } else {
+                                  const numValue = parseInt(value);
+                                  if (!isNaN(numValue) && numValue > 0) {
+                                    setRecurringData(prev => ({ ...prev, interval: numValue }));
+                                  }
+                                }
+                              }}
+                              placeholder="1"
+                              className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400"
                             />
                           </div>
                         </div>

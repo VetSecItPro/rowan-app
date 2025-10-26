@@ -76,10 +76,10 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
   };
 
   return (
-    <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-6 hover:shadow-lg transition-all duration-200">
+    <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-200">
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2">
             {/* Three-state checkbox */}
             <div className="relative group">
               <button
@@ -102,22 +102,22 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
             </div>
 
             <div
-              className={`w-1 h-12 rounded-full ${getCategoryConfig().barColor} flex-shrink-0`}
+              className={`w-1 h-10 sm:h-12 rounded-full ${getCategoryConfig().barColor} flex-shrink-0`}
             />
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <h3 className={`text-lg font-semibold text-gray-900 dark:text-white truncate ${
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className={`text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate ${
                   event.status === 'completed' ? 'line-through opacity-60' : ''
                 }`}>
                   {event.title}
                 </h3>
-                <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryConfig().color} ${
+                <span className={`px-2 py-0.5 sm:py-1 rounded text-xs font-medium ${getCategoryConfig().color} ${
                   event.status === 'completed' ? 'opacity-60' : ''
                 }`}>
                   {getCategoryConfig().icon} {getCategoryConfig().label}
                 </span>
               </div>
-              <div className={`flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-400 ${
+              <div className={`flex items-center gap-2 sm:gap-3 md:gap-4 mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400 flex-wrap ${
                 event.status === 'completed' ? 'line-through opacity-60' : ''
               }`}>
                 <div className="flex items-center gap-1">
@@ -133,7 +133,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
           </div>
 
           {event.description && (
-            <p className={`text-gray-600 dark:text-gray-400 mt-3 ml-4 break-words line-clamp-2 ${
+            <p className={`text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2 sm:mt-3 ml-3 sm:ml-4 break-words line-clamp-2 ${
               event.status === 'completed' ? 'line-through opacity-60' : ''
             }`}>
               {event.description}
@@ -141,23 +141,23 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
           )}
 
           {event.location && (
-            <div className={`flex items-center gap-2 mt-3 ml-4 text-gray-600 dark:text-gray-400 ${
+            <div className={`flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3 ml-3 sm:ml-4 text-gray-600 dark:text-gray-400 ${
               event.status === 'completed' ? 'line-through opacity-60' : ''
             }`}>
-              <MapPin className="w-4 h-4 flex-shrink-0" />
-              <span className="text-sm truncate">{event.location}</span>
+              <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="text-xs sm:text-sm truncate">{event.location}</span>
             </div>
           )}
 
           {linkedShoppingList && (
             <Link
               href="/shopping"
-              className={`btn-touch inline-flex items-center gap-2 py-2 px-3 mt-3 ml-4 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors active:opacity-80 hover-lift shimmer-emerald active-press ${
+              className={`btn-touch inline-flex items-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 px-2.5 sm:px-3 mt-2 sm:mt-3 ml-3 sm:ml-4 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors active:opacity-80 hover-lift shimmer-emerald active-press ${
                 event.status === 'completed' ? 'opacity-60' : ''
               }`}
             >
-              <ShoppingCart className="w-4 h-4 flex-shrink-0" />
-              <span className="text-sm font-medium truncate">
+              <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="text-xs sm:text-sm font-medium truncate">
                 {linkedShoppingList.title}
                 {linkedShoppingList.items_count !== undefined && ` (${linkedShoppingList.items_count} items)`}
               </span>

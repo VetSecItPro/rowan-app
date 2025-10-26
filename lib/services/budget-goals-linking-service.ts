@@ -241,7 +241,7 @@ export async function createGoalFromBudgetTemplate(
 
   const goal = await createGoal(goalData);
 
-  // Create milestones
+  // Create milestones (created as not completed by default)
   for (const milestoneTemplate of template.milestones) {
     await createMilestone({
       goal_id: goal.id,
@@ -252,7 +252,6 @@ export async function createGoalFromBudgetTemplate(
         ? (milestoneTemplate.target_value / (template.target_amount || 100)) * customAmount
         : milestoneTemplate.target_value,
       current_value: 0,
-      completed: false
     });
   }
 

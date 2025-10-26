@@ -87,7 +87,7 @@ export function GoalCheckInModal({
 
     setFormData(prev => ({
       ...prev,
-      photos: [...prev.photos, ...imageFiles]
+      photos: [...(prev.photos || []), ...imageFiles]
     }));
 
     // Reset input
@@ -99,7 +99,7 @@ export function GoalCheckInModal({
   const removePhoto = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      photos: prev.photos.filter((_, i) => i !== index)
+      photos: (prev.photos || []).filter((_, i) => i !== index)
     }));
   };
 
@@ -386,7 +386,7 @@ export function GoalCheckInModal({
                 <span>Add Progress Photos</span>
               </button>
 
-              {formData.photos.length > 0 && (
+              {formData.photos && formData.photos.length > 0 && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {formData.photos.map((photo, index) => (
                     <div key={index} className="relative group">
@@ -425,9 +425,6 @@ export function GoalCheckInModal({
               feature="goals"
               className="flex-1"
               loading={isSubmitting}
-              magnetic
-              gradientShift
-              breathing
               icon={<Target className="w-4 h-4" />}
             >
               {isSubmitting ? 'Saving...' : 'Save Check-In'}

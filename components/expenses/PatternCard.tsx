@@ -31,7 +31,7 @@ export function PatternCard({ pattern, onAction, isProcessing = false, className
 
   const confidence = getConfidenceLevel(pattern.confidence_score);
 
-  const confidenceColors = {
+  const colorMap = {
     green: {
       bg: 'bg-green-100 dark:bg-green-900/30',
       text: 'text-green-700 dark:text-green-300',
@@ -50,7 +50,9 @@ export function PatternCard({ pattern, onAction, isProcessing = false, className
       ring: 'ring-red-500',
       bar: 'bg-red-500',
     },
-  }[confidence.color];
+  };
+
+  const confidenceColors = colorMap[confidence.color as keyof typeof colorMap] || colorMap.amber;
 
   // Format next expected date
   const nextDate = pattern.next_expected_date

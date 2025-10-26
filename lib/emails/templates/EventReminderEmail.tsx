@@ -94,7 +94,7 @@ const EventReminderEmail = ({
             <Section style={eventCard}>
               <div style={eventIcon}>📅</div>
 
-              <Heading style={eventTitle}>{eventTitle}</Heading>
+              <Heading style={eventTitleStyle}>{eventTitle}</Heading>
 
               {eventDescription && (
                 <Text style={eventDesc}>{eventDescription}</Text>
@@ -244,7 +244,7 @@ const eventIcon = {
   marginBottom: '12px',
 };
 
-const eventTitle = {
+const eventTitleStyle = {
   color: '#1f2937',
   fontSize: '20px',
   fontWeight: 'bold',

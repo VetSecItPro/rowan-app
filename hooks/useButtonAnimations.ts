@@ -30,7 +30,7 @@ export interface ButtonAnimationOptions {
 function useFeatureDetection() {
   const pathname = usePathname();
 
-  return pathname.split('/').filter(Boolean)[0] as ButtonAnimationOptions['feature'] || 'dashboard';
+  return pathname?.split('/').filter(Boolean)[0] as ButtonAnimationOptions['feature'] || 'dashboard';
 }
 
 // Magnetic attraction hook

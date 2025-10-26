@@ -7,7 +7,7 @@ export const choreBaseSchema = z.object({
     .transform(val => val === '' ? null : val),
   space_id: z.string().uuid('Invalid space ID'),
   status: z.enum(['pending', 'in-progress', 'blocked', 'on-hold', 'completed']).default('pending'),
-  frequency: z.enum(['daily', 'weekly', 'monthly', 'once'], 'Frequency is required'),
+  frequency: z.enum(['daily', 'weekly', 'biweekly', 'monthly', 'once'], 'Frequency is required'),
   assigned_to: z.string().max(255, 'Assigned to must be less than 255 characters').optional().nullable()
     .transform(val => val === '' ? null : val),
   due_date: z.string().optional().nullable()
@@ -91,7 +91,7 @@ export const bulkUpdateChoresSchema = z.object({
   chore_ids: z.array(z.string().uuid()).min(1).max(50),
   updates: z.object({
     status: z.enum(['pending', 'in-progress', 'blocked', 'on-hold', 'completed']).optional(),
-    frequency: z.enum(['daily', 'weekly', 'monthly', 'once']).optional(),
+    frequency: z.enum(['daily', 'weekly', 'biweekly', 'monthly', 'once']).optional(),
     assigned_to: z.string().uuid().optional().nullable(),
     due_date: z.string().datetime().optional().nullable(),
   }),

@@ -103,7 +103,7 @@ export const CommandGroup = React.forwardRef<HTMLDivElement, CommandGroupProps>(
 
 CommandGroup.displayName = 'CommandGroup';
 
-interface CommandItemProps extends React.HTMLAttributes<HTMLDivElement> {
+interface CommandItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onSelect'> {
   disabled?: boolean;
   onSelect?: (value: string) => void;
   value?: string;

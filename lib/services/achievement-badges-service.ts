@@ -281,7 +281,7 @@ export async function getRecentBadgeActivities(spaceId: string, limit: number = 
     .limit(limit);
 
   if (error) throw error;
-  return data || [];
+  return (data as unknown as UserAchievement[]) || [];
 }
 
 // =====================================================

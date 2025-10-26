@@ -130,6 +130,10 @@ export interface SpaceInvitationData {
  */
 export async function sendTaskAssignmentEmail(data: TaskAssignmentData): Promise<EmailResult> {
   try {
+    if (!resend) {
+      return { success: false, error: 'Email service not configured' };
+    }
+
     const emailHtml = await render(TaskAssignmentEmail(data));
 
     const { data: result, error } = await resend.emails.send({
@@ -162,6 +166,10 @@ export async function sendTaskAssignmentEmail(data: TaskAssignmentData): Promise
  */
 export async function sendEventReminderEmail(data: EventReminderData): Promise<EmailResult> {
   try {
+    if (!resend) {
+      return { success: false, error: 'Email service not configured' };
+    }
+
     const emailHtml = await render(EventReminderEmail(data));
 
     const { data: result, error } = await resend.emails.send({
@@ -194,6 +202,10 @@ export async function sendEventReminderEmail(data: EventReminderData): Promise<E
  */
 export async function sendNewMessageEmail(data: NewMessageData): Promise<EmailResult> {
   try {
+    if (!resend) {
+      return { success: false, error: 'Email service not configured' };
+    }
+
     const emailHtml = await render(NewMessageEmail(data));
 
     const { data: result, error } = await resend.emails.send({
@@ -225,6 +237,10 @@ export async function sendNewMessageEmail(data: NewMessageData): Promise<EmailRe
  */
 export async function sendShoppingListEmail(data: ShoppingListData): Promise<EmailResult> {
   try {
+    if (!resend) {
+      return { success: false, error: 'Email service not configured' };
+    }
+
     const emailHtml = await render(ShoppingListEmail(data));
 
     const actionLabels = {
@@ -263,6 +279,10 @@ export async function sendShoppingListEmail(data: ShoppingListData): Promise<Ema
  */
 export async function sendMealReminderEmail(data: MealReminderData): Promise<EmailResult> {
   try {
+    if (!resend) {
+      return { success: false, error: 'Email service not configured' };
+    }
+
     const emailHtml = await render(MealReminderEmail(data));
 
     const reminderLabels = {
@@ -302,6 +322,10 @@ export async function sendMealReminderEmail(data: MealReminderData): Promise<Ema
  */
 export async function sendGeneralReminderEmail(data: GeneralReminderData): Promise<EmailResult> {
   try {
+    if (!resend) {
+      return { success: false, error: 'Email service not configured' };
+    }
+
     const emailHtml = await render(GeneralReminderEmail(data));
 
     const { data: result, error } = await resend.emails.send({
@@ -427,6 +451,10 @@ export async function sendBatchEmails(emails: Array<{
  */
 export async function verifyEmailService(): Promise<EmailResult> {
   try {
+    if (!resend) {
+      return { success: false, error: 'Email service not configured' };
+    }
+
     // Send a test email to verify the service is working
     const { data: result, error } = await resend.emails.send({
       from: FROM_EMAIL,

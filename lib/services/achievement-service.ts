@@ -650,7 +650,7 @@ export async function getUserBadgeStats(
 ): Promise<{
   totalBadges: number;
   totalPoints: number;
-  byRarity: Record<string, number>;
+  byRarity: { common: number; uncommon: number; rare: number; epic: number; legendary: number };
   byCategory: Record<string, number>;
 }> {
   try {
@@ -659,7 +659,7 @@ export async function getUserBadgeStats(
     const stats = {
       totalBadges: userBadges.length,
       totalPoints: 0,
-      byRarity: { common: 0, rare: 0, epic: 0, legendary: 0 },
+      byRarity: { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0 },
       byCategory: {
         milestone: 0,
         streak: 0,
@@ -675,8 +675,10 @@ export async function getUserBadgeStats(
         stats.totalPoints += userBadge.badge.points;
         stats.byRarity[userBadge.badge.rarity] =
           (stats.byRarity[userBadge.badge.rarity] || 0) + 1;
-        stats.byCategory[userBadge.badge.category] =
-          (stats.byCategory[userBadge.badge.category] || 0) + 1;
+        const category = userBadge.badge.category as keyof typeof stats.byCategory;
+        if (category in stats.byCategory) {
+          stats.byCategory[category] = (stats.byCategory[category] || 0) + 1;
+        }
       }
     });
 
@@ -686,7 +688,7 @@ export async function getUserBadgeStats(
     return {
       totalBadges: 0,
       totalPoints: 0,
-      byRarity: { common: 0, rare: 0, epic: 0, legendary: 0 },
+      byRarity: { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0 },
       byCategory: {
         milestone: 0,
         streak: 0,

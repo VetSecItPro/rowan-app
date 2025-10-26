@@ -59,7 +59,7 @@ export function SplitTypeSelector({
     <div className={`grid grid-cols-1 md:grid-cols-2 gap-3 ${className}`}>
       {splitTypeOptions.map((option) => {
         const isSelected = selectedType === option.type;
-        const colorClasses = {
+        const colorMap = {
           emerald: {
             border: 'border-emerald-500 dark:border-emerald-600',
             bg: 'bg-emerald-50 dark:bg-emerald-900/20',
@@ -84,7 +84,8 @@ export function SplitTypeSelector({
             icon: 'text-purple-600 dark:text-purple-400',
             ring: 'ring-purple-500',
           },
-        }[option.color];
+        };
+        const colorClasses = colorMap[option.color as keyof typeof colorMap] || colorMap.emerald;
 
         return (
           <button

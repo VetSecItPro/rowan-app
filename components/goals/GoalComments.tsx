@@ -5,9 +5,15 @@ import { formatDistanceToNow } from 'date-fns';
 import { MessageCircle, Heart, ThumbsUp, Smile, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Textarea } from '@/components/ui/textarea';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Separator } from '@/components/ui/separator';
 import { GoalComment, CreateCommentInput } from '@/lib/services/goals-service';
 import { createClient } from '@/lib/supabase/client';
 import { hapticLight, hapticSuccess } from '@/lib/utils/haptics';
+import { cn } from '@/lib/utils';
 
 interface GoalCommentsProps {
   goalId: string;
@@ -250,9 +256,9 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
             <Textarea
               placeholder="Add a comment..."
               value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewComment(e.target.value)}
               className="min-h-[80px] resize-none"
-              onKeyDown={(e) => {
+              onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
                 if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
                   handleAddComment();
                 }
@@ -286,10 +292,9 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
                 <div key={comment.id}>
                   <div className="flex items-start space-x-3">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={comment.users?.avatar_url} />
+                      <AvatarImage src={comment.user?.avatar_url} />
                       <AvatarFallback>
-                        {comment.users?.full_name?.split(' ').map(n => n[0]).join('') ||
-                         comment.users?.email?.[0].toUpperCase()}
+                        {comment.user?.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
                       </AvatarFallback>
                     </Avatar>
 
@@ -298,7 +303,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-medium">
-                              {comment.users?.full_name || comment.users?.email}
+                              {comment.user?.name}
                             </p>
                             <span className="text-xs text-gray-500 dark:text-gray-400">
                               {formatDistanceToNow(new Date(comment.created_at))} ago
@@ -343,7 +348,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
                           <div className="space-y-2">
                             <Textarea
                               value={editContent}
-                              onChange={(e) => setEditContent(e.target.value)}
+                              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setEditContent(e.target.value)}
                               className="min-h-[60px] resize-none"
                             />
                             <div className="flex gap-2">

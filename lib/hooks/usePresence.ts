@@ -36,7 +36,7 @@ export function usePresence({ channelName, spaceId, userId, userEmail }: UsePres
     presenceChannel
       .on('presence', { event: 'sync' }, () => {
         const state = presenceChannel.presenceState();
-        setPresenceState(state);
+        setPresenceState(state as unknown as Record<string, PresenceUser[]>);
       })
       .on('presence', { event: 'join' }, ({ key, newPresences }) => {
         console.log('User joined:', key, newPresences);

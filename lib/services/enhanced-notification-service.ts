@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { pushService } from './push-service';
-import { digestService } from './digest-service';
-// Removed notification-preferences-service dependency - using digest-only system
+// Removed notification-preferences-service and digest-service dependencies - using direct notification system
 
 export interface NotificationPayload {
   type: 'task' | 'event' | 'message' | 'goal' | 'shopping' | 'expense' | 'reminder';
@@ -100,6 +99,7 @@ export const enhancedNotificationService = {
     data: {
       achievementType: 'goal_completed' | 'milestone_reached' | 'streak_achieved';
       goalTitle: string;
+      goalId?: string;
       milestoneTitle?: string;
       completedBy: string;
       completionDate: string;
@@ -418,6 +418,7 @@ export const enhancedNotificationService = {
       messagePreview: string;
       conversationTitle?: string;
       isDirectMessage: boolean;
+      messageCount?: number;
       messageUrl?: string;
       spaceName: string;
     }

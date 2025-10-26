@@ -30,8 +30,7 @@ export const weatherService = {
    * Smart fetching: Only fetch for events within 5 days
    */
   shouldFetchWeather(eventTime: string, location?: string): boolean {
-    if (!location) return false;
-
+    // Allow weather fetching even without location (we'll auto-detect user location)
     try {
       const eventDate = parseISO(eventTime);
       const now = new Date();
@@ -47,27 +46,98 @@ export const weatherService = {
   },
 
   /**
+   * Detect user's location using IP geolocation
+   * Fallback for when no event location is provided
+   */
+  async detectUserLocation(): Promise<string | null> {
+    try {
+      const response = await fetch('/api/weather/user-location', {
+        method: 'GET',
+        // Add timeout to prevent hanging requests
+        signal: AbortSignal.timeout(5000),
+      });
+
+      if (!response.ok) {
+        console.warn('[Weather] User location detection failed:', response.status);
+        return null;
+      }
+
+      const data = await response.json();
+
+      if (data.success && data.location) {
+        console.log('[Weather] User location detected:', data.location.formatted);
+        return data.location.formatted;
+      }
+
+      return null;
+    } catch (error) {
+      console.warn('[Weather] User location detection error:', error instanceof Error ? error.message : 'Unknown error');
+      return null;
+    }
+  },
+
+  /**
    * Get weather forecast for a specific location and time
    * Uses Open-Meteo API (FREE) with 3-hour caching
+   * Automatically detects user location if no event location provided
    */
   async getWeatherForEvent(
     location: string | undefined,
     eventTime: string
   ): Promise<WeatherForecast | null> {
-    if (!location) return null;
+    let effectiveLocation = location;
 
-    // Smart fetching: Only fetch for upcoming events within 5 days
-    if (!this.shouldFetchWeather(eventTime, location)) {
-      console.log(`[Weather] Skipping fetch for ${location} - event outside 5-day window`);
+    // If no location provided, try to detect user location
+    if (!effectiveLocation) {
+      console.log('[Weather] No event location provided, attempting to detect user location...');
+      effectiveLocation = (await this.detectUserLocation()) || undefined;
+    }
+
+    if (!effectiveLocation) {
+      console.log('[Weather] No location available (event or user), skipping weather fetch');
       return null;
     }
 
-    // Use cache with 3-hour TTL
-    return weatherCacheService.getOrFetchWeather(
-      location,
-      eventTime,
-      () => this.fetchWeatherFromAPI(location, eventTime)
-    );
+    // Smart fetching: Only fetch for upcoming events within 5 days
+    if (!this.shouldFetchWeather(eventTime)) {
+      // Don't spam logs for events outside the window
+      return null;
+    }
+
+    try {
+      console.log(`[Weather] Fetching weather for ${effectiveLocation} at ${eventTime}`);
+
+      // Use cache with 3-hour TTL
+      return await weatherCacheService.getOrFetchWeather(
+        effectiveLocation,
+        eventTime,
+        () => this.fetchWeatherFromAPI(effectiveLocation!, eventTime)
+      );
+    } catch (error) {
+      // Silently fail for weather - it's a nice-to-have feature
+      console.warn(`[Weather] Failed to get weather for ${effectiveLocation}:`, error instanceof Error ? error.message : 'Unknown error');
+      return null;
+    }
+  },
+
+  /**
+   * Get weather for user's current location
+   * Useful for displaying general weather information
+   */
+  async getWeatherForUserLocation(): Promise<WeatherForecast | null> {
+    try {
+      const userLocation = await this.detectUserLocation();
+      if (!userLocation) {
+        return null;
+      }
+
+      // Get current weather (use current time)
+      const currentTime = new Date().toISOString();
+      return await this.getWeatherForEvent(userLocation, currentTime);
+    } catch (error) {
+      console.warn('[Weather] Failed to get weather for user location:', error instanceof Error ? error.message : 'Unknown error');
+      return null;
+    }
   },
 
   /**
@@ -128,31 +198,43 @@ export const weatherService = {
   },
 
   /**
-   * Geocode location using our server-side API route
+   * Geocode location using our server-side API route with improved error handling
    */
   async geocodeLocation(location: string): Promise<{ lat: number; lon: number } | null> {
     try {
       const geocodeUrl = `/api/weather/geocode?location=${encodeURIComponent(location)}`;
 
-      const response = await fetch(geocodeUrl);
+      const response = await fetch(geocodeUrl, {
+        // Add timeout to prevent hanging requests
+        signal: AbortSignal.timeout(8000), // 8 second timeout
+      });
 
       if (!response.ok) {
-        throw new Error(`Geocoding failed: ${response.status}`);
+        // Only log as warning, not error - geocoding failures are expected
+        console.warn(`[Weather] Geocoding failed for "${location}": ${response.status}`);
+        return null;
       }
 
       const data = await response.json();
 
       if (data.error) {
-        console.log(`[Weather] Location not found: ${location}`);
+        // This is normal for locations that can't be found
+        console.log(`[Weather] Location "${location}" not found in geocoding database`);
         return null;
       }
 
+      console.log(`[Weather] Successfully geocoded "${location}" to ${data.lat}, ${data.lon}`);
       return {
         lat: data.lat,
         lon: data.lon,
       };
     } catch (error) {
-      console.error('[Weather] Geocoding error:', error);
+      // Use warn instead of error for timeouts and network issues
+      if (error instanceof Error && error.name === 'TimeoutError') {
+        console.warn(`[Weather] Geocoding timeout for "${location}"`);
+      } else {
+        console.warn(`[Weather] Geocoding error for "${location}":`, error instanceof Error ? error.message : 'Unknown error');
+      }
       return null;
     }
   },

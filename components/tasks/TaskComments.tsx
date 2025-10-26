@@ -122,8 +122,6 @@ export function TaskComments({ taskId, userId }: TaskCommentsProps) {
           feature="tasks"
           size="sm"
           icon={<Send className="w-4 h-4" />}
-          breathing
-          ripple
         >
         </CTAButton>
       </form>

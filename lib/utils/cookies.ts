@@ -380,8 +380,8 @@ export function getCookieConsentTimestamp(): Date | null {
 export function privacyToCookiePreferences(privacy: UserPrivacyPreferences): CookiePreferences {
   return {
     necessary: true,
-    analytics: privacy.third_party_analytics_enabled,
-    marketing: privacy.share_data_with_partners && !privacy.ccpa_do_not_sell,
+    analytics: !!privacy.third_party_analytics_enabled,
+    marketing: !!(privacy.share_data_with_partners && !privacy.ccpa_do_not_sell),
     functional: true, // Always enabled for core functionality
     preferences: true, // Always enabled for user experience
   };

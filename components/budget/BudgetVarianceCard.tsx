@@ -168,41 +168,41 @@ export function BudgetVarianceCard({
       </div>
 
       {/* Quick Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="text-center">
-          <div className={`text-2xl font-bold ${
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div className="text-center p-2">
+          <div className={`text-lg sm:text-xl lg:text-2xl font-bold ${
             isOverBudget
               ? 'text-red-600 dark:text-red-400'
               : 'text-orange-600 dark:text-orange-400'
           }`}>
             ${Math.abs(variance).toLocaleString()}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Variance</div>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Variance</div>
         </div>
 
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900 dark:text-white">
+        <div className="text-center p-2">
+          <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">
             ${project.actual_cost.toLocaleString()}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Spent</div>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Spent</div>
         </div>
 
-        <div className="text-center">
-          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+        <div className="text-center p-2">
+          <div className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-600 dark:text-blue-400">
             ${projectedTotal.toLocaleString()}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Projected</div>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Projected</div>
         </div>
 
-        <div className="text-center">
-          <div className={`text-2xl font-bold ${
+        <div className="text-center p-2">
+          <div className={`text-lg sm:text-xl lg:text-2xl font-bold ${
             projectedVariance > 0
               ? 'text-red-600 dark:text-red-400'
               : 'text-green-600 dark:text-green-400'
           }`}>
             {projectedVariance > 0 ? '+' : ''}${projectedVariance.toLocaleString()}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Final Variance</div>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Final Variance</div>
         </div>
       </div>
 
@@ -257,7 +257,7 @@ export function BudgetVarianceCard({
       {showDetails && (
         <div className="space-y-6 border-t border-gray-200 dark:border-gray-700 pt-6">
           {/* Budget vs Actual Chart */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
             <div>
               <h4 className="font-medium text-gray-900 dark:text-white mb-4">
                 Budget Comparison
@@ -293,7 +293,7 @@ export function BudgetVarianceCard({
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, variance }) => `${name}: $${variance.toLocaleString()}`}
+                      label={(props: any) => `${props.name}: $${props.variance?.toLocaleString?.() || 0}`}
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="variance"
@@ -315,36 +315,36 @@ export function BudgetVarianceCard({
               <h4 className="font-medium text-gray-900 dark:text-white mb-4">
                 Category Analysis
               </h4>
-              <div className="overflow-x-auto">
-                <table className="w-full">
+              <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
+                <table className="w-full min-w-[500px]">
                   <thead>
                     <tr className="border-b border-gray-200 dark:border-gray-700">
-                      <th className="text-left py-2 text-sm font-medium text-gray-700 dark:text-gray-300">Category</th>
-                      <th className="text-right py-2 text-sm font-medium text-gray-700 dark:text-gray-300">Budgeted</th>
-                      <th className="text-right py-2 text-sm font-medium text-gray-700 dark:text-gray-300">Actual</th>
-                      <th className="text-right py-2 text-sm font-medium text-gray-700 dark:text-gray-300">Variance</th>
-                      <th className="text-right py-2 text-sm font-medium text-gray-700 dark:text-gray-300">%</th>
+                      <th className="text-left py-3 px-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Category</th>
+                      <th className="text-right py-3 px-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Budgeted</th>
+                      <th className="text-right py-3 px-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Actual</th>
+                      <th className="text-right py-3 px-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Variance</th>
+                      <th className="text-right py-3 px-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">%</th>
                     </tr>
                   </thead>
                   <tbody>
                     {overBudgetCategories.map((category) => (
-                      <tr key={category.category} className="border-b border-gray-100 dark:border-gray-800">
-                        <td className="py-2 text-sm text-gray-900 dark:text-white">
-                          {category.category}
-                          <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                      <tr key={category.category} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                        <td className="py-3 px-2 text-xs sm:text-sm text-gray-900 dark:text-white">
+                          <div className="font-medium">{category.category}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
                             ({category.count} items)
-                          </span>
+                          </div>
                         </td>
-                        <td className="py-2 text-sm text-right text-gray-900 dark:text-white">
+                        <td className="py-3 px-2 text-xs sm:text-sm text-right text-gray-900 dark:text-white">
                           ${category.estimated.toLocaleString()}
                         </td>
-                        <td className="py-2 text-sm text-right text-gray-900 dark:text-white">
+                        <td className="py-3 px-2 text-xs sm:text-sm text-right text-gray-900 dark:text-white">
                           ${category.actual.toLocaleString()}
                         </td>
-                        <td className="py-2 text-sm text-right text-red-600 dark:text-red-400 font-medium">
+                        <td className="py-3 px-2 text-xs sm:text-sm text-right text-red-600 dark:text-red-400 font-medium">
                           +${category.variance.toLocaleString()}
                         </td>
-                        <td className="py-2 text-sm text-right text-red-600 dark:text-red-400 font-medium">
+                        <td className="py-3 px-2 text-xs sm:text-sm text-right text-red-600 dark:text-red-400 font-medium">
                           +{category.percentage.toFixed(1)}%
                         </td>
                       </tr>

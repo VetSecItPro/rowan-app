@@ -85,8 +85,6 @@ export function SubtasksList({ taskId, userId }: SubtasksListProps) {
           feature="tasks"
           size="sm"
           icon={<Plus className="w-4 h-4" />}
-          breathing
-          ripple
         >
         </CTAButton>
       </form>

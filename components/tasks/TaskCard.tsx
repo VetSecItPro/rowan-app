@@ -50,8 +50,8 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
 
     // Same cycling for both tasks and chores
     if (task.status === 'pending') {
-      newStatus = 'in_progress';
-    } else if (task.status === 'in_progress') {
+      newStatus = 'in-progress';
+    } else if (task.status === 'in-progress') {
       newStatus = 'completed';
     } else if (task.status === 'completed') {
       newStatus = 'pending';
@@ -64,7 +64,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
   const getCheckboxStyle = () => {
     if (task.status === 'completed') {
       return 'bg-green-500 border-2 border-green-500 hover:bg-green-600';
-    } else if (task.status === 'in_progress') {
+    } else if (task.status === 'in-progress') {
       return 'bg-amber-500 border-2 border-amber-500 hover:bg-amber-600';
     } else {
       return 'border-2 border-gray-300 dark:border-gray-600 bg-transparent hover:border-amber-400 dark:hover:border-amber-400';
@@ -75,7 +75,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
   const getStatusLabel = () => {
     if (task.status === 'completed') {
       return { text: 'Completed', color: 'text-green-600 dark:text-green-400' };
-    } else if (task.status === 'in_progress') {
+    } else if (task.status === 'in-progress') {
       return { text: 'In Progress', color: 'text-amber-600 dark:text-amber-400' };
     } else {
       return { text: 'Pending', color: 'text-gray-600 dark:text-gray-400' };
@@ -86,7 +86,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
   const getStatusTooltip = () => {
     if (task.status === 'pending') {
       return 'Click to start (In Progress)';
-    } else if (task.status === 'in_progress') {
+    } else if (task.status === 'in-progress') {
       return 'Click to complete';
     } else if (task.status === 'completed') {
       return 'Click to reset to pending';
@@ -97,10 +97,10 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
   const statusLabel = getStatusLabel();
 
   return (
-    <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg p-4 sm:p-4 hover:shadow-lg transition-all duration-200 group">
+    <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg p-3 sm:p-4 md:p-5 hover:shadow-lg transition-all duration-200 group">
       {/* Header */}
-      <div className="flex items-start justify-between mb-3 gap-3">
-        <div className="flex items-start gap-3 flex-1">
+      <div className="flex items-start justify-between mb-2 sm:mb-3 gap-2 sm:gap-3">
+        <div className="flex items-start gap-2 sm:gap-3 flex-1">
           {/* Checkbox */}
           <button
             onClick={handleStatusClick}
@@ -111,21 +111,21 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
             {task.status === 'completed' && (
               <CheckSquare className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
             )}
-            {task.status === 'in_progress' && (
+            {task.status === 'in-progress' && (
               <Clock className="w-3 h-3 text-white" />
             )}
           </button>
 
           {/* Title & Description */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <h3 className={`font-semibold text-gray-900 dark:text-white truncate ${
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1 flex-wrap">
+              <h3 className={`text-sm sm:text-base font-semibold text-gray-900 dark:text-white truncate ${
                 task.status === 'completed' ? 'line-through opacity-60' : ''
               }`}>
                 {task.title}
               </h3>
               {/* Task/Chore Type Badge */}
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border-2 ${
+              <span className={`inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium border-2 ${
                 (task.type === 'chore')
                   ? 'border-amber-500 text-amber-600 dark:text-amber-400 dark:border-amber-400 bg-amber-50 dark:bg-amber-900/20'
                   : 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
@@ -134,18 +134,18 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
               </span>
               {/* Category Badge */}
               {task.category && TASK_CATEGORIES[task.category as keyof typeof TASK_CATEGORIES] && (
-                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                <span className={`inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-medium ${
                   TASK_CATEGORIES[task.category as keyof typeof TASK_CATEGORIES].lightBg
                 } ${
                   TASK_CATEGORIES[task.category as keyof typeof TASK_CATEGORIES].textColor
                 }`}>
                   <span>{TASK_CATEGORIES[task.category as keyof typeof TASK_CATEGORIES].emoji}</span>
-                  <span>{TASK_CATEGORIES[task.category as keyof typeof TASK_CATEGORIES].label}</span>
+                  <span className="hidden sm:inline">{TASK_CATEGORIES[task.category as keyof typeof TASK_CATEGORIES].label}</span>
                 </span>
               )}
             </div>
             {task.description && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                 {task.description}
               </p>
             )}
@@ -206,7 +206,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
       </div>
 
       {/* Meta Information */}
-      <div className="flex items-center gap-3 flex-wrap text-xs">
+      <div className="flex items-center gap-2 sm:gap-3 flex-wrap text-xs">
         {/* Priority */}
         <div className="flex items-center gap-1">
           <Flag className={`w-3 h-3 ${priorityColor.replace('bg-', 'text-')}`} />
@@ -217,20 +217,21 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
         {task.due_date && (
           <div className={`flex items-center gap-1 ${isOverdue ? 'text-red-500' : 'text-gray-600 dark:text-gray-400'}`}>
             <CalendarIcon className="w-3 h-3" />
-            <span>{formatTimestamp(task.due_date, 'MMM d, yyyy')}</span>
+            <span className="hidden sm:inline">{formatTimestamp(task.due_date, 'MMM d, yyyy')}</span>
+            <span className="sm:hidden">{formatTimestamp(task.due_date, 'MMM d')}</span>
             {isOverdue && <span className="font-semibold">Overdue</span>}
           </div>
         )}
 
         {/* Status Badge */}
-        <span className={`px-2 py-0.5 ${statusColor} text-white rounded-full capitalize ml-auto`}>
+        <span className={`px-1.5 sm:px-2 py-0.5 ${statusColor} text-white rounded-full capitalize ml-auto text-xs`}>
           {task.status.replace('_', ' ')}
         </span>
       </div>
 
       {/* Assigned User */}
       {task.assigned_to && (
-        <div className="mt-3 flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+        <div className="mt-2 sm:mt-3 flex items-center gap-1.5 sm:gap-2 text-xs text-gray-600 dark:text-gray-400">
           <User className="w-3 h-3" />
           <span>Assigned</span>
         </div>
@@ -240,9 +241,9 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
       {linkedShoppingList && (
         <Link
           href="/shopping"
-          className="mt-3 inline-flex items-center gap-2 py-2 px-3 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors text-sm hover:underline"
+          className="mt-2 sm:mt-3 inline-flex items-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 px-2.5 sm:px-3 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors text-xs sm:text-sm hover:underline"
         >
-          <ShoppingCart className="w-4 h-4 flex-shrink-0" />
+          <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
           <span className="font-medium truncate">
             {linkedShoppingList.title}
             {linkedShoppingList.items_count !== undefined && ` (${linkedShoppingList.items_count} items)`}

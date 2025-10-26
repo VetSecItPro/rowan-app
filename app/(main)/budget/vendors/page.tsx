@@ -114,7 +114,7 @@ export default function VendorManagementPage() {
   }, [loadVendorData]);
 
   // Handle vendor creation
-  const handleCreateVendor = async (vendorData: CreateVendorInput) => {
+  const handleCreateVendor = async (vendorData: Omit<CreateVendorInput, 'space_id' | 'created_by'>) => {
     if (!user) throw new Error('User not authenticated');
 
     try {
@@ -138,7 +138,7 @@ export default function VendorManagementPage() {
   };
 
   // Handle vendor update
-  const handleUpdateVendor = async (vendorData: CreateVendorInput) => {
+  const handleUpdateVendor = async (vendorData: Omit<CreateVendorInput, 'space_id' | 'created_by'>) => {
     if (!editingVendor) return;
 
     try {

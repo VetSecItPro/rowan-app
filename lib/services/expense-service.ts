@@ -14,7 +14,7 @@ export interface Expense {
   paid_at?: string;
   recurring?: boolean;
   is_recurring?: boolean;
-  recurring_frequency?: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  recurring_frequency?: 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'yearly';
   split_type?: 'equal' | 'percentage' | 'custom' | 'none';
   project_id?: string;
   created_by?: string;

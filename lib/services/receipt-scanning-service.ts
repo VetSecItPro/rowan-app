@@ -87,7 +87,7 @@ export const receiptScanningService = {
   ): Promise<ReceiptProcessingResult> {
     try {
       // Validate the uploaded file
-      const validation = fileUploadService.validateFile(file);
+      const validation = await fileUploadService.validateFile(file);
       if (!validation.valid) {
         return {
           success: false,

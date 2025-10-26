@@ -103,8 +103,10 @@ export default function CommentThread({
 
   // Handle delete
   const handleDelete = async (commentId: string) => {
+    if (!user?.id) return;
+
     try {
-      await deleteComment(commentId);
+      await deleteComment(commentId, user.id);
       await loadComments();
     } catch (err) {
       console.error('Failed to delete comment:', err);
@@ -114,8 +116,11 @@ export default function CommentThread({
 
   // Handle pin toggle
   const handlePin = async (commentId: string) => {
+    const comment = comments.find(c => c.id === commentId);
+    if (!comment) return;
+
     try {
-      await togglePinComment(commentId);
+      await togglePinComment(commentId, !comment.is_pinned);
       await loadComments();
     } catch (err) {
       console.error('Failed to pin comment:', err);

@@ -167,7 +167,6 @@ export function ButtonAnimationDemo() {
           <div className="space-y-4 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
             <h3 className="font-semibold">Magnetic Attraction</h3>
             <PremiumButton
-              magnetic
               size="lg"
               icon={<Sparkles className="w-5 h-5" />}
             >
@@ -271,9 +270,12 @@ export function LegacyButtonExample() {
     ripple: true,
   });
 
+  const { ref, ...otherProps } = animationProps;
+
   return (
     <button
-      {...animationProps}
+      ref={ref as React.Ref<HTMLButtonElement>}
+      {...otherProps}
       onClick={enhancedClickHandler(() => console.log('Legacy button clicked!'))}
       className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-medium"
     >

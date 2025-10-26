@@ -92,7 +92,7 @@ export default function GoalProgressCard({ goal, onClick }: GoalProgressCardProp
         <div className="flex items-baseline justify-between mb-2">
           <div>
             <span className="text-3xl font-bold text-gray-900 dark:text-white">
-              ${goal.current_amount.toLocaleString()}
+              ${(goal.current_amount ?? 0).toLocaleString()}
             </span>
             <span className="text-gray-500 dark:text-gray-400 ml-2">
               of ${goal.target_amount.toLocaleString()}

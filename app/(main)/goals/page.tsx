@@ -319,17 +319,10 @@ export default function GoalsPage() {
           space_id: goalData.space_id,
           description: goalData.description || undefined,
           category: goalData.category || undefined,
-          // target_value property doesn't exist in Goal interface, removing
-          // current_value property doesn't exist in Goal interface, removing
           target_date: goalData.target_date || undefined,
-          priority: (goalData as any).priority || 'medium',
-          progress_percentage: 0,
-          is_public: (goalData as any).is_public || false,
-          check_in_frequency: (goalData as any).check_in_frequency || undefined,
-          last_check_in: undefined,
+          progress: 0,
           completed_at: undefined,
-          dependencies: [],
-          milestones: [],
+          created_by: user?.id || '',
         };
 
         setGoals(prev => [optimisticGoal, ...prev]);

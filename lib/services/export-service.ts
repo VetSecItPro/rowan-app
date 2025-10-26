@@ -26,7 +26,7 @@ export function expensesToCSV(expenses: Expense[]): string {
   // Convert expenses to CSV rows
   const rows = expenses.map((expense) => [
     expense.date,
-    `"${expense.description.replace(/"/g, '""')}"`, // Escape quotes
+    expense.description ? `"${expense.description.replace(/"/g, '""')}"` : '', // Escape quotes
     expense.category || '',
     expense.amount.toFixed(2),
     expense.payment_method || '',
@@ -140,7 +140,7 @@ export function projectToCSV(project: Project, expenses: Expense[]): string {
   // Expense Rows
   const expenseRows = expenses.map((expense) => [
     expense.date,
-    `"${expense.description.replace(/"/g, '""')}"`,
+    expense.description ? `"${expense.description.replace(/"/g, '""')}"` : '',
     expense.category || '',
     `$${expense.amount.toFixed(2)}`,
     expense.payment_method || '',
@@ -230,17 +230,17 @@ export async function exportCategoryBreakdown(
     .sort()
     .forEach((category) => {
       const categoryExpenses = grouped[category];
-      const categoryTotal = categoryExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+      const categoryTotal = categoryExpenses.reduce((sum: number, exp: any) => sum + exp.amount, 0);
 
       csvRows.push(''); // Empty row
       csvRows.push(`${category} (Total: $${categoryTotal.toFixed(2)})`);
 
-      categoryExpenses.forEach((expense) => {
+      categoryExpenses.forEach((expense: any) => {
         csvRows.push(
           [
             '',
             expense.date,
-            `"${expense.description.replace(/"/g, '""')}"`,
+            expense.description ? `"${expense.description.replace(/"/g, '""')}"` : '',
             expense.amount.toFixed(2),
             expense.payment_method || '',
           ].join(',')

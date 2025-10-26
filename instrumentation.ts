@@ -43,9 +43,7 @@ export async function register() {
           'Failed to fetch',
         ],
 
-        // Enable automatic instrumentation for better performance monitoring
-        autoInstrumentServerFunctions: false, // Disabled to prevent Next.js 15 issues
-        autoInstrumentMiddleware: false, // Disabled to prevent Next.js 15 issues
+        // Automatic instrumentation disabled to prevent Next.js 15 issues
       });
     }
 

@@ -6,6 +6,7 @@ import { useOnlineCount } from '@/hooks/usePresence';
 import { PresenceIndicator } from './PresenceIndicator';
 import { MemberListItem } from './MemberListItem';
 import type { SpaceMemberWithPresence } from '@/lib/types';
+import { PresenceStatus } from '@/lib/types';
 
 interface HeaderMemberIndicatorProps {
   spaceId: string | null;
@@ -30,7 +31,7 @@ export function HeaderMemberIndicator({
   if (totalCount <= 1) {
     return (
       <div className={`flex items-center gap-2 ${className}`}>
-        <PresenceIndicator status="online" size="sm" />
+        <PresenceIndicator status={PresenceStatus.ONLINE} size="sm" />
         <span className="text-sm text-gray-600 dark:text-gray-400">
           {spaceName || 'Personal Space'}
         </span>
@@ -48,7 +49,7 @@ export function HeaderMemberIndicator({
         <div className="flex items-center gap-2">
           <Users className="w-4 h-4 text-gray-600 dark:text-gray-400" />
           <div className="flex items-center gap-1">
-            <PresenceIndicator status="online" size="sm" />
+            <PresenceIndicator status={PresenceStatus.ONLINE} size="sm" />
             <span className="text-sm font-medium text-gray-900 dark:text-white">
               {onlineCount}
             </span>
@@ -76,7 +77,7 @@ export function HeaderMemberIndicator({
                   {spaceName || 'Space Members'}
                 </h3>
                 <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                  <PresenceIndicator status="online" size="sm" />
+                  <PresenceIndicator status={PresenceStatus.ONLINE} size="sm" />
                   <span>{onlineCount} online</span>
                 </div>
               </div>

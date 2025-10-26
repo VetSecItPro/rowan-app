@@ -477,5 +477,125 @@ export const calendarService = {
       );
 
     if (error) throw error;
+  },
+
+  // ==========================================
+  // ENHANCED RECURRING EVENTS
+  // ==========================================
+
+  /**
+   * Get events with enhanced recurring event support
+   * This method generates recurring event occurrences dynamically
+   * and can be used as a drop-in replacement for getEvents when you need recurring support
+   */
+  async getEventsWithRecurring(
+    spaceId: string,
+    startDate?: Date,
+    endDate?: Date,
+    includeDeleted = false
+  ): Promise<CalendarEvent[]> {
+    // Import the recurring events service here to avoid circular dependencies
+    const { recurringEventsService } = await import('./recurring-events-service');
+
+    // Default to current month if no date range provided
+    if (!startDate) {
+      startDate = new Date();
+      startDate.setDate(1); // First day of current month
+    }
+
+    if (!endDate) {
+      endDate = new Date(startDate);
+      endDate.setMonth(endDate.getMonth() + 2); // Next 2 months
+    }
+
+    // Get events with recurring occurrences
+    const events = await recurringEventsService.getEventsWithOccurrences(
+      spaceId,
+      startDate,
+      endDate,
+      includeDeleted
+    );
+
+    return events;
+  },
+
+  /**
+   * Check if an event is a recurring event occurrence (virtual event)
+   */
+  isRecurringOccurrence(event: CalendarEvent): boolean {
+    return 'series_id' in event && 'occurrence_date' in event;
+  },
+
+  /**
+   * Get the master event for a recurring occurrence
+   */
+  async getMasterEvent(eventOrOccurrence: CalendarEvent): Promise<CalendarEvent | null> {
+    if (!this.isRecurringOccurrence(eventOrOccurrence)) {
+      return eventOrOccurrence; // Already a master event
+    }
+
+    const occurrence = eventOrOccurrence as any;
+    return this.getEventById(occurrence.series_id);
+  },
+
+  /**
+   * Enhanced recurring event management
+   */
+  recurring: {
+    /**
+     * Create a recurring event exception (modify single occurrence)
+     */
+    async createException(
+      seriesId: string,
+      occurrenceDate: string,
+      modifications: Partial<CreateEventInput>
+    ): Promise<CalendarEvent> {
+      const { recurringEventsService } = await import('./recurring-events-service');
+      return recurringEventsService.createException(seriesId, occurrenceDate, modifications);
+    },
+
+    /**
+     * Delete a single occurrence
+     */
+    async deleteOccurrence(seriesId: string, occurrenceDate: string): Promise<void> {
+      const { recurringEventsService } = await import('./recurring-events-service');
+      return recurringEventsService.deleteOccurrence(seriesId, occurrenceDate);
+    },
+
+    /**
+     * Update entire recurring series
+     */
+    async updateSeries(seriesId: string, updates: Partial<CreateEventInput>): Promise<CalendarEvent> {
+      const { recurringEventsService } = await import('./recurring-events-service');
+      return recurringEventsService.updateSeries(seriesId, updates);
+    },
+
+    /**
+     * Update this and future occurrences (split series)
+     */
+    async updateFromDate(
+      seriesId: string,
+      fromDate: string,
+      updates: Partial<CreateEventInput>
+    ): Promise<CalendarEvent> {
+      const { recurringEventsService } = await import('./recurring-events-service');
+      return recurringEventsService.updateFromDate(seriesId, fromDate, updates);
+    },
+
+    /**
+     * Parse simple recurrence pattern to enhanced format
+     */
+    async parsePattern(recurrence_pattern: string) {
+      const { recurringEventsService } = await import('./recurring-events-service');
+      return recurringEventsService.parseSimplePattern(recurrence_pattern);
+    },
+
+    /**
+     * Convert enhanced pattern to simple format for storage
+     */
+    async serializePattern(pattern: any) {
+      const { recurringEventsService } = await import('./recurring-events-service');
+      return recurringEventsService.serializeToSimplePattern(pattern);
+    }
   }
 };

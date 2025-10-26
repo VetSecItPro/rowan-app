@@ -130,7 +130,7 @@ export function PasswordConfirmModal({
               type="button"
               onClick={handleClose}
               disabled={isVerifying}
-              feature="settings"
+              feature="dashboard"
               className="flex-1"
             >
               Cancel
@@ -138,9 +138,7 @@ export function PasswordConfirmModal({
             <CTAButton
               type="submit"
               disabled={isVerifying || !password.trim()}
-              feature="settings"
-              breathing
-              ripple
+              feature="dashboard"
               icon={<Shield className="w-4 h-4" />}
               className="flex-1"
             >

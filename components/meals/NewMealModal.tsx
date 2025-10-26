@@ -378,8 +378,6 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
             <CTAButton
               type="submit"
               feature="meals"
-              breathing
-              ripple
               icon={isEditing ? <Save className="w-4 h-4" /> : <ChefHat className="w-4 h-4" />}
             >
               {isEditing ? 'Save' : 'Create'}

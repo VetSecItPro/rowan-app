@@ -9,6 +9,7 @@ import { PresenceIndicator } from '@/components/presence/PresenceIndicator';
 import { getPendingInvitations } from '@/lib/services/invitations-service';
 import { removeMember, changeMemberRole } from '@/lib/services/member-management-service';
 import type { SpaceMemberWithPresence, SpaceInvitation } from '@/lib/types';
+import { PresenceStatus } from '@/lib/types';
 
 interface EnhancedMemberManagementProps {
   spaceId: string;
@@ -135,11 +136,11 @@ export function EnhancedMemberManagement({
 
         <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
           <div className="flex items-center gap-2">
-            <PresenceIndicator status="online" size="sm" />
+            <PresenceIndicator status={PresenceStatus.ONLINE} size="sm" />
             <span>{onlineCount} online</span>
           </div>
           <div className="flex items-center gap-2">
-            <PresenceIndicator status="offline" size="sm" />
+            <PresenceIndicator status={PresenceStatus.OFFLINE} size="sm" />
             <span>{members.length - onlineCount} offline</span>
           </div>
           <span>•</span>

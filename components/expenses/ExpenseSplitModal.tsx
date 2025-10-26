@@ -94,7 +94,12 @@ export function ExpenseSplitModal({
     setError(null);
 
     try {
-      await onSave(validation.data);
+      // Type assertion: we know split_type and is_split are set because we set them explicitly above
+      await onSave({
+        ...validation.data,
+        split_type: splitType,
+        is_split: true,
+      });
       setSuccess(true);
 
       // Auto-close after success
