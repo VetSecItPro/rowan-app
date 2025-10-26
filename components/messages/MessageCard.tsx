@@ -97,12 +97,29 @@ export function MessageCard({
     }
   };
 
+  // Helper function to get color classes based on sender color
+  const getColorClasses = (color: string) => {
+    if (isOwn) {
+      return {
+        textColor: 'text-blue-600 dark:text-blue-400',
+        borderColor: 'border-blue-500',
+      };
+    } else {
+      return {
+        textColor: 'text-green-600 dark:text-green-400',
+        borderColor: 'border-green-500',
+      };
+    }
+  };
+
+  const colorClasses = getColorClasses(senderColor);
+
   return (
     <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
       <div className={`max-w-[85%] sm:max-w-[75%] md:max-w-[70%] lg:max-w-[65%] ${isOwn ? 'items-end' : 'items-start'} flex flex-col`}>
         {/* Sender Name */}
         <div className="px-4 pb-1">
-          <p className="text-xs font-medium" style={{ color: senderColor }}>
+          <p className={`text-xs font-medium ${colorClasses.textColor}`}>
             {senderName}
           </p>
         </div>
@@ -114,11 +131,7 @@ export function MessageCard({
               isOwn
                 ? 'rounded-tr-sm'
                 : 'rounded-tl-sm'
-            } backdrop-blur-md border-2 shadow-lg bg-white/40 dark:bg-gray-800/40`}
-            style={{
-              borderColor: `${senderColor}`,
-              boxShadow: `0 8px 32px 0 rgba(0, 0, 0, 0.1)`
-            }}
+            } backdrop-blur-md border-2 ${colorClasses.borderColor} bg-white/40 dark:bg-gray-800/40 shadow-[0_8px_32px_0_rgba(0,0,0,0.1)]`}
           >
             {/* Message Content with Markdown Support */}
             {message.content && (
