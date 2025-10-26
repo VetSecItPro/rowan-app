@@ -124,14 +124,14 @@ export function MessageCard({
           </p>
         </div>
 
-        {/* Message Bubble with Glassmorphism */}
+        {/* Message Bubble */}
         <div className="relative group">
           <div
             className={`rounded-2xl px-4 py-3 ${
               isOwn
-                ? 'rounded-tr-sm'
-                : 'rounded-tl-sm'
-            } backdrop-blur-md border-2 ${colorClasses.borderColor} bg-white/40 dark:bg-gray-800/40 shadow-[0_8px_32px_0_rgba(0,0,0,0.1)]`}
+                ? 'rounded-tr-sm bg-blue-50 dark:bg-blue-900/20'
+                : 'rounded-tl-sm bg-gray-50 dark:bg-gray-800'
+            } border border-gray-200 dark:border-gray-700`}
           >
             {/* Message Content with Markdown Support */}
             {message.content && (
@@ -184,16 +184,16 @@ export function MessageCard({
               )}
             </div>
 
-            {/* Reply Button - Elegant hover-only design */}
+            {/* Reply Button - Subtle conversational design */}
             {showReplyButton && onReply && !message.parent_message_id && (
-              <div className="mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <div className="mt-1 opacity-0 group-hover:opacity-60 transition-opacity">
                 <button
                   onClick={() => onReply(message)}
-                  className="btn-touch flex items-center gap-1.5 px-2 py-1 rounded-full text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all duration-200 active:scale-95"
+                  className="flex items-center gap-1.5 px-2 py-1 rounded text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
                 >
                   <MessageSquare className="w-3 h-3" />
                   {('reply_count' in message && message.reply_count) ? (
-                    <span className="font-medium">{message.reply_count}</span>
+                    <span>{message.reply_count}</span>
                   ) : null}
                 </button>
               </div>
@@ -207,17 +207,15 @@ export function MessageCard({
                     key={reaction.emoji}
                     onClick={() => handleAddReaction(reaction.emoji)}
                     disabled={loadingReaction}
-                    className={`btn-touch flex items-center gap-1 px-2 py-1 rounded-full text-xs border transition-all active:scale-95 ${
+                    className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
                       reaction.reacted_by_current_user
-                        ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700'
-                        : 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
+                        : 'bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                     }`}
                     title={`${reaction.count} ${reaction.count === 1 ? 'reaction' : 'reactions'}`}
                   >
                     <span>{reaction.emoji}</span>
-                    <span className="text-gray-600 dark:text-gray-400 font-medium">
-                      {reaction.count}
-                    </span>
+                    <span>{reaction.count}</span>
                   </button>
                 ))}
                 {/* Add Reaction Button */}
@@ -227,7 +225,7 @@ export function MessageCard({
 
             {/* Add Reaction Button (when no reactions) */}
             {reactions.length === 0 && (
-              <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="mt-2 opacity-0 group-hover:opacity-60 transition-opacity">
                 <ReactionPicker onSelectEmoji={handleAddReaction} />
               </div>
             )}
@@ -239,9 +237,9 @@ export function MessageCard({
                   onClick={() => setShowMenu(!showMenu)}
                   title="Message options"
                   aria-label="Message options menu"
-                  className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-all opacity-0 group-hover:opacity-60 hover:opacity-100"
+                  className="w-5 h-5 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-40 hover:opacity-70 transition-opacity"
                 >
-                  <MoreVertical className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
+                  <MoreVertical className="w-3 h-3 text-gray-400" />
                 </button>
 
                 {showMenu && (
@@ -250,13 +248,13 @@ export function MessageCard({
                       className="fixed inset-0 z-10"
                       onClick={() => setShowMenu(false)}
                     />
-                    <div className="absolute right-0 mt-1 w-40 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+                    <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm z-20">
                       <button
                         onClick={() => {
                           onEdit(message);
                           setShowMenu(false);
                         }}
-                        className="btn-touch w-full px-4 py-2 text-left text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg active:scale-[0.98]"
+                        className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                       >
                         Edit
                       </button>
@@ -266,9 +264,9 @@ export function MessageCard({
                             onTogglePin(message.id);
                             setShowMenu(false);
                           }}
-                          className="btn-touch w-full px-4 py-2 text-left text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-[0.98] flex items-center gap-2"
+                          className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors flex items-center gap-2"
                         >
-                          <Pin className={`w-3.5 h-3.5 ${message.is_pinned ? 'rotate-45' : ''}`} />
+                          <Pin className={`w-3 h-3 ${message.is_pinned ? 'rotate-45' : ''}`} />
                           {message.is_pinned ? 'Unpin' : 'Pin'}
                         </button>
                       )}
@@ -278,9 +276,9 @@ export function MessageCard({
                             onForward(message);
                             setShowMenu(false);
                           }}
-                          className="btn-touch w-full px-4 py-2 text-left text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-[0.98] flex items-center gap-2"
+                          className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors flex items-center gap-2"
                         >
-                          <Forward className="w-3.5 h-3.5" />
+                          <Forward className="w-3 h-3" />
                           Forward
                         </button>
                       )}
@@ -289,7 +287,7 @@ export function MessageCard({
                           onDelete(message.id);
                           setShowMenu(false);
                         }}
-                        className="btn-touch w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-600 dark:hover:text-red-400 rounded-b-lg active:scale-[0.98] transition-colors"
+                        className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors rounded-b-md"
                       >
                         Delete
                       </button>
