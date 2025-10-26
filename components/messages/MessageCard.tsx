@@ -219,11 +219,11 @@ export function MessageCard({
               <div className="absolute -top-1 -right-1">
                 <button
                   onClick={() => setShowMenu(!showMenu)}
-                  title="Edit or Delete"
+                  title="Message options"
                   aria-label="Message options menu"
-                  className="btn-touch w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all opacity-0 group-hover:opacity-100 active:scale-95"
+                  className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-all opacity-0 group-hover:opacity-60 hover:opacity-100"
                 >
-                  <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
+                  <MoreVertical className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
                 </button>
 
                 {showMenu && (
@@ -271,7 +271,7 @@ export function MessageCard({
                           onDelete(message.id);
                           setShowMenu(false);
                         }}
-                        className="btn-touch w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg active:scale-[0.98]"
+                        className="btn-touch w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-600 dark:hover:text-red-400 rounded-b-lg active:scale-[0.98] transition-colors"
                       >
                         Delete
                       </button>
