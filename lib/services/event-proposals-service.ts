@@ -257,7 +257,9 @@ export const eventProposalsService = {
         description: proposal.description,
         start_time: selectedSlot.start_time,
         end_time: selectedSlot.end_time,
-        is_recurring: false
+        is_recurring: false,
+        category: 'personal', // Default category for approved proposals
+        status: 'not-started' // Default status for new events
       }])
       .select()
       .single();
