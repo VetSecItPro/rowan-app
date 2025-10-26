@@ -198,16 +198,53 @@ export default function RemindersPage(): JSX.Element {
       // Check if we're updating an existing reminder (has an id) or creating a new one
       if (editingReminder && editingReminder.id) {
         await remindersService.updateReminder(editingReminder.id, reminderData);
+        loadReminders();
       } else {
-        // Create new reminder (even if editingReminder is set, if it has no id, it's new)
-        await remindersService.createReminder(reminderData);
+        // Create new reminder with optimistic update
+        const tempId = `temp_${Date.now()}_${Math.random()}`;
+        const optimisticReminder: Reminder = {
+          id: tempId,
+          ...reminderData,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          status: 'active',
+          // Add placeholder user data if not present
+          user: user ? {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            avatar_url: user.avatar_url
+          } : undefined,
+        };
+
+        // Optimistic update - add immediately to UI
+        setReminders(prevReminders => [optimisticReminder, ...prevReminders]);
+
+        try {
+          // Make the actual API call
+          const newReminder = await remindersService.createReminder(reminderData);
+
+          // Replace optimistic item with real one
+          setReminders(prevReminders =>
+            prevReminders.map(reminder =>
+              reminder.id === tempId ? newReminder : reminder
+            )
+          );
+        } catch (apiError) {
+          // Remove optimistic item on failure
+          setReminders(prevReminders =>
+            prevReminders.filter(reminder => reminder.id !== tempId)
+          );
+          throw apiError; // Re-throw to be caught by outer try/catch
+        }
       }
-      loadReminders();
       setEditingReminder(null);
     } catch (error) {
       console.error('Failed to save reminder:', error);
+      // Could add toast notification here for better UX
+      alert('Failed to save reminder. Please try again.');
     }
-  }, [editingReminder, loadReminders]);
+  }, [editingReminder, user]);
 
   // Memoized callback for status changes
   const handleStatusChange = useCallback(async (reminderId: string, status: string) => {
@@ -266,6 +303,7 @@ export default function RemindersPage(): JSX.Element {
 
   // Memoized callback for opening new reminder modal
   const handleOpenModal = useCallback(() => {
+    setEditingReminder(null); // Clear any previous reminder data
     setIsModalOpen(true);
   }, []);
 
