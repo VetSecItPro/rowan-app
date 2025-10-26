@@ -66,10 +66,11 @@ export function UnifiedItemModal({
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringData, setRecurringData] = useState({
     pattern: 'weekly' as keyof typeof RECURRING_PATTERNS,
-    interval: null as number | null,
+    interval: 0,
     days_of_week: [] as number[],
     end_date: '',
   });
+  const [intervalTouched, setIntervalTouched] = useState(false);
   const [calendarSync, setCalendarSync] = useState(false);
   const [familyAssignment, setFamilyAssignment] = useState('unassigned');
   const [quickNote, setQuickNote] = useState('');
@@ -109,6 +110,7 @@ export function UnifiedItemModal({
       });
     }
     setActiveSection('basic');
+    setIntervalTouched(false); // Reset interval touched state for new modal instances
   }, [editItem, spaceId, isOpen, defaultType]);
 
   // Tab navigation using keyboard
@@ -220,7 +222,7 @@ export function UnifiedItemModal({
           created_by: userId,
           recurrence: {
             pattern: recurringData.pattern as 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'yearly',
-            interval: recurringData.interval || 1,
+            interval: recurringData.interval > 0 ? recurringData.interval : 1,
             days_of_week: recurringData.days_of_week,
             end_date: recurringData.end_date || undefined,
           }
@@ -583,7 +585,10 @@ export function UnifiedItemModal({
                   <div className="lg:col-span-2">
                     <div className="flex items-center gap-3 mb-4">
                       <button
-                        onClick={() => setIsRecurring(!isRecurring)}
+                        onClick={() => {
+                          setIsRecurring(!isRecurring);
+                          setIntervalTouched(false); // Reset when toggling recurring mode
+                        }}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                           isRecurring
                             ? 'bg-blue-600 text-white'
@@ -626,20 +631,27 @@ export function UnifiedItemModal({
                             <input
                               type="number"
                               min="1"
-                              value={recurringData.interval === null ? '' : recurringData.interval}
+                              max="20"
+                              value={recurringData.interval}
+                              onFocus={(e) => {
+                                if (!intervalTouched && recurringData.interval === 0) {
+                                  e.target.select(); // Select all text when focused for easy replacement
+                                }
+                              }}
                               onChange={(e) => {
                                 const value = e.target.value;
+                                setIntervalTouched(true);
+
                                 if (value === '') {
-                                  setRecurringData(prev => ({ ...prev, interval: null }));
+                                  setRecurringData(prev => ({ ...prev, interval: 0 }));
                                 } else {
                                   const numValue = parseInt(value);
-                                  if (!isNaN(numValue) && numValue > 0) {
+                                  if (!isNaN(numValue) && numValue >= 1 && numValue <= 20) {
                                     setRecurringData(prev => ({ ...prev, interval: numValue }));
                                   }
                                 }
                               }}
-                              placeholder="1"
-                              className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400"
+                              className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                             />
                           </div>
                         </div>
