@@ -61,8 +61,13 @@ export function MessageCard({
   const senderColor = isOwn ? userColor : partnerColor;
   const senderName = isOwn ? 'You' : partnerName;
 
-  // Load reactions
+  // Load reactions (only for real messages, not temporary ones)
   useEffect(() => {
+    // Skip loading reactions for temporary messages
+    if (message.id.startsWith('temp-')) {
+      return;
+    }
+
     async function loadReactions() {
       try {
         const reactionsData = await messagesService.getMessageReactions(message.id, currentUserId);
@@ -77,7 +82,7 @@ export function MessageCard({
 
   // Handle adding reaction
   const handleAddReaction = async (emoji: string) => {
-    if (!currentUserId || loadingReaction) return;
+    if (!currentUserId || loadingReaction || message.id.startsWith('temp-')) return;
 
     setLoadingReaction(true);
     try {
