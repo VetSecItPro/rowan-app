@@ -133,10 +133,10 @@ export function BulkActionsToolbar({
   return (
     <>
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 animate-in slide-in-from-bottom-4 pb-safe">
-        <div className="bg-white dark:bg-gray-800 border-2 border-pink-500 dark:border-pink-600 rounded-xl shadow-2xl p-4 flex items-center gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
+        <div className="bg-white dark:bg-gray-800 border-2 border-blue-500 dark:border-blue-600 rounded-xl shadow-2xl p-4 flex items-center gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
           {/* Selection Count */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-pink-100 dark:bg-pink-900/30 rounded-lg">
-            <span className="text-sm font-semibold text-pink-700 dark:text-pink-300">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+            <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">
               {selectedCount} selected
             </span>
           </div>

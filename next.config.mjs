@@ -47,17 +47,113 @@ const nextConfig = {
 
   // Security headers and CSP
   async headers() {
-    // Always allow unsafe-inline for compatibility with Next.js and modern web features
-    // Include unsafe-eval only in development for hot reload
+    // Check if we're in development mode
     const isDev = process.env.NODE_ENV === 'development';
     console.log('CSP Environment:', { isDev, NODE_ENV: process.env.NODE_ENV });
 
-    // Balanced CSP policy - works in all environments without breaking functionality
-    // Includes 'unsafe-inline' for compatibility with modern React/Next.js applications
+    // In development, use a more permissive CSP policy to allow webpack hot reload
+    if (isDev) {
+      const devScriptSources = [
+        "'self'",
+        "'unsafe-inline'",
+        "'unsafe-eval'",
+        "https://vercel.live",
+        "https://va.vercel-scripts.com",
+        "https://vitals.vercel-insights.com",
+        "https://cdn.vercel-insights.com",
+        "https://www.googletagmanager.com",
+        "https://www.google-analytics.com",
+        "https://cdnjs.cloudflare.com",
+        "https://unpkg.com",
+        "https://cdn.jsdelivr.net",
+        "webpack://*",
+        "localhost:*",
+        "127.0.0.1:*",
+        // Browser extension support
+        "chrome-extension:",
+        "safari-extension:",
+        "moz-extension:",
+        "ms-browser-extension:",
+        // Dev tools and debugging
+        "data:",
+        "blob:",
+        "'wasm-unsafe-eval'"
+      ].join(' ');
+
+      const devStyleSources = [
+        "'self'",
+        "'unsafe-inline'",
+        "https://fonts.googleapis.com",
+        "https://cdnjs.cloudflare.com",
+        "https://unpkg.com",
+        "https://cdn.jsdelivr.net",
+        // Browser extension support
+        "chrome-extension:",
+        "safari-extension:",
+        "moz-extension:",
+        "ms-browser-extension:",
+        // Dev tools and debugging
+        "data:",
+        "blob:"
+      ].join(' ');
+
+      const devCspPolicy = [
+        "default-src 'self'",
+        `script-src ${devScriptSources}`,
+        `style-src ${devStyleSources}`,
+        "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
+        "img-src 'self' data: https: blob:",
+        "connect-src 'self' https: wss: data: ws: localhost:* 127.0.0.1:*",
+        "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://www.google.com",
+        "worker-src 'self' blob:",
+        "child-src 'self' blob:",
+        "manifest-src 'self'",
+        "media-src 'self' blob: data: https:",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "object-src 'none'"
+      ].join('; ');
+
+      console.log('Development CSP Policy:', devCspPolicy);
+
+      return [
+        {
+          source: '/:path*',
+          headers: [
+            {
+              key: 'Content-Security-Policy',
+              value: devCspPolicy,
+            },
+            {
+              key: 'X-Content-Type-Options',
+              value: 'nosniff',
+            },
+            {
+              key: 'X-Frame-Options',
+              value: 'SAMEORIGIN',
+            },
+            {
+              key: 'X-XSS-Protection',
+              value: '1; mode=block',
+            },
+            {
+              key: 'Referrer-Policy',
+              value: 'strict-origin-when-cross-origin',
+            },
+            {
+              key: 'Cache-Control',
+              value: 'no-cache, no-store, must-revalidate',
+            },
+          ],
+        },
+      ];
+    }
+
+    // Production CSP policy - permissive to match development behavior
     const scriptSources = [
       "'self'",
       "'unsafe-inline'",
-      isDev ? "'unsafe-eval'" : null,
+      "'unsafe-eval'",
       "https://vercel.live",
       "https://va.vercel-scripts.com",
       "https://vitals.vercel-insights.com",
@@ -66,8 +162,17 @@ const nextConfig = {
       "https://www.google-analytics.com",
       "https://cdnjs.cloudflare.com",
       "https://unpkg.com",
-      "https://cdn.jsdelivr.net"
-    ].filter(Boolean).join(' ');
+      "https://cdn.jsdelivr.net",
+      // Browser extension support for users
+      "chrome-extension:",
+      "safari-extension:",
+      "moz-extension:",
+      "ms-browser-extension:",
+      // Additional sources to prevent errors
+      "data:",
+      "blob:",
+      "'wasm-unsafe-eval'"
+    ].join(' ');
 
     const styleSources = [
       "'self'",
@@ -75,7 +180,15 @@ const nextConfig = {
       "https://fonts.googleapis.com",
       "https://cdnjs.cloudflare.com",
       "https://unpkg.com",
-      "https://cdn.jsdelivr.net"
+      "https://cdn.jsdelivr.net",
+      // Browser extension support for users
+      "chrome-extension:",
+      "safari-extension:",
+      "moz-extension:",
+      "ms-browser-extension:",
+      // Additional sources to prevent errors
+      "data:",
+      "blob:"
     ].join(' ');
 
     const cspPolicy = [
@@ -120,6 +233,10 @@ const nextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate',
           },
         ],
       },

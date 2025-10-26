@@ -57,7 +57,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
 
   return (
     <div className={`bg-gray-50 dark:bg-gray-800 border-2 rounded-lg p-4 hover:shadow-lg transition-all duration-200 group ${
-      selected ? 'border-pink-500 dark:border-pink-500 ring-2 ring-pink-200 dark:ring-pink-800' : 'border-transparent'
+      selected ? 'border-blue-500 dark:border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800' : 'border-transparent'
     }`}>
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
@@ -67,61 +67,76 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
             <button
               onClick={() => onSelectionChange?.(reminder.id, !selected)}
               aria-label={`Select reminder: ${reminder.title}`}
-              className={`btn-touch mt-1 w-6 h-6 sm:w-5 sm:h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 active:scale-95 hover:scale-110 hover-lift shimmer-pink ${
+              className={`btn-touch mt-1 w-6 h-6 sm:w-5 sm:h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 active:scale-95 hover:scale-110 hover-lift  ${
                 selected
-                  ? 'bg-pink-500 border-pink-500'
-                  : 'bg-transparent border-gray-400 dark:border-gray-500 hover:border-pink-500'
+                  ? 'bg-blue-500 border-blue-500'
+                  : 'bg-transparent border-gray-400 dark:border-gray-500 hover:border-blue-500'
               }`}
             >
               {selected && <Check className="w-4 h-4 sm:w-3 sm:h-3 text-white" />}
             </button>
           )}
 
-          {/* Three-state Checkbox */}
+          {/* Three-state Cycling Checkbox */}
           <div className="relative group">
             <button
               onClick={handleCheckboxClick}
               aria-label={`Toggle reminder status: ${reminder.status === 'active' ? 'Active' : reminder.status === 'snoozed' ? 'Snoozed' : 'Completed'}`}
-              className={`btn-touch mt-1 w-6 h-6 sm:w-5 sm:h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 active:scale-95 hover:scale-110 hover-lift shimmer-pink ${
+              className={`btn-touch mt-1 w-7 h-7 sm:w-6 sm:h-6 rounded-lg border-2 flex items-center justify-center transition-all flex-shrink-0 active:scale-95 hover:scale-110 hover-lift shadow-sm ${
                 reminder.status === 'completed'
-                  ? 'bg-green-500 border-green-500'
+                  ? 'bg-green-500 border-green-500 shadow-green-200 dark:shadow-green-900/20'
                   : reminder.status === 'snoozed'
-                  ? 'bg-purple-500 border-purple-500'
-                  : 'bg-transparent border-blue-500'
+                  ? 'bg-purple-500 border-purple-500 shadow-purple-200 dark:shadow-purple-900/20'
+                  : 'bg-white dark:bg-gray-800 border-pink-400 dark:border-pink-500 hover:border-pink-500 dark:hover:border-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/10'
               }`}
+              title="Click to cycle: Active → Snoozed → Completed → Active"
             >
-              {reminder.status === 'completed' && <Check className="w-4 h-4 sm:w-3 sm:h-3 text-white" />}
-              {reminder.status === 'snoozed' && <div className="w-2 h-2 bg-white rounded-full" />}
+              {reminder.status === 'completed' && <Check className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white" />}
+              {reminder.status === 'snoozed' && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+              {reminder.status === 'active' && <div className="w-3 h-3 border-2 border-pink-400 dark:border-pink-500 rounded-full" />}
             </button>
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-              {reminder.status === 'active' ? 'Active' : reminder.status === 'snoozed' ? 'Snoozed' : 'Completed'}
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
+              <div className="text-center">
+                <div className="font-medium">
+                  {reminder.status === 'active' ? '🔵 Active' : reminder.status === 'snoozed' ? '🟣 Snoozed' : '🟢 Completed'}
+                </div>
+                <div className="text-xs opacity-75 mt-0.5">Click to cycle states</div>
+              </div>
+              {/* Tooltip arrow */}
+              <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
             </div>
           </div>
 
           {/* Title & Description */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              {/* Emoji */}
-              <span className="text-lg">{reminder.emoji || '🔔'}</span>
+            <div className="flex items-center justify-between gap-2 mb-1">
+              {/* Left side: Emoji + Title + Badge grouped together */}
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                {/* Emoji */}
+                <span className="text-lg flex-shrink-0">{reminder.emoji || '🔔'}</span>
 
-              <h3 className={`font-semibold flex-1 truncate ${
-                reminder.status === 'completed'
-                  ? 'line-through opacity-60 text-gray-900 dark:text-white'
-                  : categoryConfig[reminder.category as keyof typeof categoryConfig]?.textColor || 'text-gray-900 dark:text-white'
-              }`}>
-                {reminder.title}
-              </h3>
+                {/* Title and Badge container */}
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <h3 className={`font-semibold truncate ${
+                    reminder.status === 'completed'
+                      ? 'line-through opacity-60 text-gray-900 dark:text-white'
+                      : categoryConfig[reminder.category as keyof typeof categoryConfig]?.textColor || 'text-gray-900 dark:text-white'
+                  }`}>
+                    {reminder.title}
+                  </h3>
 
-              {/* Category Badge */}
-              {reminder.category && (
-                <span className={`px-2 py-0.5 rounded text-xs font-medium ${categoryConfig[reminder.category as keyof typeof categoryConfig]?.bgColor} ${categoryConfig[reminder.category as keyof typeof categoryConfig]?.textColor}`}>
-                  {categoryConfig[reminder.category as keyof typeof categoryConfig]?.icon} {categoryConfig[reminder.category as keyof typeof categoryConfig]?.label}
-                </span>
-              )}
+                  {/* Category Badge - now positioned immediately after title */}
+                  {reminder.category && (
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium flex-shrink-0 ${categoryConfig[reminder.category as keyof typeof categoryConfig]?.bgColor} ${categoryConfig[reminder.category as keyof typeof categoryConfig]?.textColor}`}>
+                      {categoryConfig[reminder.category as keyof typeof categoryConfig]?.icon} {categoryConfig[reminder.category as keyof typeof categoryConfig]?.label}
+                    </span>
+                  )}
+                </div>
+              </div>
 
-              {/* Assignee Avatar Badge */}
+              {/* Right side: Assignee Avatar Badge */}
               {reminder.assignee && (
-                <div className="relative group/avatar">
+                <div className="relative group/avatar flex-shrink-0">
                   {reminder.assignee.avatar_url ? (
                     <img
                       src={reminder.assignee.avatar_url}
@@ -129,7 +144,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                       className="w-6 h-6 rounded-full object-cover border-2 border-white dark:border-gray-800"
                     />
                   ) : (
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white text-[10px] font-bold border-2 border-white dark:border-gray-800">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-[10px] font-bold border-2 border-white dark:border-gray-800">
                       {reminder.assignee.name
                         .split(' ')
                         .map((n) => n[0])
@@ -158,9 +173,9 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
           <button
             onClick={() => setShowMenu(!showMenu)}
             aria-label="Reminder options menu"
-            className="btn-touch w-12 h-12 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95 hover-lift shimmer-pink active-press"
+            className="p-2 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
-            <MoreVertical className="w-5 h-5 md:w-4 md:h-4 text-gray-600 dark:text-gray-400" />
+            <MoreVertical className="w-4 h-4 text-gray-600 dark:text-gray-400" />
           </button>
 
           {showMenu && (
@@ -169,13 +184,13 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                 className="fixed inset-0 z-10"
                 onClick={() => setShowMenu(false)}
               />
-              <div className="absolute right-0 mt-2 w-48 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
+              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
                 <button
                   onClick={() => {
                     onEdit(reminder);
                     setShowMenu(false);
                   }}
-                  className="btn-touch w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-t-lg active:scale-[0.98] hover-lift shimmer-pink active-press"
+                  className="w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 rounded-t-lg transition-colors"
                 >
                   <Edit className="w-4 h-4" />
                   Edit Reminder
@@ -187,7 +202,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                     }
                     setShowMenu(false);
                   }}
-                  className="btn-touch w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-b-lg active:scale-[0.98] hover-lift shimmer-red active-press"
+                  className="w-full px-4 py-3 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 rounded-b-lg transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                   Delete Reminder
