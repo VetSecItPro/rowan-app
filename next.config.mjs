@@ -58,7 +58,7 @@ const nextConfig = {
       "style-src 'self' 'unsafe-inline' 'unsafe-hashes' https://cdn.jsdelivr.net https://*.jsdelivr.net https://fonts.googleapis.com",
       "font-src 'self' data: https: https://fonts.gstatic.com https://cdn.jsdelivr.net",
       "img-src 'self' data: https: blob: https://*.supabase.co",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live https://api.gemini.google.com https://*.ingest.sentry.io https://*.upstash.io https://*.vercel.app wss://ws-*.pusher.com https://www.google-analytics.com",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live https://api.gemini.google.com https://*.ingest.sentry.io https://*.upstash.io https://*.vercel.app https://www.google-analytics.com",
       "frame-src 'self' https://vercel.live https://*.vercel.app",
       "worker-src 'self' blob:",
       "child-src 'self' blob:",
