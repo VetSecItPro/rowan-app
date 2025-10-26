@@ -76,7 +76,7 @@ function SortableItem({ item, onToggle }: SortableItemProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg transition-all ${
+      className={`flex items-center gap-3 p-4 sm:p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg transition-all ${
         isDragging ? 'opacity-50 shadow-2xl scale-105 z-50' : 'hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-600'
       }`}
     >
@@ -99,18 +99,18 @@ function SortableItem({ item, onToggle }: SortableItemProps) {
         </button>
       </Tooltip>
 
-      {/* Checkbox */}
+      {/* Checkbox - Mobile-optimized touch target */}
       <Tooltip content={item.checked ? 'Mark as not purchased' : 'Mark as purchased'} delay={0}>
         <button
           onClick={() => onToggle(item.id, !item.checked)}
-          className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+          className={`flex-shrink-0 w-11 h-11 sm:w-8 sm:h-8 md:w-6 md:h-6 rounded flex items-center justify-center transition-all ${
             item.checked
               ? 'bg-green-500 border-green-500'
-              : 'border-gray-300 dark:border-gray-600 hover:border-emerald-500 dark:hover:border-emerald-400'
+              : 'border-2 border-gray-300 dark:border-gray-600 hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-700'
           }`}
           aria-label={`Toggle item: ${item.name}`}
         >
-          {item.checked && <Check className="w-3 h-3 text-white" />}
+          {item.checked && <Check className="w-4 h-4 sm:w-3 sm:h-3 text-white" />}
         </button>
       </Tooltip>
 

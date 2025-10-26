@@ -53,6 +53,7 @@ function useFeatureDetection(): EnhancedButtonProps['feature'] {
   const pathname = usePathname();
 
   return React.useMemo(() => {
+    if (!pathname) return 'dashboard';
     const segments = pathname.split('/').filter(Boolean);
     const feature = segments[0];
 
@@ -198,7 +199,7 @@ export const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>
           variant === 'primary' && currentFeature === 'goals',
         'bg-amber-600 hover:bg-amber-700 text-white shadow-lg hover:shadow-xl focus:ring-amber-500':
           variant === 'primary' && (currentFeature === 'budget' || currentFeature === 'projects'),
-        'bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl focus:ring-purple-500':
+        'bg-gray-600 hover:bg-gray-700 text-white shadow-lg hover:shadow-xl focus:ring-gray-500':
           variant === 'primary' && currentFeature === 'dashboard',
 
         // Secondary variant

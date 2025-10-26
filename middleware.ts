@@ -115,18 +115,20 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // Add security headers
+  // Add security headers with strengthened CSP
   response.headers.set(
     'Content-Security-Policy',
     "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://vercel.live; " +
-    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
+    "script-src 'self' https://cdn.jsdelivr.net https://vercel.live; " +
+    "style-src 'self' https://cdn.jsdelivr.net; " +
     "img-src 'self' data: https: blob:; " +
     "font-src 'self' data: https:; " +
-    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live; " +
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live https://api.gemini.google.com https://*.ingest.sentry.io https://*.upstash.io; " +
     "frame-ancestors 'none'; " +
+    "frame-src 'self' https://vercel.live; " +
     "base-uri 'self'; " +
-    "form-action 'self';"
+    "form-action 'self'; " +
+    "object-src 'none';"
   );
 
   response.headers.set(

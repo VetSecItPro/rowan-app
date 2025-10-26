@@ -21,7 +21,7 @@ export default function GuidedTaskCreation({ onComplete, onSkip }: GuidedTaskCre
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
-  const [priority, setPriority] = useState('medium');
+  const [priority, setPriority] = useState<'low' | 'medium' | 'high' | 'urgent'>('medium');
 
   const stepTitles = ['Welcome', 'Task Details', 'Due Date', 'Success'];
 
@@ -46,11 +46,16 @@ export default function GuidedTaskCreation({ onComplete, onSkip }: GuidedTaskCre
       await tasksService.createTask({
         space_id: currentSpace.id,
         title: title || 'My First Task',
-        description,
-        due_date: dueDate || undefined,
+        description: description || null,
+        due_date: dueDate || null,
         priority,
         status: 'pending',
         created_by: user.id,
+        assigned_to: null,
+        category: null,
+        calendar_sync: false,
+        quick_note: null,
+        tags: null,
       });
 
       // Mark this guided flow as complete
@@ -150,10 +155,10 @@ export default function GuidedTaskCreation({ onComplete, onSkip }: GuidedTaskCre
                 Priority
               </label>
               <div className="grid grid-cols-3 gap-3">
-                {['low', 'medium', 'high'].map((p) => (
+                {(['low', 'medium', 'high'] as const).map((p) => (
                   <button
                     key={p}
-                    onClick={() => setPriority(p)}
+                    onClick={() => setPriority(p as 'low' | 'medium' | 'high' | 'urgent')}
                     className={`px-4 py-3 rounded-lg font-medium transition-all min-h-[44px] ${
                       priority === p
                         ? 'bg-blue-600 text-white'

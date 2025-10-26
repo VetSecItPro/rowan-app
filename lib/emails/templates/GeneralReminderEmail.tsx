@@ -141,7 +141,7 @@ const GeneralReminderEmail = ({
                 {typeEmojis[reminderType]}
               </div>
 
-              <Heading style={reminderTitle}>{reminderTitle}</Heading>
+              <Heading style={reminderTitleStyle}>{reminderTitle}</Heading>
 
               {reminderDescription && (
                 <Text style={reminderDesc}>{reminderDescription}</Text>
@@ -325,7 +325,7 @@ const reminderIcon = {
   marginBottom: '16px',
 };
 
-const reminderTitle = {
+const reminderTitleStyle = {
   color: '#1f2937',
   fontSize: '22px',
   fontWeight: 'bold',

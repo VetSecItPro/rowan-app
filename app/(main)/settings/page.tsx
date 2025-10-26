@@ -957,7 +957,6 @@ export default function SettingsPage() {
                                   setIsRenamingSpace(true);
                                   setNewSpaceNameEdit(currentSpace.name);
                                 }}
-                                title="Rename space"
                               />
                             )}
                           </div>
@@ -1704,7 +1703,10 @@ export default function SettingsPage() {
       <CreateSpaceModal
         isOpen={showCreateSpaceModal}
         onClose={() => setShowCreateSpaceModal(false)}
-        onSuccess={refreshSpaces}
+        onSpaceCreated={(spaceId, spaceName) => {
+          refreshSpaces();
+          setShowCreateSpaceModal(false);
+        }}
       />
 
       {/* Invite Partner Modal */}

@@ -24,7 +24,7 @@ function UnsubscribeContent() {
     const tokenParam = searchParams?.get('token');
     const typeParam = searchParams?.get('type') || 'email';
 
-    setToken(tokenParam);
+    setToken(tokenParam || null);
     setType(typeParam || null);
 
     if (tokenParam) {

@@ -1,12 +1,20 @@
 // =============================================
+// RE-EXPORTS FROM VALIDATION SCHEMAS
+// =============================================
+
+// Task types from Zod schemas
+export type { CreateTaskInput, UpdateTaskInput as UpdateTaskInputZod } from './validations/task-schemas';
+
+// =============================================
 // ENUMS
 // =============================================
 
 export enum TaskStatus {
   PENDING = 'pending',
-  IN_PROGRESS = 'in_progress',
+  IN_PROGRESS = 'in-progress',
+  BLOCKED = 'blocked',
+  ON_HOLD = 'on-hold',
   COMPLETED = 'completed',
-  CANCELLED = 'cancelled',
 }
 
 export enum TaskPriority {
@@ -110,6 +118,9 @@ export interface SpaceMember {
   user_id: string;
   role: string;
   joined_at: string;
+  users?: {
+    email: string;
+  };
 }
 
 export interface UserPresence {
@@ -139,8 +150,8 @@ export interface Task {
   title: string;
   description?: string;
   category?: string;
-  priority: string;
-  status: string;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed';
   due_date?: string;
   assigned_to?: string;
   created_by?: string;
@@ -331,7 +342,7 @@ export interface Project {
   space_id: string;
   name: string;
   description?: string;
-  status: string;
+  status: 'planning' | 'in_progress' | 'completed' | 'on_hold';
   start_date?: string;
   target_date?: string;
   budget_amount?: number;
@@ -357,7 +368,7 @@ export interface Expense {
   paid_at?: string;
   recurring?: boolean;
   is_recurring?: boolean;
-  recurring_frequency?: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  recurring_frequency?: 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'yearly';
   split_type?: 'equal' | 'percentage' | 'custom' | 'none';
   created_by?: string;
   created_at: string;
@@ -389,6 +400,9 @@ export interface Goal {
   created_at: string;
   updated_at: string;
   completed_at?: string;
+  progress_percentage?: number;
+  current_amount?: number | null;
+  target_amount?: number;
 }
 
 export interface GoalMilestone {
@@ -478,6 +492,7 @@ export interface ActivityLog {
   id: string;
   space_id: string;
   user_id?: string;
+  user_email?: string;
   action: string;
   resource_type?: string;
   resource_id?: string;
@@ -545,7 +560,8 @@ export interface TaskStats {
   completed: number;
   inProgress: number;
   pending: number;
-  cancelled: number;
+  blocked: number;
+  onHold: number;
   byPriority: {
     low: number;
     medium: number;
@@ -571,22 +587,9 @@ export interface TaskQueryOptions {
 // FORM TYPES
 // =============================================
 
-// CreateTaskInput type is now generated from Zod schema in task-schemas.ts
-// See: export type CreateTaskInput = z.infer<typeof createTaskSchema>;
-
-export interface UpdateTaskInput {
-  title?: string;
-  description?: string | null;
-  category?: string | null;
-  priority?: string;
-  status?: string;
-  due_date?: string | null;
-  assigned_to?: string | null;
-  estimated_hours?: number | null;
-  calendar_sync?: boolean;
-  quick_note?: string | null;
-  tags?: string | null;
-}
+// CreateTaskInput and UpdateTaskInput types are now generated from Zod schemas in task-schemas.ts
+// They are re-exported at the top of this file
+// Import them from '@/lib/types' to get the Zod-validated versions
 
 export interface CreateEventInput {
   space_id: string;
@@ -633,8 +636,11 @@ export interface CreateChoreInput {
   space_id: string;
   title: string;
   description?: string;
-  frequency: string;
+  frequency: 'daily' | 'weekly' | 'monthly' | 'once';
   assigned_to?: string;
+  created_by: string;
+  status?: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed';
+  due_date?: string;
 }
 
 export interface UpdateChoreInput {
@@ -653,20 +659,6 @@ export enum InvitationStatus {
   ACCEPTED = 'accepted',
   EXPIRED = 'expired',
   CANCELLED = 'cancelled',
-}
-
-export interface Space {
-  id: string;
-  name: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface SpaceMember {
-  space_id: string;
-  user_id: string;
-  role: string;
-  joined_at: string;
 }
 
 export interface SpaceInvitation {

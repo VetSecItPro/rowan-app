@@ -63,6 +63,7 @@ export function YearInReviewDashboard({ year, className }: YearInReviewDashboard
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState(year || new Date().getFullYear());
+  const [activeTab, setActiveTab] = useState('overview');
 
   // Fetch year in review data
   useEffect(() => {
@@ -180,12 +181,12 @@ export function YearInReviewDashboard({ year, className }: YearInReviewDashboard
             onClick={handleExport}
             variant="outline"
             className="gap-2"
-            disabled={!data || error}
+            disabled={!data || !!error}
           >
             <Download className="w-4 h-4" />
             Export Report
           </Button>
-          <Button variant="outline" className="gap-2" disabled={!data || error}>
+          <Button variant="outline" className="gap-2" disabled={!data || !!error}>
             <Share2 className="w-4 h-4" />
             Share
           </Button>
@@ -225,7 +226,7 @@ export function YearInReviewDashboard({ year, className }: YearInReviewDashboard
       </div>
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="overview" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="achievements">Achievements</TabsTrigger>

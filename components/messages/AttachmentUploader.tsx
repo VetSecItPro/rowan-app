@@ -24,7 +24,7 @@ export function AttachmentUploader({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const validation = fileUploadService.validateFile(file);
+    const validation = await fileUploadService.validateFile(file);
     if (!validation.valid) {
       toast.error('Invalid file', {
         description: validation.error,

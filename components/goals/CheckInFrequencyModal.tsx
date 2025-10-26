@@ -110,9 +110,16 @@ export function CheckInFrequencyModal({ isOpen, onClose, goalId, goalTitle }: Ch
       };
 
       if (hasExistingSettings) {
-        await goalsService.updateCheckInSettings(goalId, settingsToSave);
+        await goalsService.updateCheckInSettings({
+          ...settingsToSave,
+          goal_id: goalId
+        });
       } else {
-        await goalsService.createCheckInSettings(settingsToSave);
+        // Use updateCheckInSettings for both create and update (upsert behavior)
+        await goalsService.updateCheckInSettings({
+          ...settingsToSave,
+          goal_id: goalId
+        });
       }
 
       hapticSuccess();

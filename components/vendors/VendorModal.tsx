@@ -5,10 +5,13 @@ import { X, Star, Shield, Building2, Phone, Mail, MapPin, ExternalLink, User } f
 import type { Vendor, CreateVendorInput } from '@/lib/services/project-tracking-service';
 import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 
+// Vendor data without space_id and created_by (added by parent component)
+type VendorFormData = Omit<CreateVendorInput, 'space_id' | 'created_by'>;
+
 interface VendorModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (vendor: CreateVendorInput) => Promise<void>;
+  onSave: (vendor: VendorFormData) => Promise<void>;
   editVendor?: Vendor | null;
 }
 
@@ -37,7 +40,7 @@ const commonTrades = [
 ];
 
 export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModalProps) {
-  const [formData, setFormData] = useState<CreateVendorInput>({
+  const [formData, setFormData] = useState<VendorFormData>({
     name: '',
     company_name: '',
     trade: '',

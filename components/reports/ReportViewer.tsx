@@ -36,10 +36,8 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
 
     try {
       setLoading(true);
-      const result = await downloadReportPDF(report.id);
-      if (!result.success) {
-        console.error('Failed to download report');
-      }
+      const blob = await downloadReportPDF(report.id);
+      // The function handles the download automatically
     } catch (error) {
       console.error('Error downloading report:', error);
     } finally {
@@ -50,11 +48,9 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
   const handleShare = async () => {
     try {
       setLoading(true);
-      const result = await getReportShareUrl(report.id);
-      if (result.success && result.data) {
-        setShareUrl(result.data);
-        setShowShareModal(true);
-      }
+      const shareUrl = await getReportShareUrl(report.id);
+      setShareUrl(shareUrl);
+      setShowShareModal(true);
     } catch (error) {
       console.error('Error generating share URL:', error);
     } finally {

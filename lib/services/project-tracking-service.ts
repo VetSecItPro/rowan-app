@@ -632,6 +632,7 @@ export async function getProjectStats(spaceId: string): Promise<{
   total_variance: number;
   projects_over_budget: number;
   projects_under_budget: number;
+  avg_variance_percentage: number;
 }> {
   const supabase = createClient();
 
@@ -651,6 +652,9 @@ export async function getProjectStats(spaceId: string): Promise<{
     total_variance: projects?.reduce((sum, p) => sum + p.budget_variance, 0) || 0,
     projects_over_budget: projects?.filter((p) => p.budget_variance < 0).length || 0,
     projects_under_budget: projects?.filter((p) => p.budget_variance > 0).length || 0,
+    avg_variance_percentage: projects?.length > 0 ?
+      (projects.reduce((sum, p) => sum + Math.abs(p.budget_variance || 0), 0) / projects.length) /
+      (projects.reduce((sum, p) => sum + (p.estimated_budget || 1), 0) / projects.length) * 100 : 0,
   };
 
   return stats;

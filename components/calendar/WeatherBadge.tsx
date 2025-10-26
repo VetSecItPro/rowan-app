@@ -37,7 +37,7 @@ export function WeatherBadge({ eventTime, location, compact = false }: WeatherBa
 
   const loadWeather = async () => {
     if (!location) {
-      console.log('[WeatherBadge] No location provided');
+      // Silently return if no location - this is normal
       return;
     }
 
@@ -48,7 +48,6 @@ export function WeatherBadge({ eventTime, location, compact = false }: WeatherBa
 
     // Check if we have valid cached data
     if (cached && (now - cached.timestamp) < CACHE_DURATION) {
-      console.log('[WeatherBadge] Using cached weather data');
       setWeather(cached.data);
       setAlert(cached.alert);
       return;
@@ -56,7 +55,6 @@ export function WeatherBadge({ eventTime, location, compact = false }: WeatherBa
 
     // If we have stale cache data, show it immediately (optimistic UI)
     if (cached) {
-      console.log('[WeatherBadge] Using stale cache while fetching fresh data');
       setWeather(cached.data);
       setAlert(cached.alert);
     } else {
@@ -71,7 +69,6 @@ export function WeatherBadge({ eventTime, location, compact = false }: WeatherBa
       }
       abortControllerRef.current = new AbortController();
 
-      console.log('[WeatherBadge] Fetching fresh weather for:', location);
       const forecast = await weatherService.getWeatherForEvent(location, eventTime);
 
       if (forecast) {
@@ -87,16 +84,26 @@ export function WeatherBadge({ eventTime, location, compact = false }: WeatherBa
         // Update state
         setWeather(forecast);
         setAlert(weatherAlert);
-        console.log('[WeatherBadge] Fresh weather data loaded and cached');
+      } else {
+        // No forecast available - this is normal for many locations
+        // Don't show any error state, just hide the component
+        if (!cached) {
+          setWeather(null);
+          setAlert(null);
+        }
       }
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        console.log('[WeatherBadge] Weather request cancelled');
+        // Request was cancelled - this is normal
         return;
       }
-      console.error('[WeatherBadge] Failed to load weather:', error);
 
-      // If we had no cached data and fetch failed, show error
+      // Only log weather errors in development
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[WeatherBadge] Weather unavailable for', location, ':', error instanceof Error ? error.message : 'Unknown error');
+      }
+
+      // If we had no cached data and fetch failed, gracefully degrade
       if (!cached) {
         setWeather(null);
         setAlert(null);

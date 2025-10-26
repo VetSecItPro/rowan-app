@@ -158,7 +158,7 @@ export function SpaceSelector({
                 onSpaceChange(space);
                 setIsOpen(false);
               }}
-              className="btn-touch flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-[0.98] hover-lift shimmer-emerald active-press hover:shadow-sm"
+              className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <Home className="w-4 h-4 text-gray-400" />
@@ -191,7 +191,7 @@ export function SpaceSelector({
             onCreateSpace();
             setIsOpen(false);
           }}
-          className="btn-touch flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-[0.98] hover-lift shimmer-emerald active-press hover:shadow-sm"
+          className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Create New Space
@@ -202,7 +202,7 @@ export function SpaceSelector({
               onInvitePartner();
               setIsOpen(false);
             }}
-            className="btn-touch flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-[0.98] hover-lift shimmer-emerald active-press hover:shadow-sm"
+            className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             <UserPlus className="w-4 h-4" />
             Invite to Space
@@ -244,7 +244,7 @@ export function SpaceSelector({
         onClick={() => setIsOpen(!isOpen)}
         className={variant === 'header'
           ? `flex items-center gap-2 px-3 py-2 rounded-full text-white font-medium transition-all hover:opacity-90 active:scale-95 min-w-[120px] ${getHeaderBackgroundClass(userColorTheme)}`
-          : "btn-touch flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95 hover-lift shimmer-emerald active-press hover:shadow-md"
+          : "flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         }
       >
         <Home className={variant === 'header' ? "w-4 h-4 text-white/90" : "w-4 h-4 text-gray-600 dark:text-gray-400"} />

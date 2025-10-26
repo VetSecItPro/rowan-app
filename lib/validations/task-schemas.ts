@@ -59,7 +59,7 @@ export const updateSubtaskSchema = createSubtaskSchema.partial().omit({ created_
 
 // Recurring task schema
 export const recurringPatternSchema = z.object({
-  pattern: z.enum(['daily', 'weekly', 'monthly', 'yearly']),
+  pattern: z.enum(['daily', 'weekly', 'biweekly', 'monthly', 'yearly']),
   interval: z.number().int().min(1).max(365),
   days_of_week: z.array(z.number().int().min(0).max(6)).optional(),
   day_of_month: z.number().int().min(1).max(31).optional(),

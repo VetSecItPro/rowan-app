@@ -64,7 +64,7 @@ export default function ActivityFeed({
   const loadActivities = async () => {
     try {
       setLoading(true);
-      const data = await getActivityFeed(spaceId, entityType, entityId, limit);
+      const data = await getActivityFeed(spaceId, limit);
       setActivities(data);
       setError(null);
     } catch (err) {

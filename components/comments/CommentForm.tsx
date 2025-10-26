@@ -47,7 +47,7 @@ export default function CommentForm({
         .eq('space_id', spaceId);
 
       if (data) {
-        setMentions(data as SpaceMember[]);
+        setMentions(data as any);
       }
     };
 

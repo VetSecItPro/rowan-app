@@ -84,9 +84,15 @@ export const choresService = {
         query = query.or(`title.ilike.%${options.search}%,description.ilike.%${options.search}%`);
       }
 
-      // Order by sort_order first, then by created_at
-      query = query.order('sort_order', { ascending: true, nullsFirst: false })
-                  .order('created_at', { ascending: false });
+      // Try to order by sort_order first, fallback to created_at if column doesn't exist
+      try {
+        query = query.order('sort_order', { ascending: true, nullsFirst: false })
+                    .order('created_at', { ascending: false });
+      } catch (sortError) {
+        // Fallback to created_at only if sort_order column doesn't exist
+        console.warn('sort_order column may not exist, using created_at ordering:', sortError);
+        query = query.order('created_at', { ascending: false });
+      }
 
       const { data, error } = await query;
 
@@ -219,6 +225,65 @@ export const choresService = {
       }
     } catch (error) {
       console.error('Error in deleteChore:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Update chore sort order for drag and drop
+   *
+   * @param id - Chore ID
+   * @param newSortOrder - New sort order position
+   * @returns Promise<Chore> - Updated chore
+   */
+  async updateChoreOrder(id: string, newSortOrder: number): Promise<Chore> {
+    const supabase = createClient();
+    try {
+      const { data, error } = await supabase
+        .from('chores')
+        .update({ sort_order: newSortOrder })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        // Handle case where sort_order column might not exist
+        if (error.code === '42703') {
+          console.warn('sort_order column does not exist, skipping order update');
+          // Return the chore without updating order
+          const { data: choreData, error: fetchError } = await supabase
+            .from('chores')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+          if (fetchError) throw fetchError;
+          return choreData;
+        }
+        throw new Error(`Failed to update chore order: ${error.message}`);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in updateChoreOrder:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Bulk update chore sort orders for drag and drop
+   *
+   * @param updates - Array of {id, sort_order} objects
+   * @returns Promise<void>
+   */
+  async bulkUpdateChoreOrder(updates: Array<{id: string; sort_order: number}>): Promise<void> {
+    const supabase = createClient();
+    try {
+      for (const update of updates) {
+        await this.updateChoreOrder(update.id, update.sort_order);
+      }
+    } catch (error) {
+      console.error('Error in bulkUpdateChoreOrder:', error);
       throw error;
     }
   },

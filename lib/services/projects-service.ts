@@ -115,10 +115,10 @@ export const projectsOnlyService = {
       return {
         total: projects.length,
         planning: projects.filter(p => p.status === 'planning').length,
-        inProgress: projects.filter(p => p.status === 'in_progress').length,
+        inProgress: projects.filter(p => p.status === 'in-progress').length,
         completed: projects.filter(p => p.status === 'completed').length,
-        onHold: projects.filter(p => p.status === 'on_hold').length,
-        totalBudget: projects.reduce((sum, p) => sum + (p.budget_amount || 0), 0),
+        onHold: projects.filter(p => p.status === 'on-hold').length,
+        totalBudget: projects.reduce((sum, p) => sum + ((p as any).budget_amount || p.estimated_budget || 0), 0),
       };
     } catch (error) {
       console.error('getProjectStats error:', error);

@@ -42,12 +42,15 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
     due_date: '',
     assigned_to: '',
     created_by: userId || '',
+    calendar_sync: false,
+    quick_note: '',
+    tags: '',
   });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [dateError, setDateError] = useState<string>('');
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringData, setRecurringData] = useState({
-    pattern: 'weekly' as 'daily' | 'weekly' | 'monthly' | 'yearly',
+    pattern: 'weekly' as 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'yearly',
     interval: 1,
     daysOfWeek: [] as number[],
   });
@@ -65,6 +68,9 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
         due_date: editTask.due_date || '',
         assigned_to: editTask.assigned_to || '',
         created_by: editTask.created_by || userId || '',
+        calendar_sync: (editTask as any).calendar_sync || false,
+        quick_note: (editTask as any).quick_note || '',
+        tags: (editTask as any).tags || '',
       });
     } else {
       setFormData({
@@ -77,6 +83,9 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
         due_date: '',
         assigned_to: '',
         created_by: userId || '',
+        calendar_sync: false,
+        quick_note: '',
+        tags: '',
       });
     }
     setShowEmojiPicker(false);
@@ -229,7 +238,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
               Description
             </label>
             <textarea
-              value={formData.description}
+              value={formData.description || ''}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Add details about this task..."
               rows={3}
@@ -238,7 +247,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
           </div>
 
           {/* Priority & Status Row */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {/* Priority */}
             <div>
               <label htmlFor="field-3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
@@ -247,7 +256,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
               <div className="relative">
                 <select
                   value={formData.priority}
-                  onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, priority: e.target.value as 'low' | 'medium' | 'high' | 'urgent' })}
                   className="w-full pl-4 pr-12 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
                 >
                   <option value="low">Low</option>
@@ -267,13 +276,14 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
               <div className="relative">
                 <select
                   value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value as 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed' })}
                   className="w-full pl-4 pr-12 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
                 >
                   <option value="pending">Pending</option>
-                  <option value="in_progress">In Progress</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="blocked">Blocked</option>
+                  <option value="on-hold">On Hold</option>
                   <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
                 </select>
                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
@@ -281,7 +291,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
           </div>
 
           {/* Category & Due Date Row */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {/* Category */}
             <div>
               <label htmlFor="field-5" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
@@ -289,7 +299,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
               </label>
               <div className="relative">
                 <select
-                  value={formData.category}
+                  value={formData.category || ''}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full pl-4 pr-12 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
                 >
@@ -316,7 +326,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
               </label>
               <input
                 type="date"
-                value={formData.due_date}
+                value={formData.due_date || ''}
                 onChange={(e) => {
                   setFormData({ ...formData, due_date: e.target.value });
 
@@ -372,9 +382,9 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
 
             {/* Recurring Options - Collapsible */}
             {isRecurring && (
-              <div className="space-y-4 p-4 bg-gray-100 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="space-y-3 sm:space-y-4 p-3 sm:p-4 bg-gray-100 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
                 {/* Pattern and Interval Row */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {/* Pattern */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -392,6 +402,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                       >
                         <option value="daily">Daily</option>
                         <option value="weekly">Weekly</option>
+                        <option value="biweekly">Bi-weekly</option>
                         <option value="monthly">Monthly</option>
                         <option value="yearly">Yearly</option>
                       </select>
@@ -418,13 +429,13 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                   </div>
                 </div>
 
-                {/* Days of Week - Only show for weekly pattern */}
-                {recurringData.pattern === 'weekly' && (
+                {/* Days of Week - Show for weekly and biweekly patterns */}
+                {(recurringData.pattern === 'weekly' || recurringData.pattern === 'biweekly') && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                       Days of Week
                     </label>
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="flex gap-1.5 sm:gap-2 flex-wrap">
                       {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
                         <button
                           key={idx}
@@ -435,7 +446,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                               : [...recurringData.daysOfWeek, idx];
                             setRecurringData({ ...recurringData, daysOfWeek: days });
                           }}
-                          className={`w-10 h-10 rounded-full transition-all text-sm font-medium border-2 ${
+                          className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full transition-all text-xs sm:text-sm font-medium border-2 ${
                             recurringData.daysOfWeek.includes(idx)
                               ? 'bg-blue-500 text-white border-blue-400'
                               : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-300 dark:hover:bg-gray-600'
@@ -452,18 +463,18 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+              className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!!dateError}
-              className={`flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg transition-colors font-medium ${
+              className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white rounded-lg transition-colors font-medium ${
                 dateError ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
               }`}
             >

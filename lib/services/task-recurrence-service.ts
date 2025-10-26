@@ -8,7 +8,7 @@ import type { Task } from '@/lib/types';
  */
 
 export interface RecurrencePattern {
-  pattern: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  pattern: 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'yearly';
   interval: number;
   days_of_week?: number[]; // 0-6, Sunday=0
   day_of_month?: number; // 1-31
@@ -229,6 +229,11 @@ export const taskRecurrenceService = {
       case 'weekly':
         next = new Date(last);
         next.setDate(last.getDate() + (7 * pattern.interval));
+        break;
+
+      case 'biweekly':
+        next = new Date(last);
+        next.setDate(last.getDate() + (14 * pattern.interval)); // 2 weeks
         break;
 
       case 'monthly':

@@ -66,7 +66,7 @@ export interface CommentReaction {
 export interface ReactionSummary {
   emoji: string;
   count: number;
-  userReacted: boolean;
+  user_ids: string[];
 }
 
 export interface ActivityLog {
@@ -76,6 +76,7 @@ export interface ActivityLog {
   entity_type: CommentableType;
   entity_id: string;
   user_id: string;
+  user_email?: string;
   description: string | null;
   metadata: Record<string, any> | null;
   is_system: boolean;

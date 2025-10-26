@@ -105,8 +105,6 @@ export function ConfirmDialog({
           <CTAButton
             onClick={onConfirm}
             disabled={confirmLoading}
-            breathing
-            ripple
             icon={confirmLoading ? null : <Icon className="w-4 h-4" />}
             className={`w-full sm:w-auto min-h-[48px] sm:min-h-[44px] px-6 py-3 sm:py-2.5 text-base sm:text-sm ${style.confirmBg}`}
             aria-label={confirmLabel}

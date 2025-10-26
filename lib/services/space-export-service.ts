@@ -241,13 +241,13 @@ export async function exportSpaceData(
     let totalRecords = 0;
 
     dataQueries.forEach((result, index) => {
-      const dataType = dataTypes[index];
+      const dataType = dataTypes[index] as keyof Omit<SpaceExportData, 'space' | 'export_metadata'>;
       if (result.status === 'fulfilled' && result.value.data) {
-        exportData[dataType as keyof SpaceExportData] = result.value.data;
+        exportData[dataType] = result.value.data;
         totalRecords += result.value.data.length;
       } else {
         console.warn(`Failed to export ${dataType}:`, result.status === 'rejected' ? result.reason : 'No data');
-        exportData[dataType as keyof SpaceExportData] = [];
+        exportData[dataType] = [];
       }
     });
 

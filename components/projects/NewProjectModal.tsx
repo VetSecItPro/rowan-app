@@ -40,8 +40,8 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
         description: editProject.description || '',
         status: editProject.status as any,
         start_date: formatDateForInput(editProject.start_date),
-        target_date: formatDateForInput(editProject.target_date),
-        budget_amount: editProject.budget_amount || undefined,
+        target_date: formatDateForInput(editProject.estimated_completion_date),
+        budget_amount: editProject.estimated_budget || undefined,
       });
     } else {
       setFormData({

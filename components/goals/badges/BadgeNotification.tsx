@@ -174,12 +174,7 @@ export default function BadgeNotification({
 
       // Show success message using toast
       const { showSuccess } = await import('@/lib/utils/toast');
-      showSuccess('Achievement copied to clipboard! 📋', {
-        action: {
-          label: 'Close',
-          onClick: () => {},
-        },
-      });
+      showSuccess('Achievement copied to clipboard! 📋');
     } catch (error) {
       // Final fallback - create a temporary textarea
       const textArea = document.createElement('textarea');

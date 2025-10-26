@@ -20,71 +20,120 @@ export function TimeAwareWelcomeBox({
 }: TimeAwareWelcomeBoxProps) {
   const timePeriod = useTimePeriod();
   const [isHovered, setIsHovered] = useState(false);
-  const [particles, setParticles] = useState<Array<{id: number, x: number, y: number, delay: number, size: number, speedX: number, speedY: number, opacity: number}>>([]);
+  const [elements, setElements] = useState<Array<{id: number, x: number, y: number, delay: number, size: number, speedX: number, speedY: number, opacity: number, rotation: number}>>([]);
 
-  // Generate enhanced particles on mount
+  // Generate time-aware floating elements
   useEffect(() => {
-    const particleCount = 35; // More particles for active, shining effect
-    const newParticles = Array.from({ length: particleCount }, (_, i) => ({
+    const elementCount = timePeriod === 'morning' ? 8 : timePeriod === 'afternoon' ? 6 : timePeriod === 'evening' ? 10 : 12;
+    const newElements = Array.from({ length: elementCount }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
       delay: Math.random() * 8,
-      size: Math.random() * 6 + 3, // Bigger particles (3-9px)
-      speedX: (Math.random() - 0.5) * 2, // Random horizontal movement
-      speedY: (Math.random() - 0.5) * 2, // Random vertical movement
-      opacity: Math.random() * 0.4 + 0.6 // Variable opacity (0.6-1.0)
+      size: Math.random() * 20 + 20, // Bigger elements (20-40px)
+      speedX: (Math.random() - 0.5) * 1.5,
+      speedY: (Math.random() - 0.5) * 1.5,
+      opacity: Math.random() * 0.3 + 0.4, // Variable opacity (0.4-0.7)
+      rotation: Math.random() * 360
     }));
-    setParticles(newParticles);
-  }, []);
+    setElements(newElements);
+  }, [timePeriod]);
 
-  // Time-specific styling and configuration
+  // Time-specific styling and configuration with enhanced atmospheric gradients
   const timeBasedConfig = useMemo(() => {
     switch (timePeriod) {
       case 'morning':
         return {
-          gradient: 'linear-gradient(135deg, rgba(217, 119, 6, 0.9), rgba(249, 115, 22, 0.8), rgba(251, 191, 36, 0.7))',
-          particleColor: 'bg-yellow-300/60',
-          glowColor: 'shadow-amber-500/30',
+          gradient: 'linear-gradient(135deg, rgba(255, 159, 67, 0.9) 0%, rgba(255, 190, 11, 0.85) 25%, rgba(255, 235, 59, 0.8) 50%, rgba(135, 206, 235, 0.7) 100%)', // Sunrise
+          glowColor: 'shadow-amber-400/40',
           textGlow: 'drop-shadow-lg',
-          accent: 'from-yellow-400/40 to-orange-400/40',
+          accent: 'from-yellow-300/30 to-orange-300/30',
         };
       case 'afternoon':
         return {
-          gradient: 'linear-gradient(135deg, rgba(2, 132, 199, 0.9), rgba(59, 130, 246, 0.8), rgba(34, 211, 238, 0.7))',
-          particleColor: 'bg-cyan-300/60',
-          glowColor: 'shadow-blue-500/30',
+          gradient: 'linear-gradient(135deg, rgba(30, 144, 255, 0.9) 0%, rgba(135, 206, 250, 0.85) 30%, rgba(255, 255, 255, 0.8) 60%, rgba(173, 216, 230, 0.7) 100%)', // Clear blue sky
+          glowColor: 'shadow-sky-400/40',
           textGlow: 'drop-shadow-lg',
-          accent: 'from-cyan-400/40 to-blue-400/40',
+          accent: 'from-sky-300/30 to-blue-300/30',
         };
       case 'evening':
         return {
-          gradient: 'linear-gradient(135deg, rgba(126, 34, 206, 0.9), rgba(139, 92, 246, 0.8), rgba(217, 70, 239, 0.7))',
-          particleColor: 'bg-fuchsia-300/60',
-          glowColor: 'shadow-purple-500/30',
+          gradient: 'linear-gradient(135deg, rgba(255, 94, 77, 0.9) 0%, rgba(255, 154, 0, 0.85) 25%, rgba(142, 68, 173, 0.8) 65%, rgba(74, 0, 224, 0.7) 100%)', // Sunset
+          glowColor: 'shadow-orange-400/40',
           textGlow: 'drop-shadow-lg',
-          accent: 'from-fuchsia-400/40 to-violet-400/40',
+          accent: 'from-orange-300/30 to-purple-300/30',
         };
       case 'night':
         return {
-          gradient: 'linear-gradient(135deg, rgba(30, 58, 138, 0.9), rgba(30, 64, 175, 0.8), rgba(126, 34, 206, 0.7))',
-          particleColor: 'bg-blue-200/60',
-          glowColor: 'shadow-indigo-500/30',
+          gradient: 'linear-gradient(135deg, rgba(25, 25, 112, 0.95) 0%, rgba(72, 61, 139, 0.9) 30%, rgba(30, 30, 60, 0.85) 70%, rgba(0, 0, 0, 0.8) 100%)', // Deep night
+          glowColor: 'shadow-indigo-500/50',
           textGlow: 'drop-shadow-lg',
-          accent: 'from-blue-400/40 to-indigo-400/40',
+          accent: 'from-indigo-400/30 to-purple-400/30',
         };
       default:
         return {
-          gradient: 'linear-gradient(135deg, rgba(126, 34, 206, 0.9), rgba(139, 92, 246, 0.8), rgba(217, 70, 239, 0.7))',
-          particleColor: 'bg-fuchsia-300/60',
+          gradient: 'linear-gradient(135deg, rgba(142, 68, 173, 0.9), rgba(147, 51, 234, 0.8), rgba(192, 132, 252, 0.7))',
           glowColor: 'shadow-purple-500/30',
           textGlow: 'drop-shadow-lg',
-          accent: 'from-fuchsia-400/40 to-violet-400/40',
+          accent: 'from-purple-400/30 to-violet-400/30',
         };
     }
   }, [timePeriod]);
 
-  const { gradient, particleColor, glowColor, textGlow, accent } = timeBasedConfig;
+  const { gradient, glowColor, textGlow, accent } = timeBasedConfig;
+
+  // SVG Components for each time period
+  const SunIcon = ({ size, className = '' }: { size: number; className?: string }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
+      <circle cx="12" cy="12" r="5" fill="currentColor" className="text-yellow-300"/>
+      <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+            stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-yellow-200"/>
+    </svg>
+  );
+
+  const CloudIcon = ({ size, className = '' }: { size: number; className?: string }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
+      <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"
+            fill="currentColor" className="text-white/80"/>
+    </svg>
+  );
+
+  const StarIcon = ({ size, className = '' }: { size: number; className?: string }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
+      <polygon points="12,2 15,8.5 22,8.5 16.5,13.5 18.5,20 12,16 5.5,20 7.5,13.5 2,8.5 9,8.5"
+               fill="currentColor" className="text-yellow-100"/>
+    </svg>
+  );
+
+  const MoonIcon = ({ size, className = '' }: { size: number; className?: string }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+            fill="currentColor" className="text-slate-200"/>
+    </svg>
+  );
+
+  // Get the appropriate icon component for current time period
+  const getTimeIcon = (element: any) => {
+    const iconProps = {
+      size: element.size,
+      className: `opacity-${Math.round(element.opacity * 100)} transition-all duration-1000 ${
+        isHovered ? 'scale-125' : ''
+      }`
+    };
+
+    switch (timePeriod) {
+      case 'morning':
+        return <SunIcon {...iconProps} />;
+      case 'afternoon':
+        return <CloudIcon {...iconProps} />;
+      case 'evening':
+        return Math.random() > 0.5 ? <StarIcon {...iconProps} /> : <SunIcon {...iconProps} />;
+      case 'night':
+        return Math.random() > 0.7 ? <MoonIcon {...iconProps} /> : <StarIcon {...iconProps} />;
+      default:
+        return <StarIcon {...iconProps} />;
+    }
+  };
 
   return (
     <div
@@ -109,26 +158,32 @@ export function TimeAwareWelcomeBox({
         </div>
       </div>
 
-      {/* Enhanced Particle System - More Active and Shining */}
+      {/* Time-Aware Floating Elements */}
       <div className="absolute inset-0 pointer-events-none">
-        {particles.map((particle) => (
+        {elements.map((element) => (
           <div
-            key={particle.id}
-            className={`absolute rounded-full ${particleColor} animate-float-elegant transition-all duration-1000 ${
-              isHovered ? 'scale-125 opacity-100' : `opacity-${Math.round(particle.opacity * 100)}`
+            key={element.id}
+            className={`absolute animate-float-elegant transition-all duration-1000 ${
+              timePeriod === 'morning' ? 'animate-bounce-gentle' :
+              timePeriod === 'afternoon' ? 'animate-drift' :
+              timePeriod === 'evening' ? 'animate-twinkle' :
+              'animate-sparkle'
             }`}
             style={{
-              left: `${particle.x}%`,
-              top: `${particle.y}%`,
-              width: `${particle.size}px`,
-              height: `${particle.size}px`,
-              animationDelay: `${particle.delay}s`,
-              animationDuration: `${6 + particle.delay * 0.5}s`, // Faster, more active movement
-              transform: `translate(${particle.speedX * 10}px, ${particle.speedY * 10}px)`,
-              opacity: particle.opacity,
-              boxShadow: `0 0 ${particle.size * 2}px ${particleColor.replace('bg-', '').replace('/60', '').replace('-300', '-400')}/30`,
+              left: `${element.x}%`,
+              top: `${element.y}%`,
+              animationDelay: `${element.delay}s`,
+              animationDuration: `${timePeriod === 'morning' ? 3 + element.delay * 0.5 :
+                                 timePeriod === 'afternoon' ? 8 + element.delay * 0.3 :
+                                 4 + element.delay * 0.4}s`,
+              transform: `translate(${element.speedX * 15}px, ${element.speedY * 15}px) rotate(${element.rotation}deg)`,
+              filter: timePeriod === 'night' ? `drop-shadow(0 0 ${element.size/2}px rgba(255,255,255,0.5))` :
+                      timePeriod === 'morning' ? `drop-shadow(0 0 ${element.size/3}px rgba(255,215,0,0.6))` :
+                      `drop-shadow(0 0 ${element.size/4}px rgba(255,255,255,0.3))`
             }}
-          />
+          >
+            {getTimeIcon(element)}
+          </div>
         ))}
       </div>
 

@@ -57,7 +57,7 @@ export const TaskAssignmentEmail = ({
 
       <div style={taskCard}>
         <div style={taskHeader}>
-          <Text style={taskTitle}>{taskTitle}</Text>
+          <Text style={taskTitleStyle}>{taskTitle}</Text>
           <span
             style={{
               ...priorityBadge,
@@ -69,7 +69,7 @@ export const TaskAssignmentEmail = ({
         </div>
 
         {taskDescription && (
-          <Text style={taskDescription}>{taskDescription}</Text>
+          <Text style={taskDescriptionStyle}>{taskDescription}</Text>
         )}
 
         {dueDate && (
@@ -120,7 +120,7 @@ const taskHeader = {
   marginBottom: '12px',
 };
 
-const taskTitle = {
+const taskTitleStyle = {
   color: '#111827',
   fontSize: '18px',
   fontWeight: 'bold',
@@ -139,7 +139,7 @@ const priorityBadge = {
   marginLeft: '12px',
 };
 
-const taskDescription = {
+const taskDescriptionStyle = {
   color: '#6b7280',
   fontSize: '14px',
   lineHeight: '20px',

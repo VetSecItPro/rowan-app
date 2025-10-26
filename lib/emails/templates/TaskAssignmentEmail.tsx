@@ -105,7 +105,7 @@ const TaskAssignmentEmail = ({
                 </Column>
               </Row>
 
-              <Heading style={taskTitle}>{taskTitle}</Heading>
+              <Heading style={taskTitleStyle}>{taskTitle}</Heading>
 
               {taskDescription && (
                 <Text style={taskDesc}>{taskDescription}</Text>
@@ -230,7 +230,7 @@ const priorityBadge = {
   marginBottom: '12px',
 };
 
-const taskTitle = {
+const taskTitleStyle = {
   color: '#1f2937',
   fontSize: '20px',
   fontWeight: 'bold',

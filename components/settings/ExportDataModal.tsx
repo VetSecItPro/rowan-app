@@ -93,8 +93,10 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
         document.body.removeChild(a);
       }
 
-      // Log audit event
-      await logDataExport(userId, selectedFormat, selectedDataType !== 'all' ? selectedDataType : undefined);
+      // Log audit event (only for json/csv formats)
+      if (selectedFormat === 'json' || selectedFormat === 'csv') {
+        await logDataExport(userId, selectedFormat, selectedDataType !== 'all' ? selectedDataType : undefined);
+      }
 
       // Close modal on success
       onClose();

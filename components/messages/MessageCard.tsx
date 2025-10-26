@@ -7,9 +7,18 @@ import { useState, useEffect } from 'react';
 import { AttachmentPreview } from './AttachmentPreview';
 import { ReactionPicker } from './ReactionPicker';
 import { MentionHighlight } from './MentionHighlight';
-// Temporary fix: Remove ReactMarkdown import to fix build issues
-// TODO: Re-add ReactMarkdown after fixing dependencies
-const ReactMarkdown = ({ children }: { children: string }) => <span dangerouslySetInnerHTML={{ __html: children.replace(/\n/g, '<br>') }} />;
+import DOMPurify from 'dompurify';
+
+// Safe HTML rendering with DOMPurify sanitization
+const ReactMarkdown = ({ children }: { children: string }) => {
+  // Sanitize the content to prevent XSS attacks
+  const sanitizedContent = DOMPurify.sanitize(children.replace(/\n/g, '<br>'), {
+    ALLOWED_TAGS: ['br', 'b', 'i', 'em', 'strong', 'code', 'pre', 'p'],
+    ALLOWED_ATTR: [],
+  });
+
+  return <span dangerouslySetInnerHTML={{ __html: sanitizedContent }} />;
+};
 
 interface MessageCardProps {
   message: MessageWithAttachments | MessageWithReplies;
@@ -85,7 +94,7 @@ export function MessageCard({
 
   return (
     <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-      <div className={`max-w-[70%] ${isOwn ? 'items-end' : 'items-start'} flex flex-col`}>
+      <div className={`max-w-[85%] sm:max-w-[75%] md:max-w-[70%] lg:max-w-[65%] ${isOwn ? 'items-end' : 'items-start'} flex flex-col`}>
         {/* Sender Name */}
         <div className="px-4 pb-1">
           <p className="text-xs font-medium" style={{ color: senderColor }}>
@@ -109,28 +118,7 @@ export function MessageCard({
             {/* Message Content with Markdown Support */}
             {message.content && (
               <div className="break-words text-gray-900 dark:text-white text-sm prose prose-sm dark:prose-invert max-w-none">
-                <ReactMarkdown
-                  components={{
-                    p: ({ children }) => <p className="mb-1 last:mb-0">{children}</p>,
-                    strong: ({ children }) => <strong className="font-bold">{children}</strong>,
-                    em: ({ children }) => <em className="italic">{children}</em>,
-                    code: ({ children }) => (
-                      <code className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">
-                        {children}
-                      </code>
-                    ),
-                    a: ({ href, children }) => (
-                      <a
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 hover:underline"
-                      >
-                        {children}
-                      </a>
-                    ),
-                  }}
-                >
+                <ReactMarkdown>
                   {message.content}
                 </ReactMarkdown>
               </div>
@@ -233,9 +221,9 @@ export function MessageCard({
                   onClick={() => setShowMenu(!showMenu)}
                   title="Edit or Delete"
                   aria-label="Message options menu"
-                  className="btn-touch w-12 h-12 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all opacity-0 group-hover:opacity-100 active:scale-95"
+                  className="btn-touch w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all opacity-0 group-hover:opacity-100 active:scale-95"
                 >
-                  <MoreVertical className="w-5 h-5 md:w-4 md:h-4 text-gray-600 dark:text-gray-400" />
+                  <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
                 </button>
 
                 {showMenu && (

@@ -128,7 +128,7 @@ export default function TasksPage() {
   const stats = useMemo(() => ({
     total: allItems.length,
     pending: allItems.filter(item => item.status === 'pending').length,
-    inProgress: allItems.filter(item => item.status === 'in_progress').length,
+    inProgress: allItems.filter(item => item.status === 'in-progress').length,
     blocked: allItems.filter(item => item.status === 'blocked').length,
     completed: allItems.filter(item => item.status === 'completed').length,
     // Active items = everything except completed
@@ -398,7 +398,7 @@ export default function TasksPage() {
     }
   }, [editingItem, modalDefaultType, setTasks, setChores, user, currentSpace, refreshChores, refreshTasks, setChoreLoading]);
 
-  const handleStatusChange = useCallback(async (itemId: string, status: string, type?: 'task' | 'chore') => {
+  const handleStatusChange = useCallback(async (itemId: string, status: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed', type?: 'task' | 'chore') => {
     // Set loading state for this specific item
     setItemLoadingStates(prev => ({
       ...prev,

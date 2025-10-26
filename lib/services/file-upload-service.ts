@@ -50,11 +50,64 @@ const ALLOWED_AUDIO_TYPES = [
   'audio/wav',
 ];
 
+// Magic bytes signatures for file type validation
+const MAGIC_BYTES_SIGNATURES = {
+  // Images
+  'image/jpeg': ['FFD8FF', 'FFD8'],
+  'image/png': ['89504E47'],
+  'image/gif': ['474946'],
+  'image/webp': ['52494646'], // "RIFF" + 4 bytes + "WEBP"
+  'image/bmp': ['424D'],
+  'image/svg+xml': ['3C737667', '3C3F786D'], // "<svg" or "<?xml"
+
+  // Documents
+  'application/pdf': ['25504446'],
+  'application/msword': ['D0CF11E0'],
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['504B0304'],
+
+  // Audio
+  'audio/mp3': ['494433', 'FFFB'],
+  'audio/wav': ['52494646'], // "RIFF"
+  'audio/ogg': ['4F676753'], // "OggS"
+
+  // Video
+  'video/mp4': ['00000018667479', '00000020667479'], // ftyp box
+  'video/webm': ['1A45DFA3'],
+  'video/avi': ['52494646'], // "RIFF" + 4 bytes + "AVI "
+};
+
+/**
+ * Check file magic bytes to verify actual file type
+ */
+async function validateMagicBytes(file: File): Promise<boolean> {
+  const expectedSignatures = MAGIC_BYTES_SIGNATURES[file.type as keyof typeof MAGIC_BYTES_SIGNATURES];
+
+  if (!expectedSignatures) {
+    // If no magic bytes defined for this type, allow it (backwards compatibility)
+    return true;
+  }
+
+  try {
+    // Read first 32 bytes of the file
+    const arrayBuffer = await file.slice(0, 32).arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+    const hex = Array.from(uint8Array)
+      .map(b => b.toString(16).padStart(2, '0').toUpperCase())
+      .join('');
+
+    // Check if file starts with any of the expected signatures
+    return expectedSignatures.some(signature => hex.startsWith(signature));
+  } catch (error) {
+    console.warn('Magic bytes validation failed:', error);
+    return false;
+  }
+}
+
 export const fileUploadService = {
   /**
    * Validate file before upload
    */
-  validateFile(file: File): { valid: boolean; error?: string } {
+  async validateFile(file: File): Promise<{ valid: boolean; error?: string }> {
     // Check file size
     if (file.size > MAX_FILE_SIZE) {
       return {
@@ -75,6 +128,15 @@ export const fileUploadService = {
       return {
         valid: false,
         error: `File type not allowed: ${file.type}`,
+      };
+    }
+
+    // Validate magic bytes to prevent file type spoofing
+    const magicBytesValid = await validateMagicBytes(file);
+    if (!magicBytesValid) {
+      return {
+        valid: false,
+        error: `File content does not match declared type: ${file.type}. This may indicate a malicious file.`,
       };
     }
 
@@ -206,7 +268,7 @@ export const fileUploadService = {
     const supabase = createClient();
 
     // Validate file
-    const validation = this.validateFile(file);
+    const validation = await this.validateFile(file);
     if (!validation.valid) {
       throw new Error(validation.error);
     }
