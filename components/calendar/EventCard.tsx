@@ -85,7 +85,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
               <button
                 onClick={handleCheckboxClick}
                 aria-label={`Toggle event status: ${event.status === 'not-started' ? 'Not Started' : event.status === 'in-progress' ? 'In Progress' : 'Completed'}`}
-                className={`btn-touch w-6 h-6 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 active:scale-95 hover:scale-110 hover-lift shimmer-purple ${
+                className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 hover:scale-105 ${
                   event.status === 'completed'
                     ? 'bg-green-500 border-green-500'
                     : event.status === 'in-progress'
@@ -152,7 +152,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
           {linkedShoppingList && (
             <Link
               href="/shopping"
-              className={`btn-touch inline-flex items-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 px-2.5 sm:px-3 mt-2 sm:mt-3 ml-3 sm:ml-4 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors active:opacity-80 hover-lift shimmer-emerald active-press ${
+              className={`inline-flex items-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 px-2.5 sm:px-3 mt-2 sm:mt-3 ml-3 sm:ml-4 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-md ${
                 event.status === 'completed' ? 'opacity-60' : ''
               }`}
             >
@@ -169,7 +169,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
           <button
             onClick={() => setShowMenu(!showMenu)}
             aria-label="Event options menu"
-            className="btn-touch w-12 h-12 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95 hover-lift shimmer-purple active-press"
+            className="w-12 h-12 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
             <MoreVertical className="w-5 h-5 md:w-4 md:h-4 text-gray-600 dark:text-gray-400" />
           </button>
@@ -187,7 +187,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                       onViewDetails(event);
                       setShowMenu(false);
                     }}
-                    className="btn-touch w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-t-lg active:scale-[0.98] hover-lift shimmer-purple active-press"
+                    className="w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-t-lg transition-colors"
                   >
                     <Eye className="w-4 h-4" />
                     View Details
@@ -198,7 +198,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                     onEdit(event);
                     setShowMenu(false);
                   }}
-                  className={`btn-touch w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 active:scale-[0.98] hover-lift shimmer-purple active-press ${
+                  className={`w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors ${
                     !onViewDetails ? 'rounded-t-lg' : ''
                   }`}
                 >
@@ -210,7 +210,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                     onDelete(event.id);
                     setShowMenu(false);
                   }}
-                  className="btn-touch w-full px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-b-lg active:scale-[0.98] hover-lift shimmer-red active-press"
+                  className="w-full px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 rounded-b-lg transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                   Delete Event
