@@ -89,7 +89,7 @@ export const reminderCommentsService = {
   /**
    * Create a new comment
    */
-  async createComment(input: CreateCommentInput): Promise<ReminderComment> {
+  async createComment(input: CreateCommentInput & { space_id?: string }): Promise<ReminderComment> {
     const supabase = createClient();
 
     // Validate input
@@ -107,15 +107,24 @@ export const reminderCommentsService = {
       throw new Error('Reminder not found');
     }
 
+    // Use the space_id from the reminder (more secure)
+    const spaceId = reminder.space_id;
+
+    // Check if user has access to the space - using the same pattern as other services
     const { data: membership, error: membershipError } = await supabase
       .from('space_members')
-      .select('id')
-      .eq('space_id', reminder.space_id)
+      .select('user_id')
+      .eq('space_id', spaceId)
       .eq('user_id', validated.user_id)
-      .single();
+      .maybeSingle();
 
-    if (membershipError || !membership) {
-      console.error('User is not a member of this space');
+    if (membershipError) {
+      console.error('Error checking space membership:', membershipError);
+      throw new Error('Failed to verify space access');
+    }
+
+    if (!membership) {
+      console.error('User is not a member of this space', { userId: validated.user_id, spaceId });
       throw new Error('User is not a member of this space');
     }
 
