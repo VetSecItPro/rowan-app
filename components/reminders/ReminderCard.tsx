@@ -57,11 +57,16 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
     const nextIndex = (currentIndex + 1) % states.length;
     const nextStatus = states[nextIndex];
 
-    // Always set the status first - this prevents race conditions
+    // Always set the status first
     onStatusChange(reminder.id, nextStatus);
 
-    // Note: Completed reminders now stay completed instead of auto-deleting
-    // Users can manually delete them via the menu if desired
+    // If status is becoming "completed", auto-delete after a delay to prevent race conditions
+    if (nextStatus === 'completed') {
+      // 500ms delay allows the status change to complete in the database first
+      setTimeout(() => {
+        onDelete(reminder.id);
+      }, 500);
+    }
   };
 
   return (
@@ -104,7 +109,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
             </button>
             {/* Improved tooltip positioning */}
             <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[99999] shadow-xl border border-gray-700 dark:border-gray-600">
-              {reminder.status === 'active' ? 'Active - Click to snooze' : reminder.status === 'snoozed' ? 'Snoozed - Click to complete' : 'Completed - Click to reactivate'}
+              {reminder.status === 'active' ? 'Active - Click to snooze' : reminder.status === 'snoozed' ? 'Snoozed - Click to complete & auto-delete' : 'Completed - Click to reactivate'}
               {/* Tooltip arrow pointing up */}
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-900 dark:border-b-gray-700"></div>
             </div>
