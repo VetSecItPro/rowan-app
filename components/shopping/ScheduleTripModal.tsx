@@ -68,10 +68,10 @@ export function ScheduleTripModal({ isOpen, onClose, onSchedule, list }: Schedul
           </div>
           <button
             onClick={onClose}
-            className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active-press"
+            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             aria-label="Close modal"
           >
-            <X className="w-5 h-5 sm:w-4 sm:h-4 text-gray-600 dark:text-gray-400" />
+            <X className="w-5 h-5 text-gray-900 dark:text-white" />
           </button>
         </div>
 
