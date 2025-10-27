@@ -130,12 +130,14 @@ const CalendarDayCell = memo(({
           );
         })}
         {dayMeals.length === 0 && isCurrentMonth && (
-          <button
-            onClick={onAddClick}
-            className="w-full text-center py-2 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-          >
-            + Add
-          </button>
+          <div className="flex justify-center">
+            <button
+              onClick={onAddClick}
+              className="px-1.5 py-0.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-[9px] rounded transition-all shadow-sm"
+            >
+              Add Meal
+            </button>
+          </div>
         )}
       </div>
     </div>
