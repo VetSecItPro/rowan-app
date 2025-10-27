@@ -16,12 +16,12 @@ BEGIN
     -- Count invalid UUID format records
     SELECT COUNT(*) INTO invalid_count
     FROM reminder_activities
-    WHERE reminder_id !~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$';
+    WHERE reminder_id::text !~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$';
 
     -- Get a sample invalid UUID for logging
-    SELECT reminder_id INTO sample_invalid
+    SELECT reminder_id::text INTO sample_invalid
     FROM reminder_activities
-    WHERE reminder_id !~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+    WHERE reminder_id::text !~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
     LIMIT 1;
 
     RAISE NOTICE 'BEFORE UUID CLEANUP:';
@@ -33,12 +33,12 @@ END $$;
 -- Step 2: Delete ALL records with invalid UUID formats
 -- This includes records with .js21 suffix and other malformed UUIDs
 DELETE FROM reminder_activities
-WHERE reminder_id !~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$';
+WHERE reminder_id::text !~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$';
 
 -- Step 3: Add a CHECK constraint to prevent future invalid UUIDs
 ALTER TABLE reminder_activities
 ADD CONSTRAINT reminder_activities_valid_uuid_check
-CHECK (reminder_id ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
+CHECK (reminder_id::text ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
 
 -- Step 4: Verify cleanup success
 DO $$
@@ -53,7 +53,7 @@ BEGIN
     -- Count any remaining invalid UUIDs (should be 0)
     SELECT COUNT(*) INTO remaining_invalid
     FROM reminder_activities
-    WHERE reminder_id !~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$';
+    WHERE reminder_id::text !~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$';
 
     -- Check if constraint was added
     SELECT EXISTS (
