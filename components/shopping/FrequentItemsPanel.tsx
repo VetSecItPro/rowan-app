@@ -40,7 +40,7 @@ export function FrequentItemsPanel({ spaceId, onAddItem }: FrequentItemsPanelPro
 
   if (loading) {
     return (
-      <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border-2 border-emerald-200 dark:border-emerald-800 rounded-xl p-6">
+      <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-6">
         <div className="flex items-center justify-center gap-2 text-emerald-600 dark:text-emerald-400">
           <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
           <span className="text-sm font-medium">Loading suggestions...</span>
@@ -54,10 +54,10 @@ export function FrequentItemsPanel({ spaceId, onAddItem }: FrequentItemsPanelPro
   }
 
   return (
-    <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border-2 border-emerald-200 dark:border-emerald-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+    <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-500 rounded-lg flex items-center justify-center shadow-sm">
+          <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
           <div>
@@ -68,7 +68,7 @@ export function FrequentItemsPanel({ spaceId, onAddItem }: FrequentItemsPanelPro
         <Tooltip content={isExpanded ? 'Collapse' : 'Expand'} delay={0}>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="btn-touch p-1.5 hover:bg-emerald-100 dark:hover:bg-emerald-800/50 rounded-lg transition-all active:scale-95 hover-lift shimmer-emerald active-press hover:shadow-md"
+            className="p-1.5 hover:bg-emerald-100 dark:hover:bg-emerald-800/50 rounded-lg transition-colors"
             aria-label={isExpanded ? 'Collapse frequent items' : 'Expand frequent items'}
           >
             {isExpanded ? (
@@ -86,7 +86,7 @@ export function FrequentItemsPanel({ spaceId, onAddItem }: FrequentItemsPanelPro
             <Tooltip key={`${item.name}-${index}`} content={`Added ${item.count}x recently`} delay={0}>
               <button
                 onClick={() => onAddItem(item.name, item.category)}
-                className="btn-touch group relative flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-emerald-200 dark:border-emerald-700 rounded-lg hover:border-emerald-400 dark:hover:border-emerald-500 hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95 hover-lift shimmer-emerald active-press"
+                className="group relative flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-emerald-200 dark:border-emerald-700 rounded-lg hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <span className="text-lg flex-shrink-0">{getCategoryIcon(item.category as any)}</span>
                 <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate flex-1 text-left">
