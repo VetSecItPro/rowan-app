@@ -21,12 +21,20 @@ export function AttachmentList({ reminderId, refreshTrigger }: AttachmentListPro
 
   // Fetch attachments
   const fetchAttachments = async () => {
+    // Guard: Don't fetch if reminderId is undefined or invalid
+    if (!reminderId || reminderId === 'undefined') {
+      setAttachments([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const data = await reminderAttachmentsService.getAttachments(reminderId);
       setAttachments(data);
     } catch (error) {
       console.error('Error fetching attachments:', error);
+      setAttachments([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -35,6 +43,11 @@ export function AttachmentList({ reminderId, refreshTrigger }: AttachmentListPro
   useEffect(() => {
     fetchAttachments();
   }, [reminderId, refreshTrigger]);
+
+  // Early return if no valid reminder ID
+  if (!reminderId || reminderId === 'undefined') {
+    return null;
+  }
 
   // Delete attachment
   const handleDelete = async (attachmentId: string) => {
