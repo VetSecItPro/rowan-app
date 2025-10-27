@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown, TrendingUp, Sparkles, Zap, X } from 'lucide-react';
+import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown, TrendingUp, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
@@ -12,7 +12,6 @@ import GuidedReminderCreation from '@/components/guided/GuidedReminderCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { remindersService, Reminder, CreateReminderInput } from '@/lib/services/reminders-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
-import { reminderTemplatesService, ReminderTemplate } from '@/lib/services/reminder-templates-service';
 import { CTAButton } from '@/components/ui/EnhancedButton';
 
 export default function RemindersPage(): JSX.Element {
@@ -30,7 +29,6 @@ export default function RemindersPage(): JSX.Element {
   const [sortBy, setSortBy] = useState<'due_date' | 'priority' | 'created_date' | 'title'>('due_date');
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
-  const [popularTemplates, setPopularTemplates] = useState<ReminderTemplate[]>([]);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedReminderIds, setSelectedReminderIds] = useState<Set<string>>(new Set());
   const [displayLimit, setDisplayLimit] = useState(20); // Pagination: show 20 items initially
@@ -157,15 +155,13 @@ export default function RemindersPage(): JSX.Element {
 
     try {
       setLoading(true);
-      const [remindersData, statsData, userProgressResult, templatesData] = await Promise.all([
+      const [remindersData, statsData, userProgressResult] = await Promise.all([
         remindersService.getReminders(currentSpace.id),
         remindersService.getReminderStats(currentSpace.id),
         getUserProgress(user.id),
-        reminderTemplatesService.getPopularTemplates(currentSpace.id, 5),
       ]);
 
       setReminders(remindersData);
-      setPopularTemplates(templatesData);
 
       // Check if user has completed the guided reminder flow
       const userProgress = userProgressResult.success ? userProgressResult.data : null;
@@ -338,35 +334,6 @@ export default function RemindersPage(): JSX.Element {
     }
   }, [user]);
 
-  const handleQuickTemplateCreate = useCallback((template: ReminderTemplate) => {
-    if (!currentSpace || !user) return;
-
-    // Apply template with defaults to get pre-filled data
-    const reminderData = reminderTemplatesService.applyTemplate(template, {});
-
-    // Create a partial reminder object with template data (not saved yet)
-    const templateReminder: Partial<Reminder> = {
-      space_id: currentSpace.id,
-      title: reminderData.title,
-      description: reminderData.description,
-      emoji: reminderData.emoji,
-      category: reminderData.category as any,
-      priority: reminderData.priority as any,
-      reminder_time: reminderData.reminder_time,
-      repeat_pattern: reminderData.repeat_pattern,
-      repeat_days: reminderData.repeat_days,
-      status: 'active',
-    };
-
-    // Open modal with pre-filled template data
-    setEditingReminder(templateReminder as Reminder);
-    setIsModalOpen(true);
-
-    // Increment template usage (they clicked on it)
-    reminderTemplatesService.incrementUsage(template.id).catch((error) => {
-      console.error('Failed to increment template usage:', error);
-    });
-  }, [currentSpace, user]);
 
   const handleSelectionChange = useCallback((reminderId: string, selected: boolean) => {
     setSelectedReminderIds((prev) => {
@@ -556,60 +523,6 @@ export default function RemindersPage(): JSX.Element {
           </div>
           )}
 
-          {/* Popular Templates Quick Actions */}
-          {!showGuidedFlow && popularTemplates.length > 0 && (
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 border border-pink-200 dark:border-pink-800 rounded-xl p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Quick Templates
-                </h3>
-                <span className="px-2 py-0.5 bg-blue-200 dark:bg-blue-800 text-blue-700 dark:text-blue-300 text-xs font-medium rounded-full">
-                  Popular
-                </span>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                Quick start with pre-filled templates – customize before saving
-              </p>
-
-              {/* Mobile: Horizontal Scrolling | Desktop: Grid */}
-              <div className="relative">
-                {/* Scroll fade indicators - mobile only */}
-                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-blue-50 dark:from-blue-900/10 to-transparent pointer-events-none z-10 sm:hidden" />
-                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-blue-50 dark:from-blue-900/10 to-transparent pointer-events-none z-10 sm:hidden" />
-
-                <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-5 sm:overflow-x-visible">
-                  {popularTemplates.map((template) => (
-                    <button
-                      key={template.id}
-                      onClick={() => handleQuickTemplateCreate(template)}
-                      className="flex-none w-[240px] sm:w-auto snap-start flex flex-col items-start p-4 bg-white dark:bg-gray-800 border-2 border-pink-200 dark:border-pink-800 rounded-lg hover:shadow-lg hover:scale-105 transition-all text-left group min-h-[120px]"
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-2xl">{template.emoji}</span>
-                        <Zap className="w-4 h-4 text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white mb-1">
-                        {template.name}
-                      </h4>
-                      {template.description && (
-                        <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
-                          {template.description}
-                        </p>
-                      )}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Swipe hint - mobile only */}
-                {popularTemplates.length > 2 && (
-                  <div className="text-center mt-3 text-xs text-gray-500 dark:text-gray-400 sm:hidden">
-                    ← Swipe to see more →
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Search & Filter Bar - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
