@@ -115,40 +115,43 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // Add security headers with strengthened CSP
-  response.headers.set(
-    'Content-Security-Policy',
-    "default-src 'self'; " +
-    "script-src 'self' https://cdn.jsdelivr.net https://vercel.live; " +
-    "style-src 'self' https://cdn.jsdelivr.net; " +
-    "img-src 'self' data: https: blob:; " +
-    "font-src 'self' data: https:; " +
-    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live https://api.gemini.google.com https://*.ingest.sentry.io https://*.upstash.io; " +
-    "frame-ancestors 'none'; " +
-    "frame-src 'self' https://vercel.live; " +
-    "base-uri 'self'; " +
-    "form-action 'self'; " +
-    "object-src 'none';"
-  );
+  // Skip security headers in development to match next.config.mjs behavior
+  if (process.env.NODE_ENV !== 'development') {
+    // Add security headers with strengthened CSP for production only
+    response.headers.set(
+      'Content-Security-Policy',
+      "default-src 'self'; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://vercel.live; " +
+      "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
+      "img-src 'self' data: https: blob:; " +
+      "font-src 'self' data: https:; " +
+      "connect-src 'self' https: wss: data: https://*.supabase.co wss://*.supabase.co https://vercel.live https://api.gemini.google.com https://*.ingest.sentry.io https://*.upstash.io https://www.themealdb.com https://api.spoonacular.com https://api.edamam.com; " +
+      "frame-ancestors 'none'; " +
+      "frame-src 'self' https://vercel.live; " +
+      "base-uri 'self'; " +
+      "form-action 'self'; " +
+      "object-src 'none';"
+    );
 
-  response.headers.set(
-    'Strict-Transport-Security',
-    'max-age=31536000; includeSubDomains; preload'
-  );
+    response.headers.set(
+      'Strict-Transport-Security',
+      'max-age=31536000; includeSubDomains; preload'
+    );
 
-  response.headers.set('X-Frame-Options', 'DENY');
+    response.headers.set('X-Frame-Options', 'DENY');
 
-  response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('X-Content-Type-Options', 'nosniff');
 
-  response.headers.set(
-    'Referrer-Policy',
-    'strict-origin-when-cross-origin'
-  );
+    response.headers.set(
+      'Referrer-Policy',
+      'strict-origin-when-cross-origin'
+    );
 
-  response.headers.set(
-    'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=()'
-  );
+    response.headers.set(
+      'Permissions-Policy',
+      'camera=(), microphone=(), geolocation=()'
+    );
+  }
 
   return response;
 }
