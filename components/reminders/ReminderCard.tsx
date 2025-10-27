@@ -57,8 +57,12 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
     const nextIndex = (currentIndex + 1) % states.length;
     const nextStatus = states[nextIndex];
 
-    // Simple: just change status, no auto-deletion
     onStatusChange(reminder.id, nextStatus);
+
+    // Auto-delete completed reminders after 1 second
+    if (nextStatus === 'completed') {
+      setTimeout(() => onDelete(reminder.id), 1000);
+    }
   };
 
   return (
