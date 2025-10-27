@@ -42,9 +42,13 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
     return isoString.slice(0, 16);
   };
 
-  // Populate form when editing
+  // Reset form when modal opens or when switching between edit/create modes
   useEffect(() => {
+    // Only reset when modal is opened
+    if (!isOpen) return;
+
     if (editReminder) {
+      // Editing existing reminder - populate with existing data
       setFormData({
         space_id: spaceId,
         title: editReminder.title,
@@ -65,6 +69,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
         setSelectedMonthDays(editReminder.repeat_days);
       }
     } else {
+      // Creating new reminder - reset to clean state
       setFormData({
         space_id: spaceId,
         title: '',
@@ -79,8 +84,13 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
       setSelectedWeekdays([]);
       setSelectedMonthDays([]);
     }
+
+    // Reset other form state
     setDateError('');
-  }, [editReminder, spaceId]);
+    setShowEmojiPicker(false);
+    setShowTemplatePicker(false);
+    setAttachmentRefreshTrigger(prev => prev + 1);
+  }, [isOpen, editReminder, spaceId]);
 
   const handleSelectTemplate = (reminderData: Partial<CreateReminderInput>) => {
     // Populate form with template data
