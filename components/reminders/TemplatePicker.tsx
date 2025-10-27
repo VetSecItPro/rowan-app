@@ -165,7 +165,7 @@ export function TemplatePicker({ spaceId, onSelectTemplate, onClose }: TemplateP
                     type="text"
                     value={variables[varName]}
                     id="field-1"
-              onChange={(e) => 
+                    onChange={(e) =>
                       setVariables({ ...variables, [varName]: e.target.value })
                     }
                     placeholder={`Enter ${varName.toLowerCase()}...`}
@@ -190,7 +190,7 @@ export function TemplatePicker({ spaceId, onSelectTemplate, onClose }: TemplateP
                 type="datetime-local"
                 value={customTime}
                 id="field-2"
-              onChange={(e) =>  setCustomTime(e.target.value)}
+                onChange={(e) => setCustomTime(e.target.value)}
                 className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 dark:text-white"
               />
             </div>
