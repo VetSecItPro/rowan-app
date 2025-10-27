@@ -16,7 +16,7 @@ import { reminderTemplatesService, ReminderTemplate } from '@/lib/services/remin
 import { CTAButton } from '@/components/ui/EnhancedButton';
 
 export default function RemindersPage(): JSX.Element {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user, loading: authLoading } = useAuth();
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -144,7 +144,12 @@ export default function RemindersPage(): JSX.Element {
 
   // Stable reference to loadReminders
   const loadReminders = useCallback(async () => {
-    // Don't load data if user doesn't have a space yet
+    // Don't load data if auth is still loading
+    if (authLoading) {
+      return;
+    }
+
+    // Don't load data if user doesn't have a space yet (after auth has loaded)
     if (!currentSpace || !user) {
       setLoading(false);
       return;
@@ -181,7 +186,7 @@ export default function RemindersPage(): JSX.Element {
     } finally {
       setLoading(false);
     }
-  }, [currentSpace, user]);
+  }, [currentSpace, user, authLoading]);
 
   useEffect(() => {
     loadReminders();
@@ -193,16 +198,53 @@ export default function RemindersPage(): JSX.Element {
       // Check if we're updating an existing reminder (has an id) or creating a new one
       if (editingReminder && editingReminder.id) {
         await remindersService.updateReminder(editingReminder.id, reminderData);
+        loadReminders();
       } else {
-        // Create new reminder (even if editingReminder is set, if it has no id, it's new)
-        await remindersService.createReminder(reminderData);
+        // Create new reminder with optimistic update
+        const tempId = `temp_${Date.now()}_${Math.random()}`;
+        const optimisticReminder: Reminder = {
+          id: tempId,
+          ...reminderData,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          status: 'active',
+          // Add placeholder user data if not present
+          user: user ? {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            avatar_url: user.avatar_url
+          } : undefined,
+        };
+
+        // Optimistic update - add immediately to UI
+        setReminders(prevReminders => [optimisticReminder, ...prevReminders]);
+
+        try {
+          // Make the actual API call
+          const newReminder = await remindersService.createReminder(reminderData);
+
+          // Replace optimistic item with real one
+          setReminders(prevReminders =>
+            prevReminders.map(reminder =>
+              reminder.id === tempId ? newReminder : reminder
+            )
+          );
+        } catch (apiError) {
+          // Remove optimistic item on failure
+          setReminders(prevReminders =>
+            prevReminders.filter(reminder => reminder.id !== tempId)
+          );
+          throw apiError; // Re-throw to be caught by outer try/catch
+        }
       }
-      loadReminders();
       setEditingReminder(null);
     } catch (error) {
       console.error('Failed to save reminder:', error);
+      // Could add toast notification here for better UX
+      alert('Failed to save reminder. Please try again.');
     }
-  }, [editingReminder, loadReminders]);
+  }, [editingReminder, user]);
 
   // Memoized callback for status changes
   const handleStatusChange = useCallback(async (reminderId: string, status: string) => {
@@ -261,6 +303,7 @@ export default function RemindersPage(): JSX.Element {
 
   // Memoized callback for opening new reminder modal
   const handleOpenModal = useCallback(() => {
+    setEditingReminder(null); // Clear any previous reminder data
     setIsModalOpen(true);
   }, []);
 
@@ -696,7 +739,7 @@ export default function RemindersPage(): JSX.Element {
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => setPriorityFilter('all')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                        className={`w-20 px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center ${
                           priorityFilter === 'all'
                             ? 'bg-pink-500 text-white'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/20'
@@ -706,7 +749,7 @@ export default function RemindersPage(): JSX.Element {
                       </button>
                       <button
                         onClick={() => setPriorityFilter('urgent')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
+                        className={`w-24 px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-1 ${
                           priorityFilter === 'urgent'
                             ? 'bg-red-600 text-white'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/20'
@@ -716,7 +759,7 @@ export default function RemindersPage(): JSX.Element {
                       </button>
                       <button
                         onClick={() => setPriorityFilter('high')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
+                        className={`w-20 px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-1 ${
                           priorityFilter === 'high'
                             ? 'bg-orange-500 text-white'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900/20'
@@ -726,7 +769,7 @@ export default function RemindersPage(): JSX.Element {
                       </button>
                       <button
                         onClick={() => setPriorityFilter('medium')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
+                        className={`w-24 px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-1 ${
                           priorityFilter === 'medium'
                             ? 'bg-yellow-500 text-white'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-yellow-100 dark:hover:bg-yellow-900/20'
@@ -736,7 +779,7 @@ export default function RemindersPage(): JSX.Element {
                       </button>
                       <button
                         onClick={() => setPriorityFilter('low')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
+                        className={`w-16 px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-1 ${
                           priorityFilter === 'low'
                             ? 'bg-gray-500 text-white'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'

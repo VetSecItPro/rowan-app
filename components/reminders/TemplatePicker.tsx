@@ -158,7 +158,7 @@ export function TemplatePicker({ spaceId, onSelectTemplate, onClose }: TemplateP
               </p>
               {variableNames.map((varName) => (
                 <div key={varName}>
-                  <label htmlFor="field-1"className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                  <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                     {varName}
                   </label>
                   <input
@@ -183,7 +183,7 @@ export function TemplatePicker({ spaceId, onSelectTemplate, onClose }: TemplateP
           {/* Custom Time Input */}
           {selectedTemplate.reminder_type === 'time' && (
             <div>
-              <label htmlFor="field-2"className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Reminder Time
               </label>
               <input

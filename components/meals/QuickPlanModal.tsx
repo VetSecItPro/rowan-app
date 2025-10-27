@@ -81,7 +81,7 @@ export function QuickPlanModal({ isOpen, onClose, onPlan, recipeName }: QuickPla
 
           {/* Date Selection */}
           <div>
-            <label htmlFor="field-1"className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               When do you want this meal?
             </label>
             <input
@@ -96,7 +96,7 @@ export function QuickPlanModal({ isOpen, onClose, onPlan, recipeName }: QuickPla
 
           {/* Meal Type Selection */}
           <div>
-            <label htmlFor="field-2"className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
               Meal Type
             </label>
             <div className="grid grid-cols-2 gap-2">

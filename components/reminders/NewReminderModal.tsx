@@ -162,7 +162,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
       {/* Modal */}
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-between px-4 sm:px-6 py-4">
+        <div className="sticky top-0 z-10 bg-gradient-reminders flex items-center justify-between px-4 sm:px-6 py-4">
           <div className="flex items-center gap-3">
             <h2 className="text-lg sm:text-xl font-bold text-white">
               {editReminder ? 'Edit Reminder' : showTemplatePicker ? 'Choose Template' : 'Create New Reminder'}
@@ -426,7 +426,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                     }}
                     className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                       selectedWeekdays.includes(index)
-                        ? 'bg-blue-600 text-white shadow-lg'
+                        ? 'bg-pink-600 text-white shadow-lg'
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
@@ -457,7 +457,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                     }}
                     className={`px-2 py-2 rounded-lg text-sm font-medium transition-all ${
                       selectedMonthDays.includes(day)
-                        ? 'bg-blue-600 text-white shadow-lg'
+                        ? 'bg-pink-600 text-white shadow-lg'
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
@@ -480,8 +480,8 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
             <button
               type="submit"
               disabled={!!dateError}
-              className={`px-4 py-2 bg-blue-600 text-white rounded-lg transition-all shadow-lg ${
-                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
+              className={`px-4 py-2 bg-pink-600 text-white rounded-lg transition-all shadow-lg ${
+                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:bg-pink-700'
               }`}
             >
               {editReminder ? 'Save Changes' : 'Create Reminder'}

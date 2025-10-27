@@ -209,7 +209,7 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
               onChange={setNewCommentContent}
               spaceId={spaceId}
               placeholder="Write a comment... Type @ to mention someone"
-              className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-pink-500 resize-none"
+              className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 resize-none"
               rows={2}
               maxLength={5000}
               disabled={submitting}
@@ -225,7 +225,7 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
           <button
             type="submit"
             disabled={!newCommentContent.trim() || submitting}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Send className="w-4 h-4" />
             {submitting ? 'Posting...' : 'Post'}
@@ -362,7 +362,7 @@ function CommentItem({
                 <button
                   onClick={onUpdate}
                   disabled={!editContent.trim()}
-                  className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-3 py-1 text-sm bg-pink-600 text-white rounded hover:bg-pink-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Save
                 </button>
