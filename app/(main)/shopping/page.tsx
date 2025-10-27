@@ -16,6 +16,8 @@ import GuidedShoppingCreation from '@/components/guided/GuidedShoppingCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { shoppingService, ShoppingList, CreateListInput } from '@/lib/services/shopping-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
+import { calendarService } from '@/lib/services/calendar-service';
+import { remindersService } from '@/lib/services/reminders-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 
 export default function ShoppingPage() {
@@ -504,16 +506,22 @@ export default function ShoppingPage() {
     duration: number;
     reminderMinutes?: number;
   }) => {
-    if (!currentSpace || !listToSchedule) return;
+    if (!currentSpace || !listToSchedule) {
+      console.error('Missing required data: currentSpace or listToSchedule');
+      alert('Unable to schedule trip. Please try again.');
+      return;
+    }
 
     try {
-      // First, create the calendar event
-      const { calendarService } = await import('@/lib/services/calendar-service');
+      console.log('Starting trip scheduling...', { eventData, listId: listToSchedule.id });
 
       // Combine date and time into a proper datetime
       const startDateTime = new Date(`${eventData.date}T${eventData.time}`);
       const endDateTime = new Date(startDateTime.getTime() + eventData.duration * 60000);
 
+      console.log('Creating calendar event...');
+
+      // First, create the calendar event
       const calendarEvent = await calendarService.createEvent({
         space_id: currentSpace.id,
         title: eventData.title,
@@ -524,14 +532,17 @@ export default function ShoppingPage() {
         location: listToSchedule.store_name || undefined,
       });
 
+      console.log('Calendar event created:', calendarEvent.id);
+
       // Create a reminder if reminderMinutes is specified
+      let reminder = null;
       if (eventData.reminderMinutes && eventData.reminderMinutes > 0) {
-        const { remindersService } = await import('@/lib/services/reminders-service');
+        console.log('Creating reminder...');
 
         // Calculate reminder time (event start time minus reminder minutes)
         const reminderTime = new Date(startDateTime.getTime() - eventData.reminderMinutes * 60000);
 
-        const reminder = await remindersService.createReminder({
+        reminder = await remindersService.createReminder({
           space_id: currentSpace.id,
           title: `Shopping Trip: ${listToSchedule.title}`,
           description: `Reminder for shopping trip${listToSchedule.store_name ? ` at ${listToSchedule.store_name}` : ''}`,
@@ -544,6 +555,8 @@ export default function ShoppingPage() {
           status: 'active',
         });
 
+        console.log('Reminder created:', reminder.id);
+
         // Link the reminder to the shopping list
         await shoppingIntegrationService.linkToReminder(
           reminder.id,
@@ -551,14 +564,19 @@ export default function ShoppingPage() {
           undefined,
           'time'
         );
+
+        console.log('Reminder linked to shopping list');
       }
 
       // Link the shopping list to the calendar event
+      console.log('Linking calendar event to shopping list...');
       await shoppingIntegrationService.linkToCalendar(
         listToSchedule.id,
         calendarEvent.id,
         eventData.reminderMinutes
       );
+
+      console.log('Trip scheduling completed successfully');
 
       // Show success message
       alert(`Shopping trip scheduled for ${eventData.date} at ${eventData.time}!`);
@@ -566,6 +584,15 @@ export default function ShoppingPage() {
       setListToSchedule(null);
     } catch (error) {
       console.error('Failed to schedule trip:', error);
+      let errorMessage = 'Failed to schedule shopping trip. ';
+
+      if (error instanceof Error) {
+        errorMessage += error.message;
+      } else {
+        errorMessage += 'Please try again.';
+      }
+
+      alert(errorMessage);
       throw error;
     }
   }, [currentSpace, listToSchedule]);
