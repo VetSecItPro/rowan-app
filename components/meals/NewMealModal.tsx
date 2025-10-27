@@ -160,7 +160,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
             )}
           </div>
           <div className="relative">
-            <label htmlFor="field-2"className="block text-sm font-medium mb-2 text-gray-900 dark:text-white cursor-pointer">Recipe (Optional)</label>
+            <label htmlFor="field-2" className="block text-sm font-medium mb-2 text-gray-900 dark:text-white cursor-pointer">Recipe (Optional)</label>
             <button
               type="button"
               onClick={() => setIsRecipeSelectorOpen(!isRecipeSelectorOpen)}
@@ -347,7 +347,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
             </div>
           )}
           <div>
-            <label htmlFor="field-4"className="block text-sm font-medium mb-2 text-gray-900 dark:text-white cursor-pointer">Meal Name (Optional)</label>
+            <label htmlFor="field-4" className="block text-sm font-medium mb-2 text-gray-900 dark:text-white cursor-pointer">Meal Name (Optional)</label>
             <input
               type="text"
               placeholder="e.g., Family Dinner, Quick Lunch"
@@ -358,12 +358,12 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
             />
           </div>
           <div>
-            <label htmlFor="field-5"className="block text-sm font-medium mb-2 text-gray-900 dark:text-white cursor-pointer">Date *</label>
+            <label htmlFor="field-5" className="block text-sm font-medium mb-2 text-gray-900 dark:text-white cursor-pointer">Date *</label>
             <input type="date" required value={formData.scheduled_date} id="field-5"
               onChange={(e) =>  setFormData({ ...formData, scheduled_date: e.target.value })} className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white" />
           </div>
           <div>
-            <label htmlFor="field-6"className="block text-sm font-medium mb-2 cursor-pointer">Notes</label>
+            <label htmlFor="field-6" className="block text-sm font-medium mb-2 cursor-pointer">Notes</label>
             <textarea value={formData.notes} id="field-6"
               onChange={(e) =>  setFormData({ ...formData, notes: e.target.value })} rows={3} className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white resize-none" />
           </div>

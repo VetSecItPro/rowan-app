@@ -649,15 +649,15 @@ export default function ShoppingPage() {
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-shopping flex items-center justify-center">
+              <div className="w-12 h-12 rounded-lg bg-emerald-500 flex items-center justify-center">
                 <ShoppingCart className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-shopping bg-clip-text text-transparent">Shopping Lists</h1>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">Shopping Lists</h1>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">Collaborative shopping made easy</p>
               </div>
             </div>
-            <button onClick={handleOpenNewListModal} className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 shimmer-shopping text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2">
+            <button onClick={handleOpenNewListModal} className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2">
               <Plus className="w-5 h-5" />
               New List
             </button>
@@ -676,11 +676,11 @@ export default function ShoppingPage() {
           <div className="stats-grid-mobile gap-4 sm:gap-6">
             <button
               onClick={handleItemsThisWeekClick}
-              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Items This Week</h3>
-                <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center"><Package className="w-6 h-6 text-white" /></div>
+                <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center"><Package className="w-5 h-5 text-white" /></div>
               </div>
               <div className="flex items-end justify-between">
                 <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.itemsThisWeek}</p>
@@ -694,11 +694,11 @@ export default function ShoppingPage() {
             </button>
             <button
               onClick={handleActiveListsClick}
-              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Active Lists</h3>
-                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center"><Clock className="w-6 h-6 text-white" /></div>
+                <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center"><Clock className="w-5 h-5 text-white" /></div>
               </div>
               <div className="flex items-end justify-between">
                 <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.activeLists}</p>
@@ -712,11 +712,11 @@ export default function ShoppingPage() {
             </button>
             <button
               onClick={handleCompletedListsClick}
-              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completed Lists</h3>
-                <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"><CheckCircle2 className="w-6 h-6 text-white" /></div>
+                <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center"><CheckCircle2 className="w-5 h-5 text-white" /></div>
               </div>
               <div className="flex items-end justify-between">
                 <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.completedLists}</p>
@@ -737,11 +737,11 @@ export default function ShoppingPage() {
             </button>
             <button
               onClick={handleTotalListsClick}
-              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Lists</h3>
-                <div className="w-12 h-12 bg-gradient-shopping rounded-xl flex items-center justify-center"><List className="w-6 h-6 text-white" /></div>
+                <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center"><List className="w-5 h-5 text-white" /></div>
               </div>
               <div className="flex items-end justify-between">
                 <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.totalLists}</p>
@@ -811,43 +811,43 @@ export default function ShoppingPage() {
               </div>
 
               {/* Status Filter - Segmented Buttons */}
-              <div className="bg-gray-50 dark:bg-gray-900 border-2 border-emerald-200 dark:border-emerald-700 rounded-lg p-1 flex gap-1 w-fit">
+              <div className="bg-gray-50 dark:bg-gray-900 border border-purple-200 dark:border-purple-700 rounded-lg p-1 flex gap-1 w-fit">
                 <button
                   onClick={() => { setStatusFilter('all'); setTimeFilter('all'); }}
-                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
+                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-colors whitespace-nowrap min-w-[60px] ${
                     statusFilter === 'all' && timeFilter === 'all'
-                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
+                      ? 'bg-emerald-500 text-white'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                 >
                   All
                 </button>
                 <button
                   onClick={() => { setTimeFilter('week'); }}
-                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[80px] ${
+                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-colors whitespace-nowrap min-w-[80px] ${
                     timeFilter === 'week'
-                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
+                      ? 'bg-emerald-500 text-white'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                 >
                   This Week
                 </button>
                 <button
                   onClick={() => { setStatusFilter('active'); setTimeFilter('all'); }}
-                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
+                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-colors whitespace-nowrap min-w-[60px] ${
                     statusFilter === 'active' && timeFilter === 'all'
-                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
+                      ? 'bg-emerald-500 text-white'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                 >
                   Active
                 </button>
                 <button
                   onClick={() => { setStatusFilter('completed'); setTimeFilter('all'); }}
-                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[80px] ${
+                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-colors whitespace-nowrap min-w-[80px] ${
                     statusFilter === 'completed' && timeFilter === 'all'
-                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
+                      ? 'bg-emerald-500 text-white'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                 >
                   Completed
@@ -880,7 +880,7 @@ export default function ShoppingPage() {
                 <p className="text-gray-500 dark:text-gray-500 mb-6">{searchQuery || statusFilter !== 'active' ? 'Try adjusting your filters' : 'Create your first shopping list!'}</p>
                 {!searchQuery && statusFilter === 'active' && (
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <button onClick={handleOpenNewListModal} className="btn-touch shimmer-shopping text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2">
+                    <button onClick={handleOpenNewListModal} className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors inline-flex items-center gap-2">
                       <Plus className="w-5 h-5" />
                       Create List
                     </button>
