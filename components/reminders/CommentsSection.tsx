@@ -55,12 +55,15 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
           table: 'reminder_comments',
           filter: `reminder_id=eq.${reminderId}`,
         },
-        () => {
-          // Refresh comments when changes occur
-          fetchComments();
+        (payload) => {
+          console.log('Real-time comment update:', payload);
+          // Refresh comments when changes occur, but debounce to avoid excessive calls
+          setTimeout(() => fetchComments(), 100);
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Comment subscription status:', status);
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -72,17 +75,50 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
     e.preventDefault();
     if (!user || !newCommentContent.trim()) return;
 
+    const tempComment: ReminderComment = {
+      id: `temp-${Date.now()}`,
+      reminder_id: reminderId,
+      user_id: user.id,
+      content: newCommentContent.trim(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        avatar_url: user.avatar_url,
+      },
+    };
+
     try {
       setSubmitting(true);
-      await reminderCommentsService.createComment({
+
+      // Optimistic update: Add comment immediately to UI
+      setComments(prev => [...prev, tempComment]);
+      setNewCommentContent('');
+
+      // Create comment in database
+      const newComment = await reminderCommentsService.createComment({
         reminder_id: reminderId,
         user_id: user.id,
-        content: newCommentContent.trim(),
+        content: tempComment.content,
       });
-      setNewCommentContent('');
-      // Comments will update via real-time subscription
+
+      // Replace temp comment with real comment from database
+      setComments(prev =>
+        prev.map(c => c.id === tempComment.id ? newComment : c)
+      );
+
+      // Force refresh comments as backup (in case real-time subscription fails)
+      setTimeout(() => fetchComments(), 1000);
+
     } catch (error) {
       console.error('Error creating comment:', error);
+
+      // Remove temp comment on error
+      setComments(prev => prev.filter(c => c.id !== tempComment.id));
+      setNewCommentContent(tempComment.content); // Restore content for retry
+
       alert('Failed to post comment. Please try again.');
     } finally {
       setSubmitting(false);
