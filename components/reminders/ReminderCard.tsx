@@ -1,6 +1,6 @@
 'use client';
 
-import { Clock, Flag, MoreVertical, Timer, Check, Edit, Trash2 } from 'lucide-react';
+import { Clock, Flag, MoreVertical, Timer, Check, Edit, Trash2, ChevronDown, ChevronUp, MessageCircle, Activity, Paperclip } from 'lucide-react';
 import { Reminder } from '@/lib/services/reminders-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
@@ -43,6 +43,9 @@ const categoryConfig = {
 export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSnooze, selectionMode, selected, onSelectionChange }: ReminderCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showSnoozeMenu, setShowSnoozeMenu] = useState(false);
+  const [showAttachments, setShowAttachments] = useState(false);
+  const [showActivity, setShowActivity] = useState(false);
+  const [showComments, setShowComments] = useState(false);
 
   const isOverdue = reminder.reminder_time && new Date(reminder.reminder_time) < new Date() && reminder.status === 'active';
   const priorityColor = priorityColors[reminder.priority as keyof typeof priorityColors] || 'bg-gray-500';
@@ -247,19 +250,61 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
         </div>
       )}
 
-      {/* Attachments */}
-      <div className="mt-4">
-        <AttachmentList reminderId={reminder.id} />
-      </div>
+      {/* Collapsible Sections */}
+      <div className="mt-4 space-y-2">
+        {/* Attachments Toggle */}
+        <button
+          onClick={() => setShowAttachments(!showAttachments)}
+          className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-left"
+        >
+          <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Paperclip className="w-4 h-4" />
+            <span>Attachments</span>
+          </div>
+          {showAttachments ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        </button>
 
-      {/* Activity Timeline */}
-      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <ActivityTimeline reminderId={reminder.id} />
-      </div>
+        {showAttachments && (
+          <div className="animate-in slide-in-from-top-2 duration-200">
+            <AttachmentList reminderId={reminder.id} />
+          </div>
+        )}
 
-      {/* Comments Section */}
-      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <CommentsSection reminderId={reminder.id} spaceId={reminder.space_id} />
+        {/* Activity Timeline Toggle */}
+        <button
+          onClick={() => setShowActivity(!showActivity)}
+          className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-left"
+        >
+          <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Activity className="w-4 h-4" />
+            <span>Activity Timeline</span>
+          </div>
+          {showActivity ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        </button>
+
+        {showActivity && (
+          <div className="animate-in slide-in-from-top-2 duration-200">
+            <ActivityTimeline reminderId={reminder.id} />
+          </div>
+        )}
+
+        {/* Comments Section Toggle */}
+        <button
+          onClick={() => setShowComments(!showComments)}
+          className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-left"
+        >
+          <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <MessageCircle className="w-4 h-4" />
+            <span>Comments</span>
+          </div>
+          {showComments ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        </button>
+
+        {showComments && (
+          <div className="animate-in slide-in-from-top-2 duration-200">
+            <CommentsSection reminderId={reminder.id} spaceId={reminder.space_id} />
+          </div>
+        )}
       </div>
     </div>
   );
