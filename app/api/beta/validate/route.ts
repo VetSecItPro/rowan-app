@@ -1,0 +1,123 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import * as Sentry from '@sentry/nextjs';
+import { extractIP } from '@/lib/ratelimit-fallback';
+
+const BETA_PASSWORD = 'RowanApp2025&$&$&$';
+const MAX_BETA_USERS = 30;
+
+/**
+ * POST /api/beta/validate
+ * Validate beta password and check user capacity
+ */
+export async function POST(req: NextRequest) {
+  try {
+    // Rate limiting with automatic fallback
+    const ip = extractIP(req.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+
+    if (!rateLimitSuccess) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
+    // Parse request body
+    const body = await req.json();
+    const { password } = body;
+
+    if (!password) {
+      return NextResponse.json(
+        { error: 'Password is required' },
+        { status: 400 }
+      );
+    }
+
+    // Create Supabase client with service role for public access
+    const supabase = createClient();
+
+    // Log the beta access attempt
+    const { error: logError } = await supabase
+      .from('beta_access_requests')
+      .insert({
+        email: null, // Will be filled when user actually signs up
+        password_attempt: password,
+        ip_address: ip,
+        user_agent: req.headers.get('user-agent') || null,
+        access_granted: password === BETA_PASSWORD,
+        created_at: new Date().toISOString(),
+      });
+
+    if (logError) {
+      console.error('Failed to log beta access attempt:', logError);
+    }
+
+    // Check password
+    if (password !== BETA_PASSWORD) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid beta password. Please check with your invitation source.'
+        },
+        { status: 401 }
+      );
+    }
+
+    // Check current beta user count
+    const { count: betaUserCount, error: countError } = await supabase
+      .from('beta_access_requests')
+      .select('*', { count: 'exact', head: true })
+      .eq('access_granted', true)
+      .not('user_id', 'is', null);
+
+    if (countError) {
+      throw new Error(`Failed to check beta user count: ${countError.message}`);
+    }
+
+    // Check if we've reached capacity
+    if (betaUserCount !== null && betaUserCount >= MAX_BETA_USERS) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Beta program is currently at capacity (${MAX_BETA_USERS} users). Join our launch notification list to be notified when we open more spots!`,
+          at_capacity: true
+        },
+        { status: 403 }
+      );
+    }
+
+    // Increment daily analytics for beta requests
+    const today = new Date().toISOString().split('T')[0];
+    const { error: analyticsError } = await supabase
+      .rpc('increment_beta_requests', { target_date: today });
+
+    if (analyticsError) {
+      console.error('Failed to update analytics:', analyticsError);
+    }
+
+    // Success response
+    return NextResponse.json({
+      success: true,
+      message: `Welcome to Rowan Beta! You're user ${(betaUserCount || 0) + 1} of ${MAX_BETA_USERS}.`,
+      slots_remaining: MAX_BETA_USERS - (betaUserCount || 0) - 1,
+    });
+
+  } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        endpoint: '/api/beta/validate',
+        method: 'POST',
+      },
+      extra: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+    console.error('[API] /api/beta/validate POST error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
