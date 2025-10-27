@@ -1,16 +1,41 @@
 'use client';
 
+import { useState } from 'react';
 import { CheckSquare, Calendar, Bell, MessageCircle, ShoppingCart, UtensilsCrossed, Home, Target } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { HamburgerMenu } from '@/components/navigation/HamburgerMenu';
 import { FeatureCard } from '@/components/home/FeatureCard';
+import { BetaAccessModal } from '@/components/beta/BetaAccessModal';
+import { LaunchNotificationModal } from '@/components/beta/LaunchNotificationModal';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
 export default function HomePage() {
+  const router = useRouter();
+  const [isBetaModalOpen, setIsBetaModalOpen] = useState(false);
+  const [isLaunchModalOpen, setIsLaunchModalOpen] = useState(false);
+
+  const handleBetaSuccess = () => {
+    // On successful beta access, redirect to signup
+    router.push('/signup?beta=true');
+  };
+
+  const handleBetaModalClose = () => {
+    setIsBetaModalOpen(false);
+  };
+
+  const handleLaunchModalClose = () => {
+    setIsLaunchModalOpen(false);
+  };
+
+  const handleSwitchToLaunch = () => {
+    setIsBetaModalOpen(false);
+    setIsLaunchModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -29,17 +54,10 @@ export default function HomePage() {
               <span className="text-2xl font-semibold gradient-text">Rowan</span>
             </Link>
 
-            {/* Menu, Theme Toggle & Auth Buttons */}
+            {/* Theme Toggle & Pricing */}
             <div className="flex items-center gap-4">
               <a href="#pricing" className="hidden md:block inline-block py-3 px-4 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Pricing</a>
-              <HamburgerMenu />
               <ThemeToggle />
-              <Link
-                href="/login"
-                className="px-6 py-2 shimmer-bg text-white rounded-full hover:opacity-90 transition-all shadow-lg shadow-purple-500/30"
-              >
-                Login
-              </Link>
             </div>
           </div>
         </div>
@@ -70,13 +88,19 @@ export default function HomePage() {
           Collaborative life management for couples and families
         </p>
 
-        <div className="flex items-center justify-center">
-          <Link
-            href="/signup"
-            className="px-8 py-4 shimmer-bg text-white rounded-full font-semibold hover:opacity-90 transition-all shadow-xl shadow-purple-500/50"
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <button
+            onClick={() => setIsBetaModalOpen(true)}
+            className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-semibold transition-all shadow-xl shadow-blue-500/50"
           >
-            Create Your Account
-          </Link>
+            Access for Beta Test
+          </button>
+          <button
+            onClick={() => setIsLaunchModalOpen(true)}
+            className="px-8 py-4 bg-green-600 hover:bg-green-700 text-white rounded-full font-semibold transition-all shadow-xl shadow-green-500/50"
+          >
+            Get Notified on Launch
+          </button>
         </div>
       </section>
 
@@ -179,6 +203,20 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* Beta Access Modal */}
+      <BetaAccessModal
+        isOpen={isBetaModalOpen}
+        onClose={handleBetaModalClose}
+        onSuccess={handleBetaSuccess}
+        onSwitchToLaunch={handleSwitchToLaunch}
+      />
+
+      {/* Launch Notification Modal */}
+      <LaunchNotificationModal
+        isOpen={isLaunchModalOpen}
+        onClose={handleLaunchModalClose}
+      />
     </div>
   );
 }
