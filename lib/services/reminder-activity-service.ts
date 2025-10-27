@@ -100,7 +100,7 @@ export const reminderActivityService = {
 
     // Insert activity log
     const { data, error } = await supabase
-      .from('reminder_activity')
+      .from('reminder_activities')
       .insert({
         reminder_id: validated.reminder_id,
         user_id: validated.user_id,
@@ -131,7 +131,7 @@ export const reminderActivityService = {
 
     // Security: RLS will enforce space membership
     let query = supabase
-      .from('reminder_activity')
+      .from('reminder_activities')
       .select(`
         *,
         user:user_id (
