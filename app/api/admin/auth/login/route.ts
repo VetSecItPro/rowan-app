@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import { cookies } from 'next/headers';
+import { safeCookies } from '@/lib/utils/safe-cookies';
 import { randomBytes, createHash } from 'crypto';
 
 const ADMIN_SESSION_DURATION = 24 * 60 * 60; // 24 hours in seconds
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
     const sessionPayload = Buffer.from(JSON.stringify(sessionData)).toString('base64');
 
     // Set admin session cookie
-    const cookieStore = cookies();
+    const cookieStore = safeCookies();
     cookieStore.set('admin-session', sessionPayload, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

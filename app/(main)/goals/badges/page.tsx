@@ -3,6 +3,9 @@ import { createClient } from '@/lib/supabase/server';
 import BadgeCollection from '@/components/goals/badges/BadgeCollection';
 import Link from 'next/link';
 
+// Force dynamic rendering to prevent useContext errors during static generation
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Achievement Badges - Rowan',
   description: 'Track your achievement badges and progress',

@@ -15,14 +15,12 @@ export async function POST(request: NextRequest) {
       { createClient },
       { authRateLimit },
       { extractIP },
-      { z },
-      DOMPurify
+      { z }
     ] = await Promise.all([
       import('@/lib/supabase/server'),
       import('@/lib/ratelimit'),
       import('@/lib/ratelimit-fallback'),
-      import('zod'),
-      import('isomorphic-dompurify')
+      import('zod')
     ]);
 
     // Create validation schema at runtime
@@ -96,16 +94,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validated = SignUpSchema.parse(body);
 
-    // Sanitize profile data to prevent XSS
+    // Simple text sanitization to prevent XSS (avoid DOMPurify during build)
+    const stripTags = (str: string) => str.replace(/<[^>]*>/g, '').trim();
+
     const sanitizedProfile = {
       ...validated.profile,
-      name: DOMPurify.default.sanitize(validated.profile.name, { ALLOWED_TAGS: [] }),
-      pronouns: validated.profile.pronouns
-        ? DOMPurify.default.sanitize(validated.profile.pronouns, { ALLOWED_TAGS: [] })
-        : undefined,
-      space_name: validated.profile.space_name
-        ? DOMPurify.default.sanitize(validated.profile.space_name, { ALLOWED_TAGS: [] })
-        : undefined,
+      name: stripTags(validated.profile.name),
+      pronouns: validated.profile.pronouns ? stripTags(validated.profile.pronouns) : undefined,
+      space_name: validated.profile.space_name ? stripTags(validated.profile.space_name) : undefined,
     };
 
     // Create Supabase client (runtime only)
