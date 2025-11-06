@@ -19,8 +19,13 @@ export const createClient = () => {
   try {
     cookieStore = cookies();
   } catch (error) {
-    // During build time or when cookies() is not available
-    throw new Error('Cannot access cookies during build time');
+    // During build time, provide a mock cookie store
+    console.warn('Cookies not available during build time, using mock store');
+    cookieStore = {
+      get: () => undefined,
+      set: () => {},
+      delete: () => {}
+    };
   }
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
