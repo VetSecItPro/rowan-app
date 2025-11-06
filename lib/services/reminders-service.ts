@@ -6,11 +6,11 @@ export interface Reminder {
   title: string;
   description?: string;
   emoji?: string;
-  category: 'bills' | 'health' | 'work' | 'personal' | 'household';
+  category?: 'bills' | 'health' | 'work' | 'personal' | 'household';
   reminder_type?: 'time' | 'location';
   reminder_time?: string;
   location?: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
   status: 'active' | 'completed' | 'snoozed';
   snooze_until?: string;
   snoozed_by?: string; // User ID who snoozed this reminder
@@ -33,6 +33,12 @@ export interface Reminder {
   created_at: string;
   updated_at: string;
   completed_at?: string;
+  user?: {
+    id: string;
+    name?: string;
+    email?: string;
+    avatar_url?: string;
+  };
 }
 
 export interface CreateReminderInput {

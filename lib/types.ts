@@ -221,6 +221,12 @@ export interface Reminder {
   completed_at?: string;
   created_at: string;
   updated_at: string;
+  user?: {
+    id: string;
+    name?: string;
+    email?: string;
+    avatar_url?: string;
+  };
 }
 
 // =============================================

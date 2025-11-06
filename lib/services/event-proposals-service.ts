@@ -75,10 +75,7 @@ export const eventProposalsService = {
         time_slots: input.time_slots,
         status: 'pending'
       }])
-      .select(`
-        *,
-        proposer:auth.users!event_proposals_proposed_by_fkey(id, email, raw_user_meta_data)
-      `)
+      .select('*')
       .single();
 
     if (error) throw error;
@@ -97,10 +94,7 @@ export const eventProposalsService = {
 
     let query = supabase
       .from('event_proposals')
-      .select(`
-        *,
-        proposer:auth.users!event_proposals_proposed_by_fkey(id, email, raw_user_meta_data)
-      `)
+      .select('*')
       .eq('space_id', spaceId)
       .order('created_at', { ascending: false });
 
@@ -131,10 +125,7 @@ export const eventProposalsService = {
 
     const { data, error } = await supabase
       .from('event_proposals')
-      .select(`
-        *,
-        proposer:auth.users!event_proposals_proposed_by_fkey(id, email, raw_user_meta_data)
-      `)
+      .select('*')
       .eq('id', proposalId)
       .single();
 
@@ -166,10 +157,7 @@ export const eventProposalsService = {
       }], {
         onConflict: 'proposal_id,time_slot_index,user_id'
       })
-      .select(`
-        *,
-        user:auth.users(id, email, raw_user_meta_data)
-      `)
+      .select('*')
       .single();
 
     if (error) throw error;
@@ -185,10 +173,7 @@ export const eventProposalsService = {
 
     const { data, error } = await supabase
       .from('event_proposal_votes')
-      .select(`
-        *,
-        user:auth.users(id, email, raw_user_meta_data)
-      `)
+      .select('*')
       .eq('proposal_id', proposalId)
       .order('created_at', { ascending: false });
 
@@ -275,10 +260,7 @@ export const eventProposalsService = {
         approved_slot_index: selectedSlotIndex
       })
       .eq('id', proposalId)
-      .select(`
-        *,
-        proposer:auth.users!event_proposals_proposed_by_fkey(id, email, raw_user_meta_data)
-      `)
+      .select('*')
       .single();
 
     if (updateError) throw updateError;
@@ -307,10 +289,7 @@ export const eventProposalsService = {
       .from('event_proposals')
       .update({ status: 'rejected' })
       .eq('id', proposalId)
-      .select(`
-        *,
-        proposer:auth.users!event_proposals_proposed_by_fkey(id, email, raw_user_meta_data)
-      `)
+      .select('*')
       .single();
 
     if (error) throw error;
@@ -341,10 +320,7 @@ export const eventProposalsService = {
         status: 'pending',
         counter_proposal_id: originalProposalId
       }])
-      .select(`
-        *,
-        proposer:auth.users!event_proposals_proposed_by_fkey(id, email, raw_user_meta_data)
-      `)
+      .select('*')
       .single();
 
     if (error) throw error;
