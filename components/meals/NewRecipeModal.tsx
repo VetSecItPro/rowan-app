@@ -312,7 +312,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
             <h2 className="text-lg sm:text-xl font-bold text-white">
               {editRecipe ? 'Edit Recipe' : 'Create New Recipe'}
             </h2>
-            <button onClick={onClose} aria-label="Close modal" className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-orange-700 transition-all active-press hover-lift">
+            <button onClick={onClose} aria-label="Close modal" className="p-2 flex items-center justify-center hover:opacity-75 transition-opacity">
               <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
             </button>
           </div>
@@ -326,7 +326,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
               <div className="inline-flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700">
                 <button
                   onClick={() => setActiveTab('manual')}
-                  className={`btn-touch px-4 py-2 rounded-lg flex items-center gap-2 transition-all font-medium text-sm min-w-[130px] hover-lift active-press ${
+                  className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all font-medium text-sm min-w-[130px] ${
                     activeTab === 'manual'
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
@@ -337,7 +337,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                 </button>
                 <button
                   onClick={() => setActiveTab('ai')}
-                  className={`btn-touch px-4 py-2 rounded-lg flex items-center gap-2 transition-all font-medium text-sm min-w-[130px] hover-lift active-press ${
+                  className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all font-medium text-sm min-w-[130px] ${
                     activeTab === 'ai'
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
@@ -803,11 +803,11 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                 <button
                   type="button"
                   onClick={onClose}
-                  className="btn-touch px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 active-press hover-lift"
+                  className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn-touch px-6 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg shimmer-orange hover-lift active-press">
+                <button type="submit" className="px-6 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg transition-all">
                   {editRecipe ? 'Save' : 'Create'}
                 </button>
               </div>

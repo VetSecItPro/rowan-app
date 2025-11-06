@@ -21,7 +21,7 @@ type ModalMode = 'create' | 'quickEdit';
 interface UnifiedItemModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (item: CreateTaskInput | CreateChoreInput) => void | Promise<void>;
+  onSave: (item: CreateTaskInput | CreateChoreInput) => void | Promise<void> | Promise<{ id: string }>;
   editItem?: (Task & { type?: 'task' }) | (Chore & { type?: 'chore' }) | null;
   spaceId: string;
   userId?: string;

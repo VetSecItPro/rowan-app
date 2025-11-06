@@ -15,13 +15,14 @@ export default function CalendarFeaturePage() {
           </div>
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-            Shared Calendar
+            Family Calendar
           </h1>
 
           <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Keep everyone in sync with a beautiful, collaborative calendar built for families and couples.
+            Share events and schedules with your space members. Create calendar events that everyone can see, with real-time updates and automatic reminders.
           </p>
         </div>
+
 
         {/* Key Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
@@ -96,54 +97,54 @@ export default function CalendarFeaturePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Perfect for every occasion
+              How you might use calendar
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400">
-              From daily routines to special celebrations
+              Common ways to organize family schedules
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Daily Scheduling</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Family Activities</h3>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400">
                 <li className="flex items-start gap-3">
-                  <Bell className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                  <span>Coordinate pickup and drop-off times</span>
+                  <Calendar className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
+                  <span>School events and parent conferences</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Bell className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                  <span>Track kids&apos; activities and practice schedules</span>
+                  <Calendar className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
+                  <span>Sports practices and games</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Bell className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                  <span>Plan date nights and family time</span>
+                  <Calendar className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
+                  <span>Music lessons and recitals</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Bell className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                  <span>Manage work schedules and meetings</span>
+                  <Calendar className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
+                  <span>Family gatherings and celebrations</span>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Special Events</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Personal & Work</h3>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400">
                 <li className="flex items-start gap-3">
-                  <Bell className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
-                  <span>Plan birthdays and anniversaries together</span>
+                  <Calendar className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
+                  <span>Medical and dental appointments</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Bell className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
-                  <span>Organize holiday celebrations and gatherings</span>
+                  <Calendar className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
+                  <span>Work meetings and travel</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Bell className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
-                  <span>Track important medical appointments</span>
+                  <Calendar className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
+                  <span>Date nights and social plans</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Bell className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
-                  <span>Remember school events and deadlines</span>
+                  <Calendar className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
+                  <span>Vacation planning and travel</span>
                 </li>
               </ul>
             </div>
@@ -151,29 +152,33 @@ export default function CalendarFeaturePage() {
         </div>
       </section>
 
+
       {/* CTA Section */}
       <section className="bg-gradient-to-r from-purple-600 to-blue-600 py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-5xl font-bold text-white mb-6">
-            Never miss a moment
+            Interested in trying Rowan?
           </h2>
-          <p className="text-xl text-blue-100 mb-10">
-            Join families staying organized and connected together
+          <p className="text-xl text-blue-100 mb-8">
+            We're currently developing Rowan's calendar features
           </p>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/signup"
-              className="px-8 py-4 shimmer-bg text-white rounded-full font-semibold hover:opacity-90 transition-all shadow-xl shadow-purple-500/50"
+              href="/"
+              className="px-8 py-4 bg-white text-purple-600 rounded-full font-semibold hover:bg-blue-50 transition-all shadow-xl text-lg"
             >
-              Create Your Account
+              Request Beta Access
             </Link>
             <Link
               href="/"
-              className="px-8 py-4 bg-purple-700 text-white rounded-full font-bold text-lg hover:bg-purple-800 transition-all"
+              className="px-8 py-4 bg-purple-700/50 border border-purple-400 text-white rounded-full font-semibold hover:bg-purple-600/50 transition-all text-lg"
             >
-              Learn More
+              Get Notified When Ready
             </Link>
           </div>
+          <p className="text-blue-200 text-sm mt-6">
+            Currently in development
+          </p>
         </div>
       </section>
 

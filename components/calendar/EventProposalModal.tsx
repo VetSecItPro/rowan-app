@@ -192,7 +192,7 @@ export function EventProposalModal({
           </div>
           {mode === 'vote' && proposal && (
             <p className="mt-2 text-purple-100 text-sm">
-              Created by {proposal.proposer?.name} • {formatDistance(new Date(proposal.created_at), new Date(), { addSuffix: true })}
+              Created by {proposal.proposer?.raw_user_meta_data?.name || proposal.proposer?.email} • {formatDistance(new Date(proposal.created_at), new Date(), { addSuffix: true })}
             </p>
           )}
         </div>

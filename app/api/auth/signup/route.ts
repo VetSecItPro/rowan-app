@@ -1,47 +1,71 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { authRateLimit } from '@/lib/ratelimit';
-import { extractIP } from '@/lib/ratelimit-fallback';
-import { z } from 'zod';
-import DOMPurify from 'isomorphic-dompurify';
 
-// Strong password validation schema
-const SignUpSchema = z.object({
-  email: z.string()
-    .email('Invalid email format')
-    .max(254, 'Email too long')
-    .toLowerCase()
-    .trim(),
-  password: z.string()
-    .min(8, 'Password must be at least 8 characters')
-    .max(128, 'Password too long')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number'),
-  profile: z.object({
-    name: z.string()
-      .min(1, 'Name is required')
-      .max(100, 'Name too long')
-      .trim(),
-    pronouns: z.string()
-      .max(50, 'Pronouns too long')
-      .optional(),
-    color_theme: z.enum([
-      'emerald', 'blue', 'purple', 'pink', 'orange', 'rose',
-      'cyan', 'amber', 'indigo', 'teal', 'red', 'lime',
-      'fuchsia', 'violet', 'sky', 'mint', 'coral', 'lavender', 'sage', 'slate'
-    ]).optional(),
-    space_name: z.string()
-      .min(1, 'Space name is required')
-      .max(100, 'Space name too long')
-      .trim()
-      .optional(),
-    marketing_emails_enabled: z.boolean().optional(),
-  }),
-});
+// Lazy-loaded validation schema (will be created at runtime)
+let SignUpSchema: any;
 
 export async function POST(request: NextRequest) {
+  // CRITICAL: Prevent any execution during build time
+  // Check for various build-time indicators
+  if (!request ||
+      !request.headers ||
+      typeof request.json !== 'function' ||
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      process.env.NODE_ENV === 'test' ||
+      !globalThis.Request) {
+    return NextResponse.json({ error: 'Build time - route disabled' }, { status: 503 });
+  }
+
   try {
+    // Lazy-load dependencies at runtime to prevent build-time issues
+    const [
+      { createClient },
+      { authRateLimit },
+      { extractIP },
+      { z }
+    ] = await Promise.all([
+      import('@/lib/supabase/server'),
+      import('@/lib/ratelimit'),
+      import('@/lib/ratelimit-fallback'),
+      import('zod')
+    ]);
+
+    // Create validation schema at runtime
+    if (!SignUpSchema) {
+      SignUpSchema = z.object({
+        email: z.string()
+          .email('Invalid email format')
+          .max(254, 'Email too long')
+          .toLowerCase()
+          .trim(),
+        password: z.string()
+          .min(8, 'Password must be at least 8 characters')
+          .max(128, 'Password too long')
+          .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+          .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+          .regex(/[0-9]/, 'Password must contain at least one number'),
+        profile: z.object({
+          name: z.string()
+            .min(1, 'Name is required')
+            .max(100, 'Name too long')
+            .trim(),
+          pronouns: z.string()
+            .max(50, 'Pronouns too long')
+            .optional(),
+          color_theme: z.enum([
+            'emerald', 'blue', 'purple', 'pink', 'orange', 'rose',
+            'cyan', 'amber', 'indigo', 'teal', 'red', 'lime',
+            'fuchsia', 'violet', 'sky', 'mint', 'coral', 'lavender', 'sage', 'slate'
+          ]).optional(),
+          space_name: z.string()
+            .min(1, 'Space name is required')
+            .max(100, 'Space name too long')
+            .trim()
+            .optional(),
+          marketing_emails_enabled: z.boolean().optional(),
+        }),
+      });
+    }
+
     // Extract IP for rate limiting (deployment fix)
     const ip = extractIP(request.headers);
 
@@ -71,20 +95,27 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validated = SignUpSchema.parse(body);
 
-    // Sanitize profile data to prevent XSS
+    // Simple text sanitization to prevent XSS (avoid DOMPurify during build)
+    const stripTags = (str: string) => str.replace(/<[^>]*>/g, '').trim();
+
     const sanitizedProfile = {
       ...validated.profile,
-      name: DOMPurify.sanitize(validated.profile.name, { ALLOWED_TAGS: [] }),
-      pronouns: validated.profile.pronouns
-        ? DOMPurify.sanitize(validated.profile.pronouns, { ALLOWED_TAGS: [] })
-        : undefined,
-      space_name: validated.profile.space_name
-        ? DOMPurify.sanitize(validated.profile.space_name, { ALLOWED_TAGS: [] })
-        : undefined,
+      name: stripTags(validated.profile.name),
+      pronouns: validated.profile.pronouns ? stripTags(validated.profile.pronouns) : undefined,
+      space_name: validated.profile.space_name ? stripTags(validated.profile.space_name) : undefined,
     };
 
-    // Create Supabase client
-    const supabase = createClient();
+    // Create Supabase client (runtime only)
+    let supabase;
+    try {
+      supabase = createClient();
+    } catch (error) {
+      console.error('Supabase client creation failed:', error);
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
 
     // Attempt signup with Supabase
     const { data, error } = await supabase.auth.signUp({
@@ -153,7 +184,8 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     // Handle validation errors
-    if (error instanceof z.ZodError) {
+    const { z: ZodImport } = await import('zod');
+    if (error instanceof ZodImport.ZodError) {
       return NextResponse.json(
         {
           error: 'Invalid input',
