@@ -19,9 +19,10 @@ export default function MealsFeaturePage() {
           </h1>
 
           <p className="text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Plan your meals for the week ahead. Save time, reduce stress, and eat better together.
+            Plan meals for your space with a visual calendar. Create recipes, schedule meals for specific days, and organize your family's meal planning.
           </p>
         </div>
+
 
         {/* Key Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
@@ -96,54 +97,54 @@ export default function MealsFeaturePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Perfect for every family
+              How you might use meal planning
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400">
-              From weeknight dinners to special occasions
+              Common ways to organize family meals
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Busy Weeknights</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Daily Meals</h3>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400">
                 <li className="flex items-start gap-3">
                   <UtensilsCrossed className="w-5 h-5 text-orange-500 mt-1 flex-shrink-0" />
-                  <span>Plan quick 30-minute meals for after work</span>
+                  <span>Plan weekly breakfast, lunch, and dinner</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <UtensilsCrossed className="w-5 h-5 text-orange-500 mt-1 flex-shrink-0" />
-                  <span>Coordinate who's cooking each night</span>
+                  <span>Create recipe collections for easy planning</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <UtensilsCrossed className="w-5 h-5 text-orange-500 mt-1 flex-shrink-0" />
-                  <span>Prep ingredients ahead on weekends</span>
+                  <span>Schedule leftovers and meal prep days</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <UtensilsCrossed className="w-5 h-5 text-orange-500 mt-1 flex-shrink-0" />
-                  <span>Plan kid-friendly meals everyone will eat</span>
+                  <span>Track dietary preferences and restrictions</span>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Special Meals</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Special Occasions</h3>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400">
                 <li className="flex items-start gap-3">
-                  <Users className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                  <span>Plan elaborate weekend family dinners</span>
+                  <Calendar className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                  <span>Holiday meal planning and preparation</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Users className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                  <span>Organize holiday feast preparations</span>
+                  <Calendar className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                  <span>Birthday parties and celebrations</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Users className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                  <span>Try new recipes and rate them together</span>
+                  <Calendar className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                  <span>Family gatherings and potluck coordination</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Users className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                  <span>Accommodate dietary needs and allergies</span>
+                  <Calendar className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                  <span>Vacation and travel meal planning</span>
                 </li>
               </ul>
             </div>
@@ -151,29 +152,33 @@ export default function MealsFeaturePage() {
         </div>
       </section>
 
+
       {/* CTA Section */}
       <section className="bg-gradient-to-r from-orange-600 to-red-600 py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-5xl font-bold text-white mb-6">
-            Make mealtime magical
+            Interested in trying Rowan?
           </h2>
-          <p className="text-xl text-orange-100 mb-10">
-            Join families eating better and stressing less
+          <p className="text-xl text-orange-100 mb-8">
+            We're currently developing Rowan's meal planning features
           </p>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/signup"
-              className="px-8 py-4 shimmer-bg text-white rounded-full font-semibold hover:opacity-90 transition-all shadow-xl shadow-purple-500/50"
+              href="/"
+              className="px-8 py-4 bg-white text-orange-600 rounded-full font-semibold hover:bg-orange-50 transition-all shadow-xl text-lg"
             >
-              Create Your Account
+              Request Beta Access
             </Link>
             <Link
               href="/"
-              className="px-8 py-4 bg-orange-700 text-white rounded-full font-bold text-lg hover:bg-orange-800 transition-all"
+              className="px-8 py-4 bg-orange-700/50 border border-orange-400 text-white rounded-full font-semibold hover:bg-orange-600/50 transition-all text-lg"
             >
-              Learn More
+              Get Notified When Ready
             </Link>
           </div>
+          <p className="text-orange-200 text-sm mt-6">
+            Currently in development
+          </p>
         </div>
       </section>
 

@@ -15,11 +15,11 @@ export default function TasksFeaturePage() {
           </div>
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-            Tasks & Chores
+            Task Management
           </h1>
 
           <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Organize your daily life together. Manage tasks, household chores, and responsibilities as a team.
+            Create and manage tasks for your household. Assign tasks to family members, set due dates, and track completion status in real-time.
           </p>
         </div>
 
@@ -96,54 +96,54 @@ export default function TasksFeaturePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Perfect for every situation
+              How you might use tasks
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400">
-              From daily chores to family responsibilities
+              Common ways families organize their responsibilities
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Daily Life</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Household Chores</h3>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400">
                 <li className="flex items-start gap-3">
                   <Calendar className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
-                  <span>Manage household chores and responsibilities</span>
+                  <span>Weekly cleaning assignments</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Calendar className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
-                  <span>Track kids' homework and activities</span>
+                  <span>Yard work and maintenance</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Calendar className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
-                  <span>Coordinate errands and grocery shopping</span>
+                  <span>Kids' room organization</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Calendar className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
-                  <span>Remember important appointments</span>
+                  <span>Pet care responsibilities</span>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Family Responsibilities</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Family Activities</h3>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400">
                 <li className="flex items-start gap-3">
                   <Calendar className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                  <span>Organize family events and celebrations</span>
+                  <span>School project deadlines</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Calendar className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                  <span>Plan and coordinate family trips</span>
+                  <span>Birthday party planning</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Calendar className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                  <span>Manage kids' school and activity schedules</span>
+                  <span>Vacation preparation</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Calendar className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                  <span>Coordinate pet care and vet appointments</span>
+                  <span>Home improvement projects</span>
                 </li>
               </ul>
             </div>
@@ -155,25 +155,28 @@ export default function TasksFeaturePage() {
       <section className="bg-gradient-to-r from-purple-600 to-blue-600 py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-5xl font-bold text-white mb-6">
-            Ready to get organized?
+            Interested in trying Rowan?
           </h2>
-          <p className="text-xl text-blue-100 mb-10">
-            Join thousands of families managing their tasks together
+          <p className="text-xl text-blue-100 mb-8">
+            We're currently developing Rowan's task management features
           </p>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/signup"
-              className="px-8 py-4 shimmer-bg text-white rounded-full font-semibold hover:opacity-90 transition-all shadow-xl shadow-purple-500/50"
+              href="/"
+              className="px-8 py-4 bg-white text-purple-600 rounded-full font-semibold hover:bg-blue-50 transition-all shadow-xl text-lg"
             >
-              Create Your Account
+              Request Beta Access
             </Link>
             <Link
               href="/"
-              className="px-8 py-4 bg-purple-700 text-white rounded-full font-bold text-lg hover:bg-purple-800 transition-all"
+              className="px-8 py-4 bg-purple-700/50 border border-purple-400 text-white rounded-full font-semibold hover:bg-purple-600/50 transition-all text-lg"
             >
-              Learn More
+              Get Notified When Ready
             </Link>
           </div>
+          <p className="text-blue-200 text-sm mt-6">
+            Currently in development
+          </p>
         </div>
       </section>
 

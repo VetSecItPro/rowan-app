@@ -1,0 +1,521 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  Shield,
+  Users,
+  Search,
+  Filter,
+  Download,
+  ArrowLeft,
+  Eye,
+  UserCheck,
+  UserX,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Globe,
+  TrendingUp,
+  Calendar,
+  RefreshCw,
+  Settings,
+  Lock,
+  Unlock,
+  Activity,
+  Target,
+  Award
+} from 'lucide-react';
+
+interface BetaRequest {
+  id: string;
+  email: string;
+  password_attempt: string;
+  ip_address: string | null;
+  user_agent: string | null;
+  access_granted: boolean;
+  user_id: string | null;
+  created_at: string;
+  approved_at: string | null;
+  notes: string | null;
+}
+
+interface BetaUser {
+  id: string;
+  email: string;
+  created_at: string;
+  last_sign_in_at: string | null;
+  activity_score: number;
+  sessions_count: number;
+  beta_feedback_count: number;
+}
+
+interface BetaStats {
+  totalRequests: number;
+  approvedRequests: number;
+  pendingRequests: number;
+  activeUsers: number;
+  capacity: number;
+  conversionRate: number;
+  averageActivityScore: number;
+  recentActivity: Array<{
+    type: 'request' | 'approval' | 'signup' | 'activity';
+    email: string;
+    timestamp: string;
+    details: string;
+  }>;
+}
+
+export default function AdminBetaPage() {
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<'requests' | 'users' | 'settings'>('requests');
+  const [betaRequests, setBetaRequests] = useState<BetaRequest[]>([]);
+  const [betaUsers, setBetaUsers] = useState<BetaUser[]>([]);
+  const [stats, setStats] = useState<BetaStats>({
+    totalRequests: 0,
+    approvedRequests: 0,
+    pendingRequests: 0,
+    activeUsers: 0,
+    capacity: 30,
+    conversionRate: 0,
+    averageActivityScore: 0,
+    recentActivity: [],
+  });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filter, setFilter] = useState<'all' | 'approved' | 'pending' | 'failed'>('all');
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedRequests, setSelectedRequests] = useState<Set<string>>(new Set());
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+
+      // Fetch beta data in parallel
+      const [requestsResponse, usersResponse, statsResponse] = await Promise.all([
+        fetch('/api/admin/beta/requests'),
+        fetch('/api/admin/beta/users'),
+        fetch('/api/admin/beta/stats')
+      ]);
+
+      if (requestsResponse.ok) {
+        const requestsData = await requestsResponse.json();
+        setBetaRequests(requestsData.requests || []);
+      }
+
+      if (usersResponse.ok) {
+        const usersData = await usersResponse.json();
+        setBetaUsers(usersData.users || []);
+      }
+
+      if (statsResponse.ok) {
+        const statsData = await statsResponse.json();
+        setStats(prevStats => ({ ...prevStats, ...statsData.stats }));
+      }
+    } catch (error) {
+      console.error('Failed to fetch beta data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const filteredRequests = betaRequests.filter(request => {
+    const matchesSearch = request.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter =
+      filter === 'all' ||
+      (filter === 'approved' && request.access_granted) ||
+      (filter === 'pending' && !request.access_granted && !request.user_id) ||
+      (filter === 'failed' && !request.access_granted);
+
+    return matchesSearch && matchesFilter;
+  });
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'Never';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const getStatusBadge = (request: BetaRequest) => {
+    if (request.access_granted && request.user_id) {
+      return (
+        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
+          <UserCheck className="w-3 h-3 mr-1" />
+          Active User
+        </span>
+      );
+    } else if (request.access_granted) {
+      return (
+        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
+          <CheckCircle className="w-3 h-3 mr-1" />
+          Approved
+        </span>
+      );
+    } else {
+      return (
+        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400">
+          <XCircle className="w-3 h-3 mr-1" />
+          Failed
+        </span>
+      );
+    }
+  };
+
+  const StatCard = ({ title, value, subtitle, icon: Icon, color = 'blue', trend }: {
+    title: string;
+    value: number | string;
+    subtitle?: string;
+    icon: any;
+    color?: 'blue' | 'green' | 'purple' | 'orange' | 'red';
+    trend?: string;
+  }) => {
+    const colorClasses: Record<string, string> = {
+      blue: 'bg-blue-500',
+      green: 'bg-green-500',
+      purple: 'bg-purple-500',
+      orange: 'bg-orange-500',
+      red: 'bg-red-500',
+    };
+
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{value}</p>
+            {subtitle && (
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{subtitle}</p>
+            )}
+            {trend && (
+              <p className="text-xs text-green-600 dark:text-green-400 mt-1">{trend}</p>
+            )}
+          </div>
+          <div className={`w-12 h-12 ${colorClasses[color]} rounded-lg flex items-center justify-center`}>
+            <Icon className="w-6 h-6 text-white" />
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Header */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between py-6">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => router.push('/admin/dashboard')}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              </button>
+              <div className="flex items-center gap-3">
+                <Shield className="w-8 h-8 text-purple-600" />
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    Beta Program Management
+                  </h1>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Monitor and manage the beta testing program
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <div className="text-sm font-medium text-gray-900 dark:text-white">
+                  {stats.activeUsers}/{stats.capacity} Users
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  {stats.capacity - stats.activeUsers} slots remaining
+                </div>
+              </div>
+              <button
+                onClick={fetchData}
+                disabled={isLoading}
+                className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors"
+              >
+                <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+                Refresh
+              </button>
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex space-x-8">
+            {[
+              { id: 'requests', label: 'Access Requests', count: stats.totalRequests },
+              { id: 'users', label: 'Beta Users', count: stats.activeUsers },
+              { id: 'settings', label: 'Settings', count: null },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+                  activeTab === tab.id
+                    ? 'border-purple-500 text-purple-600 dark:text-purple-400'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                }`}
+              >
+                {tab.label}
+                {tab.count !== null && (
+                  <span className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded-full text-xs">
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+          <StatCard
+            title="Total Requests"
+            value={stats.totalRequests}
+            subtitle="All time"
+            icon={Users}
+            color="blue"
+          />
+          <StatCard
+            title="Conversion Rate"
+            value={`${stats.conversionRate}%`}
+            subtitle="Approved to active"
+            icon={TrendingUp}
+            color="green"
+            trend="+5% this week"
+          />
+          <StatCard
+            title="Active Users"
+            value={`${stats.activeUsers}/${stats.capacity}`}
+            subtitle={`${Math.round((stats.activeUsers / stats.capacity) * 100)}% capacity`}
+            icon={UserCheck}
+            color="purple"
+          />
+          <StatCard
+            title="Avg Activity"
+            value={stats.averageActivityScore.toFixed(1)}
+            subtitle="Engagement score"
+            icon={Activity}
+            color="orange"
+          />
+          <StatCard
+            title="Success Rate"
+            value={`${Math.round((stats.approvedRequests / Math.max(stats.totalRequests, 1)) * 100)}%`}
+            subtitle="Password attempts"
+            icon={Target}
+            color="red"
+          />
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'requests' && (
+          <>
+            {/* Search and Filters */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Search by email..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Filter className="w-5 h-5 text-gray-400" />
+                  <select
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value as any)}
+                    className="px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                  >
+                    <option value="all">All Requests</option>
+                    <option value="approved">Approved</option>
+                    <option value="pending">Pending Signup</option>
+                    <option value="failed">Failed</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Requests Table */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+              {isLoading ? (
+                <div className="p-12 text-center">
+                  <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-gray-600 dark:text-gray-400">Loading beta requests...</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 dark:bg-gray-700">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          Request Details
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          Requested
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          Location
+                        </th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                      {filteredRequests.map((request) => (
+                        <tr key={request.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center">
+                                <Shield className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                              </div>
+                              <div className="ml-4">
+                                <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                  {request.email}
+                                </div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400">
+                                  Password: {request.password_attempt ? '••••••••' : 'None'}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {getStatusBadge(request)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                            {formatDate(request.created_at)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900 dark:text-white">
+                              {request.ip_address || 'Unknown'}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300">
+                              <Eye className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {filteredRequests.length === 0 && (
+                    <div className="p-12 text-center">
+                      <Shield className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600 dark:text-gray-400">No beta requests found</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {activeTab === 'users' && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Active Beta Users
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Beta user management features coming soon...
+            </p>
+          </div>
+        )}
+
+        {activeTab === 'settings' && (
+          <div className="space-y-6">
+            {/* Beta Program Settings */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <Settings className="w-5 h-5" />
+                Beta Program Settings
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Maximum Beta Users
+                  </label>
+                  <input
+                    type="number"
+                    value={stats.capacity}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
+                    min="1"
+                    max="100"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Beta Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="password"
+                      value="RowanApp2025&$&$&$"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white pr-10"
+                      readOnly
+                    />
+                    <Lock className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Recent Activity
+              </h3>
+              <div className="space-y-3">
+                {stats.recentActivity.slice(0, 10).map((activity, index) => (
+                  <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div className={`w-2 h-2 rounded-full ${
+                      activity.type === 'approval' ? 'bg-green-500' :
+                      activity.type === 'request' ? 'bg-blue-500' :
+                      activity.type === 'signup' ? 'bg-purple-500' :
+                      'bg-gray-500'
+                    }`} />
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-900 dark:text-white">
+                        <span className="font-medium">{activity.email}</span> {activity.details}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {formatDate(activity.timestamp)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                {stats.recentActivity.length === 0 && (
+                  <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                    No recent activity
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

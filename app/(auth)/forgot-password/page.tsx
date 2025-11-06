@@ -1,5 +1,8 @@
 'use client';
 
+// Force dynamic rendering to prevent useContext errors during static generation
+export const dynamic = 'force-dynamic';
+
 import { useState, FormEvent } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';

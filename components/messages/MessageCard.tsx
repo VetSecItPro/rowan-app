@@ -7,17 +7,15 @@ import { useState, useEffect } from 'react';
 import { AttachmentPreview } from './AttachmentPreview';
 import { ReactionPicker } from './ReactionPicker';
 import { MentionHighlight } from './MentionHighlight';
-import DOMPurify from 'dompurify';
+// Simple text sanitization to prevent XSS (avoid DOMPurify during build)
+const stripTags = (str: string) => str.replace(/<[^>]*>/g, '').trim();
 
-// Safe HTML rendering with DOMPurify sanitization
+// Safe text rendering with basic formatting
 const ReactMarkdown = ({ children }: { children: string }) => {
-  // Sanitize the content to prevent XSS attacks
-  const sanitizedContent = DOMPurify.sanitize(children.replace(/\n/g, '<br>'), {
-    ALLOWED_TAGS: ['br', 'b', 'i', 'em', 'strong', 'code', 'pre', 'p'],
-    ALLOWED_ATTR: [],
-  });
+  // Sanitize the content by stripping HTML tags and replace newlines with spaces
+  const sanitizedContent = stripTags(children).replace(/\n/g, ' ');
 
-  return <span dangerouslySetInnerHTML={{ __html: sanitizedContent }} />;
+  return <span>{sanitizedContent}</span>;
 };
 
 interface MessageCardProps {

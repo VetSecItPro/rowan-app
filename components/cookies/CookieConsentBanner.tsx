@@ -20,8 +20,15 @@ export function CookieConsentBanner() {
 
   useEffect(() => {
     // Only check after component is mounted to avoid SSR mismatch
-    if (mounted && !hasUserMadeCookieChoice()) {
-      setIsVisible(true);
+    if (mounted) {
+      try {
+        if (!hasUserMadeCookieChoice()) {
+          setIsVisible(true);
+        }
+      } catch (error) {
+        // Silently handle any localStorage errors during SSR
+        console.warn('Cookie consent check failed:', error);
+      }
     }
   }, [mounted]);
 

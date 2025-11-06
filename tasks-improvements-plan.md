@@ -22,7 +22,8 @@
 ### Overview
 Transform user identity from simple names to rich, personalized avatars that enhance family collaboration and make the interface more engaging and personal.
 
-### Avatar Gallery Implementation
+### Avatar Gallery Implementation - Don't provide too many. Just enough to provide some choices for the users.  
+
 **Adult Male Avatars**: Professional yet friendly cartoon representations with various skin tones, hairstyles, facial hair options, and clothing styles. Focus on warm, approachable expressions that convey reliability and engagement.
 
 **Adult Female Avatars**: Diverse representation with different ethnicities, hairstyles (long, short, curly, straight), accessories (glasses, earrings), and professional/casual styling options. Maintain consistency in art style while celebrating individuality.
@@ -51,7 +52,7 @@ Store avatar preferences in user profiles database. Implement lazy loading for a
 ---
 
 ## Multiple View Modes
-
+## Implement this in a toggle format box to the left of the Tasks filter box and aligned properly with it. 
 ### List View (Current + Enhanced)
 **Current State**: Dense information display with good data density
 **Enhancements**: Add inline editing capabilities, better visual hierarchy with improved typography, and enhanced filtering controls. Implement keyboard shortcuts for power users (j/k navigation, spacebar to complete tasks).
