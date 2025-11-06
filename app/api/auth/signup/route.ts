@@ -1,47 +1,67 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { authRateLimit } from '@/lib/ratelimit';
-import { extractIP } from '@/lib/ratelimit-fallback';
-import { z } from 'zod';
-import DOMPurify from 'isomorphic-dompurify';
 
-// Strong password validation schema
-const SignUpSchema = z.object({
-  email: z.string()
-    .email('Invalid email format')
-    .max(254, 'Email too long')
-    .toLowerCase()
-    .trim(),
-  password: z.string()
-    .min(8, 'Password must be at least 8 characters')
-    .max(128, 'Password too long')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number'),
-  profile: z.object({
-    name: z.string()
-      .min(1, 'Name is required')
-      .max(100, 'Name too long')
-      .trim(),
-    pronouns: z.string()
-      .max(50, 'Pronouns too long')
-      .optional(),
-    color_theme: z.enum([
-      'emerald', 'blue', 'purple', 'pink', 'orange', 'rose',
-      'cyan', 'amber', 'indigo', 'teal', 'red', 'lime',
-      'fuchsia', 'violet', 'sky', 'mint', 'coral', 'lavender', 'sage', 'slate'
-    ]).optional(),
-    space_name: z.string()
-      .min(1, 'Space name is required')
-      .max(100, 'Space name too long')
-      .trim()
-      .optional(),
-    marketing_emails_enabled: z.boolean().optional(),
-  }),
-});
+// Lazy-loaded validation schema (will be created at runtime)
+let SignUpSchema: any;
 
 export async function POST(request: NextRequest) {
+  // CRITICAL: Prevent any execution during build time
+  if (process.env.NODE_ENV === 'development' && !request?.headers) {
+    return NextResponse.json({ error: 'Build time - route disabled' }, { status: 503 });
+  }
+
   try {
+    // Lazy-load dependencies at runtime to prevent build-time issues
+    const [
+      { createClient },
+      { authRateLimit },
+      { extractIP },
+      { z },
+      DOMPurify
+    ] = await Promise.all([
+      import('@/lib/supabase/server'),
+      import('@/lib/ratelimit'),
+      import('@/lib/ratelimit-fallback'),
+      import('zod'),
+      import('isomorphic-dompurify')
+    ]);
+
+    // Create validation schema at runtime
+    if (!SignUpSchema) {
+      SignUpSchema = z.object({
+        email: z.string()
+          .email('Invalid email format')
+          .max(254, 'Email too long')
+          .toLowerCase()
+          .trim(),
+        password: z.string()
+          .min(8, 'Password must be at least 8 characters')
+          .max(128, 'Password too long')
+          .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+          .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+          .regex(/[0-9]/, 'Password must contain at least one number'),
+        profile: z.object({
+          name: z.string()
+            .min(1, 'Name is required')
+            .max(100, 'Name too long')
+            .trim(),
+          pronouns: z.string()
+            .max(50, 'Pronouns too long')
+            .optional(),
+          color_theme: z.enum([
+            'emerald', 'blue', 'purple', 'pink', 'orange', 'rose',
+            'cyan', 'amber', 'indigo', 'teal', 'red', 'lime',
+            'fuchsia', 'violet', 'sky', 'mint', 'coral', 'lavender', 'sage', 'slate'
+          ]).optional(),
+          space_name: z.string()
+            .min(1, 'Space name is required')
+            .max(100, 'Space name too long')
+            .trim()
+            .optional(),
+          marketing_emails_enabled: z.boolean().optional(),
+        }),
+      });
+    }
+
     // Prevent execution during build time - only run for actual HTTP requests
     if (!request || typeof request.json !== 'function') {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
@@ -79,12 +99,12 @@ export async function POST(request: NextRequest) {
     // Sanitize profile data to prevent XSS
     const sanitizedProfile = {
       ...validated.profile,
-      name: DOMPurify.sanitize(validated.profile.name, { ALLOWED_TAGS: [] }),
+      name: DOMPurify.default.sanitize(validated.profile.name, { ALLOWED_TAGS: [] }),
       pronouns: validated.profile.pronouns
-        ? DOMPurify.sanitize(validated.profile.pronouns, { ALLOWED_TAGS: [] })
+        ? DOMPurify.default.sanitize(validated.profile.pronouns, { ALLOWED_TAGS: [] })
         : undefined,
       space_name: validated.profile.space_name
-        ? DOMPurify.sanitize(validated.profile.space_name, { ALLOWED_TAGS: [] })
+        ? DOMPurify.default.sanitize(validated.profile.space_name, { ALLOWED_TAGS: [] })
         : undefined,
     };
 
@@ -167,7 +187,8 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     // Handle validation errors
-    if (error instanceof z.ZodError) {
+    const { z: ZodImport } = await import('zod');
+    if (error instanceof ZodImport.ZodError) {
       return NextResponse.json(
         {
           error: 'Invalid input',
