@@ -53,7 +53,7 @@ export function NewBudgetModal({
             </div>
             <button
               onClick={onClose}
-              className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all active-press hover-lift shimmer-amber text-gray-500 dark:text-gray-400"
+              className="p-2 flex items-center justify-center hover:opacity-75 transition-opacity text-gray-500 dark:text-gray-400"
               aria-label="Close modal"
             >
               <X className="w-5 h-5 sm:w-4 sm:h-4" />
@@ -89,13 +89,13 @@ export function NewBudgetModal({
             <button
               type="button"
               onClick={onClose}
-              className="btn-touch flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all font-medium active-press hover-lift"
+              className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="btn-touch flex-1 px-4 py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg font-medium active-press hover-lift"
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg font-medium"
             >
               {currentBudget ? 'Update Budget' : 'Set Budget'}
             </button>

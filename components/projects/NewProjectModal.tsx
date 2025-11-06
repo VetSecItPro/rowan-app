@@ -80,7 +80,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
             <h2 className="text-lg sm:text-xl font-bold">
               {editProject ? 'Edit Project' : 'Create New Project'}
             </h2>
-            <button onClick={onClose} aria-label="Close modal" className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active-press hover-lift shimmer-amber">
+            <button onClick={onClose} aria-label="Close modal" className="p-2 flex items-center justify-center hover:opacity-75 transition-opacity">
               <X className="w-5 h-5 sm:w-4 sm:h-4" />
             </button>
           </div>
@@ -172,14 +172,14 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
             <button
               type="button"
               onClick={onClose}
-              className="btn-touch flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium active-press hover-lift"
+              className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="btn-touch flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl transition-all shadow-lg font-medium hover:opacity-90 disabled:opacity-50 active-press hover-lift shimmer-amber"
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl transition-all shadow-lg font-medium hover:opacity-90 disabled:opacity-50"
             >
               {loading ? 'Saving...' : editProject ? 'Save Project' : 'Create Project'}
             </button>

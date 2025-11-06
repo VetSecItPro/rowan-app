@@ -123,7 +123,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
           </div>
           <button
             onClick={onClose}
-            className="btn-touch w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors active-press hover-lift"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors rounded-lg"
             disabled={isExporting}
           >
             <X className="w-4 h-4 text-gray-500" />
@@ -283,14 +283,14 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
           <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <button
               onClick={onClose}
-              className="btn-touch flex-1 px-6 py-3 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl font-medium transition-colors active-press hover-lift"
+              className="flex-1 px-6 py-3 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl font-medium transition-colors"
               disabled={isExporting}
             >
               Cancel
             </button>
             <button
               onClick={handleExport}
-              className="btn-touch flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active-press hover-lift shimmer-blue"
+              className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               disabled={isExporting}
             >
               {isExporting ? (
