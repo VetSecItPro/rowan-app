@@ -5,33 +5,7 @@ export const createClient = () => {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    // During build time or when env vars are missing, return a mock client to prevent errors
-    console.warn('Missing Supabase environment variables, using mock client during build');
-    return {
-      from: () => ({
-        select: () => ({ data: [], error: null }),
-        insert: () => ({ data: [], error: null }),
-        update: () => ({ data: [], error: null }),
-        delete: () => ({ data: [], error: null }),
-        eq: () => ({ data: [], error: null }),
-        single: () => ({ data: null, error: null }),
-      }),
-      auth: {
-        getUser: () => ({ data: { user: null }, error: null }),
-        getSession: () => ({ data: { session: null }, error: null }),
-        signUp: () => ({ data: { user: null }, error: null }),
-        signInWithPassword: () => ({ data: { user: null }, error: null }),
-        updateUser: () => ({ data: { user: null }, error: null }),
-        signOut: () => ({ error: null }),
-      },
-      rpc: () => ({ data: null, error: null }),
-      channel: () => ({
-        on: () => ({
-          subscribe: () => {},
-        }),
-      }),
-      removeChannel: () => {},
-    } as any;
+    throw new Error('Missing Supabase environment variables');
   }
 
   // Create a new client each time to ensure fresh session state
