@@ -5,7 +5,13 @@ let SignUpSchema: any;
 
 export async function POST(request: NextRequest) {
   // CRITICAL: Prevent any execution during build time
-  if (process.env.NODE_ENV === 'development' && !request?.headers) {
+  // Check for various build-time indicators
+  if (!request ||
+      !request.headers ||
+      typeof request.json !== 'function' ||
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      process.env.NODE_ENV === 'test' ||
+      !globalThis.Request) {
     return NextResponse.json({ error: 'Build time - route disabled' }, { status: 503 });
   }
 
@@ -58,11 +64,6 @@ export async function POST(request: NextRequest) {
           marketing_emails_enabled: z.boolean().optional(),
         }),
       });
-    }
-
-    // Prevent execution during build time - only run for actual HTTP requests
-    if (!request || typeof request.json !== 'function') {
-      return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 
     // Extract IP for rate limiting (deployment fix)
