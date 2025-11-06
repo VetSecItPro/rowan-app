@@ -15,13 +15,14 @@ export default function RemindersFeaturePage() {
           </div>
 
           <h1 className="text-6xl md:text-7xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-            Smart Reminders
+            Reminders
           </h1>
 
           <p className="text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Never forget important moments. Smart reminders that notify the right person at the right time.
+            Create and manage reminders for your space. Set time-based or recurring reminders that notify you when things need attention.
           </p>
         </div>
+
 
         {/* Key Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
@@ -96,54 +97,54 @@ export default function RemindersFeaturePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Perfect for every need
+              How you might use reminders
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400">
-              From daily tasks to important events
+              Common types of reminders people create
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Daily Reminders</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Personal & Health</h3>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400">
                 <li className="flex items-start gap-3">
                   <Bell className="w-5 h-5 text-pink-500 mt-1 flex-shrink-0" />
-                  <span>Take medication at the right times</span>
+                  <span>Daily medication and vitamin reminders</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Bell className="w-5 h-5 text-pink-500 mt-1 flex-shrink-0" />
-                  <span>Pick up kids from school or activities</span>
+                  <span>Medical and dental appointments</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Bell className="w-5 h-5 text-pink-500 mt-1 flex-shrink-0" />
-                  <span>Water plants or feed pets</span>
+                  <span>Exercise and workout schedules</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Bell className="w-5 h-5 text-pink-500 mt-1 flex-shrink-0" />
-                  <span>Complete daily chores and routines</span>
+                  <span>Birthdays and anniversaries</span>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Important Events</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Household & Bills</h3>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400">
                 <li className="flex items-start gap-3">
                   <Bell className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                  <span>Birthdays and anniversaries coming up</span>
+                  <span>Monthly bill payments and due dates</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Bell className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                  <span>Bills due and payment deadlines</span>
+                  <span>Home maintenance tasks</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Bell className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                  <span>Medical appointments and checkups</span>
+                  <span>Seasonal cleaning and organization</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Bell className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                  <span>School events and parent meetings</span>
+                  <span>Car maintenance and renewals</span>
                 </li>
               </ul>
             </div>
@@ -151,29 +152,33 @@ export default function RemindersFeaturePage() {
         </div>
       </section>
 
+
       {/* CTA Section */}
       <section className="bg-gradient-to-r from-pink-600 to-purple-600 py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-5xl font-bold text-white mb-6">
-            Never forget again
+            Interested in trying Rowan?
           </h2>
-          <p className="text-xl text-pink-100 mb-10">
-            Join families staying on top of everything together
+          <p className="text-xl text-pink-100 mb-8">
+            We're currently developing Rowan's reminder features
           </p>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/signup"
-              className="px-8 py-4 shimmer-bg text-white rounded-full font-semibold hover:opacity-90 transition-all shadow-xl shadow-purple-500/50"
+              href="/"
+              className="px-8 py-4 bg-white text-purple-600 rounded-full font-semibold hover:bg-pink-50 transition-all shadow-xl text-lg"
             >
-              Create Your Account
+              Request Beta Access
             </Link>
             <Link
               href="/"
-              className="px-8 py-4 bg-pink-700 text-white rounded-full font-bold text-lg hover:bg-pink-800 transition-all"
+              className="px-8 py-4 bg-pink-700/50 border border-pink-400 text-white rounded-full font-semibold hover:bg-pink-600/50 transition-all text-lg"
             >
-              Learn More
+              Get Notified When Ready
             </Link>
           </div>
+          <p className="text-pink-200 text-sm mt-6">
+            Currently in development
+          </p>
         </div>
       </section>
 

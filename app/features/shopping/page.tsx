@@ -19,9 +19,10 @@ export default function ShoppingFeaturePage() {
           </h1>
 
           <p className="text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Collaborative shopping lists that sync in real-time. Never forget items or buy duplicates again.
+            Create and share shopping lists with your space members. Add items, check them off in real-time, and coordinate your shopping with shared lists.
           </p>
         </div>
+
 
         {/* Key Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
@@ -96,54 +97,54 @@ export default function ShoppingFeaturePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Perfect for every shopping trip
+              How you might use shopping lists
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400">
-              From weekly groceries to special occasions
+              Common ways to organize household shopping
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Everyday Shopping</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Grocery & Food</h3>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400">
                 <li className="flex items-start gap-3">
                   <ShoppingCart className="w-5 h-5 text-emerald-500 mt-1 flex-shrink-0" />
-                  <span>Weekly grocery runs made efficient</span>
+                  <span>Weekly grocery shopping lists</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <ShoppingCart className="w-5 h-5 text-emerald-500 mt-1 flex-shrink-0" />
-                  <span>Quick stops at the pharmacy or hardware store</span>
+                  <span>Special occasion meal planning</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <ShoppingCart className="w-5 h-5 text-emerald-500 mt-1 flex-shrink-0" />
-                  <span>Coordinated shopping when multiple people go out</span>
+                  <span>Bulk buying for large families</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <ShoppingCart className="w-5 h-5 text-emerald-500 mt-1 flex-shrink-0" />
-                  <span>Never forget essential household items</span>
+                  <span>Party and entertaining supplies</span>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Special Occasions</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Household & Other</h3>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                  <span>Plan party supplies and decorations</span>
+                  <ShoppingCart className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
+                  <span>Household supplies and cleaning products</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                  <span>Organize ingredients for holiday cooking</span>
+                  <ShoppingCart className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
+                  <span>Home improvement project materials</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                  <span>Track school supplies and back-to-school needs</span>
+                  <ShoppingCart className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
+                  <span>Back-to-school and office supplies</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                  <span>Manage gift shopping for birthdays</span>
+                  <ShoppingCart className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
+                  <span>Gift and holiday shopping</span>
                 </li>
               </ul>
             </div>
@@ -151,29 +152,33 @@ export default function ShoppingFeaturePage() {
         </div>
       </section>
 
+
       {/* CTA Section */}
       <section className="bg-gradient-to-r from-emerald-600 to-green-600 py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-5xl font-bold text-white mb-6">
-            Shop smarter together
+            Interested in trying Rowan?
           </h2>
-          <p className="text-xl text-emerald-100 mb-10">
-            Join families saving time and money on every trip
+          <p className="text-xl text-emerald-100 mb-8">
+            We're currently developing Rowan's shopping list features
           </p>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/signup"
-              className="px-8 py-4 shimmer-bg text-white rounded-full font-semibold hover:opacity-90 transition-all shadow-xl shadow-purple-500/50"
+              href="/"
+              className="px-8 py-4 bg-white text-emerald-600 rounded-full font-semibold hover:bg-emerald-50 transition-all shadow-xl text-lg"
             >
-              Create Your Account
+              Request Beta Access
             </Link>
             <Link
               href="/"
-              className="px-8 py-4 bg-emerald-700 text-white rounded-full font-bold text-lg hover:bg-emerald-800 transition-all"
+              className="px-8 py-4 bg-emerald-700/50 border border-emerald-400 text-white rounded-full font-semibold hover:bg-emerald-600/50 transition-all text-lg"
             >
-              Learn More
+              Get Notified When Ready
             </Link>
           </div>
+          <p className="text-emerald-200 text-sm mt-6">
+            Currently in development
+          </p>
         </div>
       </section>
 
