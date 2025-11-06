@@ -42,6 +42,11 @@ const SignUpSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Prevent execution during build time - only run for actual HTTP requests
+    if (!request || typeof request.json !== 'function') {
+      return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    }
+
     // Extract IP for rate limiting (deployment fix)
     const ip = extractIP(request.headers);
 
@@ -83,8 +88,17 @@ export async function POST(request: NextRequest) {
         : undefined,
     };
 
-    // Create Supabase client
-    const supabase = createClient();
+    // Create Supabase client (runtime only)
+    let supabase;
+    try {
+      supabase = createClient();
+    } catch (error) {
+      console.error('Supabase client creation failed:', error);
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
 
     // Attempt signup with Supabase
     const { data, error } = await supabase.auth.signUp({
