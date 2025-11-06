@@ -201,6 +201,7 @@ export default function RemindersPage(): JSX.Element {
         const optimisticReminder: Reminder = {
           id: tempId,
           ...reminderData,
+          created_by: user?.id || '',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
           status: 'active',

@@ -15,11 +15,11 @@ export default function MessagesFeaturePage() {
           </div>
 
           <h1 className="text-6xl md:text-7xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-            Built-in Messaging
+            Family Messages
           </h1>
 
           <p className="text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Communicate seamlessly with your family. Everything you need in one place, no switching apps.
+            Communicate with your space members through built-in messaging. Send text messages, share content, and keep family conversations organized.
           </p>
         </div>
 
@@ -96,54 +96,54 @@ export default function MessagesFeaturePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Perfect for every conversation
+              How you might use messages
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400">
-              From quick updates to important discussions
+              Common ways families communicate
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Quick Coordination</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Daily Coordination</h3>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400">
                 <li className="flex items-start gap-3">
                   <MessageCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                  <span>"Running 10 minutes late for pickup"</span>
+                  <span>Schedule changes and pickup reminders</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <MessageCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                  <span>"Can you grab milk on your way home?"</span>
+                  <span>Quick requests and grocery needs</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <MessageCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                  <span>"Kids need to be at practice at 4pm"</span>
+                  <span>Activity updates and time changes</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <MessageCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                  <span>"Dinner is ready, come eat!"</span>
+                  <span>Meal announcements and family check-ins</span>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Sharing Moments</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Sharing & Planning</h3>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400">
                 <li className="flex items-start gap-3">
                   <Video className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
-                  <span>Share photos from family outings instantly</span>
+                  <span>Photos and videos from daily activities</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Video className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
-                  <span>Send videos of kids' achievements and milestones</span>
+                  <span>Special moments and achievements</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <File className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
-                  <span>Forward important documents and forms</span>
+                  <span>Important documents and forms</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <ImageIcon className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
-                  <span>Create shared albums for special occasions</span>
+                  <span>Event planning and coordination</span>
                 </li>
               </ul>
             </div>
@@ -155,25 +155,28 @@ export default function MessagesFeaturePage() {
       <section className="bg-gradient-to-r from-green-600 to-emerald-600 py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-5xl font-bold text-white mb-6">
-            Stay connected effortlessly
+            Interested in trying Rowan?
           </h2>
-          <p className="text-xl text-green-100 mb-10">
-            Join families communicating better every day
+          <p className="text-xl text-green-100 mb-8">
+            We're currently developing Rowan's messaging features
           </p>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/signup"
-              className="px-8 py-4 shimmer-bg text-white rounded-full font-semibold hover:opacity-90 transition-all shadow-xl shadow-purple-500/50"
+              href="/"
+              className="px-8 py-4 bg-white text-green-600 rounded-full font-semibold hover:bg-green-50 transition-all shadow-xl text-lg"
             >
-              Create Your Account
+              Request Beta Access
             </Link>
             <Link
               href="/"
-              className="px-8 py-4 bg-green-700 text-white rounded-full font-bold text-lg hover:bg-green-800 transition-all"
+              className="px-8 py-4 bg-green-700/50 border border-green-400 text-white rounded-full font-semibold hover:bg-green-600/50 transition-all text-lg"
             >
-              Learn More
+              Get Notified When Ready
             </Link>
           </div>
+          <p className="text-green-200 text-sm mt-6">
+            Currently in development
+          </p>
         </div>
       </section>
 

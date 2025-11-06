@@ -8,7 +8,7 @@ export interface CreateChoreInput {
   space_id: string;
   title: string;
   description?: string;
-  frequency: 'daily' | 'weekly' | 'monthly' | 'once';
+  frequency: 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'once';
   assigned_to?: string;
   status?: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed';
   due_date?: string;
@@ -20,7 +20,7 @@ export interface CreateChoreInput {
 export interface UpdateChoreInput {
   title?: string;
   description?: string;
-  frequency?: 'daily' | 'weekly' | 'monthly' | 'once';
+  frequency?: 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'once';
   assigned_to?: string;
   status?: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed';
   due_date?: string;

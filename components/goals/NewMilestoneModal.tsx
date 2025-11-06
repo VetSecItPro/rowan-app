@@ -96,7 +96,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
             <h2 className="text-lg sm:text-xl font-bold">{editMilestone ? 'Edit Milestone' : 'New Milestone'}</h2>
             <button
               onClick={onClose}
-              className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active-press hover-lift"
+              className="p-2 flex items-center justify-center hover:opacity-75 transition-opacity"
               aria-label="Close modal"
             >
               <X className="w-5 h-5 sm:w-4 sm:h-4" />
@@ -127,7 +127,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
                   type="button"
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                   title="Add emoji"
-                  className="btn-touch p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors active-press hover-lift shimmer-purple"
+                  className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                 >
                   <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 </button>
@@ -142,7 +142,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
                           key={idx}
                           type="button"
                           onClick={() => handleEmojiClick(emoji)}
-                          className="btn-touch w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active-press hover-lift shimmer-purple"
+                          className="w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                           title="Click to add emoji"
                         >
                           {emoji}
@@ -182,7 +182,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
                     key={option.value}
                     type="button"
                     onClick={() => setFormData({ ...formData, type: option.value as any })}
-                    className={`btn-touch p-4 rounded-xl border-2 transition-all text-left active-press hover-lift shimmer-purple ${
+                    className={`p-4 rounded-xl border-2 transition-all text-left ${
                       formData.type === option.value
                         ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
                         : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-600'
@@ -263,13 +263,13 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
             <button
               type="button"
               onClick={onClose}
-              className="btn-touch flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium active-press hover-lift"
+              className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="btn-touch flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:opacity-90 transition-all shadow-lg font-medium active-press hover-lift shimmer-purple"
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:opacity-90 transition-all shadow-lg font-medium"
             >
               {editMilestone ? 'Update Milestone' : 'Create Milestone'}
             </button>

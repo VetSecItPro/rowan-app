@@ -2,7 +2,7 @@ import { Home, Wrench, DollarSign, Users, Calendar, Check } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import Link from 'next/link';
 
-export default function HouseholdFeaturePage() {
+export default function BudgetFeaturePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-amber-50/30 to-white dark:from-black dark:via-amber-950/20 dark:to-black">
       <Header />
@@ -15,11 +15,11 @@ export default function HouseholdFeaturePage() {
           </div>
 
           <h1 className="text-6xl md:text-7xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-            Projects & Budget
+            Budget Management
           </h1>
 
           <p className="text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Plan home improvement projects, track budgets, and manage family finances together.
+            Track household budgets and expenses for your space. Monitor spending, set budget limits, and coordinate family finances.
           </p>
         </div>
 
@@ -96,10 +96,10 @@ export default function HouseholdFeaturePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Perfect for every home
+              How you might use budgets
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400">
-              From home improvements to family finances
+              Common ways families manage finances
             </p>
           </div>
 
@@ -155,25 +155,28 @@ export default function HouseholdFeaturePage() {
       <section className="bg-gradient-to-r from-amber-600 to-yellow-600 py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-5xl font-bold text-white mb-6">
-            Manage projects and finances with confidence
+            Interested in trying Rowan?
           </h2>
-          <p className="text-xl text-amber-100 mb-10">
-            Join families planning their future together
+          <p className="text-xl text-amber-100 mb-8">
+            We're currently developing Rowan's budget management features
           </p>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/signup"
-              className="px-8 py-4 shimmer-bg text-white rounded-full font-semibold hover:opacity-90 transition-all shadow-xl shadow-purple-500/50"
+              href="/"
+              className="px-8 py-4 bg-white text-amber-600 rounded-full font-semibold hover:bg-amber-50 transition-all shadow-xl text-lg"
             >
-              Create Your Account
+              Request Beta Access
             </Link>
             <Link
               href="/"
-              className="px-8 py-4 bg-amber-700 text-white rounded-full font-bold text-lg hover:bg-amber-800 transition-all"
+              className="px-8 py-4 bg-amber-700/50 border border-amber-400 text-white rounded-full font-semibold hover:bg-amber-600/50 transition-all text-lg"
             >
-              Learn More
+              Get Notified When Ready
             </Link>
           </div>
+          <p className="text-amber-200 text-sm mt-6">
+            Currently in development
+          </p>
         </div>
       </section>
 

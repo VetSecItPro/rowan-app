@@ -91,7 +91,7 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
           <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
             <div className="flex items-center gap-1.5">
               <Users className="w-4 h-4" />
-              <span>Proposed by {proposal.proposer?.name || 'Unknown'}</span>
+              <span>Proposed by {proposal.proposer?.raw_user_meta_data?.name || proposal.proposer?.email || 'Unknown'}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Clock className="w-4 h-4" />
@@ -243,7 +243,7 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
                         >
                           <div className="flex items-center gap-2">
                             <span className="font-medium text-gray-900 dark:text-white">
-                              {vote.user?.name || 'Unknown User'}
+                              {vote.user?.raw_user_meta_data?.name || vote.user?.email || 'Unknown User'}
                             </span>
                             <span className={`flex items-center gap-1 ${
                               vote.vote === 'preferred' ? 'text-purple-600 dark:text-purple-400' :

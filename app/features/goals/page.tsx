@@ -15,11 +15,11 @@ export default function GoalsFeaturePage() {
           </div>
 
           <h1 className="text-6xl md:text-7xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-            Goals & Milestones
+            Goal Tracking
           </h1>
 
           <p className="text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Set family goals, track progress, and celebrate achievements together. Build the future you want.
+            Set and track goals for your space. Create milestones, monitor progress, and organize your family's objectives.
           </p>
         </div>
 
@@ -96,10 +96,10 @@ export default function GoalsFeaturePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Perfect for every dream
+              How you might use goals
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400">
-              From personal growth to family milestones
+              Common types of goals people track
             </p>
           </div>
 
@@ -155,25 +155,28 @@ export default function GoalsFeaturePage() {
       <section className="bg-gradient-to-r from-indigo-600 to-purple-600 py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-5xl font-bold text-white mb-6">
-            Achieve your dreams together
+            Interested in trying Rowan?
           </h2>
-          <p className="text-xl text-indigo-100 mb-10">
-            Join families building better futures every day
+          <p className="text-xl text-indigo-100 mb-8">
+            We're currently developing Rowan's goal tracking features
           </p>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/signup"
-              className="px-8 py-4 shimmer-bg text-white rounded-full font-semibold hover:opacity-90 transition-all shadow-xl shadow-purple-500/50"
+              href="/"
+              className="px-8 py-4 bg-white text-indigo-600 rounded-full font-semibold hover:bg-indigo-50 transition-all shadow-xl text-lg"
             >
-              Create Your Account
+              Request Beta Access
             </Link>
             <Link
               href="/"
-              className="px-8 py-4 bg-indigo-700 text-white rounded-full font-bold text-lg hover:bg-indigo-800 transition-all"
+              className="px-8 py-4 bg-indigo-700/50 border border-indigo-400 text-white rounded-full font-semibold hover:bg-indigo-600/50 transition-all text-lg"
             >
-              Learn More
+              Get Notified When Ready
             </Link>
           </div>
+          <p className="text-indigo-200 text-sm mt-6">
+            Currently in development
+          </p>
         </div>
       </section>
 

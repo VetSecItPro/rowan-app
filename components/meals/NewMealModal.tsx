@@ -108,7 +108,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
         <div className="sticky top-0 z-10 bg-gradient-to-r from-orange-500 to-orange-600 px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg sm:text-xl font-bold text-white">{isEditing ? 'Edit Meal' : 'Plan New Meal'}</h2>
-            <button onClick={onClose} aria-label="Close modal" className="btn-touch w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-orange-700 transition-all active-press">
+            <button onClick={onClose} aria-label="Close modal" className="p-2 flex items-center justify-center hover:opacity-75 transition-opacity">
               <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
             </button>
           </div>

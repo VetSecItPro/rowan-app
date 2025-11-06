@@ -7,8 +7,9 @@ import ClientErrorBoundary from "@/components/shared/ClientErrorBoundary";
 // import { CommandPaletteProvider } from "@/components/ui/command-palette"; // Temporarily disabled UI
 import { Toaster } from 'sonner';
 
-// Force dynamic rendering for all pages (needed for auth context)
-export const dynamic = 'force-dynamic';
+// Remove forced dynamic rendering - let Next.js handle static/dynamic per page
+// export const dynamic = 'force-dynamic'; // ❌ This was causing hydration issues
+// export const revalidate = 0; // ❌ This was preventing proper caching
 
 export const metadata: Metadata = {
   title: "Rowan - Your Life, Organized",
