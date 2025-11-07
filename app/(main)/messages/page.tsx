@@ -1,5 +1,8 @@
 'use client';
 
+// Force dynamic rendering to prevent useContext errors during static generation
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as ImageIcon, Paperclip, TrendingUp, X } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
