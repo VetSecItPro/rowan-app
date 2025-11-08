@@ -36,6 +36,61 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [spaces, setSpaces] = useState<(Space & { role: string })[]>([]);
   const [currentSpace, setCurrentSpace] = useState<(Space & { role: string }) | null>(null);
   const [loading, setLoading] = useState(true);
+  // Load user profile and spaces data
+  const loadUserData = async (userId: string) => {
+    const supabase = createClient();
+
+    try {
+      // Get user profile
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (!profileError && profile) {
+        setUser({
+          id: profile.id,
+          email: profile.email || '',
+          name: profile.full_name || profile.email || '',
+          pronouns: profile.pronouns,
+          color_theme: profile.color_theme || 'light',
+          avatar_url: profile.avatar_url,
+        });
+      }
+
+      // Get user spaces
+      const { data: spacesData, error: spacesError } = await supabase
+        .from('space_members')
+        .select(`
+          role,
+          spaces (
+            id,
+            name,
+            created_at,
+            updated_at
+          )
+        `)
+        .eq('user_id', userId)
+        .order('joined_at', { ascending: false });
+
+      if (!spacesError && spacesData) {
+        const userSpaces = spacesData.map((item: any) => ({
+          ...item.spaces,
+          role: item.role,
+        }));
+        setSpaces(userSpaces);
+
+        // Set first space as current if no space is selected
+        if (userSpaces.length > 0) {
+          setCurrentSpace(userSpaces[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load user data:', error);
+    }
+  };
+
   // Initialize auth on mount
   useEffect(() => {
     const supabase = createClient();
@@ -43,12 +98,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      if (session?.user) {
+        loadUserData(session.user.id);
+      }
       setLoading(false);
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
+      if (session?.user) {
+        await loadUserData(session.user.id);
+      } else {
+        // Clear user data on logout
+        setUser(null);
+        setSpaces([]);
+        setCurrentSpace(null);
+      }
       setLoading(false);
     });
 
@@ -86,11 +152,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const refreshSpaces = async () => {
-    // Stub for now
+    if (session?.user) {
+      await loadUserData(session.user.id);
+    }
   };
 
   const refreshProfile = async () => {
-    // Stub for now
+    if (session?.user) {
+      await loadUserData(session.user.id);
+    }
   };
 
   const value: AuthContextType = {
