@@ -1,7 +1,6 @@
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
-import { createSpace } from '@/lib/services/spaces-service';
 
 interface AutoSpaceResult {
   success: boolean;
@@ -62,21 +61,50 @@ export async function ensureUserHasSpace(): Promise<AutoSpaceResult> {
     console.log('[auto-space] Creating default space for user:', user.id);
 
     const defaultSpaceName = "My Space";
-    const spaceResult = await createSpace(defaultSpaceName, user.id);
 
-    if (!spaceResult.success) {
-      console.error('[auto-space] Failed to create default space:', spaceResult.error);
+    // Create space directly using client
+    const { data: newSpace, error: spaceError } = await supabase
+      .from('spaces')
+      .insert({
+        name: defaultSpaceName,
+        created_by: user.id,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (spaceError || !newSpace) {
+      console.error('[auto-space] Failed to create default space:', spaceError);
       return {
         success: false,
-        error: spaceResult.error || 'Failed to create default space'
+        error: spaceError?.message || 'Failed to create default space'
       };
     }
 
-    console.log('[auto-space] Successfully created default space:', spaceResult.data?.id);
+    // Add user as owner of the space
+    const { error: memberError } = await supabase
+      .from('space_members')
+      .insert({
+        space_id: newSpace.id,
+        user_id: user.id,
+        role: 'owner',
+        joined_at: new Date().toISOString()
+      });
+
+    if (memberError) {
+      console.error('[auto-space] Failed to add user to space:', memberError);
+      return {
+        success: false,
+        error: memberError.message || 'Failed to add user to space'
+      };
+    }
+
+    console.log('[auto-space] Successfully created default space:', newSpace.id);
 
     return {
       success: true,
-      spaceId: spaceResult.data?.id
+      spaceId: newSpace.id
     };
 
   } catch (error) {
@@ -94,19 +122,48 @@ export async function ensureUserHasSpace(): Promise<AutoSpaceResult> {
  */
 export async function createDefaultSpace(userId: string, customName?: string): Promise<AutoSpaceResult> {
   try {
+    const supabase = createClient();
     const spaceName = customName || "My Space";
-    const spaceResult = await createSpace(spaceName, userId);
 
-    if (!spaceResult.success) {
+    // Create space directly using client
+    const { data: newSpace, error: spaceError } = await supabase
+      .from('spaces')
+      .insert({
+        name: spaceName,
+        created_by: userId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (spaceError || !newSpace) {
       return {
         success: false,
-        error: spaceResult.error || 'Failed to create space'
+        error: spaceError?.message || 'Failed to create space'
+      };
+    }
+
+    // Add user as owner of the space
+    const { error: memberError } = await supabase
+      .from('space_members')
+      .insert({
+        space_id: newSpace.id,
+        user_id: userId,
+        role: 'owner',
+        joined_at: new Date().toISOString()
+      });
+
+    if (memberError) {
+      return {
+        success: false,
+        error: memberError.message || 'Failed to add user to space'
       };
     }
 
     return {
       success: true,
-      spaceId: spaceResult.data?.id
+      spaceId: newSpace.id
     };
 
   } catch (error) {
