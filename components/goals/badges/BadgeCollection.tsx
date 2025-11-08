@@ -174,12 +174,12 @@ export default function BadgeCollection({ userId, spaceId }: BadgeCollectionProp
               className="w-full px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
             >
               <option value="all">All Categories</option>
-              <option value="milestone">Milestone</option>
-              <option value="streak">Streak</option>
-              <option value="collaboration">Collaboration</option>
-              <option value="persistence">Persistence</option>
-              <option value="variety">Variety</option>
-              <option value="speed">Speed</option>
+              <option value="goals">Goals</option>
+              <option value="milestones">Milestones</option>
+              <option value="streaks">Streaks</option>
+              <option value="social">Social</option>
+              <option value="special">Special</option>
+              <option value="seasonal">Seasonal</option>
             </select>
           </div>
 
