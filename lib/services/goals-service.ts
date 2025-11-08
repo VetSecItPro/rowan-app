@@ -1055,21 +1055,33 @@ export const goalsService = {
   async getActivityFeed(spaceId: string, limit = 20, offset = 0): Promise<GoalActivity[]> {
     const supabase = createClient();
 
-    const { data, error } = await supabase
-      .from('goal_activities')
-      .select(`
-        *,
-        user:users(id, name, avatar_url),
-        goal:goals(id, title, status, progress),
-        milestone:goal_milestones(id, title, completed),
-        check_in:goal_check_ins(id, progress_percentage, mood)
-      `)
-      .eq('space_id', spaceId)
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1);
+    try {
+      const { data, error } = await supabase
+        .from('goal_activities')
+        .select(`
+          *,
+          user:users(id, name, avatar_url),
+          goal:goals(id, title, status, progress),
+          milestone:goal_milestones(id, title, completed),
+          check_in:goal_check_ins(id, progress_percentage, mood)
+        `)
+        .eq('space_id', spaceId)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1);
 
-    if (error) throw error;
-    return data || [];
+      if (error) {
+        // Handle table not found error gracefully
+        if (error.message?.includes('goal_activities') || error.code === '42P01') {
+          console.warn('goal_activities table not found, returning empty activity feed');
+          return [];
+        }
+        throw error;
+      }
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching activity feed:', error);
+      return [];
+    }
   },
 
   async getGoalActivityFeed(goalId: string, limit = 20, offset = 0): Promise<GoalActivity[]> {

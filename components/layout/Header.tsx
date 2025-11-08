@@ -8,7 +8,7 @@ import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { HamburgerMenu } from '@/components/navigation/HamburgerMenu';
 import { ComprehensiveNotificationCenter } from '@/components/notifications/ComprehensiveNotificationCenter';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { LogOut, User as UserIcon, ChevronDown, Plus } from 'lucide-react';
+import { LogOut, User as UserIcon, ChevronDown, Plus, Trophy } from 'lucide-react';
 import { SpaceSelector } from '@/components/spaces/SpaceSelector';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
 
@@ -222,6 +222,15 @@ export function Header() {
                     >
                       <UserIcon className="w-4 h-4" />
                       Settings
+                    </Link>
+
+                    <Link
+                      href="/goals/badges"
+                      onClick={() => setIsDropdownOpen(false)}
+                      className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors active:scale-[0.98]"
+                    >
+                      <Trophy className="w-4 h-4" />
+                      Achievements
                     </Link>
 
                     <button
