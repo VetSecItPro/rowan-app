@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Get user profile with more detailed error handling
       console.log('📋 Fetching user profile...');
       const profileQuery = supabase
-        .from('profiles')
+        .from('users')
         .select('*')
         .eq('id', userId)
         .single();
@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser({
           id: profile.id,
           email: profile.email || '',
-          name: profile.full_name || profile.email || 'User',
+          name: profile.name || profile.email || 'User',
           pronouns: profile.pronouns,
           color_theme: profile.color_theme || 'light',
           avatar_url: profile.avatar_url,
@@ -179,7 +179,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Simple stub functions for now
   const signUp = async (email: string, password: string, profile: any) => {
-    return { error: new Error('SignUp not implemented yet') };
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          profile,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: new Error(data.error || data.details || 'Signup failed') };
+      }
+
+      return { error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
