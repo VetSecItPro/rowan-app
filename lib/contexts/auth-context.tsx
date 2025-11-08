@@ -36,23 +36,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [spaces, setSpaces] = useState<(Space & { role: string })[]>([]);
   const [currentSpace, setCurrentSpace] = useState<(Space & { role: string }) | null>(null);
   const [loading, setLoading] = useState(true);
-  // Load user profile and spaces data
+  // Load user profile and spaces data with bulletproof error handling
   const loadUserData = async (userId: string) => {
     console.log('🔄 Loading user data for:', userId);
+
+    // Always set a fallback user immediately to prevent hanging
+    const fallbackUser = {
+      id: userId,
+      email: 'user@example.com',
+      name: 'User',
+      color_theme: 'light',
+    };
 
     try {
       const supabase = createClient();
       console.log('📡 Supabase client created');
 
-      // Get user profile with more detailed error handling
+      // Wrap queries in timeout promise to prevent hanging
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Database query timeout')), 10000)
+      );
+
+      // Get user profile with timeout protection
       console.log('📋 Fetching user profile...');
-      const profileQuery = supabase
+      const profilePromise = supabase
         .from('users')
         .select('*')
         .eq('id', userId)
         .single();
 
-      const { data: profile, error: profileError } = await profileQuery;
+      const profileResult = await Promise.race([profilePromise, timeoutPromise]);
+      const { data: profile, error: profileError } = profileResult as any;
 
       if (profileError) {
         console.error('❌ Profile error details:', {
@@ -61,36 +75,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           details: profileError.details,
           hint: profileError.hint
         });
-        // Continue anyway - create minimal user object
-        setUser({
-          id: userId,
-          email: 'unknown@example.com',
-          name: 'User',
-          color_theme: 'light',
-        });
+        console.log('🔄 Setting fallback user due to profile error');
+        setUser(fallbackUser);
       } else if (profile) {
         console.log('✅ Profile loaded successfully:', profile);
         setUser({
           id: profile.id,
-          email: profile.email || '',
-          name: profile.name || profile.email || 'User',
+          email: profile.email || fallbackUser.email,
+          name: profile.name || profile.email || fallbackUser.name,
           pronouns: profile.pronouns,
           color_theme: profile.color_theme || 'light',
           avatar_url: profile.avatar_url,
         });
       } else {
-        console.log('⚠️ No profile found - creating minimal user');
-        setUser({
-          id: userId,
-          email: 'unknown@example.com',
-          name: 'User',
-          color_theme: 'light',
-        });
+        console.log('⚠️ No profile found - creating fallback user');
+        setUser(fallbackUser);
       }
 
-      // Get user spaces with detailed error handling
+      // Get user spaces with timeout protection
       console.log('🏠 Fetching user spaces...');
-      const spacesQuery = supabase
+      const spacesPromise = supabase
         .from('space_members')
         .select(`
           role,
@@ -104,28 +108,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('user_id', userId)
         .order('joined_at', { ascending: false });
 
-      const { data: spacesData, error: spacesError } = await spacesQuery;
+      try {
+        const spacesResult = await Promise.race([spacesPromise, timeoutPromise]);
+        const { data: spacesData, error: spacesError } = spacesResult as any;
 
-      if (spacesError) {
-        console.error('❌ Spaces error details:', {
-          code: spacesError.code,
-          message: spacesError.message,
-          details: spacesError.details,
-          hint: spacesError.hint
-        });
-        // Continue with empty spaces array
-        setSpaces([]);
-      } else if (spacesData && spacesData.length > 0) {
-        console.log('✅ Spaces loaded successfully:', spacesData);
-        const userSpaces = spacesData.map((item: any) => ({
-          ...item.spaces,
-          role: item.role,
-        }));
-        setSpaces(userSpaces);
-        setCurrentSpace(userSpaces[0]);
-        console.log('✅ Current space set:', userSpaces[0]);
-      } else {
-        console.log('⚠️ User has no spaces - continuing without space');
+        if (spacesError) {
+          console.error('❌ Spaces error details:', {
+            code: spacesError.code,
+            message: spacesError.message,
+            details: spacesError.details,
+            hint: spacesError.hint
+          });
+          setSpaces([]);
+          setCurrentSpace(null);
+        } else if (spacesData && spacesData.length > 0) {
+          console.log('✅ Spaces loaded successfully:', spacesData);
+          const userSpaces = spacesData.map((item: any) => ({
+            ...item.spaces,
+            role: item.role,
+          }));
+          setSpaces(userSpaces);
+          setCurrentSpace(userSpaces[0]);
+          console.log('✅ Current space set:', userSpaces[0]);
+        } else {
+          console.log('⚠️ User has no spaces - continuing without space');
+          setSpaces([]);
+          setCurrentSpace(null);
+        }
+      } catch (spacesError) {
+        console.error('❌ Spaces query failed or timeout:', spacesError);
         setSpaces([]);
         setCurrentSpace(null);
       }
@@ -134,13 +145,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     } catch (error) {
       console.error('💥 Unexpected error in loadUserData:', error);
-      // Set minimal user data to prevent infinite loading
-      setUser({
-        id: userId,
-        email: 'error@example.com',
-        name: 'User',
-        color_theme: 'light',
-      });
+      console.log('🔄 Setting fallback user due to unexpected error');
+      // Always set user data to prevent infinite loading
+      setUser(fallbackUser);
       setSpaces([]);
       setCurrentSpace(null);
     }
