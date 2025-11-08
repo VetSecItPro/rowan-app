@@ -91,12 +91,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }));
         setSpaces(userSpaces);
 
-        // Set first space as current if no space is selected
+        // Set first space as current if available
         if (userSpaces.length > 0) {
           setCurrentSpace(userSpaces[0]);
           console.log('✅ Current space set:', userSpaces[0]);
         } else {
-          console.log('⚠️ User has no spaces');
+          console.log('⚠️ User has no spaces - continuing without space');
+          // Don't hang - just continue without a space
         }
       } else {
         console.log('⚠️ No spaces data returned');
