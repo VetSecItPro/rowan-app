@@ -571,7 +571,7 @@ export default function MealsPage() {
     // Pre-populate meal modal with selected date and meal type
     setEditingMeal({
       id: '',
-      space_id: currentSpace?.id || '',
+      space_id: currentSpace?.id || 'skip',
       recipe_id: undefined,
       recipe: undefined,
       name: '',
@@ -623,7 +623,7 @@ export default function MealsPage() {
       // Pre-populate the meal modal with the newly added recipe
       setEditingMeal({
         id: '', // Empty ID indicates this is a new meal
-        space_id: currentSpace?.id || '',
+        space_id: currentSpace?.id || 'skip',
         recipe_id: savedRecipe.id,
         recipe: savedRecipe,
         name: '',
@@ -682,7 +682,7 @@ export default function MealsPage() {
     // Create a new meal state with pre-selected recipe
     setEditingMeal({
       id: '', // Empty ID indicates this is a new meal
-      space_id: currentSpace?.id || '',
+      space_id: currentSpace?.id || 'skip',
       recipe_id: recipe.id,
       recipe: recipe,
       name: '',

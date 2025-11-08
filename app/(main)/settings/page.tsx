@@ -1716,7 +1716,7 @@ export default function SettingsPage() {
       <InvitePartnerModal
         isOpen={showInviteModal}
         onClose={() => setShowInviteModal(false)}
-        spaceId={currentSpace?.id || ''}
+        spaceId={currentSpace?.id || 'skip'}
         spaceName={currentSpace?.name || ''}
       />
 
