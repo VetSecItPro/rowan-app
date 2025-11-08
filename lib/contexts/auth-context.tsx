@@ -41,6 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const supabase = createClient();
 
     try {
+      console.log('🔄 Loading user data for:', userId);
+
       // Get user profile
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
@@ -48,7 +50,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('id', userId)
         .single();
 
-      if (!profileError && profile) {
+      if (profileError) {
+        console.error('❌ Profile error:', profileError);
+      } else if (profile) {
+        console.log('✅ Profile loaded:', profile);
         setUser({
           id: profile.id,
           email: profile.email || '',
@@ -57,6 +62,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           color_theme: profile.color_theme || 'light',
           avatar_url: profile.avatar_url,
         });
+      } else {
+        console.log('⚠️ No profile found for user');
       }
 
       // Get user spaces
@@ -74,7 +81,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('user_id', userId)
         .order('joined_at', { ascending: false });
 
-      if (!spacesError && spacesData) {
+      if (spacesError) {
+        console.error('❌ Spaces error:', spacesError);
+      } else if (spacesData) {
+        console.log('✅ Spaces loaded:', spacesData);
         const userSpaces = spacesData.map((item: any) => ({
           ...item.spaces,
           role: item.role,
@@ -84,10 +94,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Set first space as current if no space is selected
         if (userSpaces.length > 0) {
           setCurrentSpace(userSpaces[0]);
+          console.log('✅ Current space set:', userSpaces[0]);
+        } else {
+          console.log('⚠️ User has no spaces');
         }
+      } else {
+        console.log('⚠️ No spaces data returned');
       }
     } catch (error) {
-      console.error('Failed to load user data:', error);
+      console.error('💥 Failed to load user data:', error);
     }
   };
 
@@ -96,16 +111,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const supabase = createClient();
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       if (session?.user) {
-        loadUserData(session.user.id);
+        await loadUserData(session.user.id);
       }
       setLoading(false);
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setLoading(true); // Set loading while processing auth change
       setSession(session);
       if (session?.user) {
         await loadUserData(session.user.id);
