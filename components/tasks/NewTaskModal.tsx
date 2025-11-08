@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Smile, ChevronDown, Repeat } from 'lucide-react';
+import { X, Smile, ChevronDown, Repeat, Loader2 } from 'lucide-react';
 import { CreateTaskInput, Task } from '@/lib/types';
 import { taskRecurrenceService } from '@/lib/services/task-recurrence-service';
+import { useAuth } from '@/lib/contexts/auth-context';
 
 // 20 family-friendly universal emojis
 const EMOJIS = ['😊', '😂', '❤️', '👍', '🎉', '🙏', '👏', '🤝', '💪', '🌟', '✨', '🎈', '🌸', '🌈', '☀️', '🍕', '☕', '📅', '✅', '🏠'];
@@ -27,13 +28,18 @@ interface NewTaskModalProps {
   onClose: () => void;
   onSave: (task: CreateTaskInput) => void;
   editTask?: Task | null;
-  spaceId: string;
+  spaceId?: string;
   userId?: string;
 }
 
 export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTaskModalProps) {
+  const { ensureCurrentUserHasSpace } = useAuth();
+  const [actualSpaceId, setActualSpaceId] = useState<string | undefined>(spaceId);
+  const [spaceCreationLoading, setSpaceCreationLoading] = useState(false);
+  const [spaceError, setSpaceError] = useState<string>('');
+
   const [formData, setFormData] = useState<CreateTaskInput>({
-    space_id: spaceId,
+    space_id: actualSpaceId || '',
     title: '',
     description: '',
     category: '',
@@ -55,11 +61,38 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
     daysOfWeek: [] as number[],
   });
 
+  // Auto-create space if needed when modal opens
+  useEffect(() => {
+    if (isOpen && !actualSpaceId && !editTask) {
+      setSpaceCreationLoading(true);
+      setSpaceError('');
+
+      ensureCurrentUserHasSpace()
+        .then((result) => {
+          if (result.success && result.spaceId) {
+            setActualSpaceId(result.spaceId);
+            setFormData(prev => ({ ...prev, space_id: result.spaceId }));
+          } else {
+            setSpaceError(result.error || 'Failed to create space');
+          }
+        })
+        .catch((error) => {
+          console.error('Error ensuring space:', error);
+          setSpaceError('Failed to create space');
+        })
+        .finally(() => {
+          setSpaceCreationLoading(false);
+        });
+    } else if (spaceId) {
+      setActualSpaceId(spaceId);
+    }
+  }, [isOpen, spaceId, actualSpaceId, editTask, ensureCurrentUserHasSpace]);
+
   // Populate form when editing
   useEffect(() => {
     if (editTask) {
       setFormData({
-        space_id: spaceId,
+        space_id: actualSpaceId || '',
         title: editTask.title,
         description: editTask.description || '',
         category: editTask.category || '',
@@ -74,7 +107,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
       });
     } else {
       setFormData({
-        space_id: spaceId,
+        space_id: actualSpaceId || '',
         title: '',
         description: '',
         category: '',
@@ -96,7 +129,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
       interval: 1,
       daysOfWeek: [],
     });
-  }, [editTask, spaceId, isOpen]);
+  }, [editTask, actualSpaceId, isOpen, userId]);
 
   const handleEmojiClick = (emoji: string) => {
     setFormData({ ...formData, title: formData.title + emoji });
@@ -121,11 +154,17 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
     // Clear any previous errors
     setDateError('');
 
+    // Ensure we have a space ID before proceeding
+    if (!actualSpaceId) {
+      setDateError('Space creation required');
+      return;
+    }
+
     // Handle recurring tasks
     if (isRecurring && !editTask && userId) {
       try {
         await taskRecurrenceService.createRecurringTask({
-          space_id: spaceId,
+          space_id: actualSpaceId,
           title: formData.title,
           description: formData.description || undefined,
           category: formData.category || undefined,
@@ -166,6 +205,31 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
     <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
+
+        {/* Loading Overlay for Space Creation */}
+        {spaceCreationLoading && (
+          <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+            <div className="text-center">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-3" />
+              <p className="text-sm text-gray-600 dark:text-gray-400">Setting up your space...</p>
+            </div>
+          </div>
+        )}
+
+        {/* Error Message */}
+        {spaceError && !spaceCreationLoading && (
+          <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+            <div className="text-center max-w-sm mx-4">
+              <p className="text-red-600 dark:text-red-400 mb-4">{spaceError}</p>
+              <button
+                onClick={onClose}
+                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
         {/* Header */}
         <div className="sticky top-0 z-10 bg-blue-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">

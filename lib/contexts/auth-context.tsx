@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { createClient } from '@/lib/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Space } from '@/lib/types';
+import { ensureUserHasSpace } from '@/lib/services/space-auto-creation-service';
 
 interface UserProfile {
   id: string;
@@ -26,6 +27,7 @@ interface AuthContextType {
   switchSpace: (space: Space & { role: string }) => void;
   refreshSpaces: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  ensureCurrentUserHasSpace: () => Promise<{ success: boolean; spaceId?: string; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -248,6 +250,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const ensureCurrentUserHasSpace = async () => {
+    try {
+      const result = await ensureUserHasSpace();
+
+      if (result.success && result.spaceId) {
+        // Refresh spaces to update context with new space
+        await refreshSpaces();
+        return result;
+      }
+
+      return result;
+    } catch (error) {
+      console.error('[auth-context] Error ensuring user has space:', error);
+      return {
+        success: false,
+        error: 'Failed to ensure user has space'
+      };
+    }
+  };
+
   const value: AuthContextType = {
     user,
     session,
@@ -260,6 +282,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     switchSpace,
     refreshSpaces,
     refreshProfile,
+    ensureCurrentUserHasSpace,
   };
 
   return (

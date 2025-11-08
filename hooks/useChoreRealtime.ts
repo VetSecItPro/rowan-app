@@ -31,10 +31,10 @@ export function useChoreRealtime({
 
   useEffect(() => {
     // Guard against invalid spaceId to prevent empty query parameters
-    if (!spaceId || spaceId.trim() === '' || spaceId === 'undefined' || spaceId === 'null') {
+    if (!spaceId || spaceId.trim() === '' || spaceId === 'undefined' || spaceId === 'null' || spaceId === 'placeholder' || spaceId === 'skip') {
       setChores([]);
       setLoading(false);
-      setError(new Error('Invalid space ID provided'));
+      setError(null); // Don't set error for intentional skips
       return;
     }
 
