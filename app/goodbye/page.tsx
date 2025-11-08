@@ -1,5 +1,8 @@
 'use client';
 
+// Force dynamic rendering to prevent useContext errors during static generation
+export const dynamic = 'force-dynamic';
+
 import { useEffect } from 'react';
 import { CheckCircle, Clock, Mail, Heart } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';

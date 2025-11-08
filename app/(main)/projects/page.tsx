@@ -1,5 +1,8 @@
 'use client';
 
+// Force dynamic rendering to prevent useContext errors during static generation
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Folder, Plus, Search, Wallet, Receipt, DollarSign, CheckCircle, Clock, FileText, FileCheck, X } from 'lucide-react';
 import { format } from 'date-fns';

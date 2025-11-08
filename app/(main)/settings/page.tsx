@@ -1,5 +1,8 @@
 'use client';
 
+// Force dynamic rendering to prevent useContext errors during static generation
+export const dynamic = 'force-dynamic';
+
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
