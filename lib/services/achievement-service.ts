@@ -661,12 +661,12 @@ export async function getUserBadgeStats(
       totalPoints: 0,
       byRarity: { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0 },
       byCategory: {
-        milestone: 0,
-        streak: 0,
-        collaboration: 0,
-        persistence: 0,
-        variety: 0,
-        speed: 0,
+        goals: 0,
+        milestones: 0,
+        streaks: 0,
+        social: 0,
+        special: 0,
+        seasonal: 0,
       },
     };
 
@@ -690,12 +690,12 @@ export async function getUserBadgeStats(
       totalPoints: 0,
       byRarity: { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0 },
       byCategory: {
-        milestone: 0,
-        streak: 0,
-        collaboration: 0,
-        persistence: 0,
-        variety: 0,
-        speed: 0,
+        goals: 0,
+        milestones: 0,
+        streaks: 0,
+        social: 0,
+        special: 0,
+        seasonal: 0,
       },
     };
   }
