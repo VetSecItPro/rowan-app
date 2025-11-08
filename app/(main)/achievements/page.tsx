@@ -34,7 +34,7 @@ export default function AchievementsPage() {
   // Presence tracking
   const { onlineUsers } = usePresence({
     channelName: 'achievements-presence',
-    spaceId: currentSpace?.id || '',
+    spaceId: currentSpace?.id || 'skip',
     userId: user?.id || '',
     userEmail: user?.email,
   });
