@@ -85,22 +85,22 @@ export function TemplateSelectionModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-4xl max-h-[90vh] bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+      <div className="w-full max-w-4xl max-h-[90vh] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-6 bg-gradient-to-r from-indigo-600 to-purple-600">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Choose a Goal Template</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            <h2 className="text-2xl font-bold text-white">Choose a Goal Template</h2>
+            <p className="text-sm text-indigo-100 mt-1">
               Start with a pre-built template or create from scratch
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
             aria-label="Close modal"
           >
-            <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <X className="w-5 h-5 text-white" />
           </button>
         </div>
 
@@ -113,7 +113,7 @@ export function TemplateSelectionModal({
               placeholder="Search templates..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-white/50 dark:bg-black/30 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all hover:border-indigo-400 dark:hover:border-indigo-500 focus:shadow-lg hover:shadow-md"
+              className="w-full pl-12 pr-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all hover:border-indigo-400 dark:hover:border-indigo-500"
             />
           </div>
         </div>
@@ -165,7 +165,7 @@ export function TemplateSelectionModal({
                 <button
                   key={template.id}
                   onClick={() => onSelectTemplate(template)}
-                  className="btn-touch group relative bg-white/60 dark:bg-black/40 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-6 text-left hover:bg-white/80 dark:hover:bg-black/60 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-[0.98] hover-lift shimmer-indigo active-press"
+                  className="group relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 text-left hover:bg-gray-50 dark:hover:bg-gray-750 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-lg transition-all duration-200"
                 >
                   {/* Category Badge */}
                   <div className="flex items-center justify-between mb-3">
@@ -216,7 +216,7 @@ export function TemplateSelectionModal({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50">
+        <div className="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-between">
             <button
               onClick={onClose}
