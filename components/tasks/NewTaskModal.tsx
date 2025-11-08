@@ -71,7 +71,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
         .then((result) => {
           if (result.success && result.spaceId) {
             setActualSpaceId(result.spaceId);
-            setFormData(prev => ({ ...prev, space_id: result.spaceId }));
+            setFormData(prev => ({ ...prev, space_id: result.spaceId! }));
           } else {
             setSpaceError(result.error || 'Failed to create space');
           }

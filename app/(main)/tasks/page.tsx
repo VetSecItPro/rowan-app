@@ -1001,29 +1001,33 @@ export default function TasksPage() {
             mode={editingItem ? "quickEdit" : "create"}
           />
 
-          <UnifiedDetailsModal
-            isOpen={isDetailsModalOpen}
-            onClose={handleCloseDetailsModal}
-            item={selectedItem}
-            onEdit={handleEditItem as any}
-            onDelete={handleDeleteItem}
-            onSave={handleSaveItem}
-            spaceId={currentSpace.id}
-            userId={user.id}
-          />
+          {currentSpace && (
+            <>
+              <UnifiedDetailsModal
+                isOpen={isDetailsModalOpen}
+                onClose={handleCloseDetailsModal}
+                item={selectedItem}
+                onEdit={handleEditItem as any}
+                onDelete={handleDeleteItem}
+                onSave={handleSaveItem}
+                spaceId={currentSpace.id}
+                userId={user.id}
+              />
 
-          {/* Advanced Feature Modals */}
+              {/* Advanced Feature Modals */}
 
-          <TemplatePickerModal
-            isOpen={isTemplatePickerOpen}
-            onClose={() => setIsTemplatePickerOpen(false)}
-            onSelect={(templateId) => {
-              console.log('Selected template:', templateId);
-              setIsTemplatePickerOpen(false);
-              // TODO: Create task from template
-            }}
-            spaceId={currentSpace.id}
-          />
+              <TemplatePickerModal
+                isOpen={isTemplatePickerOpen}
+                onClose={() => setIsTemplatePickerOpen(false)}
+                onSelect={(templateId) => {
+                  console.log('Selected template:', templateId);
+                  setIsTemplatePickerOpen(false);
+                  // TODO: Create task from template
+                }}
+                spaceId={currentSpace.id}
+              />
+            </>
+          )}
 
 
         </>
