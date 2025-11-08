@@ -8,8 +8,9 @@ import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { HamburgerMenu } from '@/components/navigation/HamburgerMenu';
 import { ComprehensiveNotificationCenter } from '@/components/notifications/ComprehensiveNotificationCenter';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { LogOut, User as UserIcon, ChevronDown } from 'lucide-react';
+import { LogOut, User as UserIcon, ChevronDown, Plus } from 'lucide-react';
 import { SpaceSelector } from '@/components/spaces/SpaceSelector';
+import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
 
 const COLOR_THEMES = {
   emerald: 'bg-emerald-500',
@@ -25,6 +26,7 @@ const COLOR_THEMES = {
 export function Header() {
   const { user, signOut, currentSpace, spaces, switchSpace } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -46,8 +48,14 @@ export function Header() {
     router.push('/login');
   };
 
+  const handleCreateSpace = () => {
+    setShowCreateSpaceModal(true);
+    setIsDropdownOpen(false);
+  };
+
   return (
-    <header className="bg-white/80 dark:bg-black/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-800/50 sticky top-0 z-50">
+    <>
+      <header className="bg-white/80 dark:bg-black/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-800/50 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
           {/* Logo and Brand - Clickable */}
@@ -95,8 +103,12 @@ export function Header() {
               </div>
             </div>
 
-            {/* Pricing Link */}
-            <a href="#pricing" className="hidden md:block inline-block py-2 px-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95">Pricing</a>
+            {/* Pricing Link - Only show for non-logged-in users */}
+            {!user && (
+              <a href="#pricing" className="hidden md:block inline-block py-2 px-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95">
+                Pricing
+              </a>
+            )}
 
             {/* Show Dashboard only for logged-in users, Create Account for non-logged-in */}
             {user ? (
@@ -195,6 +207,14 @@ export function Header() {
                     </div>
 
                     {/* Navigation Items */}
+                    <button
+                      onClick={handleCreateSpace}
+                      className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors active:scale-[0.98]"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Create New Space
+                    </button>
+
                     <Link
                       href="/settings"
                       onClick={() => setIsDropdownOpen(false)}
@@ -225,6 +245,14 @@ export function Header() {
           </div>
         </div>
       </div>
-    </header>
+      </header>
+
+      {/* Create Space Modal */}
+      <CreateSpaceModal
+        isOpen={showCreateSpaceModal}
+        onClose={() => setShowCreateSpaceModal(false)}
+        onSpaceCreated={() => setShowCreateSpaceModal(false)}
+      />
+    </>
   );
 }

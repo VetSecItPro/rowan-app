@@ -98,7 +98,7 @@ export default function GoalsPage() {
   // Presence tracking for collaborative editing
   const { onlineUsers, getUsersViewingGoal, updateViewingGoal } = usePresence({
     channelName: 'goals-presence',
-    spaceId: currentSpace?.id || '',
+    spaceId: currentSpace?.id || 'skip',
     userId: user?.id || '',
     userEmail: user?.email,
   });
@@ -1068,7 +1068,7 @@ export default function GoalsPage() {
               )
             ) : viewMode === 'habits' ? (
               /* Habits View */
-              <HabitTracker spaceId={currentSpace?.id || ''} />
+              <HabitTracker spaceId={currentSpace?.id || 'skip'} />
             ) : viewMode === 'dependencies' ? (
               /* Dependencies View */
               <div className="space-y-6">
@@ -1106,7 +1106,7 @@ export default function GoalsPage() {
               /* Activity View */
               <div className="space-y-6">
                 <ActivityFeed
-                  spaceId={currentSpace?.id || ''}
+                  spaceId={currentSpace?.id || 'skip'}
                   className="max-h-[600px]"
                 />
               </div>

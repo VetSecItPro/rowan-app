@@ -80,9 +80,9 @@ export default function TasksPage() {
   const [displayLimit, setDisplayLimit] = useState(20);
   const ITEMS_PER_PAGE = 20;
 
-  // Real-time tasks with filters (always enabled now) - exclude chore-specific fields
+  // Real-time tasks with filters (only when currentSpace exists)
   const { tasks: realtimeTasks, loading: realtimeLoading, refreshTasks, setTasks } = useTaskRealtime({
-    spaceId: currentSpace?.id || 'placeholder',
+    spaceId: currentSpace?.id || 'skip', // Use 'skip' to prevent database calls
     filters: {
       status: filters.status,
       priority: filters.priority,
@@ -96,7 +96,7 @@ export default function TasksPage() {
 
   // Real-time chores with enhanced filters
   const { chores: realtimeChores, loading: choreRealtimeLoading, refreshChores, setChores } = useChoreRealtime({
-    spaceId: currentSpace?.id || 'placeholder',
+    spaceId: currentSpace?.id || 'skip', // Use 'skip' to prevent database calls
     filters: {
       status: filters.status,
       frequency: filters.frequency, // Add frequency filter for chores
@@ -988,14 +988,14 @@ export default function TasksPage() {
       </PageErrorBoundary>
 
       {/* Unified Modals */}
-      {currentSpace && user && (
+      {user && (
         <>
           <UnifiedItemModal
             isOpen={isUnifiedModalOpen}
             onClose={handleCloseModal}
             onSave={handleSaveItem}
             editItem={editingItem}
-            spaceId={currentSpace.id}
+            spaceId={currentSpace?.id}
             userId={user.id}
             defaultType={modalDefaultType}
             mode={editingItem ? "quickEdit" : "create"}

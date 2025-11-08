@@ -1009,20 +1009,8 @@ export default function DashboardPage() {
             greetingText={greetingText}
             userName={user?.name}
             currentDate={currentDate}
-          >
-            {!currentSpace && (
-              <CTAButton
-                onClick={() => setShowCreateSpaceModal(true)}
-                feature="dashboard"
-                animationLevel="premium"
-                icon={<Plus className="w-4 h-4" />}
-                size="md"
-                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
-              >
-                Create Your Space
-              </CTAButton>
-            )}
-          </TimeAwareWelcomeBox>
+          />
+
 
           {/* Enhanced Feature Cards - 8 Cards */}
           <div>
@@ -2081,7 +2069,7 @@ export default function DashboardPage() {
       <InvitePartnerModal
         isOpen={showInviteModal}
         onClose={() => setShowInviteModal(false)}
-        spaceId={currentSpace?.id || ''}
+        spaceId={currentSpace?.id || 'skip'}
         spaceName={currentSpace?.name || ''}
       />
 
