@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const supabase = createClient();
       console.log('📡 Supabase client created');
 
-      // Get user profile with more detailed error handling
+      // Get user profile with more detailed error handling and timeout
       console.log('📋 Fetching user profile...');
       const profileQuery = supabase
         .from('users')
@@ -52,7 +52,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('id', userId)
         .single();
 
-      const { data: profile, error: profileError } = await profileQuery;
+      // Add timeout wrapper to prevent hanging
+      const profileQueryWithTimeout = Promise.race([
+        profileQuery,
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Profile query timeout')), 10000)
+        )
+      ]) as Promise<{ data: any; error: any }>;
+
+      const { data: profile, error: profileError } = await profileQueryWithTimeout;
 
       if (profileError) {
         console.error('❌ Profile error details:', {
