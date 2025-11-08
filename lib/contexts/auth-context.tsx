@@ -36,12 +36,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [spaces, setSpaces] = useState<(Space & { role: string })[]>([]);
   const [currentSpace, setCurrentSpace] = useState<(Space & { role: string }) | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isClient, setIsClient] = useState(false);
-
-  // Simple client-only initialization
+  // Initialize auth on mount
   useEffect(() => {
-    setIsClient(true);
-
     const supabase = createClient();
 
     // Get initial session
@@ -96,11 +92,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshProfile = async () => {
     // Stub for now
   };
-
-  // Don't render anything until we're on the client
-  if (!isClient) {
-    return null;
-  }
 
   const value: AuthContextType = {
     user,
