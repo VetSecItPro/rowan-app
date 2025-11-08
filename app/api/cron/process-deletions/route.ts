@@ -351,7 +351,7 @@ async function executeAccountDeletion(userId: string, email: string, userName: s
     await supabase.from('privacy_email_notifications').delete().eq('user_id', userId);
 
     // Delete user profile and related data (CASCADE should handle most)
-    await supabase.from('profiles').delete().eq('id', userId);
+    await supabase.from('users').delete().eq('id', userId);
 
     // 2. Delete from auth.users (this will cascade to related tables)
     const { error: authDeleteError } = await supabase.auth.admin.deleteUser(userId);

@@ -61,6 +61,24 @@ export const createClient = () => {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
+      fetch: (url, options = {}) => {
+        // Add timeout to all Supabase requests to prevent hanging
+        const timeoutDuration = 15000; // 15 second timeout
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          controller.abort();
+        }, timeoutDuration);
+
+        const fetchWithTimeout = fetch(url, {
+          ...options,
+          signal: controller.signal,
+        }).finally(() => {
+          clearTimeout(timeoutId);
+        });
+
+        return fetchWithTimeout;
+      },
     },
   });
 };
