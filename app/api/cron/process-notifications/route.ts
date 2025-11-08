@@ -122,8 +122,8 @@ async function sendInstantNotification(userId: string, notification: any): Promi
 
   // Get user details
   const { data: user } = await supabase
-    .from('profiles')
-    .select('email, first_name, last_name')
+    .from('users')
+    .select('email, name')
     .eq('id', userId)
     .single();
 

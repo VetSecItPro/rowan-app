@@ -38,59 +38,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   // Load user profile and spaces data
   const loadUserData = async (userId: string) => {
-    console.log('🔄 Loading user data for:', userId);
-
     try {
       const supabase = createClient();
-      console.log('📡 Supabase client created');
 
-      // Get user profile with more detailed error handling
-      console.log('📋 Fetching user profile...');
-      const profileQuery = supabase
-        .from('profiles')
+      // Get user profile - simple and reliable
+      const { data: profile, error: profileError } = await supabase
+        .from('users')
         .select('*')
         .eq('id', userId)
         .single();
 
-      const { data: profile, error: profileError } = await profileQuery;
-
       if (profileError) {
-        console.error('❌ Profile error details:', {
-          code: profileError.code,
-          message: profileError.message,
-          details: profileError.details,
-          hint: profileError.hint
-        });
-        // Continue anyway - create minimal user object
-        setUser({
-          id: userId,
-          email: 'unknown@example.com',
-          name: 'User',
-          color_theme: 'light',
-        });
-      } else if (profile) {
-        console.log('✅ Profile loaded successfully:', profile);
+        console.error('Profile loading error:', profileError);
+        return; // Exit early if profile fails
+      }
+
+      if (profile) {
         setUser({
           id: profile.id,
           email: profile.email || '',
-          name: profile.full_name || profile.email || 'User',
+          name: profile.name || profile.email || 'User',
           pronouns: profile.pronouns,
           color_theme: profile.color_theme || 'light',
           avatar_url: profile.avatar_url,
         });
-      } else {
-        console.log('⚠️ No profile found - creating minimal user');
-        setUser({
-          id: userId,
-          email: 'unknown@example.com',
-          name: 'User',
-          color_theme: 'light',
-        });
       }
 
-      // Get user spaces with detailed error handling
-      console.log('🏠 Fetching user spaces...');
-      const spacesQuery = supabase
+      // Get user spaces
+      const { data: spacesData, error: spacesError } = await supabase
         .from('space_members')
         .select(`
           role,
@@ -104,45 +79,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('user_id', userId)
         .order('joined_at', { ascending: false });
 
-      const { data: spacesData, error: spacesError } = await spacesQuery;
-
       if (spacesError) {
-        console.error('❌ Spaces error details:', {
-          code: spacesError.code,
-          message: spacesError.message,
-          details: spacesError.details,
-          hint: spacesError.hint
-        });
-        // Continue with empty spaces array
+        console.error('Spaces loading error:', spacesError);
         setSpaces([]);
-      } else if (spacesData && spacesData.length > 0) {
-        console.log('✅ Spaces loaded successfully:', spacesData);
+        return;
+      }
+
+      if (spacesData && spacesData.length > 0) {
         const userSpaces = spacesData.map((item: any) => ({
           ...item.spaces,
           role: item.role,
         }));
         setSpaces(userSpaces);
         setCurrentSpace(userSpaces[0]);
-        console.log('✅ Current space set:', userSpaces[0]);
       } else {
-        console.log('⚠️ User has no spaces - continuing without space');
         setSpaces([]);
         setCurrentSpace(null);
       }
 
-      console.log('✅ User data loading completed successfully');
-
     } catch (error) {
-      console.error('💥 Unexpected error in loadUserData:', error);
-      // Set minimal user data to prevent infinite loading
-      setUser({
-        id: userId,
-        email: 'error@example.com',
-        name: 'User',
-        color_theme: 'light',
-      });
-      setSpaces([]);
-      setCurrentSpace(null);
+      console.error('User data loading failed:', error);
     }
   };
 
@@ -177,9 +133,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Simple stub functions for now
   const signUp = async (email: string, password: string, profile: any) => {
-    return { error: new Error('SignUp not implemented yet') };
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          profile,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: new Error(data.error || data.details || 'Signup failed') };
+      }
+
+      return { error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
   };
 
   const signIn = async (email: string, password: string) => {

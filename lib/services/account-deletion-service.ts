@@ -148,7 +148,7 @@ async function deleteUserAccount(userId: string): Promise<DeletionResult> {
     await supabase.from('partnership_members').delete().eq('user_id', userId);
 
     // Delete user profile
-    await supabase.from('profiles').delete().eq('id', userId);
+    await supabase.from('users').delete().eq('id', userId);
 
     return { success: true };
   } catch (error) {
