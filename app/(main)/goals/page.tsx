@@ -4,7 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle, GitBranch, X, BarChart3, Calendar } from 'lucide-react';
+import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle, GitBranch, X, BarChart3, Calendar, MoreHorizontal, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -93,6 +93,7 @@ export default function GoalsPage() {
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; action: 'delete-goal' | 'delete-milestone'; id: string }>({ isOpen: false, action: 'delete-goal', id: '' });
 
   // Presence tracking for collaborative editing
@@ -485,6 +486,22 @@ export default function GoalsPage() {
     setEditingGoal(null);
   }, []);
 
+  // Handle click outside for more menu dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showMoreMenu) {
+        setShowMoreMenu(false);
+      }
+    };
+
+    if (showMoreMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [showMoreMenu]);
+
   const handleCloseMilestoneModal = useCallback(() => {
     setIsMilestoneModalOpen(false);
     setEditingMilestone(null);
@@ -679,6 +696,7 @@ export default function GoalsPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              {/* Core Navigation */}
               <div className="flex items-center gap-1 p-1.5 bg-gradient-to-r from-indigo-100 to-indigo-200 dark:from-indigo-900/30 dark:to-indigo-800/30 rounded-xl border border-indigo-200 dark:border-indigo-700">
                 <button
                   onClick={() => handleViewModeChange('goals')}
@@ -703,17 +721,6 @@ export default function GoalsPage() {
                   <span className="text-sm">Milestones</span>
                 </button>
                 <button
-                  onClick={() => handleViewModeChange('habits')}
-                  className={`px-2 sm:px-3 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
-                    viewMode === 'habits'
-                      ? 'bg-gradient-goals text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                  }`}
-                >
-                  <Target className="w-4 h-4" />
-                  <span className="text-sm">Habits</span>
-                </button>
-                <button
                   onClick={() => handleViewModeChange('activity')}
                   className={`px-2 sm:px-3 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
                     viewMode === 'activity'
@@ -724,28 +731,62 @@ export default function GoalsPage() {
                   <MessageCircle className="w-4 h-4" />
                   <span className="text-sm">Activity</span>
                 </button>
-                <button
-                  onClick={() => handleViewModeChange('dependencies')}
-                  className={`px-2 sm:px-3 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
-                    viewMode === 'dependencies'
-                      ? 'bg-gradient-goals text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                  }`}
-                >
-                  <GitBranch className="w-4 h-4" />
-                  <span className="text-sm">Dependencies</span>
-                </button>
-                <button
-                  onClick={() => handleViewModeChange('nudges')}
-                  className={`px-2 sm:px-3 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
-                    viewMode === 'nudges'
-                      ? 'bg-gradient-goals text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                  }`}
-                >
-                  <Sparkles className="w-4 h-4" />
-                  <span className="text-sm">Nudges</span>
-                </button>
+
+                {/* More Menu Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowMoreMenu(!showMoreMenu)}
+                    className={`px-2 sm:px-3 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                      ['habits', 'dependencies', 'nudges'].includes(viewMode)
+                        ? 'bg-gradient-goals text-white'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                    }`}
+                  >
+                    <MoreHorizontal className="w-4 h-4" />
+                    <ChevronDown className={`w-3 h-3 transition-transform ${showMoreMenu ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {showMoreMenu && (
+                    <div className="absolute top-full left-0 mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10 min-w-[140px]">
+                      <button
+                        onClick={() => {
+                          handleViewModeChange('habits');
+                          setShowMoreMenu(false);
+                        }}
+                        className={`w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm ${
+                          viewMode === 'habits' ? 'text-indigo-600 dark:text-indigo-400 font-medium' : 'text-gray-700 dark:text-gray-300'
+                        }`}
+                      >
+                        <Target className="w-4 h-4" />
+                        Habits
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleViewModeChange('dependencies');
+                          setShowMoreMenu(false);
+                        }}
+                        className={`w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm ${
+                          viewMode === 'dependencies' ? 'text-indigo-600 dark:text-indigo-400 font-medium' : 'text-gray-700 dark:text-gray-300'
+                        }`}
+                      >
+                        <GitBranch className="w-4 h-4" />
+                        Dependencies
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleViewModeChange('nudges');
+                          setShowMoreMenu(false);
+                        }}
+                        className={`w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm ${
+                          viewMode === 'nudges' ? 'text-indigo-600 dark:text-indigo-400 font-medium' : 'text-gray-700 dark:text-gray-300'
+                        }`}
+                      >
+                        <Sparkles className="w-4 h-4" />
+                        Nudges
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
               <Link
                 href="/goals/analytics"
