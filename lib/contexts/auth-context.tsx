@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Get user profile with more detailed error handling
       console.log('📋 Fetching user profile...');
       const profileQuery = supabase
-        .from('profiles')
+        .from('users')
         .select('*')
         .eq('id', userId)
         .single();
@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser({
           id: profile.id,
           email: profile.email || '',
-          name: profile.full_name || profile.email || 'User',
+          name: profile.name || profile.email || 'User',
           pronouns: profile.pronouns,
           color_theme: profile.color_theme || 'light',
           avatar_url: profile.avatar_url,
