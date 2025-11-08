@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Smile, ChevronDown, Repeat, Calendar, User, Clock, MessageSquare, Tag, Star, Users, CheckSquare, Home } from 'lucide-react';
+import { X, Smile, ChevronDown, Repeat, Calendar, User, Clock, MessageSquare, Tag, Star, Users, CheckSquare, Home, Loader2 } from 'lucide-react';
 import { CreateTaskInput, CreateChoreInput, Task, Chore } from '@/lib/types';
+import { useAuth } from '@/lib/contexts/auth-context';
 import { taskRecurrenceService } from '@/lib/services/task-recurrence-service';
 import { choreCalendarService } from '@/lib/services/chore-calendar-service';
 import {
@@ -23,7 +24,7 @@ interface UnifiedItemModalProps {
   onClose: () => void;
   onSave: (item: CreateTaskInput | CreateChoreInput) => void | Promise<void> | Promise<{ id: string }>;
   editItem?: (Task & { type?: 'task' }) | (Chore & { type?: 'chore' }) | null;
-  spaceId: string;
+  spaceId?: string;
   userId?: string;
   defaultType?: ItemType;
   mode?: ModalMode;
@@ -39,10 +40,17 @@ export function UnifiedItemModal({
   defaultType = 'task',
   mode = 'create'
 }: UnifiedItemModalProps) {
+  const { ensureCurrentUserHasSpace } = useAuth();
+
+  // Space management state
+  const [actualSpaceId, setActualSpaceId] = useState<string | undefined>(spaceId);
+  const [spaceCreationLoading, setSpaceCreationLoading] = useState(false);
+  const [spaceError, setSpaceError] = useState<string>('');
+
   // Core state
   const [itemType, setItemType] = useState<ItemType>(defaultType);
   const [formData, setFormData] = useState<any>({
-    space_id: spaceId,
+    space_id: actualSpaceId || '',
     title: '',
     description: '',
     category: '',
@@ -76,12 +84,39 @@ export function UnifiedItemModal({
   const [familyAssignment, setFamilyAssignment] = useState('unassigned');
   const [quickNote, setQuickNote] = useState('');
 
+  // Auto-create space if needed when modal opens
+  useEffect(() => {
+    if (isOpen && !actualSpaceId && !editItem) {
+      setSpaceCreationLoading(true);
+      setSpaceError('');
+
+      ensureCurrentUserHasSpace()
+        .then((result) => {
+          if (result.success && result.spaceId) {
+            setActualSpaceId(result.spaceId);
+            setFormData(prev => ({ ...prev, space_id: result.spaceId }));
+          } else {
+            setSpaceError(result.error || 'Failed to create space');
+          }
+        })
+        .catch((error) => {
+          console.error('Error ensuring space:', error);
+          setSpaceError('Failed to create space');
+        })
+        .finally(() => {
+          setSpaceCreationLoading(false);
+        });
+    } else if (spaceId) {
+      setActualSpaceId(spaceId);
+    }
+  }, [isOpen, spaceId, actualSpaceId, editItem, ensureCurrentUserHasSpace]);
+
   // Initialize form data
   useEffect(() => {
     if (editItem) {
       setItemType(editItem.type || 'task');
       setFormData({
-        space_id: spaceId,
+        space_id: actualSpaceId || '',
         title: editItem.title || '',
         description: editItem.description || '',
         category: (editItem as any).category || '',
@@ -97,7 +132,7 @@ export function UnifiedItemModal({
       // Reset for new items and set to defaultType
       setItemType(defaultType);
       setFormData({
-        space_id: spaceId,
+        space_id: actualSpaceId || '',
         title: '',
         description: '',
         category: '',
@@ -112,7 +147,7 @@ export function UnifiedItemModal({
     }
     setActiveSection('basic');
     setIntervalTouched(false); // Reset interval touched state for new modal instances
-  }, [editItem, spaceId, isOpen, defaultType]);
+  }, [editItem, actualSpaceId, isOpen, defaultType]);
 
   // Tab navigation using keyboard
   useEffect(() => {
@@ -166,6 +201,12 @@ export function UnifiedItemModal({
 
   const handleSubmit = async () => {
     if (!formData.title.trim()) {
+      return;
+    }
+
+    // Ensure we have a space ID before proceeding
+    if (!actualSpaceId) {
+      setSpaceError('Space creation required');
       return;
     }
 
@@ -289,6 +330,31 @@ export function UnifiedItemModal({
 
       {/* Enhanced Wide Modal */}
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full max-w-6xl h-full max-h-[95vh] overflow-hidden rounded-none sm:rounded-2xl shadow-2xl flex flex-col">
+
+        {/* Loading Overlay for Space Creation */}
+        {spaceCreationLoading && (
+          <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-2xl">
+            <div className="text-center">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-3" />
+              <p className="text-sm text-gray-600 dark:text-gray-400">Setting up your space...</p>
+            </div>
+          </div>
+        )}
+
+        {/* Error Message */}
+        {spaceError && !spaceCreationLoading && (
+          <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-2xl">
+            <div className="text-center max-w-sm mx-4">
+              <p className="text-red-600 dark:text-red-400 mb-4">{spaceError}</p>
+              <button
+                onClick={onClose}
+                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Elegant Header with Gradient */}
         <div className="sticky top-0 z-10 bg-gradient-tasks text-white px-6 py-5 border-b border-blue-500/20">
