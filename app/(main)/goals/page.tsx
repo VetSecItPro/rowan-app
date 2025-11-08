@@ -40,10 +40,21 @@ const DependenciesModal = dynamicImport(() => import('@/components/goals/Depende
 });
 
 // Dynamic imports for heavy view components (load only when active)
-const CheckInHistoryTimeline = dynamicImport(() => import('@/components/goals/CheckInHistoryTimeline').then(mod => ({ default: mod.CheckInHistoryTimeline })));
-const ActivityFeed = dynamicImport(() => import('@/components/goals/ActivityFeed').then(mod => ({ default: mod.ActivityFeed })));
-const HabitTracker = dynamicImport(() => import('@/components/goals/HabitTracker').then(mod => ({ default: mod.HabitTracker })));
-const DependencyVisualization = dynamicImport(() => import('@/components/goals/DependencyVisualization').then(mod => ({ default: mod.DependencyVisualization })));
+const CheckInHistoryTimeline = dynamicImport(() => import('@/components/goals/CheckInHistoryTimeline').then(mod => ({ default: mod.CheckInHistoryTimeline })), {
+  loading: () => <div className="p-6 flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
+});
+
+const ActivityFeed = dynamicImport(() => import('@/components/goals/ActivityFeed').then(mod => ({ default: mod.ActivityFeed })), {
+  loading: () => <div className="p-6 flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
+});
+
+const HabitTracker = dynamicImport(() => import('@/components/goals/HabitTracker').then(mod => ({ default: mod.HabitTracker })), {
+  loading: () => <div className="p-6 flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
+});
+
+const DependencyVisualization = dynamicImport(() => import('@/components/goals/DependencyVisualization').then(mod => ({ default: mod.DependencyVisualization })), {
+  loading: () => <div className="p-6 flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
+});
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { GoalCardSkeleton, MilestoneCardSkeleton, StatsCardSkeleton } from '@/components/ui/Skeleton';
@@ -53,8 +64,13 @@ const GuidedGoalCreation = dynamicImport(() => import('@/components/guided/Guide
   loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div></div>
 });
 
-const NudgeCenter = dynamicImport(() => import('@/components/nudges/NudgeCenter').then(mod => ({ default: mod.NudgeCenter })));
-const BadgesWidget = dynamicImport(() => import('@/components/goals/badges/BadgesWidget'));
+const NudgeCenter = dynamicImport(() => import('@/components/nudges/NudgeCenter').then(mod => ({ default: mod.NudgeCenter })), {
+  loading: () => <div className="p-6 flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
+});
+
+const BadgesWidget = dynamicImport(() => import('@/components/goals/badges/BadgesWidget'), {
+  loading: () => <div className="p-4 flex items-center justify-center"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div></div>
+});
 
 import { useAuth } from '@/lib/contexts/auth-context';
 import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput, GoalTemplate, CreateCheckInInput } from '@/lib/services/goals-service';
@@ -804,7 +820,7 @@ export default function GoalsPage() {
               </Link>
               <button
                 onClick={handleNewButtonClick}
-                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 w-[140px] sm:w-[160px]"
               >
                 <Plus className="w-5 h-5" />
                 <span>New {viewMode === 'goals' ? 'Goal' : viewMode === 'milestones' ? 'Milestone' : viewMode === 'habits' ? 'Habit' : viewMode === 'dependencies' ? 'Dependency' : viewMode === 'nudges' ? 'Goal' : 'Goal'}</span>
@@ -915,12 +931,6 @@ export default function GoalsPage() {
               </div>
             </div>
 
-            {/* Badges Widget */}
-            {user && currentSpace && (
-              <div className="sm:col-span-2 lg:col-span-1">
-                <BadgesWidget userId={user.id} spaceId={currentSpace.id} />
-              </div>
-            )}
             </>
             )}
           </div>
