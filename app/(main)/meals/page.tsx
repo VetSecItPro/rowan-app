@@ -266,7 +266,7 @@ export default function MealsPage() {
 
   // Load meals callback
   const loadMeals = useCallback(async () => {
-    // Don't load data if user doesn't have a space yet
+    // Don't load data if user doesn't have a space yet - but keep loading state
     if (!currentSpace || !user) {
       setLoading(false);
       return;
@@ -305,7 +305,7 @@ export default function MealsPage() {
 
   // Load recipes callback
   const loadRecipes = useCallback(async () => {
-    // Don't load data if user doesn't have a space yet
+    // Don't load data if user doesn't have a space yet - but still allow function to complete
     if (!currentSpace) {
       return;
     }
@@ -378,12 +378,18 @@ export default function MealsPage() {
 
   // Memoized handlers
   const handleCreateMeal = useCallback(async (mealData: CreateMealInput, createShoppingList?: boolean) => {
+    // If currentSpace is not available, don't allow meal creation
+    if (!currentSpace) {
+      console.warn('Cannot create meal: space not loaded yet');
+      return;
+    }
+
     try {
       // If creating shopping list and recipe has ingredients, show review modal
       // Check if this is a new meal (no editingMeal OR editingMeal has empty ID)
       const isNewMeal = !editingMeal || !editingMeal.id;
 
-      if (createShoppingList && mealData.recipe_id && currentSpace && isNewMeal) {
+      if (createShoppingList && mealData.recipe_id && isNewMeal) {
         const recipe = recipes.find(r => r.id === mealData.recipe_id);
         if (recipe && recipe.ingredients && recipe.ingredients.length > 0) {
           // Convert ingredients to strings if they're objects
@@ -472,6 +478,12 @@ export default function MealsPage() {
   }, [meals]);
 
   const handleCreateRecipe = useCallback(async (recipeData: CreateRecipeInput) => {
+    // If currentSpace is not available, don't allow recipe creation
+    if (!currentSpace) {
+      console.warn('Cannot create recipe: space not loaded yet');
+      return;
+    }
+
     try {
       if (editingRecipe) {
         await mealsService.updateRecipe(editingRecipe.id, recipeData);
@@ -483,7 +495,7 @@ export default function MealsPage() {
     } catch (error) {
       console.error('Failed to save recipe:', error);
     }
-  }, [editingRecipe, loadRecipes]);
+  }, [editingRecipe, loadRecipes, currentSpace]);
 
   const handleDeleteRecipe = useCallback(async (recipeId: string) => {
     const recipeToDelete = recipes.find(r => r.id === recipeId);
@@ -1367,48 +1379,45 @@ export default function MealsPage() {
           )}
         </div>
       </div>
-      {currentSpace && (
-        <>
-          <NewMealModal
-            isOpen={isModalOpen}
-            onClose={handleCloseMealModal}
-            onSave={handleCreateMeal}
-            editMeal={editingMeal}
-            spaceId={currentSpace.id}
-            recipes={recipes}
-            onOpenRecipeDiscover={handleOpenRecipeDiscover}
-          />
-          <NewRecipeModal
-            isOpen={isRecipeModalOpen}
-            onClose={handleCloseRecipeModal}
-            onSave={handleCreateRecipe}
-            editRecipe={editingRecipe}
-            spaceId={currentSpace.id}
-            initialTab={recipeModalInitialTab}
-            onRecipeAdded={handleRecipeAddedFromDiscover}
-          />
-          {selectedRecipeForReview && (
-            <IngredientReviewModal
-              isOpen={isIngredientReviewOpen}
-              onClose={() => {
-                setIsIngredientReviewOpen(false);
-                setPendingMealData(null);
-                setSelectedRecipeForReview(null);
-              }}
-              onConfirm={handleIngredientConfirm}
-              ingredients={selectedRecipeForReview.ingredients}
-              recipeName={selectedRecipeForReview.name}
-            />
-          )}
-          <GenerateListModal
-            isOpen={isGenerateListOpen}
-            onClose={() => setIsGenerateListOpen(false)}
-            meals={meals}
-            spaceId={currentSpace.id}
-            onSuccess={() => loadMeals()}
-          />
-        </>
+      {/* Modals - render even when currentSpace is temporarily null */}
+      <NewMealModal
+        isOpen={isModalOpen}
+        onClose={handleCloseMealModal}
+        onSave={handleCreateMeal}
+        editMeal={editingMeal}
+        spaceId={currentSpace?.id || 'loading'}
+        recipes={recipes}
+        onOpenRecipeDiscover={handleOpenRecipeDiscover}
+      />
+      <NewRecipeModal
+        isOpen={isRecipeModalOpen}
+        onClose={handleCloseRecipeModal}
+        onSave={handleCreateRecipe}
+        editRecipe={editingRecipe}
+        spaceId={currentSpace?.id || 'loading'}
+        initialTab={recipeModalInitialTab}
+        onRecipeAdded={handleRecipeAddedFromDiscover}
+      />
+      {selectedRecipeForReview && (
+        <IngredientReviewModal
+          isOpen={isIngredientReviewOpen}
+          onClose={() => {
+            setIsIngredientReviewOpen(false);
+            setPendingMealData(null);
+            setSelectedRecipeForReview(null);
+          }}
+          onConfirm={handleIngredientConfirm}
+          ingredients={selectedRecipeForReview.ingredients}
+          recipeName={selectedRecipeForReview.name}
+        />
       )}
+      <GenerateListModal
+        isOpen={isGenerateListOpen}
+        onClose={() => setIsGenerateListOpen(false)}
+        meals={meals}
+        spaceId={currentSpace?.id || 'loading'}
+        onSuccess={() => loadMeals()}
+      />
     </FeatureLayout>
   );
 }

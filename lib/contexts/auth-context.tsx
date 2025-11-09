@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const supabase = createClient();
 
-      // Get user profile - simple and reliable
+      // Get user profile - continue even if profile fails
       const { data: profile, error: profileError } = await supabase
         .from('users')
         .select('*')
@@ -50,10 +50,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (profileError) {
         console.error('Profile loading error:', profileError);
-        return; // Exit early if profile fails
-      }
-
-      if (profile) {
+        // Don't return early - set basic user info and continue with spaces
+        setUser({
+          id: userId,
+          email: '', // Will be filled from session if available
+          name: 'User',
+          pronouns: undefined,
+          color_theme: 'light',
+          avatar_url: undefined,
+        });
+      } else if (profile) {
         setUser({
           id: profile.id,
           email: profile.email || '',
@@ -64,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
       }
 
-      // Get user spaces
+      // Get user spaces - always attempt this regardless of profile status
       const { data: spacesData, error: spacesError } = await supabase
         .from('space_members')
         .select(`
@@ -81,24 +87,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (spacesError) {
         console.error('Spaces loading error:', spacesError);
+        // Don't return early - always set spaces state even if empty
         setSpaces([]);
-        return;
-      }
-
-      if (spacesData && spacesData.length > 0) {
+        setCurrentSpace(null);
+      } else if (spacesData && spacesData.length > 0) {
         const userSpaces = spacesData.map((item: any) => ({
           ...item.spaces,
           role: item.role,
         }));
         setSpaces(userSpaces);
         setCurrentSpace(userSpaces[0]);
+        console.log('Successfully loaded spaces:', userSpaces.length);
       } else {
+        console.log('No spaces found for user');
         setSpaces([]);
         setCurrentSpace(null);
       }
 
     } catch (error) {
       console.error('User data loading failed:', error);
+      // Even on catastrophic failure, ensure states are set
+      setSpaces([]);
+      setCurrentSpace(null);
     }
   };
 
