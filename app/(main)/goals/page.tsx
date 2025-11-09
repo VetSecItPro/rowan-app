@@ -88,6 +88,7 @@ export default function GoalsPage() {
   const [isFrequencyModalOpen, setIsFrequencyModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<GoalTemplate | null>(null);
   const [checkInGoal, setCheckInGoal] = useState<Goal | null>(null);
   const [historyGoal, setHistoryGoal] = useState<Goal | null>(null);
   const [frequencyGoal, setFrequencyGoal] = useState<Goal | null>(null);
@@ -487,6 +488,7 @@ export default function GoalsPage() {
   const handleCloseGoalModal = useCallback(() => {
     setIsGoalModalOpen(false);
     setEditingGoal(null);
+    setSelectedTemplate(null);
   }, []);
 
   const handleCloseMilestoneModal = useCallback(() => {
@@ -549,18 +551,14 @@ export default function GoalsPage() {
     }
   }, [viewMode, handleOpenMilestoneModal]);
 
-  const handleSelectTemplate = useCallback(async (template: GoalTemplate) => {
+  const handleSelectTemplate = useCallback((template: GoalTemplate) => {
     if (!currentSpace) return;
 
-    try {
-      setIsTemplateModalOpen(false);
-      // Create goal from template with auto-generated milestones
-      await goalsService.createGoalFromTemplate(currentSpace.id, template.id);
-      loadData();
-    } catch (error) {
-      console.error('Failed to create goal from template:', error);
-    }
-  }, [currentSpace, loadData]);
+    // Set template data and open NewGoalModal for editing
+    setSelectedTemplate(template);
+    setIsTemplateModalOpen(false);
+    setIsGoalModalOpen(true);
+  }, [currentSpace]);
 
   const handleCloseTemplateModal = useCallback(() => {
     setIsTemplateModalOpen(false);
@@ -1053,6 +1051,7 @@ export default function GoalsPage() {
             editGoal={editingGoal}
             spaceId={currentSpace.id}
             availableGoals={goals.filter(g => g.status === 'active')}
+            selectedTemplate={selectedTemplate}
           />
           <NewMilestoneModal
             isOpen={isMilestoneModalOpen}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Smile, Target } from 'lucide-react';
-import { CreateGoalInput, Goal } from '@/lib/services/goals-service';
+import { CreateGoalInput, Goal, GoalTemplate } from '@/lib/services/goals-service';
 
 // 20 family-friendly universal emojis
 const EMOJIS = ['😊', '😂', '❤️', '👍', '🎉', '🙏', '👏', '🤝', '💪', '🌟', '✨', '🎈', '🌸', '🌈', '☀️', '🍕', '☕', '📅', '✅', '🏠'];
@@ -14,9 +14,10 @@ interface NewGoalModalProps {
   editGoal?: Goal | null;
   spaceId: string;
   availableGoals?: Goal[]; // Goals that can be selected as dependencies
+  selectedTemplate?: GoalTemplate | null;
 }
 
-export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, availableGoals = [] }: NewGoalModalProps) {
+export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, availableGoals = [], selectedTemplate }: NewGoalModalProps) {
   const [formData, setFormData] = useState<CreateGoalInput>({
     space_id: spaceId,
     title: '',
@@ -63,6 +64,34 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
         setSelectedCategory('Other');
         setCustomCategory(category);
       }
+    } else if (selectedTemplate) {
+      // Prefill from template
+      const templateCategory = selectedTemplate.category || '';
+      const isPresetCategory = categoryOptions.includes(templateCategory);
+
+      // Calculate target date if template has target_days
+      const targetDate = selectedTemplate.target_days
+        ? new Date(Date.now() + selectedTemplate.target_days * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        : '';
+
+      setFormData({
+        space_id: spaceId,
+        title: selectedTemplate.title,
+        description: selectedTemplate.description || '',
+        category: templateCategory,
+        status: 'active',
+        progress: 0,
+        target_date: targetDate,
+        depends_on_goal_id: '',
+      });
+
+      if (isPresetCategory) {
+        setSelectedCategory(templateCategory);
+        setCustomCategory('');
+      } else {
+        setSelectedCategory('Other');
+        setCustomCategory(templateCategory);
+      }
     } else {
       setFormData({
         space_id: spaceId,
@@ -78,7 +107,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
       setCustomCategory('');
     }
     setShowEmojiPicker(false);
-  }, [editGoal, spaceId, isOpen]);
+  }, [editGoal, selectedTemplate, spaceId, isOpen]);
 
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
@@ -125,7 +154,9 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
         {/* Header */}
         <div className="sticky top-0 z-10 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-bold">{editGoal ? 'Edit Goal' : 'New Goal'}</h2>
+            <h2 className="text-lg sm:text-xl font-bold">
+              {editGoal ? 'Edit Goal' : selectedTemplate ? `New Goal from Template` : 'New Goal'}
+            </h2>
             <button
               onClick={onClose}
               className="p-2 flex items-center justify-center hover:opacity-75 transition-opacity"
