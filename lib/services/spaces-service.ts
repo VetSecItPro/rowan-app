@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/client';
 import { z } from 'zod';
 import type { Space, SpaceMember, CreateSpaceInput } from '@/lib/types';
 
