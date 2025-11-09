@@ -804,26 +804,12 @@ export default function GoalsPage() {
                   )}
                 </div>
               </div>
-              <Link
-                href="/goals/analytics"
-                className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
-              >
-                <BarChart3 className="w-5 h-5" />
-                <span>Analytics</span>
-              </Link>
-              <Link
-                href="/goals/calendar"
-                className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
-              >
-                <Calendar className="w-5 h-5" />
-                <span>Calendar</span>
-              </Link>
               <button
                 onClick={handleNewButtonClick}
-                className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 min-w-[140px]"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
-                <span>New {viewMode === 'goals' ? 'Goal' : viewMode === 'milestones' ? 'Milestone' : 'Goal'}</span>
+                <span>New {viewMode === 'goals' ? 'Goal' : viewMode === 'milestones' ? 'Milestone' : viewMode === 'habits' ? 'Habit' : viewMode === 'dependencies' ? 'Goal' : viewMode === 'nudges' ? 'Goal' : 'Goal'}</span>
               </button>
             </div>
           </div>
