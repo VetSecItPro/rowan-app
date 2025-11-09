@@ -165,6 +165,7 @@ export function TemplateSelectionModal({
                 <button
                   key={template.id}
                   onClick={() => onSelectTemplate(template)}
+                  title={`Click to use "${template.title}" template - ${template.description || 'Pre-configured goal template'}`}
                   className="group relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 text-left hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-lg transition-all duration-200"
                 >
                   {/* Category Badge */}
@@ -216,18 +217,20 @@ export function TemplateSelectionModal({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-between">
+        <div className="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 sm:justify-between">
             <button
               onClick={onClose}
-              className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors order-2 sm:order-1"
+              title="Close without selecting a template"
+              className="flex-1 sm:flex-none px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             >
               Cancel
             </button>
             {onCreateFromScratch && (
               <button
                 onClick={onCreateFromScratch}
-                className="px-6 py-3 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-600 transition-colors order-1 sm:order-2"
+                title="Start with a blank goal instead of using a template"
+                className="flex-1 sm:flex-none px-6 py-3 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-600 transition-colors"
               >
                 Create from Scratch
               </button>
