@@ -820,10 +820,10 @@ export default function GoalsPage() {
               </Link>
               <button
                 onClick={handleNewButtonClick}
-                className="px-4 sm:px-6 py-2 sm:py-3 shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 w-[140px] sm:w-[160px]"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 min-w-[140px]"
               >
                 <Plus className="w-5 h-5" />
-                <span>New {viewMode === 'goals' ? 'Goal' : viewMode === 'milestones' ? 'Milestone' : viewMode === 'habits' ? 'Habit' : viewMode === 'dependencies' ? 'Dependency' : viewMode === 'nudges' ? 'Goal' : 'Goal'}</span>
+                <span>New {viewMode === 'goals' ? 'Goal' : viewMode === 'milestones' ? 'Milestone' : 'Goal'}</span>
               </button>
             </div>
           </div>
@@ -1058,7 +1058,7 @@ export default function GoalsPage() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                       <button
                         onClick={handleOpenGoalModal}
-                        className="btn-touch shimmer-goals text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                        className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
                       >
                         <Plus className="w-5 h-5" />
                         Create Goal
