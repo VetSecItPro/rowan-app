@@ -165,7 +165,7 @@ export function TemplateSelectionModal({
                 <button
                   key={template.id}
                   onClick={() => onSelectTemplate(template)}
-                  className="group relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 text-left hover:bg-gray-50 dark:hover:bg-gray-750 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-lg transition-all duration-200"
+                  className="group relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 text-left hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-lg transition-all duration-200"
                 >
                   {/* Category Badge */}
                   <div className="flex items-center justify-between mb-3">
@@ -205,7 +205,7 @@ export function TemplateSelectionModal({
 
                   {/* Target Days Badge */}
                   {template.target_days && (
-                    <div className="absolute top-4 right-4 px-2 py-1 bg-indigo-500/20 dark:bg-indigo-500/30 text-indigo-700 dark:text-indigo-300 text-xs font-medium rounded-lg backdrop-blur-sm">
+                    <div className="absolute top-4 right-4 px-2 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-xs font-medium rounded-lg border border-indigo-200 dark:border-indigo-700">
                       {template.target_days} days
                     </div>
                   )}

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, DollarSign, Percent, Hash, Calendar, Smile } from 'lucide-react';
-import { Milestone, CreateMilestoneInput } from '@/lib/services/goals-service';
+import { X, DollarSign, Percent, Hash, Calendar, Smile, Target } from 'lucide-react';
+import { Milestone, CreateMilestoneInput, Goal } from '@/lib/services/goals-service';
 
 // 20 family-friendly universal emojis
 const EMOJIS = ['😊', '😂', '❤️', '👍', '🎉', '🙏', '👏', '🤝', '💪', '🌟', '✨', '🎈', '🌸', '🌈', '☀️', '🍕', '☕', '📅', '✅', '🏠'];
@@ -13,9 +13,10 @@ interface NewMilestoneModalProps {
   onSave: (data: CreateMilestoneInput) => void;
   editMilestone: Milestone | null;
   goalId: string;
+  availableGoals?: Goal[]; // Goals that can be selected as dependencies
 }
 
-export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goalId }: NewMilestoneModalProps) {
+export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goalId, availableGoals = [] }: NewMilestoneModalProps) {
   const [formData, setFormData] = useState<CreateMilestoneInput>({
     goal_id: goalId,
     title: '',
@@ -24,6 +25,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
     target_value: 0,
     current_value: 0,
     target_date: '',
+    depends_on_goal_id: '',
   });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
@@ -37,6 +39,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
         target_value: editMilestone.target_value,
         current_value: editMilestone.current_value,
         target_date: editMilestone.target_date || '',
+        depends_on_goal_id: '', // For editing, we don't show existing dependencies
       });
     } else {
       setFormData({
@@ -47,6 +50,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
         target_value: 0,
         current_value: 0,
         target_date: '',
+        depends_on_goal_id: '',
       });
     }
     setShowEmojiPicker(false);
@@ -60,10 +64,11 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Clean up the form data - don't send empty strings for dates
+    // Clean up the form data - don't send empty strings for dates or dependencies
     const cleanedData: CreateMilestoneInput = {
       ...formData,
       target_date: formData.target_date || undefined,
+      depends_on_goal_id: formData.depends_on_goal_id || undefined,
     };
 
     // For non-date types, remove target_date entirely
@@ -255,6 +260,35 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
                 onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
                 className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
               />
+            </div>
+          )}
+
+          {/* Depends On */}
+          {availableGoals.length > 0 && (
+            <div>
+              <label htmlFor="field-7" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                Depends on Goal (optional)
+              </label>
+              <div className="relative">
+                <Target className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <select
+                  value={formData.depends_on_goal_id}
+                  onChange={(e) => setFormData({ ...formData, depends_on_goal_id: e.target.value })}
+                  className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
+                >
+                  <option value="">No dependency (can start immediately)</option>
+                  {availableGoals
+                    .filter(goal => goal.id !== goalId) // Don't show the parent goal
+                    .map((goal) => (
+                      <option key={goal.id} value={goal.id}>
+                        {goal.title}
+                      </option>
+                    ))}
+                </select>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                This milestone will be available after the selected goal is completed
+              </p>
             </div>
           )}
 

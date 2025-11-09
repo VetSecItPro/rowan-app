@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Smile } from 'lucide-react';
+import { X, Smile, Target } from 'lucide-react';
 import { CreateGoalInput, Goal } from '@/lib/services/goals-service';
 
 // 20 family-friendly universal emojis
@@ -13,9 +13,10 @@ interface NewGoalModalProps {
   onSave: (goal: CreateGoalInput) => void;
   editGoal?: Goal | null;
   spaceId: string;
+  availableGoals?: Goal[]; // Goals that can be selected as dependencies
 }
 
-export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: NewGoalModalProps) {
+export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, availableGoals = [] }: NewGoalModalProps) {
   const [formData, setFormData] = useState<CreateGoalInput>({
     space_id: spaceId,
     title: '',
@@ -24,6 +25,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
     status: 'active',
     progress: 0,
     target_date: '',
+    depends_on_goal_id: '',
   });
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [customCategory, setCustomCategory] = useState<string>('');
@@ -51,6 +53,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
         status: editGoal.status,
         progress: editGoal.progress,
         target_date: editGoal.target_date || '',
+        depends_on_goal_id: '', // For editing, we don't show existing dependencies
       });
 
       if (isPresetCategory) {
@@ -69,6 +72,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
         status: 'active',
         progress: 0,
         target_date: '',
+        depends_on_goal_id: '',
       });
       setSelectedCategory('');
       setCustomCategory('');
@@ -100,11 +104,12 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
     // Use custom category if "Other" is selected, otherwise use selected category
     const finalCategory = selectedCategory === 'Other' ? customCategory : selectedCategory;
 
-    // Clean up the form data - don't send empty strings for dates
+    // Clean up the form data - don't send empty strings for dates or dependencies
     const cleanedData: CreateGoalInput = {
       ...formData,
       category: finalCategory,
       target_date: formData.target_date || undefined,
+      depends_on_goal_id: formData.depends_on_goal_id || undefined,
     };
 
     onSave(cleanedData);
@@ -256,6 +261,35 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId }: New
               className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
             />
           </div>
+
+          {/* Depends On */}
+          {availableGoals.length > 0 && (
+            <div>
+              <label htmlFor="field-7" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                Depends on (optional)
+              </label>
+              <div className="relative">
+                <Target className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <select
+                  value={formData.depends_on_goal_id}
+                  onChange={(e) => setFormData({ ...formData, depends_on_goal_id: e.target.value })}
+                  className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
+                >
+                  <option value="">No dependency (can start immediately)</option>
+                  {availableGoals
+                    .filter(goal => goal.id !== editGoal?.id) // Don't show the goal being edited
+                    .map((goal) => (
+                      <option key={goal.id} value={goal.id}>
+                        {goal.title}
+                      </option>
+                    ))}
+                </select>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                This goal will start after the selected goal is completed
+              </p>
+            </div>
+          )}
           {/* Actions */}
           <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <button
