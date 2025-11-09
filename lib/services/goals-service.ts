@@ -39,6 +39,25 @@ export interface MilestoneTemplate {
   created_at: string;
 }
 
+export interface GoalDependency {
+  id: string;
+  space_id: string;
+  goal_id: string;
+  depends_on_goal_id: string;
+  dependency_type: 'prerequisite' | 'trigger' | 'blocking';
+  completion_threshold: number;
+  auto_unlock: boolean;
+  unlock_delay_days: number;
+  status: 'pending' | 'satisfied' | 'bypassed';
+  satisfied_at?: string;
+  bypassed_at?: string;
+  bypassed_by?: string;
+  bypass_reason?: string;
+  created_at: string;
+  updated_at: string;
+  created_by?: string;
+}
+
 export interface GoalTemplate {
   id: string;
   title: string;
@@ -86,6 +105,7 @@ export interface CreateGoalInput {
   visibility?: 'private' | 'shared';
   template_id?: string;
   target_date?: string;
+  depends_on_goal_id?: string; // Optional dependency
 }
 
 export interface AddCollaboratorInput {
@@ -102,6 +122,7 @@ export interface CreateMilestoneInput {
   target_value?: number;
   current_value?: number;
   target_date?: string;
+  depends_on_goal_id?: string; // Optional goal dependency
 }
 
 export interface GoalStats {

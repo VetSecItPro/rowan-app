@@ -35,10 +35,6 @@ const CheckInFrequencyModal = dynamicImport(() => import('@/components/goals/Che
   loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
 });
 
-const DependenciesModal = dynamicImport(() => import('@/components/goals/DependenciesModal').then(mod => ({ default: mod.DependenciesModal })), {
-  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
-});
-
 // Dynamic imports for heavy view components (load only when active)
 const CheckInHistoryTimeline = dynamicImport(() => import('@/components/goals/CheckInHistoryTimeline').then(mod => ({ default: mod.CheckInHistoryTimeline })), {
   loading: () => <div className="p-6 flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
@@ -52,9 +48,6 @@ const HabitTracker = dynamicImport(() => import('@/components/goals/HabitTracker
   loading: () => <div className="p-6 flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
 });
 
-const DependencyVisualization = dynamicImport(() => import('@/components/goals/DependencyVisualization').then(mod => ({ default: mod.DependencyVisualization })), {
-  loading: () => <div className="p-6 flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
-});
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { GoalCardSkeleton, MilestoneCardSkeleton, StatsCardSkeleton } from '@/components/ui/Skeleton';
@@ -64,9 +57,6 @@ const GuidedGoalCreation = dynamicImport(() => import('@/components/guided/Guide
   loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div></div>
 });
 
-const NudgeCenter = dynamicImport(() => import('@/components/nudges/NudgeCenter').then(mod => ({ default: mod.NudgeCenter })), {
-  loading: () => <div className="p-6 flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
-});
 
 const BadgesWidget = dynamicImport(() => import('@/components/goals/badges/BadgesWidget'), {
   loading: () => <div className="p-4 flex items-center justify-center"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div></div>
@@ -80,7 +70,7 @@ import { toast } from 'sonner';
 import { usePresence } from '@/lib/hooks/usePresence';
 import { OnlineUsersIndicator, PresenceIndicator } from '@/components/shared/PresenceIndicator';
 
-type ViewMode = 'goals' | 'milestones' | 'habits' | 'activity' | 'dependencies' | 'nudges';
+type ViewMode = 'goals' | 'milestones' | 'habits' | 'activity';
 
 export default function GoalsPage() {
   const { currentSpace, user } = useAuth();
@@ -96,20 +86,17 @@ export default function GoalsPage() {
   const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
   const [isHistoryTimelineOpen, setIsHistoryTimelineOpen] = useState(false);
   const [isFrequencyModalOpen, setIsFrequencyModalOpen] = useState(false);
-  const [isDependenciesModalOpen, setIsDependenciesModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null);
   const [checkInGoal, setCheckInGoal] = useState<Goal | null>(null);
   const [historyGoal, setHistoryGoal] = useState<Goal | null>(null);
   const [frequencyGoal, setFrequencyGoal] = useState<Goal | null>(null);
-  const [dependenciesGoal, setDependenciesGoal] = useState<Goal | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [showGuidedFlow, setShowGuidedFlow] = useState(false);
   const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
-  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; action: 'delete-goal' | 'delete-milestone'; id: string }>({ isOpen: false, action: 'delete-goal', id: '' });
 
   // Presence tracking for collaborative editing
@@ -502,22 +489,6 @@ export default function GoalsPage() {
     setEditingGoal(null);
   }, []);
 
-  // Handle click outside for more menu dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (showMoreMenu) {
-        setShowMoreMenu(false);
-      }
-    };
-
-    if (showMoreMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
-    }
-  }, [showMoreMenu]);
-
   const handleCloseMilestoneModal = useCallback(() => {
     setIsMilestoneModalOpen(false);
     setEditingMilestone(null);
@@ -553,11 +524,6 @@ export default function GoalsPage() {
     setFrequencyGoal(null);
   }, []);
 
-  const handleOpenDependenciesModal = useCallback((goal: Goal) => {
-    setDependenciesGoal(goal);
-    setIsDependenciesModalOpen(true);
-  }, []);
-
   const handleEditGoal = useCallback((goal: Goal) => {
     setEditingGoal(goal);
     setIsGoalModalOpen(true);
@@ -577,9 +543,6 @@ export default function GoalsPage() {
     } else if (viewMode === 'habits') {
       // TODO: Open habit creation modal (placeholder for now)
       toast.info('Habit creation modal coming soon!');
-    } else if (viewMode === 'dependencies') {
-      // Dependencies view shows the DependencyVisualization component
-      // Modal is opened from there for specific goals
     } else if (viewMode === 'activity') {
       // For activity view, default to creating a new goal
       setIsTemplateModalOpen(true);
@@ -712,11 +675,11 @@ export default function GoalsPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              {/* Core Navigation */}
+              {/* Simplified Navigation - Core tabs only */}
               <div className="flex items-center gap-1 p-1.5 bg-gradient-to-r from-indigo-100 to-indigo-200 dark:from-indigo-900/30 dark:to-indigo-800/30 rounded-xl border border-indigo-200 dark:border-indigo-700">
                 <button
                   onClick={() => handleViewModeChange('goals')}
-                  className={`px-2 sm:px-3 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
                     viewMode === 'goals'
                       ? 'bg-gradient-goals text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
@@ -727,7 +690,7 @@ export default function GoalsPage() {
                 </button>
                 <button
                   onClick={() => handleViewModeChange('milestones')}
-                  className={`px-2 sm:px-3 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
                     viewMode === 'milestones'
                       ? 'bg-gradient-goals text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
@@ -738,7 +701,7 @@ export default function GoalsPage() {
                 </button>
                 <button
                   onClick={() => handleViewModeChange('activity')}
-                  className={`px-2 sm:px-3 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
                     viewMode === 'activity'
                       ? 'bg-gradient-goals text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
@@ -747,69 +710,24 @@ export default function GoalsPage() {
                   <MessageCircle className="w-4 h-4" />
                   <span className="text-sm">Activity</span>
                 </button>
-
-                {/* More Menu Dropdown */}
-                <div className="relative">
-                  <button
-                    onClick={() => setShowMoreMenu(!showMoreMenu)}
-                    className={`px-2 sm:px-3 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
-                      ['habits', 'dependencies', 'nudges'].includes(viewMode)
-                        ? 'bg-gradient-goals text-white'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                    }`}
-                  >
-                    <MoreHorizontal className="w-4 h-4" />
-                    <ChevronDown className={`w-3 h-3 transition-transform ${showMoreMenu ? 'rotate-180' : ''}`} />
-                  </button>
-
-                  {showMoreMenu && (
-                    <div className="absolute top-full left-0 mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10 min-w-[140px]">
-                      <button
-                        onClick={() => {
-                          handleViewModeChange('habits');
-                          setShowMoreMenu(false);
-                        }}
-                        className={`w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm ${
-                          viewMode === 'habits' ? 'text-indigo-600 dark:text-indigo-400 font-medium' : 'text-gray-700 dark:text-gray-300'
-                        }`}
-                      >
-                        <Target className="w-4 h-4" />
-                        Habits
-                      </button>
-                      <button
-                        onClick={() => {
-                          handleViewModeChange('dependencies');
-                          setShowMoreMenu(false);
-                        }}
-                        className={`w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm ${
-                          viewMode === 'dependencies' ? 'text-indigo-600 dark:text-indigo-400 font-medium' : 'text-gray-700 dark:text-gray-300'
-                        }`}
-                      >
-                        <GitBranch className="w-4 h-4" />
-                        Dependencies
-                      </button>
-                      <button
-                        onClick={() => {
-                          handleViewModeChange('nudges');
-                          setShowMoreMenu(false);
-                        }}
-                        className={`w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm ${
-                          viewMode === 'nudges' ? 'text-indigo-600 dark:text-indigo-400 font-medium' : 'text-gray-700 dark:text-gray-300'
-                        }`}
-                      >
-                        <Sparkles className="w-4 h-4" />
-                        Nudges
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <button
+                  onClick={() => handleViewModeChange('habits')}
+                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                    viewMode === 'habits'
+                      ? 'bg-gradient-goals text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                  }`}
+                >
+                  <Target className="w-4 h-4" />
+                  <span className="text-sm">Habits</span>
+                </button>
               </div>
               <button
                 onClick={handleNewButtonClick}
                 className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
-                <span>New {viewMode === 'goals' ? 'Goal' : viewMode === 'milestones' ? 'Milestone' : viewMode === 'habits' ? 'Habit' : viewMode === 'dependencies' ? 'Goal' : viewMode === 'nudges' ? 'Goal' : 'Goal'}</span>
+                <span>New {viewMode === 'goals' ? 'Goal' : viewMode === 'milestones' ? 'Milestone' : viewMode === 'habits' ? 'Habit' : 'Goal'}</span>
               </button>
             </div>
           </div>
@@ -962,8 +880,6 @@ export default function GoalsPage() {
                   {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` :
                    viewMode === 'milestones' ? `Achievement Wall (${filteredMilestones.length})` :
                    viewMode === 'habits' ? 'Habit Tracker' :
-                   viewMode === 'dependencies' ? 'Goal Dependencies' :
-                   viewMode === 'nudges' ? 'Smart Nudges' :
                    'Activity Feed'}
                 </h2>
                 <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 text-sm font-medium rounded-full">
@@ -1106,39 +1022,6 @@ export default function GoalsPage() {
             ) : viewMode === 'habits' ? (
               /* Habits View */
               <HabitTracker spaceId={currentSpace?.id || 'skip'} />
-            ) : viewMode === 'dependencies' ? (
-              /* Dependencies View */
-              <div className="space-y-6">
-                {currentSpace && goals.length > 0 ? (
-                  <DependencyVisualization
-                    spaceId={currentSpace.id}
-                    goals={goals.filter(goal => goal?.id)} // Filter out any undefined goals
-                    className="max-h-[600px]"
-                    onGoalClick={handleOpenDependenciesModal}
-                  />
-                ) : (
-                  <div className="text-center py-12">
-                    <GitBranch className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No goals available</p>
-                    <p className="text-gray-500 dark:text-gray-500">Create some goals first to set up dependencies</p>
-                  </div>
-                )}
-              </div>
-            ) : viewMode === 'nudges' ? (
-              /* Smart Nudges View */
-              <div className="space-y-6">
-                <NudgeCenter
-                  limit={10}
-                  showHeader={false}
-                  onGoalClick={(goalId) => {
-                    // Find and edit the goal
-                    const goal = goals.find(g => g.id === goalId);
-                    if (goal) {
-                      handleEditGoal(goal);
-                    }
-                  }}
-                />
-              </div>
             ) : (
               /* Activity View */
               <div className="space-y-6">
@@ -1169,6 +1052,7 @@ export default function GoalsPage() {
             onSave={handleCreateGoal}
             editGoal={editingGoal}
             spaceId={currentSpace.id}
+            availableGoals={goals.filter(g => g.status === 'active')}
           />
           <NewMilestoneModal
             isOpen={isMilestoneModalOpen}
@@ -1176,6 +1060,7 @@ export default function GoalsPage() {
             onSave={handleCreateMilestone}
             editMilestone={editingMilestone}
             goalId={goals[0]?.id || currentSpace.id}
+            availableGoals={goals.filter(g => g.status === 'active')}
           />
           {checkInGoal && (
             <GoalCheckInModal
@@ -1200,19 +1085,6 @@ export default function GoalsPage() {
               onClose={handleCloseFrequencyModal}
               goalId={frequencyGoal.id}
               goalTitle={frequencyGoal.title}
-            />
-          )}
-          {dependenciesGoal && (
-            <DependenciesModal
-              isOpen={isDependenciesModalOpen}
-              onClose={() => {
-                setIsDependenciesModalOpen(false);
-                setDependenciesGoal(null);
-              }}
-              goal={dependenciesGoal}
-              spaceId={currentSpace.id}
-              userId={user?.id || ''}
-              onRefresh={loadData}
             />
           )}
         </>
