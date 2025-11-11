@@ -85,6 +85,7 @@ export const weatherService = {
     location: string | undefined,
     eventTime: string
   ): Promise<WeatherForecast | null> {
+    console.log('[Weather Service] getWeatherForEvent called with:', { location, eventTime });
     let effectiveLocation = location;
 
     // If no location provided, try to detect user location
@@ -99,8 +100,10 @@ export const weatherService = {
     }
 
     // Smart fetching: Only fetch for upcoming events within 5 days
-    if (!this.shouldFetchWeather(eventTime)) {
-      // Don't spam logs for events outside the window
+    const shouldFetch = this.shouldFetchWeather(eventTime);
+    console.log('[Weather Service] shouldFetchWeather result:', { eventTime, shouldFetch });
+    if (!shouldFetch) {
+      console.log('[Weather Service] Skipping weather fetch - outside 5-day window');
       return null;
     }
 
@@ -155,6 +158,12 @@ export const weatherService = {
       );
 
       if (!coords) return null;
+
+      // Additional validation to prevent undefined coordinates from reaching API
+      if (!coords.lat || !coords.lon || typeof coords.lat !== 'number' || typeof coords.lon !== 'number') {
+        console.warn(`[Weather] Invalid coordinates received for ${location}:`, coords);
+        return null;
+      }
 
       // Step 2: Get weather forecast from our server-side API
       const eventDate = parseISO(eventTime);
@@ -220,6 +229,13 @@ export const weatherService = {
       if (data.error) {
         // This is normal for locations that can't be found
         console.log(`[Weather] Location "${location}" not found in geocoding database`);
+        return null;
+      }
+
+      // Validate that we have valid coordinates
+      if (typeof data.lat !== 'number' || typeof data.lon !== 'number' ||
+          isNaN(data.lat) || isNaN(data.lon)) {
+        console.warn(`[Weather] Invalid coordinates returned for "${location}":`, data);
         return null;
       }
 

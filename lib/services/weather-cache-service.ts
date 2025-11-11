@@ -119,7 +119,7 @@ export const weatherCacheService = {
     }
 
     try {
-      const cacheKey = `geocode:${location.toLowerCase().replace(/\s+/g, '-')}`;
+      const cacheKey = `geocode:v2:${location.toLowerCase().replace(/\s+/g, '-')}`;
 
       // Try to get from cache
       const cached = await redis.get<CachedGeocode>(cacheKey);

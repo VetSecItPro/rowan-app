@@ -60,7 +60,6 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('today');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Load habits data
   const loadHabits = useCallback(async () => {
@@ -160,27 +159,6 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Habit Tracker
-          </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Build consistent habits and track your progress
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            New Habit
-          </button>
-        </div>
-      </div>
-
       {/* Stats Overview */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
@@ -457,13 +435,9 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
               : `No habits found in the ${getCategoryInfo(selectedCategory).label} category`
             }
           </p>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Create Your First Habit
-          </button>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Use the "New Habit" button above to get started.
+          </p>
         </div>
       )}
     </div>

@@ -297,9 +297,9 @@ export function UnifiedDetailsModal({
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Quick Edit</h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
+                        <div className="relative z-50">
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
-                          <select className="w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900">
+                          <select className="w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 relative z-50" style={{ position: 'relative', zIndex: 9999 }}>
                             {Object.entries(STATUS_TYPES).map(([key, status]) => (
                               <option key={key} value={key} selected={key === item.status}>
                                 {status.emoji} {status.label}
@@ -307,9 +307,9 @@ export function UnifiedDetailsModal({
                             ))}
                           </select>
                         </div>
-                        <div>
+                        <div className="relative z-50">
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Priority</label>
-                          <select className="w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900">
+                          <select className="w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 relative z-50" style={{ position: 'relative', zIndex: 9999 }}>
                             {Object.entries(PRIORITY_LEVELS).map(([key, priority]) => (
                               <option key={key} value={key}>
                                 {priority.emoji} {priority.label}
@@ -493,14 +493,15 @@ export function UnifiedDetailsModal({
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <div>
+                    <div className="relative z-50">
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Export Scope
                       </label>
                       <select
                         value={exportOptions.scope}
                         onChange={(e) => setExportOptions(prev => ({ ...prev, scope: e.target.value }))}
-                        className="w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900"
+                        className="w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 relative z-50"
+                        style={{ position: 'relative', zIndex: 9999 }}
                       >
                         <option value="this_item">This {itemType} only</option>
                         <option value="related">This {itemType} + related items</option>

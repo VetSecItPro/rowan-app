@@ -23,6 +23,7 @@ import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-s
 import { useTaskRealtime } from '@/hooks/useTaskRealtime';
 import { useChoreRealtime } from '@/hooks/useChoreRealtime';
 import { TaskFilterPanel, TaskFilters } from '@/components/tasks/TaskFilterPanel';
+import { Dropdown } from '@/components/ui/Dropdown';
 import { BulkActionsBar } from '@/components/tasks/BulkActionsBar';
 import { TemplatePickerModal } from '@/components/tasks/TemplatePickerModal';
 import { SnoozeModal } from '@/components/tasks/SnoozeModal';
@@ -305,8 +306,9 @@ export default function TasksPage() {
         if (modalDefaultType === 'task') {
           // Optimistic update - add to UI immediately
           const taskData = itemData as CreateTaskInput;
+          const tempId = `temp-${Date.now()}`;
           const optimisticTask: Task = {
-            id: `temp-${Date.now()}`, // Temporary ID
+            id: tempId, // Temporary ID
             title: taskData.title,
             status: taskData.status || 'pending',
             created_at: new Date().toISOString(),
@@ -328,19 +330,28 @@ export default function TasksPage() {
           setTasks(prev => [optimisticTask, ...prev]);
 
           try {
-            // Create task on server
-            await tasksService.createTask(itemData as CreateTaskInput);
-            // Real-time subscription will replace the optimistic task with the real one
+            // Create task on server and get the real task back
+            const createdTask = await tasksService.createTask(itemData as CreateTaskInput);
+
+            // Immediately replace the optimistic task with the real one from database
+            setTasks(prev => prev.map(task =>
+              task.id === tempId ? createdTask : task
+            ));
+
+            console.log('✅ Task created successfully with real ID:', createdTask.id);
+            return { id: createdTask.id }; // Return real ID to caller
           } catch (error) {
             // Revert optimistic update on error
-            setTasks(prev => prev.filter(task => task.id !== optimisticTask.id));
+            setTasks(prev => prev.filter(task => task.id !== tempId));
+            console.error('❌ Failed to create task:', error);
             throw error;
           }
         } else {
           // Optimistic update for chores - add to UI immediately
           const choreData = itemData as CreateChoreInput;
+          const tempId = `temp-${Date.now()}`;
           const optimisticChore: Chore = {
-            id: `temp-${Date.now()}`, // Temporary ID
+            id: tempId, // Temporary ID
             title: choreData.title,
             status: choreData.status || 'pending',
             frequency: choreData.frequency,
@@ -357,12 +368,20 @@ export default function TasksPage() {
           setChores(prev => [optimisticChore, ...prev]);
 
           try {
-            // Create chore on server
-            await choresService.createChore(itemData as CreateChoreInput);
-            // Real-time subscription will replace the optimistic chore with the real one
+            // Create chore on server and get the real chore back
+            const createdChore = await choresService.createChore(itemData as CreateChoreInput);
+
+            // Immediately replace the optimistic chore with the real one from database
+            setChores(prev => prev.map(chore =>
+              chore.id === tempId ? createdChore : chore
+            ));
+
+            console.log('✅ Chore created successfully with real ID:', createdChore.id);
+            return { id: createdChore.id }; // Return real ID to caller
           } catch (error) {
             // Revert optimistic update on error
-            setChores(prev => prev.filter(chore => chore.id !== optimisticChore.id));
+            setChores(prev => prev.filter(chore => chore.id !== tempId));
+            console.error('❌ Failed to create chore:', error);
             throw error;
           }
         }
@@ -578,9 +597,6 @@ export default function TasksPage() {
     }
   }, []);
 
-  const handleStatusFilterChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStatusFilter(e.target.value);
-  }, []);
 
   const handleOpenModal = useCallback((type: 'task' | 'chore') => {
     setModalDefaultType(type);
@@ -806,7 +822,7 @@ export default function TasksPage() {
 
             {/* Main Content */}
             <div className={showFilters ? 'lg:col-span-3' : 'lg:col-span-4'}>
-              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 relative" style={{zIndex: 'auto'}}>
                 {/* Header with Month Badge and Status Filter */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                   <div className="flex items-center gap-3">
@@ -820,44 +836,25 @@ export default function TasksPage() {
 
                   {/* Status Filter - Mobile Dropdown + Desktop Buttons */}
                   <div>
-                    {/* Mobile: Dropdown Select */}
-                    <div className="relative">
-                      <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400 pointer-events-none z-10" />
-                      <select
-                        id="status-filter-tasks-mobile"
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        className="w-full max-w-xs pl-10 pr-12 py-2.5 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white font-medium appearance-none cursor-pointer mb-3 flex items-center"
-                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1.5em 1.5em' }}
-                      >
-                        <option value="all">All Tasks & Chores</option>
-                      <option value="pending">Pending</option>
-                      <option value="in_progress">In Progress</option>
-                      <option value="completed">Completed</option>
-                    </select>
+                    {/* Custom Dropdown with Filter Icon */}
+                    <div className="relative mb-3 max-w-xs">
+                      <div className="relative">
+                        <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400 pointer-events-none z-10" />
+                        <Dropdown
+                          value={statusFilter}
+                          onChange={(value) => setStatusFilter(value || 'all')}
+                          options={[
+                            { value: 'all', label: 'All Tasks & Chores' },
+                            { value: 'pending', label: 'Pending' },
+                            { value: 'in_progress', label: 'In Progress' },
+                            { value: 'completed', label: 'Completed' }
+                          ]}
+                          placeholder="Filter by status..."
+                          className="pl-10"
+                        />
+                      </div>
                     </div>
 
-                    {/* Desktop: Clean Filter Buttons */}
-                    <div className="hidden gap-2">
-                      {[
-                        { value: 'all', label: 'All' },
-                        { value: 'pending', label: 'Pending' },
-                        { value: 'in_progress', label: 'In Progress' },
-                        { value: 'completed', label: 'Completed' }
-                      ].map(({ value, label }) => (
-                        <button
-                          key={value}
-                          onClick={() => setStatusFilter(value)}
-                          className={`px-3 py-2 text-sm rounded-lg transition-colors ${
-                            statusFilter === value
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                          }`}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
                   </div>
                 </div>
 
