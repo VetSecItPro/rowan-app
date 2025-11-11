@@ -841,7 +841,7 @@ export default function ShoppingPage() {
               </div>
 
               {/* Status Filter - Segmented Buttons */}
-              <div className="bg-gray-50 dark:bg-gray-900 border border-purple-200 dark:border-purple-700 rounded-lg p-1 flex gap-1 w-fit">
+              <div className="bg-gray-50 dark:bg-gray-900 border border-emerald-200 dark:border-emerald-700 rounded-lg p-1 flex gap-1 w-fit">
                 <button
                   onClick={() => { setStatusFilter('all'); setTimeFilter('all'); }}
                   className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-colors whitespace-nowrap min-w-[60px] ${
@@ -927,7 +927,7 @@ export default function ShoppingPage() {
                 )}
               </div>
             ) : (
-              <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+              <div className="min-h-[600px] max-h-[900px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                 {filteredLists.map((list) => (
                   <ShoppingListCard
                     key={list.id}
