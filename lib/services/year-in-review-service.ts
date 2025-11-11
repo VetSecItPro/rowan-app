@@ -222,7 +222,7 @@ export class YearInReviewService {
       .gte('created_at', yearStart.toISOString())
       .lte('created_at', yearEnd.toISOString());
 
-    const totalExpenses = expensesData?.reduce((sum, expense) => sum + expense.amount, 0) || 0;
+    const totalExpenses = expensesData?.reduce((sum: number, expense: any) => sum + expense.amount, 0) || 0;
 
     // Get badges earned (simplified - would need actual badges table)
     const badgesEarned = Math.floor((tasksCompleted || 0) / 10); // Placeholder logic
@@ -236,7 +236,7 @@ export class YearInReviewService {
       .lte('created_at', yearEnd.toISOString());
 
     const uniqueDays = new Set(
-      activeDaysData?.map(task => format(new Date(task.created_at), 'yyyy-MM-dd'))
+      activeDaysData?.map((task: any) => format(new Date(task.created_at), 'yyyy-MM-dd'))
     );
     const activeDays = uniqueDays.size;
 
@@ -309,7 +309,7 @@ export class YearInReviewService {
           .gte('created_at', monthStart.toISOString())
           .lte('created_at', monthEnd.toISOString());
 
-        const expensesAmount = expensesData?.reduce((sum, expense) => sum + expense.amount, 0) || 0;
+        const expensesAmount = expensesData?.reduce((sum: number, expense: any) => sum + expense.amount, 0) || 0;
 
         // Active days this month
         const { data: activeDaysData } = await supabase
@@ -320,7 +320,7 @@ export class YearInReviewService {
           .lte('created_at', monthEnd.toISOString());
 
         const uniqueDays = new Set(
-          activeDaysData?.map(task => format(new Date(task.created_at), 'yyyy-MM-dd'))
+          activeDaysData?.map((task: any) => format(new Date(task.created_at), 'yyyy-MM-dd'))
         );
 
         return {
@@ -457,7 +457,7 @@ export class YearInReviewService {
       .gte('created_at', yearStart.toISOString())
       .lte('created_at', yearEnd.toISOString());
 
-    const categoryCount = taskCategories?.reduce((acc, task) => {
+    const categoryCount = taskCategories?.reduce((acc: Record<string, number>, task: any) => {
       acc[task.category] = (acc[task.category] || 0) + 1;
       return acc;
     }, {} as Record<string, number>) || {};
@@ -561,7 +561,7 @@ export class YearInReviewService {
       .gte('created_at', yearStart.toISOString())
       .lte('created_at', yearEnd.toISOString());
 
-    const totalAmount = expenses?.reduce((sum, expense) => sum + expense.amount, 0) || 0;
+    const totalAmount = expenses?.reduce((sum: number, expense: any) => sum + expense.amount, 0) || 0;
 
     return {
       totalAmount,

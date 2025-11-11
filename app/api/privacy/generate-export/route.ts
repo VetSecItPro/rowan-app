@@ -202,7 +202,7 @@ async function gatherUserData(userId: string) {
     .eq('user_id', userId);
 
   // Get user's tasks across all spaces
-  const spaceIds = spaceMembers?.map(sm => sm.space_id) || [];
+  const spaceIds = spaceMembers?.map((sm: any) => sm.space_id) || [];
   const { data: tasks } = spaceIds.length > 0 ? await supabase
     .from('tasks')
     .select('*')

@@ -3,7 +3,9 @@
 import React from 'react';
 import { useZeroSpacesDetection, useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { FirstSpaceOnboarding } from '@/components/ui/FirstSpaceOnboarding';
+import { SmartOnboarding } from '@/components/onboarding/SmartOnboarding';
 import { AuthLoadingState, SpacesLoadingState } from '@/components/ui/LoadingStates';
+import { featureFlags } from '@/lib/constants/feature-flags';
 
 /**
  * APP WITH ONBOARDING WRAPPER - PHASE 4 INTEGRATION
@@ -54,6 +56,21 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
 
   // Show onboarding for zero-spaces scenario
   if (shouldShowOnboarding && hasZeroSpaces) {
+    // Use Smart Onboarding if feature flag is enabled, otherwise fall back to traditional onboarding
+    if (featureFlags.isSmartOnboardingEnabled()) {
+      return (
+        <SmartOnboarding
+          isOpen={true}
+          onClose={() => {
+            console.log('Smart onboarding completed - user should now have access to the app');
+            // The SmartOnboarding component handles its own space creation and navigation
+            // No additional action needed here as refreshSpaces() is called internally
+          }}
+        />
+      );
+    }
+
+    // Traditional onboarding fallback
     return (
       <FirstSpaceOnboarding
         userName={user?.name || user?.email?.split('@')[0] || 'there'}
