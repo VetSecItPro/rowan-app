@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { weatherCacheService } from '@/lib/services/weather-cache-service';
 
 // Force dynamic rendering for this route since it uses request.url
 export const dynamic = 'force-dynamic';
@@ -197,10 +198,28 @@ export async function GET(request: NextRequest) {
 
     console.log('[Weather Geocode API] Geocoding location:', location);
 
-    // Try geocoding with multiple fallback strategies
-    const result = await tryGeocodingWithFallbacks(location);
+    // Get geocoding result (cache the basic coordinates, but get full details)
+    let fullResult: any = null;
+    const cachedCoords = await weatherCacheService.getOrFetchGeocode(
+      location,
+      async () => {
+        fullResult = await tryGeocodingWithFallbacks(location);
+        if (!fullResult) return null;
 
-    if (!result) {
+        // Return coordinates for caching
+        return {
+          lat: fullResult.latitude,
+          lon: fullResult.longitude,
+        };
+      }
+    );
+
+    // If we got cached coordinates but no full result, we need to fetch again for details
+    if (cachedCoords && !fullResult) {
+      fullResult = await tryGeocodingWithFallbacks(location);
+    }
+
+    if (!cachedCoords || !fullResult) {
       console.log('[Weather Geocode API] All geocoding strategies failed for:', location);
       return NextResponse.json(
         { error: 'Location not found after trying multiple search strategies' },
@@ -209,11 +228,11 @@ export async function GET(request: NextRequest) {
     }
 
     const coordinates = {
-      lat: result.latitude,
-      lon: result.longitude,
-      name: result.name,
-      country: result.country,
-      admin1: result.admin1, // state/region
+      lat: cachedCoords.lat,
+      lon: cachedCoords.lon,
+      name: fullResult.name || 'Unknown',
+      country: fullResult.country || 'Unknown',
+      admin1: fullResult.admin1 || 'Unknown', // state/region
     };
 
     console.log('[Weather Geocode API] Geocoding successful:', coordinates);

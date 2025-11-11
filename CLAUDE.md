@@ -108,6 +108,46 @@ USING (space_id IN (
 - Dark mode: `dark:` variants on all colors
 - Error messages: user-friendly, no technical details
 
+### PortalDropdown Component
+**Reference Name:** "PortalDropdown" or "Use the PortalDropdown"
+**Location:** `/components/ui/Dropdown.tsx`
+
+**When to use:**
+- Any dropdown positioning issues in modals
+- Native `<select>` dropdowns that appear "off to the side"
+- Dropdowns clipped by parent container overflow
+- Z-index conflicts with modals or overlays
+
+**Key Features:**
+- Portal-based rendering at `document.body` level
+- Modal-safe positioning (never clipped)
+- Automatic placement calculation
+- Z-index management (`z-index: 10000`)
+- Responsive design
+
+**Implementation Pattern:**
+```tsx
+import { Dropdown } from '@/components/ui/Dropdown';
+
+// Replace problematic native selects with:
+<Dropdown
+  value={selectedValue}
+  onChange={(value) => setSelectedValue(value)}
+  options={[
+    { value: 'option1', label: 'Option 1' },
+    { value: 'option2', label: 'Option 2' }
+  ]}
+  placeholder="Select option..."
+  className="your-styling"
+/>
+```
+
+**Proven Solutions:**
+- ✅ UnifiedItemModal dropdown alignment
+- ✅ DateTimePicker calendar positioning
+- ✅ TaskCard filter dropdown issues
+- ✅ Modal overflow constraints
+
 ## Git Workflow & Deployment
 
 ### CRITICAL: Branching Strategy

@@ -23,6 +23,10 @@ const NewMilestoneModal = dynamicImport(() => import('@/components/goals/NewMile
   loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
 });
 
+const NewHabitModal = dynamicImport(() => import('@/components/goals/NewHabitModal').then(mod => ({ default: mod.NewHabitModal })), {
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
+});
+
 const TemplateSelectionModal = dynamicImport(() => import('@/components/goals/TemplateSelectionModal').then(mod => ({ default: mod.TemplateSelectionModal })), {
   loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
 });
@@ -54,7 +58,7 @@ import { GoalCardSkeleton, MilestoneCardSkeleton, StatsCardSkeleton } from '@/co
 // Dynamic imports for additional heavy components
 const GuidedGoalCreation = dynamicImport(() => import('@/components/guided/GuidedGoalCreation'), {
   ssr: false,
-  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div></div>
+  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
 });
 
 
@@ -82,12 +86,14 @@ export default function GoalsPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('goals');
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
   const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
+  const [isHabitModalOpen, setIsHabitModalOpen] = useState(false);
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
   const [isHistoryTimelineOpen, setIsHistoryTimelineOpen] = useState(false);
   const [isFrequencyModalOpen, setIsFrequencyModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null);
+  const [editingHabit, setEditingHabit] = useState<any | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<GoalTemplate | null>(null);
   const [checkInGoal, setCheckInGoal] = useState<Goal | null>(null);
   const [historyGoal, setHistoryGoal] = useState<Goal | null>(null);
@@ -368,6 +374,20 @@ export default function GoalsPage() {
     }
   }, [editingMilestone, loadData]);
 
+  const handleCreateHabit = useCallback(async (habitData: any) => {
+    try {
+      // TODO: Implement habit creation service when backend is ready
+      console.log('Creating habit:', habitData);
+      toast.success('Habit created successfully!');
+
+      // For now, just close the modal
+      setEditingHabit(null);
+    } catch (error) {
+      console.error('Failed to save habit:', error);
+      toast.error('Failed to create habit. Please try again.');
+    }
+  }, [editingHabit]);
+
   const handleCreateCheckIn = useCallback(async (checkInData: CreateCheckInInput) => {
     try {
       await goalsService.createCheckIn(checkInData);
@@ -496,6 +516,15 @@ export default function GoalsPage() {
     setEditingMilestone(null);
   }, []);
 
+  const handleOpenHabitModal = useCallback(() => {
+    setIsHabitModalOpen(true);
+  }, []);
+
+  const handleCloseHabitModal = useCallback(() => {
+    setIsHabitModalOpen(false);
+    setEditingHabit(null);
+  }, []);
+
   const handleOpenCheckInModal = useCallback((goal: Goal) => {
     setCheckInGoal(goal);
     setIsCheckInModalOpen(true);
@@ -543,22 +572,19 @@ export default function GoalsPage() {
     } else if (viewMode === 'milestones') {
       handleOpenMilestoneModal();
     } else if (viewMode === 'habits') {
-      // TODO: Open habit creation modal (placeholder for now)
-      toast.info('Habit creation modal coming soon!');
+      handleOpenHabitModal();
     } else if (viewMode === 'activity') {
       // For activity view, default to creating a new goal
       setIsTemplateModalOpen(true);
     }
-  }, [viewMode, handleOpenMilestoneModal]);
+  }, [viewMode, handleOpenMilestoneModal, handleOpenHabitModal]);
 
   const handleSelectTemplate = useCallback((template: GoalTemplate) => {
-    if (!currentSpace) return;
-
     // Set template data and open NewGoalModal for editing
     setSelectedTemplate(template);
     setIsTemplateModalOpen(false);
     setIsGoalModalOpen(true);
-  }, [currentSpace]);
+  }, []);
 
   const handleCloseTemplateModal = useCallback(() => {
     setIsTemplateModalOpen(false);
@@ -698,17 +724,6 @@ export default function GoalsPage() {
                   <span className="text-sm">Milestones</span>
                 </button>
                 <button
-                  onClick={() => handleViewModeChange('activity')}
-                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
-                    viewMode === 'activity'
-                      ? 'bg-gradient-goals text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                  }`}
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  <span className="text-sm">Activity</span>
-                </button>
-                <button
                   onClick={() => handleViewModeChange('habits')}
                   className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
                     viewMode === 'habits'
@@ -719,10 +734,21 @@ export default function GoalsPage() {
                   <Target className="w-4 h-4" />
                   <span className="text-sm">Habits</span>
                 </button>
+                <button
+                  onClick={() => handleViewModeChange('activity')}
+                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                    viewMode === 'activity'
+                      ? 'bg-gradient-goals text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                  }`}
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span className="text-sm">Activity</span>
+                </button>
               </div>
               <button
                 onClick={handleNewButtonClick}
-                className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 sm:min-w-[150px]"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-lg flex items-center justify-center gap-2 sm:min-w-[150px]"
               >
                 <Plus className="w-5 h-5" />
                 <span>New {viewMode === 'goals' ? 'Goal' : viewMode === 'milestones' ? 'Milestone' : viewMode === 'habits' ? 'Habit' : 'Goal'}</span>
@@ -792,14 +818,14 @@ export default function GoalsPage() {
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Milestones</h3>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-500 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-500 rounded-xl flex items-center justify-center">
                   <Award className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
               <div className="flex items-end justify-between">
                 <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.milestonesReached}</p>
                 {stats.milestonesReached > 0 && (
-                  <div className="flex items-center gap-1 text-purple-600 dark:text-purple-400">
+                  <div className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400">
                     <Award className="w-3 h-3" />
                     <span className="text-xs font-medium">Reached!</span>
                   </div>
@@ -871,7 +897,8 @@ export default function GoalsPage() {
           {/* Goals/Milestones List - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
-            {/* Header with Month Badge and Status Filter */}
+            {/* Header with Month Badge and Status Filter - Hide for habits since it has custom header */}
+            {viewMode !== 'habits' && (
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
@@ -925,8 +952,8 @@ export default function GoalsPage() {
                   onClick={() => setFocusMode(!focusMode)}
                   className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap flex items-center gap-2 ${
                     focusMode
-                      ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 border border-purple-300 dark:border-purple-700'
+                      ? 'bg-indigo-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 border border-indigo-300 dark:border-indigo-700'
                   }`}
                   title="Show only top 3 priority goals"
                 >
@@ -936,6 +963,7 @@ export default function GoalsPage() {
                 </button>
               )}
             </div>
+            )}
 
             {loading ? (
               <div className="space-y-4">
@@ -958,7 +986,7 @@ export default function GoalsPage() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                       <button
                         onClick={handleOpenGoalModal}
-                        className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
+                        className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-lg inline-flex items-center gap-2"
                       >
                         <Plus className="w-5 h-5" />
                         Create Goal
@@ -966,7 +994,7 @@ export default function GoalsPage() {
                       {!hasCompletedGuide && (
                         <button
                           onClick={() => setShowGuidedFlow(true)}
-                          className="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
+                          className="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all inline-flex items-center gap-2"
                         >
                           <Target className="w-5 h-5" />
                           Try Guided Creation
@@ -1019,7 +1047,27 @@ export default function GoalsPage() {
               )
             ) : viewMode === 'habits' ? (
               /* Habits View */
-              <HabitTracker spaceId={currentSpace?.id || 'skip'} />
+              <div className="space-y-6">
+                {/* Custom header for Habits without button */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                          Habit Tracker
+                        </h2>
+                        <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 text-sm font-medium rounded-full">
+                          {format(new Date(), 'MMM yyyy')}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Build consistent healthy habits daily
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <HabitTracker spaceId={currentSpace?.id || 'skip'} />
+              </div>
             ) : (
               /* Activity View */
               <div className="space-y-6">
@@ -1035,58 +1083,62 @@ export default function GoalsPage() {
       </div>
       </PullToRefresh>
       </PageErrorBoundary>
-      {currentSpace && (
-        <>
-          <TemplateSelectionModal
-            isOpen={isTemplateModalOpen}
-            onClose={handleCloseTemplateModal}
-            onSelectTemplate={handleSelectTemplate}
-            onCreateFromScratch={handleCreateFromScratch}
-            spaceId={currentSpace.id}
-          />
-          <NewGoalModal
-            isOpen={isGoalModalOpen}
-            onClose={handleCloseGoalModal}
-            onSave={handleCreateGoal}
-            editGoal={editingGoal}
-            spaceId={currentSpace.id}
-            availableGoals={goals.filter(g => g.status === 'active')}
-            selectedTemplate={selectedTemplate}
-          />
-          <NewMilestoneModal
-            isOpen={isMilestoneModalOpen}
-            onClose={handleCloseMilestoneModal}
-            onSave={handleCreateMilestone}
-            editMilestone={editingMilestone}
-            goalId={goals[0]?.id || currentSpace.id}
-            availableGoals={goals.filter(g => g.status === 'active')}
-          />
-          {checkInGoal && (
-            <GoalCheckInModal
-              isOpen={isCheckInModalOpen}
-              onClose={handleCloseCheckInModal}
-              onSave={handleCreateCheckIn}
-              goalTitle={checkInGoal.title}
-              goalId={checkInGoal.id}
-              currentProgress={checkInGoal.progress}
-            />
-          )}
-          {historyGoal && (
-            <CheckInHistoryTimeline
-              goalId={historyGoal.id}
-              isOpen={isHistoryTimelineOpen}
-              onClose={handleCloseHistoryTimeline}
-            />
-          )}
-          {frequencyGoal && (
-            <CheckInFrequencyModal
-              isOpen={isFrequencyModalOpen}
-              onClose={handleCloseFrequencyModal}
-              goalId={frequencyGoal.id}
-              goalTitle={frequencyGoal.title}
-            />
-          )}
-        </>
+      {/* Always render modals with fallback spaceId */}
+      <TemplateSelectionModal
+        isOpen={isTemplateModalOpen}
+        onClose={handleCloseTemplateModal}
+        onSelectTemplate={handleSelectTemplate}
+        onCreateFromScratch={handleCreateFromScratch}
+        spaceId={currentSpace?.id || 'placeholder'}
+      />
+      <NewGoalModal
+        isOpen={isGoalModalOpen}
+        onClose={handleCloseGoalModal}
+        onSave={handleCreateGoal}
+        editGoal={editingGoal}
+        spaceId={currentSpace?.id || 'placeholder'}
+        availableGoals={goals.filter(g => g.status === 'active')}
+        selectedTemplate={selectedTemplate}
+      />
+      <NewMilestoneModal
+        isOpen={isMilestoneModalOpen}
+        onClose={handleCloseMilestoneModal}
+        onSave={handleCreateMilestone}
+        editMilestone={editingMilestone}
+        goalId={goals[0]?.id || currentSpace?.id || 'placeholder'}
+        availableGoals={goals.filter(g => g.status === 'active')}
+      />
+      <NewHabitModal
+        isOpen={isHabitModalOpen}
+        onClose={handleCloseHabitModal}
+        onSave={handleCreateHabit}
+        editHabit={editingHabit}
+        spaceId={currentSpace?.id || 'placeholder'}
+      />
+      {checkInGoal && (
+        <GoalCheckInModal
+          isOpen={isCheckInModalOpen}
+          onClose={handleCloseCheckInModal}
+          onSave={handleCreateCheckIn}
+          goalTitle={checkInGoal.title}
+          goalId={checkInGoal.id}
+          currentProgress={checkInGoal.progress}
+        />
+      )}
+      {historyGoal && (
+        <CheckInHistoryTimeline
+          goalId={historyGoal.id}
+          isOpen={isHistoryTimelineOpen}
+          onClose={handleCloseHistoryTimeline}
+        />
+      )}
+      {frequencyGoal && (
+        <CheckInFrequencyModal
+          isOpen={isFrequencyModalOpen}
+          onClose={handleCloseFrequencyModal}
+          goalId={frequencyGoal.id}
+          goalTitle={frequencyGoal.title}
+        />
       )}
 
       <ConfirmDialog

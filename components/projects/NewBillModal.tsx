@@ -239,7 +239,7 @@ export function NewBillModal({
                 )}
               </div>
 
-              <div>
+              <div className="relative z-50">
                 <label htmlFor="frequency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Frequency
                 </label>
@@ -247,7 +247,8 @@ export function NewBillModal({
                   id="frequency"
                   value={frequency}
                   onChange={(e) => setFrequency(e.target.value as BillFrequency)}
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent relative z-50"
+                  style={{ position: 'relative', zIndex: 9999 }}
                 >
                   {frequencies.map((freq) => (
                     <option key={freq.value} value={freq.value}>
@@ -257,7 +258,7 @@ export function NewBillModal({
                 </select>
               </div>
 
-              <div>
+              <div className="relative z-50">
                 <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Category
                 </label>
@@ -265,11 +266,12 @@ export function NewBillModal({
                   id="category"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${
+                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent relative z-50 ${
                     errors.category
                       ? 'border-red-500 dark:border-red-500'
                       : 'border-gray-300 dark:border-gray-600'
                   }`}
+                  style={{ position: 'relative', zIndex: 9999 }}
                 >
                   <option value="">Select category...</option>
                   {categories.map((cat) => (

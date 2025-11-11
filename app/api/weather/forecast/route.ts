@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { weatherCacheService } from '@/lib/services/weather-cache-service';
 
 // Force dynamic rendering for this route since it uses request.url
 export const dynamic = 'force-dynamic';
@@ -10,81 +11,64 @@ export async function GET(request: NextRequest) {
     const lon = searchParams.get('lon');
     const date = searchParams.get('date');
 
-    if (!lat || !lon) {
+    if (!lat || !lon || lat === 'undefined' || lon === 'undefined' || lat === 'null' || lon === 'null') {
       return NextResponse.json(
         { error: 'Latitude and longitude parameters are required' },
         { status: 400 }
       );
     }
 
-    console.log('[Weather Forecast API] Fetching weather for:', { lat, lon, date });
+    // Validate that coordinates are valid numbers
+    const latNum = parseFloat(lat);
+    const lonNum = parseFloat(lon);
 
-    // Call Open-Meteo Weather API server-side
-    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,windspeed_10m_max&current=temperature_2m,relative_humidity_2m,apparent_temperature,weathercode,windspeed_10m&timezone=auto`;
-
-    const response = await fetch(weatherUrl, {
-      headers: {
-        'User-Agent': 'Rowan-App/1.0',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Weather API error: ${response.status} ${response.statusText}`);
+    if (isNaN(latNum) || isNaN(lonNum)) {
+      return NextResponse.json(
+        { error: 'Latitude and longitude must be valid numbers' },
+        { status: 400 }
+      );
     }
 
-    const data = await response.json();
+    console.log('[Weather Forecast API] Fetching weather for:', { lat: latNum, lon: lonNum, date });
 
-    // If a specific date is requested, find it in daily forecast
-    if (date) {
-      const dateIndex = data.daily.time.indexOf(date);
+    // Create location string and event time for cache key
+    const location = `${latNum},${lonNum}`;
+    const eventTime = date ? `${date}T12:00:00.000Z` : new Date().toISOString();
 
-      if (dateIndex === -1) {
-        return NextResponse.json(
-          { error: 'No forecast available for the requested date' },
-          { status: 404 }
-        );
+    // Use cache service with 3-hour TTL
+    const forecast = await weatherCacheService.getOrFetchWeather(
+      location,
+      eventTime,
+      async () => {
+        // Call Open-Meteo Weather API server-side
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latNum}&longitude=${lonNum}&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,windspeed_10m_max&current=temperature_2m,relative_humidity_2m,apparent_temperature,weathercode,windspeed_10m&timezone=auto`;
+
+        const response = await fetch(weatherUrl, {
+          headers: {
+            'User-Agent': 'Rowan-App/1.0',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Weather API error: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        // Process the data and return the formatted forecast
+        return processWeatherData(data, date);
       }
+    );
 
-      // Return daily forecast for specific date
-      const weatherCode = data.daily.weathercode[dateIndex];
-      const tempMax = data.daily.temperature_2m_max[dateIndex];
-      const tempMin = data.daily.temperature_2m_min[dateIndex];
-      const temp = Math.round((tempMax + tempMin) / 2);
-
-      const feelsLikeMax = data.daily.apparent_temperature_max[dateIndex];
-      const feelsLikeMin = data.daily.apparent_temperature_min[dateIndex];
-      const feelsLike = Math.round((feelsLikeMax + feelsLikeMin) / 2);
-
-      const forecast = {
-        condition: mapWeatherCode(weatherCode),
-        temp,
-        feelsLike,
-        description: getWeatherDescription(weatherCode),
-        humidity: 0, // Not available in daily API
-        windSpeed: Math.round(data.daily.windspeed_10m_max[dateIndex]),
-        icon: weatherCode.toString(),
-        timestamp: new Date().toISOString(),
-      };
-
-      console.log('[Weather Forecast API] Daily forecast:', forecast);
-      return NextResponse.json(forecast);
+    if (!forecast) {
+      return NextResponse.json(
+        { error: 'Failed to fetch weather forecast' },
+        { status: 500 }
+      );
     }
 
-    // Return current weather
-    const current = data.current;
-    const currentForecast = {
-      condition: mapWeatherCode(current.weathercode),
-      temp: Math.round(current.temperature_2m),
-      feelsLike: Math.round(current.apparent_temperature),
-      description: getWeatherDescription(current.weathercode),
-      humidity: Math.round(current.relative_humidity_2m),
-      windSpeed: Math.round(current.windspeed_10m),
-      icon: current.weathercode.toString(),
-      timestamp: new Date().toISOString(),
-    };
-
-    console.log('[Weather Forecast API] Current weather:', currentForecast);
-    return NextResponse.json(currentForecast);
+    console.log('[Weather Forecast API] Returning weather:', forecast);
+    return NextResponse.json(forecast);
   } catch (error) {
     console.error('[Weather Forecast API] Error:', error);
     return NextResponse.json(
@@ -92,6 +76,54 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+/**
+ * Process weather data and return formatted forecast
+ */
+function processWeatherData(data: any, date?: string | null) {
+  // If a specific date is requested, find it in daily forecast
+  if (date) {
+    const dateIndex = data.daily.time.indexOf(date);
+
+    if (dateIndex === -1) {
+      throw new Error('No forecast available for the requested date');
+    }
+
+    // Return daily forecast for specific date
+    const weatherCode = data.daily.weathercode[dateIndex];
+    const tempMax = data.daily.temperature_2m_max[dateIndex];
+    const tempMin = data.daily.temperature_2m_min[dateIndex];
+    const temp = Math.round((tempMax + tempMin) / 2);
+
+    const feelsLikeMax = data.daily.apparent_temperature_max[dateIndex];
+    const feelsLikeMin = data.daily.apparent_temperature_min[dateIndex];
+    const feelsLike = Math.round((feelsLikeMax + feelsLikeMin) / 2);
+
+    return {
+      condition: mapWeatherCode(weatherCode),
+      temp,
+      feelsLike,
+      description: getWeatherDescription(weatherCode),
+      humidity: 0, // Not available in daily API
+      windSpeed: Math.round(data.daily.windspeed_10m_max[dateIndex]),
+      icon: weatherCode.toString(),
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // Return current weather
+  const current = data.current;
+  return {
+    condition: mapWeatherCode(current.weathercode),
+    temp: Math.round(current.temperature_2m),
+    feelsLike: Math.round(current.apparent_temperature),
+    description: getWeatherDescription(current.weathercode),
+    humidity: Math.round(current.relative_humidity_2m),
+    windSpeed: Math.round(current.windspeed_10m),
+    icon: current.weathercode.toString(),
+    timestamp: new Date().toISOString(),
+  };
 }
 
 /**

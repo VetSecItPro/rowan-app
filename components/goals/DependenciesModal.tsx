@@ -269,14 +269,15 @@ export function DependenciesModal({
 
               <div className="space-y-4">
                 {/* Select Goal */}
-                <div>
+                <div className="relative z-50">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Select Goal
                   </label>
                   <select
                     value={selectedGoalId}
                     onChange={(e) => setSelectedGoalId(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 relative z-50"
+                    style={{ position: 'relative', zIndex: 9999 }}
                   >
                     <option value="">Choose a goal...</option>
                     {availableGoals.map((availableGoal) => (
