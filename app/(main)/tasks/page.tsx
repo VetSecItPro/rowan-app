@@ -13,7 +13,7 @@ import { DraggableItemList } from '@/components/tasks/DraggableItemList';
 import { UnifiedItemModal } from '@/components/shared/UnifiedItemModal';
 import { UnifiedDetailsModal } from '@/components/shared/UnifiedDetailsModal';
 import GuidedTaskCreation from '@/components/guided/GuidedTaskCreation';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { tasksService } from '@/lib/services/tasks-service';
 import { choresService, CreateChoreInput } from '@/lib/services/chores-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
@@ -39,7 +39,7 @@ type TaskType = 'task' | 'chore';
 type TaskOrChore = (Task & { type: 'task' }) | (Chore & { type: 'chore' });
 
 export default function TasksPage() {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
 
   // Basic state
   const [loading, setLoading] = useState(true);
@@ -284,7 +284,7 @@ export default function TasksPage() {
   }, [loadData]);
 
   // Unified modal handlers
-  const handleSaveItem = useCallback(async (itemData: CreateTaskInput | CreateChoreInput) => {
+  const handleSaveItem = useCallback(async (itemData: CreateTaskInput | CreateChoreInput): Promise<void | { id: string }> => {
     console.log('=== ENHANCED DEBUG LOGGING - PHASE 1.2 ===');
     console.log('🎯 handleSaveItem called with:', JSON.stringify(itemData, null, 2));
     console.log('📝 editingItem:', editingItem);
@@ -301,6 +301,8 @@ export default function TasksPage() {
           await choresService.updateChore(editingItem.id, itemData as CreateChoreInput);
         }
         // Real-time subscription will handle the update
+        setEditingItem(null);
+        return; // Return void for updates
       } else {
         // Create new item with optimistic updates
         if (modalDefaultType === 'task') {
@@ -386,7 +388,6 @@ export default function TasksPage() {
           }
         }
       }
-      setEditingItem(null);
     } catch (error) {
       console.error('Failed to save item:', error);
 

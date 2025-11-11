@@ -2,8 +2,9 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronDown, Home, Plus, UserPlus, Check } from 'lucide-react';
+import { ChevronDown, Home, Plus, UserPlus, Check, User } from 'lucide-react';
 import type { Space } from '@/lib/types';
+import { featureFlags } from '@/lib/constants/feature-flags';
 
 interface SpaceSelectorProps {
   spaces: (Space & { role: string })[];
@@ -43,6 +44,28 @@ export function SpaceSelector({
       case 'amber': return 'bg-amber-500';
       default: return 'bg-purple-600';
     }
+  };
+
+  // Check if a space is a personal workspace
+  const isPersonalWorkspace = (space: Space & { role: string }): boolean => {
+    return featureFlags.isPersonalWorkspacesEnabled() &&
+           (space as any).is_personal === true;
+  };
+
+  // Get icon for space type
+  const getSpaceIcon = (space: Space & { role: string }) => {
+    if (isPersonalWorkspace(space)) {
+      return <User className="w-4 h-4 text-purple-500" />;
+    }
+    return <Home className="w-4 h-4 text-gray-400" />;
+  };
+
+  // Get display name for space
+  const getSpaceDisplayName = (space: Space & { role: string }): string => {
+    if (isPersonalWorkspace(space)) {
+      return 'Personal Workspace';
+    }
+    return space.name;
   };
 
   // Get theme color class for space name
@@ -161,11 +184,13 @@ export function SpaceSelector({
               className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <Home className="w-4 h-4 text-gray-400" />
+                {getSpaceIcon(space)}
                 <div className="text-left">
-                  <div className="font-medium">{space.name}</div>
+                  <div className={`font-medium ${isPersonalWorkspace(space) ? 'text-purple-600 dark:text-purple-400' : ''}`}>
+                    {getSpaceDisplayName(space)}
+                  </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 capitalize">
-                    {space.role}
+                    {isPersonalWorkspace(space) ? 'Personal' : space.role}
                   </div>
                 </div>
               </div>

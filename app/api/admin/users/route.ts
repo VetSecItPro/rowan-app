@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get beta access information for users
-    const userIds = authUsers.users.map(user => user.id);
+    const userIds = authUsers.users.map((user: any) => user.id);
 
     let betaUsers: any[] = [];
     if (userIds.length > 0) {
@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
     const betaUserIds = new Set(betaUsers.map(beta => beta.user_id));
 
     // Transform users data
-    const users = authUsers.users.map(user => ({
+    const users = authUsers.users.map((user: any) => ({
       id: user.id,
       email: user.email || '',
       created_at: user.created_at,
