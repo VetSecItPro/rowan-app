@@ -738,6 +738,31 @@ export default function MessagesPage() {
     }
   }, [currentSpace, user, conversationId, conversations]);
 
+  // Handle renaming a conversation from sidebar
+  const handleRenameConversationFromSidebar = useCallback(async (conversationIdToRename: string, newTitle: string) => {
+    if (!newTitle.trim()) return;
+
+    try {
+      // Update the conversation title in the backend
+      await messagesService.updateConversation(conversationIdToRename, { title: newTitle.trim() });
+
+      // Optimistically update local state
+      setConversations(prev =>
+        prev.map(conv =>
+          conv.id === conversationIdToRename
+            ? { ...conv, title: newTitle.trim() }
+            : conv
+        )
+      );
+
+      toast.success('Conversation renamed');
+    } catch (error) {
+      console.error('Failed to update conversation title:', error);
+      toast.error('Failed to rename conversation');
+      throw error; // Re-throw to let the sidebar handle the error state
+    }
+  }, []);
+
   // Handle creating a new conversation
   const handleCreateConversation = useCallback(async (conversationData: CreateConversationInput) => {
     if (!currentSpace) return;
@@ -977,6 +1002,7 @@ export default function MessagesPage() {
                   onSelectConversation={handleSelectConversation}
                   onNewConversation={() => setShowNewConversationModal(true)}
                   onDeleteConversation={handleDeleteConversation}
+                  onRenameConversation={handleRenameConversationFromSidebar}
                 />
               </div>
             </div>
@@ -1332,6 +1358,7 @@ export default function MessagesPage() {
                   onSelectConversation={handleSelectConversation}
                   onNewConversation={() => setShowNewConversationModal(true)}
                   onDeleteConversation={handleDeleteConversation}
+                  onRenameConversation={handleRenameConversationFromSidebar}
                   onClose={() => setShowConversationSidebar(false)}
                 />
               </div>
