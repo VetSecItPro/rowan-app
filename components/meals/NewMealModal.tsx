@@ -114,7 +114,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
           </div>
         </div>
         <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-4">
-          <div className="relative">
+          <div className="relative z-50">
             <label className="block text-sm font-medium mb-2">Meal Type *</label>
             <button
               type="button"
@@ -138,7 +138,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
               </svg>
             </button>
             {isMealTypeOpen && (
-              <div className="absolute z-10 w-full mt-1 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg overflow-hidden">
+              <div className="absolute w-full mt-1 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg overflow-hidden" style={{ zIndex: 9999 }}>
                 {mealTypeOptions.map((option) => {
                   const Icon = option.icon;
                   return (
@@ -159,7 +159,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
               </div>
             )}
           </div>
-          <div className="relative">
+          <div className="relative z-50">
             <label htmlFor="field-2" className="block text-sm font-medium mb-2 text-gray-900 dark:text-white cursor-pointer">Recipe (Optional)</label>
             <button
               type="button"
@@ -175,7 +175,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
               </svg>
             </button>
             {isRecipeSelectorOpen && (
-              <div className="absolute z-10 w-full mt-1 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg overflow-hidden">
+              <div className="absolute w-full mt-1 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg overflow-hidden" style={{ zIndex: 9999 }}>
                 {/* Search Input */}
                 <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-3 z-10">
                   <div className="relative">

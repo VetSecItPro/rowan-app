@@ -11,32 +11,20 @@ import { EventCard } from '@/components/calendar/EventCard';
 import { ProposalsList } from '@/components/calendar/ProposalsList';
 import { MiniCalendar } from '@/components/calendar/MiniCalendar';
 import { QuickAddEvent } from '@/components/calendar/QuickAddEvent';
-import dynamicImport from 'next/dynamic';
 
-// Dynamic imports for heavy components (load only when needed)
-const NewEventModal = dynamicImport(() => import('@/components/calendar/NewEventModal').then(mod => ({ default: mod.NewEventModal })), {
-  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
-});
-
-const EventDetailModal = dynamicImport(() => import('@/components/calendar/EventDetailModal').then(mod => ({ default: mod.EventDetailModal })), {
-  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
-});
-
-const EventProposalModal = dynamicImport(() => import('@/components/calendar/EventProposalModal').then(mod => ({ default: mod.EventProposalModal })), {
-  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
-});
-
-const EnhancedDayView = dynamicImport(() => import('@/components/calendar/EnhancedDayView').then(mod => ({ default: mod.EnhancedDayView })));
-const EnhancedWeekView = dynamicImport(() => import('@/components/calendar/EnhancedWeekView').then(mod => ({ default: mod.EnhancedWeekView })));
-const TemplateLibrary = dynamicImport(() => import('@/components/calendar/TemplateLibrary').then(mod => ({ default: mod.TemplateLibrary })));
-const WeatherBadge = dynamicImport(() => import('@/components/calendar/WeatherBadge').then(mod => ({ default: mod.WeatherBadge })));
+// Import components directly to fix clickability issues
+import { NewEventModal } from '@/components/calendar/NewEventModal';
+import { EventDetailModal } from '@/components/calendar/EventDetailModal';
+import { EventProposalModal } from '@/components/calendar/EventProposalModal';
+import { EnhancedDayView } from '@/components/calendar/EnhancedDayView';
+import { EnhancedWeekView } from '@/components/calendar/EnhancedWeekView';
+import { TemplateLibrary } from '@/components/calendar/TemplateLibrary';
+import { WeatherBadge } from '@/components/calendar/WeatherBadge';
 import { geolocationService } from '@/lib/services/geolocation-service';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
-const GuidedEventCreation = dynamicImport(() => import('@/components/guided/GuidedEventCreation'), {
-  ssr: false, // Only load on client side for new users
-  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div></div>
-});
+import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { useSpaces } from '@/lib/contexts/spaces-context';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
 import { useCalendarShortcuts } from '@/lib/hooks/useCalendarShortcuts';
 import { useCalendarGestures } from '@/lib/hooks/useCalendarGestures';
@@ -48,7 +36,8 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMont
 type ViewMode = 'day' | 'week' | 'month' | 'agenda' | 'timeline' | 'proposal' | 'list';
 
 export default function CalendarPage() {
-  const { currentSpace, user } = useAuth();
+  const { user } = useAuth();
+  const { currentSpace } = useSpaces();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -344,14 +333,30 @@ export default function CalendarPage() {
     return eventsByDate.get(dateKey) || [];
   }, [eventsByDate]);
 
-  // Helper to cycle event status
+  // Helper to cycle event status with auto-deletion on completion
   const handleEventStatusClick = useCallback((e: React.MouseEvent, eventId: string, currentStatus: 'not-started' | 'in-progress' | 'completed') => {
     e.stopPropagation(); // Prevent opening edit modal
+
     const states: Array<'not-started' | 'in-progress' | 'completed'> = ['not-started', 'in-progress', 'completed'];
     const currentIndex = states.indexOf(currentStatus);
-    const nextIndex = (currentIndex + 1) % states.length;
-    handleStatusChange(eventId, states[nextIndex]);
-  }, [handleStatusChange]);
+    const nextStatus = states[(currentIndex + 1) % states.length];
+
+    // If the next status would be 'completed', automatically delete the event instead
+    if (nextStatus === 'completed') {
+      // Optimistic update - remove from UI immediately
+      setEvents(prev => prev.filter(event => event.id !== eventId));
+
+      // Delete in background
+      calendarService.deleteEvent(eventId).catch(error => {
+        console.error('Failed to auto-delete completed event:', error);
+        // Revert optimistic update on error
+        loadEvents();
+      });
+    } else {
+      // Normal status change
+      handleStatusChange(eventId, nextStatus);
+    }
+  }, [handleStatusChange, loadEvents]);
 
   const handleGuidedFlowComplete = useCallback(() => {
     setShowGuidedFlow(false);
@@ -1068,9 +1073,10 @@ export default function CalendarPage() {
                             {dayEvents.length === 0 && isCurrentMonth && (
                               <button
                                 onClick={() => setIsModalOpen(true)}
-                                className="hidden sm:block w-full text-center py-2 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                                className="hidden sm:block w-full text-center py-2 px-2 text-xs font-semibold bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-all duration-200 transform hover:scale-105 shadow-sm border-2 border-purple-500"
+                                title="Create new event"
                               >
-                                + Add
+                                + Add Event
                               </button>
                             )}
                           </div>

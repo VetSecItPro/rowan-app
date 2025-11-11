@@ -36,7 +36,9 @@ export function WeatherBadge({ eventTime, location, compact = false }: WeatherBa
   }, [eventTime, location]);
 
   const loadWeather = async () => {
+    console.log('[WeatherBadge] loadWeather called with:', { location, eventTime });
     if (!location) {
+      console.log('[WeatherBadge] No location provided, returning early');
       // Silently return if no location - this is normal
       return;
     }
@@ -69,7 +71,9 @@ export function WeatherBadge({ eventTime, location, compact = false }: WeatherBa
       }
       abortControllerRef.current = new AbortController();
 
+      console.log('[WeatherBadge] About to call weatherService.getWeatherForEvent with:', { location, eventTime });
       const forecast = await weatherService.getWeatherForEvent(location, eventTime);
+      console.log('[WeatherBadge] weatherService.getWeatherForEvent returned:', forecast);
 
       if (forecast) {
         const weatherAlert = weatherService.shouldWarnAboutWeather(forecast, location);
