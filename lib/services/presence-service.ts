@@ -75,7 +75,7 @@ export async function getSpaceMembersWithPresence(
     }
 
     // Transform data to match our TypeScript interface
-    const members: SpaceMemberWithPresence[] = (data || []).map(member => ({
+    const members: SpaceMemberWithPresence[] = (data || []).map((member: any) => ({
       space_id: member.space_id,
       user_id: member.user_id,
       role: member.role,

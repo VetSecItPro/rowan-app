@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
       ];
 
       // CSV rows
-      const rows = (notifications || []).map(notification => [
+      const rows = (notifications || []).map((notification: any) => [
         notification.id,
         `"${(notification.name || '').replace(/"/g, '""')}"`, // Escape quotes
         `"${(notification.email || '').replace(/"/g, '""')}"`,
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
       ]);
 
       // Combine headers and rows
-      const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+      const csvContent = [headers.join(','), ...rows.map((row: string[]) => row.join(','))].join('\n');
 
       // Log export activity
       console.log(`Admin notification export by: ${sessionData.email} from IP: ${ip}, Records: ${rows.length}`);

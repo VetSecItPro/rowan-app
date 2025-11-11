@@ -16,10 +16,10 @@ const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 interface WeatherBadgeProps {
   eventTime: string;
   location?: string;
-  compact?: boolean;
+  display?: 'compact' | 'medium' | 'full';
 }
 
-export function WeatherBadge({ eventTime, location, compact = false }: WeatherBadgeProps) {
+export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherBadgeProps) {
   const [weather, setWeather] = useState<WeatherForecast | null>(null);
   const [alert, setAlert] = useState<WeatherAlert | null>(null);
   const [loading, setLoading] = useState(false);
@@ -37,14 +37,11 @@ export function WeatherBadge({ eventTime, location, compact = false }: WeatherBa
 
   const loadWeather = async () => {
     console.log('[WeatherBadge] loadWeather called with:', { location, eventTime });
-    if (!location) {
-      console.log('[WeatherBadge] No location provided, returning early');
-      // Silently return if no location - this is normal
-      return;
-    }
+    // Note: No early return - let weather service handle user location detection when location is undefined
 
-    // Create cache key
-    const cacheKey = `${location}-${eventTime.split('T')[0]}`;
+    // Create cache key - handle undefined location for user location detection
+    const effectiveLocation = location || 'user-location';
+    const cacheKey = `${effectiveLocation}-${eventTime.split('T')[0]}`;
     const now = Date.now();
     const cached = weatherCache.get(cacheKey);
 
@@ -136,12 +133,14 @@ export function WeatherBadge({ eventTime, location, compact = false }: WeatherBa
 
   const emoji = weatherService.getWeatherEmoji(weather.condition);
 
-  // Convert Celsius to Fahrenheit for US users
+  // Convert Celsius to Fahrenheit and km/h to mph for US users
   const toFahrenheit = (celsius: number) => Math.round((celsius * 9/5) + 32);
+  const toMph = (kmh: number) => Math.round(kmh * 0.621371);
   const tempF = toFahrenheit(weather.temp);
   const feelsLikeF = toFahrenheit(weather.feelsLike);
+  const windMph = toMph(weather.windSpeed);
 
-  if (compact) {
+  if (display === 'compact') {
     return (
       <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
         <span className="text-sm">{emoji}</span>
@@ -156,6 +155,58 @@ export function WeatherBadge({ eventTime, location, compact = false }: WeatherBa
                 : 'text-blue-500'
             }`}
           />
+        )}
+      </div>
+    );
+  }
+
+  if (display === 'medium') {
+    return (
+      <div className="space-y-2">
+        {/* Main weather info */}
+        <div className="flex items-center gap-2">
+          <span className="text-lg">{emoji}</span>
+          <div className="flex-1">
+            <div className="flex items-baseline gap-1">
+              <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                {tempF}°F
+              </span>
+              <span className="text-xs text-gray-600 dark:text-gray-400">
+                feels {feelsLikeF}°F
+              </span>
+            </div>
+            <div className="text-xs text-gray-600 dark:text-gray-400 capitalize">
+              {weather.description}
+            </div>
+          </div>
+        </div>
+
+        {/* Additional details */}
+        <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-1">
+            <span>💧</span>
+            <span>{weather.humidity}%</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span>💨</span>
+            <span>{windMph} mph</span>
+          </div>
+        </div>
+
+        {/* Compact alert */}
+        {alert && (
+          <div className="flex items-center gap-1 text-xs">
+            <AlertTriangle
+              className={`w-3 h-3 ${
+                alert.severity === 'severe'
+                  ? 'text-red-500'
+                  : alert.severity === 'warning'
+                  ? 'text-orange-500'
+                  : 'text-blue-500'
+              }`}
+            />
+            <span className="text-gray-600 dark:text-gray-400">{alert.title}</span>
+          </div>
         )}
       </div>
     );
@@ -181,7 +232,7 @@ export function WeatherBadge({ eventTime, location, compact = false }: WeatherBa
         </div>
         <div className="text-xs text-gray-600 dark:text-gray-400 text-right">
           <div>💧 {weather.humidity}%</div>
-          <div>💨 {Math.round(weather.windSpeed)} km/h</div>
+          <div>💨 {windMph} mph</div>
         </div>
       </div>
 

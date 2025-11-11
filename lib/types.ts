@@ -111,6 +111,20 @@ export interface Space {
   name: string;
   created_at: string;
   updated_at: string;
+  user_id?: string;
+  is_personal?: boolean;
+  auto_created?: boolean;
+}
+
+export interface WorkspaceMigration {
+  id: string;
+  user_id: string;
+  from_space_id: string;
+  to_space_id: string;
+  item_type: string;
+  item_id: string;
+  migrated_at: string;
+  created_at: string;
 }
 
 export interface SpaceMember {
@@ -221,6 +235,13 @@ export interface Reminder {
   completed_at?: string;
   created_at: string;
   updated_at: string;
+  // New fields from migration 20251006000003_add_reminder_category.sql
+  category: 'bills' | 'health' | 'work' | 'personal' | 'household';
+  emoji?: string;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status: 'active' | 'completed' | 'snoozed';
+  snooze_until?: string;
+  reminder_time?: string;
   user?: {
     id: string;
     name?: string;

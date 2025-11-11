@@ -80,7 +80,7 @@ export async function GET(
 
     // Group items by category
     const itemsByCategory: Record<string, any[]> = {};
-    items?.forEach((item) => {
+    items?.forEach((item: any) => {
       const category = item.category || 'Other';
       if (!itemsByCategory[category]) {
         itemsByCategory[category] = [];
@@ -99,7 +99,7 @@ export async function GET(
         itemsByCategory,
         stats: {
           totalItems: items?.length || 0,
-          purchasedItems: items?.filter((i) => i.is_purchased).length || 0,
+          purchasedItems: items?.filter((i: any) => i.is_purchased).length || 0,
           categories: Object.keys(itemsByCategory).length,
         },
       },

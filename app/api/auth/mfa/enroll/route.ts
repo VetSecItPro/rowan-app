@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
       success: true,
       data: {
         factors: data.totp || [],
-        is_enrolled: (data.totp || []).some(factor => factor.status === 'verified'),
+        is_enrolled: (data.totp || []).some((factor: any) => factor.status === 'verified'),
       },
     });
   } catch (error) {

@@ -66,7 +66,7 @@ const BadgesWidget = dynamicImport(() => import('@/components/goals/badges/Badge
   loading: () => <div className="p-4 flex items-center justify-center"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div></div>
 });
 
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput, GoalTemplate, CreateCheckInInput } from '@/lib/services/goals-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { createClient } from '@/lib/supabase/client';
@@ -77,7 +77,7 @@ import { OnlineUsersIndicator, PresenceIndicator } from '@/components/shared/Pre
 type ViewMode = 'goals' | 'milestones' | 'habits' | 'activity';
 
 export default function GoalsPage() {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const goalsRef = useRef<Goal[]>([]);
@@ -904,7 +904,6 @@ export default function GoalsPage() {
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                   {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` :
                    viewMode === 'milestones' ? `Achievement Wall (${filteredMilestones.length})` :
-                   viewMode === 'habits' ? 'Habit Tracker' :
                    'Activity Feed'}
                 </h2>
                 <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 text-sm font-medium rounded-full">
