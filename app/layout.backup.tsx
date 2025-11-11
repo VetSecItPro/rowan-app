@@ -2,8 +2,6 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthProvider } from "@/lib/contexts/auth-context";
-import { SpacesProvider } from "@/lib/contexts/spaces-context";
-import { AppWithOnboarding } from "@/components/app/AppWithOnboarding";
 import { CookieConsent } from "@/components/gdpr/CookieConsent";
 import ClientErrorBoundary from "@/components/shared/ClientErrorBoundary";
 // import { CommandPaletteProvider } from "@/components/ui/command-palette"; // Temporarily disabled UI
@@ -59,15 +57,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <SpacesProvider>
-              <AppWithOnboarding>
-                <ClientErrorBoundary>
-                  {/* <CommandPaletteProvider> // Temporarily disabled UI */}
-                    {children}
-                  {/* </CommandPaletteProvider> */}
-                </ClientErrorBoundary>
-              </AppWithOnboarding>
-            </SpacesProvider>
+            <ClientErrorBoundary>
+              {/* <CommandPaletteProvider> // Temporarily disabled UI */}
+                {children}
+              {/* </CommandPaletteProvider> */}
+            </ClientErrorBoundary>
             <CookieConsent />
             <Toaster
               position="top-center"

@@ -33,13 +33,114 @@ export function TemplateSelectionModal({
     }
   }, [isOpen, selectedCategory]);
 
+  // Fallback data for when database is unavailable
+  const fallbackTemplates: GoalTemplate[] = [
+    {
+      id: 'fallback-1',
+      title: 'Build Emergency Fund',
+      description: 'Save 3-6 months of living expenses for unexpected situations',
+      category: 'financial',
+      icon: '💰',
+      target_days: 180,
+      is_public: true,
+      usage_count: 245,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'fallback-2',
+      title: 'Pay Off Debt',
+      description: 'Eliminate credit card or loan debt systematically',
+      category: 'financial',
+      icon: '💳',
+      target_days: 365,
+      is_public: true,
+      usage_count: 189,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'fallback-3',
+      title: 'Weight Loss Journey',
+      description: 'Lose weight through healthy eating and regular exercise',
+      category: 'health',
+      icon: '🏃',
+      target_days: 90,
+      is_public: true,
+      usage_count: 156,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'fallback-4',
+      title: 'Save for Home Down Payment',
+      description: 'Accumulate funds for a house or apartment down payment',
+      category: 'home',
+      icon: '🏠',
+      target_days: 730,
+      is_public: true,
+      usage_count: 134,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'fallback-5',
+      title: 'Retirement Savings Boost',
+      description: 'Increase retirement account contributions and grow nest egg',
+      category: 'financial',
+      icon: '🏦',
+      target_days: 365,
+      is_public: true,
+      usage_count: 112,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'fallback-6',
+      title: 'Investment Portfolio',
+      description: 'Build a diversified investment portfolio',
+      category: 'financial',
+      icon: '📈',
+      target_days: 365,
+      is_public: true,
+      usage_count: 98,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: 'fallback-7',
+      title: 'Career Advancement',
+      description: 'Work towards a promotion or new career opportunity',
+      category: 'career',
+      icon: '💼',
+      target_days: 365,
+      is_public: true,
+      usage_count: 87,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  ];
+
+  const fallbackCategories = [
+    { category: 'financial', count: 5, icon: '💰' },
+    { category: 'health', count: 4, icon: '🏃' },
+    { category: 'home', count: 4, icon: '🏠' },
+    { category: 'relationship', count: 4, icon: '💕' },
+    { category: 'career', count: 3, icon: '💼' },
+  ];
+
   const loadTemplates = async () => {
     try {
       setLoading(true);
       const data = await goalsService.getGoalTemplates(selectedCategory || undefined);
       setTemplates(data);
     } catch (error) {
-      console.error('Error loading templates:', error);
+      console.error('Error loading templates, using fallback data:', error);
+      // Use fallback data when database is unavailable
+      const filtered = selectedCategory
+        ? fallbackTemplates.filter(t => t.category === selectedCategory)
+        : fallbackTemplates;
+      setTemplates(filtered);
     } finally {
       setLoading(false);
     }
@@ -50,7 +151,9 @@ export function TemplateSelectionModal({
       const data = await goalsService.getTemplateCategories();
       setCategories(data);
     } catch (error) {
-      console.error('Error loading categories:', error);
+      console.error('Error loading categories, using fallback data:', error);
+      // Use fallback data when database is unavailable
+      setCategories(fallbackCategories);
     }
   };
 
@@ -85,10 +188,10 @@ export function TemplateSelectionModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      <div className="w-full max-w-4xl max-h-[90vh] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden flex flex-col">
+    <div className="fixed inset-0 flex items-center justify-center p-4 bg-black/50 z-50">
+      <div className="w-full max-w-6xl max-h-screen sm:max-h-[90vh] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 bg-gradient-to-r from-indigo-600 to-purple-600">
+        <div className="flex items-center justify-between p-6 bg-indigo-600">
           <div>
             <h2 className="text-2xl font-bold text-white">Choose a Goal Template</h2>
             <p className="text-sm text-indigo-100 mt-1">
@@ -120,10 +223,10 @@ export function TemplateSelectionModal({
 
         {/* Category Tabs */}
         <div className="px-6 pb-4">
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setSelectedCategory(null)}
-              className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all ${
+              className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all flex-shrink-0 ${
                 selectedCategory === null
                   ? 'bg-indigo-500 text-white hover:bg-indigo-600'
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -135,7 +238,7 @@ export function TemplateSelectionModal({
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all flex items-center gap-2 flex-shrink-0 ${
                   selectedCategory === category
                     ? 'bg-indigo-500 text-white hover:bg-indigo-600'
                     : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'

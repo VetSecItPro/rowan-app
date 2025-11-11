@@ -247,7 +247,7 @@ export interface GoalActivity {
   // Populated relations
   user?: {
     id: string;
-    name: string;
+    full_name: string;
     avatar_url?: string;
   };
   goal?: Goal;
@@ -270,7 +270,7 @@ export interface GoalComment {
   // Populated relations
   user?: {
     id: string;
-    name: string;
+    full_name: string;
     avatar_url?: string;
   };
   replies?: GoalComment[];

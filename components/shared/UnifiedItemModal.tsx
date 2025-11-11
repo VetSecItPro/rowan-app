@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { X, Smile, ChevronDown, Repeat, Calendar, User, Clock, MessageSquare, Tag, Star, Users, CheckSquare, Home, Loader2 } from 'lucide-react';
 import { CreateTaskInput, CreateChoreInput, Task, Chore } from '@/lib/types';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { taskRecurrenceService } from '@/lib/services/task-recurrence-service';
 import { choreCalendarService } from '@/lib/services/chore-calendar-service';
+import { Dropdown } from '@/components/ui/Dropdown';
+import { DateTimePicker } from '@/components/ui/DateTimePicker';
 import {
   TASK_CATEGORIES,
   CHORE_CATEGORIES,
@@ -40,7 +42,7 @@ export function UnifiedItemModal({
   defaultType = 'task',
   mode = 'create'
 }: UnifiedItemModalProps) {
-  const { ensureCurrentUserHasSpace } = useAuth();
+  const { currentSpace, createSpace, hasZeroSpaces } = useAuthWithSpaces();
 
   // Space management state
   const [actualSpaceId, setActualSpaceId] = useState<string | undefined>(spaceId);
@@ -84,32 +86,28 @@ export function UnifiedItemModal({
   const [familyAssignment, setFamilyAssignment] = useState('unassigned');
   const [quickNote, setQuickNote] = useState('');
 
-  // Auto-create space if needed when modal opens
+  // Set up space ID when modal opens
   useEffect(() => {
-    if (isOpen && !actualSpaceId && !editItem) {
-      setSpaceCreationLoading(true);
-      setSpaceError('');
-
-      ensureCurrentUserHasSpace()
-        .then((result) => {
-          if (result.success && result.spaceId) {
-            setActualSpaceId(result.spaceId);
-            setFormData((prev: any) => ({ ...prev, space_id: result.spaceId }));
-          } else {
-            setSpaceError(result.error || 'Failed to create space');
-          }
-        })
-        .catch((error) => {
-          console.error('Error ensuring space:', error);
-          setSpaceError('Failed to create space');
-        })
-        .finally(() => {
-          setSpaceCreationLoading(false);
-        });
-    } else if (spaceId) {
-      setActualSpaceId(spaceId);
+    if (isOpen) {
+      if (spaceId) {
+        // Use provided spaceId
+        setActualSpaceId(spaceId);
+        setFormData((prev: any) => ({ ...prev, space_id: spaceId }));
+      } else if (currentSpace && !editItem) {
+        // Use current space from context
+        setActualSpaceId(currentSpace.id);
+        setFormData((prev: any) => ({ ...prev, space_id: currentSpace.id }));
+      } else if (editItem) {
+        // For edit mode, keep existing space_id from the item
+        setActualSpaceId(editItem.space_id);
+        setFormData((prev: any) => ({ ...prev, space_id: editItem.space_id }));
+      } else if (hasZeroSpaces) {
+        // Zero spaces scenario - this should be handled by AppWithOnboarding
+        // but if we get here, show a friendly error
+        setSpaceError('Please create a workspace before adding items.');
+      }
     }
-  }, [isOpen, spaceId, actualSpaceId, editItem, ensureCurrentUserHasSpace]);
+  }, [isOpen, spaceId, currentSpace, editItem, hasZeroSpaces]);
 
   // Initialize form data
   useEffect(() => {
@@ -199,8 +197,46 @@ export function UnifiedItemModal({
     setFormData((prev: any) => ({ ...prev, category: '' })); // Reset category when switching
   };
 
+  // Validation helper for recurring interval
+  const getIntervalValidation = () => {
+    const interval = recurringData.interval;
+
+    if (!interval || interval === 0) {
+      return { isValid: true, message: '' }; // Empty is valid, will default to 1 on blur
+    }
+
+    if (interval < 1) {
+      return { isValid: false, message: 'Must be at least 1' };
+    }
+
+    switch (recurringData.pattern) {
+      case 'daily':
+        if (interval > 31) {
+          return { isValid: false, message: 'Daily: max 31 days' };
+        }
+        break;
+      case 'weekly':
+        if (interval > 52) {
+          return { isValid: false, message: 'Weekly: max 52 weeks' };
+        }
+        break;
+      case 'monthly':
+        if (interval > 12) {
+          return { isValid: false, message: 'Monthly: max 12 months' };
+        }
+        break;
+    }
+
+    return { isValid: true, message: '' };
+  };
+
   const handleSubmit = async () => {
     if (!formData.title.trim()) {
+      return;
+    }
+
+    // Check recurring validation if recurring is enabled
+    if (isRecurring && !getIntervalValidation().isValid) {
       return;
     }
 
@@ -322,6 +358,31 @@ export function UnifiedItemModal({
     return itemType === 'task' ? TASK_CATEGORIES : CHORE_CATEGORIES;
   };
 
+  // Helper function to convert categories to dropdown options
+  const getCategoryOptions = () => {
+    const categories = getCurrentCategories();
+    return Object.entries(categories).map(([key, category]) => ({
+      value: key,
+      label: `${category.emoji} ${category.label}`
+    }));
+  };
+
+  // Helper function to convert priority levels to dropdown options
+  const getPriorityOptions = () => {
+    return Object.entries(PRIORITY_LEVELS).map(([key, priority]) => ({
+      value: key,
+      label: `${priority.emoji} ${priority.label} - ${priority.description}`
+    }));
+  };
+
+  // Helper function to convert status types to dropdown options
+  const getStatusOptions = () => {
+    return Object.entries(STATUS_TYPES).map(([key, status]) => ({
+      value: key,
+      label: `${status.emoji} ${status.label} - ${status.description}`
+    }));
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -329,7 +390,7 @@ export function UnifiedItemModal({
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
       {/* Enhanced Wide Modal */}
-      <div className="relative bg-gray-50 dark:bg-gray-800 w-full max-w-6xl h-full max-h-[95vh] overflow-hidden rounded-none sm:rounded-2xl shadow-2xl flex flex-col">
+      <div className="relative bg-gray-50 dark:bg-gray-800 w-full max-w-6xl h-full max-h-[95vh] rounded-none sm:rounded-2xl shadow-2xl flex flex-col" style={{ overflowX: 'visible', overflowY: 'auto' }}>
 
         {/* Loading Overlay for Space Creation */}
         {spaceCreationLoading && (
@@ -474,21 +535,12 @@ export function UnifiedItemModal({
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Category
                     </label>
-                    <div className="relative">
-                      <select
-                        value={formData.category}
-                        onChange={(e) => handleInputChange('category', e.target.value)}
-                        className="w-full pl-4 pr-12 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white appearance-none"
-                      >
-                        <option value="">Select a category</option>
-                        {Object.entries(getCurrentCategories()).map(([key, category]) => (
-                          <option key={key} value={key}>
-                            {category.emoji} {category.label}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                    </div>
+                    <Dropdown
+                      value={formData.category}
+                      onChange={(value) => handleInputChange('category', value)}
+                      options={getCategoryOptions()}
+                      placeholder="Select a category"
+                    />
                   </div>
 
                   {/* Priority */}
@@ -496,20 +548,12 @@ export function UnifiedItemModal({
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Priority
                     </label>
-                    <div className="relative">
-                      <select
-                        value={formData.priority}
-                        onChange={(e) => handleInputChange('priority', e.target.value)}
-                        className="w-full pl-4 pr-12 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white appearance-none"
-                      >
-                        {Object.entries(PRIORITY_LEVELS).map(([key, priority]) => (
-                          <option key={key} value={key}>
-                            {priority.emoji} {priority.label} - {priority.description}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                    </div>
+                    <Dropdown
+                      value={formData.priority}
+                      onChange={(value) => handleInputChange('priority', value)}
+                      options={getPriorityOptions()}
+                      placeholder="Select priority..."
+                    />
                   </div>
                 </div>
               </div>
@@ -524,20 +568,12 @@ export function UnifiedItemModal({
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Status
                     </label>
-                    <div className="relative">
-                      <select
-                        value={formData.status}
-                        onChange={(e) => handleInputChange('status', e.target.value)}
-                        className="w-full pl-4 pr-12 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white appearance-none"
-                      >
-                      {Object.entries(STATUS_TYPES).map(([key, status]) => (
-                        <option key={key} value={key}>
-                          {status.emoji} {status.label} - {status.description}
-                        </option>
-                      ))}
-                      </select>
-                      <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                    </div>
+                    <Dropdown
+                      value={formData.status}
+                      onChange={(value) => handleInputChange('status', value)}
+                      options={getStatusOptions()}
+                      placeholder="Select status..."
+                    />
                   </div>
 
                   {/* Estimated Hours */}
@@ -601,21 +637,15 @@ export function UnifiedItemModal({
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Assign to Family Member
                     </label>
-                    <div className="relative">
-                      <select
-                        value={familyAssignment}
-                        onChange={(e) => setFamilyAssignment(e.target.value)}
-                        disabled={false}
-                        className="w-full pl-4 pr-12 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                      {Object.entries(FAMILY_ROLES).map(([key, role]) => (
-                        <option key={key} value={key}>
-                          {role.emoji} {role.label} - {role.description}
-                        </option>
-                      ))}
-                      </select>
-                      <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                    </div>
+                    <Dropdown
+                      value={familyAssignment}
+                      onChange={(value) => setFamilyAssignment(value || '')}
+                      options={Object.entries(FAMILY_ROLES).map(([key, role]) => ({
+                        value: key,
+                        label: `${role.emoji} ${role.label} - ${role.description}`
+                      }))}
+                      placeholder="Select family member..."
+                    />
                   </div>
 
                   {/* Custom Assignment */}
@@ -641,14 +671,11 @@ export function UnifiedItemModal({
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Due Date */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Due Date
-                    </label>
-                    <input
-                      type="datetime-local"
+                    <DateTimePicker
                       value={formData.due_date}
-                      onChange={(e) => handleInputChange('due_date', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                      onChange={(value) => handleInputChange('due_date', value)}
+                      label="Due Date"
+                      placeholder="Click to select date and time..."
                     />
                     {dateError && (
                       <p className="text-red-600 text-sm mt-1">{dateError}</p>
@@ -699,56 +726,123 @@ export function UnifiedItemModal({
                     {/* Recurring Options */}
                     {isRecurring && (
                       <div className="space-y-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                              Repeat Pattern
-                            </label>
-                            <div className="relative">
-                              <select
-                                value={recurringData.pattern}
-                                onChange={(e) => setRecurringData(prev => ({ ...prev, pattern: e.target.value as keyof typeof RECURRING_PATTERNS }))}
-                                className="w-full pl-3 pr-10 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white appearance-none"
-                              >
-                              {Object.entries(RECURRING_PATTERNS).map(([key, pattern]) => (
-                                <option key={key} value={key}>
-                                  {pattern.emoji} {pattern.label} - {pattern.description}
-                                </option>
-                              ))}
-                              </select>
-                              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                            </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                            How often should this repeat?
+                          </label>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                            {/* Common repeat options */}
+                            {[
+                              { pattern: 'daily', interval: 1, label: '📅 Every day', desc: 'Daily' },
+                              { pattern: 'daily', interval: 2, label: '📅 Every 2 days', desc: 'Every other day' },
+                              { pattern: 'daily', interval: 3, label: '📅 Every 3 days', desc: 'Every 3rd day' },
+                              { pattern: 'weekly', interval: 1, label: '📆 Every week', desc: 'Weekly' },
+                              { pattern: 'weekly', interval: 2, label: '📆 Every 2 weeks', desc: 'Bi-weekly' },
+                              { pattern: 'monthly', interval: 1, label: '📊 Every month', desc: 'Monthly' },
+                            ].map((option) => {
+                              const isSelected = recurringData.pattern === option.pattern && recurringData.interval === option.interval;
+                              return (
+                                <button
+                                  key={`${option.pattern}-${option.interval}`}
+                                  type="button"
+                                  onClick={() => setRecurringData(prev => ({
+                                    ...prev,
+                                    pattern: option.pattern as keyof typeof RECURRING_PATTERNS,
+                                    interval: option.interval
+                                  }))}
+                                  className={`p-3 rounded-lg border-2 transition-all text-left ${
+                                    isSelected
+                                      ? 'border-blue-500 bg-blue-100 dark:bg-blue-900/30'
+                                      : 'border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600 bg-white dark:bg-gray-800'
+                                  }`}
+                                >
+                                  <div className="font-medium text-sm text-gray-900 dark:text-white">
+                                    {option.label}
+                                  </div>
+                                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                                    {option.desc}
+                                  </div>
+                                </button>
+                              );
+                            })}
                           </div>
 
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                              Every
+                          {/* Custom option for advanced users */}
+                          <div className="mt-4 p-3 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                              Custom schedule (advanced)
                             </label>
-                            <input
-                              type="number"
-                              min="1"
-                              max="20"
-                              value={recurringData.interval}
-                              onFocus={(e) => {
-                                if (!intervalTouched && recurringData.interval === 0) {
-                                  e.target.select(); // Select all text when focused for easy replacement
-                                }
-                              }}
-                              onChange={(e) => {
-                                const value = e.target.value;
-                                setIntervalTouched(true);
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <Dropdown
+                                  value={recurringData.pattern}
+                                  onChange={(value) => setRecurringData(prev => ({ ...prev, pattern: (value || 'daily') as keyof typeof RECURRING_PATTERNS }))}
+                                  options={[
+                                    { value: 'daily', label: 'Daily' },
+                                    { value: 'weekly', label: 'Weekly' },
+                                    { value: 'monthly', label: 'Monthly' }
+                                  ]}
+                                  placeholder="Select pattern..."
+                                  className="text-sm"
+                                />
+                              </div>
+                              <div className="flex items-center gap-2 relative">
+                                <span className="text-xs text-gray-600 dark:text-gray-300">Every</span>
+                                <div className="relative">
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    max={recurringData.pattern === 'daily' ? 31 : recurringData.pattern === 'weekly' ? 52 : 12}
+                                    value={recurringData.interval || ''}
+                                    onFocus={(e) => {
+                                      // Select all text when focused for easy replacement
+                                      e.target.select();
+                                    }}
+                                    onChange={(e) => {
+                                      const value = e.target.value;
+                                      if (value === '') {
+                                        setRecurringData(prev => ({ ...prev, interval: 0 }));
+                                        return;
+                                      }
 
-                                if (value === '') {
-                                  setRecurringData(prev => ({ ...prev, interval: 0 }));
-                                } else {
-                                  const numValue = parseInt(value);
-                                  if (!isNaN(numValue) && numValue >= 1 && numValue <= 20) {
-                                    setRecurringData(prev => ({ ...prev, interval: numValue }));
-                                  }
-                                }
-                              }}
-                              className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                            />
+                                      const numValue = parseInt(value);
+                                      if (!isNaN(numValue) && numValue >= 1) {
+                                        // Set max limits based on pattern
+                                        const maxLimit = recurringData.pattern === 'daily' ? 31 :
+                                                       recurringData.pattern === 'weekly' ? 52 : 12;
+
+                                        if (numValue <= maxLimit) {
+                                          setRecurringData(prev => ({ ...prev, interval: numValue }));
+                                        }
+                                      }
+                                    }}
+                                    onBlur={() => {
+                                      // Set to 1 if empty when leaving field
+                                      if (!recurringData.interval || recurringData.interval === 0) {
+                                        setRecurringData(prev => ({ ...prev, interval: 1 }));
+                                      }
+                                    }}
+                                    className={`w-16 px-2 py-1 text-sm border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-center ${
+                                      getIntervalValidation().isValid
+                                        ? 'border-gray-300 dark:border-gray-500'
+                                        : 'border-red-500 dark:border-red-400'
+                                    }`}
+                                    placeholder="1"
+                                  />
+
+                                  {/* Error Tooltip */}
+                                  {!getIntervalValidation().isValid && (
+                                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-red-600 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-50">
+                                      {getIntervalValidation().message}
+                                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-b-red-600"></div>
+                                    </div>
+                                  )}
+                                </div>
+                                <span className="text-xs text-gray-600 dark:text-gray-300">
+                                  {recurringData.pattern === 'daily' ? 'days' : recurringData.pattern === 'weekly' ? 'weeks' : 'months'}
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
