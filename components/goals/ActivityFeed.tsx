@@ -71,6 +71,13 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
   const loadActivities = async () => {
     try {
       setLoading(true);
+
+      // Return empty activities for invalid spaceIds (like "skip" or other placeholder values)
+      if (!spaceId || spaceId === 'skip' || spaceId === 'placeholder') {
+        setActivities([]);
+        return;
+      }
+
       let query = supabase
         .from('goal_activities')
         .select(`
@@ -94,6 +101,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
       setActivities(activitiesData || []);
     } catch (error) {
       console.error('Error loading activities:', error);
+      setActivities([]);
     } finally {
       setLoading(false);
     }
@@ -278,7 +286,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                         {getActivityIcon(activity.activity_type)}
                         <p className="text-sm">
                           <span className="font-medium">
-                            {activity.user?.name}
+                            {activity.user?.full_name}
                           </span>
                           {' '}
                           <span className="text-gray-600 dark:text-gray-400">
@@ -322,7 +330,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                               <div className="flex-1">
                                 <div className="bg-gray-50 dark:bg-gray-800 rounded-lg px-3 py-2">
                                   <p className="text-xs font-medium mb-1">
-                                    {comment.user?.name}
+                                    {comment.user?.full_name}
                                   </p>
                                   <p className="text-sm">{comment.content}</p>
                                 </div>

@@ -112,14 +112,15 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
             />
           </div>
 
-          <div>
+          <div className="relative z-50">
             <label htmlFor="field-3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">
               Status
             </label>
             <select
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-              className="w-full pl-1 pr-1 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
+              className="w-full pl-1 pr-1 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white relative z-50"
+              style={{ position: 'relative', zIndex: 9999 }}
             >
               <option value="planning">Planning</option>
               <option value="in_progress">In Progress</option>

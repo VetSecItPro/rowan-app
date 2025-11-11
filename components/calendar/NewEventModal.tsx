@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Smile, Image as ImageIcon, Paperclip, Calendar, ChevronDown, Palette, ShoppingCart } from 'lucide-react';
+import { X, Smile, Image as ImageIcon, Paperclip, Calendar, ChevronDown, ShoppingCart } from 'lucide-react';
 import { CreateEventInput, CalendarEvent } from '@/lib/services/calendar-service';
 import { eventAttachmentsService } from '@/lib/services/event-attachments-service';
 import { shoppingService, ShoppingList } from '@/lib/services/shopping-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { toDateTimeLocalValue, fromDateTimeLocalValue, fromUTC, toUTC } from '@/lib/utils/timezone-utils';
+import { Dropdown } from '@/components/ui/Dropdown';
+import { DateTimePicker } from '@/components/ui/DateTimePicker';
 
 interface NewEventModalProps {
   isOpen: boolean;
@@ -66,24 +68,12 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
   const [selectedDaysOfWeek, setSelectedDaysOfWeek] = useState<number[]>([]);
   const [selectedDaysOfMonth, setSelectedDaysOfMonth] = useState<number[]>([]);
   const [dateError, setDateError] = useState<string>('');
-  const [customColor, setCustomColor] = useState<string>('');
   const [linkToShopping, setLinkToShopping] = useState(false);
   const [selectedListId, setSelectedListId] = useState('');
   const [shoppingLists, setShoppingLists] = useState<ShoppingList[]>([]);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Predefined color palette
-  const colorPalette = [
-    { name: 'Purple', value: '#9333ea' },
-    { name: 'Blue', value: '#3b82f6' },
-    { name: 'Green', value: '#10b981' },
-    { name: 'Yellow', value: '#eab308' },
-    { name: 'Red', value: '#ef4444' },
-    { name: 'Pink', value: '#ec4899' },
-    { name: 'Indigo', value: '#6366f1' },
-    { name: 'Orange', value: '#f97316' },
-  ];
 
   useEffect(() => {
     if (editEvent) {
@@ -97,7 +87,6 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
         location: editEvent.location || '',
         category: editEvent.category || 'personal',
       });
-      setCustomColor((editEvent as any).custom_color || '');
 
       // Parse recurrence pattern if it exists
       if (editEvent.recurrence_pattern) {
@@ -129,7 +118,6 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
         location: '',
         category: 'personal',
       });
-      setCustomColor('');
       setRecurringFrequency('weekly');
       setSelectedDaysOfWeek([]);
       setSelectedDaysOfMonth([]);
@@ -205,7 +193,6 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
         recurrence_pattern: recurrencePattern,
         location: formData.location || undefined,
         category: formData.category,
-        custom_color: customColor || undefined,
       };
 
       // Save the event and get the created event back
@@ -323,12 +310,32 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
     setAttachedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
+  // Helper functions for dropdown options
+  const getFrequencyOptions = () => {
+    return [
+      { value: 'daily', label: 'Daily' },
+      { value: 'weekly', label: 'Weekly' },
+      { value: 'monthly', label: 'Monthly' }
+    ];
+  };
+
+  const getShoppingListOptions = () => {
+    const options = [{ value: '', label: 'Choose a list...' }];
+    shoppingLists.forEach((list) => {
+      options.push({
+        value: list.id,
+        label: `${list.title} (${list.items?.length || 0} items)`
+      });
+    });
+    return options;
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
+      <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-3xl sm:h-[90vh] sm:rounded-2xl overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-purple-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
@@ -488,17 +495,13 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
           {/* Date & Time */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label htmlFor="field-5" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
-                Start Date & Time *
-              </label>
-              <input
-                type="datetime-local"
-                required
+              <DateTimePicker
+                label="Start Date & Time *"
                 value={formData.start_time ? toDateTimeLocalValue(formData.start_time) : ''}
-                onChange={(e) => {
-                  if (e.target.value) {
+                onChange={(value) => {
+                  if (value) {
                     // Convert from datetime-local (user's local time) to UTC for storage
-                    const newStartTime = fromDateTimeLocalValue(e.target.value);
+                    const newStartTime = fromDateTimeLocalValue(value);
                     setFormData({ ...formData, start_time: newStartTime });
 
                     // Re-validate if end time is already set
@@ -514,21 +517,19 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                     }
                   }
                 }}
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                placeholder="Select start date and time..."
+                className={dateError ? 'border-red-500 dark:border-red-500' : ''}
               />
             </div>
 
             <div>
-              <label htmlFor="field-6" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
-                End Date & Time
-              </label>
-              <input
-                type="datetime-local"
+              <DateTimePicker
+                label="End Date & Time"
                 value={formData.end_time ? toDateTimeLocalValue(formData.end_time) : ''}
-                onChange={(e) => {
-                  if (e.target.value) {
+                onChange={(value) => {
+                  if (value) {
                     // Convert from datetime-local (user's local time) to UTC for storage
-                    const newEndTime = fromDateTimeLocalValue(e.target.value);
+                    const newEndTime = fromDateTimeLocalValue(value);
                     setFormData({ ...formData, end_time: newEndTime });
 
                     // Validate end time is not before start time
@@ -547,9 +548,8 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                     setDateError('');
                   }
                 }}
-                className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white ${
-                  dateError ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'
-                }`}
+                placeholder="Select end date and time..."
+                className={dateError ? 'border-red-500 dark:border-red-500' : ''}
               />
               {dateError && (
                 <p className="mt-2 text-base md:text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
@@ -594,19 +594,12 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                 <label htmlFor="field-9" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                   Frequency
                 </label>
-                <div className="relative">
-                  <select
-                    value={recurringFrequency}
-                    onChange={(e) => setRecurringFrequency(e.target.value as any)}
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
-                    style={{ paddingRight: '2.5rem' }}
-                  >
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                </div>
+                <Dropdown
+                  value={recurringFrequency}
+                  onChange={(value) => setRecurringFrequency(value as any)}
+                  options={getFrequencyOptions()}
+                  placeholder="Select frequency..."
+                />
               </div>
 
               {/* Day Selection for Weekly */}
@@ -697,22 +690,12 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
                   Select Shopping List
                 </label>
                 {shoppingLists.length > 0 ? (
-                  <div className="relative">
-                    <select
-                      value={selectedListId}
-                      onChange={(e) => setSelectedListId(e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
-                      style={{ paddingRight: '2.5rem' }}
-                    >
-                      <option value="">Choose a list...</option>
-                      {shoppingLists.map((list) => (
-                        <option key={list.id} value={list.id}>
-                          {list.title} ({list.items?.length || 0} items)
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                  </div>
+                  <Dropdown
+                    value={selectedListId}
+                    onChange={setSelectedListId}
+                    options={getShoppingListOptions()}
+                    placeholder="Choose a list..."
+                  />
                 ) : (
                   <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -729,71 +712,6 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
             </div>
           )}
 
-          {/* Custom Color */}
-          <div>
-            <label htmlFor="field-14" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-3 flex items-center gap-2 cursor-pointer">
-              <Palette className="w-4 h-4" />
-              Custom Color (Optional)
-            </label>
-            <div className="space-y-2 sm:space-y-3">
-              {/* Predefined colors */}
-              <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                {colorPalette.map((color) => (
-                  <button
-                    key={color.value}
-                    type="button"
-                    onClick={() => setCustomColor(color.value)}
-                    className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg border-2 transition-colors ${
-                      customColor === color.value
-                        ? 'border-gray-900 dark:border-white ring-2 ring-offset-2 ring-purple-500'
-                        : 'border-gray-300 dark:border-gray-600'
-                    }`}
-                    style={{ backgroundColor: color.value }}
-                    title={color.name}
-                  />
-                ))}
-                {customColor && !colorPalette.find(c => c.value === customColor) && (
-                  <button
-                    type="button"
-                    onClick={() => setCustomColor('')}
-                    className="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                    title="Clear custom color"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-
-              {/* Custom color input */}
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={customColor || '#9333ea'}
-                  onChange={(e) => setCustomColor(e.target.value)}
-                  className="w-12 h-10 rounded-lg border border-gray-300 dark:border-gray-600 cursor-pointer"
-                />
-                <input
-                  type="text"
-                  value={customColor}
-                  onChange={(e) => setCustomColor(e.target.value)}
-                  placeholder="Enter hex color (e.g., #9333ea)"
-                  className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white text-sm"
-                />
-                {customColor && (
-                  <button
-                    type="button"
-                    onClick={() => setCustomColor('')}
-                    className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Custom color overrides category color
-              </p>
-            </div>
-          </div>
 
           {/* Category */}
           <div>
