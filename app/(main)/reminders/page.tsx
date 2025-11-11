@@ -12,13 +12,13 @@ import { ReminderCard } from '@/components/reminders/ReminderCard';
 import { NewReminderModal } from '@/components/reminders/NewReminderModal';
 import { BulkActionsToolbar } from '@/components/reminders/BulkActionsToolbar';
 import GuidedReminderCreation from '@/components/guided/GuidedReminderCreation';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { remindersService, Reminder, CreateReminderInput } from '@/lib/services/reminders-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { CTAButton } from '@/components/ui/EnhancedButton';
 
 export default function RemindersPage(): JSX.Element {
-  const { currentSpace, user, loading: authLoading } = useAuth();
+  const { currentSpace, user, loading: authLoading } = useAuthWithSpaces();
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -88,8 +88,10 @@ export default function RemindersPage(): JSX.Element {
         }
         case 'priority': {
           // Priority order: urgent > high > medium > low
-          const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
-          return priorityOrder[a.priority] - priorityOrder[b.priority];
+          const priorityOrder: Record<string, number> = { urgent: 0, high: 1, medium: 2, low: 3 };
+          const aPriority = a.priority || 'medium';
+          const bPriority = b.priority || 'medium';
+          return priorityOrder[aPriority] - priorityOrder[bPriority];
         }
         case 'created_date': {
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();

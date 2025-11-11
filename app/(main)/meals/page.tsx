@@ -19,7 +19,7 @@ import { GenerateListModal } from '@/components/meals/GenerateListModal';
 import { WeekCalendarView } from '@/components/meals/WeekCalendarView';
 import { TwoWeekCalendarView } from '@/components/meals/TwoWeekCalendarView';
 import GuidedMealCreation from '@/components/guided/GuidedMealCreation';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { mealsService, Meal, CreateMealInput, Recipe, CreateRecipeInput } from '@/lib/services/meals-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { shoppingService } from '@/lib/services/shopping-service';
@@ -150,7 +150,7 @@ const CalendarDayCell = memo(({
 CalendarDayCell.displayName = 'CalendarDayCell';
 
 export default function MealsPage() {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);

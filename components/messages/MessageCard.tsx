@@ -227,25 +227,27 @@ export function MessageCard({
               </div>
             )}
 
-            {/* Message Actions */}
+            {/* Message Actions - Truly Hidden by Default */}
             {isOwn && (
-              <div className="absolute -top-1 -right-1 flex items-center gap-1 opacity-0 group-hover:opacity-60 transition-opacity">
-                <button
-                  onClick={() => onEdit(message)}
-                  title="Edit message"
-                  aria-label="Edit message"
-                  className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
-                >
-                  <Edit3 className="w-3 h-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
-                </button>
-                <button
-                  onClick={() => onDelete(message.id)}
-                  title="Delete message"
-                  aria-label="Delete message"
-                  className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
-                >
-                  <Trash2 className="w-3 h-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
-                </button>
+              <div className="absolute -top-1 -right-1 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300 delay-150">
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => onEdit(message)}
+                    title="Edit message"
+                    aria-label="Edit message"
+                    className="w-7 h-7 flex items-center justify-center rounded-full bg-white/95 dark:bg-gray-800/95 border border-gray-200/70 dark:border-gray-600/70 shadow-md hover:shadow-lg hover:bg-blue-50 dark:hover:bg-blue-900/40 transition-all duration-200 group/edit"
+                  >
+                    <Edit3 className="w-3 h-3 text-gray-500 dark:text-gray-400 group-hover/edit:text-blue-600 dark:group-hover/edit:text-blue-400 transition-colors" />
+                  </button>
+                  <button
+                    onClick={() => onDelete(message.id)}
+                    title="Delete message"
+                    aria-label="Delete message"
+                    className="w-7 h-7 flex items-center justify-center rounded-full bg-white/95 dark:bg-gray-800/95 border border-gray-200/70 dark:border-gray-600/70 shadow-md hover:shadow-lg hover:bg-red-50 dark:hover:bg-red-900/40 transition-all duration-200 group/delete"
+                  >
+                    <Trash2 className="w-3 h-3 text-gray-500 dark:text-gray-400 group-hover/delete:text-red-600 dark:group-hover/delete:text-red-400 transition-colors" />
+                  </button>
+                </div>
               </div>
             )}
           </div>
