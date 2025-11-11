@@ -80,6 +80,8 @@ export default function MessagesPage() {
   const [showConversationSidebar, setShowConversationSidebar] = useState(false);
   const [showForwardModal, setShowForwardModal] = useState(false);
   const [forwardingMessage, setForwardingMessage] = useState<Message | null>(null);
+  const [editingConversationTitle, setEditingConversationTitle] = useState(false);
+  const [conversationTitleInput, setConversationTitleInput] = useState('');
 
   const [stats, setStats] = useState({
     thisWeek: 0,
@@ -799,6 +801,57 @@ export default function MessagesPage() {
     }
   }, [currentSpace, user, conversationId, scrollToBottom]);
 
+  // Get current conversation
+  const currentConversation = conversations.find(conv => conv.id === conversationId);
+  const conversationTitle = currentConversation?.title || 'Conversation';
+
+  // Handle conversation title editing
+  const handleEditConversationTitle = () => {
+    setConversationTitleInput(conversationTitle);
+    setEditingConversationTitle(true);
+  };
+
+  const handleSaveConversationTitle = async () => {
+    if (!conversationId || !conversationTitleInput.trim() || conversationTitleInput === conversationTitle) {
+      setEditingConversationTitle(false);
+      return;
+    }
+
+    try {
+      // Update the conversation title in the backend
+      await messagesService.updateConversation(conversationId, { title: conversationTitleInput.trim() });
+
+      // Optimistically update local state
+      setConversations(prev =>
+        prev.map(conv =>
+          conv.id === conversationId
+            ? { ...conv, title: conversationTitleInput.trim() }
+            : conv
+        )
+      );
+
+      setEditingConversationTitle(false);
+      toast.success('Conversation renamed');
+    } catch (error) {
+      console.error('Failed to update conversation title:', error);
+      toast.error('Failed to rename conversation');
+      setEditingConversationTitle(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingConversationTitle(false);
+    setConversationTitleInput('');
+  };
+
+  const handleTitleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSaveConversationTitle();
+    } else if (e.key === 'Escape') {
+      handleCancelEdit();
+    }
+  };
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Messages' }]}>
       <PageErrorBoundary>
@@ -911,54 +964,6 @@ export default function MessagesPage() {
           </div>
           )}
 
-          {/* Search Bar - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 sm:p-4">
-            <div className={`relative flex items-center w-full group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
-              <input
-                type="search"
-                inputMode="search"
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="none"
-                spellCheck="false"
-                placeholder="Search all messages across conversations..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                className="w-full pl-10 pr-12 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-              />
-              {isSearching && (
-                <div className="absolute right-12 top-1/2 -translate-y-1/2">
-                  <div className="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
-                </div>
-              )}
-              {searchQuery && !isSearching && (
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSearchResults([]);
-                  }}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 flex items-center justify-center transition-colors"
-                  aria-label="Clear search"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-            {searchQuery && (
-              <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                {isSearching ? (
-                  'Searching...'
-                ) : searchResults.length > 0 ? (
-                  `Found ${searchResults.length} message${searchResults.length === 1 ? '' : 's'}`
-                ) : (
-                  'No messages found'
-                )}
-              </div>
-            )}
-          </div>
-          )}
 
           {/* Conversations and Chat Interface - Only show when NOT in guided flow */}
           {!showGuidedFlow && (
@@ -996,9 +1001,25 @@ export default function MessagesPage() {
                       <MessageCircle className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white tracking-tight">
-                        Conversation
-                      </h2>
+                      {editingConversationTitle ? (
+                        <input
+                          type="text"
+                          value={conversationTitleInput}
+                          onChange={(e) => setConversationTitleInput(e.target.value)}
+                          onKeyDown={handleTitleKeyDown}
+                          onBlur={handleSaveConversationTitle}
+                          autoFocus
+                          className="text-base sm:text-lg font-bold text-gray-900 dark:text-white tracking-tight bg-transparent border-b-2 border-emerald-500 outline-none max-w-[200px]"
+                        />
+                      ) : (
+                        <h2
+                          className="text-base sm:text-lg font-bold text-gray-900 dark:text-white tracking-tight cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                          onClick={handleEditConversationTitle}
+                          title="Click to rename conversation"
+                        >
+                          {conversationTitle}
+                        </h2>
+                      )}
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                         <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">

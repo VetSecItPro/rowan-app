@@ -368,15 +368,15 @@ export async function getPendingInvitations(
 
     // Filter out expired invitations
     const now = new Date();
-    const activeInvitations = data.filter(inv => new Date(inv.expires_at) > now);
+    const activeInvitations = data.filter((inv: any) => new Date(inv.expires_at) > now);
 
     // Update expired invitations
-    const expiredInvitations = data.filter(inv => new Date(inv.expires_at) <= now);
+    const expiredInvitations = data.filter((inv: any) => new Date(inv.expires_at) <= now);
     if (expiredInvitations.length > 0) {
       await supabase
         .from('space_invitations')
         .update({ status: 'expired' })
-        .in('id', expiredInvitations.map(inv => inv.id));
+        .in('id', expiredInvitations.map((inv: any) => inv.id));
     }
 
     return { success: true, data: activeInvitations };
