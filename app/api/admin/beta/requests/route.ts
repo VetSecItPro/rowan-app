@@ -109,7 +109,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Enhance the data with additional information
-    const enhancedRequests = (requests || []).map(request => {
+    const enhancedRequests = (requests || []).map((request: any) => {
       // Determine request status
       let requestStatus: 'active_user' | 'approved_pending' | 'failed';
       if (request.access_granted && request.user_id) {
@@ -154,10 +154,10 @@ export async function GET(req: NextRequest) {
     // Calculate summary statistics for this query
     const summary = {
       total: count || 0,
-      approved: enhancedRequests.filter(r => r.access_granted).length,
-      active_users: enhancedRequests.filter(r => r.has_account).length,
-      failed: enhancedRequests.filter(r => !r.access_granted).length,
-      pending_signup: enhancedRequests.filter(r => r.access_granted && !r.has_account).length,
+      approved: enhancedRequests.filter((r: any) => r.access_granted).length,
+      active_users: enhancedRequests.filter((r: any) => r.has_account).length,
+      failed: enhancedRequests.filter((r: any) => !r.access_granted).length,
+      pending_signup: enhancedRequests.filter((r: any) => r.access_granted && !r.has_account).length,
     };
 
     // Log admin access

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/Modal';
 import { useSpaces } from '@/lib/contexts/spaces-context';
+import { useAuth } from '@/lib/contexts/auth-context';
 import { featureFlags } from '@/lib/constants/feature-flags';
 import { personalWorkspaceService } from '@/lib/services/personal-workspace-service';
 import { logger } from '@/lib/logger';
@@ -31,7 +32,8 @@ export function SmartOnboarding({ isOpen, onClose }: SmartOnboardingProps) {
   const [intent, setIntent] = useState<UserIntent>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>();
-  const { user, refreshSpaces } = useSpaces();
+  const { user } = useAuth();
+  const { refreshSpaces } = useSpaces();
   const router = useRouter();
 
   // If smart onboarding is disabled, don't render this component
@@ -94,7 +96,6 @@ export function SmartOnboarding({ isOpen, onClose }: SmartOnboardingProps) {
         isOpen={isOpen}
         onClose={onClose}
         title="Welcome to Rowan!"
-        subtitle="How will you be using Rowan?"
       >
         <div className="space-y-6">
           <div className="text-center">
@@ -229,9 +230,9 @@ export function SmartOnboarding({ isOpen, onClose }: SmartOnboardingProps) {
             Back
           </Button>
           <Button
-            variant="primary"
+            variant="default"
             onClick={isPersonalFlow ? handlePersonalChoice : handleFamilyChoice}
-            loading={loading}
+            disabled={loading}
             className="flex-1"
           >
             {isPersonalFlow ? 'Create Personal Workspace' : 'Create Shared Workspace'}
