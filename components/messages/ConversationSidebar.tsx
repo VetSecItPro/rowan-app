@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MessageCircle, Search, Plus, Archive, X } from 'lucide-react';
+import { MessageCircle, Search, Plus, Archive, X, Edit2, Check, X as XIcon } from 'lucide-react';
 import { Conversation } from '@/lib/services/messages-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { SwipeableConversationItem } from './SwipeableConversationItem';
@@ -12,6 +12,7 @@ interface ConversationSidebarProps {
   onSelectConversation: (conversationId: string) => void;
   onNewConversation: () => void;
   onDeleteConversation: (conversationId: string) => void;
+  onRenameConversation?: (conversationId: string, newTitle: string) => Promise<void>;
   onClose?: () => void; // For mobile drawer
   showArchived?: boolean;
   className?: string;
@@ -23,11 +24,14 @@ export function ConversationSidebar({
   onSelectConversation,
   onNewConversation,
   onDeleteConversation,
+  onRenameConversation,
   onClose,
   showArchived = false,
   className = '',
 }: ConversationSidebarProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [editingConversationId, setEditingConversationId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState('');
 
   // Filter conversations based on search and archived status
   const filteredConversations = conversations.filter((conv) => {
@@ -44,6 +48,44 @@ export function ConversationSidebar({
 
     return true;
   });
+
+  // Handle starting rename
+  const handleStartRename = (conversation: Conversation) => {
+    setEditingConversationId(conversation.id);
+    setEditingTitle(conversation.title || '');
+  };
+
+  // Handle save rename
+  const handleSaveRename = async () => {
+    if (!editingConversationId || !editingTitle.trim() || !onRenameConversation) {
+      handleCancelRename();
+      return;
+    }
+
+    try {
+      await onRenameConversation(editingConversationId, editingTitle.trim());
+      setEditingConversationId(null);
+      setEditingTitle('');
+    } catch (error) {
+      console.error('Failed to rename conversation:', error);
+      // Keep editing mode open on error
+    }
+  };
+
+  // Handle cancel rename
+  const handleCancelRename = () => {
+    setEditingConversationId(null);
+    setEditingTitle('');
+  };
+
+  // Handle key press in rename input
+  const handleRenameKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSaveRename();
+    } else if (e.key === 'Escape') {
+      handleCancelRename();
+    }
+  };
 
   return (
     <div className={`flex flex-col h-full bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border-r border-gray-200/50 dark:border-gray-700/50 ${className}`}>
@@ -113,6 +155,9 @@ export function ConversationSidebar({
                 conversation={conversation}
                 isSelected={conversation.id === activeConversationId}
                 onClick={() => {
+                  if (editingConversationId === conversation.id) {
+                    return; // Don't select if currently editing
+                  }
                   onSelectConversation(conversation.id);
                   onClose?.(); // Close mobile drawer on selection
                 }}
@@ -121,7 +166,18 @@ export function ConversationSidebar({
                 <ConversationItem
                   conversation={conversation}
                   isActive={conversation.id === activeConversationId}
+                  isEditing={editingConversationId === conversation.id}
+                  editingTitle={editingTitle}
+                  onTitleChange={setEditingTitle}
+                  onStartRename={() => handleStartRename(conversation)}
+                  onSaveRename={handleSaveRename}
+                  onCancelRename={handleCancelRename}
+                  onKeyDown={handleRenameKeyDown}
+                  canRename={!!onRenameConversation}
                   onClick={() => {
+                    if (editingConversationId === conversation.id) {
+                      return; // Don't select if currently editing
+                    }
                     onSelectConversation(conversation.id);
                     onClose?.(); // Close mobile drawer on selection
                   }}
@@ -139,10 +195,30 @@ export function ConversationSidebar({
 interface ConversationItemProps {
   conversation: Conversation;
   isActive: boolean;
+  isEditing?: boolean;
+  editingTitle?: string;
+  onTitleChange?: (title: string) => void;
+  onStartRename?: () => void;
+  onSaveRename?: () => void;
+  onCancelRename?: () => void;
+  onKeyDown?: (e: React.KeyboardEvent) => void;
+  canRename?: boolean;
   onClick: () => void;
 }
 
-function ConversationItem({ conversation, isActive, onClick }: ConversationItemProps) {
+function ConversationItem({
+  conversation,
+  isActive,
+  isEditing = false,
+  editingTitle = '',
+  onTitleChange,
+  onStartRename,
+  onSaveRename,
+  onCancelRename,
+  onKeyDown,
+  canRename = false,
+  onClick
+}: ConversationItemProps) {
   const getConversationIcon = () => {
     switch (conversation.conversation_type) {
       case 'group':
@@ -157,7 +233,7 @@ function ConversationItem({ conversation, isActive, onClick }: ConversationItemP
   return (
     <button
       onClick={onClick}
-      className={`w-full px-4 py-3 flex items-start gap-3 border-b border-gray-100 dark:border-gray-800 transition-colors ${
+      className={`group w-full px-4 py-3 flex items-start gap-3 border-b border-gray-100 dark:border-gray-800 transition-colors ${
         isActive
           ? 'bg-green-50 dark:bg-green-900/20 border-l-4 border-l-green-600'
           : 'hover:bg-gray-50 dark:hover:bg-gray-800 border-l-4 border-l-transparent'
@@ -179,10 +255,67 @@ function ConversationItem({ conversation, isActive, onClick }: ConversationItemP
       {/* Conversation Info */}
       <div className="flex-1 min-w-0 text-left">
         <div className="flex items-center justify-between mb-1">
-          <h3 className="font-semibold text-gray-900 dark:text-white truncate text-sm">
-            {conversation.title || 'Untitled Conversation'}
-          </h3>
-          {conversation.last_message_at && (
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            {isEditing ? (
+              <div className="flex items-center gap-1 flex-1">
+                <input
+                  type="text"
+                  value={editingTitle}
+                  onChange={(e) => onTitleChange?.(e.target.value)}
+                  onKeyDown={onKeyDown}
+                  onBlur={onSaveRename}
+                  autoFocus
+                  className="flex-1 text-sm font-semibold bg-white dark:bg-gray-800 border border-green-500 rounded px-2 py-1 text-gray-900 dark:text-white focus:outline-none"
+                />
+                <button
+                  onClick={onSaveRename}
+                  className="p-1 hover:bg-green-100 dark:hover:bg-green-900/30 rounded transition-colors"
+                  title="Save"
+                >
+                  <Check className="w-3 h-3 text-green-600 dark:text-green-400" />
+                </button>
+                <button
+                  onClick={onCancelRename}
+                  className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors"
+                  title="Cancel"
+                >
+                  <XIcon className="w-3 h-3 text-red-600 dark:text-red-400" />
+                </button>
+              </div>
+            ) : (
+              <>
+                <h3
+                  className="font-semibold text-gray-900 dark:text-white truncate text-sm cursor-pointer hover:text-green-600 dark:hover:text-green-400 transition-colors relative group/title"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onStartRename?.();
+                  }}
+                  title={canRename ? 'Click to rename conversation' : undefined}
+                >
+                  {conversation.title || 'Untitled Conversation'}
+                  {/* Tooltip */}
+                  {canRename && (
+                    <span className="absolute bottom-full left-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover/title:opacity-100 transition-opacity pointer-events-none z-10">
+                      Click to rename
+                    </span>
+                  )}
+                </h3>
+                {canRename && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onStartRename?.();
+                    }}
+                    className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-all"
+                    title="Rename conversation"
+                  >
+                    <Edit2 className="w-3 h-3 text-gray-500 dark:text-gray-400" />
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+          {!isEditing && conversation.last_message_at && (
             <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0 ml-2">
               {formatTimestamp(conversation.last_message_at, 'MMM d')}
             </span>
