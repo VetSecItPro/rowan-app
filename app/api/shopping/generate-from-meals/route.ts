@@ -105,8 +105,8 @@ export async function POST(req: NextRequest) {
 
     // Extract recipes from meals
     const recipes = meals
-      .filter((meal) => meal.recipes)
-      .map((meal) => ({
+      .filter((meal: any) => meal.recipes)
+      .map((meal: any) => ({
         id: meal.recipes.id,
         name: meal.recipes.name,
         ingredients: meal.recipes.ingredients,

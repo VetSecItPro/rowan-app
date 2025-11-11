@@ -361,7 +361,6 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
               }}
               label="Reminder Time"
               placeholder="Click to select date and time..."
-              error={dateError}
             />
           </div>
 
@@ -373,8 +372,8 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                 Priority
               </label>
               <Dropdown
-                value={formData.priority}
-                onChange={(value) => setFormData({ ...formData, priority: value as any })}
+                value={formData.priority || 'medium'}
+                onChange={(value) => setFormData({ ...formData, priority: value as 'low' | 'medium' | 'high' | 'urgent' })}
                 options={getPriorityOptions()}
                 placeholder="Select priority..."
               />
