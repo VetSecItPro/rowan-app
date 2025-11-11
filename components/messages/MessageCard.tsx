@@ -122,17 +122,19 @@ export function MessageCard({
         </div>
 
         {/* Message Bubble */}
-        <div className="relative group">
+        <div className="relative group/message">
           <div
-            className={`rounded-2xl px-4 py-3 ${
+            className={`rounded-2xl px-4 py-3 cursor-pointer ${
               isOwn
-                ? 'rounded-tr-sm bg-blue-50 dark:bg-blue-900/20'
-                : 'rounded-tl-sm bg-gray-50 dark:bg-gray-800'
-            } border border-gray-200 dark:border-gray-700`}
+                ? 'rounded-tr-sm bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30'
+                : 'rounded-tl-sm bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750'
+            } border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200`}
           >
+            {/* Invisible hover area overlay to ensure hover works across entire bubble */}
+            <div className="absolute inset-0 z-0"></div>
             {/* Message Content with Markdown Support */}
             {message.content && (
-              <div className="break-words text-gray-900 dark:text-white text-sm prose prose-sm dark:prose-invert max-w-none">
+              <div className="relative z-10 break-words text-gray-900 dark:text-white text-sm prose prose-sm dark:prose-invert max-w-none">
                 <ReactMarkdown>
                   {message.content}
                 </ReactMarkdown>
@@ -141,7 +143,7 @@ export function MessageCard({
 
             {/* Attachments */}
             {message.attachments_data && message.attachments_data.length > 0 && (
-              <div className={`space-y-2 ${message.content ? 'mt-2' : ''}`}>
+              <div className={`relative z-10 space-y-2 ${message.content ? 'mt-2' : ''}`}>
                 {message.attachments_data.map((attachment) => (
                   <AttachmentPreview
                     key={attachment.id}
@@ -153,7 +155,7 @@ export function MessageCard({
             )}
 
             {/* Timestamp and Read Status */}
-            <div className="flex items-center gap-2 mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+            <div className="relative z-10 flex items-center gap-2 mt-1.5 text-xs text-gray-500 dark:text-gray-400">
               <span>{formatTimestamp(message.created_at, 'h:mm a')}</span>
               {message.updated_at && message.updated_at !== message.created_at && (
                 <span className="italic">(edited)</span>
@@ -183,7 +185,7 @@ export function MessageCard({
 
             {/* Reply Button - Subtle conversational design */}
             {showReplyButton && onReply && !message.parent_message_id && (
-              <div className="mt-1 opacity-0 group-hover:opacity-60 transition-opacity">
+              <div className="relative z-10 mt-1 opacity-0 group-hover/message:opacity-60 transition-opacity">
                 <button
                   onClick={() => onReply(message)}
                   className="flex items-center gap-1.5 px-2 py-1 rounded text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
@@ -198,7 +200,7 @@ export function MessageCard({
 
             {/* Reactions Display */}
             {reactions.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-2">
+              <div className="relative z-10 flex flex-wrap gap-1 mt-2">
                 {reactions.map((reaction) => (
                   <button
                     key={reaction.emoji}
@@ -222,34 +224,75 @@ export function MessageCard({
 
             {/* Add Reaction Button (when no reactions) */}
             {reactions.length === 0 && (
-              <div className="mt-2 opacity-0 group-hover:opacity-60 transition-opacity">
+              <div className="relative z-10 mt-2 opacity-0 group-hover/message:opacity-60 transition-opacity">
                 <ReactionPicker onSelectEmoji={handleAddReaction} />
               </div>
             )}
 
-            {/* Message Actions - Truly Hidden by Default */}
-            {isOwn && (
-              <div className="absolute -top-1 -right-1 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300 delay-150">
-                <div className="flex items-center gap-1">
+            {/* Message Actions - Enhanced Hover Experience */}
+            <div className="absolute -top-2 -right-2 z-20 opacity-0 invisible group-hover/message:opacity-100 group-hover/message:visible transition-all duration-200 transform translate-y-1 group-hover/message:translate-y-0 pointer-events-none">
+              <div className="flex items-center gap-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-1 pointer-events-auto">
+                {/* Edit Button - Always show for own messages, or if user has edit permissions */}
+                {isOwn && (
                   <button
-                    onClick={() => onEdit(message)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(message);
+                    }}
                     title="Edit message"
                     aria-label="Edit message"
-                    className="w-7 h-7 flex items-center justify-center rounded-full bg-white/95 dark:bg-gray-800/95 border border-gray-200/70 dark:border-gray-600/70 shadow-md hover:shadow-lg hover:bg-blue-50 dark:hover:bg-blue-900/40 transition-all duration-200 group/edit"
+                    className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/40 transition-all duration-200 group/edit"
                   >
-                    <Edit3 className="w-3 h-3 text-gray-500 dark:text-gray-400 group-hover/edit:text-blue-600 dark:group-hover/edit:text-blue-400 transition-colors" />
+                    <Edit3 className="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover/edit:text-blue-600 dark:group-hover/edit:text-blue-400 transition-colors" />
                   </button>
+                )}
+
+                {/* Delete Button - Show for own messages or if user has delete permissions */}
+                {isOwn && (
                   <button
-                    onClick={() => onDelete(message.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(message.id);
+                    }}
                     title="Delete message"
                     aria-label="Delete message"
-                    className="w-7 h-7 flex items-center justify-center rounded-full bg-white/95 dark:bg-gray-800/95 border border-gray-200/70 dark:border-gray-600/70 shadow-md hover:shadow-lg hover:bg-red-50 dark:hover:bg-red-900/40 transition-all duration-200 group/delete"
+                    className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-red-50 dark:hover:bg-red-900/40 transition-all duration-200 group/delete"
                   >
-                    <Trash2 className="w-3 h-3 text-gray-500 dark:text-gray-400 group-hover/delete:text-red-600 dark:group-hover/delete:text-red-400 transition-colors" />
+                    <Trash2 className="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover/delete:text-red-600 dark:group-hover/delete:text-red-400 transition-colors" />
                   </button>
-                </div>
+                )}
+
+                {/* Pin Button - If pin functionality is available */}
+                {onTogglePin && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onTogglePin(message.id);
+                    }}
+                    title="Pin message"
+                    aria-label="Pin message"
+                    className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-yellow-50 dark:hover:bg-yellow-900/40 transition-all duration-200 group/pin"
+                  >
+                    <Pin className="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover/pin:text-yellow-600 dark:group-hover/pin:text-yellow-400 transition-colors" />
+                  </button>
+                )}
+
+                {/* Forward Button - If forward functionality is available */}
+                {onForward && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onForward(message);
+                    }}
+                    title="Forward message"
+                    aria-label="Forward message"
+                    className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-green-50 dark:hover:bg-green-900/40 transition-all duration-200 group/forward"
+                  >
+                    <Forward className="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover/forward:text-green-600 dark:group-hover/forward:text-green-400 transition-colors" />
+                  </button>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
