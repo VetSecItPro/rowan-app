@@ -906,11 +906,6 @@ html:not(.dark) .bg-white {
     @apply w-12 h-12 md:w-10 md:h-10;
   }
 
-  /* Smaller icon buttons for status checkboxes (32x32px) */
-  .btn-icon-small {
-    @apply w-8 h-8 md:w-7 md:h-7;
-  }
-
   /* Hide scrollbar */
   .scrollbar-hide {
     -ms-overflow-style: none;
@@ -959,6 +954,28 @@ html:not(.dark) .bg-white {
     @apply max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto;
   }
 
+  /* Select dropdown positioning fix for modals */
+  .select-dropdown-fix select {
+    position: relative !important;
+    z-index: 9999 !important;
+  }
+
+  .select-dropdown-fix select:focus {
+    z-index: 10000 !important;
+  }
+
+  /* Ensure select dropdown content appears above modal overlays */
+  .select-dropdown-fix select option {
+    background: white !important;
+    color: black !important;
+    position: relative;
+    z-index: 10001 !important;
+  }
+
+  .dark .select-dropdown-fix select option {
+    background: #1f2937 !important;
+    color: white !important;
+  }
 
   /* Safe area support for iOS notch */
   @supports (padding-bottom: env(safe-area-inset-bottom)) {

@@ -370,7 +370,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
           {/* Priority & Status Row */}
           <div className="grid grid-cols-2 gap-4">
             {/* Priority */}
-            <div>
+            <div className="relative z-50">
               <label htmlFor="field-6" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Priority
               </label>
@@ -379,19 +379,20 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                   value={formData.priority}
                   id="field-6"
               onChange={(e) =>  setFormData({ ...formData, priority: e.target.value as any })}
-                  className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none pr-10"
+                  className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none pr-10 relative z-50"
+                  style={{ position: 'relative', zIndex: 9999 }}
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
                   <option value="high">High</option>
                   <option value="urgent">Urgent</option>
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10" />
               </div>
             </div>
 
             {/* Repeat Pattern */}
-            <div>
+            <div className="relative z-50">
               <label htmlFor="field-7" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Repeat
               </label>
@@ -404,14 +405,15 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                     setSelectedWeekdays([]);
                     setSelectedMonthDays([]);
                   }}
-                  className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none pr-10"
+                  className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none pr-10 relative z-50"
+                  style={{ position: 'relative', zIndex: 9999 }}
                 >
                   <option value="">Never</option>
                   <option value="daily">Daily</option>
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10" />
               </div>
             </div>
           </div>

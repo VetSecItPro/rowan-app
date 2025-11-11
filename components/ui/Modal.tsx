@@ -197,7 +197,7 @@ export function Modal({
         </div>
 
         {/* Content */}
-        <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto">
+        <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 relative" style={{ overflowX: 'visible', overflowY: 'visible' }}>
           {children}
         </div>
       </div>

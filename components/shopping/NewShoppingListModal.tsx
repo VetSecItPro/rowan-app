@@ -6,6 +6,7 @@ import { CreateListInput, ShoppingList, shoppingService } from '@/lib/services/s
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { createClient } from '@/lib/supabase/client';
 import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
+import { Dropdown } from '@/components/ui/Dropdown';
 
 interface NewShoppingListModalProps {
   isOpen: boolean;
@@ -139,6 +140,29 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
     ));
   };
 
+  // Helper functions for dropdown options
+  const getAssignAllOptions = () => {
+    const options = [{ value: '', label: 'No one' }];
+    spaceMembers.forEach((member) => {
+      options.push({
+        value: member.user_id,
+        label: member.display_name || member.email
+      });
+    });
+    return options;
+  };
+
+  const getItemAssignmentOptions = () => {
+    const options = [{ value: '', label: 'Unassigned' }];
+    spaceMembers.forEach((member) => {
+      options.push({
+        value: member.user_id,
+        label: member.display_name || member.email
+      });
+    });
+    return options;
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -219,18 +243,15 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
                 {spaceMembers.length > 0 && items.length > 0 && (
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-600 dark:text-gray-400">Assign all to:</span>
-                    <select
-                      value={defaultAssignee}
-                      onChange={(e) => handleAssignAllItems(e.target.value || undefined)}
-                      className="text-xs bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 rounded-lg px-2 py-1.5 text-emerald-700 dark:text-emerald-300 font-medium focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                    >
-                      <option value="">No one</option>
-                      {spaceMembers.map((member) => (
-                        <option key={member.user_id} value={member.user_id}>
-                          {member.display_name || member.email}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="w-40">
+                      <Dropdown
+                        value={defaultAssignee}
+                        onChange={(value) => handleAssignAllItems(value || undefined)}
+                        options={getAssignAllOptions()}
+                        placeholder="No one"
+                        className="text-xs bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 font-medium focus:ring-emerald-500"
+                      />
+                    </div>
                   </div>
                 )}
                 {items.length > 1 && (
@@ -325,7 +346,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
 
                       {/* Assignment Dropdown */}
                       {spaceMembers.length > 0 && (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 relative z-50">
                           {item.assigned_to && (
                             <UserAvatar
                               name={spaceMembers.find(m => m.user_id === item.assigned_to)?.display_name || 'User'}
@@ -333,18 +354,15 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
                               colorTheme="emerald"
                             />
                           )}
-                          <select
-                            value={item.assigned_to || ''}
-                            onChange={(e) => handleAssignItem(index, e.target.value || undefined)}
-                            className="text-xs bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-gray-700 dark:text-gray-300 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
-                          >
-                            <option value="">Unassigned</option>
-                            {spaceMembers.map((member) => (
-                              <option key={member.user_id} value={member.user_id}>
-                                {member.display_name || member.email}
-                              </option>
-                            ))}
-                          </select>
+                          <div className="w-32">
+                            <Dropdown
+                              value={item.assigned_to || ''}
+                              onChange={(value) => handleAssignItem(index, value || undefined)}
+                              options={getItemAssignmentOptions()}
+                              placeholder="Unassigned"
+                              className="text-xs bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 focus:ring-emerald-500"
+                            />
+                          </div>
                         </div>
                       )}
 

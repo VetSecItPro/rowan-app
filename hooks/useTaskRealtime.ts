@@ -55,12 +55,21 @@ export function useTaskRealtime({
     deletes: string[];
   }>({ inserts: [], updates: [], deletes: [] });
 
-  // Memoized filter function to avoid recalculation
-  const taskFilter = useCallback((task: Task) => taskPassesFilters(task, filters), [filters]);
+  // Memoized filters to prevent unnecessary re-renders
+  const memoizedFilters = useMemo(() => filters, [
+    filters?.status?.join(','),
+    filters?.priority?.join(','),
+    filters?.assignedTo
+  ]);
 
-  // Debounced batch update function
-  const debouncedBatchUpdate = useMemo(
-    () => debounce(() => {
+  // Memoized filter function to avoid recalculation
+  const taskFilter = useCallback((task: Task) => taskPassesFilters(task, memoizedFilters), [memoizedFilters]);
+
+  // Debounced batch update function - use useRef to avoid recreation
+  const debouncedBatchUpdateRef = useRef<(() => void) | null>(null);
+
+  if (!debouncedBatchUpdateRef.current) {
+    debouncedBatchUpdateRef.current = debounce(() => {
       const queue = updateQueueRef.current;
       if (queue.inserts.length === 0 && queue.updates.length === 0 && queue.deletes.length === 0) {
         return;
@@ -94,9 +103,10 @@ export function useTaskRealtime({
 
       // Clear the queue
       updateQueueRef.current = { inserts: [], updates: [], deletes: [] };
-    }, 50), // 50ms debounce for smooth updates
-    []
-  );
+    }, 50); // 50ms debounce for smooth updates
+  }
+
+  const debouncedBatchUpdate = debouncedBatchUpdateRef.current;
 
   useEffect(() => {
     // Guard against invalid spaceId to prevent empty query parameters
@@ -279,7 +289,7 @@ export function useTaskRealtime({
       // Clear any pending debounced updates
       updateQueueRef.current = { inserts: [], updates: [], deletes: [] };
     };
-  }, [spaceId, taskFilter, debouncedBatchUpdate]);
+  }, [spaceId, memoizedFilters]); // Only depend on spaceId and memoized filters
 
   function refreshTasks() {
     setLoading(true);

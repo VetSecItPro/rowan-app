@@ -289,14 +289,15 @@ export function ReceiptUploadModal({
                     </div>
                   </div>
 
-                  <div>
+                  <div className="relative z-50">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Category
                     </label>
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
-                      className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent relative z-50"
+                      style={{ position: 'relative', zIndex: 9999 }}
                     >
                       <option value="">Select category</option>
                       <option value="Groceries">Groceries</option>
