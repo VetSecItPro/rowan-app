@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle, AlertTriangle, ArrowRight, Database, Calendar, Task, MessageSquare, ShoppingCart, Users } from 'lucide-react';
+import { CheckCircle, AlertTriangle, ArrowRight, Database, Calendar, CheckSquare, MessageSquare, ShoppingCart, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/Modal';
 import { useSpaces } from '@/lib/contexts/spaces-context';
+import { useAuth } from '@/lib/contexts/auth-context';
 import { featureFlags } from '@/lib/constants/feature-flags';
 import { personalWorkspaceService } from '@/lib/services/personal-workspace-service';
 import type { Space } from '@/lib/types';
@@ -41,7 +42,7 @@ const MIGRATION_ITEMS: MigrationItem[] = [
     type: 'tasks',
     label: 'Tasks & Projects',
     description: 'All your tasks, projects, and related data',
-    icon: <Task className="w-5 h-5" />,
+    icon: <CheckSquare className="w-5 h-5" />,
     enabled: true,
   },
   {
@@ -95,7 +96,8 @@ export function MigrationModal({ isOpen, onClose, personalSpace, targetSpaces }:
     current: string;
   }>({ total: 0, completed: 0, current: '' });
   const [error, setError] = useState<string | null>(null);
-  const { user, refreshSpaces } = useSpaces();
+  const { user } = useAuth();
+  const { refreshSpaces } = useSpaces();
   const router = useRouter();
 
   // If workspace migration is disabled, don't render this component
@@ -168,7 +170,6 @@ export function MigrationModal({ isOpen, onClose, personalSpace, targetSpaces }:
         isOpen={isOpen}
         onClose={onClose}
         title="Migrate Personal Workspace"
-        subtitle="Choose what to move to a shared workspace"
       >
         <div className="space-y-6">
           <div className="text-center">
@@ -233,7 +234,7 @@ export function MigrationModal({ isOpen, onClose, personalSpace, targetSpaces }:
               Cancel
             </Button>
             <Button
-              variant="primary"
+              variant="default"
               onClick={() => setStep('target')}
               disabled={selectedItems.length === 0}
             >
@@ -252,7 +253,6 @@ export function MigrationModal({ isOpen, onClose, personalSpace, targetSpaces }:
         isOpen={isOpen}
         onClose={onClose}
         title="Choose Destination Workspace"
-        subtitle="Select where to move your data"
       >
         <div className="space-y-6">
           <div className="text-center">
@@ -325,7 +325,7 @@ export function MigrationModal({ isOpen, onClose, personalSpace, targetSpaces }:
               Back
             </Button>
             <Button
-              variant="primary"
+              variant="default"
               onClick={() => setStep('confirmation')}
               disabled={!targetSpace}
             >
@@ -344,7 +344,6 @@ export function MigrationModal({ isOpen, onClose, personalSpace, targetSpaces }:
         isOpen={isOpen}
         onClose={onClose}
         title="Confirm Migration"
-        subtitle="Review your migration settings"
       >
         <div className="space-y-6">
           {error && (
@@ -423,7 +422,7 @@ export function MigrationModal({ isOpen, onClose, personalSpace, targetSpaces }:
               Back
             </Button>
             <Button
-              variant="primary"
+              variant="default"
               onClick={handleStartMigration}
               className="bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600"
             >
@@ -446,7 +445,6 @@ export function MigrationModal({ isOpen, onClose, personalSpace, targetSpaces }:
         isOpen={isOpen}
         onClose={() => {}} // Prevent closing during migration
         title="Migrating Data"
-        subtitle="Please wait while we move your data"
       >
         <div className="space-y-6">
           <div className="text-center">
@@ -485,7 +483,6 @@ export function MigrationModal({ isOpen, onClose, personalSpace, targetSpaces }:
         isOpen={isOpen}
         onClose={handleCompleteMigration}
         title="Migration Complete!"
-        subtitle="Your data has been successfully moved"
       >
         <div className="space-y-6">
           <div className="text-center">
@@ -509,7 +506,7 @@ export function MigrationModal({ isOpen, onClose, personalSpace, targetSpaces }:
 
           <div className="flex justify-center pt-4">
             <Button
-              variant="primary"
+              variant="default"
               onClick={handleCompleteMigration}
               className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600"
             >

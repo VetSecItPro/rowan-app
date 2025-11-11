@@ -294,7 +294,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={comment.user?.avatar_url} />
                       <AvatarFallback>
-                        {comment.user?.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
+                        {comment.user?.full_name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
                       </AvatarFallback>
                     </Avatar>
 
@@ -303,7 +303,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-medium">
-                              {comment.user?.name}
+                              {comment.user?.full_name}
                             </p>
                             <span className="text-xs text-gray-500 dark:text-gray-400">
                               {formatDistanceToNow(new Date(comment.created_at))} ago

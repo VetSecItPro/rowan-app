@@ -139,7 +139,7 @@ export function EnhancedDayView({
           <WeatherBadge
             eventTime={firstEventWithLocation.start_time}
             location={firstEventWithLocation.location}
-            compact={true}
+            display="compact"
           />
         </div>
       )}

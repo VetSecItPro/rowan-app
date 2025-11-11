@@ -2,7 +2,13 @@
 
 import React from 'react';
 
-export function FirstSpaceOnboarding() {
+interface FirstSpaceOnboardingProps {
+  userName?: string;
+  onSpaceCreated?: (spaceId: string, spaceName: string) => Promise<void>;
+  onSkip?: () => void;
+}
+
+export function FirstSpaceOnboarding({ userName, onSpaceCreated, onSkip }: FirstSpaceOnboardingProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <div className="max-w-md mx-auto text-center p-8">

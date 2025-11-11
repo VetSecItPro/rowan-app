@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
     const betaUsers: any[] = [];
 
     if (betaRequests && betaRequests.length > 0) {
-      const userIds = betaRequests.map(request => request.user_id);
+      const userIds = betaRequests.map((request: any) => request.user_id);
 
       // Get auth users data
       const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers({
@@ -86,8 +86,8 @@ export async function GET(req: NextRequest) {
       }
 
       // Filter and enhance beta users
-      betaRequests.forEach(betaRequest => {
-        const authUser = authUsers.users.find(user => user.id === betaRequest.user_id);
+      betaRequests.forEach((betaRequest: any) => {
+        const authUser = authUsers.users.find((user: any) => user.id === betaRequest.user_id);
 
         if (authUser) {
           // Calculate activity metrics (mock data for now)

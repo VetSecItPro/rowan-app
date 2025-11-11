@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
       ];
 
       // CSV rows
-      const rows = (notifications || []).map(notification => [
+      const rows = (notifications || []).map((notification: any) => [
         notification.id,
         `"${(notification.name || '').replace(/"/g, '""')}"`, // Escape quotes
         `"${(notification.email || '').replace(/"/g, '""')}"`,
