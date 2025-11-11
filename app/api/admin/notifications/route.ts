@@ -95,7 +95,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Transform the data
-    const transformedNotifications = (notifications || []).map(notification => ({
+    const transformedNotifications = (notifications || []).map((notification: any) => ({
       id: notification.id,
       name: notification.name,
       email: notification.email,

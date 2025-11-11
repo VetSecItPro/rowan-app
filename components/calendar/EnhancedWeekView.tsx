@@ -188,7 +188,7 @@ export function EnhancedWeekView({
           <WeatherBadge
             eventTime={firstEventWithLocation.start_time}
             location={firstEventWithLocation.location}
-            compact={true}
+            display="compact"
           />
         </div>
       )}
