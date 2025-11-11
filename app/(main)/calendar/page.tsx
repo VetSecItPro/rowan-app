@@ -23,8 +23,7 @@ import { WeatherBadge } from '@/components/calendar/WeatherBadge';
 import { geolocationService } from '@/lib/services/geolocation-service';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
-import { useAuth } from '@/lib/contexts/auth-context';
-import { useSpaces } from '@/lib/contexts/spaces-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
 import { useCalendarShortcuts } from '@/lib/hooks/useCalendarShortcuts';
 import { useCalendarGestures } from '@/lib/hooks/useCalendarGestures';
@@ -36,8 +35,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMont
 type ViewMode = 'day' | 'week' | 'month' | 'agenda' | 'timeline' | 'proposal' | 'list';
 
 export default function CalendarPage() {
-  const { user } = useAuth();
-  const { currentSpace } = useSpaces();
+  const { currentSpace, user } = useAuthWithSpaces();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -925,7 +923,7 @@ export default function CalendarPage() {
                       <WeatherBadge
                         eventTime={new Date().toISOString()}
                         location={userLocation}
-                        compact={true}
+                        display="medium"
                       />
                       <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
                         {userLocation.split(',')[0]} • Today's weather

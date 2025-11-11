@@ -22,7 +22,7 @@ import { BudgetTemplateModal } from '@/components/projects/BudgetTemplateModal';
 import { SpendingInsightsCard } from '@/components/projects/SpendingInsightsCard';
 import { ReceiptUploadModal } from '@/components/projects/ReceiptUploadModal';
 import { ReceiptsListCard } from '@/components/projects/ReceiptsListCard';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { projectsOnlyService, type CreateProjectInput } from '@/lib/services/projects-service';
 import { projectsService, type Expense, type CreateExpenseInput } from '@/lib/services/budgets-service';
 import { budgetAlertsService } from '@/lib/services/budget-alerts-service';
@@ -33,7 +33,7 @@ import type { Project } from '@/lib/services/project-tracking-service';
 type TabType = 'projects' | 'budgets' | 'expenses' | 'bills' | 'receipts';
 
 export default function ProjectsPage() {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
   const [activeTab, setActiveTab] = useState<TabType>('projects');
   const [projects, setProjects] = useState<Project[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);

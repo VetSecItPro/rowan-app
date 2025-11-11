@@ -4,7 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { tasksService } from '@/lib/services/tasks-service';
 import { calendarService } from '@/lib/services/calendar-service';
@@ -209,7 +209,7 @@ const TrendIndicator = memo(function TrendIndicator({ value, label }: { value: n
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, spaces, currentSpace, loading: authLoading, switchSpace, refreshSpaces } = useAuth();
+  const { user, spaces, currentSpace, loading: authLoading, switchSpace, refreshSpaces } = useAuthWithSpaces();
   const [loading, setLoading] = useState(true);
   const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -461,7 +461,8 @@ export default function DashboardPage() {
         r.reminder_time && isToday(parseISO(r.reminder_time)) && r.status === 'active'
       ).length;
       const remindersByCategory = allReminders.reduce((acc, r) => {
-        acc[r.category] = (acc[r.category] || 0) + 1;
+        const category = r.category || 'personal';
+        acc[category] = (acc[category] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
       const nextDueReminder = allReminders

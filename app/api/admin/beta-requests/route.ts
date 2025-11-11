@@ -88,7 +88,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Transform the data to include additional information
-    const requests = (betaRequests || []).map(request => ({
+    const requests = (betaRequests || []).map((request: any) => ({
       id: request.id,
       email: request.email,
       password_attempt: request.password_attempt,
@@ -118,9 +118,9 @@ export async function GET(req: NextRequest) {
 
     if (!statsError && stats) {
       summary.total = stats.length;
-      summary.approved = stats.filter(s => s.access_granted).length;
-      summary.pending = stats.filter(s => !s.access_granted).length;
-      summary.with_accounts = stats.filter(s => s.user_id !== null).length;
+      summary.approved = stats.filter((s: any) => s.access_granted).length;
+      summary.pending = stats.filter((s: any) => !s.access_granted).length;
+      summary.with_accounts = stats.filter((s: any) => s.user_id !== null).length;
     }
 
     // Log admin access

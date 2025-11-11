@@ -1,12 +1,29 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, ChevronDown, Smile, Sparkles } from 'lucide-react';
+import { X, Smile, Sparkles } from 'lucide-react';
 import { CreateReminderInput, Reminder } from '@/lib/services/reminders-service';
 import { UserPicker } from './UserPicker';
 import { TemplatePicker } from './TemplatePicker';
 import { AttachmentUploader } from './AttachmentUploader';
 import { AttachmentList } from './AttachmentList';
+import { DateTimePicker } from '@/components/ui/DateTimePicker';
+import { Dropdown } from '@/components/ui/Dropdown';
+
+// Helper functions for dropdown options
+const getPriorityOptions = () => [
+  { value: 'low', label: 'Low' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'high', label: 'High' },
+  { value: 'urgent', label: 'Urgent' },
+];
+
+const getRepeatOptions = () => [
+  { value: '', label: 'Never' },
+  { value: 'daily', label: 'Daily' },
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'monthly', label: 'Monthly' },
+];
 
 interface NewReminderModalProps {
   isOpen: boolean;
@@ -35,12 +52,6 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [attachmentRefreshTrigger, setAttachmentRefreshTrigger] = useState(0);
 
-  // Helper function to convert ISO string to datetime-local format
-  const formatDatetimeLocal = (isoString: string) => {
-    if (!isoString) return '';
-    // Convert ISO string to format "yyyy-MM-ddTHH:mm" for datetime-local input
-    return isoString.slice(0, 16);
-  };
 
   // Reset form when modal opens or when switching between edit/create modes
   useEffect(() => {
@@ -55,7 +66,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
         description: editReminder.description || '',
         emoji: editReminder.emoji || '🔔',
         category: editReminder.category || 'personal',
-        reminder_time: formatDatetimeLocal(editReminder.reminder_time || ''),
+        reminder_time: editReminder.reminder_time || '',
         priority: editReminder.priority || 'medium',
         status: editReminder.status || 'active',
         repeat_pattern: editReminder.repeat_pattern || '',
@@ -101,9 +112,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
       emoji: reminderData.emoji || formData.emoji,
       category: (reminderData.category as any) || formData.category,
       priority: (reminderData.priority as any) || formData.priority,
-      reminder_time: reminderData.reminder_time
-        ? formatDatetimeLocal(reminderData.reminder_time)
-        : formData.reminder_time,
+      reminder_time: reminderData.reminder_time || formData.reminder_time,
       repeat_pattern: reminderData.repeat_pattern || formData.repeat_pattern,
     });
 
@@ -331,19 +340,14 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
 
           {/* Reminder Time */}
           <div>
-            <label htmlFor="field-5" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
-              Reminder Time
-            </label>
-            <input
-              type="datetime-local"
+            <DateTimePicker
               value={formData.reminder_time || ''}
-              id="field-5"
-              onChange={(e) =>  {
-                setFormData({ ...formData, reminder_time: e.target.value });
+              onChange={(value) => {
+                setFormData({ ...formData, reminder_time: value });
 
                 // Validate on change
-                if (e.target.value) {
-                  const reminderDate = new Date(e.target.value);
+                if (value) {
+                  const reminderDate = new Date(value);
                   const now = new Date();
 
                   if (reminderDate < now) {
@@ -355,66 +359,42 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                   setDateError('');
                 }
               }}
-              className={`w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white ${
-                dateError ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'
-              }`}
+              label="Reminder Time"
+              placeholder="Click to select date and time..."
+              error={dateError}
             />
-            {dateError && (
-              <p className="mt-2 text-base md:text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                <span className="font-medium">⚠</span>
-                {dateError}
-              </p>
-            )}
           </div>
 
           {/* Priority & Status Row */}
           <div className="grid grid-cols-2 gap-4">
             {/* Priority */}
-            <div className="relative z-50">
-              <label htmlFor="field-6" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Priority
               </label>
-              <div className="relative">
-                <select
-                  value={formData.priority}
-                  id="field-6"
-              onChange={(e) =>  setFormData({ ...formData, priority: e.target.value as any })}
-                  className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none pr-10 relative z-50"
-                  style={{ position: 'relative', zIndex: 9999 }}
-                >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                  <option value="urgent">Urgent</option>
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10" />
-              </div>
+              <Dropdown
+                value={formData.priority}
+                onChange={(value) => setFormData({ ...formData, priority: value as any })}
+                options={getPriorityOptions()}
+                placeholder="Select priority..."
+              />
             </div>
 
             {/* Repeat Pattern */}
-            <div className="relative z-50">
-              <label htmlFor="field-7" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Repeat
               </label>
-              <div className="relative">
-                <select
-                  value={formData.repeat_pattern || ''}
-                  id="field-7"
-              onChange={(e) =>  {
-                    setFormData({ ...formData, repeat_pattern: e.target.value });
-                    setSelectedWeekdays([]);
-                    setSelectedMonthDays([]);
-                  }}
-                  className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none pr-10 relative z-50"
-                  style={{ position: 'relative', zIndex: 9999 }}
-                >
-                  <option value="">Never</option>
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10" />
-              </div>
+              <Dropdown
+                value={formData.repeat_pattern || ''}
+                onChange={(value) => {
+                  setFormData({ ...formData, repeat_pattern: value });
+                  setSelectedWeekdays([]);
+                  setSelectedMonthDays([]);
+                }}
+                options={getRepeatOptions()}
+                placeholder="Select repeat pattern..."
+              />
             </div>
           </div>
 
