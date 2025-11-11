@@ -22,7 +22,7 @@ import { MessageNotificationBell } from '@/components/messages/MessageNotificati
 import { SwipeableMessageCard } from '@/components/messages/SwipeableMessageCard';
 import GuidedMessageCreation from '@/components/guided/GuidedMessageCreation';
 import { fileUploadService } from '@/lib/services/file-upload-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { messagesService, Message, MessageWithReplies, CreateMessageInput, TypingIndicator as TypingIndicatorType, Conversation, CreateConversationInput } from '@/lib/services/messages-service';
 import { mentionsService } from '@/lib/services/mentions-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
@@ -49,7 +49,7 @@ const EMOJIS = [
 ];
 
 export default function MessagesPage() {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -278,14 +278,36 @@ export default function MessagesPage() {
   const handleCreateMessage = useCallback(async (messageData: CreateMessageInput) => {
     try {
       if (editingMessage) {
+        // Optimistic update for edits - update UI immediately
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === editingMessage.id
+              ? {
+                  ...m,
+                  content: messageData.content,
+                  updated_at: new Date().toISOString()
+                }
+              : m
+          )
+        );
+
         await messagesService.updateMessage(editingMessage.id, messageData);
       } else {
         await messagesService.createMessage(messageData);
       }
-      // Real-time subscription will handle adding the new message to the UI
+      // Real-time subscription will handle adding new messages and confirming edits
       setEditingMessage(null);
     } catch (error) {
       console.error('Failed to save message:', error);
+
+      // Revert optimistic update on error for edits
+      if (editingMessage) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === editingMessage.id ? editingMessage : m
+          )
+        );
+      }
     }
   }, [editingMessage]);
 
@@ -438,9 +460,25 @@ export default function MessagesPage() {
         // Don't block message sending if mentions fail
       }
 
-      // Real-time subscription will add the server message,
-      // so remove the temp message to avoid duplicates
-      setMessages((prev) => prev.filter((m) => m.id !== tempId));
+      // Replace optimistic message with server message immediately
+      // instead of relying on real-time subscription
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === tempId ? { ...savedMessage } : m
+        )
+      );
+
+      // Also set up a cleanup timeout in case real-time adds a duplicate
+      setTimeout(() => {
+        setMessages((prev) => {
+          const serverMessageExists = prev.some(m => m.id === savedMessage.id && m.id !== tempId);
+          if (serverMessageExists) {
+            // Remove temp message if server message was added by real-time
+            return prev.filter(m => m.id !== tempId);
+          }
+          return prev;
+        });
+      }, 2000);
 
       toast.success('Message sent!');
     } catch (error) {

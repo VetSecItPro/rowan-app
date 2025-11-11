@@ -129,15 +129,15 @@ export async function GET(req: NextRequest) {
       const dateStr = date.toISOString().split('T')[0];
 
       // Count events for this day
-      const betaRequestsCount = betaRequests.filter(req =>
+      const betaRequestsCount = betaRequests.filter((req: any) =>
         req.created_at.startsWith(dateStr)
       ).length;
 
-      const launchNotificationsCount = launchNotifications.filter(notif =>
+      const launchNotificationsCount = launchNotifications.filter((notif: any) =>
         notif.created_at.startsWith(dateStr)
       ).length;
 
-      const userRegistrationsCount = userRegistrations.filter(user =>
+      const userRegistrationsCount = userRegistrations.filter((user: any) =>
         user.approved_at && user.approved_at.startsWith(dateStr)
       ).length;
 
@@ -151,7 +151,7 @@ export async function GET(req: NextRequest) {
 
     // Calculate success metrics
     const totalBetaRequests = betaRequests.length;
-    const approvedBetaRequests = betaRequests.filter(req => req.access_granted).length;
+    const approvedBetaRequests = betaRequests.filter((req: any) => req.access_granted).length;
     const totalLaunchNotifications = launchNotifications.length;
     const totalUserRegistrations = userRegistrations.length;
 
@@ -161,7 +161,7 @@ export async function GET(req: NextRequest) {
     const capacityUsage = Math.round((activeBetaUsers / betaCapacity) * 100);
 
     // Source distribution for launch notifications
-    const sourceDistribution = launchNotifications.reduce((acc: any, notif) => {
+    const sourceDistribution = launchNotifications.reduce((acc: any, notif: any) => {
       const source = notif.source || 'direct';
       acc[source] = (acc[source] || 0) + 1;
       return acc;

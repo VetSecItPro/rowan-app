@@ -4,6 +4,8 @@ import { createContext, useContext, useState, useEffect, ReactNode, useCallback,
 import { createClient } from '@/lib/supabase/client';
 import type { Space } from '@/lib/types';
 import { useAuth } from './auth-context';
+import { featureFlags } from '@/lib/constants/feature-flags';
+import { personalWorkspaceService } from '@/lib/services/personal-workspace-service';
 
 /**
  * SPACES CONTEXT - PHASE 3
@@ -98,7 +100,39 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
         setCurrentSpace(userSpaces[0]); // Select first space by default
         setHasZeroSpaces(false);
       } else {
-        console.log('No spaces found for user - zero spaces scenario');
+        console.log('No shared spaces found for user');
+
+        // FEATURE: Personal Workspaces - Auto-create if enabled
+        if (featureFlags.isPersonalWorkspacesEnabled()) {
+          console.log('Personal workspaces enabled - attempting to get/create personal space');
+
+          try {
+            const personalSpace = await personalWorkspaceService.ensurePersonalSpace(
+              userId,
+              user?.name // Pass user name for workspace naming
+            );
+
+            if (personalSpace) {
+              // Treat personal space like a regular space
+              const personalSpaceWithRole = {
+                ...personalSpace,
+                role: 'owner' // Personal space owner
+              };
+
+              console.log('Personal space ready:', personalSpace.name);
+              setSpaces([personalSpaceWithRole]);
+              setCurrentSpace(personalSpaceWithRole);
+              setHasZeroSpaces(false);
+              return; // Exit early - personal workspace is active
+            }
+          } catch (personalSpaceError) {
+            console.warn('Personal workspace creation failed:', personalSpaceError);
+            // Fall through to zero spaces scenario
+          }
+        }
+
+        // FALLBACK: Original zero spaces logic (unchanged)
+        console.log('No workspaces available - zero spaces scenario');
         setSpaces([]);
         setCurrentSpace(null);
         setHasZeroSpaces(true);

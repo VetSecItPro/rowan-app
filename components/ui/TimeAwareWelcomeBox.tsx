@@ -2,6 +2,13 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import { useTimePeriod } from './SmartBackgroundCanvas';
+import { WeatherBadge } from '@/components/calendar/WeatherBadge';
+import {
+  SunIcon,
+  CloudIcon,
+  SparklesIcon,
+  MoonIcon
+} from '@heroicons/react/24/outline';
 
 interface TimeAwareWelcomeBoxProps {
   greetingText: string;
@@ -22,20 +29,60 @@ export function TimeAwareWelcomeBox({
   const [isHovered, setIsHovered] = useState(false);
   const [elements, setElements] = useState<Array<{id: number, x: number, y: number, delay: number, size: number, speedX: number, speedY: number, opacity: number, rotation: number}>>([]);
 
-  // Generate time-aware floating elements
+  // Generate time-aware floating elements with smart positioning to avoid text and weather widget
   useEffect(() => {
     const elementCount = timePeriod === 'morning' ? 8 : timePeriod === 'afternoon' ? 6 : timePeriod === 'evening' ? 10 : 12;
-    const newElements = Array.from({ length: elementCount }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      delay: Math.random() * 8,
-      size: Math.random() * 20 + 20, // Bigger elements (20-40px)
-      speedX: (Math.random() - 0.5) * 1.5,
-      speedY: (Math.random() - 0.5) * 1.5,
-      opacity: Math.random() * 0.3 + 0.4, // Variable opacity (0.4-0.7)
-      rotation: Math.random() * 360
-    }));
+    const newElements = Array.from({ length: elementCount }, (_, i) => {
+      // Create exclusion zones to avoid:
+      // 1. Text content in center (40-60% horizontally, 25-75% vertically)
+      // 2. Weather widget in bottom-right corner (75-100% horizontally, 75-100% vertically)
+      let x, y;
+
+      // Better distribution across 6 zones for more even spacing
+      const zone = i % 6;
+
+      switch (zone) {
+        case 0: // Top-left corner
+          x = Math.random() * 25; // Left 25%
+          y = Math.random() * 20; // Top 20%
+          break;
+        case 1: // Top-center (avoid text)
+          x = 15 + Math.random() * 25; // 15-40% (before text starts)
+          y = Math.random() * 15; // Top 15%
+          break;
+        case 2: // Top-right corner (safe from weather widget)
+          x = 75 + Math.random() * 20; // 75-95% (leave 5% margin)
+          y = Math.random() * 20; // Top 20%
+          break;
+        case 3: // Left side (avoid center text)
+          x = Math.random() * 15; // Left 15% (narrower to avoid text)
+          y = 25 + Math.random() * 50; // 25-75% (middle band)
+          break;
+        case 4: // Right side (avoid weather widget)
+          x = 80 + Math.random() * 15; // 80-95% (avoid weather area)
+          y = 15 + Math.random() * 45; // 15-60% (avoid weather widget)
+          break;
+        case 5: // Bottom-left (safe zone)
+          x = Math.random() * 35; // Left 35% (wider than right due to weather widget)
+          y = 80 + Math.random() * 15; // Bottom 15% (leave margin)
+          break;
+        default:
+          x = Math.random() * 20;
+          y = Math.random() * 20;
+      }
+
+      return {
+        id: i,
+        x,
+        y,
+        delay: Math.random() * 12, // Increased delay for more staggered animations
+        size: Math.random() * 12 + 18, // Slightly larger but consistent (18-30px)
+        speedX: (Math.random() - 0.5) * 0.6, // Much slower movement
+        speedY: (Math.random() - 0.5) * 0.6,
+        opacity: Math.random() * 0.2 + 0.5, // More visible but less variation (0.5-0.7)
+        rotation: Math.random() * 360
+      };
+    });
     setElements(newElements);
   }, [timePeriod]);
 
@@ -82,56 +129,41 @@ export function TimeAwareWelcomeBox({
 
   const { gradient, glowColor, textGlow, accent } = timeBasedConfig;
 
-  // SVG Components for each time period
-  const SunIcon = ({ size, className = '' }: { size: number; className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
-      <circle cx="12" cy="12" r="5" fill="currentColor" className="text-yellow-300"/>
-      <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
-            stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-yellow-200"/>
-    </svg>
-  );
+  // Using sophisticated Heroicons instead of basic SVG components
 
-  const CloudIcon = ({ size, className = '' }: { size: number; className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
-      <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"
-            fill="currentColor" className="text-white/80"/>
-    </svg>
-  );
-
-  const StarIcon = ({ size, className = '' }: { size: number; className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
-      <polygon points="12,2 15,8.5 22,8.5 16.5,13.5 18.5,20 12,16 5.5,20 7.5,13.5 2,8.5 9,8.5"
-               fill="currentColor" className="text-yellow-100"/>
-    </svg>
-  );
-
-  const MoonIcon = ({ size, className = '' }: { size: number; className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
-            fill="currentColor" className="text-slate-200"/>
-    </svg>
-  );
-
-  // Get the appropriate icon component for current time period
+  // Get the appropriate icon component for current time period (deterministic, sophisticated Heroicons)
   const getTimeIcon = (element: any) => {
     const iconProps = {
-      size: element.size,
+      width: element.size,
+      height: element.size,
       className: `opacity-${Math.round(element.opacity * 100)} transition-all duration-1000 ${
         isHovered ? 'scale-125' : ''
+      } ${
+        timePeriod === 'morning' ? 'text-amber-200 stroke-[1.5]' :
+        timePeriod === 'afternoon' ? 'text-sky-100 stroke-[1.5]' :
+        timePeriod === 'evening' ? 'text-violet-200 stroke-[1.5]' :
+        'text-indigo-200 stroke-[1.5]'
       }`
     };
 
+    // Use element ID to deterministically assign icon types for variety
+    const iconVariant = element.id % 3; // 0, 1, or 2 for 3 variants
+
     switch (timePeriod) {
       case 'morning':
+        // Morning: Sun icons only (sophisticated, warm colors)
         return <SunIcon {...iconProps} />;
       case 'afternoon':
-        return <CloudIcon {...iconProps} />;
+        // Afternoon: Mix of sun and clouds (clean, bright)
+        return iconVariant === 0 ? <SunIcon {...iconProps} /> : <CloudIcon {...iconProps} />;
       case 'evening':
-        return Math.random() > 0.5 ? <StarIcon {...iconProps} /> : <SunIcon {...iconProps} />;
+        // Evening: Sparkles and moon only (elegant, mystical)
+        return iconVariant === 0 ? <SparklesIcon {...iconProps} /> : <MoonIcon {...iconProps} />;
       case 'night':
-        return Math.random() > 0.7 ? <MoonIcon {...iconProps} /> : <StarIcon {...iconProps} />;
+        // Night: Moon and sparkles only (sophisticated, dreamy)
+        return iconVariant === 0 ? <MoonIcon {...iconProps} /> : <SparklesIcon {...iconProps} />;
       default:
-        return <StarIcon {...iconProps} />;
+        return <SparklesIcon {...iconProps} />;
     }
   };
 
@@ -158,8 +190,8 @@ export function TimeAwareWelcomeBox({
         </div>
       </div>
 
-      {/* Time-Aware Floating Elements */}
-      <div className="absolute inset-0 pointer-events-none">
+      {/* Time-Aware Floating Elements - positioned to avoid text overlap */}
+      <div className="absolute inset-0 pointer-events-none z-0">
         {elements.map((element) => (
           <div
             key={element.id}
@@ -173,13 +205,14 @@ export function TimeAwareWelcomeBox({
               left: `${element.x}%`,
               top: `${element.y}%`,
               animationDelay: `${element.delay}s`,
-              animationDuration: `${timePeriod === 'morning' ? 3 + element.delay * 0.5 :
-                                 timePeriod === 'afternoon' ? 8 + element.delay * 0.3 :
-                                 4 + element.delay * 0.4}s`,
-              transform: `translate(${element.speedX * 15}px, ${element.speedY * 15}px) rotate(${element.rotation}deg)`,
-              filter: timePeriod === 'night' ? `drop-shadow(0 0 ${element.size/2}px rgba(255,255,255,0.5))` :
-                      timePeriod === 'morning' ? `drop-shadow(0 0 ${element.size/3}px rgba(255,215,0,0.6))` :
-                      `drop-shadow(0 0 ${element.size/4}px rgba(255,255,255,0.3))`
+              animationDuration: `${timePeriod === 'morning' ? 8 + element.delay * 0.8 :
+                                 timePeriod === 'afternoon' ? 15 + element.delay * 1.0 :
+                                 timePeriod === 'evening' ? 12 + element.delay * 0.9 :
+                                 18 + element.delay * 1.2}s`,
+              transform: `translate(${element.speedX * 6}px, ${element.speedY * 6}px) rotate(${element.rotation}deg)`,
+              filter: timePeriod === 'night' ? `drop-shadow(0 0 ${element.size/3}px rgba(255,255,255,0.3))` :
+                      timePeriod === 'morning' ? `drop-shadow(0 0 ${element.size/4}px rgba(255,215,0,0.4))` :
+                      `drop-shadow(0 0 ${element.size/5}px rgba(255,255,255,0.2))`
             }}
           >
             {getTimeIcon(element)}
@@ -202,13 +235,13 @@ export function TimeAwareWelcomeBox({
       {/* Main Content */}
       <div className="relative z-10 text-center">
         {/* Animated Greeting */}
-        <div className="mb-6">
-          <h1 className={`text-4xl sm:text-5xl lg:text-6xl font-black text-white ${textGlow} leading-none tracking-tight font-serif`}>
+        <div className="mb-8">
+          <h1 className={`text-4xl sm:text-5xl lg:text-6xl font-black text-white ${textGlow} leading-tight tracking-tight font-serif px-2`}>
             <span
-              className="inline-block animate-slide-in-left bg-gradient-to-r from-white via-white to-white/90 bg-clip-text text-transparent"
+              className="inline-block animate-slide-in-left text-white"
               style={{
                 animationDelay: '0.2s',
-                textShadow: '0 0 40px rgba(255,255,255,0.3), 0 0 80px rgba(255,255,255,0.1)',
+                textShadow: '0 0 40px rgba(255,255,255,0.4), 0 0 80px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.3)',
                 fontFamily: '"Playfair Display", "Georgia", serif'
               }}
             >
@@ -217,10 +250,10 @@ export function TimeAwareWelcomeBox({
             {userName && (
               <>
                 <span
-                  className="inline-block animate-slide-in-right bg-gradient-to-r from-white via-white/95 to-white/85 bg-clip-text text-transparent font-black"
+                  className="inline-block animate-slide-in-right text-white font-black"
                   style={{
                     animationDelay: '0.6s',
-                    textShadow: '0 0 60px rgba(255,255,255,0.4), 0 0 120px rgba(255,255,255,0.15)',
+                    textShadow: '0 0 60px rgba(255,255,255,0.5), 0 0 120px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.3)',
                     fontFamily: '"Playfair Display", "Georgia", serif'
                   }}
                 >
@@ -232,9 +265,9 @@ export function TimeAwareWelcomeBox({
         </div>
 
         {/* Enhanced Date Display */}
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-4 sm:gap-6">
           <div
-            className="text-white/90 text-xl font-semibold animate-fade-in-up tracking-wide mb-2"
+            className="text-white/90 text-xl sm:text-2xl font-semibold animate-fade-in-up tracking-wide"
             style={{ animationDelay: '0.8s' }}
           >
             {new Date().toLocaleDateString('en-US', {
@@ -245,7 +278,7 @@ export function TimeAwareWelcomeBox({
             })}
           </div>
           <div
-            className="text-white/70 text-lg font-medium animate-fade-in-up"
+            className="text-white/70 text-lg sm:text-xl font-medium animate-fade-in-up"
             style={{ animationDelay: '1s' }}
           >
             {new Date().toLocaleTimeString('en-US', {
@@ -273,6 +306,17 @@ export function TimeAwareWelcomeBox({
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 border-4 border-white/30 rounded-full animate-ripple" />
         </div>
       )}
+
+      {/* Weather Widget - positioned to avoid text and floating elements */}
+      <div className="absolute bottom-4 right-4 z-20 opacity-95 hover:opacity-100 transition-all duration-300">
+        <div className="backdrop-blur-md bg-black/25 rounded-lg p-3 border border-white/30 shadow-lg shadow-black/20">
+          <WeatherBadge
+            eventTime={new Date().toISOString()}
+            location="Wylie, Texas, United States" // Fallback for development testing
+            display="medium"
+          />
+        </div>
+      </div>
     </div>
   );
 }

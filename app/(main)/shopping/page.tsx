@@ -16,7 +16,7 @@ import { ScheduleTripModal } from '@/components/shopping/ScheduleTripModal';
 import { FrequentItemsPanel } from '@/components/shopping/FrequentItemsPanel';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import GuidedShoppingCreation from '@/components/guided/GuidedShoppingCreation';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { shoppingService, ShoppingList, CreateListInput } from '@/lib/services/shopping-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { calendarService } from '@/lib/services/calendar-service';
@@ -24,7 +24,7 @@ import { remindersService } from '@/lib/services/reminders-service';
 import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 
 export default function ShoppingPage() {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
   const [lists, setLists] = useState<ShoppingList[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
