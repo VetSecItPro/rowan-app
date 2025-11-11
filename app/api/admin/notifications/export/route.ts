@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
       ]);
 
       // Combine headers and rows
-      const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+      const csvContent = [headers.join(','), ...rows.map((row: string[]) => row.join(','))].join('\n');
 
       // Log export activity
       console.log(`Admin notification export by: ${sessionData.email} from IP: ${ip}, Records: ${rows.length}`);
