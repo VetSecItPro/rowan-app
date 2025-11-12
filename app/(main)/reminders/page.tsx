@@ -11,10 +11,8 @@ import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { ReminderCard } from '@/components/reminders/ReminderCard';
 import { NewReminderModal } from '@/components/reminders/NewReminderModal';
 import { BulkActionsToolbar } from '@/components/reminders/BulkActionsToolbar';
-import GuidedReminderCreation from '@/components/guided/GuidedReminderCreation';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { remindersService, Reminder, CreateReminderInput } from '@/lib/services/reminders-service';
-import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { CTAButton } from '@/components/ui/EnhancedButton';
 
 export default function RemindersPage(): JSX.Element {
@@ -30,8 +28,6 @@ export default function RemindersPage(): JSX.Element {
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'bills' | 'health' | 'work' | 'personal' | 'household'>('all');
   const [priorityFilter, setPriorityFilter] = useState<'all' | 'low' | 'medium' | 'high' | 'urgent'>('all');
   const [sortBy, setSortBy] = useState<'due_date' | 'priority' | 'created_date' | 'title'>('due_date');
-  const [showGuidedFlow, setShowGuidedFlow] = useState(false);
-  const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedReminderIds, setSelectedReminderIds] = useState<Set<string>>(new Set());
   const [displayLimit, setDisplayLimit] = useState(20); // Pagination: show 20 items initially
@@ -160,28 +156,13 @@ export default function RemindersPage(): JSX.Element {
 
     try {
       setLoading(true);
-      const [remindersData, statsData, userProgressResult] = await Promise.all([
+      const [remindersData, statsData] = await Promise.all([
         remindersService.getReminders(currentSpace.id),
         remindersService.getReminderStats(currentSpace.id),
-        getUserProgress(user.id),
       ]);
 
       setReminders(remindersData);
 
-      // Check if user has completed the guided reminder flow
-      const userProgress = userProgressResult.success ? userProgressResult.data : null;
-      if (userProgress) {
-        setHasCompletedGuide(userProgress.first_reminder_created);
-      }
-
-      // Show guided flow if no reminders exist, user hasn't completed the guide, AND user hasn't skipped it
-      if (
-        remindersData.length === 0 &&
-        !userProgress?.first_reminder_created &&
-        !userProgress?.skipped_reminder_guide
-      ) {
-        setShowGuidedFlow(true);
-      }
     } catch (error) {
       console.error('Failed to load reminders:', error);
     } finally {
@@ -321,26 +302,6 @@ export default function RemindersPage(): JSX.Element {
     setStatusFilter(e.target.value);
   }, []);
 
-  const handleGuidedFlowComplete = useCallback(() => {
-    setShowGuidedFlow(false);
-    setHasCompletedGuide(true);
-    loadReminders(); // Reload to show newly created reminder
-  }, [loadReminders]);
-
-  const handleGuidedFlowSkip = useCallback(async () => {
-    setShowGuidedFlow(false);
-
-    // Mark the guide as skipped in user progress
-    if (user) {
-      try {
-        await markFlowSkipped(user.id, 'reminder_guide');
-      } catch (error) {
-        console.error('Failed to mark reminder guide as skipped:', error);
-      }
-    }
-  }, [user]);
-
-
   const handleSelectionChange = useCallback((reminderId: string, selected: boolean) => {
     setSelectedReminderIds((prev) => {
       const newSet = new Set(prev);
@@ -433,16 +394,7 @@ export default function RemindersPage(): JSX.Element {
             </div>
           </div>
 
-          {/* Guided Creation - MOVED TO TOP */}
-          {!loading && showGuidedFlow && (
-            <GuidedReminderCreation
-              onComplete={handleGuidedFlowComplete}
-              onSkip={handleGuidedFlowSkip}
-            />
-          )}
-
-          {/* Stats Cards - Horizontal Row - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Stats Cards - Horizontal Row */}
           <div className="stats-grid-mobile gap-4 sm:gap-6">
             {/* Active */}
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
@@ -527,11 +479,8 @@ export default function RemindersPage(): JSX.Element {
               </div>
             </div>
           </div>
-          )}
 
-
-          {/* Search & Filter Bar - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Search & Filter Bar */}
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 space-y-3">
                 {/* Search and Sort Row */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -710,10 +659,8 @@ export default function RemindersPage(): JSX.Element {
                   </div>
                 </div>
               </div>
-          )}
 
-          {/* Reminders List - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Reminders List */}
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             {/* Header with Month Badge and Filters - Now with filters on the right */}
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6">
@@ -854,15 +801,6 @@ export default function RemindersPage(): JSX.Element {
                     >
                       Create Reminder
                     </CTAButton>
-                    {!hasCompletedGuide && (
-                      <button
-                        onClick={() => setShowGuidedFlow(true)}
-                        className="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
-                      >
-                        <Bell className="w-5 h-5" />
-                        Try Guided Creation
-                      </button>
-                    )}
                   </div>
                 )}
               </div>
@@ -911,7 +849,6 @@ export default function RemindersPage(): JSX.Element {
               </div>
             )}
           </div>
-          )}
         </div>
       </div>
 

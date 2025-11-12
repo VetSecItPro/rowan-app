@@ -22,14 +22,13 @@ import { TemplateLibrary } from '@/components/calendar/TemplateLibrary';
 import { WeatherBadge } from '@/components/calendar/WeatherBadge';
 import { geolocationService } from '@/lib/services/geolocation-service';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
-import GuidedEventCreation from '@/components/guided/GuidedEventCreation';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
 import { useCalendarShortcuts } from '@/lib/hooks/useCalendarShortcuts';
 import { useCalendarGestures } from '@/lib/hooks/useCalendarGestures';
+import { CalendarDaySkeleton } from '@/components/ui/Skeleton';
 import { calendarService, CalendarEvent, CreateEventInput } from '@/lib/services/calendar-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
-import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, parseISO, addDays, addWeeks, subWeeks } from 'date-fns';
 
 type ViewMode = 'day' | 'week' | 'month' | 'agenda' | 'timeline' | 'proposal' | 'list';
@@ -44,8 +43,6 @@ export default function CalendarPage() {
   const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [showGuidedFlow, setShowGuidedFlow] = useState(false);
-  const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, any>>({});
   const [detailEvent, setDetailEvent] = useState<CalendarEvent | null>(null);
   const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
@@ -166,10 +163,7 @@ export default function CalendarPage() {
 
     try {
       setLoading(true);
-      const [eventsData, userProgressResult] = await Promise.all([
-        calendarService.getEvents(currentSpace.id),
-        getUserProgress(user.id),
-      ]);
+      const eventsData = await calendarService.getEvents(currentSpace.id);
 
       setEvents(eventsData);
 
@@ -189,20 +183,6 @@ export default function CalendarPage() {
       );
       setLinkedShoppingLists(linkedListsMap);
 
-      // Check if user has completed the guided event flow
-      const userProgress = userProgressResult.success ? userProgressResult.data : null;
-      if (userProgress) {
-        setHasCompletedGuide(userProgress.first_event_created);
-      }
-
-      // Show guided flow if no events exist, user hasn't completed the guide, AND user hasn't skipped it
-      if (
-        eventsData.length === 0 &&
-        !userProgress?.first_event_created &&
-        !userProgress?.skipped_event_guide
-      ) {
-        setShowGuidedFlow(true);
-      }
     } catch (error) {
       console.error('Failed to load events:', error);
     } finally {
@@ -355,25 +335,6 @@ export default function CalendarPage() {
       handleStatusChange(eventId, nextStatus);
     }
   }, [handleStatusChange, loadEvents]);
-
-  const handleGuidedFlowComplete = useCallback(() => {
-    setShowGuidedFlow(false);
-    setHasCompletedGuide(true);
-    loadEvents(); // Reload to show newly created event
-  }, [loadEvents]);
-
-  const handleGuidedFlowSkip = useCallback(async () => {
-    setShowGuidedFlow(false);
-
-    // Mark the guide as skipped in user progress
-    if (user) {
-      try {
-        await markFlowSkipped(user.id, 'event_guide');
-      } catch (error) {
-        console.error('Failed to mark event guide as skipped:', error);
-      }
-    }
-  }, [user]);
 
   useEffect(() => {
     loadEvents();
@@ -591,16 +552,7 @@ export default function CalendarPage() {
             </div>
           </div>
 
-          {/* Guided Creation - MOVED TO TOP */}
-          {!loading && showGuidedFlow && (
-            <GuidedEventCreation
-              onComplete={handleGuidedFlowComplete}
-              onSkip={handleGuidedFlowSkip}
-            />
-          )}
-
-          {/* Stats Dashboard - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Stats Dashboard */}
           <div className="stats-grid-mobile gap-4 sm:gap-6">
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
@@ -674,10 +626,8 @@ export default function CalendarPage() {
               </div>
             </div>
           </div>
-          )}
 
-          {/* Search Bar - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Search Bar */}
           <div className="relative">
             <div className="relative">
               {/* Search Icon - Only show when not typing */}
@@ -727,10 +677,8 @@ export default function CalendarPage() {
               )}
             </div>
           </div>
-          )}
 
-          {/* Events Section - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Events Section */}
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
@@ -940,9 +888,23 @@ export default function CalendarPage() {
               {/* Main Calendar Content */}
               <div ref={calendarContentRef} className="flex-1 min-w-0 min-h-[600px] touch-pan-y">
               {loading ? (
-                <div className="text-center py-12">
-                  <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-                  <p className="mt-4 text-gray-600 dark:text-gray-400">Loading events...</p>
+                <div>
+                  <div className="flex items-center justify-center mb-6">
+                    <h3 className="text-lg font-semibold text-gray-400">Loading calendar...</h3>
+                  </div>
+                  <div className="grid grid-cols-7 gap-2">
+                    {/* Day headers skeleton */}
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                      <div key={day} className="text-center text-sm font-medium text-gray-400 py-2">
+                        {day}
+                      </div>
+                    ))}
+
+                    {/* Calendar day skeletons - showing 5 weeks worth */}
+                    {Array.from({ length: 35 }, (_, index) => (
+                      <CalendarDaySkeleton key={index} />
+                    ))}
+                  </div>
                 </div>
               ) : viewMode === 'month' ? (
                 /* Calendar View */
@@ -1564,7 +1526,6 @@ export default function CalendarPage() {
             </div>
             {/* End Calendar Content with Sidebar */}
           </div>
-          )}
         </div>
       </div>
       </PageErrorBoundary>
