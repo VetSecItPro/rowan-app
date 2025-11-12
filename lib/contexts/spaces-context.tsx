@@ -1,95 +1,35 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import type { Space } from '@/lib/types';
+import { createContext, useContext, ReactNode, useEffect } from 'react';
+import {
+  useSpaces as useSpacesQuery,
+  useSwitchSpace,
+  useCreateSpace,
+  useDeleteSpace,
+  useSpacesStateChange,
+  type Space
+} from '@/lib/hooks/useSpacesQuery';
 import { useAuth } from './auth-context';
+import { createClient } from '@/lib/supabase/client';
 import { featureFlags } from '@/lib/constants/feature-flags';
 import { personalWorkspaceService } from '@/lib/services/personal-workspace-service';
 
-// Cache utilities for localStorage
-const SPACES_CACHE_KEYS = {
-  USER_SPACES: 'rowan_user_spaces',
-  CURRENT_SPACE: 'rowan_current_space',
-  SPACES_TIMESTAMP: 'rowan_spaces_timestamp',
-} as const;
-
-const SPACES_CACHE_DURATION = 3 * 60 * 1000; // 3 minutes (shorter than auth cache)
-
-interface CachedSpacesData {
-  spaces: (Space & { role: string })[];
-  currentSpace: (Space & { role: string }) | null;
-  hasZeroSpaces: boolean;
-}
-
-const getCachedSpaces = (userId: string): CachedSpacesData | null => {
-  try {
-    const cached = localStorage.getItem(SPACES_CACHE_KEYS.USER_SPACES);
-    const currentSpaceCached = localStorage.getItem(SPACES_CACHE_KEYS.CURRENT_SPACE);
-    const timestamp = localStorage.getItem(SPACES_CACHE_KEYS.SPACES_TIMESTAMP);
-
-    if (!cached || !timestamp) return null;
-
-    const isExpired = Date.now() - parseInt(timestamp) > SPACES_CACHE_DURATION;
-    if (isExpired) {
-      clearCachedSpaces();
-      return null;
-    }
-
-    const spaces: (Space & { role: string })[] = JSON.parse(cached);
-    const currentSpace: (Space & { role: string }) | null = currentSpaceCached
-      ? JSON.parse(currentSpaceCached)
-      : null;
-
-    // Verify cached data belongs to current user (basic security)
-    if (spaces.length > 0 && !spaces.some(s => s.id)) return null;
-
-    return {
-      spaces,
-      currentSpace,
-      hasZeroSpaces: spaces.length === 0,
-    };
-  } catch (error) {
-    // Clear corrupted cache
-    clearCachedSpaces();
-    return null;
-  }
-};
-
-const setCachedSpaces = (data: CachedSpacesData): void => {
-  try {
-    localStorage.setItem(SPACES_CACHE_KEYS.USER_SPACES, JSON.stringify(data.spaces));
-    localStorage.setItem(SPACES_CACHE_KEYS.CURRENT_SPACE, JSON.stringify(data.currentSpace));
-    localStorage.setItem(SPACES_CACHE_KEYS.SPACES_TIMESTAMP, Date.now().toString());
-  } catch (error) {
-    // Silently fail if localStorage is full or unavailable
-    console.warn('Failed to cache spaces:', error);
-  }
-};
-
-const clearCachedSpaces = (): void => {
-  try {
-    localStorage.removeItem(SPACES_CACHE_KEYS.USER_SPACES);
-    localStorage.removeItem(SPACES_CACHE_KEYS.CURRENT_SPACE);
-    localStorage.removeItem(SPACES_CACHE_KEYS.SPACES_TIMESTAMP);
-  } catch (error) {
-    // Silently fail
-  }
-};
-
 /**
- * SPACES CONTEXT - PHASE 3
+ * NEW SPACES CONTEXT - REACT QUERY VERSION
  *
- * Clean separation: Workspace management ONLY
- * - Spaces loading and management
- * - Current space selection
- * - Zero spaces detection and handling
- * - Space creation and deletion
+ * Professional-grade workspace management with React Query
+ * Features:
+ * - Automatic caching with stale-while-revalidate
+ * - Optimistic updates for space switching
+ * - Background refetching for fresh data
+ * - Intelligent cache invalidation
+ * - Zero-spaces handling with smooth UX
  *
- * DEPENDS ON: AuthContext for user authentication
- * INTEGRATES WITH: Phase 1 UI components for proper UX
- *
- * This resolves zero-spaces scenarios and provides proper workspace UX.
+ * ELIMINATES:
+ * - Manual localStorage caching
+ * - Complex cache expiration logic
+ * - Race conditions in space loading
+ * - Blocking space operations
  */
 
 interface SpacesContextType {
@@ -116,310 +56,130 @@ const SpacesContext = createContext<SpacesContextType | null>(null);
 export function SpacesProvider({ children }: { children: ReactNode }) {
   const { user, session, loading: authLoading } = useAuth();
 
-  const [spaces, setSpaces] = useState<(Space & { role: string })[]>([]);
-  const [currentSpace, setCurrentSpace] = useState<(Space & { role: string }) | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [hasZeroSpaces, setHasZeroSpaces] = useState(false);
+  // React Query powered spaces data
+  const spacesQuery = useSpacesQuery(user?.id);
+  const switchSpaceMutation = useSwitchSpace();
+  const createSpaceMutation = useCreateSpace();
+  const deleteSpaceMutation = useDeleteSpace();
+  const handleSpacesChange = useSpacesStateChange();
 
-  // Clear any previous errors when starting new operations
-  const clearError = () => setError(null);
-
-  // OPTIMIZED: Load user spaces with caching and quick existence check
-  const loadUserSpaces = async (userId: string): Promise<void> => {
-    if (loading) return; // Prevent concurrent loads
-
-    try {
-      clearError();
-      setLoading(true);
-
-      // OPTIMIZATION 1: Try cached spaces first for instant loading
-      const cachedSpaces = getCachedSpaces(userId);
-      if (cachedSpaces) {
-        // Use cached spaces immediately - instant loading!
-        setSpaces(cachedSpaces.spaces);
-        setCurrentSpace(cachedSpaces.currentSpace);
-        setHasZeroSpaces(cachedSpaces.hasZeroSpaces);
-        setLoading(false);
-
-        // Refresh spaces in background for accuracy (non-blocking)
-        loadUserSpacesFromServer(userId).catch(error => {
-          console.error('Background spaces refresh failed:', error);
-        });
-        return;
-      }
-
-      // OPTIMIZATION 2: No cache available - load from server
-      await loadUserSpacesFromServer(userId);
-
-    } catch (error) {
-      console.error('Spaces loading failed:', error);
-      setError('Failed to load workspaces');
-      setSpaces([]);
-      setCurrentSpace(null);
-      setHasZeroSpaces(true);
-      setLoading(false);
-    }
-  };
-
-  // Server loading with quick existence check and optimizations
-  const loadUserSpacesFromServer = async (userId: string): Promise<void> => {
-    try {
-      const supabase = createClient();
-
-      // OPTIMIZATION 3: Quick existence check first (fast COUNT query)
-      const { count: spacesCount, error: countError } = await supabase
-        .from('space_members')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId);
-
-      if (countError) {
-        throw countError;
-      }
-
-      // OPTIMIZATION 4: Handle zero spaces immediately (perfect solo experience)
-      if (spacesCount === 0) {
-        // FEATURE: Personal Workspaces - Auto-create if enabled
-        if (featureFlags.isPersonalWorkspacesEnabled()) {
-          try {
-            const personalSpace = await personalWorkspaceService.ensurePersonalSpace(
-              userId,
-              user?.name // Pass user name for workspace naming
-            );
-
-            if (personalSpace) {
-              // Treat personal space like a regular space
-              const personalSpaceWithRole = {
-                ...personalSpace,
-                role: 'owner' // Personal space owner
-              };
-
-              const spacesData = {
-                spaces: [personalSpaceWithRole],
-                currentSpace: personalSpaceWithRole,
-                hasZeroSpaces: false,
-              };
-
-              setSpaces(spacesData.spaces);
-              setCurrentSpace(spacesData.currentSpace);
-              setHasZeroSpaces(spacesData.hasZeroSpaces);
-              setCachedSpaces(spacesData); // Cache the result
-              setLoading(false);
-              return;
-            }
-          } catch (personalSpaceError) {
-            console.warn('Personal workspace creation failed:', personalSpaceError);
-            // Fall through to zero spaces scenario
-          }
-        }
-
-        // SOLO USER EXPERIENCE: No spaces, no problem!
-        const zeroSpacesData = {
-          spaces: [],
-          currentSpace: null,
-          hasZeroSpaces: true,
-        };
-
-        setSpaces(zeroSpacesData.spaces);
-        setCurrentSpace(zeroSpacesData.currentSpace);
-        setHasZeroSpaces(zeroSpacesData.hasZeroSpaces);
-        setCachedSpaces(zeroSpacesData); // Cache the zero-spaces state
-        setLoading(false);
-        return;
-      }
-
-      // OPTIMIZATION 5: Load full spaces data (only when spaces exist)
-      const { data: spacesData, error: spacesError } = await supabase
-        .from('space_members')
-        .select(`
-          role,
-          spaces (
-            id,
-            name,
-            created_at,
-            updated_at
-          )
-        `)
-        .eq('user_id', userId)
-        .order('joined_at', { ascending: false });
-
-      if (spacesError) {
-        throw spacesError;
-      }
-
-      if (spacesData && spacesData.length > 0) {
-        const userSpaces = spacesData.map((item: any) => ({
-          ...item.spaces,
-          role: item.role,
-        }));
-
-        const fullSpacesData = {
-          spaces: userSpaces,
-          currentSpace: userSpaces[0], // Select first space by default
-          hasZeroSpaces: false,
-        };
-
-        setSpaces(fullSpacesData.spaces);
-        setCurrentSpace(fullSpacesData.currentSpace);
-        setHasZeroSpaces(fullSpacesData.hasZeroSpaces);
-        setCachedSpaces(fullSpacesData); // Cache the successful result
-      }
-
-      setLoading(false);
-
-    } catch (error) {
-      console.error('Server spaces loading failed:', error);
-      setError('Failed to load workspaces');
-
-      // Set minimal fallback data
-      const fallbackData = {
-        spaces: [],
-        currentSpace: null,
-        hasZeroSpaces: true,
-      };
-
-      setSpaces(fallbackData.spaces);
-      setCurrentSpace(fallbackData.currentSpace);
-      setHasZeroSpaces(fallbackData.hasZeroSpaces);
-      setLoading(false);
-    }
-  };
-
-  // PARALLEL LOADING: Load spaces in parallel with auth (not sequentially after)
+  // Set up real-time spaces change listener
   useEffect(() => {
-    // OPTIMIZATION 6: Start loading as soon as we have user ID (don't wait for full auth)
-    if (user?.id && session) {
-      // User ID available - start loading spaces immediately
-      loadUserSpaces(user.id);
-    } else if (!authLoading && !user) {
-      // Auth completed but no user - clear spaces state
-      setSpaces([]);
-      setCurrentSpace(null);
-      setHasZeroSpaces(false);
-      setLoading(false);
-      clearError();
-      clearCachedSpaces(); // Clear cached spaces on logout
-    }
-    // Note: Removed authLoading dependency to enable parallel loading
-  }, [user?.id, session]); // Only depend on user ID and session, not authLoading
+    if (!session) return;
 
-  const switchSpace = useCallback((space: Space & { role: string }) => {
-    if (!space || !spaces.find(s => s.id === space.id)) {
-      console.error('Attempted to switch to invalid space:', space);
-      return;
-    }
+    const supabase = createClient();
 
-    setCurrentSpace(space);
+    const spacesChannel = supabase
+      .channel('spaces-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'space_members',
+          filter: `user_id=eq.${user?.id}`,
+        },
+        handleSpacesChange
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'spaces',
+        },
+        handleSpacesChange
+      )
+      .subscribe();
 
-    // OPTIMIZATION 7: Update cache with new current space
-    if (user?.id) {
-      const updatedCacheData = {
-        spaces,
-        currentSpace: space,
-        hasZeroSpaces: false,
-      };
-      setCachedSpaces(updatedCacheData);
-    }
-  }, [spaces, user?.id]);
+    return () => {
+      supabase.removeChannel(spacesChannel);
+    };
+  }, [session, user?.id, handleSpacesChange]);
 
-  const refreshSpaces = useCallback(async () => {
-    if (user?.id) {
-      // OPTIMIZATION 8: Clear cache to force fresh data load
-      clearCachedSpaces();
-      await loadUserSpacesFromServer(user.id);
-    }
-  }, [user?.id]);
+  // Spaces management methods
+  const switchSpace = (space: Space & { role: string }) => {
+    if (!user?.id) return;
 
-  const createSpace = useCallback(async (name: string): Promise<{ success: boolean; spaceId?: string; error?: string }> => {
-    if (!user) {
+    switchSpaceMutation.mutate({
+      space,
+      userId: user.id,
+    });
+  };
+
+  const refreshSpaces = async () => {
+    spacesQuery.refetch();
+  };
+
+  const createSpace = async (name: string): Promise<{ success: boolean; spaceId?: string; error?: string }> => {
+    if (!user?.id) {
       return { success: false, error: 'User not authenticated' };
     }
 
     try {
-      const response = await fetch('/api/spaces/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name: name.trim() }),
+      const newSpace = await createSpaceMutation.mutateAsync({
+        name,
+        description: null,
+        type: 'personal',
+        userId: user.id,
       });
-
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || 'Failed to create workspace');
-      }
-
-      // OPTIMIZATION 9: Clear cache and refresh spaces after successful creation
-      clearCachedSpaces();
-      await loadUserSpacesFromServer(user.id);
 
       return {
         success: true,
-        spaceId: result.data.id
+        spaceId: newSpace.id,
       };
-
     } catch (error) {
-      console.error('Error creating space:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to create workspace'
+        error: error instanceof Error ? error.message : 'Failed to create space',
       };
     }
-  }, [user]);
+  };
 
-  const deleteSpace = useCallback(async (spaceId: string): Promise<{ success: boolean; error?: string }> => {
-    if (!user) {
+  const deleteSpace = async (spaceId: string): Promise<{ success: boolean; error?: string }> => {
+    if (!user?.id) {
       return { success: false, error: 'User not authenticated' };
     }
 
     try {
-      const response = await fetch(`/api/spaces/${spaceId}/delete`, {
-        method: 'DELETE',
+      await deleteSpaceMutation.mutateAsync({
+        spaceId,
+        userId: user.id,
       });
 
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || 'Failed to delete workspace');
-      }
-
-      // OPTIMIZATION 10: Clear cache and refresh spaces after successful deletion
-      clearCachedSpaces();
-      await loadUserSpacesFromServer(user.id);
-
       return { success: true };
-
     } catch (error) {
-      console.error('Error deleting space:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to delete workspace'
+        error: error instanceof Error ? error.message : 'Failed to delete space',
       };
     }
-  }, [user]);
+  };
 
-  const triggerOnboarding = useCallback(() => {
-    console.log('Triggering workspace onboarding');
-    // This can be used to show the FirstSpaceOnboarding component
-    // Implementation will depend on how we integrate with the app layout
-  }, []);
+  // Zero-spaces onboarding helpers
+  const triggerOnboarding = () => {
+    if (featureFlags.isSmartOnboardingEnabled()) {
+      // Placeholder for onboarding trigger logic
+      console.log('Onboarding triggered');
+    }
+  };
 
-  const skipOnboarding = useCallback(() => {
-    console.log('Skipping workspace onboarding');
-    // This allows users to skip the onboarding if they want
-    setHasZeroSpaces(false);
-  }, []);
+  const skipOnboarding = () => {
+    if (featureFlags.isSmartOnboardingEnabled()) {
+      // Placeholder for onboarding skip logic
+      console.log('Onboarding skipped');
+    }
+  };
 
-  const value: SpacesContextType = useMemo(() => ({
-    // Core spaces state
-    spaces,
-    currentSpace,
-    loading,
-    error,
-    hasZeroSpaces,
+  const contextValue: SpacesContextType = {
+    // Core state from React Query
+    spaces: spacesQuery.spaces as (Space & { role: string })[],
+    currentSpace: spacesQuery.currentSpace as (Space & { role: string }) | null,
+    loading: spacesQuery.isLoading || authLoading,
+    error: spacesQuery.error?.message || null,
+    hasZeroSpaces: spacesQuery.hasZeroSpaces,
 
-    // Spaces management methods
+    // Management methods
     switchSpace,
     refreshSpaces,
     createSpace,
@@ -428,36 +188,85 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
     // Zero-spaces helpers
     triggerOnboarding,
     skipOnboarding,
-  }), [
-    spaces,
-    currentSpace,
-    loading,
-    error,
-    hasZeroSpaces,
-    switchSpace,
-    refreshSpaces,
-    createSpace,
-    deleteSpace,
-    triggerOnboarding,
-    skipOnboarding,
-  ]);
+  };
 
   return (
-    <SpacesContext.Provider value={value}>
+    <SpacesContext.Provider value={contextValue}>
       {children}
     </SpacesContext.Provider>
   );
 }
 
-export function useSpaces() {
+/**
+ * Hook to access spaces context
+ *
+ * IMPORTANT: This hook now provides React Query-powered spaces state
+ * All data is automatically cached, refreshed, and synchronized
+ */
+export function useSpaces(): SpacesContextType {
   const context = useContext(SpacesContext);
+
   if (!context) {
-    throw new Error('useSpaces must be used within SpacesProvider');
+    throw new Error('useSpaces must be used within a SpacesProvider');
   }
+
   return context;
 }
 
 /**
- * Type definitions for TypeScript support
+ * Convenience hook for space operations
+ * Provides optimistic updates and loading states
  */
-export type { SpacesContextType };
+export function useSpaceOperations() {
+  const createSpaceMutation = useCreateSpace();
+  const deleteSpaceMutation = useDeleteSpace();
+  const switchSpaceMutation = useSwitchSpace();
+
+  return {
+    // Create space
+    createSpace: createSpaceMutation.mutate,
+    isCreatingSpace: createSpaceMutation.isPending,
+    createError: createSpaceMutation.error,
+
+    // Delete space
+    deleteSpace: deleteSpaceMutation.mutate,
+    isDeletingSpace: deleteSpaceMutation.isPending,
+    deleteError: deleteSpaceMutation.error,
+
+    // Switch space
+    switchSpace: switchSpaceMutation.mutate,
+    isSwitchingSpace: switchSpaceMutation.isPending,
+    switchError: switchSpaceMutation.error,
+  };
+}
+
+/**
+ * MIGRATION BENEFITS:
+ *
+ * 1. **Eliminates Manual Caching:**
+ *    - No more localStorage cache management
+ *    - No cache expiration logic
+ *    - No cache corruption handling
+ *
+ * 2. **Professional Data Management:**
+ *    - Automatic background refetching
+ *    - Stale-while-revalidate patterns
+ *    - Intelligent cache invalidation
+ *    - Optimistic updates for space operations
+ *
+ * 3. **Better Performance:**
+ *    - Instant space switching with optimistic updates
+ *    - Non-blocking space operations
+ *    - Smart cache invalidation
+ *
+ * 4. **Enhanced Reliability:**
+ *    - Real-time synchronization
+ *    - Automatic error recovery
+ *    - Network-aware caching
+ *
+ * 5. **Developer Experience:**
+ *    - React Query DevTools integration
+ *    - Better error handling
+ *    - TypeScript support throughout
+ *    - Simplified state management
+ */
