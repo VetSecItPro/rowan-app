@@ -26,6 +26,10 @@ export const queryClient = new QueryClient({
       // GARBAGE COLLECTION: Remove unused data after 10 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes (was cacheTime in v4)
 
+      // TIMEOUT: Prevent infinite loading from hanging requests (CRITICAL FIX)
+      // This ensures queries fail gracefully instead of hanging forever in production
+      timeout: 30000, // 30 second timeout for all queries
+
       // BACKGROUND REFETCHING: Keep data fresh while showing cached data
       refetchOnWindowFocus: true,   // Refetch when user returns to tab
       refetchOnReconnect: true,     // Refetch when internet reconnects
@@ -33,6 +37,11 @@ export const queryClient = new QueryClient({
 
       // RETRY CONFIGURATION: Smart retries for failed requests
       retry: (failureCount, error: any) => {
+        // Don't retry on timeout errors to prevent extended loading times
+        if (error?.name === 'AbortError' || error?.code === 'TIMEOUT') {
+          return false;
+        }
+
         // Don't retry on 4xx errors (client errors like 401, 404)
         if (error?.response?.status >= 400 && error?.response?.status < 500) {
           return false;
@@ -55,6 +64,9 @@ export const queryClient = new QueryClient({
     },
 
     mutations: {
+      // TIMEOUT: Prevent infinite loading from hanging mutation requests
+      timeout: 30000, // 30 second timeout for mutations
+
       // MUTATION RETRIES: Limited retries for mutations to prevent duplicate operations
       retry: 1,
 
