@@ -20,12 +20,11 @@ import { NewConversationModal } from '@/components/messages/NewConversationModal
 import { ForwardMessageModal } from '@/components/messages/ForwardMessageModal';
 import { MessageNotificationBell } from '@/components/messages/MessageNotificationBell';
 import { SwipeableMessageCard } from '@/components/messages/SwipeableMessageCard';
-import GuidedMessageCreation from '@/components/guided/GuidedMessageCreation';
 import { fileUploadService } from '@/lib/services/file-upload-service';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { messagesService, Message, MessageWithReplies, CreateMessageInput, TypingIndicator as TypingIndicatorType, Conversation, CreateConversationInput } from '@/lib/services/messages-service';
 import { mentionsService } from '@/lib/services/mentions-service';
-import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
+import { getUserProgress } from '@/lib/services/user-progress-service';
 import { format, isSameDay, isToday, isYesterday } from 'date-fns';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { toast } from 'sonner';
@@ -67,8 +66,6 @@ export default function MessagesPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const [showGuidedFlow, setShowGuidedFlow] = useState(false);
-  const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, messageId: '' });
   const [selectedThread, setSelectedThread] = useState<MessageWithReplies | null>(null);
   const [typingUsers, setTypingUsers] = useState<TypingIndicatorType[]>([]);
@@ -162,20 +159,6 @@ export default function MessagesPage() {
       setPinnedMessages(pinnedData);
       setConversations(conversationsData);
 
-      // Check if user has completed the guided message flow
-      const userProgress = userProgressResult.success ? userProgressResult.data : null;
-      if (userProgress) {
-        setHasCompletedGuide(userProgress.first_message_sent);
-      }
-
-      // Show guided flow if no messages exist, user hasn't completed the guide, AND user hasn't skipped it
-      if (
-        messagesData.length === 0 &&
-        !userProgress?.first_message_sent &&
-        !userProgress?.skipped_message_guide
-      ) {
-        setShowGuidedFlow(true);
-      }
     } catch (error) {
       console.error('Failed to load messages:', error);
     } finally {
@@ -615,24 +598,6 @@ export default function MessagesPage() {
     };
   }, [searchQuery]);
 
-  const handleGuidedFlowComplete = useCallback(() => {
-    setShowGuidedFlow(false);
-    setHasCompletedGuide(true);
-    loadMessages(); // Reload to show newly created message
-  }, [loadMessages]);
-
-  const handleGuidedFlowSkip = useCallback(async () => {
-    setShowGuidedFlow(false);
-
-    // Mark the guide as skipped in user progress
-    if (user) {
-      try {
-        await markFlowSkipped(user.id, 'message_guide');
-      } catch (error) {
-        console.error('Failed to mark message guide as skipped:', error);
-      }
-    }
-  }, [user]);
 
   // Handle opening thread view
   const handleReply = useCallback((message: Message | MessageWithReplies) => {
@@ -779,6 +744,9 @@ export default function MessagesPage() {
       // Switch to the new conversation
       await handleSelectConversation(newConversation.id);
 
+      // Close the modal
+      setShowNewConversationModal(false);
+
       toast.success('Conversation created successfully');
     } catch (error) {
       console.error('Failed to create conversation:', error);
@@ -904,16 +872,8 @@ export default function MessagesPage() {
             )}
           </div>
 
-          {/* Guided Creation - MOVED TO TOP */}
-          {!loading && showGuidedFlow && (
-            <GuidedMessageCreation
-              onComplete={handleGuidedFlowComplete}
-              onSkip={handleGuidedFlowSkip}
-            />
-          )}
 
-          {/* Stats Dashboard - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Stats Dashboard */}
           <div className="stats-grid-mobile gap-3 sm:gap-6">
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-2 sm:mb-4">
@@ -987,11 +947,9 @@ export default function MessagesPage() {
               </div>
             </div>
           </div>
-          )}
 
 
-          {/* Conversations and Chat Interface - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Conversations and Chat Interface */}
           <div className="flex gap-4">
             {/* Conversation Sidebar - Desktop */}
             <div className="hidden md:block w-80 flex-shrink-0">
@@ -1101,15 +1059,6 @@ export default function MessagesPage() {
                   <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 max-w-xs">
                     {emptyStateMessage.secondary}
                   </p>
-                  {!searchQuery && !hasCompletedGuide && (
-                    <button
-                      onClick={() => setShowGuidedFlow(true)}
-                      className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-500 text-white font-medium rounded-2xl hover:from-emerald-600 hover:to-green-600 transition-all duration-200 inline-flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                    >
-                      <MessageCircle className="w-5 h-5" />
-                      Try Guided Creation
-                    </button>
-                  )}
                 </div>
               ) : (
                 <>
@@ -1339,7 +1288,6 @@ export default function MessagesPage() {
             </div>
             </div>
           </div>
-          )}
 
           {/* Mobile Conversation Sidebar Drawer */}
           {showConversationSidebar && (

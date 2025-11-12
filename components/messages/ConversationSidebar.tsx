@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { MessageCircle, Search, Plus, Archive, X, Edit2, Check, X as XIcon } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { MessageCircle, Search, Plus, Archive, X, Edit2, Check, X as XIcon, MoreVertical, Trash2 } from 'lucide-react';
 import { Conversation } from '@/lib/services/messages-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { SwipeableConversationItem } from './SwipeableConversationItem';
@@ -32,6 +33,15 @@ export function ConversationSidebar({
   const [searchQuery, setSearchQuery] = useState('');
   const [editingConversationId, setEditingConversationId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState('');
+  const [dropdownOpenForId, setDropdownOpenForId] = useState<string | null>(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 });
+  const [mounted, setMounted] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Ensure component is mounted on client side
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Filter conversations based on search and archived status
   const filteredConversations = conversations.filter((conv) => {
@@ -87,8 +97,48 @@ export function ConversationSidebar({
     }
   };
 
+  // Handle dropdown open
+  const handleOpenDropdown = (conversationId: string, buttonElement: HTMLElement) => {
+    const rect = buttonElement.getBoundingClientRect();
+    setDropdownPosition({
+      top: rect.bottom + window.scrollY + 4,
+      right: window.innerWidth - rect.right + window.scrollX
+    });
+    setDropdownOpenForId(conversationId);
+  };
+
+  // Handle dropdown close
+  const handleCloseDropdown = () => {
+    setDropdownOpenForId(null);
+  };
+
+  // Close dropdown when clicking outside or on escape
+  useEffect(() => {
+    if (!dropdownOpenForId) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpenForId(null);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setDropdownOpenForId(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [dropdownOpenForId]);
+
   return (
-    <div className={`flex flex-col h-full bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border-r border-gray-200/50 dark:border-gray-700/50 ${className}`}>
+    <div className={`flex flex-col h-full bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border-r border-gray-200/50 dark:border-gray-700/50 conversation-sidebar ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200/50 dark:border-gray-700/50">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
@@ -174,6 +224,8 @@ export function ConversationSidebar({
                   onCancelRename={handleCancelRename}
                   onKeyDown={handleRenameKeyDown}
                   canRename={!!onRenameConversation}
+                  onDelete={onDeleteConversation}
+                  onOpenDropdown={handleOpenDropdown}
                   onClick={() => {
                     if (editingConversationId === conversation.id) {
                       return; // Don't select if currently editing
@@ -187,6 +239,47 @@ export function ConversationSidebar({
           </div>
         )}
       </div>
+
+      {/* Portal-based dropdown */}
+      {dropdownOpenForId && mounted && createPortal(
+        <div
+          ref={dropdownRef}
+          className="fixed w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl py-1 z-[10000]"
+          style={{
+            top: dropdownPosition.top,
+            right: dropdownPosition.right
+          }}
+        >
+          {onRenameConversation && (
+            <button
+              onClick={() => {
+                handleCloseDropdown();
+                const conversation = conversations.find(c => c.id === dropdownOpenForId);
+                if (conversation) handleStartRename(conversation);
+              }}
+              className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg transition-colors flex items-center gap-2"
+            >
+              <Edit2 className="w-4 h-4" />
+              Rename
+            </button>
+          )}
+          {onDeleteConversation && (
+            <button
+              onClick={() => {
+                handleCloseDropdown();
+                if (dropdownOpenForId) {
+                  onDeleteConversation(dropdownOpenForId);
+                }
+              }}
+              className="w-full px-3 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-b-lg transition-colors flex items-center gap-2"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete
+            </button>
+          )}
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
@@ -203,6 +296,8 @@ interface ConversationItemProps {
   onCancelRename?: () => void;
   onKeyDown?: (e: React.KeyboardEvent) => void;
   canRename?: boolean;
+  onDelete?: (id: string) => void;
+  onOpenDropdown?: (conversationId: string, buttonElement: HTMLElement) => void;
   onClick: () => void;
 }
 
@@ -217,6 +312,8 @@ function ConversationItem({
   onCancelRename,
   onKeyDown,
   canRename = false,
+  onDelete,
+  onOpenDropdown,
   onClick
 }: ConversationItemProps) {
   const getConversationIcon = () => {
@@ -283,43 +380,51 @@ function ConversationItem({
                 </button>
               </div>
             ) : (
-              <>
-                <h3
-                  className="font-semibold text-gray-900 dark:text-white truncate text-sm cursor-pointer hover:text-green-600 dark:hover:text-green-400 transition-colors relative group/title"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onStartRename?.();
-                  }}
-                  title={canRename ? 'Click to rename conversation' : undefined}
-                >
-                  {conversation.title || 'Untitled Conversation'}
-                  {/* Tooltip */}
-                  {canRename && (
-                    <span className="absolute bottom-full left-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover/title:opacity-100 transition-opacity pointer-events-none z-10">
-                      Click to rename
-                    </span>
-                  )}
-                </h3>
+              <h3
+                className="font-semibold text-gray-900 dark:text-white truncate text-sm cursor-pointer hover:text-green-600 dark:hover:text-green-400 transition-colors relative group/title"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onStartRename?.();
+                }}
+                title={canRename ? 'Click to rename conversation' : undefined}
+              >
+                {conversation.title || 'Untitled Conversation'}
+                {/* Tooltip */}
                 {canRename && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onStartRename?.();
-                    }}
-                    className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-all"
-                    title="Rename conversation"
-                  >
-                    <Edit2 className="w-3 h-3 text-gray-500 dark:text-gray-400" />
-                  </button>
+                  <span className="absolute bottom-full left-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover/title:opacity-100 transition-opacity pointer-events-none z-10">
+                    Click to rename
+                  </span>
                 )}
-              </>
+              </h3>
             )}
           </div>
-          {!isEditing && conversation.last_message_at && (
-            <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0 ml-2">
-              {formatTimestamp(conversation.last_message_at, 'MMM d')}
-            </span>
-          )}
+
+          {/* Right side: Date and Three-dot menu */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Date */}
+            {!isEditing && conversation.last_message_at && (
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {formatTimestamp(conversation.last_message_at, 'MMM d')}
+              </span>
+            )}
+
+            {/* Three-dot menu - aligned consistently */}
+            {!isEditing && (
+              <div className="relative hidden md:block">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenDropdown?.(conversation.id, e.currentTarget);
+                  }}
+                  className="w-6 h-6 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                  title="Conversation options"
+                  aria-label="Conversation options"
+                >
+                  <MoreVertical className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Last Message Preview */}
