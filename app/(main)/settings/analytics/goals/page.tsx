@@ -4,23 +4,7 @@ import { useState, useEffect } from 'react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { Target, Award, TrendingUp, CheckCircle, Calendar, BarChart3, Activity, Zap } from 'lucide-react';
 import { format, subMonths } from 'date-fns';
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Area,
-  AreaChart,
-} from 'recharts';
+import { DynamicAreaChart, DynamicPieChart, DynamicBarChart } from '@/components/charts/DynamicCharts';
 import { useAuth } from '@/lib/contexts/auth-context';
 import {
   getGoalAnalytics,
@@ -222,27 +206,16 @@ export default function GoalsAnalyticsPage() {
                       {format(new Date(), 'MMM yyyy')}
                     </span>
                   </div>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <AreaChart data={analytics.progressTrend}>
-                      <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                      <XAxis dataKey="date" className="text-xs" />
-                      <YAxis className="text-xs" />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                          border: '1px solid #e5e7eb',
-                          borderRadius: '8px',
-                        }}
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="progress"
-                        stroke="#6366f1"
-                        fill="#6366f1"
-                        fillOpacity={0.3}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
+                  <DynamicAreaChart
+                    data={analytics.progressTrend}
+                    xDataKey="date"
+                    areaDataKey="progress"
+                    areaColor="#6366f1"
+                    height={300}
+                    showGrid={true}
+                    showLegend={false}
+                    fillOpacity={0.3}
+                  />
                 </div>
 
                 {/* Category Breakdown */}
@@ -252,25 +225,15 @@ export default function GoalsAnalyticsPage() {
                       Goals by Category
                     </h3>
                   </div>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={analytics.categoryBreakdown}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ category, value }) => `${category}: ${value}`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {analytics.categoryBreakdown.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
+                  <DynamicPieChart
+                    data={analytics.categoryBreakdown.map(item => ({
+                      name: item.category,
+                      value: item.value,
+                      color: item.color
+                    }))}
+                    colors={analytics.categoryBreakdown.map(item => item.color)}
+                    height={300}
+                  />
                 </div>
 
                 {/* Milestones by Week */}
@@ -280,22 +243,15 @@ export default function GoalsAnalyticsPage() {
                       Weekly Milestones
                     </h3>
                   </div>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={analytics.milestonesByWeek}>
-                      <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                      <XAxis dataKey="week" className="text-xs" />
-                      <YAxis className="text-xs" />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                          border: '1px solid #e5e7eb',
-                          borderRadius: '8px',
-                        }}
-                      />
-                      <Bar dataKey="completed" fill="#10b981" />
-                      <Bar dataKey="total" fill="#e5e7eb" />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <DynamicBarChart
+                    data={analytics.milestonesByWeek}
+                    xDataKey="week"
+                    yDataKey="completed"
+                    barColor="#10b981"
+                    height={300}
+                    showGrid={true}
+                    showLegend={true}
+                  />
                 </div>
 
                 {/* Success by Category */}

@@ -30,6 +30,60 @@ interface UserProfile {
   avatar_url?: string;
 }
 
+// Cache utilities for localStorage
+const CACHE_KEYS = {
+  USER_PROFILE: 'rowan_user_profile',
+  USER_PROFILE_TIMESTAMP: 'rowan_user_profile_timestamp',
+} as const;
+
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+const getCachedProfile = (userId: string): UserProfile | null => {
+  try {
+    const cached = localStorage.getItem(CACHE_KEYS.USER_PROFILE);
+    const timestamp = localStorage.getItem(CACHE_KEYS.USER_PROFILE_TIMESTAMP);
+
+    if (!cached || !timestamp) return null;
+
+    const isExpired = Date.now() - parseInt(timestamp) > CACHE_DURATION;
+    if (isExpired) {
+      localStorage.removeItem(CACHE_KEYS.USER_PROFILE);
+      localStorage.removeItem(CACHE_KEYS.USER_PROFILE_TIMESTAMP);
+      return null;
+    }
+
+    const profile: UserProfile = JSON.parse(cached);
+    // Verify cached profile belongs to current user
+    if (profile.id !== userId) return null;
+
+    return profile;
+  } catch (error) {
+    // Clear corrupted cache
+    localStorage.removeItem(CACHE_KEYS.USER_PROFILE);
+    localStorage.removeItem(CACHE_KEYS.USER_PROFILE_TIMESTAMP);
+    return null;
+  }
+};
+
+const setCachedProfile = (profile: UserProfile): void => {
+  try {
+    localStorage.setItem(CACHE_KEYS.USER_PROFILE, JSON.stringify(profile));
+    localStorage.setItem(CACHE_KEYS.USER_PROFILE_TIMESTAMP, Date.now().toString());
+  } catch (error) {
+    // Silently fail if localStorage is full or unavailable
+    console.warn('Failed to cache user profile:', error);
+  }
+};
+
+const clearCachedProfile = (): void => {
+  try {
+    localStorage.removeItem(CACHE_KEYS.USER_PROFILE);
+    localStorage.removeItem(CACHE_KEYS.USER_PROFILE_TIMESTAMP);
+  } catch (error) {
+    // Silently fail
+  }
+};
+
 interface AuthContextType {
   // Core authentication state
   user: UserProfile | null;
@@ -68,9 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       clearError();
       const supabase = createClient();
 
-      console.log('Loading user profile for:', userId);
-
-      // Add timeout to prevent hanging
+      // Add reasonable timeout (reduced from 10s to 5s)
       const profilePromise = supabase
         .from('users')
         .select('*')
@@ -78,68 +130,67 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
 
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Profile loading timeout')), 10000)
+        setTimeout(() => reject(new Error('Profile loading timeout')), 5000)
       );
 
       const { data: profile, error: profileError } = await Promise.race([profilePromise, timeoutPromise]) as any;
 
-      console.log('Profile query completed, checking results...');
-
       if (profileError) {
+        // Only log actual errors, not debug info
         console.error('Profile loading error:', profileError);
 
         // For missing profiles, create basic user info from session
         if (profileError.code === 'PGRST116') {
-          console.log('Profile not found, creating basic user info');
           const sessionData = await supabase.auth.getSession();
-          setUser({
+          const basicProfile = {
             id: userId,
             email: sessionData.data.session?.user?.email || '',
             name: sessionData.data.session?.user?.email?.split('@')[0] || 'User',
             pronouns: undefined,
             color_theme: 'light',
             avatar_url: undefined,
-          });
-          console.log('Basic user info set from session');
+          };
+          setUser(basicProfile);
+          setCachedProfile(basicProfile);
           return;
         }
 
         // For other errors, set error state but still try to set basic user info
-        console.log('Setting fallback user info due to profile error');
         setError('Failed to load user profile');
-        setUser({
+        const fallbackProfile = {
           id: userId,
           email: '',
           name: 'User',
           pronouns: undefined,
           color_theme: 'light',
           avatar_url: undefined,
-        });
-        console.log('Fallback user info set');
+        };
+        setUser(fallbackProfile);
         return;
       }
 
       if (profile) {
-        console.log('Successfully loaded user profile:', profile);
-        setUser({
+        const fullProfile = {
           id: profile.id,
           email: profile.email || '',
           name: profile.name || profile.email || 'User',
           pronouns: profile.pronouns,
           color_theme: profile.color_theme || 'light',
           avatar_url: profile.avatar_url,
-        });
-        console.log('User profile set successfully');
+        };
+        setUser(fullProfile);
+        setCachedProfile(fullProfile); // Cache successful profile loads
       } else {
-        console.log('No profile data returned, setting minimal user info');
-        setUser({
+        const minimalProfile = {
           id: userId,
           email: '',
           name: 'User',
           pronouns: undefined,
           color_theme: 'light',
           avatar_url: undefined,
-        });
+        };
+        setUser(minimalProfile);
+        setCachedProfile(minimalProfile);
       }
 
     } catch (error) {
@@ -147,19 +198,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setError('Failed to load user profile');
 
       // Set minimal user data to prevent total failure
-      console.log('Setting minimal user data due to catch block');
-      setUser({
+      const minimalProfile = {
         id: userId,
         email: '',
         name: 'User',
         pronouns: undefined,
         color_theme: 'light',
         avatar_url: undefined,
-      });
-      console.log('Minimal user data set in catch block');
+      };
+      setUser(minimalProfile);
     }
-
-    console.log('loadUserProfile function completed');
   };
 
   // Initialize authentication on mount
@@ -178,32 +226,89 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
 
       if (session?.user) {
-        await loadUserProfile(session.user.id);
+        // OPTIMIZATION: Try cached profile first for instant loading
+        const cachedProfile = getCachedProfile(session.user.id);
+
+        if (cachedProfile) {
+          // Use cached profile immediately - instant loading!
+          setUser(cachedProfile);
+
+          // Refresh profile in background for accuracy
+          loadUserProfile(session.user.id).catch(error => {
+            console.error('Background profile refresh failed:', error);
+          });
+        } else {
+          // No cache available - set minimal user data immediately to unblock loading
+          setUser({
+            id: session.user.id,
+            email: session.user.email || '',
+            name: session.user.email?.split('@')[0] || 'User',
+            pronouns: undefined,
+            color_theme: 'light',
+            avatar_url: undefined,
+          });
+
+          // Load full profile in background (non-blocking)
+          loadUserProfile(session.user.id).catch(error => {
+            console.error('Background profile load failed:', error);
+            // Keep the minimal user data we already set
+          });
+        }
       }
 
+      // CRITICAL FIX: Unblock immediately instead of waiting for profile
       setLoading(false);
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change:', event);
+      // Only show loading for significant auth changes
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+        setLoading(true);
+      }
 
-      setLoading(true);
       clearError();
       setSession(session);
 
       try {
         if (session?.user) {
-          await loadUserProfile(session.user.id);
+          // OPTIMIZATION: Try cached profile first for instant loading
+          const cachedProfile = getCachedProfile(session.user.id);
+
+          if (cachedProfile) {
+            // Use cached profile immediately - instant loading!
+            setUser(cachedProfile);
+
+            // Refresh profile in background for accuracy
+            loadUserProfile(session.user.id).catch(error => {
+              console.error('Background profile refresh failed:', error);
+            });
+          } else {
+            // No cache available - set minimal user data immediately to unblock loading
+            setUser({
+              id: session.user.id,
+              email: session.user.email || '',
+              name: session.user.email?.split('@')[0] || 'User',
+              pronouns: undefined,
+              color_theme: 'light',
+              avatar_url: undefined,
+            });
+
+            // Load full profile in background (non-blocking)
+            loadUserProfile(session.user.id).catch(error => {
+              console.error('Background profile load failed:', error);
+            });
+          }
         } else {
-          // Clear user data on logout
+          // Clear user data and cache on logout
           setUser(null);
+          clearCachedProfile();
         }
       } catch (error) {
         console.error('Error in auth state change:', error);
         setError('Failed to load user data');
       } finally {
-        // Always set loading to false, even if profile loading fails
+        // CRITICAL FIX: Unblock immediately
         setLoading(false);
       }
     });
@@ -269,11 +374,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const supabase = createClient();
       await supabase.auth.signOut();
       setUser(null);
+      clearCachedProfile(); // Clear cached data on logout
     } catch (error) {
       console.error('Sign out error:', error);
       setError('Failed to sign out');
-      // Still clear user data even if sign out fails
+      // Still clear user data and cache even if sign out fails
       setUser(null);
+      clearCachedProfile();
     }
   }, []);
 

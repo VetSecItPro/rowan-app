@@ -14,18 +14,7 @@ import {
   Edit3,
   X
 } from 'lucide-react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from 'recharts';
+import { DynamicBarChart, DynamicPieChart } from '@/components/charts/DynamicCharts';
 import type { Project, ProjectLineItem } from '@/lib/services/project-tracking-service';
 
 interface BudgetVarianceCardProps {
@@ -262,22 +251,15 @@ export function BudgetVarianceCard({
               <h4 className="font-medium text-gray-900 dark:text-white mb-4">
                 Budget Comparison
               </h4>
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={budgetComparisonData}>
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis dataKey="name" className="text-xs" />
-                  <YAxis className="text-xs" />
-                  <Tooltip
-                    formatter={(value: number, name: string) => [
-                      `$${value.toLocaleString()}`,
-                      name === 'estimated' ? 'Budgeted' : name === 'actual' ? 'Spent' : 'Projected'
-                    ]}
-                  />
-                  <Bar dataKey="estimated" fill="#10b981" name="Budgeted" />
-                  <Bar dataKey="actual" fill="#f59e0b" name="Spent" />
-                  <Bar dataKey="projected" fill="#ef4444" name="Projected" />
-                </BarChart>
-              </ResponsiveContainer>
+              <DynamicBarChart
+                data={budgetComparisonData}
+                xDataKey="name"
+                yDataKey="actual"
+                barColor="#f59e0b"
+                height={200}
+                showGrid={true}
+                showLegend={true}
+              />
             </div>
 
             {/* Category Variances */}
@@ -286,25 +268,11 @@ export function BudgetVarianceCard({
                 <h4 className="font-medium text-gray-900 dark:text-white mb-4">
                   Over-Budget Categories
                 </h4>
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie
-                      data={categoryChartData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={(props: any) => `${props.name}: $${props.variance?.toLocaleString?.() || 0}`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="variance"
-                    >
-                      {categoryChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value: number) => `$${value.toLocaleString()}`} />
-                  </PieChart>
-                </ResponsiveContainer>
+                <DynamicPieChart
+                  data={categoryChartData.map(item => ({ name: item.name, value: item.variance, color: item.color }))}
+                  colors={categoryChartData.map(item => item.color)}
+                  height={200}
+                />
               </div>
             )}
           </div>

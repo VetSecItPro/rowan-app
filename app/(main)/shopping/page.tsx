@@ -15,13 +15,11 @@ import { TemplatePickerModal } from '@/components/shopping/TemplatePickerModal';
 import { ScheduleTripModal } from '@/components/shopping/ScheduleTripModal';
 import { FrequentItemsPanel } from '@/components/shopping/FrequentItemsPanel';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
-import GuidedShoppingCreation from '@/components/guided/GuidedShoppingCreation';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { shoppingService, ShoppingList, CreateListInput } from '@/lib/services/shopping-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { calendarService } from '@/lib/services/calendar-service';
 import { remindersService } from '@/lib/services/reminders-service';
-import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 
 export default function ShoppingPage() {
   const { currentSpace, user } = useAuthWithSpaces();
@@ -33,8 +31,6 @@ export default function ShoppingPage() {
   const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed'>('active');
   const [timeFilter, setTimeFilter] = useState<'all' | 'week'>('all');
-  const [showGuidedFlow, setShowGuidedFlow] = useState(false);
-  const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [listForTemplate, setListForTemplate] = useState<ShoppingList | null>(null);
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
@@ -100,28 +96,13 @@ export default function ShoppingPage() {
 
     try {
       setLoading(true);
-      const [listsData, statsData, userProgressResult] = await Promise.all([
+      const [listsData, statsData] = await Promise.all([
         shoppingService.getLists(currentSpace.id),
         shoppingService.getShoppingStats(currentSpace.id),
-        getUserProgress(user.id),
       ]);
       setLists(listsData);
       setStats(statsData);
 
-      // Check if user has completed the guided shopping flow
-      const userProgress = userProgressResult.success ? userProgressResult.data : null;
-      if (userProgress) {
-        setHasCompletedGuide(userProgress.first_shopping_item_added);
-      }
-
-      // Show guided flow if no lists exist, user hasn't completed the guide, AND user hasn't skipped it
-      if (
-        listsData.length === 0 &&
-        !userProgress?.first_shopping_item_added &&
-        !userProgress?.skipped_shopping_guide
-      ) {
-        setShowGuidedFlow(true);
-      }
     } catch (error) {
       console.error('Failed to load shopping lists:', error);
     } finally {
@@ -436,25 +417,6 @@ export default function ShoppingPage() {
     setStatusFilter(e.target.value as 'all' | 'active' | 'completed');
   }, []);
 
-  const handleGuidedFlowComplete = useCallback(() => {
-    setShowGuidedFlow(false);
-    setHasCompletedGuide(true);
-    loadLists(); // Reload to show newly created list
-  }, []);
-
-  const handleGuidedFlowSkip = useCallback(async () => {
-    setShowGuidedFlow(false);
-
-    // Mark the guide as skipped in user progress
-    if (user) {
-      try {
-        await markFlowSkipped(user.id, 'shopping_guide');
-      } catch (error) {
-        console.error('Failed to mark shopping guide as skipped:', error);
-      }
-    }
-  }, [user]);
-
   const handleSaveAsTemplate = useCallback((list: ShoppingList) => {
     // Prevent actions on optimistic lists (temp IDs)
     if (list.id.startsWith('temp-')) {
@@ -693,16 +655,7 @@ export default function ShoppingPage() {
             </button>
           </div>
 
-          {/* Guided Creation - MOVED TO TOP */}
-          {!loading && showGuidedFlow && (
-            <GuidedShoppingCreation
-              onComplete={handleGuidedFlowComplete}
-              onSkip={handleGuidedFlowSkip}
-            />
-          )}
-
-          {/* Stats Dashboard - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Stats Dashboard */}
           <div className="stats-grid-mobile gap-4 sm:gap-6">
             <button
               onClick={handleItemsThisWeekClick}
@@ -784,18 +737,16 @@ export default function ShoppingPage() {
               </div>
             </button>
           </div>
-          )}
 
-          {/* Frequent Items Panel - Only show when NOT in guided flow and when there are active lists */}
-          {!showGuidedFlow && currentSpace && lists.length > 0 && (
+          {/* Frequent Items Panel */}
+          {currentSpace && lists.length > 0 && (
             <FrequentItemsPanel
               spaceId={currentSpace.id}
               onAddItem={handleAddFrequentItem}
             />
           )}
 
-          {/* Apple-Inspired Search Bar - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Apple-Inspired Search Bar */}
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className={`apple-search-container shopping-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
               <Search className="apple-search-icon" />
@@ -824,10 +775,8 @@ export default function ShoppingPage() {
               )}
             </div>
           </div>
-          )}
 
-          {/* Shopping Lists - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Shopping Lists */}
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             {/* Header with Month Badge and Status Filter */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
@@ -914,15 +863,6 @@ export default function ShoppingPage() {
                       <Plus className="w-5 h-5" />
                       Create List
                     </button>
-                    {!hasCompletedGuide && (
-                      <button
-                        onClick={() => setShowGuidedFlow(true)}
-                        className="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
-                      >
-                        <ShoppingCart className="w-5 h-5" />
-                        Try Guided Creation
-                      </button>
-                    )}
                   </div>
                 )}
               </div>
@@ -945,7 +885,6 @@ export default function ShoppingPage() {
               </div>
             )}
           </div>
-          )}
         </div>
       </div>
       </PageErrorBoundary>
