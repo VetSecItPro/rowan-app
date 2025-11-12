@@ -12,12 +12,15 @@ import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
 import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import { DeleteSpaceModal } from '@/components/spaces/DeleteSpaceModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
-import { PasswordConfirmModal } from '@/components/settings/PasswordConfirmModal';
-import { AccountDeletionModal } from '@/components/settings/AccountDeletionModal';
-import { ExportDataModal } from '@/components/settings/ExportDataModal';
-import { TwoFactorAuth } from '@/components/settings/TwoFactorAuth';
+// Dynamic imports for optimized bundle splitting
+import {
+  PasswordConfirmModal,
+  AccountDeletionModal,
+  ExportDataModal,
+  TwoFactorAuth,
+  PrivacyDataManager,
+} from '@/components/ui/DynamicSettingsComponents';
 import { Toggle } from '@/components/ui/Toggle';
-import { PrivacyDataManager } from '@/components/settings/PrivacyDataManager';
 import { createClient } from '@/lib/supabase/client';
 import {
   Settings,

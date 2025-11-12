@@ -1,34 +1,37 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
+import { createContext, useContext, ReactNode, useEffect } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { queryClient } from '@/lib/react-query/query-client';
+import {
+  useAuth as useAuthQuery,
+  useSignOut,
+  useUpdateProfile,
+  useAuthStateChange,
+  type UserProfile
+} from '@/lib/hooks/useAuthQuery';
 import { createClient } from '@/lib/supabase/client';
-import type { User, Session } from '@supabase/supabase-js';
+import type { Session } from '@supabase/supabase-js';
 import type { Space } from '@/lib/types';
 
 /**
- * NEW AUTHENTICATION CONTEXT - PHASE 2
+ * NEW AUTHENTICATION CONTEXT - REACT QUERY VERSION
  *
- * Clean separation of concerns: Authentication ONLY
- * - Session management
- * - User profile loading
- * - Authentication methods
+ * Professional-grade auth management with React Query
+ * Features:
+ * - Automatic caching with stale-while-revalidate
+ * - Background refetching for fresh data
+ * - Optimistic updates for profile changes
+ * - Request deduplication built-in
+ * - Intelligent error handling with retries
  *
- * REMOVED from this context:
- * - Spaces management (moved to SpacesContext in Phase 3)
- * - currentSpace logic
- * - Space-related methods
- *
- * This resolves race conditions and zero-spaces handling issues.
+ * ELIMINATES:
+ * - Manual localStorage caching
+ * - Complex cache invalidation logic
+ * - Race conditions in data loading
+ * - Blocking authentication flows
  */
-
-interface UserProfile {
-  id: string;
-  email: string;
-  name: string;
-  pronouns?: string;
-  color_theme: string;
-  avatar_url?: string;
-}
 
 interface AuthContextType {
   // Core authentication state
@@ -53,252 +56,83 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+/**
+ * Inner AuthProvider that uses React Query hooks
+ * This component has access to the QueryClient context
+ */
+function InnerAuthProvider({ children }: { children: ReactNode }) {
+  const authQuery = useAuthQuery();
+  const signOutMutation = useSignOut();
+  const updateProfileMutation = useUpdateProfile();
+  const handleAuthStateChange = useAuthStateChange();
 
-  // Clear any previous errors when starting new operations
-  const clearError = () => setError(null);
-
-  // Load user profile data only (spaces moved to separate context)
-  const loadUserProfile = async (userId: string): Promise<void> => {
-    try {
-      clearError();
-      const supabase = createClient();
-
-      console.log('Loading user profile for:', userId);
-
-      // Add timeout to prevent hanging
-      const profilePromise = supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Profile loading timeout')), 10000)
-      );
-
-      const { data: profile, error: profileError } = await Promise.race([profilePromise, timeoutPromise]) as any;
-
-      console.log('Profile query completed, checking results...');
-
-      if (profileError) {
-        console.error('Profile loading error:', profileError);
-
-        // For missing profiles, create basic user info from session
-        if (profileError.code === 'PGRST116') {
-          console.log('Profile not found, creating basic user info');
-          const sessionData = await supabase.auth.getSession();
-          setUser({
-            id: userId,
-            email: sessionData.data.session?.user?.email || '',
-            name: sessionData.data.session?.user?.email?.split('@')[0] || 'User',
-            pronouns: undefined,
-            color_theme: 'light',
-            avatar_url: undefined,
-          });
-          console.log('Basic user info set from session');
-          return;
-        }
-
-        // For other errors, set error state but still try to set basic user info
-        console.log('Setting fallback user info due to profile error');
-        setError('Failed to load user profile');
-        setUser({
-          id: userId,
-          email: '',
-          name: 'User',
-          pronouns: undefined,
-          color_theme: 'light',
-          avatar_url: undefined,
-        });
-        console.log('Fallback user info set');
-        return;
-      }
-
-      if (profile) {
-        console.log('Successfully loaded user profile:', profile);
-        setUser({
-          id: profile.id,
-          email: profile.email || '',
-          name: profile.name || profile.email || 'User',
-          pronouns: profile.pronouns,
-          color_theme: profile.color_theme || 'light',
-          avatar_url: profile.avatar_url,
-        });
-        console.log('User profile set successfully');
-      } else {
-        console.log('No profile data returned, setting minimal user info');
-        setUser({
-          id: userId,
-          email: '',
-          name: 'User',
-          pronouns: undefined,
-          color_theme: 'light',
-          avatar_url: undefined,
-        });
-      }
-
-    } catch (error) {
-      console.error('User profile loading failed:', error);
-      setError('Failed to load user profile');
-
-      // Set minimal user data to prevent total failure
-      console.log('Setting minimal user data due to catch block');
-      setUser({
-        id: userId,
-        email: '',
-        name: 'User',
-        pronouns: undefined,
-        color_theme: 'light',
-        avatar_url: undefined,
-      });
-      console.log('Minimal user data set in catch block');
-    }
-
-    console.log('loadUserProfile function completed');
-  };
-
-  // Initialize authentication on mount
+  // Set up real-time auth state change listener
   useEffect(() => {
     const supabase = createClient();
 
-    // Get initial session
-    supabase.auth.getSession().then(async ({ data: { session }, error: sessionError }) => {
-      if (sessionError) {
-        console.error('Session retrieval error:', sessionError);
-        setError('Failed to retrieve session');
-        setLoading(false);
-        return;
-      }
-
-      setSession(session);
-
-      if (session?.user) {
-        await loadUserProfile(session.user.id);
-      }
-
-      setLoading(false);
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change:', event);
-
-      setLoading(true);
-      clearError();
-      setSession(session);
-
-      try {
-        if (session?.user) {
-          await loadUserProfile(session.user.id);
-        } else {
-          // Clear user data on logout
-          setUser(null);
-        }
-      } catch (error) {
-        console.error('Error in auth state change:', error);
-        setError('Failed to load user data');
-      } finally {
-        // Always set loading to false, even if profile loading fails
-        setLoading(false);
-      }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      handleAuthStateChange(event, session);
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [handleAuthStateChange]);
 
-  const signUp = useCallback(async (email: string, password: string, profile: any) => {
+  // Authentication methods
+  const signUp = async (email: string, password: string, profile: any) => {
     try {
-      clearError();
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const supabase = createClient();
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: profile,
         },
-        body: JSON.stringify({
-          email,
-          password,
-          profile,
-        }),
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        const errorMessage = data.error || data.details || 'Signup failed';
-        setError(errorMessage);
-        return { error: new Error(errorMessage) };
-      }
-
-      return { error: null };
+      return { error };
     } catch (error) {
-      const errorMessage = 'Signup failed';
-      setError(errorMessage);
       return { error: error as Error };
     }
-  }, []);
+  };
 
-  const signIn = useCallback(async (email: string, password: string) => {
+  const signIn = async (email: string, password: string) => {
     try {
-      clearError();
       const supabase = createClient();
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-
-      if (error) {
-        setError(error.message);
-      }
-
       return { error };
     } catch (error) {
-      const errorMessage = 'Sign in failed';
-      setError(errorMessage);
       return { error: error as Error };
     }
-  }, []);
+  };
 
-  const signOut = useCallback(async () => {
-    try {
-      clearError();
-      const supabase = createClient();
-      await supabase.auth.signOut();
-      setUser(null);
-    } catch (error) {
-      console.error('Sign out error:', error);
-      setError('Failed to sign out');
-      // Still clear user data even if sign out fails
-      setUser(null);
-    }
-  }, []);
+  const signOut = async () => {
+    await signOutMutation.mutateAsync();
+  };
 
-  const refreshProfile = useCallback(async () => {
-    if (session?.user) {
-      await loadUserProfile(session.user.id);
-    }
-  }, [session?.user]);
+  const refreshProfile = async () => {
+    authQuery.refetch();
+  };
 
-  // Backward compatibility methods (deprecated - will be removed in Phase 4)
-  const spaces: (Space & { role: string })[] = useMemo(() => [], []);
-  const currentSpace: (Space & { role: string }) | null = useMemo(() => null, []);
-  const switchSpace = useCallback((space: Space & { role: string }) => {
-    console.warn('switchSpace is deprecated - use SpacesContext instead');
-  }, []);
-  const refreshSpaces = useCallback(async () => {
-    console.warn('refreshSpaces is deprecated - use SpacesContext instead');
-  }, []);
+  // Backward compatibility stubs (will be removed once SpacesContext is fully implemented)
+  const spaces: (Space & { role: string })[] = [];
+  const currentSpace: (Space & { role: string }) | null = null;
+  const switchSpace = (_space: Space & { role: string }) => {
+    // No-op for backward compatibility
+  };
+  const refreshSpaces = async () => {
+    // No-op for backward compatibility
+  };
 
-  const value: AuthContextType = useMemo(() => ({
-    // Core authentication state
-    user,
-    session,
-    loading,
-    error,
+  const contextValue: AuthContextType = {
+    // Core state from React Query
+    user: authQuery.profile || null,
+    session: authQuery.session || null,
+    loading: authQuery.isLoading,
+    error: authQuery.error?.message || null,
 
     // Authentication methods
     signUp,
@@ -306,42 +140,96 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signOut,
     refreshProfile,
 
-    // Backward compatibility (deprecated)
+    // Backward compatibility
     spaces,
     currentSpace,
     switchSpace,
     refreshSpaces,
-  }), [
-    user,
-    session,
-    loading,
-    error,
-    signUp,
-    signIn,
-    signOut,
-    refreshProfile,
-    spaces,
-    currentSpace,
-    switchSpace,
-    refreshSpaces,
-  ]);
+  };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth() {
+/**
+ * Main AuthProvider that sets up QueryClient and DevTools
+ */
+export function AuthProvider({ children }: { children: ReactNode }) {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <InnerAuthProvider>
+        {children}
+      </InnerAuthProvider>
+      {/* React Query DevTools for development */}
+      {process.env.NODE_ENV === 'development' && (
+        <ReactQueryDevtools initialIsOpen={false} />
+      )}
+    </QueryClientProvider>
+  );
+}
+
+/**
+ * Hook to access auth context
+ *
+ * IMPORTANT: This hook now provides React Query-powered auth state
+ * All data is automatically cached, refreshed, and synchronized
+ */
+export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
+
   if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error('useAuth must be used within an AuthProvider');
   }
+
   return context;
 }
 
 /**
- * Type definitions for TypeScript support
+ * Convenience hook for profile updates
+ * Uses optimistic updates for instant UI feedback
  */
+export function useProfileUpdate() {
+  const updateProfileMutation = useUpdateProfile();
+
+  return {
+    updateProfile: updateProfileMutation.mutate,
+    isUpdating: updateProfileMutation.isPending,
+    error: updateProfileMutation.error,
+  };
+}
+
+// Export types for external use
 export type { UserProfile, AuthContextType };
+
+/**
+ * MIGRATION BENEFITS:
+ *
+ * 1. **Eliminates Manual Caching:**
+ *    - No more localStorage cache management
+ *    - No cache expiration logic
+ *    - No cache corruption handling
+ *
+ * 2. **Professional Data Management:**
+ *    - Automatic background refetching
+ *    - Stale-while-revalidate patterns
+ *    - Request deduplication
+ *    - Intelligent retry with exponential backoff
+ *
+ * 3. **Better Performance:**
+ *    - Non-blocking auth loading
+ *    - Optimistic updates for profile changes
+ *    - Smart cache invalidation
+ *
+ * 4. **Developer Experience:**
+ *    - React Query DevTools in development
+ *    - Better error handling
+ *    - TypeScript support throughout
+ *
+ * 5. **Reliability:**
+ *    - Eliminates race conditions
+ *    - Handles network errors gracefully
+ *    - Automatic cache synchronization
+ */
