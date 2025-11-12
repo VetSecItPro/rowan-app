@@ -7,6 +7,76 @@ import { useAuth } from './auth-context';
 import { featureFlags } from '@/lib/constants/feature-flags';
 import { personalWorkspaceService } from '@/lib/services/personal-workspace-service';
 
+// Cache utilities for localStorage
+const SPACES_CACHE_KEYS = {
+  USER_SPACES: 'rowan_user_spaces',
+  CURRENT_SPACE: 'rowan_current_space',
+  SPACES_TIMESTAMP: 'rowan_spaces_timestamp',
+} as const;
+
+const SPACES_CACHE_DURATION = 3 * 60 * 1000; // 3 minutes (shorter than auth cache)
+
+interface CachedSpacesData {
+  spaces: (Space & { role: string })[];
+  currentSpace: (Space & { role: string }) | null;
+  hasZeroSpaces: boolean;
+}
+
+const getCachedSpaces = (userId: string): CachedSpacesData | null => {
+  try {
+    const cached = localStorage.getItem(SPACES_CACHE_KEYS.USER_SPACES);
+    const currentSpaceCached = localStorage.getItem(SPACES_CACHE_KEYS.CURRENT_SPACE);
+    const timestamp = localStorage.getItem(SPACES_CACHE_KEYS.SPACES_TIMESTAMP);
+
+    if (!cached || !timestamp) return null;
+
+    const isExpired = Date.now() - parseInt(timestamp) > SPACES_CACHE_DURATION;
+    if (isExpired) {
+      clearCachedSpaces();
+      return null;
+    }
+
+    const spaces: (Space & { role: string })[] = JSON.parse(cached);
+    const currentSpace: (Space & { role: string }) | null = currentSpaceCached
+      ? JSON.parse(currentSpaceCached)
+      : null;
+
+    // Verify cached data belongs to current user (basic security)
+    if (spaces.length > 0 && !spaces.some(s => s.id)) return null;
+
+    return {
+      spaces,
+      currentSpace,
+      hasZeroSpaces: spaces.length === 0,
+    };
+  } catch (error) {
+    // Clear corrupted cache
+    clearCachedSpaces();
+    return null;
+  }
+};
+
+const setCachedSpaces = (data: CachedSpacesData): void => {
+  try {
+    localStorage.setItem(SPACES_CACHE_KEYS.USER_SPACES, JSON.stringify(data.spaces));
+    localStorage.setItem(SPACES_CACHE_KEYS.CURRENT_SPACE, JSON.stringify(data.currentSpace));
+    localStorage.setItem(SPACES_CACHE_KEYS.SPACES_TIMESTAMP, Date.now().toString());
+  } catch (error) {
+    // Silently fail if localStorage is full or unavailable
+    console.warn('Failed to cache spaces:', error);
+  }
+};
+
+const clearCachedSpaces = (): void => {
+  try {
+    localStorage.removeItem(SPACES_CACHE_KEYS.USER_SPACES);
+    localStorage.removeItem(SPACES_CACHE_KEYS.CURRENT_SPACE);
+    localStorage.removeItem(SPACES_CACHE_KEYS.SPACES_TIMESTAMP);
+  } catch (error) {
+    // Silently fail
+  }
+};
+
 /**
  * SPACES CONTEXT - PHASE 3
  *
@@ -55,7 +125,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
   // Clear any previous errors when starting new operations
   const clearError = () => setError(null);
 
-  // Load user spaces (only called when user is authenticated)
+  // OPTIMIZED: Load user spaces with caching and quick existence check
   const loadUserSpaces = async (userId: string): Promise<void> => {
     if (loading) return; // Prevent concurrent loads
 
@@ -63,9 +133,102 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
       clearError();
       setLoading(true);
 
-      console.log('Loading spaces for user:', userId);
+      // OPTIMIZATION 1: Try cached spaces first for instant loading
+      const cachedSpaces = getCachedSpaces(userId);
+      if (cachedSpaces) {
+        // Use cached spaces immediately - instant loading!
+        setSpaces(cachedSpaces.spaces);
+        setCurrentSpace(cachedSpaces.currentSpace);
+        setHasZeroSpaces(cachedSpaces.hasZeroSpaces);
+        setLoading(false);
 
+        // Refresh spaces in background for accuracy (non-blocking)
+        loadUserSpacesFromServer(userId).catch(error => {
+          console.error('Background spaces refresh failed:', error);
+        });
+        return;
+      }
+
+      // OPTIMIZATION 2: No cache available - load from server
+      await loadUserSpacesFromServer(userId);
+
+    } catch (error) {
+      console.error('Spaces loading failed:', error);
+      setError('Failed to load workspaces');
+      setSpaces([]);
+      setCurrentSpace(null);
+      setHasZeroSpaces(true);
+      setLoading(false);
+    }
+  };
+
+  // Server loading with quick existence check and optimizations
+  const loadUserSpacesFromServer = async (userId: string): Promise<void> => {
+    try {
       const supabase = createClient();
+
+      // OPTIMIZATION 3: Quick existence check first (fast COUNT query)
+      const { count: spacesCount, error: countError } = await supabase
+        .from('space_members')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId);
+
+      if (countError) {
+        throw countError;
+      }
+
+      // OPTIMIZATION 4: Handle zero spaces immediately (perfect solo experience)
+      if (spacesCount === 0) {
+        // FEATURE: Personal Workspaces - Auto-create if enabled
+        if (featureFlags.isPersonalWorkspacesEnabled()) {
+          try {
+            const personalSpace = await personalWorkspaceService.ensurePersonalSpace(
+              userId,
+              user?.name // Pass user name for workspace naming
+            );
+
+            if (personalSpace) {
+              // Treat personal space like a regular space
+              const personalSpaceWithRole = {
+                ...personalSpace,
+                role: 'owner' // Personal space owner
+              };
+
+              const spacesData = {
+                spaces: [personalSpaceWithRole],
+                currentSpace: personalSpaceWithRole,
+                hasZeroSpaces: false,
+              };
+
+              setSpaces(spacesData.spaces);
+              setCurrentSpace(spacesData.currentSpace);
+              setHasZeroSpaces(spacesData.hasZeroSpaces);
+              setCachedSpaces(spacesData); // Cache the result
+              setLoading(false);
+              return;
+            }
+          } catch (personalSpaceError) {
+            console.warn('Personal workspace creation failed:', personalSpaceError);
+            // Fall through to zero spaces scenario
+          }
+        }
+
+        // SOLO USER EXPERIENCE: No spaces, no problem!
+        const zeroSpacesData = {
+          spaces: [],
+          currentSpace: null,
+          hasZeroSpaces: true,
+        };
+
+        setSpaces(zeroSpacesData.spaces);
+        setCurrentSpace(zeroSpacesData.currentSpace);
+        setHasZeroSpaces(zeroSpacesData.hasZeroSpaces);
+        setCachedSpaces(zeroSpacesData); // Cache the zero-spaces state
+        setLoading(false);
+        return;
+      }
+
+      // OPTIMIZATION 5: Load full spaces data (only when spaces exist)
       const { data: spacesData, error: spacesError } = await supabase
         .from('space_members')
         .select(`
@@ -81,12 +244,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
         .order('joined_at', { ascending: false });
 
       if (spacesError) {
-        console.error('Spaces loading error:', spacesError);
-        setError('Failed to load workspaces');
-        setSpaces([]);
-        setCurrentSpace(null);
-        setHasZeroSpaces(true);
-        return;
+        throw spacesError;
       }
 
       if (spacesData && spacesData.length > 0) {
@@ -95,79 +253,55 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
           role: item.role,
         }));
 
-        console.log('Successfully loaded spaces:', userSpaces.length);
-        setSpaces(userSpaces);
-        setCurrentSpace(userSpaces[0]); // Select first space by default
-        setHasZeroSpaces(false);
-      } else {
-        console.log('No shared spaces found for user');
+        const fullSpacesData = {
+          spaces: userSpaces,
+          currentSpace: userSpaces[0], // Select first space by default
+          hasZeroSpaces: false,
+        };
 
-        // FEATURE: Personal Workspaces - Auto-create if enabled
-        if (featureFlags.isPersonalWorkspacesEnabled()) {
-          console.log('Personal workspaces enabled - attempting to get/create personal space');
-
-          try {
-            const personalSpace = await personalWorkspaceService.ensurePersonalSpace(
-              userId,
-              user?.name // Pass user name for workspace naming
-            );
-
-            if (personalSpace) {
-              // Treat personal space like a regular space
-              const personalSpaceWithRole = {
-                ...personalSpace,
-                role: 'owner' // Personal space owner
-              };
-
-              console.log('Personal space ready:', personalSpace.name);
-              setSpaces([personalSpaceWithRole]);
-              setCurrentSpace(personalSpaceWithRole);
-              setHasZeroSpaces(false);
-              return; // Exit early - personal workspace is active
-            }
-          } catch (personalSpaceError) {
-            console.warn('Personal workspace creation failed:', personalSpaceError);
-            // Fall through to zero spaces scenario
-          }
-        }
-
-        // FALLBACK: Original zero spaces logic (unchanged)
-        console.log('No workspaces available - zero spaces scenario');
-        setSpaces([]);
-        setCurrentSpace(null);
-        setHasZeroSpaces(true);
+        setSpaces(fullSpacesData.spaces);
+        setCurrentSpace(fullSpacesData.currentSpace);
+        setHasZeroSpaces(fullSpacesData.hasZeroSpaces);
+        setCachedSpaces(fullSpacesData); // Cache the successful result
       }
 
+      setLoading(false);
+
     } catch (error) {
-      console.error('Spaces loading failed:', error);
+      console.error('Server spaces loading failed:', error);
       setError('Failed to load workspaces');
-      setSpaces([]);
-      setCurrentSpace(null);
-      setHasZeroSpaces(true);
-    } finally {
+
+      // Set minimal fallback data
+      const fallbackData = {
+        spaces: [],
+        currentSpace: null,
+        hasZeroSpaces: true,
+      };
+
+      setSpaces(fallbackData.spaces);
+      setCurrentSpace(fallbackData.currentSpace);
+      setHasZeroSpaces(fallbackData.hasZeroSpaces);
       setLoading(false);
     }
   };
 
-  // Load spaces when user authentication completes
+  // PARALLEL LOADING: Load spaces in parallel with auth (not sequentially after)
   useEffect(() => {
-    if (authLoading) {
-      // Don't load spaces while auth is still loading
-      return;
-    }
-
-    if (user && session) {
-      // User is authenticated, load their spaces
+    // OPTIMIZATION 6: Start loading as soon as we have user ID (don't wait for full auth)
+    if (user?.id && session) {
+      // User ID available - start loading spaces immediately
       loadUserSpaces(user.id);
-    } else {
-      // No user, clear spaces state
+    } else if (!authLoading && !user) {
+      // Auth completed but no user - clear spaces state
       setSpaces([]);
       setCurrentSpace(null);
       setHasZeroSpaces(false);
       setLoading(false);
       clearError();
+      clearCachedSpaces(); // Clear cached spaces on logout
     }
-  }, [user, session, authLoading]);
+    // Note: Removed authLoading dependency to enable parallel loading
+  }, [user?.id, session]); // Only depend on user ID and session, not authLoading
 
   const switchSpace = useCallback((space: Space & { role: string }) => {
     if (!space || !spaces.find(s => s.id === space.id)) {
@@ -175,15 +309,26 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    console.log('Switching to space:', space.name);
     setCurrentSpace(space);
-  }, [spaces]);
+
+    // OPTIMIZATION 7: Update cache with new current space
+    if (user?.id) {
+      const updatedCacheData = {
+        spaces,
+        currentSpace: space,
+        hasZeroSpaces: false,
+      };
+      setCachedSpaces(updatedCacheData);
+    }
+  }, [spaces, user?.id]);
 
   const refreshSpaces = useCallback(async () => {
-    if (user) {
-      await loadUserSpaces(user.id);
+    if (user?.id) {
+      // OPTIMIZATION 8: Clear cache to force fresh data load
+      clearCachedSpaces();
+      await loadUserSpacesFromServer(user.id);
     }
-  }, [user]);
+  }, [user?.id]);
 
   const createSpace = useCallback(async (name: string): Promise<{ success: boolean; spaceId?: string; error?: string }> => {
     if (!user) {
@@ -205,8 +350,9 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
         throw new Error(result.error || 'Failed to create workspace');
       }
 
-      // Refresh spaces after successful creation
-      await loadUserSpaces(user.id);
+      // OPTIMIZATION 9: Clear cache and refresh spaces after successful creation
+      clearCachedSpaces();
+      await loadUserSpacesFromServer(user.id);
 
       return {
         success: true,
@@ -238,8 +384,9 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
         throw new Error(result.error || 'Failed to delete workspace');
       }
 
-      // Refresh spaces after successful deletion
-      await loadUserSpaces(user.id);
+      // OPTIMIZATION 10: Clear cache and refresh spaces after successful deletion
+      clearCachedSpaces();
+      await loadUserSpacesFromServer(user.id);
 
       return { success: true };
 
