@@ -26,6 +26,7 @@ import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
 import { useCalendarShortcuts } from '@/lib/hooks/useCalendarShortcuts';
 import { useCalendarGestures } from '@/lib/hooks/useCalendarGestures';
+import { CalendarDaySkeleton } from '@/components/ui/Skeleton';
 import { calendarService, CalendarEvent, CreateEventInput } from '@/lib/services/calendar-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, parseISO, addDays, addWeeks, subWeeks } from 'date-fns';
@@ -887,9 +888,23 @@ export default function CalendarPage() {
               {/* Main Calendar Content */}
               <div ref={calendarContentRef} className="flex-1 min-w-0 min-h-[600px] touch-pan-y">
               {loading ? (
-                <div className="text-center py-12">
-                  <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-                  <p className="mt-4 text-gray-600 dark:text-gray-400">Loading events...</p>
+                <div>
+                  <div className="flex items-center justify-center mb-6">
+                    <h3 className="text-lg font-semibold text-gray-400">Loading calendar...</h3>
+                  </div>
+                  <div className="grid grid-cols-7 gap-2">
+                    {/* Day headers skeleton */}
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                      <div key={day} className="text-center text-sm font-medium text-gray-400 py-2">
+                        {day}
+                      </div>
+                    ))}
+
+                    {/* Calendar day skeletons - showing 5 weeks worth */}
+                    {Array.from({ length: 35 }, (_, index) => (
+                      <CalendarDaySkeleton key={index} />
+                    ))}
+                  </div>
                 </div>
               ) : viewMode === 'month' ? (
                 /* Calendar View */

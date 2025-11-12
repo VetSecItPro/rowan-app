@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Camera, Upload, X, Check, FileText, DollarSign, Calendar, Store } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/lib/contexts/auth-context';
 import { receiptScanningService, ExtractedReceiptData, ExpenseSuggestion } from '@/lib/services/receipt-scanning-service';
 import { cn } from '@/lib/utils';
 

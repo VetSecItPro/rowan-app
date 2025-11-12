@@ -24,7 +24,7 @@ import {
   ArrowDownRight,
   Link as LinkIcon
 } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/lib/contexts/auth-context';
 import {
   BudgetProgress,
   SavingsGoalProgress,

@@ -40,7 +40,7 @@ import {
   Share2,
   Sparkles
 } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/lib/contexts/auth-context';
 import { YearInReviewData } from '@/lib/services/year-in-review-service';
 import { cn } from '@/lib/utils';
 
