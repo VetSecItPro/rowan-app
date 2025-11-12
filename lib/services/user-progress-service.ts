@@ -67,7 +67,7 @@ export async function createUserProgress(
 }
 
 /**
- * Update user progress (mark guided flows as complete)
+ * Update user progress
  * @param userId - User UUID
  * @param updates - Fields to update
  * @returns Updated user progress record
@@ -149,109 +149,3 @@ export async function getOrCreateUserProgress(
   }
 }
 
-/**
- * Mark a specific guided flow as completed
- * @param userId - User UUID
- * @param flowType - Type of guided flow completed
- * @returns Updated user progress
- */
-export async function markFlowComplete(
-  userId: string,
-  flowType:
-    | 'first_task_created'
-    | 'first_event_created'
-    | 'first_reminder_created'
-    | 'first_message_sent'
-    | 'first_shopping_item_added'
-    | 'first_meal_planned'
-    | 'first_household_task_created'
-    | 'first_goal_set'
-): Promise<{
-  success: boolean;
-  data?: UserProgress;
-  error?: string;
-}> {
-  return updateUserProgress(userId, { [flowType]: true });
-}
-
-/**
- * Mark a specific guided flow as skipped
- * @param userId - User UUID
- * @param flowType - Type of guided flow skipped
- * @returns Updated user progress
- */
-export async function markFlowSkipped(
-  userId: string,
-  flowType:
-    | 'task_guide'
-    | 'event_guide'
-    | 'reminder_guide'
-    | 'message_guide'
-    | 'shopping_guide'
-    | 'meal_guide'
-    | 'household_guide'
-    | 'goal_guide'
-): Promise<{
-  success: boolean;
-  data?: UserProgress;
-  error?: string;
-}> {
-  const skipFieldMap: Record<typeof flowType, keyof UpdateUserProgressInput> = {
-    'task_guide': 'skipped_task_guide',
-    'event_guide': 'skipped_event_guide',
-    'reminder_guide': 'skipped_reminder_guide',
-    'message_guide': 'skipped_message_guide',
-    'shopping_guide': 'skipped_shopping_guide',
-    'meal_guide': 'skipped_meal_guide',
-    'household_guide': 'skipped_household_guide',
-    'goal_guide': 'skipped_goal_guide',
-  };
-
-  const fieldToUpdate = skipFieldMap[flowType];
-  return updateUserProgress(userId, { [fieldToUpdate]: true });
-}
-
-/**
- * Check if all onboarding flows are complete
- * @param userId - User UUID
- * @returns Whether onboarding is complete
- */
-export async function checkOnboardingComplete(userId: string): Promise<{
-  success: boolean;
-  isComplete: boolean;
-  error?: string;
-}> {
-  try {
-    const progressResult = await getUserProgress(userId);
-
-    if (!progressResult.success || !progressResult.data) {
-      return { success: true, isComplete: false };
-    }
-
-    const progress = progressResult.data;
-
-    // Onboarding is complete if user has created at least one item in 3+ features
-    const completedFlows = [
-      progress.first_task_created,
-      progress.first_event_created,
-      progress.first_reminder_created,
-      progress.first_message_sent,
-      progress.first_shopping_item_added,
-      progress.first_meal_planned,
-      progress.first_household_task_created,
-      progress.first_goal_set,
-    ].filter(Boolean).length;
-
-    const isComplete = completedFlows >= 3;
-
-    // Update onboarding_completed if threshold met
-    if (isComplete && !progress.onboarding_completed) {
-      await updateUserProgress(userId, { onboarding_completed: true });
-    }
-
-    return { success: true, isComplete };
-  } catch (error) {
-    console.error('[userProgressService] checkOnboardingComplete error:', error);
-    return { success: false, isComplete: false, error: 'Failed to check onboarding status' };
-  }
-}

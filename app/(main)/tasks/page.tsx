@@ -12,14 +12,12 @@ import { TaskCard } from '@/components/tasks/TaskCard';
 import { DraggableItemList } from '@/components/tasks/DraggableItemList';
 import { UnifiedItemModal } from '@/components/shared/UnifiedItemModal';
 import { UnifiedDetailsModal } from '@/components/shared/UnifiedDetailsModal';
-import GuidedTaskCreation from '@/components/guided/GuidedTaskCreation';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { tasksService } from '@/lib/services/tasks-service';
 import { choresService, CreateChoreInput } from '@/lib/services/chores-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { Task, Chore } from '@/lib/types';
 import type { CreateTaskInput, UpdateTaskInput } from '@/lib/validations/task-schemas';
-import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { useTaskRealtime } from '@/hooks/useTaskRealtime';
 import { useChoreRealtime } from '@/hooks/useChoreRealtime';
 import { TaskFilterPanel, TaskFilters } from '@/components/tasks/TaskFilterPanel';
@@ -55,8 +53,6 @@ export default function TasksPage() {
   const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   // Removed activeTab state - now showing all items together
-  const [showGuidedFlow, setShowGuidedFlow] = useState(false);
-  const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, any>>({});
 
   // Unified modal state (replacing separate task/chore modals)
@@ -253,24 +249,6 @@ export default function TasksPage() {
       );
       setLinkedShoppingLists(linkedListsMap);
 
-      // Try to fetch user progress (non-blocking)
-      try {
-        const userProgressResult = await getUserProgress(user.id);
-        if (userProgressResult.success && userProgressResult.data) {
-          setHasCompletedGuide(userProgressResult.data.first_task_created);
-
-          // Show guided flow if no tasks exist, user hasn't completed the guide, AND user hasn't skipped it
-          if (
-            tasksData.length === 0 &&
-            chores.length === 0 &&
-            !userProgressResult.data.first_task_created &&
-            !userProgressResult.data.skipped_task_guide
-          ) {
-            setShowGuidedFlow(true);
-          }
-        }
-      } catch (progressError) {
-      }
     } catch (error) {
       console.error('Failed to load data:', error);
     } finally {
@@ -604,24 +582,6 @@ export default function TasksPage() {
     setIsUnifiedModalOpen(true);
   }, []);
 
-  const handleGuidedFlowComplete = useCallback(() => {
-    setShowGuidedFlow(false);
-    setHasCompletedGuide(true);
-    loadData(); // Reload to show the newly created task
-  }, [loadData]);
-
-  const handleGuidedFlowSkip = useCallback(async () => {
-    setShowGuidedFlow(false);
-
-    // Mark the guide as skipped in user progress
-    if (user) {
-      try {
-        await markFlowSkipped(user.id, 'task_guide');
-      } catch (error) {
-        console.error('Failed to mark task guide as skipped:', error);
-      }
-    }
-  }, [user]);
 
   // Advanced feature handlers
   const handleQuickAction = useCallback((action: string) => {
@@ -687,16 +647,8 @@ export default function TasksPage() {
             </div>
           </div>
 
-          {/* Guided Creation - MOVED TO TOP */}
-          {!loading && showGuidedFlow && (
-            <GuidedTaskCreation
-              onComplete={handleGuidedFlowComplete}
-              onSkip={handleGuidedFlowSkip}
-            />
-          )}
 
-          {/* Stats Dashboard - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Stats Dashboard */}
           <div className="stats-grid-mobile gap-4 sm:gap-6">
             {/* Pending */}
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
@@ -781,10 +733,7 @@ export default function TasksPage() {
               </div>
             </div>
           </div>
-          )}
-
           {/* Search Bar - Full Width (spans same width as stats cards above) */}
-          {!showGuidedFlow && (
           <div className="w-full">
             <div className={`apple-search-container tasks-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
               <Search className="apple-search-icon" />
@@ -809,10 +758,7 @@ export default function TasksPage() {
               )}
             </div>
           </div>
-          )}
-
-          {/* Tasks List - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Tasks List */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Filters Sidebar - Only show when filters are enabled */}
             {showFilters && currentSpace && (
@@ -883,15 +829,6 @@ export default function TasksPage() {
                           <Plus className="w-5 h-5" />
                           Create Task or Chore
                         </button>
-                        {!hasCompletedGuide && (
-                          <button
-                            onClick={() => setShowGuidedFlow(true)}
-                            className="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
-                          >
-                            <CheckSquare className="w-5 h-5" />
-                            Try Guided Creation
-                          </button>
-                        )}
                       </div>
                     )}
                   </div>
@@ -980,7 +917,6 @@ export default function TasksPage() {
               </div>
             </div>
           </div>
-          )}
         </div>
       </div>
       </PageErrorBoundary>

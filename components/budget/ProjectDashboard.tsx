@@ -17,19 +17,7 @@ import {
   Plus
 } from 'lucide-react';
 import { format, parseISO, isAfter } from 'date-fns';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
+import { DynamicPieChart, DynamicBarChart } from '@/components/charts/DynamicCharts';
 import type { Project, ProjectLineItem } from '@/lib/services/project-tracking-service';
 
 interface ProjectDashboardProps {
@@ -223,33 +211,15 @@ export function ProjectDashboard({
           </div>
 
           {costBreakdown.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={categoryData}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis
-                  dataKey="name"
-                  className="text-xs"
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                />
-                <YAxis className="text-xs" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                  }}
-                  formatter={(value: number, name: string) => [
-                    `$${value.toLocaleString()}`,
-                    name === 'estimated' ? 'Estimated' : 'Actual'
-                  ]}
-                />
-                <Legend />
-                <Bar dataKey="estimated" fill="#f59e0b" name="Estimated" />
-                <Bar dataKey="actual" fill="#10b981" name="Actual" />
-              </BarChart>
-            </ResponsiveContainer>
+            <DynamicBarChart
+              data={categoryData}
+              xDataKey="name"
+              yDataKey="estimated"
+              barColor="#f59e0b"
+              height={300}
+              showGrid={true}
+              showLegend={true}
+            />
           ) : (
             <div className="text-center py-12">
               <BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -270,28 +240,11 @@ export function ProjectDashboard({
           </div>
 
           {lineItems.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={statusData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={(props: any) => {
-                    const { name, value, percent } = props;
-                    return `${name}: ${value} (${(percent * 100).toFixed(0)}%)`;
-                  }}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {statusData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            <DynamicPieChart
+              data={statusData}
+              colors={statusData.map(item => item.color)}
+              height={300}
+            />
           ) : (
             <div className="text-center py-12">
               <CheckCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />

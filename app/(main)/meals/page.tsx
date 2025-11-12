@@ -18,10 +18,8 @@ import { IngredientReviewModal } from '@/components/meals/IngredientReviewModal'
 import { GenerateListModal } from '@/components/meals/GenerateListModal';
 import { WeekCalendarView } from '@/components/meals/WeekCalendarView';
 import { TwoWeekCalendarView } from '@/components/meals/TwoWeekCalendarView';
-import GuidedMealCreation from '@/components/guided/GuidedMealCreation';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { mealsService, Meal, CreateMealInput, Recipe, CreateRecipeInput } from '@/lib/services/meals-service';
-import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { shoppingService } from '@/lib/services/shopping-service';
 import { createClient } from '@/lib/supabase/client';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth } from 'date-fns';
@@ -166,8 +164,6 @@ export default function MealsPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
-  const [showGuidedFlow, setShowGuidedFlow] = useState(false);
-  const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [recipeModalInitialTab, setRecipeModalInitialTab] = useState<'manual' | 'ai' | 'discover'>('manual');
   const [showPastMeals, setShowPastMeals] = useState(false);
 
@@ -274,28 +270,13 @@ export default function MealsPage() {
 
     try {
       setLoading(true);
-      const [mealsData, statsData, userProgressResult] = await Promise.all([
+      const [mealsData, statsData] = await Promise.all([
         mealsService.getMeals(currentSpace.id),
         mealsService.getMealStats(currentSpace.id),
-        getUserProgress(user.id),
       ]);
       setMeals(mealsData);
       setStats(statsData);
 
-      // Check if user has completed the guided meal flow
-      const userProgress = userProgressResult.success ? userProgressResult.data : null;
-      if (userProgress) {
-        setHasCompletedGuide(userProgress.first_meal_planned);
-      }
-
-      // Show guided flow if no meals exist, user hasn't completed the guide, AND user hasn't skipped it
-      if (
-        mealsData.length === 0 &&
-        !userProgress?.first_meal_planned &&
-        !userProgress?.skipped_meal_guide
-      ) {
-        setShowGuidedFlow(true);
-      }
     } catch (error) {
       console.error('Failed to load meals:', error);
     } finally {
@@ -714,25 +695,6 @@ export default function MealsPage() {
     setIsModalOpen(true);
   }, []);
 
-  const handleGuidedFlowComplete = useCallback(() => {
-    setShowGuidedFlow(false);
-    setHasCompletedGuide(true);
-    loadMeals(); // Reload to show newly created meal
-  }, [loadMeals]);
-
-  const handleGuidedFlowSkip = useCallback(async () => {
-    setShowGuidedFlow(false);
-
-    // Mark the guide as skipped in user progress
-    if (user) {
-      try {
-        await markFlowSkipped(user.id, 'meal_guide');
-      } catch (error) {
-        console.error('Failed to mark meal guide as skipped:', error);
-      }
-    }
-  }, [user]);
-
   // Handle ingredient selection confirmation from modal
   // Bulk operations handlers
   const handleBulkDelete = useCallback(async (mealIds: string[]) => {
@@ -822,7 +784,7 @@ export default function MealsPage() {
       },
       description: 'Close modals'
     }
-  ], !showGuidedFlow); // Disable shortcuts during guided flow
+  ]);
 
   const handleIngredientConfirm = useCallback(async (selectedIngredients: string[]) => {
     if (!pendingMealData || !selectedRecipeForReview || !currentSpace) return;
@@ -961,16 +923,7 @@ export default function MealsPage() {
             </div>
           </div>
 
-          {/* Guided Creation - MOVED TO TOP */}
-          {!loading && showGuidedFlow && (
-            <GuidedMealCreation
-              onComplete={handleGuidedFlowComplete}
-              onSkip={handleGuidedFlowSkip}
-            />
-          )}
-
-          {/* Stats Dashboard - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Stats Dashboard */}
           <div className="stats-grid-mobile gap-4 sm:gap-6">
             {/* This Week Card */}
             <button
@@ -1052,10 +1005,8 @@ export default function MealsPage() {
               </div>
             </Link>
           </div>
-          )}
 
-          {/* Search Bar - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Search Bar */}
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="apple-search-container meals-search">
               <Search className="apple-search-icon" />
@@ -1081,10 +1032,8 @@ export default function MealsPage() {
               )}
             </div>
           </div>
-          )}
 
-          {/* Meals/Recipes Section - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Meals/Recipes Section */}
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             {viewMode !== 'calendar' && (
               <div className="flex items-center justify-between mb-6">
@@ -1344,15 +1293,6 @@ export default function MealsPage() {
                         >
                           Plan Your First Meal
                         </CTAButton>
-                        {!hasCompletedGuide && (
-                          <button
-                            onClick={() => setShowGuidedFlow(true)}
-                            className="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all inline-flex items-center gap-2"
-                          >
-                            <UtensilsCrossed className="w-5 h-5" />
-                            Try Guided Creation
-                          </button>
-                        )}
                       </div>
                     </>
                   )}
@@ -1376,7 +1316,6 @@ export default function MealsPage() {
             )}
             </div>
           </div>
-          )}
         </div>
       </div>
       {/* Modals - render even when currentSpace is temporarily null */}

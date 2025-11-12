@@ -55,12 +55,6 @@ const HabitTracker = dynamicImport(() => import('@/components/goals/HabitTracker
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { GoalCardSkeleton, MilestoneCardSkeleton, StatsCardSkeleton } from '@/components/ui/Skeleton';
-// Dynamic imports for additional heavy components
-const GuidedGoalCreation = dynamicImport(() => import('@/components/guided/GuidedGoalCreation'), {
-  ssr: false,
-  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
-});
-
 
 const BadgesWidget = dynamicImport(() => import('@/components/goals/badges/BadgesWidget'), {
   loading: () => <div className="p-4 flex items-center justify-center"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div></div>
@@ -68,7 +62,6 @@ const BadgesWidget = dynamicImport(() => import('@/components/goals/badges/Badge
 
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput, GoalTemplate, CreateCheckInInput } from '@/lib/services/goals-service';
-import { getUserProgress, markFlowSkipped } from '@/lib/services/user-progress-service';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import { usePresence } from '@/lib/hooks/usePresence';
@@ -101,8 +94,6 @@ export default function GoalsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
-  const [showGuidedFlow, setShowGuidedFlow] = useState(false);
-  const [hasCompletedGuide, setHasCompletedGuide] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; action: 'delete-goal' | 'delete-milestone'; id: string }>({ isOpen: false, action: 'delete-goal', id: '' });
 
@@ -287,29 +278,14 @@ export default function GoalsPage() {
 
     try {
       setLoading(true);
-      const [goalsData, milestonesData, userProgressResult] = await Promise.all([
+      const [goalsData, milestonesData] = await Promise.all([
         goalsService.getGoals(currentSpace.id),
         goalsService.getAllMilestones(currentSpace.id),
-        getUserProgress(user.id),
       ]);
 
       setGoals(goalsData);
       setMilestones(milestonesData);
 
-      // Check if user has completed the guided goal flow
-      const userProgress = userProgressResult.success ? userProgressResult.data : null;
-      if (userProgress) {
-        setHasCompletedGuide(userProgress.first_goal_set);
-      }
-
-      // Show guided flow if no goals exist, user hasn't completed the guide, AND user hasn't skipped it
-      if (
-        goalsData.length === 0 &&
-        !userProgress?.first_goal_set &&
-        !userProgress?.skipped_goal_guide
-      ) {
-        setShowGuidedFlow(true);
-      }
     } catch (error) {
       console.error('Failed to load data:', error);
     } finally {
@@ -595,25 +571,6 @@ export default function GoalsPage() {
     setIsGoalModalOpen(true);
   }, []);
 
-  const handleGuidedFlowComplete = useCallback(() => {
-    setShowGuidedFlow(false);
-    setHasCompletedGuide(true);
-    loadData(); // Reload to show newly created goal
-  }, [loadData]);
-
-  const handleGuidedFlowSkip = useCallback(async () => {
-    setShowGuidedFlow(false);
-
-    // Mark the guide as skipped in user progress
-    if (user) {
-      try {
-        await markFlowSkipped(user.id, 'goal_guide');
-      } catch (error) {
-        console.error('Failed to mark goal guide as skipped:', error);
-      }
-    }
-  }, [user]);
-
   const handleReorderGoals = useCallback(async (goalIds: string[]) => {
     if (!currentSpace) return;
 
@@ -673,7 +630,7 @@ export default function GoalsPage() {
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
       <PageErrorBoundary>
-        <PullToRefresh onRefresh={loadData} disabled={loading || showGuidedFlow}>
+        <PullToRefresh onRefresh={loadData} disabled={loading}>
           <div className="p-4 sm:p-8">
           <div className="max-w-7xl mx-auto space-y-8">
             {/* Header */}
@@ -756,16 +713,7 @@ export default function GoalsPage() {
             </div>
           </div>
 
-          {/* Guided Creation - MOVED TO TOP */}
-          {!loading && showGuidedFlow && (
-            <GuidedGoalCreation
-              onComplete={handleGuidedFlowComplete}
-              onSkip={handleGuidedFlowSkip}
-            />
-          )}
-
-          {/* Stats Dashboard - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Stats Dashboard */}
           <div className="stats-grid-mobile gap-4 sm:gap-6">
             {loading ? (
               <>
@@ -862,10 +810,8 @@ export default function GoalsPage() {
             </>
             )}
           </div>
-          )}
 
-          {/* Search Bar - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Search Bar */}
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className={`apple-search-container goals-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
               <Search className="apple-search-icon" />
@@ -892,10 +838,8 @@ export default function GoalsPage() {
               )}
             </div>
           </div>
-          )}
 
-          {/* Goals/Milestones List - Only show when NOT in guided flow */}
-          {!showGuidedFlow && (
+          {/* Goals/Milestones List */}
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
             {/* Header with Month Badge and Status Filter - Hide for habits since it has custom header */}
             {viewMode !== 'habits' && (
@@ -990,15 +934,6 @@ export default function GoalsPage() {
                         <Plus className="w-5 h-5" />
                         Create Goal
                       </button>
-                      {!hasCompletedGuide && (
-                        <button
-                          onClick={() => setShowGuidedFlow(true)}
-                          className="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all inline-flex items-center gap-2"
-                        >
-                          <Target className="w-5 h-5" />
-                          Try Guided Creation
-                        </button>
-                      )}
                     </div>
                   )}
                 </div>
@@ -1077,7 +1012,6 @@ export default function GoalsPage() {
               </div>
             )}
           </div>
-          )}
         </div>
       </div>
       </PullToRefresh>
