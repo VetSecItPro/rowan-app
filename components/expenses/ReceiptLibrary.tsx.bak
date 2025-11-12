@@ -23,7 +23,7 @@ import {
   List,
   ExternalLink
 } from 'lucide-react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuth } from '@/hooks/useAuth';
 import { receiptScanningService, ReceiptData, ExtractedReceiptData } from '@/lib/services/receipt-scanning-service';
 import { cn } from '@/lib/utils';
 
