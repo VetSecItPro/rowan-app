@@ -7,6 +7,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS, QUERY_OPTIONS } from '@/lib/react-query/query-client';
+import { deduplicatedRequests } from '@/lib/react-query/request-deduplication';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
@@ -147,18 +148,21 @@ export function useUpdateProfile() {
       if (authError) throw authError;
       if (!user) throw new Error('No authenticated user');
 
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', user.id)
-        .select()
-        .single();
+      // Use request deduplication for rapid profile updates
+      return deduplicatedRequests.updateProfile(user.id, async () => {
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .update({
+            ...updates,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', user.id)
+          .select()
+          .single();
 
-      if (error) throw error;
-      return data;
+        if (error) throw error;
+        return data;
+      });
     },
     // Optimistic update
     onMutate: async (updates) => {

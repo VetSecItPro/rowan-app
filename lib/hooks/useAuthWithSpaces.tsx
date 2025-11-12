@@ -1,7 +1,7 @@
 'use client';
 
-import { useAuthContext } from '@/lib/contexts/auth-context';
-import { useSpacesContext } from '@/lib/contexts/spaces-context';
+import { useAuth } from '@/lib/contexts/auth-context';
+import { useSpaces } from '@/lib/contexts/spaces-context';
 import { useMemo } from 'react';
 
 /**
@@ -63,8 +63,8 @@ export interface AuthWithSpacesState {
  * Main integration hook - combines auth and spaces contexts
  */
 export function useAuthWithSpaces(): AuthWithSpacesState {
-  const auth = useAuthContext();
-  const spaces = useSpacesContext();
+  const auth = useAuth();
+  const spaces = useSpaces();
 
   const state = useMemo(() => {
     // Authentication state

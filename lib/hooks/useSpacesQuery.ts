@@ -7,6 +7,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS, QUERY_OPTIONS } from '@/lib/react-query/query-client';
+import { deduplicatedRequests } from '@/lib/react-query/request-deduplication';
 import { supabase } from '@/lib/supabase';
 
 /**
@@ -221,10 +222,16 @@ export function useSpaces(userId: string | undefined) {
     error: spacesQuery.error || currentSpaceQuery.error,
     isError: spacesQuery.isError || currentSpaceQuery.isError,
 
-    // Actions
+    // Actions with request deduplication
     refetch: () => {
-      spacesQuery.refetch();
-      currentSpaceQuery.refetch();
+      if (userId) {
+        // Use coordinated refresh to prevent duplicate requests
+        deduplicatedRequests.refreshSpaceData(userId);
+      } else {
+        // Fallback for cases without userId
+        spacesQuery.refetch();
+        currentSpaceQuery.refetch();
+      }
     },
   };
 }
@@ -239,9 +246,12 @@ export function useSwitchSpace() {
 
   return useMutation({
     mutationFn: async ({ space, userId }: { space: Space; userId: string }) => {
-      // Save to localStorage for persistence
-      localStorage.setItem(`currentSpace_${userId}`, space.id);
-      return space;
+      // Use request deduplication for rapid space switching
+      return deduplicatedRequests.switchSpace(userId, space.id, async () => {
+        // Save to localStorage for persistence
+        localStorage.setItem(`currentSpace_${userId}`, space.id);
+        return space;
+      });
     },
     // Optimistic update
     onMutate: async ({ space, userId }) => {
@@ -320,24 +330,77 @@ export function useCreateSpace() {
         role: 'owner' as const,
       } as Space;
     },
-    // Invalidate cache on success
-    onSuccess: (newSpace, { userId }) => {
-      // Invalidate user spaces to refetch with new space
-      queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.spaces.all(userId),
-      });
+    // OPTIMISTIC UPDATE: Show new space immediately
+    onMutate: async ({ name, description, type, userId }) => {
+      const spacesQueryKey = QUERY_KEYS.spaces.all(userId);
+      const currentSpaceQueryKey = QUERY_KEYS.spaces.current(userId);
 
-      // Set as current space if it's the user's first space
-      const existingSpaces = queryClient.getQueryData<Space[]>(
-        QUERY_KEYS.spaces.all(userId)
-      );
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: spacesQueryKey });
 
-      if (!existingSpaces || existingSpaces.length <= 1) {
-        queryClient.setQueryData(
-          QUERY_KEYS.spaces.current(userId),
-          newSpace
+      // Snapshot previous values
+      const previousSpaces = queryClient.getQueryData<Space[]>(spacesQueryKey);
+      const previousCurrentSpace = queryClient.getQueryData<Space>(currentSpaceQueryKey);
+
+      // Create optimistic space object
+      const optimisticSpace: Space = {
+        id: `temp_${Date.now()}`, // Temporary ID until server responds
+        name,
+        description,
+        type,
+        role: 'owner',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        settings: {},
+      };
+
+      // Optimistically add to spaces list
+      const newSpaces = previousSpaces ? [...previousSpaces, optimisticSpace] : [optimisticSpace];
+      queryClient.setQueryData(spacesQueryKey, newSpaces);
+
+      // If user has no spaces, set as current space optimistically
+      if (!previousSpaces || previousSpaces.length === 0) {
+        queryClient.setQueryData(currentSpaceQueryKey, optimisticSpace);
+        localStorage.setItem(`currentSpace_${userId}`, optimisticSpace.id);
+      }
+
+      return { previousSpaces, previousCurrentSpace, optimisticSpace };
+    },
+    // Update with real data on success
+    onSuccess: (newSpace, { userId }, context) => {
+      const spacesQueryKey = QUERY_KEYS.spaces.all(userId);
+      const currentSpaceQueryKey = QUERY_KEYS.spaces.current(userId);
+
+      // Replace optimistic space with real space data
+      const spaces = queryClient.getQueryData<Space[]>(spacesQueryKey);
+      if (spaces && context?.optimisticSpace) {
+        const updatedSpaces = spaces.map(space =>
+          space.id === context.optimisticSpace.id ? newSpace : space
         );
+        queryClient.setQueryData(spacesQueryKey, updatedSpaces);
+      }
+
+      // Update current space with real ID if it was set optimistically
+      const currentSpace = queryClient.getQueryData<Space>(currentSpaceQueryKey);
+      if (currentSpace?.id === context?.optimisticSpace.id) {
+        queryClient.setQueryData(currentSpaceQueryKey, newSpace);
         localStorage.setItem(`currentSpace_${userId}`, newSpace.id);
+      }
+
+      // Invalidate to ensure fresh data
+      queryClient.invalidateQueries({ queryKey: spacesQueryKey });
+    },
+    // Revert optimistic updates on error
+    onError: (error, { userId }, context) => {
+      if (context?.previousSpaces) {
+        queryClient.setQueryData(QUERY_KEYS.spaces.all(userId), context.previousSpaces);
+      }
+      if (context?.previousCurrentSpace) {
+        queryClient.setQueryData(QUERY_KEYS.spaces.current(userId), context.previousCurrentSpace);
+      } else if (!context?.previousCurrentSpace && context?.optimisticSpace) {
+        // Remove optimistic current space if there was none before
+        queryClient.setQueryData(QUERY_KEYS.spaces.current(userId), null);
+        localStorage.removeItem(`currentSpace_${userId}`);
       }
     },
   });
@@ -361,32 +424,57 @@ export function useDeleteSpace() {
       if (error) throw error;
       return spaceId;
     },
-    // Update cache on success
-    onSuccess: (deletedSpaceId, { userId }) => {
-      // Remove from spaces list
-      const existingSpaces = queryClient.getQueryData<Space[]>(
-        QUERY_KEYS.spaces.all(userId)
-      );
+    // OPTIMISTIC UPDATE: Remove space immediately
+    onMutate: async ({ spaceId, userId }) => {
+      const spacesQueryKey = QUERY_KEYS.spaces.all(userId);
+      const currentSpaceQueryKey = QUERY_KEYS.spaces.current(userId);
 
-      if (existingSpaces) {
-        const updatedSpaces = existingSpaces.filter(space => space.id !== deletedSpaceId);
-        queryClient.setQueryData(QUERY_KEYS.spaces.all(userId), updatedSpaces);
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: spacesQueryKey });
+
+      // Snapshot previous values
+      const previousSpaces = queryClient.getQueryData<Space[]>(spacesQueryKey);
+      const previousCurrentSpace = queryClient.getQueryData<Space>(currentSpaceQueryKey);
+
+      // Optimistically remove from spaces list
+      if (previousSpaces) {
+        const optimisticSpaces = previousSpaces.filter(space => space.id !== spaceId);
+        queryClient.setQueryData(spacesQueryKey, optimisticSpaces);
       }
 
       // Clear current space if it was the deleted one
-      const currentSpace = queryClient.getQueryData<Space>(
-        QUERY_KEYS.spaces.current(userId)
-      );
+      if (previousCurrentSpace?.id === spaceId) {
+        // If there are other spaces, automatically switch to the first one
+        const remainingSpaces = previousSpaces?.filter(space => space.id !== spaceId);
+        const nextCurrentSpace = remainingSpaces?.[0] || null;
 
-      if (currentSpace?.id === deletedSpaceId) {
-        queryClient.setQueryData(QUERY_KEYS.spaces.current(userId), null);
-        localStorage.removeItem(`currentSpace_${userId}`);
+        queryClient.setQueryData(currentSpaceQueryKey, nextCurrentSpace);
+
+        if (nextCurrentSpace) {
+          localStorage.setItem(`currentSpace_${userId}`, nextCurrentSpace.id);
+        } else {
+          localStorage.removeItem(`currentSpace_${userId}`);
+        }
       }
 
+      return { previousSpaces, previousCurrentSpace };
+    },
+    // Clean up additional caches on success
+    onSuccess: (deletedSpaceId, { userId }) => {
       // Invalidate space members cache
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.spaces.members(deletedSpaceId),
       });
+    },
+    // Revert optimistic updates on error
+    onError: (error, { spaceId, userId }, context) => {
+      if (context?.previousSpaces) {
+        queryClient.setQueryData(QUERY_KEYS.spaces.all(userId), context.previousSpaces);
+      }
+      if (context?.previousCurrentSpace) {
+        queryClient.setQueryData(QUERY_KEYS.spaces.current(userId), context.previousCurrentSpace);
+        localStorage.setItem(`currentSpace_${userId}`, context.previousCurrentSpace.id);
+      }
     },
   });
 }

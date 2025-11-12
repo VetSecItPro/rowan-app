@@ -138,17 +138,246 @@ export const QUERY_OPTIONS = {
 } as const;
 
 /**
- * Utility function to invalidate related queries
+ * Intelligent Cache Invalidation System
  *
- * Use this when data changes to ensure cache consistency
+ * Smart invalidation that understands data relationships and only invalidates
+ * what needs to be refreshed, preventing unnecessary API calls
+ */
+export const intelligentInvalidation = {
+  /**
+   * Invalidate auth data and related dependencies
+   */
+  auth: async (userId?: string) => {
+    const promises = [queryClient.invalidateQueries({ queryKey: ['auth'] })];
+
+    if (userId) {
+      promises.push(
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.auth.profile(userId) })
+      );
+    }
+
+    await Promise.all(promises);
+  },
+
+  /**
+   * Invalidate spaces data with intelligent dependency management
+   */
+  spaces: async (userId?: string) => {
+    const promises = [queryClient.invalidateQueries({ queryKey: ['spaces'] })];
+
+    if (userId) {
+      promises.push(
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.spaces.all(userId) }),
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.spaces.current(userId) })
+      );
+    }
+
+    await Promise.all(promises);
+  },
+
+  /**
+   * Invalidate specific space and its related data
+   */
+  space: async (spaceId: string, userId?: string) => {
+    const promises = [
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.spaces.members(spaceId) }),
+      // Invalidate all feature data for this space
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tasks.all(spaceId) }),
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.goals.all(spaceId) }),
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar.events(spaceId) }),
+    ];
+
+    // If userId provided, also invalidate user's spaces list
+    if (userId) {
+      promises.push(
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.spaces.all(userId) }),
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.spaces.current(userId) })
+      );
+    }
+
+    await Promise.all(promises);
+  },
+
+  /**
+   * Comprehensive user data invalidation (use sparingly)
+   */
+  userData: async (userId: string) => {
+    await Promise.all([
+      this.auth(userId),
+      this.spaces(userId),
+      // Invalidate all user's analytics data
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.goals.analytics }),
+    ]);
+  },
+
+  /**
+   * Smart space membership invalidation
+   * When space membership changes, invalidate affected caches
+   */
+  spaceMembership: async (spaceId: string, affectedUserIds: string[]) => {
+    const promises = [
+      // Invalidate space members
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.spaces.members(spaceId) }),
+    ];
+
+    // Invalidate spaces list for all affected users
+    affectedUserIds.forEach(userId => {
+      promises.push(
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.spaces.all(userId) }),
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.spaces.current(userId) })
+      );
+    });
+
+    await Promise.all(promises);
+  },
+
+  /**
+   * Feature-specific invalidation with cascade effects
+   */
+  feature: {
+    /**
+     * Invalidate tasks and related data
+     */
+    tasks: async (spaceId: string, taskIds?: string[]) => {
+      const promises = [
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tasks.all(spaceId) }),
+      ];
+
+      if (taskIds) {
+        taskIds.forEach(taskId => {
+          promises.push(
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tasks.byId(taskId) })
+          );
+        });
+      }
+
+      // Task changes may affect goals analytics
+      promises.push(
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.goals.analytics(spaceId) })
+      );
+
+      await Promise.all(promises);
+    },
+
+    /**
+     * Invalidate goals and dependent analytics
+     */
+    goals: async (spaceId: string) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.goals.all(spaceId) }),
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.goals.analytics(spaceId) }),
+      ]);
+    },
+
+    /**
+     * Invalidate calendar events
+     */
+    calendar: async (spaceId: string) => {
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.calendar.events(spaceId)
+      });
+    },
+  },
+
+  /**
+   * Conditional invalidation based on data relationships
+   */
+  conditional: {
+    /**
+     * Only invalidate if data is currently cached and stale
+     */
+    async ifStale(queryKey: unknown[], maxAge: number = 5 * 60 * 1000) {
+      const queryState = queryClient.getQueryState(queryKey as any);
+
+      if (!queryState || !queryState.dataUpdatedAt) {
+        return false;
+      }
+
+      const age = Date.now() - queryState.dataUpdatedAt;
+
+      if (age > maxAge) {
+        await queryClient.invalidateQueries({ queryKey });
+        return true;
+      }
+
+      return false;
+    },
+
+    /**
+     * Invalidate only if data exists in cache
+     */
+    async ifCached(queryKey: unknown[]) {
+      const data = queryClient.getQueryData(queryKey);
+
+      if (data) {
+        await queryClient.invalidateQueries({ queryKey });
+        return true;
+      }
+
+      return false;
+    },
+  },
+
+  /**
+   * Batch invalidation with intelligent grouping
+   */
+  batch: {
+    /**
+     * Group related invalidations together for efficiency
+     */
+    async spaceOperations(operations: Array<{
+      type: 'space' | 'tasks' | 'goals' | 'calendar' | 'members';
+      spaceId: string;
+      userId?: string;
+    }>) {
+      // Group operations by space to minimize invalidation calls
+      const spaceGroups = operations.reduce((groups, op) => {
+        if (!groups[op.spaceId]) {
+          groups[op.spaceId] = new Set();
+        }
+        groups[op.spaceId].add(op.type);
+        return groups;
+      }, {} as Record<string, Set<string>>);
+
+      const promises: Promise<void>[] = [];
+
+      for (const [spaceId, types] of Object.entries(spaceGroups)) {
+        if (types.has('space')) {
+          promises.push(intelligentInvalidation.space(spaceId));
+        } else {
+          // Individual feature invalidations
+          if (types.has('tasks')) {
+            promises.push(intelligentInvalidation.feature.tasks(spaceId));
+          }
+          if (types.has('goals')) {
+            promises.push(intelligentInvalidation.feature.goals(spaceId));
+          }
+          if (types.has('calendar')) {
+            promises.push(intelligentInvalidation.feature.calendar(spaceId));
+          }
+          if (types.has('members')) {
+            promises.push(
+              queryClient.invalidateQueries({
+                queryKey: QUERY_KEYS.spaces.members(spaceId)
+              })
+            );
+          }
+        }
+      }
+
+      await Promise.all(promises);
+    },
+  },
+} as const;
+
+/**
+ * Legacy invalidation utilities (for backward compatibility)
+ * @deprecated Use intelligentInvalidation instead
  */
 export const invalidateQueries = {
-  auth: () => queryClient.invalidateQueries({ queryKey: ['auth'] }),
-  spaces: () => queryClient.invalidateQueries({ queryKey: ['spaces'] }),
-  userSpace: (userId: string) => {
-    queryClient.invalidateQueries({ queryKey: ['auth', 'profile', userId] });
-    queryClient.invalidateQueries({ queryKey: ['spaces', 'all', userId] });
-  },
+  auth: () => intelligentInvalidation.auth(),
+  spaces: () => intelligentInvalidation.spaces(),
+  userSpace: (userId: string) => intelligentInvalidation.userData(userId),
 } as const;
 
 /**
