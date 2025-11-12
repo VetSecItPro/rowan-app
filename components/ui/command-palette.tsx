@@ -37,7 +37,7 @@ import {
   Sparkles,
   Command as CommandIcon
 } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/lib/contexts/auth-context';
 import { cn } from '@/lib/utils';
 
 // ==================== TYPES ====================

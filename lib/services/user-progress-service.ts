@@ -149,3 +149,46 @@ export async function getOrCreateUserProgress(
   }
 }
 
+/**
+ * TEMPORARY PLACEHOLDER: Mark flow complete
+ * TODO: Implement proper flow completion tracking
+ * @param userId - User UUID
+ * @param flowType - Type of flow completed
+ */
+export async function markFlowComplete(userId: string, flowType: string): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  try {
+    // Placeholder implementation - just log for now
+    console.log(`Flow '${flowType}' marked complete for user ${userId}`);
+
+    // TODO: Implement actual flow completion tracking in database
+    return { success: true };
+  } catch (error) {
+    console.error('[userProgressService] markFlowComplete error:', error);
+    return { success: false, error: 'Failed to mark flow complete' };
+  }
+}
+
+/**
+ * TEMPORARY PLACEHOLDER: Mark flow skipped
+ * TODO: Implement proper flow skip tracking
+ * @param userId - User UUID
+ * @param flowType - Type of flow skipped
+ */
+export async function markFlowSkipped(userId: string, flowType: string): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  try {
+    // Placeholder implementation - just log for now
+    console.log(`Flow '${flowType}' marked skipped for user ${userId}`);
+
+    // TODO: Implement actual flow skip tracking in database
+    return { success: true };
+  } catch (error) {
+    console.error('[userProgressService] markFlowSkipped error:', error);
+    return { success: false, error: 'Failed to mark flow skipped' };
+  }
+}

@@ -2,14 +2,14 @@
 
 import { createContext, useContext, ReactNode, useEffect } from 'react';
 import {
-  useSpaces as useSpacesQuery,
+  useSpaces,
   useSwitchSpace,
   useCreateSpace,
   useDeleteSpace,
   useSpacesStateChange,
   type Space
 } from '@/lib/hooks/useSpacesQuery';
-import { useAuth } from './auth-context';
+import { useAuthContext } from './auth-context-v2';
 import { createClient } from '@/lib/supabase/client';
 import { featureFlags } from '@/lib/constants/feature-flags';
 import { personalWorkspaceService } from '@/lib/services/personal-workspace-service';
@@ -54,10 +54,10 @@ interface SpacesContextType {
 const SpacesContext = createContext<SpacesContextType | null>(null);
 
 export function SpacesProvider({ children }: { children: ReactNode }) {
-  const { user, session, loading: authLoading } = useAuth();
+  const { user, session, loading: authLoading } = useAuthContext();
 
   // React Query powered spaces data
-  const spacesQuery = useSpacesQuery(user?.id);
+  const spacesQuery = useSpaces(user?.id);
   const switchSpaceMutation = useSwitchSpace();
   const createSpaceMutation = useCreateSpace();
   const deleteSpaceMutation = useDeleteSpace();
@@ -203,11 +203,11 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
  * IMPORTANT: This hook now provides React Query-powered spaces state
  * All data is automatically cached, refreshed, and synchronized
  */
-export function useSpaces(): SpacesContextType {
+export function useSpacesContext(): SpacesContextType {
   const context = useContext(SpacesContext);
 
   if (!context) {
-    throw new Error('useSpaces must be used within a SpacesProvider');
+    throw new Error('useSpacesContext must be used within a SpacesProvider');
   }
 
   return context;

@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { queryClient } from '@/lib/react-query/query-client';
 import {
-  useAuth as useAuthQuery,
+  useAuth,
   useSignOut,
   useUpdateProfile,
   useAuthStateChange,
@@ -61,7 +61,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
  * This component has access to the QueryClient context
  */
 function InnerAuthProvider({ children }: { children: ReactNode }) {
-  const authQuery = useAuthQuery();
+  const authQuery = useAuth();
   const signOutMutation = useSignOut();
   const updateProfileMutation = useUpdateProfile();
   const handleAuthStateChange = useAuthStateChange();
@@ -177,11 +177,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
  * IMPORTANT: This hook now provides React Query-powered auth state
  * All data is automatically cached, refreshed, and synchronized
  */
-export function useAuth(): AuthContextType {
+export function useAuthContext(): AuthContextType {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useAuthContext must be used within an AuthProvider');
   }
 
   return context;
