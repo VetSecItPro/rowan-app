@@ -54,7 +54,7 @@ export function SmartOnboarding({ isOpen, onClose }: SmartOnboardingProps) {
       // Ensure personal workspace exists
       const personalSpace = await personalWorkspaceService.ensurePersonalSpace(
         user.id,
-        user.name
+        user.name || undefined
       );
 
       if (personalSpace) {
