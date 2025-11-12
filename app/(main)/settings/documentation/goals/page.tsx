@@ -68,7 +68,7 @@ const guideSections: GuideSection[] = [
       },
       {
         title: 'Creating Your First Goal',
-        description: 'Quick guide to setting up goals with templates, guided creation, or manual setup',
+        description: 'Quick guide to setting up goals with templates or manual setup',
         readTime: '5 min read',
         href: '#first-goal',
       },
@@ -96,12 +96,6 @@ const guideSections: GuideSection[] = [
         description: 'Use pre-built templates across 8 categories with auto-generated milestones',
         readTime: '6 min read',
         href: '#template-goals',
-      },
-      {
-        title: 'Guided Goal Creation Flow',
-        description: 'Step-by-step wizard for first-time users to create meaningful goals',
-        readTime: '5 min read',
-        href: '#guided-creation',
       },
       {
         title: 'Manual Goal Creation',
@@ -359,7 +353,7 @@ export default function GoalsDocumentationPage() {
                 <div className="grid sm:grid-cols-2 gap-2 text-sm text-indigo-700 dark:text-indigo-300">
                   <div className="flex items-start gap-2">
                     <Target className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                    <span><strong>Smart Goals</strong> - Templates, guided creation, and manual setup</span>
+                    <span><strong>Smart Goals</strong> - Templates and manual setup</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Award className="w-4 h-4 mt-0.5 flex-shrink-0" />
@@ -452,7 +446,7 @@ export default function GoalsDocumentationPage() {
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Key Features at a Glance</h3>
               <ul className="space-y-2 text-gray-700 dark:text-gray-300">
                 <li><strong>Four View Modes:</strong> Goals, Milestones, Habits, and Activity views for complete goal management</li>
-                <li><strong>Smart Goal Creation:</strong> Templates, guided creation, or manual setup with pre-built milestones</li>
+                <li><strong>Smart Goal Creation:</strong> Templates or manual setup with pre-built milestones</li>
                 <li><strong>Advanced Check-ins:</strong> Progress tracking with mood, notes, voice recordings, and photos</li>
                 <li><strong>Milestone Celebrations:</strong> Automatic achievements with confetti and motivational messages</li>
                 <li><strong>Habit Tracking:</strong> Daily habits with streak tracking and completion analytics</li>
@@ -464,7 +458,7 @@ export default function GoalsDocumentationPage() {
               </ul>
               <div className="mt-6 p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
                 <p className="text-indigo-800 dark:text-indigo-200 text-sm">
-                  <strong>💡 Pro Tip:</strong> Start with the <Link href="/goals" className="text-indigo-600 dark:text-indigo-400 underline hover:text-indigo-700">guided goal creation flow</Link> if you're new to goal setting, or browse our <a href="#template-goals" className="text-indigo-600 dark:text-indigo-400 underline">template library</a> for quick setup.
+                  <strong>💡 Pro Tip:</strong> Browse our <a href="#template-goals" className="text-indigo-600 dark:text-indigo-400 underline">template library</a> for quick setup, or create custom goals manually for complete control.
                 </p>
               </div>
             </div>
@@ -607,7 +601,7 @@ export default function GoalsDocumentationPage() {
                   </div>
                   <div className="mt-4 p-3 bg-green-100 dark:bg-green-800/30 rounded-lg">
                     <p className="text-green-800 dark:text-green-200 text-sm">
-                      <strong>How to:</strong> Visit Goals page with no existing goals → Follow guided prompts → Or click "Try Guided Creation" from empty state
+                      <strong>How to:</strong> Visit Goals page → Click "New Goal" → Choose from templates or create manually
                     </p>
                   </div>
                 </div>
