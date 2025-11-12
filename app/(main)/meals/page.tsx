@@ -9,15 +9,18 @@ import Link from 'next/link';
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { CTAButton } from '@/components/ui/EnhancedButton';
-import { MealCard } from '@/components/meals/MealCard';
+// Dynamic imports for optimized bundle splitting
+import {
+  MealCard,
+  RecipeCard,
+  NewMealModal,
+  NewRecipeModal,
+  IngredientReviewModal,
+  GenerateListModal,
+  WeekCalendarView,
+  TwoWeekCalendarView,
+} from '@/components/ui/DynamicMealComponents';
 import { MealCardSkeleton, CalendarDaySkeleton, RecipeCardSkeleton } from '@/components/ui/Skeleton';
-import { NewMealModal } from '@/components/meals/NewMealModal';
-import { NewRecipeModal } from '@/components/meals/NewRecipeModal';
-import { RecipeCard } from '@/components/meals/RecipeCard';
-import { IngredientReviewModal } from '@/components/meals/IngredientReviewModal';
-import { GenerateListModal } from '@/components/meals/GenerateListModal';
-import { WeekCalendarView } from '@/components/meals/WeekCalendarView';
-import { TwoWeekCalendarView } from '@/components/meals/TwoWeekCalendarView';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { mealsService, Meal, CreateMealInput, Recipe, CreateRecipeInput } from '@/lib/services/meals-service';
 import { shoppingService } from '@/lib/services/shopping-service';

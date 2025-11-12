@@ -20,7 +20,7 @@ import {
   Info,
   Sparkles
 } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/lib/contexts/auth-context';
 import {
   BUDGET_GOAL_TEMPLATES,
   createGoalFromBudgetTemplate,

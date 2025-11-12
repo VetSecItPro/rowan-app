@@ -19,7 +19,7 @@ import {
   Tag,
   FolderPlus
 } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/lib/contexts/auth-context';
 import {
   CustomCategory,
   Tag as TagType,

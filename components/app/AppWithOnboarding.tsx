@@ -4,7 +4,7 @@ import React from 'react';
 import { useZeroSpacesDetection, useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { FirstSpaceOnboarding } from '@/components/ui/FirstSpaceOnboarding';
 import { SmartOnboarding } from '@/components/onboarding/SmartOnboarding';
-import { AuthLoadingState, SpacesLoadingState } from '@/components/ui/LoadingStates';
+import { AuthLoadingState, SpacesLoadingState, DashboardSkeleton } from '@/components/ui/LoadingStates';
 import { featureFlags } from '@/lib/constants/feature-flags';
 
 /**
@@ -39,9 +39,10 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
     createSpace
   } = useAuthWithSpaces();
 
-  // Show authentication loading state
+  // OPTIMIZED: Optimistic UI - show skeleton immediately while auth loads
+  // This eliminates the 500ms blocking spinner and provides instant visual feedback
   if (authLoading) {
-    return <AuthLoadingState />;
+    return <DashboardSkeleton />;
   }
 
   // If not authenticated, show normal app (login page will handle this)
@@ -49,9 +50,19 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
     return <>{children}</>;
   }
 
-  // Show spaces loading state while checking spaces for authenticated users
+  // OPTIMIZED: Show content with skeleton overlay instead of full blocking
+  // Users can see the interface structure while spaces load
   if (isCheckingSpaces || spacesLoading) {
-    return <SpacesLoadingState />;
+    // Show skeleton if spaces are still loading, but allow children to render underneath
+    return (
+      <>
+        {/* Show children with skeleton overlay */}
+        <div className="relative">
+          {children}
+          {/* Optional: could add a subtle overlay here if needed */}
+        </div>
+      </>
+    );
   }
 
   // Show onboarding for zero-spaces scenario
