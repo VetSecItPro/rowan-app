@@ -15,7 +15,8 @@ export default function SignUpPage() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [pronouns, setPronouns] = useState('');
-  const [spaceName, setSpaceName] = useState('');
+  const [spaceName, setSpaceName] = useState('My Space');
+  const [spaceTouched, setSpaceTouched] = useState(false);
   const [colorTheme, setColorTheme] = useState('emerald');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -55,6 +56,19 @@ export default function SignUpPage() {
     { value: 'sage', label: 'Sage' },
     { value: 'slate', label: 'Slate' },
   ];
+
+  useEffect(() => {
+    if (spaceTouched) return;
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      setSpaceName('My Space');
+      return;
+    }
+    const firstName = trimmedName.split(' ')[0];
+    if (firstName) {
+      setSpaceName(`${firstName}'s Space`);
+    }
+  }, [name, spaceTouched]);
 
   const getColorClasses = (theme: string) => {
     switch (theme) {
@@ -131,7 +145,7 @@ export default function SignUpPage() {
       name,
       pronouns: pronouns || undefined,
       color_theme: colorTheme,
-      space_name: spaceName || undefined,
+      space_name: spaceName,
       marketing_emails_enabled: emailOptIn,
     });
 
@@ -347,10 +361,10 @@ export default function SignUpPage() {
               </div>
             </div>
 
-            {/* Space Name (Optional) */}
+            {/* Space Name */}
             <div>
               <label htmlFor="spaceName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Create a Space <span className="text-gray-400">(optional)</span>
+                Space Name <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <Home className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -358,15 +372,16 @@ export default function SignUpPage() {
                   id="spaceName"
                   type="text"
                   value={spaceName}
-                  onChange={(e) => setSpaceName(e.target.value)}
+                  onChange={(e) => {
+                    setSpaceName(e.target.value);
+                    setSpaceTouched(true);
+                  }}
+                  required
                   className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Our Family, Team Workspace, etc."
+                  placeholder="Samira's Space"
                   disabled={isLoading}
                 />
               </div>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                You can create or join a space later if you prefer
-              </p>
             </div>
 
             {/* Color Theme Selector */}

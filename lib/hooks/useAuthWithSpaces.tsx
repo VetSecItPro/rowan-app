@@ -50,13 +50,8 @@ export interface AuthWithSpacesState {
   createSpace: (name: string) => Promise<{ success: boolean; spaceId?: string; error?: string }>;
   deleteSpace: (spaceId: string) => Promise<{ success: boolean; error?: string }>;
 
-  // Zero-spaces helpers
-  triggerOnboarding: () => void;
-  skipOnboarding: () => void;
-
   // State helpers
   isReady: boolean; // True when auth is complete and spaces are loaded (or confirmed zero)
-  needsOnboarding: boolean; // True when user has zero spaces and should see onboarding
 }
 
 /**
@@ -103,9 +98,6 @@ export function useAuthWithSpaces(): AuthWithSpacesState {
     // App readiness state (forced ready if emergency timeout reached)
     const isReady = emergencyTimeoutReached ? true : (!authLoading && (!isAuthenticated || !spacesLoading));
 
-    // Zero-spaces onboarding state
-    const needsOnboarding = isAuthenticated && !spacesLoading && hasZeroSpaces;
-
     return {
       // Combined authentication state
       user: auth.user,
@@ -139,13 +131,8 @@ export function useAuthWithSpaces(): AuthWithSpacesState {
       createSpace: spaces.createSpace,
       deleteSpace: spaces.deleteSpace,
 
-      // Zero-spaces helpers
-      triggerOnboarding: spaces.triggerOnboarding,
-      skipOnboarding: spaces.skipOnboarding,
-
       // State helpers
       isReady,
-      needsOnboarding,
     };
   }, [
     auth.user,
@@ -207,11 +194,3 @@ export function useAuthLegacy() {
 /**
  * Zero-spaces detection hook for triggering onboarding
  */
-export function useZeroSpacesDetection() {
-  const { isAuthenticated, hasZeroSpaces, authLoading, spacesLoading } = useAuthWithSpaces();
-
-  return {
-    shouldShowOnboarding: isAuthenticated && !authLoading && !spacesLoading && hasZeroSpaces,
-    isCheckingSpaces: isAuthenticated && spacesLoading,
-  };
-}
