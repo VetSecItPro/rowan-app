@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, Home, Plus, UserPlus, Check, User } from 'lucide-react';
 import type { Space } from '@/lib/types';
-import { featureFlags } from '@/lib/constants/feature-flags';
 
 interface SpaceSelectorProps {
   spaces: (Space & { role: string })[];
@@ -48,8 +47,7 @@ export function SpaceSelector({
 
   // Check if a space is a personal workspace
   const isPersonalWorkspace = (space: Space & { role: string }): boolean => {
-    return featureFlags.isPersonalWorkspacesEnabled() &&
-           (space as any).is_personal === true;
+    return (space as any).is_personal === true;
   };
 
   // Get icon for space type
@@ -62,9 +60,6 @@ export function SpaceSelector({
 
   // Get display name for space
   const getSpaceDisplayName = (space: Space & { role: string }): string => {
-    if (isPersonalWorkspace(space)) {
-      return 'Personal Workspace';
-    }
     return space.name;
   };
 

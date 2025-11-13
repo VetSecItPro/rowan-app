@@ -1,28 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useZeroSpacesDetection, useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
-import { FirstSpaceOnboarding } from '@/components/ui/FirstSpaceOnboarding';
-import { SmartOnboarding } from '@/components/onboarding/SmartOnboarding';
+import React, { useMemo, useCallback } from 'react';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { DashboardSkeleton } from '@/components/ui/LoadingStates';
-import { featureFlags } from '@/lib/constants/feature-flags';
 import { usePathname } from 'next/navigation';
-
-/**
- * APP WITH ONBOARDING WRAPPER - PHASE 4 INTEGRATION
- *
- * This component integrates zero-spaces detection with the FirstSpaceOnboarding UI.
- * It intercepts the app flow when users have zero spaces and guides them through
- * creating their first workspace.
- *
- * Flow:
- * 1. Show authentication loading while auth is being checked
- * 2. Show spaces loading while spaces are being loaded
- * 3. If user has zero spaces, show FirstSpaceOnboarding
- * 4. Otherwise, render normal app content
- *
- * This resolves the original zero-spaces issue that caused login spinning.
- */
 
 interface AppWithOnboardingProps {
   children: React.ReactNode;
@@ -30,10 +11,15 @@ interface AppWithOnboardingProps {
 
 export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
   const pathname = usePathname();
-  const authRoutes = ['/login', '/signup', '/reset-password', '/forgot-password', '/restore-account'];
-  const isAuthRoute = pathname ? authRoutes.some(route => pathname === route || pathname?.startsWith(`${route}/`)) : false;
+  const authRoutes = useMemo(
+    () => ['/login', '/signup', '/reset-password', '/forgot-password', '/restore-account'],
+    []
+  );
+  const isAuthRoute = useMemo(() => {
+    if (!pathname) return false;
+    return authRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+  }, [authRoutes, pathname]);
 
-  const { shouldShowOnboarding, isCheckingSpaces } = useZeroSpacesDetection();
   const {
     user,
     authLoading,
@@ -41,134 +27,55 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
     isAuthenticated,
     hasZeroSpaces,
     refreshSpaces,
-    createSpace
+    createSpace,
   } = useAuthWithSpaces();
 
-  const [loadingTimeoutReached, setLoadingTimeoutReached] = useState(false);
-
-  const handleCreateFirstSpace = useCallback(async () => {
-    const defaultName = user?.name ? `${user.name}'s Space` : 'Personal Workspace';
-    const result = await createSpace(defaultName);
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to create space');
+  const handleCreateSpace = useCallback(async () => {
+    try {
+      const defaultName = user?.name ? `${user.name}'s Space` : 'My Space';
+      const result = await createSpace(defaultName);
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to create space');
+      }
+      await refreshSpaces();
+    } catch (error) {
+      console.error('Failed to create space:', error);
     }
-    await refreshSpaces();
   }, [createSpace, refreshSpaces, user?.name]);
 
-  // Timeout guard for spaces loading (12 seconds max)
-  useEffect(() => {
-    if (isAuthenticated && (isCheckingSpaces || spacesLoading) && !loadingTimeoutReached) {
-      const timeoutTimer = setTimeout(() => {
-        console.warn('[AppWithOnboarding] Loading timeout reached - showing warning');
-        setLoadingTimeoutReached(true);
-      }, 12000); // 12 second timeout
-
-      return () => clearTimeout(timeoutTimer);
-    }
-  }, [isAuthenticated, isCheckingSpaces, spacesLoading, loadingTimeoutReached]);
-
-  // Reset timeout when spaces loading completes
-  useEffect(() => {
-    if (!spacesLoading && !isCheckingSpaces) {
-      setLoadingTimeoutReached(false);
-    }
-  }, [spacesLoading, isCheckingSpaces]);
-
-  // OPTIMIZED: Optimistic UI - show skeleton immediately while auth loads
-  // This eliminates the 500ms blocking spinner and provides instant visual feedback
   if (authLoading) {
     return isAuthRoute ? <>{children}</> : <DashboardSkeleton />;
   }
 
-  if (isAuthRoute) {
+  if (!isAuthenticated || isAuthRoute) {
     return <>{children}</>;
   }
 
-  // If not authenticated, show normal app (login page will handle this)
-  if (!isAuthenticated) {
-    return <>{children}</>;
+  if (spacesLoading) {
+    return <DashboardSkeleton />;
   }
 
-  // OPTIMIZED: Show content with skeleton overlay instead of full blocking
-  // Users can see the interface structure while spaces load
-  if (isCheckingSpaces || spacesLoading) {
-    // If timeout reached, show error banner but allow app to continue
-    if (loadingTimeoutReached) {
-      return (
-        <>
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-yellow-800">
-                  <strong>Loading is taking longer than expected.</strong> The app may not function correctly.
-                </p>
-                <p className="text-xs text-yellow-600 mt-1">
-                  Check your internet connection and try refreshing the page.
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  setLoadingTimeoutReached(false);
-                  refreshSpaces();
-                }}
-                className="ml-4 px-3 py-1 text-xs bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200"
-              >
-                Retry
-              </button>
-            </div>
+  if (hasZeroSpaces) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-gray-950 to-black text-center px-4">
+        <div className="max-w-md space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">Welcome to Rowan</h1>
+            <p className="text-gray-400">
+              Create your first space to start organizing tasks, reminders, and goals together.
+            </p>
           </div>
-          {children}
-        </>
-      );
-    }
 
-    // Show skeleton if spaces are still loading (first 12 seconds)
-    return (
-      <>
-        {/* Show children with skeleton overlay */}
-        <div className="relative">
-          {children}
-          {/* Optional: could add a subtle overlay here if needed */}
+          <button
+            onClick={handleCreateSpace}
+            className="w-full px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold transition"
+          >
+            Create Your Space
+          </button>
         </div>
-      </>
+      </div>
     );
   }
 
-  // Show onboarding for zero-spaces scenario
-  if (shouldShowOnboarding && hasZeroSpaces) {
-    // Use Smart Onboarding if feature flag is enabled, otherwise fall back to traditional onboarding
-    if (featureFlags.isSmartOnboardingEnabled()) {
-      return (
-        <SmartOnboarding
-          isOpen={true}
-          onClose={() => {
-            console.log('Smart onboarding completed - user should now have access to the app');
-            // The SmartOnboarding component handles its own space creation and navigation
-            // No additional action needed here as refreshSpaces() is called internally
-          }}
-        />
-      );
-    }
-
-    // Traditional onboarding fallback
-    return (
-      <FirstSpaceOnboarding
-        userName={user?.name || user?.email?.split('@')[0] || 'there'}
-        onCreateSpace={handleCreateFirstSpace}
-        onSkip={() => {
-          console.log('User skipped onboarding - continuing to app');
-        }}
-      />
-    );
-  }
-
-  // Normal app flow - user is authenticated and has spaces (or chose to skip onboarding)
   return <>{children}</>;
-}
-
-/**
- * Type definitions for TypeScript support
- */
-export interface OnboardingWrapperProps {
-  children: React.ReactNode;
 }
