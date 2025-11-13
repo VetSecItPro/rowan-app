@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useZeroSpacesDetection, useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { FirstSpaceOnboarding } from '@/components/ui/FirstSpaceOnboarding';
 import { SmartOnboarding } from '@/components/onboarding/SmartOnboarding';
@@ -136,16 +136,9 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
     return (
       <FirstSpaceOnboarding
         userName={user?.name || user?.email?.split('@')[0] || 'there'}
-        onSpaceCreated={async (spaceId: string, spaceName: string) => {
-          console.log(`Created space: ${spaceName} (${spaceId})`);
-          // Refresh spaces to load the newly created space
-          await refreshSpaces();
-          // The app will automatically switch to the new space and hide onboarding
-        }}
+        onCreateSpace={handleCreateFirstSpace}
         onSkip={() => {
           console.log('User skipped onboarding - continuing to app');
-          // This could set some preference or just continue to the app
-          // For now, we'll just continue - the user can create spaces later
         }}
       />
     );
@@ -161,3 +154,11 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
 export interface OnboardingWrapperProps {
   children: React.ReactNode;
 }
+  const handleCreateFirstSpace = useCallback(async () => {
+    const defaultName = user?.name ? `${user.name}'s Space` : 'Personal Workspace';
+    const result = await createSpace(defaultName);
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to create space');
+    }
+    await refreshSpaces();
+  }, [createSpace, refreshSpaces, user?.name]);

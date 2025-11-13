@@ -19,6 +19,11 @@ interface FeatureFlags {
  * Feature flag configuration
  * CRITICAL: All flags default to false for safety
  */
+const parseBooleanFlag = (value: string | undefined, fallback: boolean) => {
+  if (value === undefined) return fallback;
+  return value === 'true';
+};
+
 export const FEATURE_FLAGS: FeatureFlags = {
   /**
    * Personal Workspaces Feature
@@ -26,7 +31,7 @@ export const FEATURE_FLAGS: FeatureFlags = {
    *
    * Enable with: NEXT_PUBLIC_ENABLE_PERSONAL_WORKSPACES=true
    */
-  PERSONAL_WORKSPACES: process.env.NEXT_PUBLIC_ENABLE_PERSONAL_WORKSPACES === 'true',
+  PERSONAL_WORKSPACES: parseBooleanFlag(process.env.NEXT_PUBLIC_ENABLE_PERSONAL_WORKSPACES, true),
 
   /**
    * Smart Onboarding Feature
