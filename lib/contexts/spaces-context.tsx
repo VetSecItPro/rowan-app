@@ -117,7 +117,16 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
     setEnsuringPersonalSpace(true);
     personalWorkspaceService
       .ensurePersonalSpace(user.id, preferredName)
-      .then(() => spacesQuery.refetch())
+      .then((personalSpace) => {
+        if (personalSpace?.id) {
+          try {
+            localStorage.setItem(`currentSpace_${user.id}`, personalSpace.id);
+          } catch (error) {
+            console.warn('[SpacesProvider] Unable to persist personal space selection:', error);
+          }
+        }
+        spacesQuery.refetch();
+      })
       .catch((error) => {
         console.error('[SpacesProvider] Failed to auto-create personal space:', error);
       })
