@@ -47,6 +47,7 @@ export function useTaskRealtime({
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [timeoutReached, setTimeoutReached] = useState(false);
 
   // Performance optimizations
   const updateQueueRef = useRef<{
@@ -108,7 +109,26 @@ export function useTaskRealtime({
 
   const debouncedBatchUpdate = debouncedBatchUpdateRef.current;
 
+  // Emergency timeout to prevent perpetual loading (12 seconds max)
   useEffect(() => {
+    if (!spaceId || spaceId === 'skip') return;
+
+    const emergencyTimeout = setTimeout(() => {
+      if (loading) {
+        console.warn('[useTaskRealtime] Emergency timeout reached - forcing loading completion');
+        setTimeoutReached(true);
+        setLoading(false);
+        setError(new Error('Loading timeout - please refresh to try again'));
+      }
+    }, 12000); // 12 second emergency timeout
+
+    return () => clearTimeout(emergencyTimeout);
+  }, [spaceId, loading]);
+
+  useEffect(() => {
+    // Reset timeout state when spaceId changes
+    setTimeoutReached(false);
+
     // Guard against invalid spaceId to prevent empty query parameters
     if (!spaceId || spaceId.trim() === '' || spaceId === 'undefined' || spaceId === 'null' || spaceId === 'placeholder' || spaceId === 'skip') {
       setTasks([]);
@@ -121,31 +141,57 @@ export function useTaskRealtime({
     let channel: RealtimeChannel;
     let accessCheckInterval: NodeJS.Timeout;
 
+    // Timeout wrapper to prevent hanging operations
+    function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+      return Promise.race([
+        promise,
+        new Promise<T>((_, reject) =>
+          setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
+        )
+      ]);
+    }
+
     // Verify user still has access to this space
     async function verifyAccess(): Promise<boolean> {
       try {
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        // Add 8-second timeout to individual operations
+        const { data: { user }, error: authError } = await withTimeout(
+          supabase.auth.getUser(),
+          8000
+        );
 
         if (authError || !user) {
           return false;
         }
 
-        const { data: membership, error: memberError } = await supabase
-          .from('space_members')
-          .select('user_id')
-          .eq('space_id', spaceId)
-          .eq('user_id', user.id)
-          .single();
+        const { data: membership, error: memberError } = await withTimeout(
+          supabase
+            .from('space_members')
+            .select('user_id')
+            .eq('space_id', spaceId)
+            .eq('user_id', user.id)
+            .single(),
+          8000
+        );
 
         return !memberError && !!membership;
       } catch (err) {
+        console.warn('[useTaskRealtime] Access verification timeout or error:', err);
         return false;
       }
     }
 
     async function loadTasks() {
       try {
-        // Verify access before loading
+        // If timeout already reached, skip loading and use empty state
+        if (timeoutReached) {
+          console.warn('[useTaskRealtime] Timeout reached - skipping data load');
+          setTasks([]);
+          setLoading(false);
+          return;
+        }
+
+        // Verify access before loading with timeout protection
         const hasAccess = await verifyAccess();
         if (!hasAccess) {
           setError(new Error('You do not have access to this space'));
@@ -184,7 +230,7 @@ export function useTaskRealtime({
           query = query.eq('assigned_to', filters.assignedTo);
         }
 
-        const { data, error: fetchError } = await query;
+        const { data, error: fetchError } = await withTimeout(query, 10000); // 10 second timeout for data fetch
 
         if (fetchError) throw fetchError;
 
