@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 export interface Chore {
   id: string;
@@ -76,6 +76,7 @@ export interface HouseholdStats {
 export const householdService = {
   // Chores
   async getChores(spaceId: string): Promise<Chore[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('chores')
       .select('*')
@@ -87,6 +88,7 @@ export const householdService = {
   },
 
   async getChoreById(id: string): Promise<Chore | null> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('chores')
       .select('*')
@@ -98,6 +100,7 @@ export const householdService = {
   },
 
   async createChore(input: CreateChoreInput): Promise<Chore> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('chores')
       .insert([{
@@ -122,6 +125,7 @@ export const householdService = {
       finalUpdates.completed_at = null;
     }
 
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('chores')
       .update(finalUpdates)
@@ -134,6 +138,7 @@ export const householdService = {
   },
 
   async deleteChore(id: string): Promise<void> {
+    const supabase = createClient();
     const { error } = await supabase
       .from('chores')
       .delete()
@@ -161,6 +166,7 @@ export const householdService = {
 
   // Expenses
   async getExpenses(spaceId: string): Promise<Expense[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('expenses')
       .select('*')
@@ -172,6 +178,7 @@ export const householdService = {
   },
 
   async getExpenseById(id: string): Promise<Expense | null> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('expenses')
       .select('*')
@@ -183,6 +190,7 @@ export const householdService = {
   },
 
   async createExpense(input: CreateExpenseInput): Promise<Expense> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('expenses')
       .insert([{
@@ -208,6 +216,7 @@ export const householdService = {
       finalUpdates.paid_at = null;
     }
 
+    const supabase = createClient();
     const { data, error } = await supabase
       .from('expenses')
       .update(finalUpdates)
@@ -220,6 +229,7 @@ export const householdService = {
   },
 
   async deleteExpense(id: string): Promise<void> {
+    const supabase = createClient();
     const { error } = await supabase
       .from('expenses')
       .delete()

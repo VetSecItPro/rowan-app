@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 interface SpaceMember {
   user_id: string;
@@ -29,6 +29,7 @@ export function SpaceMembersIndicator() {
 
   useEffect(() => {
     if (!currentSpace) return;
+    const supabase = createClient();
 
     const loadMembers = async () => {
       const { data, error } = await supabase

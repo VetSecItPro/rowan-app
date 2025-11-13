@@ -8,21 +8,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS, QUERY_OPTIONS } from '@/lib/react-query/query-client';
 import { deduplicatedRequests } from '@/lib/react-query/request-deduplication';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
+import type { Space } from '@/lib/types';
 
-/**
- * Space interface
- */
-export interface Space {
-  id: string;
-  name: string;
-  description: string | null;
-  type: 'personal' | 'household' | 'family' | 'roommates' | 'friends';
-  created_at: string;
-  updated_at: string;
-  settings?: Record<string, any>;
-  role?: string; // User's role in this space
-}
+type SpaceWithRole = Space & { role?: string };
 
 /**
  * Space member interface
@@ -48,7 +37,8 @@ export interface SpaceMember {
 export function useUserSpaces(userId: string | undefined) {
   return useQuery({
     queryKey: QUERY_KEYS.spaces.all(userId || ''),
-    queryFn: async (): Promise<Space[]> => {
+    queryFn: async (): Promise<SpaceWithRole[]> => {
+      const supabase = createClient();
       if (!userId) throw new Error('User ID is required');
 
       // Quick existence check first (fast COUNT query)
@@ -74,6 +64,10 @@ export function useUserSpaces(userId: string | undefined) {
             name,
             description,
             type,
+            user_id,
+            created_by,
+            is_personal,
+            auto_created,
             created_at,
             updated_at,
             settings
@@ -90,7 +84,7 @@ export function useUserSpaces(userId: string | undefined) {
         .map((item: any) => ({
           ...item.spaces,
           role: item.role,
-        })) as Space[];
+        })) as SpaceWithRole[];
     },
     enabled: !!userId,
     ...QUERY_OPTIONS.spaces,
@@ -108,7 +102,8 @@ export function useUserSpaces(userId: string | undefined) {
 export function useCurrentSpace(userId: string | undefined) {
   return useQuery({
     queryKey: QUERY_KEYS.spaces.current(userId || ''),
-    queryFn: async (): Promise<Space | null> => {
+    queryFn: async (): Promise<SpaceWithRole | null> => {
+      const supabase = createClient();
       if (!userId) return null;
 
       // Try to get saved space from localStorage first
@@ -117,19 +112,23 @@ export function useCurrentSpace(userId: string | undefined) {
       if (savedSpaceId) {
         // Verify the saved space still exists and user has access
         const { data, error } = await supabase
-          .from('space_members')
-          .select(`
-            role,
-            spaces:space_id (
-              id,
-              name,
-              description,
-              type,
-              created_at,
-              updated_at,
-              settings
-            )
-          `)
+        .from('space_members')
+        .select(`
+          role,
+          spaces:space_id (
+            id,
+            name,
+            description,
+            type,
+            user_id,
+            created_by,
+            is_personal,
+            auto_created,
+            created_at,
+            updated_at,
+            settings
+          )
+        `)
           .eq('user_id', userId)
           .eq('space_id', savedSpaceId)
           .single();
@@ -138,7 +137,7 @@ export function useCurrentSpace(userId: string | undefined) {
           return {
             ...data.spaces,
             role: data.role,
-          } as unknown as Space;
+          } as unknown as SpaceWithRole;
         }
 
         // If saved space is invalid, clear it
@@ -164,6 +163,7 @@ export function useSpaceMembers(spaceId: string | undefined) {
   return useQuery({
     queryKey: QUERY_KEYS.spaces.members(spaceId || ''),
     queryFn: async (): Promise<SpaceMember[]> => {
+      const supabase = createClient();
       if (!spaceId) throw new Error('Space ID is required');
 
       const { data, error } = await supabase
@@ -245,7 +245,7 @@ export function useSwitchSpace() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ space, userId }: { space: Space; userId: string }) => {
+    mutationFn: async ({ space, userId }: { space: SpaceWithRole; userId: string }) => {
       // Use request deduplication for rapid space switching
       return deduplicatedRequests.switchSpace(userId, space.id, async () => {
         // Save to localStorage for persistence
@@ -261,10 +261,10 @@ export function useSwitchSpace() {
       await queryClient.cancelQueries({ queryKey });
 
       // Snapshot previous value
-      const previousSpace = queryClient.getQueryData<Space>(queryKey);
+      const previousSpace = queryClient.getQueryData<SpaceWithRole>(queryKey);
 
       // Optimistically update current space
-      queryClient.setQueryData<Space>(queryKey, space);
+      queryClient.setQueryData<SpaceWithRole>(queryKey, space);
 
       return { previousSpace };
     },
@@ -300,6 +300,9 @@ export function useCreateSpace() {
       type: Space['type'];
       userId: string;
     }) => {
+      const supabase = createClient();
+      const isPersonal = type === 'personal';
+
       // Create the space
       const { data: space, error: spaceError } = await supabase
         .from('spaces')
@@ -308,6 +311,9 @@ export function useCreateSpace() {
           description,
           type,
           settings: {},
+          user_id: userId,
+          is_personal: isPersonal,
+          auto_created: false,
         })
         .select()
         .single();
@@ -328,7 +334,7 @@ export function useCreateSpace() {
       return {
         ...space,
         role: 'owner' as const,
-      } as Space;
+      } as SpaceWithRole;
     },
     // OPTIMISTIC UPDATE: Show new space immediately
     onMutate: async ({ name, description, type, userId }) => {
@@ -339,11 +345,11 @@ export function useCreateSpace() {
       await queryClient.cancelQueries({ queryKey: spacesQueryKey });
 
       // Snapshot previous values
-      const previousSpaces = queryClient.getQueryData<Space[]>(spacesQueryKey);
-      const previousCurrentSpace = queryClient.getQueryData<Space>(currentSpaceQueryKey);
+      const previousSpaces = queryClient.getQueryData<SpaceWithRole[]>(spacesQueryKey);
+      const previousCurrentSpace = queryClient.getQueryData<SpaceWithRole>(currentSpaceQueryKey);
 
       // Create optimistic space object
-      const optimisticSpace: Space = {
+      const optimisticSpace: SpaceWithRole = {
         id: `temp_${Date.now()}`, // Temporary ID until server responds
         name,
         description,
@@ -352,6 +358,9 @@ export function useCreateSpace() {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         settings: {},
+        is_personal: type === 'personal',
+        user_id: userId,
+        auto_created: false,
       };
 
       // Optimistically add to spaces list
@@ -372,7 +381,7 @@ export function useCreateSpace() {
       const currentSpaceQueryKey = QUERY_KEYS.spaces.current(userId);
 
       // Replace optimistic space with real space data
-      const spaces = queryClient.getQueryData<Space[]>(spacesQueryKey);
+      const spaces = queryClient.getQueryData<SpaceWithRole[]>(spacesQueryKey);
       if (spaces && context?.optimisticSpace) {
         const updatedSpaces = spaces.map(space =>
           space.id === context.optimisticSpace.id ? newSpace : space
@@ -381,7 +390,7 @@ export function useCreateSpace() {
       }
 
       // Update current space with real ID if it was set optimistically
-      const currentSpace = queryClient.getQueryData<Space>(currentSpaceQueryKey);
+      const currentSpace = queryClient.getQueryData<SpaceWithRole>(currentSpaceQueryKey);
       if (currentSpace?.id === context?.optimisticSpace.id) {
         queryClient.setQueryData(currentSpaceQueryKey, newSpace);
         localStorage.setItem(`currentSpace_${userId}`, newSpace.id);
@@ -416,6 +425,7 @@ export function useDeleteSpace() {
 
   return useMutation({
     mutationFn: async ({ spaceId, userId }: { spaceId: string; userId: string }) => {
+      const supabase = createClient();
       const { error } = await supabase
         .from('spaces')
         .delete()
@@ -433,8 +443,8 @@ export function useDeleteSpace() {
       await queryClient.cancelQueries({ queryKey: spacesQueryKey });
 
       // Snapshot previous values
-      const previousSpaces = queryClient.getQueryData<Space[]>(spacesQueryKey);
-      const previousCurrentSpace = queryClient.getQueryData<Space>(currentSpaceQueryKey);
+      const previousSpaces = queryClient.getQueryData<SpaceWithRole[]>(spacesQueryKey);
+      const previousCurrentSpace = queryClient.getQueryData<SpaceWithRole>(currentSpaceQueryKey);
 
       // Optimistically remove from spaces list
       if (previousSpaces) {
@@ -497,6 +507,7 @@ export function useJoinSpace() {
       userId: string;
       invitationToken: string;
     }) => {
+      const supabase = createClient();
       // Validate invitation and join space (API call would handle this)
       const { data, error } = await supabase
         .rpc('join_space_with_invitation', {
