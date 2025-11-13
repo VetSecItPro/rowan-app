@@ -111,7 +111,7 @@ export function useTaskRealtime({
 
   // Emergency timeout to prevent perpetual loading (12 seconds max)
   useEffect(() => {
-    if (!spaceId || spaceId === 'skip') return;
+    if (!spaceId) return;
 
     const emergencyTimeout = setTimeout(() => {
       if (loading) {
@@ -129,8 +129,8 @@ export function useTaskRealtime({
     // Reset timeout state when spaceId changes
     setTimeoutReached(false);
 
-    // Guard against invalid spaceId to prevent empty query parameters
-    if (!spaceId || spaceId.trim() === '' || spaceId === 'undefined' || spaceId === 'null' || spaceId === 'placeholder' || spaceId === 'skip') {
+    // Guard against invalid spaceId to prevent unnecessary queries
+    if (!spaceId || spaceId.trim() === '') {
       setTasks([]);
       setLoading(false);
       setError(null); // Don't set error for intentional skips

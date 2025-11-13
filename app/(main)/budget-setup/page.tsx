@@ -9,7 +9,7 @@ import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { TemplateGallery } from '@/components/budget/TemplateGallery';
 import { TemplatePreview } from '@/components/budget/TemplatePreview';
 import { IncomeInput } from '@/components/budget/IncomeInput';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import {
   budgetTemplatesService,
   type BudgetTemplate,
@@ -17,9 +17,11 @@ import {
 } from '@/lib/services/budget-templates-service';
 import { safeValidateApplyTemplate } from '@/lib/validations/budget-templates';
 import { useRouter } from 'next/navigation';
+import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 
 export default function BudgetSetupPage() {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
   const router = useRouter();
 
   const [templates, setTemplates] = useState<BudgetTemplate[]>([]);
@@ -63,13 +65,13 @@ export default function BudgetSetupPage() {
   }, []);
 
   const handleApplyTemplate = useCallback(async () => {
-    if (!currentSpace || !selectedTemplate || !monthlyIncome || !isIncomeValid) {
+    if (!spaceId || !selectedTemplate || !monthlyIncome || !isIncomeValid) {
       return;
     }
 
     // Validate input with Zod
     const validation = safeValidateApplyTemplate({
-      space_id: currentSpace.id,
+      space_id: spaceId,
       template_id: selectedTemplate.id,
       monthly_income: monthlyIncome,
     });
@@ -96,7 +98,7 @@ export default function BudgetSetupPage() {
     } finally {
       setApplying(false);
     }
-  }, [currentSpace, selectedTemplate, monthlyIncome, isIncomeValid, router]);
+  }, [spaceId, selectedTemplate, monthlyIncome, isIncomeValid, router]);
 
   const selectedCategories = selectedTemplate
     ? templateCategories[selectedTemplate.id] || []
@@ -104,6 +106,10 @@ export default function BudgetSetupPage() {
 
   const canApply =
     !!selectedTemplate && monthlyIncome > 0 && isIncomeValid && !applying && !success;
+
+  if (!spaceId || !user) {
+    return <SpacesLoadingState />;
+  }
 
   return (
     <FeatureLayout

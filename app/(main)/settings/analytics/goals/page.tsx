@@ -5,17 +5,19 @@ import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { Target, Award, TrendingUp, CheckCircle, Calendar, BarChart3, Activity, Zap } from 'lucide-react';
 import { format, subMonths } from 'date-fns';
 import { DynamicAreaChart, DynamicPieChart, DynamicBarChart } from '@/components/charts/DynamicCharts';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import {
   getGoalAnalytics,
   getGoalQuickStats,
   type GoalAnalytics,
 } from '@/lib/services/goal-analytics-service';
+import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 
 type TimeRange = '1m' | '3m' | '6m' | '12m';
 
 export default function GoalsAnalyticsPage() {
-  const { currentSpace } = useAuth();
+  const { currentSpace } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
   const [timeRange, setTimeRange] = useState<TimeRange>('3m');
   const [analytics, setAnalytics] = useState<GoalAnalytics | null>(null);
   const [quickStats, setQuickStats] = useState<any>(null);
@@ -24,7 +26,7 @@ export default function GoalsAnalyticsPage() {
 
   useEffect(() => {
     async function loadAnalytics() {
-      if (!currentSpace) return;
+      if (!spaceId) return;
 
       try {
         setLoading(true);
@@ -35,8 +37,8 @@ export default function GoalsAnalyticsPage() {
         const startDate = subMonths(endDate, monthsBack);
 
         const [analyticsData, statsData] = await Promise.all([
-          getGoalAnalytics(currentSpace.id, { start: startDate, end: endDate }),
-          getGoalQuickStats(currentSpace.id),
+          getGoalAnalytics(spaceId, { start: startDate, end: endDate }),
+          getGoalQuickStats(spaceId),
         ]);
 
         setAnalytics(analyticsData);
@@ -50,22 +52,10 @@ export default function GoalsAnalyticsPage() {
     }
 
     loadAnalytics();
-  }, [currentSpace, timeRange]);
+  }, [spaceId, timeRange]);
 
-  if (!currentSpace) {
-    return (
-      <FeatureLayout
-        breadcrumbItems={[
-          { label: 'Settings', href: '/settings' },
-          { label: 'Analytics', href: '/settings/analytics' },
-          { label: 'Goals & Milestones' },
-        ]}
-      >
-        <div className="p-8 text-center">
-          <p className="text-gray-600 dark:text-gray-400">Please select a space to continue</p>
-        </div>
-      </FeatureLayout>
-    );
+  if (!spaceId) {
+    return <SpacesLoadingState />;
   }
 
   return (

@@ -16,12 +16,14 @@ import {
   BadgeStats,
   getAchievementLevel
 } from '@/lib/services/achievement-badges-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { usePresence } from '@/lib/hooks/usePresence';
 import { toast } from 'sonner';
+import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 
 export default function AchievementsPage() {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
   const [badges, setBadges] = useState<AchievementBadge[]>([]);
   const [userAchievements, setUserAchievements] = useState<UserAchievement[]>([]);
   const [progress, setProgress] = useState<AchievementProgress[]>([]);
@@ -34,17 +36,17 @@ export default function AchievementsPage() {
   // Presence tracking
   const { onlineUsers } = usePresence({
     channelName: 'achievements-presence',
-    spaceId: currentSpace?.id || 'skip',
+    spaceId: spaceId || '',
     userId: user?.id || '',
     userEmail: user?.email,
   });
 
   useEffect(() => {
     loadAchievementData();
-  }, [currentSpace, user]);
+  }, [spaceId, user]);
 
   const loadAchievementData = async () => {
-    if (!currentSpace || !user) {
+    if (!spaceId || !user) {
       setLoading(false);
       return;
     }
@@ -53,9 +55,9 @@ export default function AchievementsPage() {
       setLoading(true);
       const [allBadges, userBadges, userProgress, badgeStats] = await Promise.all([
         achievementBadgesService.getAllBadges(),
-        achievementBadgesService.getUserBadges(user.id, currentSpace.id),
-        achievementBadgesService.getUserBadgeProgress(user.id, currentSpace.id),
-        achievementBadgesService.getUserBadgeStats(user.id, currentSpace.id)
+        achievementBadgesService.getUserBadges(user.id, spaceId),
+        achievementBadgesService.getUserBadgeProgress(user.id, spaceId),
+        achievementBadgesService.getUserBadgeStats(user.id, spaceId)
       ]);
 
       setBadges(allBadges);
@@ -71,12 +73,12 @@ export default function AchievementsPage() {
   };
 
   const handleCheckForNewBadges = async () => {
-    if (!user || !currentSpace) return;
+    if (!user || !spaceId) return;
 
     try {
       const newBadges = await achievementBadgesService.checkAndAwardBadges(
         user.id,
-        currentSpace.id,
+        spaceId,
         'manual_check'
       );
 
@@ -106,6 +108,10 @@ export default function AchievementsPage() {
 
   // Get achievement level info
   const levelInfo = stats ? getAchievementLevel(stats.total_points) : null;
+
+  if (!spaceId || !user) {
+    return <SpacesLoadingState />;
+  }
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Achievements' }]}>

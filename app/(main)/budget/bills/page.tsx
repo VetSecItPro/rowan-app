@@ -5,7 +5,7 @@ import { Receipt, Plus, AlertCircle, TrendingUp, Calendar, DollarSign } from 'lu
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { BillsList } from '@/components/budget/BillsList';
 import { NewBillModal } from '@/components/projects/NewBillModal';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import {
   billsService,
   createBill,
@@ -18,9 +18,11 @@ import {
   type BillStats,
 } from '@/lib/services/bills-service';
 import { useRouter } from 'next/navigation';
+import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 
 export default function BillsManagementPage() {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
   const router = useRouter();
 
   const [bills, setBills] = useState<Bill[]>([]);
@@ -32,15 +34,15 @@ export default function BillsManagementPage() {
 
   // Load bills and stats
   const loadBillsData = useCallback(async () => {
-    if (!currentSpace) return;
+    if (!spaceId) return;
 
     try {
       setLoading(true);
       setError(null);
 
       const [billsData, statsData] = await Promise.all([
-        billsService.getBills(currentSpace.id),
-        getBillStats(currentSpace.id),
+        billsService.getBills(spaceId),
+        getBillStats(spaceId),
       ]);
 
       setBills(billsData);
@@ -51,7 +53,7 @@ export default function BillsManagementPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentSpace]);
+  }, [spaceId]);
 
   useEffect(() => {
     loadBillsData();
@@ -124,21 +126,8 @@ export default function BillsManagementPage() {
     setEditingBill(null);
   };
 
-  if (!currentSpace) {
-    return (
-      <FeatureLayout
-        breadcrumbItems={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Budget', href: '/projects?tab=budgets' },
-          { label: 'Bills' },
-        ]}
-      >
-        <div className="p-8 text-center">
-          <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-          <p className="text-gray-600 dark:text-gray-400">Please select a space to continue</p>
-        </div>
-      </FeatureLayout>
-    );
+  if (!spaceId || !user) {
+    return <SpacesLoadingState />;
   }
 
   return (
@@ -246,7 +235,7 @@ export default function BillsManagementPage() {
             </div>
           ) : (
             <BillsList
-              spaceId={currentSpace.id}
+              spaceId={spaceId}
               onEdit={handleEditBill}
               onDelete={handleDeleteBill}
               onMarkPaid={handleMarkPaid}
@@ -262,7 +251,7 @@ export default function BillsManagementPage() {
         onClose={handleModalClose}
         onSave={editingBill ? handleUpdateBill : handleCreateBill}
         editBill={editingBill}
-        spaceId={currentSpace.id}
+        spaceId={spaceId}
       />
     </FeatureLayout>
   );

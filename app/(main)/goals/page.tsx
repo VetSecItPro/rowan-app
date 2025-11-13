@@ -66,11 +66,13 @@ import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import { usePresence } from '@/lib/hooks/usePresence';
 import { OnlineUsersIndicator, PresenceIndicator } from '@/components/shared/PresenceIndicator';
+import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 
 type ViewMode = 'goals' | 'milestones' | 'habits' | 'activity';
 
 export default function GoalsPage() {
   const { currentSpace, user } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
   const [goals, setGoals] = useState<Goal[]>([]);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const goalsRef = useRef<Goal[]>([]);
@@ -100,7 +102,7 @@ export default function GoalsPage() {
   // Presence tracking for collaborative editing
   const { onlineUsers, getUsersViewingGoal, updateViewingGoal } = usePresence({
     channelName: 'goals-presence',
-    spaceId: currentSpace?.id || 'skip',
+    spaceId: spaceId || '',
     userId: user?.id || '',
     userEmail: user?.email,
   });
@@ -627,6 +629,10 @@ export default function GoalsPage() {
     }
   }, [goals]);
 
+  if (!spaceId || !user) {
+    return <SpacesLoadingState />;
+  }
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
       <PageErrorBoundary>
@@ -1000,13 +1006,13 @@ export default function GoalsPage() {
                     </div>
                   </div>
                 </div>
-                <HabitTracker spaceId={currentSpace?.id || 'skip'} />
+                {spaceId && <HabitTracker spaceId={spaceId} />}
               </div>
             ) : (
               /* Activity View */
               <div className="space-y-6">
                 <ActivityFeed
-                  spaceId={currentSpace?.id || 'skip'}
+                  spaceId={spaceId}
                   className="max-h-[600px]"
                 />
               </div>
@@ -1022,14 +1028,14 @@ export default function GoalsPage() {
         onClose={handleCloseTemplateModal}
         onSelectTemplate={handleSelectTemplate}
         onCreateFromScratch={handleCreateFromScratch}
-        spaceId={currentSpace?.id || 'placeholder'}
+        spaceId={spaceId}
       />
       <NewGoalModal
         isOpen={isGoalModalOpen}
         onClose={handleCloseGoalModal}
         onSave={handleCreateGoal}
         editGoal={editingGoal}
-        spaceId={currentSpace?.id || 'placeholder'}
+        spaceId={spaceId}
         availableGoals={goals.filter(g => g.status === 'active')}
         selectedTemplate={selectedTemplate}
       />
@@ -1038,7 +1044,7 @@ export default function GoalsPage() {
         onClose={handleCloseMilestoneModal}
         onSave={handleCreateMilestone}
         editMilestone={editingMilestone}
-        goalId={goals[0]?.id || currentSpace?.id || 'placeholder'}
+        goalId={goals[0]?.id || spaceId}
         availableGoals={goals.filter(g => g.status === 'active')}
       />
       <NewHabitModal
@@ -1046,7 +1052,7 @@ export default function GoalsPage() {
         onClose={handleCloseHabitModal}
         onSave={handleCreateHabit}
         editHabit={editingHabit}
-        spaceId={currentSpace?.id || 'placeholder'}
+        spaceId={spaceId}
       />
       {checkInGoal && (
         <GoalCheckInModal
