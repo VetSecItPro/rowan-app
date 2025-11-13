@@ -41,11 +41,13 @@ export async function createSpace(
     // Validate input
     const validated = CreateSpaceSchema.parse({ name });
 
-    // Create space
+    // Create shared space (personal spaces are handled by personalWorkspaceService)
     const { data: space, error: spaceError } = await supabase
       .from('spaces')
       .insert({
         name: validated.name,
+        is_personal: false,
+        auto_created: false,
       })
       .select()
       .single();
