@@ -34,14 +34,15 @@ export const personalWorkspaceService = {
         .select('spaces!inner(*)')
         .eq('user_id', userId)
         .eq('spaces.is_personal', true)
-        .maybeSingle();
+        .limit(1);
 
       if (error) {
         logger.warn('[personalWorkspaceService] getPersonalSpace failed', error);
         return null;
       }
 
-      return (data?.spaces || null) as Space | null;
+      const record = data?.[0];
+      return (record?.spaces || null) as Space | null;
     } catch (error) {
       logger.error('Failed to get personal space:', error);
       return null;
