@@ -164,8 +164,8 @@ export const recurringGoalsService = {
    * Get all recurring goal templates for a space
    */
   async getTemplates(spaceId: string): Promise<RecurringGoalTemplate[]> {
-    // Return empty array for invalid spaceIds (like "skip" or other placeholder values)
-    if (!spaceId || spaceId === 'skip' || spaceId === 'placeholder') {
+    // Return empty array for invalid spaceIds
+    if (!spaceId) {
       return [];
     }
 
@@ -190,8 +190,8 @@ export const recurringGoalsService = {
    * Get habit templates (recurring goals marked as habits)
    */
   async getHabitTemplates(spaceId: string): Promise<RecurringGoalTemplate[]> {
-    // Return empty array for invalid spaceIds (like "skip" or other placeholder values)
-    if (!spaceId || spaceId === 'skip' || spaceId === 'placeholder') {
+    // Return empty array for invalid spaceIds
+    if (!spaceId) {
       return [];
     }
 
@@ -670,8 +670,8 @@ export const recurringGoalsService = {
     streak?: HabitStreak;
   }[]> {
     try {
-      // Return empty array for invalid spaceIds (like "skip" or other placeholder values)
-      if (!spaceId || spaceId === 'skip' || spaceId === 'placeholder') {
+      // Return empty array for invalid spaceIds
+      if (!spaceId) {
         return [];
       }
 

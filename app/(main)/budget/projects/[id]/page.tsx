@@ -27,16 +27,18 @@ import {
   type ProjectLineItem,
   type ProjectPhoto,
 } from '@/lib/services/project-tracking-service';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { ProjectDashboard } from '@/components/budget/ProjectDashboard';
 import { ProjectLineItems } from '@/components/budget/ProjectLineItems';
 import { ProjectPhotoGallery } from '@/components/budget/ProjectPhotoGallery';
 import { BudgetVarianceCard } from '@/components/budget/BudgetVarianceCard';
+import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 
 export default function ProjectTrackingPage() {
   const params = useParams();
   const projectId = params?.id;
-  const { currentSpace } = useAuth();
+  const { currentSpace } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
   const [project, setProject] = useState<Project | null>(null);
   const [lineItems, setLineItems] = useState<ProjectLineItem[]>([]);
   const [photos, setPhotos] = useState<ProjectPhoto[]>([]);
@@ -84,20 +86,8 @@ export default function ProjectTrackingPage() {
     loadProjectData();
   }, [projectId]);
 
-  if (!currentSpace) {
-    return (
-      <FeatureLayout
-        breadcrumbItems={[
-          { label: 'Budget', href: '/budget' },
-          { label: 'Projects', href: '/budget/projects' },
-          { label: 'Project Details' },
-        ]}
-      >
-        <div className="p-8 text-center">
-          <p className="text-gray-600 dark:text-gray-400">Please select a space to continue</p>
-        </div>
-      </FeatureLayout>
-    );
+  if (!spaceId) {
+    return <SpacesLoadingState />;
   }
 
   if (loading) {

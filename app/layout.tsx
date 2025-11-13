@@ -3,7 +3,6 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthProvider } from "@/lib/contexts/auth-context";
 import { SpacesProvider } from "@/lib/contexts/spaces-context";
-import { AppWithOnboarding } from "@/components/app/AppWithOnboarding";
 import { CookieConsent } from "@/components/gdpr/CookieConsent";
 import ClientErrorBoundary from "@/components/shared/ClientErrorBoundary";
 // import { CommandPaletteProvider } from "@/components/ui/command-palette"; // Temporarily disabled UI
@@ -49,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body className="antialiased bg-gradient-to-br from-gray-50 via-purple-50/30 to-blue-50/30 dark:from-gray-950 dark:via-purple-950/20 dark:to-blue-950/20 text-gray-900 dark:text-white" style={{ scrollbarGutter: 'stable' }}>
         <ThemeProvider
           attribute="class"
@@ -60,13 +59,11 @@ export default function RootLayout({
         >
           <AuthProvider>
             <SpacesProvider>
-              <AppWithOnboarding>
-                <ClientErrorBoundary>
-                  {/* <CommandPaletteProvider> // Temporarily disabled UI */}
-                    {children}
-                  {/* </CommandPaletteProvider> */}
-                </ClientErrorBoundary>
-              </AppWithOnboarding>
+              <ClientErrorBoundary>
+                {/* <CommandPaletteProvider> // Temporarily disabled UI */}
+                  {children}
+                {/* </CommandPaletteProvider> */}
+              </ClientErrorBoundary>
             </SpacesProvider>
             <CookieConsent />
             <Toaster

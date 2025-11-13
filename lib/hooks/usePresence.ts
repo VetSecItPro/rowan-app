@@ -21,6 +21,11 @@ export function usePresence({ channelName, spaceId, userId, userEmail }: UsePres
   const [channel, setChannel] = useState<RealtimeChannel | null>(null);
 
   useEffect(() => {
+    if (!spaceId || !userId) {
+      setChannel(null);
+      return;
+    }
+
     const supabase = createClient();
 
     // Create presence channel

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import {
   Database,
   Trash2,
@@ -13,9 +13,11 @@ import {
   CheckCircle,
   Info,
 } from 'lucide-react';
+import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 
 export default function BulkOperationsPage() {
-  const { user, currentSpace } = useAuth();
+  const { user, currentSpace } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
   const router = useRouter();
 
   const [deleteStartDate, setDeleteStartDate] = useState('');
@@ -29,8 +31,8 @@ export default function BulkOperationsPage() {
   const [isArchiving, setIsArchiving] = useState(false);
   const [archiveSuccess, setArchiveSuccess] = useState(false);
 
-  if (!user || !currentSpace) {
-    return null;
+  if (!user || !spaceId) {
+    return <SpacesLoadingState />;
   }
 
   const handleGetDeleteCount = async () => {
@@ -41,7 +43,7 @@ export default function BulkOperationsPage() {
 
     try {
       const response = await fetch(
-        `/api/bulk/delete-expenses?partnership_id=${currentSpace.id}&start_date=${deleteStartDate}&end_date=${deleteEndDate}`
+        `/api/bulk/delete-expenses?partnership_id=${spaceId}&start_date=${deleteStartDate}&end_date=${deleteEndDate}`
       );
       const data = await response.json();
       setDeleteCount(data.count || 0);
@@ -69,7 +71,7 @@ export default function BulkOperationsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          partnership_id: currentSpace.id,
+          partnership_id: spaceId,
           options: {
             startDate: deleteStartDate,
             endDate: deleteEndDate,
@@ -117,7 +119,7 @@ export default function BulkOperationsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          partnership_id: currentSpace.id,
+          partnership_id: spaceId,
           data_type: 'tasks',
           older_than_date: archiveDate,
         }),

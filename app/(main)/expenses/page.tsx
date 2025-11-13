@@ -21,7 +21,6 @@ import {
 } from 'lucide-react';
 import { ReceiptScanner } from '@/components/expenses/ReceiptScanner';
 import { ReceiptLibrary } from '@/components/expenses/ReceiptLibrary';
-import { useAuth } from '@/lib/contexts/auth-context';
 import { ExtractedReceiptData, ExpenseSuggestion } from '@/lib/services/receipt-scanning-service';
 
 interface ExpenseSummary {
@@ -33,7 +32,6 @@ interface ExpenseSummary {
 }
 
 export default function ExpensesPage() {
-  const { currentSpace } = useAuth();
   const [activeTab, setActiveTab] = useState('scanner');
   const [recentExpenses] = useState<ExpenseSummary>({
     total: 2847.32,

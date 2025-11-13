@@ -4,7 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { goalsService, Goal, Milestone } from '@/lib/services/goals-service';
 import { ArrowLeft, Calendar, ChevronLeft, ChevronRight, Target, Trophy, Clock, Filter } from 'lucide-react';
 import Link from 'next/link';
@@ -25,6 +25,7 @@ import {
   addDays,
   startOfDay
 } from 'date-fns';
+import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 
 interface MilestoneWithGoal extends Milestone {
   goal: Pick<Goal, 'id' | 'title' | 'category' | 'status'>;
@@ -57,7 +58,8 @@ const categoryColors = {
 };
 
 export default function GoalsCalendarPage() {
-  const { currentSpace } = useAuth();
+  const { currentSpace } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
   const [currentDate, setCurrentDate] = useState(new Date());
   const [goals, setGoals] = useState<Goal[]>([]);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -67,14 +69,14 @@ export default function GoalsCalendarPage() {
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
 
   useEffect(() => {
-    if (!currentSpace?.id) return;
+    if (!spaceId) return;
 
     const fetchData = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const goalsData = await goalsService.getGoals(currentSpace.id);
+        const goalsData = await goalsService.getGoals(spaceId);
         setGoals(goalsData);
 
         // Transform goals and milestones into calendar events
@@ -138,7 +140,7 @@ export default function GoalsCalendarPage() {
     };
 
     fetchData();
-  }, [currentSpace?.id]);
+  }, [spaceId]);
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
@@ -206,6 +208,10 @@ export default function GoalsCalendarPage() {
   const categories = Array.from(new Set(goals.map(g => g.category || 'personal')));
   const overdueCount = getOverdueEvents().length;
   const upcomingCount = getUpcomingEvents().length;
+
+  if (!spaceId) {
+    return <SpacesLoadingState />;
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

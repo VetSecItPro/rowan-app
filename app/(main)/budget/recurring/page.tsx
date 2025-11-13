@@ -5,7 +5,7 @@ import { RefreshCw, TrendingUp, AlertCircle, Sparkles } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { RecurringPatternsList } from '@/components/expenses/RecurringPatternsList';
 import { DuplicateSubscriptions } from '@/components/expenses/DuplicateSubscriptions';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import {
   analyzeRecurringPatterns,
   getRecurringPatterns,
@@ -14,6 +14,7 @@ import {
   type RecurringExpensePattern,
 } from '@/lib/services/recurring-expenses-service';
 import { useRouter } from 'next/navigation';
+import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 
 // Mock duplicate detection for now - this would come from the service
 interface DuplicateGroup {
@@ -23,7 +24,8 @@ interface DuplicateGroup {
 }
 
 export default function RecurringExpensesPage() {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
   const router = useRouter();
 
   const [patterns, setPatterns] = useState<RecurringExpensePattern[]>([]);
@@ -34,13 +36,13 @@ export default function RecurringExpensesPage() {
 
   // Load patterns
   const loadPatterns = useCallback(async () => {
-    if (!currentSpace) return;
+    if (!spaceId) return;
 
     try {
       setLoading(true);
       setError(null);
 
-      const data = await getRecurringPatterns(currentSpace.id);
+      const data = await getRecurringPatterns(spaceId);
       setPatterns(data);
 
       // Detect duplicates (simplified version)
@@ -52,7 +54,7 @@ export default function RecurringExpensesPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentSpace]);
+  }, [spaceId]);
 
   useEffect(() => {
     loadPatterns();
@@ -60,13 +62,13 @@ export default function RecurringExpensesPage() {
 
   // Run analysis
   const handleAnalyze = async () => {
-    if (!currentSpace) return;
+    if (!spaceId) return;
 
     try {
       setAnalyzing(true);
       setError(null);
 
-      await analyzeRecurringPatterns(currentSpace.id);
+      await analyzeRecurringPatterns(spaceId);
       await loadPatterns();
     } catch (err) {
       console.error('Failed to analyze patterns:', err);
@@ -81,7 +83,7 @@ export default function RecurringExpensesPage() {
     patternId: string,
     action: 'confirm' | 'ignore' | 'create'
   ) => {
-    if (!currentSpace) return;
+    if (!spaceId) return;
 
     try {
       if (action === 'confirm') {
@@ -118,21 +120,8 @@ export default function RecurringExpensesPage() {
     // TODO: Implement duplicate review modal
   };
 
-  if (!currentSpace) {
-    return (
-      <FeatureLayout
-        breadcrumbItems={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Budget', href: '/projects?tab=budgets' },
-          { label: 'Recurring Expenses' },
-        ]}
-      >
-        <div className="p-8 text-center">
-          <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-          <p className="text-gray-600 dark:text-gray-400">Please select a space to continue</p>
-        </div>
-      </FeatureLayout>
-    );
+  if (!spaceId || !user) {
+    return <SpacesLoadingState />;
   }
 
   return (

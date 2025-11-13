@@ -32,12 +32,14 @@ import { TaskQuickActions } from '@/components/tasks/TaskQuickActions';
 import { CalendarSyncToggle } from '@/components/tasks/CalendarSyncToggle';
 import { ChoreRotationConfig } from '@/components/tasks/ChoreRotationConfig';
 import { TaskCardSkeleton } from '@/components/ui/Skeleton';
+import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 
 type TaskType = 'task' | 'chore';
 type TaskOrChore = (Task & { type: 'task' }) | (Chore & { type: 'chore' });
 
 export default function TasksPage() {
   const { currentSpace, user } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
 
   // Basic state
   const [loading, setLoading] = useState(true);
@@ -79,7 +81,7 @@ export default function TasksPage() {
 
   // Real-time tasks with filters (only when currentSpace exists)
   const { tasks: realtimeTasks, loading: realtimeLoading, refreshTasks, setTasks } = useTaskRealtime({
-    spaceId: currentSpace?.id || 'skip', // Use 'skip' to prevent database calls
+    spaceId: spaceId || '',
     filters: {
       status: filters.status,
       priority: filters.priority,
@@ -93,7 +95,7 @@ export default function TasksPage() {
 
   // Real-time chores with enhanced filters
   const { chores: realtimeChores, loading: choreRealtimeLoading, refreshChores, setChores } = useChoreRealtime({
-    spaceId: currentSpace?.id || 'skip', // Use 'skip' to prevent database calls
+    spaceId: spaceId || '',
     filters: {
       status: filters.status,
       frequency: filters.frequency, // Add frequency filter for chores
@@ -600,6 +602,10 @@ export default function TasksPage() {
     refreshTasks();
     loadData();
   }, [refreshTasks, loadData]);
+
+  if (!spaceId || !user) {
+    return <SpacesLoadingState />;
+  }
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Tasks & Chores' }]}>
