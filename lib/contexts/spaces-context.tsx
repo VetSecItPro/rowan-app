@@ -56,6 +56,7 @@ const SpacesContext = createContext<SpacesContextType | null>(null);
 export function SpacesProvider({ children }: { children: ReactNode }) {
   const { user, session, loading: authLoading } = useAuth();
   const [ensuringPersonalSpace, setEnsuringPersonalSpace] = useState(false);
+  const [autoCreateAttempted, setAutoCreateAttempted] = useState(false);
 
   // React Query powered spaces data
   const spacesQuery = useSpacesQuery(user?.id);
@@ -103,7 +104,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
     if (!featureFlags.isPersonalWorkspacesEnabled()) return;
     if (!user?.id) return;
     if (authLoading) return;
-    if (ensuringPersonalSpace) return;
+    if (ensuringPersonalSpace || autoCreateAttempted) return;
 
     const hasSpaces = (spacesQuery.spaces?.length || 0) > 0;
     if (spacesQuery.isLoading || spacesQuery.isFetching) return;
@@ -130,10 +131,14 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
       .catch((error) => {
         console.error('[SpacesProvider] Failed to auto-create personal space:', error);
       })
-      .finally(() => setEnsuringPersonalSpace(false));
+      .finally(() => {
+        setEnsuringPersonalSpace(false);
+        setAutoCreateAttempted(true);
+      });
   }, [
     authLoading,
     ensuringPersonalSpace,
+    autoCreateAttempted,
     spacesQuery.isFetching,
     spacesQuery.isLoading,
     spacesQuery.spaces,
