@@ -82,15 +82,21 @@ function InnerAuthProvider({ children }: { children: ReactNode }) {
   // Authentication methods
   const signUp = async (email: string, password: string, profile: any) => {
     try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: profile,
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
         },
+        body: JSON.stringify({ email, password, profile })
       });
-      return { error };
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: new Error(data?.error || 'Failed to create account') };
+      }
+
+      return { error: null };
     } catch (error) {
       return { error: error as Error };
     }
