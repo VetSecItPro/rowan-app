@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, ReactNode, useEffect } from 'react';
+import { createContext, useContext, ReactNode, useEffect, useState } from 'react';
 import {
   useSpaces as useSpacesQuery,
   useSwitchSpace,
@@ -55,6 +55,7 @@ const SpacesContext = createContext<SpacesContextType | null>(null);
 
 export function SpacesProvider({ children }: { children: ReactNode }) {
   const { user, session, loading: authLoading } = useAuth();
+  const [ensuringPersonalSpace, setEnsuringPersonalSpace] = useState(false);
 
   // React Query powered spaces data
   const spacesQuery = useSpacesQuery(user?.id);
@@ -96,6 +97,41 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
       supabase.removeChannel(spacesChannel);
     };
   }, [session, user?.id, handleSpacesChange]);
+
+  // Ensure every user has at least one (personal) space for solo usage
+  useEffect(() => {
+    if (!featureFlags.isPersonalWorkspacesEnabled()) return;
+    if (!user?.id) return;
+    if (authLoading) return;
+    if (ensuringPersonalSpace) return;
+
+    const hasSpaces = (spacesQuery.spaces?.length || 0) > 0;
+    if (spacesQuery.isLoading || spacesQuery.isFetching) return;
+    if (hasSpaces) return;
+
+    const preferredName =
+      user.name ||
+      user.email?.split('@')[0] ||
+      undefined;
+
+    setEnsuringPersonalSpace(true);
+    personalWorkspaceService
+      .ensurePersonalSpace(user.id, preferredName)
+      .then(() => spacesQuery.refetch())
+      .catch((error) => {
+        console.error('[SpacesProvider] Failed to auto-create personal space:', error);
+      })
+      .finally(() => setEnsuringPersonalSpace(false));
+  }, [
+    authLoading,
+    ensuringPersonalSpace,
+    spacesQuery.isFetching,
+    spacesQuery.isLoading,
+    spacesQuery.spaces,
+    user?.email,
+    user?.id,
+    user?.name,
+  ]);
 
   // Spaces management methods
   const switchSpace = (space: Space & { role: string }) => {
@@ -175,9 +211,9 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
     // Core state from React Query
     spaces: spacesQuery.spaces as (Space & { role: string })[],
     currentSpace: spacesQuery.currentSpace as (Space & { role: string }) | null,
-    loading: spacesQuery.isLoading || authLoading,
+    loading: spacesQuery.isLoading || authLoading || ensuringPersonalSpace,
     error: spacesQuery.error?.message || null,
-    hasZeroSpaces: spacesQuery.hasZeroSpaces,
+    hasZeroSpaces: !ensuringPersonalSpace && spacesQuery.hasZeroSpaces,
 
     // Management methods
     switchSpace,
