@@ -31,16 +31,13 @@ export const personalWorkspaceService = {
 
       const { data, error } = await supabase
         .from('space_members')
-        .select('spaces(*)')
+        .select('spaces!inner(*)')
         .eq('user_id', userId)
         .eq('spaces.is_personal', true)
-        .single();
+        .maybeSingle();
 
       if (error) {
-        if (error.code === 'PGRST116') {
-          return null;
-        }
-        logger.warn('Personal workspace lookup failed, assuming none exists:', error);
+        logger.warn('[personalWorkspaceService] getPersonalSpace failed', error);
         return null;
       }
 
