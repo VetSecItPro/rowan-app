@@ -41,6 +41,15 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
 
   const [loadingTimeoutReached, setLoadingTimeoutReached] = useState(false);
 
+  const handleCreateFirstSpace = useCallback(async () => {
+    const defaultName = user?.name ? `${user.name}'s Space` : 'Personal Workspace';
+    const result = await createSpace(defaultName);
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to create space');
+    }
+    await refreshSpaces();
+  }, [createSpace, refreshSpaces, user?.name]);
+
   // Timeout guard for spaces loading (12 seconds max)
   useEffect(() => {
     if (isAuthenticated && (isCheckingSpaces || spacesLoading) && !loadingTimeoutReached) {
@@ -154,11 +163,3 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
 export interface OnboardingWrapperProps {
   children: React.ReactNode;
 }
-  const handleCreateFirstSpace = useCallback(async () => {
-    const defaultName = user?.name ? `${user.name}'s Space` : 'Personal Workspace';
-    const result = await createSpace(defaultName);
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to create space');
-    }
-    await refreshSpaces();
-  }, [createSpace, refreshSpaces, user?.name]);
