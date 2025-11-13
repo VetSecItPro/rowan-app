@@ -53,7 +53,7 @@ export default function RootLayout({
       <body className="antialiased bg-gradient-to-br from-gray-50 via-purple-50/30 to-blue-50/30 dark:from-gray-950 dark:via-purple-950/20 dark:to-blue-950/20 text-gray-900 dark:text-white" style={{ scrollbarGutter: 'stable' }}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
+          defaultTheme="dark"
           enableSystem={false}
           storageKey="rowan-theme"
           disableTransitionOnChange

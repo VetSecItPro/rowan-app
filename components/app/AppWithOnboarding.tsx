@@ -4,8 +4,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useZeroSpacesDetection, useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { FirstSpaceOnboarding } from '@/components/ui/FirstSpaceOnboarding';
 import { SmartOnboarding } from '@/components/onboarding/SmartOnboarding';
-import { AuthLoadingState, SpacesLoadingState, DashboardSkeleton } from '@/components/ui/LoadingStates';
+import { DashboardSkeleton } from '@/components/ui/LoadingStates';
 import { featureFlags } from '@/lib/constants/feature-flags';
+import { usePathname } from 'next/navigation';
 
 /**
  * APP WITH ONBOARDING WRAPPER - PHASE 4 INTEGRATION
@@ -28,6 +29,10 @@ interface AppWithOnboardingProps {
 }
 
 export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
+  const pathname = usePathname();
+  const authRoutes = ['/login', '/signup', '/reset-password', '/forgot-password', '/restore-account'];
+  const isAuthRoute = pathname ? authRoutes.some(route => pathname === route || pathname?.startsWith(`${route}/`)) : false;
+
   const { shouldShowOnboarding, isCheckingSpaces } = useZeroSpacesDetection();
   const {
     user,
@@ -72,7 +77,11 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
   // OPTIMIZED: Optimistic UI - show skeleton immediately while auth loads
   // This eliminates the 500ms blocking spinner and provides instant visual feedback
   if (authLoading) {
-    return <DashboardSkeleton />;
+    return isAuthRoute ? <>{children}</> : <DashboardSkeleton />;
+  }
+
+  if (isAuthRoute) {
+    return <>{children}</>;
   }
 
   // If not authenticated, show normal app (login page will handle this)
