@@ -7,8 +7,8 @@ import {
   useCreateSpace,
   useDeleteSpace,
   useSpacesStateChange,
-  type Space
 } from '@/lib/hooks/useSpacesQuery';
+import type { Space } from '@/lib/types';
 import { useAuth } from './auth-context';
 import { createClient } from '@/lib/supabase/client';
 import { featureFlags } from '@/lib/constants/feature-flags';
@@ -120,7 +120,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
       const newSpace = await createSpaceMutation.mutateAsync({
         name,
         description: null,
-        type: 'personal',
+        type: 'household',
         userId: user.id,
       });
 

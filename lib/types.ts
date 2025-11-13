@@ -109,9 +109,13 @@ export interface User {
 export interface Space {
   id: string;
   name: string;
+  description?: string | null;
+  type?: 'personal' | 'household' | 'family' | 'roommates' | 'friends';
   created_at: string;
   updated_at: string;
   user_id?: string;
+  created_by?: string;
+  settings?: Record<string, any>;
   is_personal?: boolean;
   auto_created?: boolean;
 }

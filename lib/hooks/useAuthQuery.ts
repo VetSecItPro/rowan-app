@@ -8,7 +8,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS, QUERY_OPTIONS } from '@/lib/react-query/query-client';
 import { deduplicatedRequests } from '@/lib/react-query/request-deduplication';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 
 /**
@@ -34,6 +34,7 @@ export function useAuthSession() {
   return useQuery({
     queryKey: QUERY_KEYS.auth.session(),
     queryFn: async () => {
+      const supabase = createClient();
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) throw error;
       return session;
@@ -56,6 +57,7 @@ export function useUserProfile(userId: string | undefined) {
   return useQuery({
     queryKey: QUERY_KEYS.auth.profile(userId || ''),
     queryFn: async (): Promise<UserProfile> => {
+      const supabase = createClient();
       if (!userId) throw new Error('User ID is required');
 
       const { data, error } = await supabase
@@ -145,6 +147,7 @@ export function useUpdateProfile() {
 
   return useMutation({
     mutationFn: async (updates: Partial<UserProfile>) => {
+      const supabase = createClient();
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       if (authError) throw authError;
       if (!user) throw new Error('No authenticated user');
@@ -167,6 +170,7 @@ export function useUpdateProfile() {
     },
     // Optimistic update
     onMutate: async (updates) => {
+      const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
@@ -191,6 +195,7 @@ export function useUpdateProfile() {
     },
     // Revert on error
     onError: async (err, updates, context) => {
+      const supabase = createClient();
       if (context?.previousProfile) {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
@@ -220,6 +225,7 @@ export function useSignOut() {
 
   return useMutation({
     mutationFn: async () => {
+      const supabase = createClient();
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
     },
