@@ -94,9 +94,9 @@ export function useUserSpaces(userId: string | undefined) {
     },
     enabled: !!userId,
     ...QUERY_OPTIONS.spaces,
-    // OPTIMIZED: Cache-first strategy for instant spaces loading
-    refetchOnMount: false, // Use cached spaces data instead of always refetching
-    staleTime: 8 * 60 * 1000, // 8 minutes - spaces don't change frequently
+    // EMERGENCY FIX: Always refetch to prevent perpetual loading with stale cache
+    refetchOnMount: true, // Always fetch fresh spaces data on mount
+    staleTime: 30 * 1000, // 30 seconds - balanced caching without breaking loading states
   });
 }
 
@@ -149,9 +149,9 @@ export function useCurrentSpace(userId: string | undefined) {
     },
     enabled: !!userId,
     ...QUERY_OPTIONS.spaces,
-    // OPTIMIZED: Cache-first strategy for instant current space loading
-    refetchOnMount: false, // Use cached current space instead of always refetching
-    staleTime: 5 * 60 * 1000, // 5 minutes - current space changes less frequently
+    // EMERGENCY FIX: Always refetch to prevent perpetual loading with stale cache
+    refetchOnMount: true, // Always fetch fresh current space data on mount
+    staleTime: 30 * 1000, // 30 seconds - balanced caching without breaking loading states
   });
 }
 
@@ -209,8 +209,8 @@ export function useSpaces(userId: string | undefined) {
   const hasZeroSpaces = spacesQuery.isSuccess && spaces.length === 0;
 
   return {
-    // Loading states
-    isLoading: spacesQuery.isLoading || currentSpaceQuery.isLoading,
+    // EMERGENCY FIX: Include isFetching to cover background refetch scenarios
+    isLoading: spacesQuery.isLoading || spacesQuery.isFetching || currentSpaceQuery.isLoading || currentSpaceQuery.isFetching,
     isRefetching: spacesQuery.isFetching || currentSpaceQuery.isFetching,
 
     // Data
