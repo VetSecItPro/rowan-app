@@ -72,8 +72,8 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
     try {
       setLoading(true);
 
-      // Return empty activities for invalid spaceIds (like "skip" or other placeholder values)
-      if (!spaceId || spaceId === 'skip' || spaceId === 'placeholder') {
+      // Return empty activities for invalid spaceIds
+      if (!spaceId) {
         setActivities([]);
         return;
       }

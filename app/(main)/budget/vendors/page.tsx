@@ -20,7 +20,8 @@ import {
 } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { VendorModal } from '@/components/vendors/VendorModal';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 import {
   getVendors,
   getPreferredVendors,
@@ -45,7 +46,8 @@ interface VendorStats {
 }
 
 export default function VendorManagementPage() {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
 
   const [vendors, setVendors] = useState<VendorWithSpend[]>([]);
   const [stats, setStats] = useState<VendorStats>({
@@ -64,13 +66,13 @@ export default function VendorManagementPage() {
 
   // Load vendors and stats
   const loadVendorData = useCallback(async () => {
-    if (!currentSpace) return;
+    if (!spaceId) return;
 
     try {
       setLoading(true);
       setError(null);
 
-      const vendorData = await getVendors(currentSpace.id);
+      const vendorData = await getVendors(spaceId);
 
       // Enhance vendors with spend data
       const enhancedVendors = await Promise.all(
@@ -107,7 +109,7 @@ export default function VendorManagementPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentSpace]);
+  }, [spaceId]);
 
   useEffect(() => {
     loadVendorData();
@@ -120,7 +122,7 @@ export default function VendorManagementPage() {
     try {
       await createVendor({
         ...vendorData,
-        space_id: currentSpace!.id,
+        space_id: spaceId!,
         created_by: user.id
       });
       await loadVendorData();
@@ -187,21 +189,8 @@ export default function VendorManagementPage() {
   // Get unique trades for filter
   const trades = Array.from(new Set(vendors.map(v => v.trade).filter(Boolean))).sort();
 
-  if (!currentSpace) {
-    return (
-      <FeatureLayout
-        breadcrumbItems={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Budget', href: '/projects?tab=budgets' },
-          { label: 'Vendors' },
-        ]}
-      >
-        <div className="p-8 text-center">
-          <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-          <p className="text-gray-600 dark:text-gray-400">Please select a space to continue</p>
-        </div>
-      </FeatureLayout>
-    );
+  if (!spaceId || !user) {
+    return <SpacesLoadingState />;
   }
 
   return (

@@ -210,6 +210,7 @@ const TrendIndicator = memo(function TrendIndicator({ value, label }: { value: n
 export default function DashboardPage() {
   const router = useRouter();
   const { user, spaces, currentSpace, loading: authLoading, switchSpace, refreshSpaces } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
   const [loading, setLoading] = useState(true);
   const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -2067,12 +2068,14 @@ export default function DashboardPage() {
         }}
       />
 
-      <InvitePartnerModal
-        isOpen={showInviteModal}
-        onClose={() => setShowInviteModal(false)}
-        spaceId={currentSpace?.id || 'skip'}
-        spaceName={currentSpace?.name || ''}
-      />
+      {spaceId && (
+        <InvitePartnerModal
+          isOpen={showInviteModal}
+          onClose={() => setShowInviteModal(false)}
+          spaceId={spaceId}
+          spaceName={currentSpace?.name || ''}
+        />
+      )}
 
       {/* Check-In Success Modal */}
       <CheckInSuccess

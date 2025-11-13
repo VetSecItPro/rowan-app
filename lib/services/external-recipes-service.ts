@@ -195,7 +195,16 @@ export async function searchExternalRecipes(query: string): Promise<ExternalReci
     apininjas: 5,
   };
 
-  return allResults.sort((a, b) => {
+  const uniqueMap = new Map<string, ExternalRecipe>();
+  for (const recipe of allResults) {
+    if (!uniqueMap.has(recipe.id)) {
+      uniqueMap.set(recipe.id, recipe);
+    }
+  }
+
+  const dedupedResults = Array.from(uniqueMap.values());
+
+  return dedupedResults.sort((a, b) => {
     return sourcePriority[a.source] - sourcePriority[b.source];
   });
 }
@@ -254,7 +263,15 @@ export async function searchByCuisine(cuisine: string): Promise<ExternalRecipe[]
     // Don't over-filter since the search query itself targets the cuisine
     const filteredResults = allResults;
 
-    // Sort by source priority
+    const uniqueMap = new Map<string, ExternalRecipe>();
+    for (const recipe of filteredResults) {
+      if (!uniqueMap.has(recipe.id)) {
+        uniqueMap.set(recipe.id, recipe);
+      }
+    }
+
+    const dedupedResults = Array.from(uniqueMap.values());
+
     const sourcePriority: Record<string, number> = {
       themealdb: 1,
       spoonacular: 2,
@@ -263,7 +280,7 @@ export async function searchByCuisine(cuisine: string): Promise<ExternalRecipe[]
       apininjas: 5,
     };
 
-    return filteredResults.sort((a, b) => {
+    return dedupedResults.sort((a, b) => {
       return sourcePriority[a.source] - sourcePriority[b.source];
     });
   } catch (error) {

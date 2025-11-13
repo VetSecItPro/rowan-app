@@ -7,7 +7,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
 import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import { DeleteSpaceModal } from '@/components/spaces/DeleteSpaceModal';
@@ -21,6 +21,7 @@ import {
   PrivacyDataManager,
 } from '@/components/ui/DynamicSettingsComponents';
 import { Toggle } from '@/components/ui/Toggle';
+import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 import { createClient } from '@/lib/supabase/client';
 import {
   Settings,
@@ -221,7 +222,8 @@ const documentationFeatures = [
 ];
 
 export default function SettingsPage() {
-  const { user, currentSpace, spaces, switchSpace, refreshSpaces, refreshProfile } = useAuth();
+  const { user, currentSpace, spaces, switchSpace, refreshSpaces, refreshProfile } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -759,6 +761,10 @@ export default function SettingsPage() {
     { id: 'analytics' as SettingsTab, name: 'Analytics', icon: BarChart3, description: 'Track productivity trends' },
     { id: 'help' as SettingsTab, name: 'Help & Support', icon: HelpCircle, description: 'Get help and contact us' },
   ];
+
+  if (!spaceId || !user) {
+    return <SpacesLoadingState />;
+  }
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Settings' }]}>
@@ -1533,11 +1539,11 @@ export default function SettingsPage() {
         }}
       />
 
-      {currentSpace && (
+      {spaceId && currentSpace && (
         <InvitePartnerModal
           isOpen={showInviteModal}
           onClose={() => setShowInviteModal(false)}
-          spaceId={currentSpace.id}
+          spaceId={spaceId}
           spaceName={currentSpace.name}
         />
       )}
@@ -1716,12 +1722,14 @@ export default function SettingsPage() {
       />
 
       {/* Invite Partner Modal */}
-      <InvitePartnerModal
-        isOpen={showInviteModal}
-        onClose={() => setShowInviteModal(false)}
-        spaceId={currentSpace?.id || 'skip'}
-        spaceName={currentSpace?.name || ''}
-      />
+      {spaceId && (
+        <InvitePartnerModal
+          isOpen={showInviteModal}
+          onClose={() => setShowInviteModal(false)}
+          spaceId={spaceId}
+          spaceName={currentSpace?.name || ''}
+        />
+      )}
 
       {/* Delete Space Modal */}
       {currentSpace && (

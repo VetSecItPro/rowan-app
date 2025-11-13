@@ -55,7 +55,11 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(recipes);
+    const uniqueRecipes = Array.from(
+      new Map(recipes.map((recipe) => [recipe.id, recipe])).values()
+    );
+
+    return NextResponse.json(uniqueRecipes);
   } catch (error) {
     console.error('Random recipes API error:', error);
     return NextResponse.json(

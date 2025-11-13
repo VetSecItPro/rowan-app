@@ -28,6 +28,7 @@ import { createClient } from '@/lib/supabase/client';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth } from 'date-fns';
 import { showSuccess, showError, showPromise } from '@/lib/utils/toast';
 import { toast } from 'sonner';
+import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 
 type ViewMode = 'calendar' | 'list' | 'recipes';
 type CalendarViewMode = 'week' | '2weeks' | 'month';
@@ -98,6 +99,10 @@ const CalendarDayCell = memo(({
   const isCurrentMonth = isSameMonth(day, currentMonth);
   const isToday = isSameDay(day, new Date());
 
+  if (!spaceId) {
+    return <SpacesLoadingState />;
+  }
+
   return (
     <div
       className={`min-h-[120px] p-2 rounded-lg border-2 transition-all ${
@@ -152,6 +157,7 @@ CalendarDayCell.displayName = 'CalendarDayCell';
 
 export default function MealsPage() {
   const { currentSpace, user } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -266,7 +272,7 @@ export default function MealsPage() {
   // Load meals callback
   const loadMeals = useCallback(async () => {
     // Don't load data if user doesn't have a space yet - but keep loading state
-    if (!currentSpace || !user) {
+    if (!spaceId || !user) {
       setLoading(false);
       return;
     }
@@ -274,8 +280,8 @@ export default function MealsPage() {
     try {
       setLoading(true);
       const [mealsData, statsData] = await Promise.all([
-        mealsService.getMeals(currentSpace.id),
-        mealsService.getMealStats(currentSpace.id),
+        mealsService.getMeals(spaceId),
+        mealsService.getMealStats(spaceId),
       ]);
       setMeals(mealsData);
       setStats(statsData);
@@ -285,22 +291,22 @@ export default function MealsPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentSpace, user]);
+  }, [spaceId, user]);
 
   // Load recipes callback
   const loadRecipes = useCallback(async () => {
     // Don't load data if user doesn't have a space yet - but still allow function to complete
-    if (!currentSpace) {
+    if (!spaceId) {
       return;
     }
 
     try {
-      const recipesData = await mealsService.getRecipes(currentSpace.id);
+      const recipesData = await mealsService.getRecipes(spaceId);
       setRecipes(recipesData);
     } catch (error) {
       console.error('Failed to load recipes:', error);
     }
-  }, [currentSpace]);
+  }, [spaceId]);
 
   useEffect(() => {
     loadMeals();
@@ -309,12 +315,12 @@ export default function MealsPage() {
 
   // Real-time subscriptions for collaborative editing
   useEffect(() => {
-    if (!currentSpace) return;
+    if (!spaceId) return;
 
     const supabase = createClient();
 
     // Subscribe to meal changes
-    const mealsChannel = mealsService.subscribeToMeals(currentSpace.id, (payload) => {
+    const mealsChannel = mealsService.subscribeToMeals(spaceId, (payload) => {
       console.log('[Real-time] Meal change:', payload.eventType, payload.new || payload.old);
 
       if (payload.eventType === 'INSERT' && payload.new) {
@@ -334,7 +340,7 @@ export default function MealsPage() {
     });
 
     // Subscribe to recipe changes
-    const recipesChannel = mealsService.subscribeToRecipes(currentSpace.id, (payload) => {
+    const recipesChannel = mealsService.subscribeToRecipes(spaceId, (payload) => {
       console.log('[Real-time] Recipe change:', payload.eventType, payload.new || payload.old);
 
       if (payload.eventType === 'INSERT' && payload.new) {
@@ -358,12 +364,12 @@ export default function MealsPage() {
       // Clear all pending deletion timeouts
       pendingDeletions.forEach(({ timeoutId }) => clearTimeout(timeoutId));
     };
-  }, [currentSpace, pendingDeletions]);
+  }, [spaceId, pendingDeletions]);
 
   // Memoized handlers
   const handleCreateMeal = useCallback(async (mealData: CreateMealInput, createShoppingList?: boolean) => {
-    // If currentSpace is not available, don't allow meal creation
-    if (!currentSpace) {
+    // If space is not available, don't allow meal creation
+    if (!spaceId) {
       console.warn('Cannot create meal: space not loaded yet');
       return;
     }
@@ -411,7 +417,7 @@ export default function MealsPage() {
     } catch (error) {
       console.error('Failed to save meal:', error);
     }
-  }, [editingMeal, loadMeals, currentSpace, recipes]);
+  }, [editingMeal, loadMeals, spaceId, recipes]);
 
   const handleDeleteMeal = useCallback(async (mealId: string) => {
     const mealToDelete = meals.find(m => m.id === mealId);
@@ -462,8 +468,8 @@ export default function MealsPage() {
   }, [meals]);
 
   const handleCreateRecipe = useCallback(async (recipeData: CreateRecipeInput) => {
-    // If currentSpace is not available, don't allow recipe creation
-    if (!currentSpace) {
+    // If space is not available, don't allow recipe creation
+    if (!spaceId) {
       console.warn('Cannot create recipe: space not loaded yet');
       return;
     }
@@ -479,7 +485,7 @@ export default function MealsPage() {
     } catch (error) {
       console.error('Failed to save recipe:', error);
     }
-  }, [editingRecipe, loadRecipes, currentSpace]);
+  }, [editingRecipe, loadRecipes, spaceId]);
 
   const handleDeleteRecipe = useCallback(async (recipeId: string) => {
     const recipeToDelete = recipes.find(r => r.id === recipeId);
@@ -564,10 +570,12 @@ export default function MealsPage() {
   }, []);
 
   const handleAddMealForDate = useCallback((date: Date, mealType?: string) => {
+    if (!spaceId) return;
+
     // Pre-populate meal modal with selected date and meal type
     setEditingMeal({
       id: '',
-      space_id: currentSpace?.id || 'skip',
+      space_id: spaceId,
       recipe_id: undefined,
       recipe: undefined,
       name: '',
@@ -579,7 +587,7 @@ export default function MealsPage() {
       updated_at: new Date().toISOString(),
     } as Meal);
     setIsModalOpen(true);
-  }, [currentSpace]);
+  }, [spaceId]);
 
   // Modal handlers
   const handleOpenMealModal = useCallback(() => setIsModalOpen(true), []);
@@ -605,6 +613,8 @@ export default function MealsPage() {
   }, []);
 
   const handleRecipeAddedFromDiscover = useCallback(async (recipeData: CreateRecipeInput) => {
+    if (!spaceId) return;
+
     try {
       // Save the recipe to library
       const savedRecipe = await mealsService.createRecipe(recipeData);
@@ -619,7 +629,7 @@ export default function MealsPage() {
       // Pre-populate the meal modal with the newly added recipe
       setEditingMeal({
         id: '', // Empty ID indicates this is a new meal
-        space_id: currentSpace?.id || 'skip',
+        space_id: spaceId,
         recipe_id: savedRecipe.id,
         recipe: savedRecipe,
         name: '',
@@ -639,7 +649,7 @@ export default function MealsPage() {
       console.error('Failed to save discovered recipe:', error);
       showError('Failed to save recipe. Please try again.');
     }
-  }, [currentSpace, loadRecipes]);
+  }, [spaceId, loadRecipes]);
 
   // Stat card click handlers
   const handleThisWeekClick = useCallback(() => {
@@ -675,10 +685,12 @@ export default function MealsPage() {
   }, []);
 
   const handlePlanMealFromRecipe = useCallback((recipe: Recipe) => {
+    if (!spaceId) return;
+
     // Create a new meal state with pre-selected recipe
     setEditingMeal({
       id: '', // Empty ID indicates this is a new meal
-      space_id: currentSpace?.id || 'skip',
+      space_id: spaceId,
       recipe_id: recipe.id,
       recipe: recipe,
       name: '',
@@ -690,7 +702,7 @@ export default function MealsPage() {
       updated_at: new Date().toISOString(),
     } as Meal);
     setIsModalOpen(true);
-  }, [currentSpace]);
+  }, [spaceId]);
 
   // Meal card handlers
   const handleEditMeal = useCallback((meal: Meal) => {
@@ -790,7 +802,7 @@ export default function MealsPage() {
   ]);
 
   const handleIngredientConfirm = useCallback(async (selectedIngredients: string[]) => {
-    if (!pendingMealData || !selectedRecipeForReview || !currentSpace) return;
+    if (!pendingMealData || !selectedRecipeForReview || !spaceId) return;
 
     try {
       // Create the meal
@@ -801,7 +813,7 @@ export default function MealsPage() {
       const listTitle = `${pendingMealData.name || selectedRecipeForReview.name} - ${formattedDate}`;
 
       const list = await shoppingService.createList({
-        space_id: currentSpace.id,
+        space_id: spaceId,
         title: listTitle,
         description: `Ingredients for ${selectedRecipeForReview.name}`,
         status: 'active',
@@ -833,7 +845,7 @@ export default function MealsPage() {
       console.error('Failed to create meal with shopping list:', error);
       showError('Failed to create shopping list. Please try again.');
     }
-  }, [pendingMealData, selectedRecipeForReview, currentSpace, loadMeals]);
+  }, [pendingMealData, selectedRecipeForReview, spaceId, loadMeals]);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Meal Planning' }]}>
@@ -1321,13 +1333,13 @@ export default function MealsPage() {
           </div>
         </div>
       </div>
-      {/* Modals - render even when currentSpace is temporarily null */}
+      {/* Modals */}
       <NewMealModal
         isOpen={isModalOpen}
         onClose={handleCloseMealModal}
         onSave={handleCreateMeal}
         editMeal={editingMeal}
-        spaceId={currentSpace?.id || 'loading'}
+        spaceId={spaceId}
         recipes={recipes}
         onOpenRecipeDiscover={handleOpenRecipeDiscover}
       />
@@ -1336,7 +1348,7 @@ export default function MealsPage() {
         onClose={handleCloseRecipeModal}
         onSave={handleCreateRecipe}
         editRecipe={editingRecipe}
-        spaceId={currentSpace?.id || 'loading'}
+        spaceId={spaceId}
         initialTab={recipeModalInitialTab}
         onRecipeAdded={handleRecipeAddedFromDiscover}
       />
@@ -1357,7 +1369,7 @@ export default function MealsPage() {
         isOpen={isGenerateListOpen}
         onClose={() => setIsGenerateListOpen(false)}
         meals={meals}
-        spaceId={currentSpace?.id || 'loading'}
+        spaceId={spaceId}
         onSuccess={() => loadMeals()}
       />
     </FeatureLayout>

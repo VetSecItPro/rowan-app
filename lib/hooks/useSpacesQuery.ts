@@ -109,7 +109,11 @@ export function useCurrentSpace(userId: string | undefined) {
       // Try to get saved space from localStorage first
       const savedSpaceId = localStorage.getItem(`currentSpace_${userId}`);
 
-      if (savedSpaceId) {
+      const isValidUuid = savedSpaceId
+        ? /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(savedSpaceId)
+        : false;
+
+      if (savedSpaceId && isValidUuid) {
         // Verify the saved space still exists and user has access
         const { data, error } = await supabase
         .from('space_members')
@@ -141,6 +145,8 @@ export function useCurrentSpace(userId: string | undefined) {
         }
 
         // If saved space is invalid, clear it
+        localStorage.removeItem(`currentSpace_${userId}`);
+      } else if (savedSpaceId && !isValidUuid) {
         localStorage.removeItem(`currentSpace_${userId}`);
       }
 

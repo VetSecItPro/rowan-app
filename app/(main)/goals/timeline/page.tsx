@@ -25,9 +25,10 @@ import {
   Sparkles
 } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { goalsService, type Goal, type Milestone, type GoalCheckIn } from '@/lib/services/goals-service';
 import { format, parseISO, isToday, isYesterday, isSameWeek, isSameMonth } from 'date-fns';
+import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 
 interface TimelineEvent {
   id: string;
@@ -88,7 +89,8 @@ const EVENT_CONFIGS = {
 };
 
 export default function GoalsTimelinePage() {
-  const { currentSpace, user } = useAuth();
+  const { currentSpace, user } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
 
   const [timelineGroups, setTimelineGroups] = useState<TimelineGroup[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -100,20 +102,20 @@ export default function GoalsTimelinePage() {
 
   // Load timeline data
   useEffect(() => {
-    if (currentSpace && user) {
+    if (spaceId && user) {
       loadTimelineData();
     }
-  }, [currentSpace, user]);
+  }, [spaceId, user]);
 
   const loadTimelineData = async () => {
-    if (!currentSpace || !user) return;
+    if (!spaceId || !user) return;
 
     try {
       setLoading(true);
       setError(null);
 
       // Load all goals for the space
-      const goalsData = await goalsService.getGoals(currentSpace.id);
+      const goalsData = await goalsService.getGoals(spaceId);
       setGoals(goalsData);
 
       // Create timeline events
@@ -260,21 +262,8 @@ export default function GoalsTimelinePage() {
   // Get unique categories
   const categories = Array.from(new Set(goals.map(g => g.category).filter(Boolean))).sort();
 
-  if (!currentSpace) {
-    return (
-      <FeatureLayout
-        breadcrumbItems={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Goals', href: '/goals' },
-          { label: 'Timeline' },
-        ]}
-      >
-        <div className="p-8 text-center">
-          <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-          <p className="text-gray-600 dark:text-gray-400">Please select a space to continue</p>
-        </div>
-      </FeatureLayout>
-    );
+  if (!spaceId || !user) {
+    return <SpacesLoadingState />;
   }
 
   return (

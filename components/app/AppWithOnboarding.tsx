@@ -1,76 +1,63 @@
 'use client';
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
-import { DashboardSkeleton } from '@/components/ui/LoadingStates';
-import { usePathname } from 'next/navigation';
+import { DashboardSkeleton, SpacesLoadingState } from '@/components/ui/LoadingStates';
 
 interface AppWithOnboardingProps {
   children: React.ReactNode;
 }
 
 export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
-  const pathname = usePathname();
-  const authRoutes = useMemo(
-    () => ['/login', '/signup', '/reset-password', '/forgot-password', '/restore-account'],
-    []
-  );
-  const isAuthRoute = useMemo(() => {
-    if (!pathname) return false;
-    return authRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
-  }, [authRoutes, pathname]);
-
   const {
-    user,
+    isAuthenticated,
     authLoading,
     spacesLoading,
-    isAuthenticated,
     hasZeroSpaces,
+    currentSpace,
     refreshSpaces,
-    createSpace,
+    isReady,
   } = useAuthWithSpaces();
+  const [retrying, setRetrying] = useState(false);
 
-  const handleCreateSpace = useCallback(async () => {
-    try {
-      const defaultName = user?.name ? `${user.name}'s Space` : 'My Space';
-      const result = await createSpace(defaultName);
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to create space');
-      }
-      await refreshSpaces();
-    } catch (error) {
-      console.error('Failed to create space:', error);
-    }
-  }, [createSpace, refreshSpaces, user?.name]);
-
-  if (authLoading) {
-    return isAuthRoute ? <>{children}</> : <DashboardSkeleton />;
-  }
-
-  if (!isAuthenticated || isAuthRoute) {
+  // Auth pages are no longer wrapped with this component, but guard just in case
+  if (!isAuthenticated) {
     return <>{children}</>;
   }
 
-  if (spacesLoading) {
+  if (authLoading || spacesLoading || !isReady) {
     return <DashboardSkeleton />;
   }
 
-  if (hasZeroSpaces) {
+  if (!currentSpace) {
+    if (!hasZeroSpaces) {
+      return <SpacesLoadingState />;
+    }
+
+    const handleRetry = async () => {
+      try {
+        setRetrying(true);
+        await refreshSpaces();
+      } finally {
+        setRetrying(false);
+      }
+    };
+
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-gray-950 to-black text-center px-4">
         <div className="max-w-md space-y-6">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Welcome to Rowan</h1>
+            <h1 className="text-3xl font-bold text-white mb-2">Finalizing your workspace</h1>
             <p className="text-gray-400">
-              Create your first space to start organizing tasks, reminders, and goals together.
+              Your household space is provisioning. This usually takes just a few seconds. Click retry to check again.
             </p>
           </div>
-
           <button
-            onClick={handleCreateSpace}
-            className="w-full px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold transition"
+            onClick={handleRetry}
+            disabled={retrying}
+            className="w-full px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white font-semibold transition"
           >
-            Create Your Space
+            {retrying ? 'Refreshing...' : 'Retry space lookup'}
           </button>
         </div>
       </div>

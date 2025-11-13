@@ -4,7 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { getGoalAnalytics, GoalAnalytics, DateRange } from '@/lib/services/goal-analytics-service';
 import StatCards from '@/components/goals/analytics/StatCards';
 import CompletionRateChart from '@/components/goals/analytics/CompletionRateChart';
@@ -15,18 +15,20 @@ import ProgressHeatmap from '@/components/goals/analytics/ProgressHeatmap';
 import { ArrowLeft, Calendar, Download } from 'lucide-react';
 import Link from 'next/link';
 import { subMonths, subYears } from 'date-fns';
+import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 
 type DateRangeOption = '1m' | '3m' | '6m' | '1y';
 
 export default function GoalsAnalyticsPage() {
-  const { currentSpace } = useAuth();
+  const { currentSpace } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
   const [analytics, setAnalytics] = useState<GoalAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dateRangeOption, setDateRangeOption] = useState<DateRangeOption>('6m');
 
   useEffect(() => {
-    if (!currentSpace?.id) return;
+    if (!spaceId) return;
 
     const fetchAnalytics = async () => {
       setLoading(true);
@@ -55,7 +57,7 @@ export default function GoalsAnalyticsPage() {
         }
 
         const dateRange: DateRange = { start: startDate, end: endDate };
-        const data = await getGoalAnalytics(currentSpace.id, dateRange);
+        const data = await getGoalAnalytics(spaceId, dateRange);
         setAnalytics(data);
       } catch (err) {
         console.error('Failed to fetch analytics:', err);
@@ -66,12 +68,16 @@ export default function GoalsAnalyticsPage() {
     };
 
     fetchAnalytics();
-  }, [currentSpace?.id, dateRangeOption]);
+  }, [spaceId, dateRangeOption]);
 
   const handleExport = () => {
     // TODO: Implement export functionality (PNG/PDF)
     alert('Export functionality coming soon!');
   };
+
+  if (!spaceId) {
+    return <SpacesLoadingState />;
+  }
 
   if (loading) {
     return (
