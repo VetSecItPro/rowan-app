@@ -39,9 +39,9 @@ export function useAuthSession() {
       return session;
     },
     ...QUERY_OPTIONS.auth,
-    // OPTIMIZED: Cache-first strategy for instant loading
-    refetchOnMount: false, // Use cached session data instead of always refetching
-    staleTime: 15 * 60 * 1000, // 15 minutes - sessions are stable
+    // EMERGENCY FIX: Always refetch to prevent perpetual loading with stale cache
+    refetchOnMount: true, // Always fetch fresh session data on mount
+    staleTime: 30 * 1000, // 30 seconds - balanced caching without breaking loading states
     refetchInterval: 5 * 60 * 1000, // Still refresh every 5 minutes in background
     refetchIntervalInBackground: false,
   });
@@ -86,9 +86,9 @@ export function useUserProfile(userId: string | undefined) {
     },
     enabled: !!userId, // Only run query if userId exists
     ...QUERY_OPTIONS.auth,
-    // OPTIMIZED: Cache-first strategy for instant profile loading
-    refetchOnMount: false, // Use cached profile data instead of always refetching
-    staleTime: 10 * 60 * 1000, // 10 minutes - profile data is fairly stable
+    // EMERGENCY FIX: Always refetch to prevent perpetual loading with stale cache
+    refetchOnMount: true, // Always fetch fresh profile data on mount
+    staleTime: 30 * 1000, // 30 seconds - balanced caching without breaking loading states
   });
 }
 
@@ -101,8 +101,9 @@ export function useAuth() {
   const sessionQuery = useAuthSession();
   const profileQuery = useUserProfile(sessionQuery.data?.user?.id);
 
-  const isLoading = sessionQuery.isLoading;
-  const isProfileLoading = profileQuery.isLoading;
+  // EMERGENCY FIX: Include isFetching to cover background refetch scenarios
+  const isLoading = sessionQuery.isLoading || sessionQuery.isFetching;
+  const isProfileLoading = profileQuery.isLoading || profileQuery.isFetching;
   const error = sessionQuery.error || profileQuery.error;
 
   // Determine auth state

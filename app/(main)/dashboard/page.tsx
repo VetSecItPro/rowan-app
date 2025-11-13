@@ -340,8 +340,8 @@ export default function DashboardPage() {
 
   // Load all comprehensive stats - Memoized with useCallback
   const loadAllStats = useCallback(async () => {
-    // Don't load data if user doesn't have a space yet
-    if (!currentSpace || !user) {
+    // Don't load data if user doesn't have a space yet OR if auth is still loading
+    if (!currentSpace || !user || authLoading) {
       setLoading(false);
       return;
     }
@@ -665,7 +665,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentSpace, user]);
+  }, [currentSpace, user, authLoading]);
 
   // Real-time subscriptions
   useEffect(() => {
