@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useSpaces } from '@/lib/contexts/spaces-context';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 /**
  * UNIFIED AUTH WITH SPACES HOOK - PHASE 3 INTEGRATION
@@ -65,26 +65,43 @@ export interface AuthWithSpacesState {
 export function useAuthWithSpaces(): AuthWithSpacesState {
   const auth = useAuth();
   const spaces = useSpaces();
+  const [emergencyTimeoutReached, setEmergencyTimeoutReached] = useState(false);
+
+  // Emergency timeout to prevent perpetual loading (15 seconds max)
+  useEffect(() => {
+    const isLoading = auth.loading || (!!auth.user && spaces.loading);
+
+    if (isLoading && !emergencyTimeoutReached) {
+      const emergencyTimeout = setTimeout(() => {
+        console.warn('[useAuthWithSpaces] Emergency timeout reached - forcing loading completion');
+        setEmergencyTimeoutReached(true);
+      }, 15000); // 15 second emergency timeout
+
+      return () => clearTimeout(emergencyTimeout);
+    }
+  }, [auth.loading, spaces.loading, auth.user, emergencyTimeoutReached]);
 
   const state = useMemo(() => {
     // Authentication state
     const isAuthenticated = !!(auth.user && auth.session);
-    const authLoading = auth.loading;
-    const authError = auth.error;
 
-    // Spaces state
-    const spacesLoading = spaces.loading;
+    // Apply emergency timeout overrides
+    const authLoading = emergencyTimeoutReached ? false : auth.loading;
+    const spacesLoading = emergencyTimeoutReached ? false : spaces.loading;
+
+    const authError = auth.error;
     const spacesError = spaces.error;
     const hasZeroSpaces = spaces.hasZeroSpaces;
 
-    // Combined loading state
-    const loading = authLoading || (isAuthenticated && spacesLoading);
+    // Combined loading state (forced to false if emergency timeout reached)
+    const loading = emergencyTimeoutReached ? false : (authLoading || (isAuthenticated && spacesLoading));
 
-    // Combined error state (auth errors take precedence)
-    const error = authError || spacesError;
+    // Combined error state (auth errors take precedence, add timeout error if needed)
+    const timeoutError = emergencyTimeoutReached ? 'Loading timeout - some data may be incomplete' : null;
+    const error = authError || spacesError || timeoutError;
 
-    // App readiness state
-    const isReady = !authLoading && (!isAuthenticated || !spacesLoading);
+    // App readiness state (forced ready if emergency timeout reached)
+    const isReady = emergencyTimeoutReached ? true : (!authLoading && (!isAuthenticated || !spacesLoading));
 
     // Zero-spaces onboarding state
     const needsOnboarding = isAuthenticated && !spacesLoading && hasZeroSpaces;
@@ -139,7 +156,8 @@ export function useAuthWithSpaces(): AuthWithSpacesState {
     spaces.currentSpace,
     spaces.loading,
     spaces.error,
-    spaces.hasZeroSpaces
+    spaces.hasZeroSpaces,
+    emergencyTimeoutReached
   ]);
 
   return state;
