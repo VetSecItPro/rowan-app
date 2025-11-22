@@ -54,10 +54,13 @@ export default function HomePage() {
               <span className="text-2xl font-semibold gradient-text">Rowan</span>
             </Link>
 
-            {/* Theme Toggle & Pricing */}
+            {/* Theme Toggle, Pricing & Login */}
             <div className="flex items-center gap-4">
               <a href="#pricing" className="hidden md:block inline-block py-3 px-4 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Pricing</a>
               <ThemeToggle />
+              <Link href="/login" className="inline-block px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-semibold transition-all shadow-lg hover:shadow-xl">
+                Login
+              </Link>
             </div>
           </div>
         </div>
