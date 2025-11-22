@@ -148,7 +148,53 @@ import { Dropdown } from '@/components/ui/Dropdown';
 - ✅ TaskCard filter dropdown issues
 - ✅ Modal overflow constraints
 
+## MCP Configuration
+
+### Supabase MCP
+**Status**: ✅ Connected
+**Authentication**: Personal Access Token (`sbp_8ea8e961bb80c1f0b97708ae57e509c3c1681f2c`)
+**Configuration**: `.mcp.json` - Local MCP server using `@supabase/mcp-server-supabase@latest`
+**Project**: `mhqpjprmpvigmwcghpzx`
+
+**Capabilities**:
+- Direct SQL queries and database operations
+- Database migration management
+- Real-time table monitoring
+- RLS policy management
+
+### Vercel MCP
+**Status**: ✅ Connected
+**Authentication**: OAuth via Claude Code
+**Team**: VetSecItPro (`team_HFUTBVxI8jKYi334LvgVsVNh`)
+**Project**: rowan-app (`prj_JDUhvutaUVWf0QXkBEe8axFVlWvE`)
+
+**Capabilities**:
+- Direct deployment to Vercel (`vercel deploy`)
+- Deployment monitoring and logs
+- Protected URL access
+- Project management
+
 ## Git Workflow & Deployment
+
+### Hybrid Deployment Strategy
+We use **dual deployment paths** for optimal workflow:
+
+**🚀 Direct Deployment** (Development/Testing):
+```bash
+# Quick iteration cycle
+vercel deploy          # Preview deployment for rapid testing
+vercel deploy --prod   # Direct production deployment (emergency)
+```
+
+**🔄 GitHub Actions** (Official Releases):
+```bash
+# Automated production pipeline
+git push origin main   # Triggers automated deployment
+```
+
+**When to use each**:
+- **Direct Deployment**: Quick prototypes, demos, emergency hotfixes, feature testing
+- **GitHub Actions**: Official releases, team collaboration, automated testing pipeline
 
 ### CRITICAL: Branching Strategy
 **NEVER commit directly to main branch. Always use feature branches.**

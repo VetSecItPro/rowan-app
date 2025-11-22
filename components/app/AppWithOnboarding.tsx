@@ -37,7 +37,26 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
     const handleRetry = async () => {
       try {
         setRetrying(true);
+
+        // First, try normal space refresh
         await refreshSpaces();
+
+        // If still no spaces after refresh, check if user is orphaned and auto-fix
+        if (!currentSpace && !hasZeroSpaces) {
+          console.log('[AppWithOnboarding] Auto-fixing orphaned user...');
+
+          // Create a space for this orphaned user
+          const spaceName = `${user?.email?.split('@')[0] || 'My'} Space`;
+          const result = await createSpace(spaceName);
+
+          if (result.success) {
+            console.log('[AppWithOnboarding] Successfully created space for orphaned user');
+            // Refresh spaces again to load the new space
+            await refreshSpaces();
+          } else {
+            console.error('[AppWithOnboarding] Failed to create space for orphaned user:', result.error);
+          }
+        }
       } finally {
         setRetrying(false);
       }
