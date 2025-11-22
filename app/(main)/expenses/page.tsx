@@ -106,7 +106,7 @@ export default function ExpensesPage() {
       </div>
 
       {/* Expense Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
@@ -228,7 +228,7 @@ export default function ExpensesPage() {
           <CardDescription>Common expense management tasks</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <Button variant="outline" className="h-20 flex-col">
               <Receipt className="h-6 w-6 mb-2" />
               Scan Receipt

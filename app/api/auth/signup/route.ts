@@ -23,16 +23,16 @@ export async function POST(request: NextRequest) {
       { authRateLimit },
       { extractIP },
       { z },
-      { supabaseServer }
+      { supabaseAdmin }
     ] = await Promise.all([
       import('@/lib/supabase/server'),
       import('@/lib/ratelimit'),
       import('@/lib/ratelimit-fallback'),
       import('zod'),
-      import('@/lib/supabase-server')
+      import('@/lib/supabase/admin')
     ]);
 
-    supabaseServerClient = supabaseServer;
+    supabaseServerClient = supabaseAdmin;
 
     // Create validation schema at runtime
     if (!SignUpSchema) {
@@ -53,9 +53,6 @@ export async function POST(request: NextRequest) {
             .min(1, 'Name is required')
             .max(100, 'Name too long')
             .trim(),
-          pronouns: z.string()
-            .max(50, 'Pronouns too long')
-            .optional(),
           color_theme: z.enum([
             'emerald', 'blue', 'purple', 'pink', 'orange', 'rose',
             'cyan', 'amber', 'indigo', 'teal', 'red', 'lime',
@@ -105,7 +102,6 @@ export async function POST(request: NextRequest) {
     const sanitizedProfile = {
       ...validated.profile,
       name: stripTags(validated.profile.name),
-      pronouns: validated.profile.pronouns ? stripTags(validated.profile.pronouns) : undefined,
       space_name: validated.profile.space_name ? stripTags(validated.profile.space_name) : undefined,
     };
 
@@ -128,7 +124,6 @@ export async function POST(request: NextRequest) {
       options: {
         data: {
           name: sanitizedProfile.name,
-          pronouns: sanitizedProfile.pronouns,
           color_theme: sanitizedProfile.color_theme || 'purple',
           space_name: sanitizedProfile.space_name,
           marketing_emails_enabled: sanitizedProfile.marketing_emails_enabled ?? false,
@@ -176,6 +171,40 @@ export async function POST(request: NextRequest) {
 
     const userId = data.user.id;
     const spaceName = sanitizedProfile.space_name;
+
+    // CRITICAL FIX: Create user record in public.users table first
+    const { error: publicUserError } = await supabaseServerClient
+      .from('users')
+      .insert({
+        id: userId,
+        email: validated.email,
+        name: sanitizedProfile.name,
+        color_theme: sanitizedProfile.color_theme || 'purple',
+        timezone: 'America/New_York', // Default timezone
+        show_tasks_on_calendar: true,
+        calendar_task_filter: { categories: [], priorities: [] },
+        default_reminder_offset: '1_day_before',
+        privacy_settings: { analytics: true, readReceipts: true, activityStatus: true, profileVisibility: true },
+        show_chores_on_calendar: true,
+        calendar_chore_filter: { categories: [], frequencies: [] },
+        created_at: data.user.created_at,
+        updated_at: data.user.created_at
+      });
+
+    if (publicUserError) {
+      console.error('Public user creation failed:', publicUserError);
+      // Clean up the auth user
+      try {
+        await supabaseServerClient.auth.admin.deleteUser(userId);
+      } catch (error) {
+        console.error('Failed to cleanup auth user after public user creation failure:', error);
+      }
+
+      return NextResponse.json(
+        { error: 'Failed to create user profile. Please try again.' },
+        { status: 500 }
+      );
+    }
 
     // Create the initial space using service role client
     const { data: newSpace, error: spaceError } = await supabaseServerClient

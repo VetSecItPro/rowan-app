@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Search, Plus, ExternalLink, Loader2, ChefHat, Clock, Users, Calendar, X } from 'lucide-react';
-import { useAuth } from '@/lib/contexts/auth-context';
+import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { QuickPlanModal } from '@/components/meals/QuickPlanModal';
 import { RecipePreviewModal } from '@/components/meals/RecipePreviewModal';
 import {
@@ -17,51 +17,9 @@ import { useDebouncedCallback } from 'use-debounce';
 import { showSuccess, showError, showInfo } from '@/lib/utils/toast';
 
 export default function DiscoverRecipesPage() {
-  const { user } = useAuth();
-  const [currentSpaceId, setCurrentSpaceId] = useState<string | null>(null);
-  const [spaceLoading, setSpaceLoading] = useState(true);
-  const [spaceError, setSpaceError] = useState<string | null>(null);
-
-  // Load user's current space
-  useEffect(() => {
-    const loadSpace = async () => {
-      if (!user) {
-        console.log('No user found, skipping space load');
-        setSpaceLoading(false);
-        return;
-      }
-
-      try {
-        setSpaceLoading(true);
-        setSpaceError(null);
-
-        console.log('Loading spaces for user:', user.id);
-        const response = await fetch('/api/spaces');
-
-        if (!response.ok) {
-          throw new Error(`Failed to load spaces: ${response.statusText}`);
-        }
-
-        const spaces = await response.json();
-        console.log('Loaded spaces:', spaces);
-
-        if (spaces && Array.isArray(spaces) && spaces.length > 0) {
-          setCurrentSpaceId(spaces[0].id);
-          console.log('Current space ID set to:', spaces[0].id);
-        } else {
-          setSpaceError('No space found. Please create a space first.');
-          console.error('No spaces found for user');
-        }
-      } catch (error: any) {
-        console.error('Failed to load space:', error);
-        setSpaceError(error?.message || 'Failed to load your space. Please try again.');
-      } finally {
-        setSpaceLoading(false);
-      }
-    };
-
-    loadSpace();
-  }, [user]);
+  const { currentSpace, spacesLoading, authLoading, hasZeroSpaces } = useAuthWithSpaces();
+  const spaceId = currentSpace?.id;
+  const isSpaceLoading = authLoading || spacesLoading;
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null);
@@ -72,6 +30,20 @@ export default function DiscoverRecipesPage() {
   const [isQuickPlanOpen, setIsQuickPlanOpen] = useState(false);
   const [previewRecipe, setPreviewRecipe] = useState<ExternalRecipe | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  const notifySpaceIssue = useCallback(() => {
+    if (isSpaceLoading) {
+      showInfo('Please wait while we finish loading your workspace...');
+      return;
+    }
+
+    if (hasZeroSpaces) {
+      showError('Create a space from the dashboard before saving recipes.');
+      return;
+    }
+
+    showError('Unable to determine your current workspace. Please refresh and try again.');
+  }, [hasZeroSpaces, isSpaceLoading]);
 
   // Load random recipes on mount
   useEffect(() => {
@@ -138,22 +110,27 @@ export default function DiscoverRecipesPage() {
   };
 
   const handlePlanMeal = useCallback(async (externalRecipe: ExternalRecipe) => {
-    if (!currentSpaceId) {
-      showInfo('Please wait while loading your space...');
+    if (!spaceId) {
+      notifySpaceIssue();
       return;
     }
 
     setPlanningRecipe(externalRecipe);
     setIsQuickPlanOpen(true);
-  }, [currentSpaceId]);
+  }, [notifySpaceIssue, spaceId]);
 
   const handleQuickPlan = useCallback(async (date: string, mealType: string, createShoppingList: boolean) => {
-    if (!currentSpaceId || !planningRecipe) return;
+    if (!planningRecipe) return;
+
+    if (!spaceId) {
+      notifySpaceIssue();
+      return;
+    }
 
     try {
       // First, save recipe to library
       const recipeData = {
-        space_id: currentSpaceId,
+        space_id: spaceId,
         name: planningRecipe.name,
         description: planningRecipe.description || '',
         prep_time: planningRecipe.prep_time,
@@ -176,7 +153,7 @@ export default function DiscoverRecipesPage() {
 
       // Then create meal with the saved recipe
       const mealData = {
-        space_id: currentSpaceId,
+        space_id: spaceId,
         recipe_id: savedRecipe.id,
         name: planningRecipe.name,
         meal_type: mealType as 'breakfast' | 'lunch' | 'dinner' | 'snack',
@@ -195,7 +172,7 @@ export default function DiscoverRecipesPage() {
         const listTitle = `${planningRecipe.name} - ${formattedDate}`;
 
         const list = await shoppingService.createList({
-          space_id: currentSpaceId,
+          space_id: spaceId,
           title: listTitle,
           description: `Ingredients for ${planningRecipe.name}`,
           status: 'active',
@@ -234,11 +211,11 @@ export default function DiscoverRecipesPage() {
       console.error('Failed to plan meal:', error);
       showError(`Failed to plan meal: ${error?.message || 'Unknown error'}`);
     }
-  }, [currentSpaceId, planningRecipe]);
+  }, [notifySpaceIssue, planningRecipe, spaceId]);
 
   const handleAddToLibrary = useCallback(async (externalRecipe: ExternalRecipe) => {
-    if (!currentSpaceId) {
-      showInfo('Please wait while loading your space...');
+    if (!spaceId) {
+      notifySpaceIssue();
       return;
     }
 
@@ -247,7 +224,7 @@ export default function DiscoverRecipesPage() {
     try {
       // Prepare recipe data
       const recipeData = {
-        space_id: currentSpaceId,
+        space_id: spaceId,
         name: externalRecipe.name,
         description: externalRecipe.description || '',
         prep_time: externalRecipe.prep_time,
@@ -290,7 +267,7 @@ export default function DiscoverRecipesPage() {
         return next;
       });
     }
-  }, [currentSpaceId]);
+  }, [notifySpaceIssue, spaceId]);
 
   const getSourceBadgeColor = (source: string) => {
     switch (source) {
