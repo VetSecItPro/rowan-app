@@ -31,7 +31,6 @@ import {
   Lock,
   Users,
   Database,
-  HelpCircle,
   Save,
   Camera,
   Mail,
@@ -70,7 +69,7 @@ import {
   FolderOpen
 } from 'lucide-react';
 
-type SettingsTab = 'profile' | 'security' | 'privacy-data' | 'documentation' | 'analytics' | 'help';
+type SettingsTab = 'profile' | 'security' | 'privacy-data' | 'documentation' | 'analytics';
 type UserRole = 'Admin' | 'Member' | 'Viewer';
 type ExportStatus = 'idle' | 'pending' | 'processing' | 'ready';
 
@@ -805,7 +804,6 @@ export default function SettingsPage() {
     { id: 'privacy-data' as SettingsTab, name: 'Privacy & Data', icon: Lock, description: 'Privacy settings and data management' },
     { id: 'documentation' as SettingsTab, name: 'Documentation', icon: BookOpen, description: 'Browse our guides and tutorials' },
     { id: 'analytics' as SettingsTab, name: 'Analytics', icon: BarChart3, description: 'Track productivity trends' },
-    { id: 'help' as SettingsTab, name: 'Help & Support', icon: HelpCircle, description: 'Get help and contact us' },
   ];
 
   if (!spaceId || !user) {
@@ -1537,38 +1535,6 @@ export default function SettingsPage() {
                   </div>
                 )}
 
-                {/* Help & Support Tab */}
-                {activeTab === 'help' && (
-                  <div className="space-y-6 sm:space-y-8">
-                    <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Help & Support</h2>
-                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Get help and learn more about Rowan</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                      <a href="#" className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg transition-shadow">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Contact Support</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Get help from our team</p>
-                      </a>
-
-                      <a href="#" className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg transition-shadow">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Community Forum</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Connect with other users</p>
-                      </a>
-
-                      <a href="#" className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg transition-shadow">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">What&apos;s New</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">See the latest features and updates</p>
-                      </a>
-                    </div>
-
-                    <div className="p-6 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">App Version</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Rowan v1.0.0</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">You&apos;re running the latest version</p>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>

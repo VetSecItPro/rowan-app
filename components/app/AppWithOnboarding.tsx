@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { DashboardSkeleton, SpacesLoadingState } from '@/components/ui/LoadingStates';
+import { BetaFeedbackButton } from '@/components/beta/BetaFeedbackButton';
 
 interface AppWithOnboardingProps {
   children: React.ReactNode;
@@ -83,5 +84,10 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
     );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <BetaFeedbackButton />
+    </>
+  );
 }

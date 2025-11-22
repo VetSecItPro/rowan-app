@@ -68,12 +68,6 @@ export function Footer() {
             >
               Documentation
             </Link>
-            <Link
-              href="/settings/support"
-              className="btn-touch px-2 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95"
-            >
-              Support
-            </Link>
           </div>
         </div>
       </div>
