@@ -133,6 +133,48 @@ export default function SupportPage() {
                 </p>
               </div>
               <div>
+                <h4 className="font-medium text-gray-900 dark:text-white mb-1">How does AI recipe import work?</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Paste any cooking website URL in the recipe import feature and our AI (Google Gemini) will automatically extract ingredients, instructions, and timing. You can review and edit before saving.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900 dark:text-white mb-1">How accurate is receipt scanning?</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Our AI-powered OCR is very accurate for clear receipts. Always review extracted data before saving. Take photos in good lighting for best results.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900 dark:text-white mb-1">What external recipe sources are available?</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  We integrate with Spoonacular, Tasty, and API Ninjas to give you access to thousands of recipes across 37+ cuisines. Search, filter by difficulty, and save favorites.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900 dark:text-white mb-1">Can I track multiple projects and budgets?</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Yes! Create unlimited projects with individual budgets, track expenses, manage vendors, and analyze budget vs actual spending with detailed reports.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900 dark:text-white mb-1">How do task and chore templates work?</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Save frequently used task configurations as templates for quick reuse. Set up recurring chores with automatic rotation between family members.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900 dark:text-white mb-1">What happens to my data if I delete my account?</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Account deletion includes a 30-day grace period. You can export your data in JSON, CSV, or PDF formats before deletion. All data is permanently removed after the grace period.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900 dark:text-white mb-1">How many workspaces can I have?</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  This depends on your subscription tier. Free users get 1 workspace, Pro users get 3 workspaces, and Enterprise users get unlimited workspaces.
+                </p>
+              </div>
+              <div>
                 <h4 className="font-medium text-gray-900 dark:text-white mb-1">Need more help?</h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   Check out our <Link href="/settings/documentation" className="text-purple-600 dark:text-purple-400 hover:underline">comprehensive documentation</Link> or reach out on <a href="https://github.com/VetSecItPro/rowan-app" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">GitHub</a>.

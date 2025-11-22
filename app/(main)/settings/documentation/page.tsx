@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
-import { CheckSquare, Calendar, Bell, MessageSquare, ShoppingBag, UtensilsCrossed, Home, Target, ArrowLeft, Heart, Users } from 'lucide-react';
+import { CheckSquare, Calendar, Bell, MessageSquare, ShoppingBag, UtensilsCrossed, Home, Target, ArrowLeft, Heart, Users, Receipt, DollarSign, FolderOpen } from 'lucide-react';
 
 const features = [
   {
@@ -104,6 +104,50 @@ const features = [
     href: '/settings/documentation/spaces',
     available: true,
   },
+  {
+    id: 'household',
+    name: 'Household & Budget',
+    description: 'Manage household chores, bills, and budget tracking',
+    icon: Home,
+    color: 'from-amber-500 to-amber-600',
+    hoverBorder: 'hover:border-amber-500',
+    hoverShadow: 'hover:shadow-amber-500/50',
+    href: '/settings/documentation/household',
+    available: true,
+  },
+  {
+    id: 'expenses',
+    name: 'Expenses & Receipt Scanning',
+    description: 'AI-powered expense tracking and receipt scanning',
+    icon: Receipt,
+    color: 'from-red-500 to-red-600',
+    hoverBorder: 'hover:border-red-500',
+    hoverShadow: 'hover:shadow-red-500/50',
+    href: '/settings/documentation/expenses',
+    available: true,
+  },
+  {
+    id: 'projects',
+    name: 'Projects & Budgets',
+    description: 'Project management, budget vs actual tracking, vendor management',
+    icon: FolderOpen,
+    color: 'from-cyan-500 to-cyan-600',
+    hoverBorder: 'hover:border-cyan-500',
+    hoverShadow: 'hover:shadow-cyan-500/50',
+    href: '/settings/documentation/projects',
+    available: true,
+  },
+  {
+    id: 'recipes',
+    name: 'Recipe Library & Discovery',
+    description: 'Browse, save, and discover new recipes with AI-powered import',
+    icon: UtensilsCrossed,
+    color: 'from-yellow-500 to-yellow-600',
+    hoverBorder: 'hover:border-yellow-500',
+    hoverShadow: 'hover:shadow-yellow-500/50',
+    href: '/settings/documentation/recipes',
+    available: true,
+  },
 ];
 
 export default function DocumentationPage() {
@@ -131,8 +175,8 @@ export default function DocumentationPage() {
             </div>
           </div>
 
-          {/* Features Grid - Optimized for 9 cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {/* Features Grid - Optimized for 13 cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
             {features.map((feature) => {
               const Icon = feature.icon;
               const isAvailable = feature.available;
