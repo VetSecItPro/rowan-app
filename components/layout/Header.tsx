@@ -8,8 +8,9 @@ import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { HamburgerMenu } from '@/components/navigation/HamburgerMenu';
 import { ComprehensiveNotificationCenter } from '@/components/notifications/ComprehensiveNotificationCenter';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { LogOut, User as UserIcon, ChevronDown, Plus, Trophy } from 'lucide-react';
+import { LogOut, User as UserIcon, ChevronDown, Plus, Trophy, Shield } from 'lucide-react';
 import { SpaceSelector } from '@/components/spaces/SpaceSelector';
+import { hasAdminAccess } from '@/lib/utils/admin-utils';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
 
 const COLOR_THEMES = {
@@ -232,6 +233,18 @@ export function Header() {
                       <Trophy className="w-4 h-4" />
                       Achievements
                     </Link>
+
+                    {/* Admin Dashboard - Only show for admin users */}
+                    {hasAdminAccess(user) && (
+                      <Link
+                        href="/admin/beta"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-2 w-full px-4 py-2 text-sm text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors active:scale-[0.98] border-t border-gray-200/50 dark:border-gray-700/50 mt-1 pt-3"
+                      >
+                        <Shield className="w-4 h-4" />
+                        Admin Dashboard
+                      </Link>
+                    )}
 
                     <button
                       onClick={handleSignOut}
