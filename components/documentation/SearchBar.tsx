@@ -77,6 +77,62 @@ const DOCUMENTATION_INDEX: SearchResult[] = [
   { title: 'File Attachments', description: 'Share files and images in messages', href: '/settings/documentation/messages#attachments', category: 'Messages' },
   { title: 'Mentions & Tagging', description: 'Mention users with @ symbol', href: '/settings/documentation/messages#mentions', category: 'Messages' },
   { title: 'Search Messages', description: 'Find messages in conversation history', href: '/settings/documentation/messages#search', category: 'Messages' },
+
+  // Household & Budget
+  { title: 'Household Management Overview', description: 'Organize household with chore tracking, budget management, and bill organization', href: '/settings/documentation/household#understanding-household', category: 'Household & Budget' },
+  { title: 'Setting Up Your First Budget', description: 'Create your household budget and expense categories', href: '/settings/documentation/household#first-budget', category: 'Household & Budget' },
+  { title: 'Creating Household Chores', description: 'Set up recurring chores and assign them to family members', href: '/settings/documentation/household#creating-chores', category: 'Household & Budget' },
+  { title: 'Chore Status System', description: 'Understand chore statuses: pending, in-progress, blocked, on-hold, completed', href: '/settings/documentation/household#chore-status', category: 'Household & Budget' },
+  { title: 'Chore Assignment & Rotation', description: 'Assign chores to family members and set up rotation schedules', href: '/settings/documentation/household#chore-assignment', category: 'Household & Budget' },
+  { title: 'Budget Analytics', description: 'Detailed budget vs actual analysis with insights', href: '/settings/documentation/household#budget-analytics', category: 'Household & Budget' },
+  { title: 'Bills & Payments', description: 'Track bills with due dates and payment history', href: '/settings/documentation/household#adding-bills', category: 'Household & Budget' },
+  { title: 'Expense Categories', description: 'Organize expenses like groceries, utilities, entertainment', href: '/settings/documentation/household#expense-categories', category: 'Household & Budget' },
+  { title: 'Smart Home Integration', description: 'Connect with smart home devices and IoT sensors for automated tracking', href: '/settings/documentation/household#smart-home', category: 'Household & Budget' },
+  { title: 'Seasonal Planning', description: 'Set up seasonal chores, budget adjustments, and holiday planning', href: '/settings/documentation/household#seasonal-planning', category: 'Household & Budget' },
+  { title: 'Emergency Fund Tracking', description: 'Monitor emergency savings and unexpected expense handling', href: '/settings/documentation/household#emergency-fund', category: 'Household & Budget' },
+  { title: 'Multi-Property Management', description: 'Manage chores and budgets across multiple properties or rental units', href: '/settings/documentation/household#multi-property', category: 'Household & Budget' },
+  { title: 'Handling Irregular Income', description: 'Budget strategies for freelancers and variable income households', href: '/settings/documentation/household#irregular-income', category: 'Household & Budget' },
+  { title: 'Motivating Family Members', description: 'Tips for encouraging chore completion and budget compliance', href: '/settings/documentation/household#family-motivation', category: 'Household & Budget' },
+  { title: 'Overdue Chores Management', description: 'Handle chores that don\'t get done on time with escalation rules', href: '/settings/documentation/household#overdue-chores', category: 'Household & Budget' },
+  { title: 'Individual Budget Limits', description: 'Set different budget limits for different family members', href: '/settings/documentation/household#individual-budgets', category: 'Household & Budget' },
+  { title: 'Over Budget Handling', description: 'What happens when you exceed budget limits and how to adjust', href: '/settings/documentation/household#over-budget', category: 'Household & Budget' },
+  { title: 'Chore Rotation System', description: 'Set up automatic rotation of chores between family members', href: '/settings/documentation/household#chore-rotation', category: 'Household & Budget' },
+  { title: 'Bank Account Import', description: 'Import expenses from bank accounts and CSV files', href: '/settings/documentation/household#bank-import', category: 'Household & Budget' },
+  { title: 'Seasonal Expenses', description: 'Handle seasonal or irregular expenses in your budget planning', href: '/settings/documentation/household#seasonal-expenses', category: 'Household & Budget' },
+  { title: 'Chores vs Tasks', description: 'Understanding the difference between chores and tasks', href: '/settings/documentation/household#chores-vs-tasks', category: 'Household & Budget' },
+  { title: 'Automatic Bill Payments', description: 'Set up automatic bill payments tracking and expense creation', href: '/settings/documentation/household#auto-bills', category: 'Household & Budget' },
+  { title: 'Kids Chore Motivation', description: 'Gamification features and reward systems for children', href: '/settings/documentation/household#kids-motivation', category: 'Household & Budget' },
+  { title: 'Household Analytics', description: 'Completion rates, spending trends, and performance analytics', href: '/settings/documentation/household#household-analytics', category: 'Household & Budget' },
+
+  // Expenses & Receipt Scanning
+  { title: 'Expense Tracking Overview', description: 'Master AI-powered expense tracking with receipt scanning and analytics', href: '/settings/documentation/expenses#understanding-expenses', category: 'Expenses & Receipt Scanning' },
+  { title: 'Camera Receipt Scanning', description: 'Take photos of receipts for instant AI processing', href: '/settings/documentation/expenses#camera-scanning', category: 'Expenses & Receipt Scanning' },
+  { title: 'AI Data Extraction', description: 'How AI extracts merchant, amount, date, and items from receipts', href: '/settings/documentation/expenses#ai-extraction', category: 'Expenses & Receipt Scanning' },
+  { title: 'Receipt Correction', description: 'Review and correct AI-extracted data before saving', href: '/settings/documentation/expenses#receipt-correction', category: 'Expenses & Receipt Scanning' },
+  { title: 'Expense Analytics Dashboard', description: 'View comprehensive spending analytics and trends', href: '/settings/documentation/expenses#spending-analytics', category: 'Expenses & Receipt Scanning' },
+  { title: 'Category Breakdown', description: 'Analyze spending by category with visual charts', href: '/settings/documentation/expenses#category-breakdown', category: 'Expenses & Receipt Scanning' },
+  { title: 'Bulk Expense Operations', description: 'Edit, delete, or categorize multiple expenses at once', href: '/settings/documentation/expenses#bulk-operations', category: 'Expenses & Receipt Scanning' },
+  { title: 'Expense Export', description: 'Export expense data for tax purposes or external accounting', href: '/settings/documentation/expenses#expense-export', category: 'Expenses & Receipt Scanning' },
+
+  // Projects & Budgets
+  { title: 'Project Management Overview', description: 'Master project management with comprehensive budget tracking and vendor management', href: '/settings/documentation/projects#understanding-projects', category: 'Projects & Budgets' },
+  { title: 'Creating Your First Project', description: 'Set up a project with budget, timeline, and team members', href: '/settings/documentation/projects#first-project', category: 'Projects & Budgets' },
+  { title: 'Project Status Tracking', description: 'Use project statuses: planning, in-progress, completed, on-hold', href: '/settings/documentation/projects#project-status', category: 'Projects & Budgets' },
+  { title: 'Budget vs Actual Analysis', description: 'Compare planned budgets with actual spending for insights', href: '/settings/documentation/projects#budget-analysis', category: 'Projects & Budgets' },
+  { title: 'Vendor Database', description: 'Maintain a database of contractors, suppliers, and service providers', href: '/settings/documentation/projects#vendor-database', category: 'Projects & Budgets' },
+  { title: 'Project Templates', description: 'Create reusable project templates for common project types', href: '/settings/documentation/projects#project-templates', category: 'Projects & Budgets' },
+  { title: 'Financial Reports', description: 'Generate detailed financial reports for projects and portfolios', href: '/settings/documentation/projects#financial-reports', category: 'Projects & Budgets' },
+  { title: 'Receipt Scanning Integration', description: 'Link receipt scanning directly to project expense tracking', href: '/settings/documentation/projects#receipt-integration', category: 'Projects & Budgets' },
+
+  // Recipe Library & Discovery
+  { title: 'Recipe Library Overview', description: 'Discover, import, and organize recipes with AI-powered tools and external integrations', href: '/settings/documentation/recipes#understanding-recipes', category: 'Recipe Library & Discovery' },
+  { title: 'AI Recipe Import', description: 'Import recipes from any cooking website using AI technology', href: '/settings/documentation/recipes#url-import', category: 'Recipe Library & Discovery' },
+  { title: 'External API Recipe Search', description: 'Search recipes from Spoonacular, Tasty, and API Ninjas', href: '/settings/documentation/recipes#external-apis', category: 'Recipe Library & Discovery' },
+  { title: 'Google Gemini Integration', description: 'How AI extracts ingredients, instructions, and metadata from websites', href: '/settings/documentation/recipes#gemini-integration', category: 'Recipe Library & Discovery' },
+  { title: 'Recipe Organization', description: 'Categorize recipes with tags, cuisines, and custom collections', href: '/settings/documentation/recipes#recipe-organization', category: 'Recipe Library & Discovery' },
+  { title: 'Recipe Rating & Reviews', description: 'Rate recipes and add personal notes and modifications', href: '/settings/documentation/recipes#recipe-rating', category: 'Recipe Library & Discovery' },
+  { title: 'Recipe Collections', description: 'Create themed collections like "Quick Weeknight Dinners"', href: '/settings/documentation/recipes#recipe-collections', category: 'Recipe Library & Discovery' },
+  { title: 'Recipe to Meal Conversion', description: 'Turn saved recipes into planned meals for your calendar', href: '/settings/documentation/recipes#recipe-to-meal', category: 'Recipe Library & Discovery' },
 ];
 
 export function SearchBar() {
