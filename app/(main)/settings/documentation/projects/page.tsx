@@ -1,12 +1,28 @@
 'use client';
 
-import { FeatureLayout } from '@/components/layout/FeatureLayout';
-import { FolderOpen, Target, DollarSign, TrendingUp, Users, Calendar, FileText, BarChart3, Clock, CheckSquare } from 'lucide-react';
+import Link from 'next/link';
+import { Header } from '@/components/layout/Header';
+import { FolderOpen, Target, DollarSign, TrendingUp, Users, Calendar, FileText, BarChart3, Clock, CheckSquare, ArrowLeft } from 'lucide-react';
 
-const guides = [
+interface GuideSection {
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  color: string;
+  articles: {
+    title: string;
+    description: string;
+    readTime: string;
+    href: string;
+  }[];
+}
+
+const guideSections: GuideSection[] = [
   {
     title: 'Getting Started',
     description: 'Learn the basics of project management and budget tracking',
+    icon: FolderOpen,
+    color: 'from-cyan-500 to-cyan-600',
     articles: [
       {
         title: 'Understanding Project Management',
@@ -31,6 +47,8 @@ const guides = [
   {
     title: 'Project Setup & Management',
     description: 'Master project creation and organization',
+    icon: Target,
+    color: 'from-blue-500 to-blue-600',
     articles: [
       {
         title: 'Project Status Tracking',
@@ -61,6 +79,8 @@ const guides = [
   {
     title: 'Budget Management',
     description: 'Track project budgets and financial performance',
+    icon: DollarSign,
+    color: 'from-green-500 to-green-600',
     articles: [
       {
         title: 'Setting Project Budgets',
@@ -97,6 +117,8 @@ const guides = [
   {
     title: 'Vendor & Resource Management',
     description: 'Manage vendors, contractors, and project resources',
+    icon: Users,
+    color: 'from-purple-500 to-purple-600',
     articles: [
       {
         title: 'Vendor Database',
@@ -127,6 +149,8 @@ const guides = [
   {
     title: 'Project Analytics & Reporting',
     description: 'Get insights into project performance and financial health',
+    icon: BarChart3,
+    color: 'from-indigo-500 to-indigo-600',
     articles: [
       {
         title: 'Project Dashboard',
@@ -163,6 +187,8 @@ const guides = [
   {
     title: 'Collaboration Features',
     description: 'Work with family members and teams on projects',
+    icon: Users,
+    color: 'from-pink-500 to-pink-600',
     articles: [
       {
         title: 'Team Project Management',
@@ -193,6 +219,8 @@ const guides = [
   {
     title: 'Advanced Features',
     description: 'Unlock powerful project management capabilities',
+    icon: CheckSquare,
+    color: 'from-orange-500 to-orange-600',
     articles: [
       {
         title: 'Project Templates',
@@ -224,181 +252,105 @@ const guides = [
 
 export default function ProjectsDocumentationPage() {
   return (
-    <FeatureLayout
-      breadcrumbItems={[
-        { label: 'Documentation', href: '/settings/documentation' },
-        { label: 'Projects & Budgets' },
-      ]}
-    >
-      {/* Page Header */}
-      <div className="mb-12 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center mx-auto mb-6 shadow-lg">
-          <FolderOpen className="w-8 h-8 text-white" />
-        </div>
-        <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-          Projects & Budgets
-        </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          Master project management with comprehensive budget tracking and vendor management
-        </p>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="mb-12 p-8 bg-gradient-to-br from-cyan-50 to-cyan-100 dark:from-cyan-900/20 dark:to-cyan-800/20 rounded-2xl border border-cyan-200 dark:border-cyan-800">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center mx-auto mb-3">
-              <Target className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Project Management</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Organize projects with timelines and status tracking</p>
-          </div>
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mx-auto mb-3">
-              <DollarSign className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Budget vs Actual</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Track spending against planned budgets</p>
-          </div>
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mx-auto mb-3">
-              <Users className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Vendor Management</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Track vendors, contractors, and suppliers</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Key Features */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Key Features</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <Target className="w-8 h-8 text-cyan-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Project Status Tracking</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Track projects from planning to completion</p>
-          </div>
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <BarChart3 className="w-8 h-8 text-green-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Budget Analytics</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Detailed budget vs actual analysis with insights</p>
-          </div>
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <Users className="w-8 h-8 text-purple-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Vendor Database</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Maintain contractor and supplier information</p>
-          </div>
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <Calendar className="w-8 h-8 text-blue-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Timeline Management</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Set deadlines and track project progress</p>
-          </div>
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <TrendingUp className="w-8 h-8 text-red-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Financial Reporting</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Generate comprehensive financial reports</p>
-          </div>
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <CheckSquare className="w-8 h-8 text-indigo-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Project Templates</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Reusable templates for common project types</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Project Lifecycle */}
-      <div className="mb-12 p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-2xl border border-blue-200 dark:border-blue-800">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📊 Project Lifecycle Management</h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="text-center">
-            <div className="w-10 h-10 rounded-lg bg-yellow-500 flex items-center justify-center mx-auto mb-3">
-              <span className="text-white font-bold">1</span>
-            </div>
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Planning</h4>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Define scope, budget, and timeline</p>
-          </div>
-          <div className="text-center">
-            <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center mx-auto mb-3">
-              <span className="text-white font-bold">2</span>
-            </div>
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-1">In Progress</h4>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Execute tasks and track expenses</p>
-          </div>
-          <div className="text-center">
-            <div className="w-10 h-10 rounded-lg bg-purple-500 flex items-center justify-center mx-auto mb-3">
-              <span className="text-white font-bold">3</span>
-            </div>
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-1">On Hold</h4>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Pause for issues or resource constraints</p>
-          </div>
-          <div className="text-center">
-            <div className="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center mx-auto mb-3">
-              <span className="text-white font-bold">4</span>
-            </div>
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Completed</h4>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Finalize and analyze results</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Guide Sections */}
-      <div className="space-y-12">
-        {guides.map((guide) => (
-          <section key={guide.title} className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center flex-shrink-0">
-                <FolderOpen className="w-5 h-5 text-white" />
+    <>
+      <Header />
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-cyan-50/30 to-blue-50/30 dark:from-gray-950 dark:via-cyan-950/20 dark:to-blue-950/20">
+        <div className="max-w-7xl mx-auto p-6 sm:p-8">
+          {/* Header */}
+          <div className="mb-8">
+            <Link
+              href="/settings/documentation"
+              className="inline-flex items-center gap-2 py-2 px-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-6"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Documentation
+            </Link>
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <FolderOpen className="w-8 h-8 text-white" />
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{guide.title}</h2>
-                <p className="text-gray-600 dark:text-gray-400">{guide.description}</p>
-              </div>
+              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                Projects & Budgets
+              </h1>
+              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                Master project management with comprehensive budget tracking and vendor management
+              </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {guide.articles.map((article) => (
-                <a
-                  key={article.title}
-                  href={article.href}
-                  className="group p-4 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-cyan-300 dark:hover:border-cyan-600 hover:shadow-lg transition-all"
-                >
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-cyan-600 transition-colors">
-                    {article.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{article.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-cyan-600 dark:text-cyan-400">{article.readTime}</span>
-                    <Clock className="w-3 h-3 text-gray-400" />
+          </div>
+
+          {/* Guide Sections */}
+          <div className="space-y-12">
+            {guideSections.map((section) => {
+              const Icon = section.icon;
+              return (
+                <div key={section.title} className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200/60 dark:border-gray-700/60 rounded-3xl overflow-hidden shadow-lg">
+                  {/* Section Header */}
+                  <div className={`p-8 bg-gradient-to-r ${section.color} text-white`}>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-bold mb-2">{section.title}</h2>
+                        <p className="text-white/90">{section.description}</p>
+                      </div>
+                    </div>
                   </div>
-                </a>
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
 
-      {/* Pro Tips */}
-      <div className="mt-12 p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-2xl border border-green-200 dark:border-green-800">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💡 Pro Tips</h3>
-        <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Start with planning:</strong> Spend time in the planning phase to define clear scope and realistic budgets</p>
+                  {/* Articles Grid */}
+                  <div className="p-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {section.articles.map((article) => (
+                        <a
+                          key={article.title}
+                          href={article.href}
+                          className="group p-6 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-cyan-300 dark:hover:border-cyan-600 transition-all duration-200 hover:-translate-y-1"
+                        >
+                          <h3 className="font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+                            {article.title}
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                            {article.description}
+                          </p>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-cyan-600 dark:text-cyan-400 font-medium">
+                              {article.readTime}
+                            </span>
+                            <Clock className="w-3 h-3 text-gray-400" />
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Add buffer to budgets:</strong> Include a 10-20% contingency for unexpected costs</p>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Track expenses regularly:</strong> Update project expenses weekly for accurate budget monitoring</p>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Use templates:</strong> Create templates for recurring project types like home renovations or events</p>
+
+          {/* Pro Tips */}
+          <div className="mt-12 p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-2xl border border-green-200 dark:border-green-800">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💡 Pro Tips</h3>
+            <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Start with planning:</strong> Spend time in the planning phase to define clear scope and realistic budgets</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Add buffer to budgets:</strong> Include a 10-20% contingency for unexpected costs</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Track expenses regularly:</strong> Update project expenses weekly for accurate budget monitoring</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Use templates:</strong> Create templates for recurring project types like home renovations or events</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </FeatureLayout>
+    </>
   );
 }
