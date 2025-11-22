@@ -1,12 +1,28 @@
 'use client';
 
-import { FeatureLayout } from '@/components/layout/FeatureLayout';
-import { Home, CheckSquare, DollarSign, Calendar, TrendingUp, AlertCircle, Receipt, Target, Clock, Users } from 'lucide-react';
+import Link from 'next/link';
+import { Header } from '@/components/layout/Header';
+import { Home, CheckSquare, DollarSign, Calendar, TrendingUp, AlertCircle, Receipt, Target, Clock, Users, ArrowLeft } from 'lucide-react';
 
-const guides = [
+interface GuideSection {
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  color: string;
+  articles: {
+    title: string;
+    description: string;
+    readTime: string;
+    href: string;
+  }[];
+}
+
+const guideSections: GuideSection[] = [
   {
     title: 'Getting Started',
     description: 'Learn the basics of household and budget management',
+    icon: Home,
+    color: 'from-amber-500 to-amber-600',
     articles: [
       {
         title: 'Understanding Household Management',
@@ -31,6 +47,8 @@ const guides = [
   {
     title: 'Chore Management',
     description: 'Master household chore organization and tracking',
+    icon: CheckSquare,
+    color: 'from-blue-500 to-blue-600',
     articles: [
       {
         title: 'Chore Status System',
@@ -61,6 +79,8 @@ const guides = [
   {
     title: 'Budget & Expense Tracking',
     description: 'Track household expenses and manage your budget',
+    icon: DollarSign,
+    color: 'from-green-500 to-green-600',
     articles: [
       {
         title: 'Expense Categories',
@@ -91,6 +111,8 @@ const guides = [
   {
     title: 'Bills & Payments',
     description: 'Never miss a payment with bill tracking',
+    icon: Receipt,
+    color: 'from-red-500 to-red-600',
     articles: [
       {
         title: 'Adding Bills',
@@ -121,6 +143,8 @@ const guides = [
   {
     title: 'Analytics & Reporting',
     description: 'Get insights into your household management',
+    icon: TrendingUp,
+    color: 'from-purple-500 to-purple-600',
     articles: [
       {
         title: 'Chore Analytics',
@@ -145,6 +169,8 @@ const guides = [
   {
     title: 'Collaboration Features',
     description: 'Work together on household management',
+    icon: Users,
+    color: 'from-pink-500 to-pink-600',
     articles: [
       {
         title: 'Shared Responsibility',
@@ -169,6 +195,8 @@ const guides = [
   {
     title: 'Advanced Features & Automation',
     description: 'Leverage advanced features for streamlined household management',
+    icon: Target,
+    color: 'from-indigo-500 to-indigo-600',
     articles: [
       {
         title: 'Smart Home Integration',
@@ -199,6 +227,8 @@ const guides = [
   {
     title: 'Troubleshooting & Tips',
     description: 'Common questions and solutions for household management',
+    icon: AlertCircle,
+    color: 'from-orange-500 to-orange-600',
     articles: [
       {
         title: 'Handling Irregular Income',
@@ -230,220 +260,113 @@ const guides = [
 
 export default function HouseholdDocumentationPage() {
   return (
-    <FeatureLayout
-      breadcrumbItems={[
-        { label: 'Documentation', href: '/settings/documentation' },
-        { label: 'Household & Budget' },
-      ]}
-    >
-      {/* Page Header */}
-      <div className="mb-12 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center mx-auto mb-6 shadow-lg">
-          <Home className="w-8 h-8 text-white" />
-        </div>
-        <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-          Household & Budget
-        </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          Master household management with chore tracking, budget management, and bill organization
-        </p>
-      </div>
-      {/* Quick Stats */}
-      <div className="mb-12 p-8 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 rounded-2xl border border-amber-200 dark:border-amber-800">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center mx-auto mb-3">
-              <CheckSquare className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Chore Management</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Organize household chores with smart scheduling</p>
-          </div>
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mx-auto mb-3">
-              <DollarSign className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Budget Tracking</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Monitor expenses and stay within budget</p>
-          </div>
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center mx-auto mb-3">
-              <Receipt className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Bill Management</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Never miss a payment with bill tracking</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Key Features */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Key Features</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <CheckSquare className="w-8 h-8 text-amber-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Smart Chore Scheduling</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Set up recurring chores with flexible scheduling options</p>
-          </div>
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <Users className="w-8 h-8 text-blue-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Family Assignment</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Assign chores and bills to family members</p>
-          </div>
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <Calendar className="w-8 h-8 text-purple-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Calendar Integration</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Sync chores and bills with your calendar</p>
-          </div>
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <TrendingUp className="w-8 h-8 text-green-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Budget Analytics</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Track spending trends and budget performance</p>
-          </div>
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <AlertCircle className="w-8 h-8 text-red-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Smart Alerts</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Get notified about overdue chores and upcoming bills</p>
-          </div>
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <Target className="w-8 h-8 text-indigo-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Goal Tracking</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Set and track household management goals</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Guide Sections */}
-      <div className="space-y-12">
-        {guides.map((guide) => (
-          <section key={guide.title} className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center flex-shrink-0">
-                <Home className="w-5 h-5 text-white" />
+    <>
+      <Header />
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-amber-50/30 to-orange-50/30 dark:from-gray-950 dark:via-amber-950/20 dark:to-orange-950/20">
+        <div className="max-w-7xl mx-auto p-6 sm:p-8">
+          {/* Header */}
+          <div className="mb-8">
+            <Link
+              href="/settings/documentation"
+              className="inline-flex items-center gap-2 py-2 px-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-6"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Documentation
+            </Link>
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <Home className="w-8 h-8 text-white" />
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{guide.title}</h2>
-                <p className="text-gray-600 dark:text-gray-400">{guide.description}</p>
-              </div>
+              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                Household & Budget
+              </h1>
+              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                Master household management with chore tracking, budget management, and bill organization
+              </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {guide.articles.map((article) => (
-                <a
-                  key={article.title}
-                  href={article.href}
-                  className="group p-4 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-amber-300 dark:hover:border-amber-600 hover:shadow-lg transition-all"
-                >
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-amber-600 transition-colors">
-                    {article.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{article.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-amber-600 dark:text-amber-400">{article.readTime}</span>
-                    <Clock className="w-3 h-3 text-gray-400" />
+          </div>
+
+          {/* Guide Sections */}
+          <div className="space-y-12">
+            {guideSections.map((section) => {
+              const Icon = section.icon;
+              return (
+                <div key={section.title} className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200/60 dark:border-gray-700/60 rounded-3xl overflow-hidden shadow-lg">
+                  {/* Section Header */}
+                  <div className={`p-8 bg-gradient-to-r ${section.color} text-white`}>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-bold mb-2">{section.title}</h2>
+                        <p className="text-white/90">{section.description}</p>
+                      </div>
+                    </div>
                   </div>
-                </a>
-              ))}
+
+                  {/* Articles Grid */}
+                  <div className="p-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {section.articles.map((article) => (
+                        <a
+                          key={article.title}
+                          href={article.href}
+                          className="group p-6 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-amber-300 dark:hover:border-amber-600 transition-all duration-200 hover:-translate-y-1"
+                        >
+                          <h3 className="font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                            {article.title}
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                            {article.description}
+                          </p>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-amber-600 dark:text-amber-400 font-medium">
+                              {article.readTime}
+                            </span>
+                            <Clock className="w-3 h-3 text-gray-400" />
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Pro Tips */}
+          <div className="mt-12 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl border border-blue-200 dark:border-blue-800">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💡 Pro Tips</h3>
+            <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Set realistic schedules:</strong> Don't overwhelm yourself with too many chores on the same day</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Use the rotation feature:</strong> Automatically rotate chores between family members to keep things fair</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Track everything:</strong> Log all expenses to get accurate budget insights and identify spending patterns</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Review monthly:</strong> Check your household analytics monthly to optimize chores and budget allocation</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Plan for seasonality:</strong> Use seasonal planning to budget for holidays, vacations, and weather-related expenses</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Involve everyone:</strong> Hold weekly family meetings to discuss chores, budget progress, and upcoming expenses</p>
+              </div>
             </div>
-          </section>
-        ))}
-      </div>
-
-      {/* Frequently Asked Questions */}
-      <div className="mt-12 bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
-        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Frequently Asked Questions</h3>
-        <div className="space-y-6">
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">How do I handle chores that don't get done on time?</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Use the chore status system to mark items as "blocked" or "on-hold" with notes explaining delays. Set up escalation rules to reassign overdue chores automatically, or use the family meeting feature to discuss recurring issues.
-            </p>
-          </div>
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Can I set different budget limits for different family members?</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Yes! Create individual budget categories for each family member (e.g., "John's Allowance", "Sarah's School Expenses") and set spending limits. Use the expense tracking to monitor individual spending against these budgets.
-            </p>
-          </div>
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">What happens if I go over budget in a category?</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              You'll receive notifications when approaching budget limits (90% threshold). If you exceed the budget, the system will flag it in red on your dashboard and suggest adjustments for next month or moving funds from other categories.
-            </p>
-          </div>
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">How do recurring chores work with family rotation?</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Set up rotation patterns (weekly, monthly, or custom cycles). For example, "Taking out trash" can rotate between family members each week. The system automatically assigns the next person in rotation when marking chores complete.
-            </p>
-          </div>
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Can I import expenses from my bank account?</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              While direct bank integration isn't available, you can use the receipt scanning feature or manually import CSV exports from your bank. The AI can help categorize imported transactions automatically.
-            </p>
-          </div>
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">How do I handle seasonal or irregular expenses in my budget?</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Create specific categories for seasonal expenses (e.g., "Holiday Gifts", "Summer Vacation"). Use the seasonal planning feature to set aside money monthly for these larger annual expenses.
-            </p>
-          </div>
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">What's the difference between chores and tasks?</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Chores are recurring household maintenance activities (cleaning, laundry, yard work) while tasks are typically one-time or project-specific items. Chores have built-in rotation and scheduling features that tasks don't have.
-            </p>
-          </div>
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Can I set up automatic bill payments tracking?</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Yes! Mark bills as "auto-pay" and set up automatic expense creation when the bill is due. The system will create the expense entry and mark the bill as paid automatically on the due date.
-            </p>
-          </div>
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">How can I motivate kids to complete their chores?</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Use the gamification features: set up reward points for completed chores, create family challenges, and use the analytics to show progress. Consider linking chore completion to allowance payments tracked in the budget system.
-            </p>
-          </div>
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">What analytics are available for household management?</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              View completion rates by family member, spending trends by category, overdue items, budget vs. actual comparisons, and seasonal patterns. Export data as CSV or PDF reports for detailed analysis or tax purposes.
-            </p>
           </div>
         </div>
       </div>
-
-      {/* Pro Tips */}
-      <div className="mt-8 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl border border-blue-200 dark:border-blue-800">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💡 Pro Tips</h3>
-        <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Set realistic schedules:</strong> Don't overwhelm yourself with too many chores on the same day</p>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Use the rotation feature:</strong> Automatically rotate chores between family members to keep things fair</p>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Track everything:</strong> Log all expenses to get accurate budget insights and identify spending patterns</p>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Review monthly:</strong> Check your household analytics monthly to optimize chores and budget allocation</p>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Plan for seasonality:</strong> Use seasonal planning to budget for holidays, vacations, and weather-related expenses</p>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Involve everyone:</strong> Hold weekly family meetings to discuss chores, budget progress, and upcoming expenses</p>
-          </div>
-        </div>
-      </div>
-    </FeatureLayout>
+    </>
   );
 }
