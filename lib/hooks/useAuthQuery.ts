@@ -23,6 +23,9 @@ export interface UserProfile {
   updated_at: string;
   timezone?: string;
   preferences?: Record<string, any>;
+  is_beta_tester?: boolean;
+  beta_status?: 'pending' | 'approved' | 'rejected' | 'completed';
+  beta_signup_date?: string;
 }
 
 /**
@@ -61,8 +64,8 @@ export function useUserProfile(userId: string | undefined) {
       if (!userId) throw new Error('User ID is required');
 
       const { data, error } = await supabase
-        .from('user_profiles')
-        .select('*')
+        .from('users')
+        .select('id, email, full_name, display_name, avatar_url, created_at, updated_at, timezone, preferences, is_beta_tester, beta_status, beta_signup_date')
         .eq('id', userId)
         .single();
 
@@ -81,10 +84,17 @@ export function useUserProfile(userId: string | undefined) {
           updated_at: new Date().toISOString(),
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           preferences: {},
+          is_beta_tester: false,
+          beta_status: undefined,
+          beta_signup_date: undefined,
         };
       }
 
-      return data;
+      // Map database fields to UserProfile interface
+      return {
+        ...data,
+        name: data.display_name || data.full_name || data.email?.split('@')[0] || 'User'
+      } as UserProfile;
     },
     enabled: !!userId, // Only run query if userId exists
     ...QUERY_OPTIONS.auth,
