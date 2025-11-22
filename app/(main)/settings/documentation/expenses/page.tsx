@@ -1,12 +1,28 @@
 'use client';
 
-import { FeatureLayout } from '@/components/layout/FeatureLayout';
-import { Receipt, Camera, Scan, DollarSign, TrendingUp, PieChart, Calendar, Clock, AlertCircle, FileText } from 'lucide-react';
+import Link from 'next/link';
+import { Header } from '@/components/layout/Header';
+import { Receipt, Camera, Scan, DollarSign, TrendingUp, PieChart, Calendar, Clock, AlertCircle, FileText, ArrowLeft } from 'lucide-react';
 
-const guides = [
+interface GuideSection {
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  color: string;
+  articles: {
+    title: string;
+    description: string;
+    readTime: string;
+    href: string;
+  }[];
+}
+
+const guideSections: GuideSection[] = [
   {
     title: 'Getting Started',
     description: 'Learn the basics of expense tracking and receipt scanning',
+    icon: Receipt,
+    color: 'from-red-500 to-red-600',
     articles: [
       {
         title: 'Understanding Expense Tracking',
@@ -31,6 +47,8 @@ const guides = [
   {
     title: 'Receipt Scanning (AI-Powered)',
     description: 'Master AI-powered receipt scanning and OCR technology',
+    icon: Scan,
+    color: 'from-blue-500 to-blue-600',
     articles: [
       {
         title: 'Camera Receipt Scanning',
@@ -67,6 +85,8 @@ const guides = [
   {
     title: 'Expense Management',
     description: 'Organize and manage your expense records',
+    icon: DollarSign,
+    color: 'from-green-500 to-green-600',
     articles: [
       {
         title: 'Expense Categories',
@@ -103,6 +123,8 @@ const guides = [
   {
     title: 'Analytics & Reporting',
     description: 'Get insights into your spending patterns',
+    icon: TrendingUp,
+    color: 'from-purple-500 to-purple-600',
     articles: [
       {
         title: 'Spending Analytics Dashboard',
@@ -139,6 +161,8 @@ const guides = [
   {
     title: 'Advanced Features',
     description: 'Unlock powerful expense tracking capabilities',
+    icon: FileText,
+    color: 'from-indigo-500 to-indigo-600',
     articles: [
       {
         title: 'Bulk Expense Operations',
@@ -169,6 +193,8 @@ const guides = [
   {
     title: 'Collaboration & Sharing',
     description: 'Share expense tracking with family members',
+    icon: Camera,
+    color: 'from-cyan-500 to-cyan-600',
     articles: [
       {
         title: 'Family Expense Tracking',
@@ -194,24 +220,31 @@ const guides = [
 
 export default function ExpensesDocumentationPage() {
   return (
-    <FeatureLayout
-      breadcrumbItems={[
-        { label: 'Documentation', href: '/settings/documentation' },
-        { label: 'Expenses & Receipt Scanning' },
-      ]}
-    >
-      {/* Page Header */}
-      <div className="mb-12 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center mx-auto mb-6 shadow-lg">
-          <Receipt className="w-8 h-8 text-white" />
-        </div>
-        <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-          Expenses & Receipt Scanning
-        </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          Master AI-powered expense tracking with receipt scanning and comprehensive analytics
-        </p>
-      </div>
+    <>
+      <Header />
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-red-50/30 to-orange-50/30 dark:from-gray-950 dark:via-red-950/20 dark:to-orange-950/20">
+        <div className="max-w-7xl mx-auto p-6 sm:p-8">
+          {/* Header */}
+          <div className="mb-8">
+            <Link
+              href="/settings/documentation"
+              className="inline-flex items-center gap-2 py-2 px-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-6"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Documentation
+            </Link>
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <Receipt className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                Expenses & Receipt Scanning
+              </h1>
+              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                Master AI-powered expense tracking with receipt scanning and comprehensive analytics
+              </p>
+            </div>
+          </div>
 
       {/* Quick Stats */}
       <div className="mb-12 p-8 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-2xl border border-red-200 dark:border-red-800">
@@ -310,63 +343,79 @@ export default function ExpensesDocumentationPage() {
         </div>
       </div>
 
-      {/* Guide Sections */}
-      <div className="space-y-12">
-        {guides.map((guide) => (
-          <section key={guide.title} className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center flex-shrink-0">
-                <Receipt className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{guide.title}</h2>
-                <p className="text-gray-600 dark:text-gray-400">{guide.description}</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {guide.articles.map((article) => (
-                <a
-                  key={article.title}
-                  href={article.href}
-                  className="group p-4 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-red-300 dark:hover:border-red-600 hover:shadow-lg transition-all"
-                >
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-red-600 transition-colors">
-                    {article.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{article.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-red-600 dark:text-red-400">{article.readTime}</span>
-                    <Clock className="w-3 h-3 text-gray-400" />
+          {/* Guide Sections */}
+          <div className="space-y-12">
+            {guideSections.map((section) => {
+              const Icon = section.icon;
+              return (
+                <div key={section.title} className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200/60 dark:border-gray-700/60 rounded-3xl overflow-hidden shadow-lg">
+                  {/* Section Header */}
+                  <div className={`p-8 bg-gradient-to-r ${section.color} text-white`}>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-bold mb-2">{section.title}</h2>
+                        <p className="text-white/90">{section.description}</p>
+                      </div>
+                    </div>
                   </div>
-                </a>
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
 
-      {/* Pro Tips */}
-      <div className="mt-12 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl border border-blue-200 dark:border-blue-800">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💡 Pro Tips</h3>
-        <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Good lighting:</strong> Take receipt photos in well-lit areas for better AI recognition</p>
+                  {/* Articles Grid */}
+                  <div className="p-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {section.articles.map((article) => (
+                        <a
+                          key={article.title}
+                          href={article.href}
+                          className="group p-6 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-red-300 dark:hover:border-red-600 transition-all duration-200 hover:-translate-y-1"
+                        >
+                          <h3 className="font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                            {article.title}
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                            {article.description}
+                          </p>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-red-600 dark:text-red-400 font-medium">
+                              {article.readTime}
+                            </span>
+                            <Clock className="w-3 h-3 text-gray-400" />
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Flat surface:</strong> Place receipts on flat surfaces to avoid shadows and distortion</p>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Review AI data:</strong> Always review extracted data before saving to ensure accuracy</p>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Categorize consistently:</strong> Use consistent categories for better analytics and reporting</p>
+
+          {/* Pro Tips */}
+          <div className="mt-12 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl border border-blue-200 dark:border-blue-800">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💡 Pro Tips</h3>
+            <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Good lighting:</strong> Take receipt photos in well-lit areas for better AI recognition</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Flat surface:</strong> Place receipts on flat surfaces to avoid shadows and distortion</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Review AI data:</strong> Always review extracted data before saving to ensure accuracy</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Categorize consistently:</strong> Use consistent categories for better analytics and reporting</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </FeatureLayout>
+    </>
   );
 }

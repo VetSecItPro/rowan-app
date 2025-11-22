@@ -1,12 +1,28 @@
 'use client';
 
-import { FeatureLayout } from '@/components/layout/FeatureLayout';
-import { UtensilsCrossed, Search, Brain, Clock, Star, BookOpen, Globe, Sparkles, Heart, ChefHat } from 'lucide-react';
+import Link from 'next/link';
+import { Header } from '@/components/layout/Header';
+import { UtensilsCrossed, Search, Brain, Clock, Star, BookOpen, Globe, Sparkles, Heart, ChefHat, ArrowLeft } from 'lucide-react';
 
-const guides = [
+interface GuideSection {
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  color: string;
+  articles: {
+    title: string;
+    description: string;
+    readTime: string;
+    href: string;
+  }[];
+}
+
+const guideSections: GuideSection[] = [
   {
     title: 'Getting Started',
     description: 'Learn the basics of recipe discovery and library management',
+    icon: UtensilsCrossed,
+    color: 'from-yellow-500 to-yellow-600',
     articles: [
       {
         title: 'Understanding Recipe Library',
@@ -31,6 +47,8 @@ const guides = [
   {
     title: 'Recipe Discovery',
     description: 'Find new recipes from external sources and APIs',
+    icon: Search,
+    color: 'from-blue-500 to-blue-600',
     articles: [
       {
         title: 'External API Search',
@@ -67,6 +85,8 @@ const guides = [
   {
     title: 'AI Recipe Import',
     description: 'Import recipes from any cooking website using AI',
+    icon: Brain,
+    color: 'from-purple-500 to-purple-600',
     articles: [
       {
         title: 'URL-Based Import',
@@ -103,6 +123,8 @@ const guides = [
   {
     title: 'Recipe Library Management',
     description: 'Organize and manage your personal recipe collection',
+    icon: BookOpen,
+    color: 'from-green-500 to-green-600',
     articles: [
       {
         title: 'Recipe Organization',
@@ -139,6 +161,8 @@ const guides = [
   {
     title: 'Manual Recipe Creation',
     description: 'Create your own custom recipes from scratch',
+    icon: ChefHat,
+    color: 'from-red-500 to-red-600',
     articles: [
       {
         title: 'Recipe Builder',
@@ -175,6 +199,8 @@ const guides = [
   {
     title: 'Meal Planning Integration',
     description: 'Connect recipes with meal planning features',
+    icon: Heart,
+    color: 'from-pink-500 to-pink-600',
     articles: [
       {
         title: 'Recipe to Meal Conversion',
@@ -205,6 +231,8 @@ const guides = [
   {
     title: 'Advanced Features',
     description: 'Unlock powerful recipe discovery and management capabilities',
+    icon: Star,
+    color: 'from-indigo-500 to-indigo-600',
     articles: [
       {
         title: 'Recipe Collections',
@@ -236,198 +264,105 @@ const guides = [
 
 export default function RecipesDocumentationPage() {
   return (
-    <FeatureLayout
-      breadcrumbItems={[
-        { label: 'Documentation', href: '/settings/documentation' },
-        { label: 'Recipe Library & Discovery' },
-      ]}
-    >
-      {/* Page Header */}
-      <div className="mb-12 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center mx-auto mb-6 shadow-lg">
-          <UtensilsCrossed className="w-8 h-8 text-white" />
-        </div>
-        <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-          Recipe Library & Discovery
-        </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          Discover, import, and organize recipes with AI-powered tools and extensive external integrations
-        </p>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="mb-12 p-8 bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 rounded-2xl border border-yellow-200 dark:border-yellow-800">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center mx-auto mb-3">
-              <Brain className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">AI Recipe Import</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Import from any cooking website with AI</p>
-          </div>
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mx-auto mb-3">
-              <Globe className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">External APIs</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Search Spoonacular, Tasty, API Ninjas</p>
-          </div>
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mx-auto mb-3">
-              <BookOpen className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Personal Library</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Organize and manage your recipe collection</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Key Features */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Key Features</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <Brain className="w-8 h-8 text-yellow-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">AI-Powered Import</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Import recipes from any cooking website URL</p>
-          </div>
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <Search className="w-8 h-8 text-blue-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">External Recipe Search</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Discover recipes from multiple cooking APIs</p>
-          </div>
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <BookOpen className="w-8 h-8 text-green-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Personal Recipe Library</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Organize saved and custom recipes</p>
-          </div>
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <Star className="w-8 h-8 text-purple-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Recipe Rating System</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Rate and review recipes with personal notes</p>
-          </div>
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <ChefHat className="w-8 h-8 text-red-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Custom Recipe Creation</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Build your own recipes from scratch</p>
-          </div>
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <Heart className="w-8 h-8 text-pink-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Meal Plan Integration</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Convert recipes to meals and shopping lists</p>
-          </div>
-        </div>
-      </div>
-
-      {/* AI Technology Spotlight */}
-      <div className="mb-12 p-6 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-2xl border border-purple-200 dark:border-purple-800">
-        <div className="flex items-start gap-4 mb-4">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-            <Sparkles className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">🤖 AI Recipe Import Technology</h3>
-            <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-              Our Google Gemini-powered AI can extract complete recipe information from any cooking website URL:
-            </p>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <div className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
-            <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-            <span><strong>Recipe Title:</strong> Automatic title extraction and formatting</span>
-          </div>
-          <div className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
-            <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-            <span><strong>Ingredients List:</strong> Quantities, units, and preparation notes</span>
-          </div>
-          <div className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
-            <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-            <span><strong>Instructions:</strong> Step-by-step cooking directions</span>
-          </div>
-          <div className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
-            <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-            <span><strong>Timing & Servings:</strong> Prep time, cook time, serving size</span>
-          </div>
-        </div>
-      </div>
-
-      {/* External API Sources */}
-      <div className="mb-12 p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-2xl border border-green-200 dark:border-green-800">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🌍 Recipe Discovery Sources</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="text-center p-4 bg-white dark:bg-gray-800 rounded-lg">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Spoonacular</h4>
-            <p className="text-xs text-gray-600 dark:text-gray-400">380,000+ recipes with detailed nutritional data</p>
-          </div>
-          <div className="text-center p-4 bg-white dark:bg-gray-800 rounded-lg">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Tasty API</h4>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Buzzfeed's popular recipe collection</p>
-          </div>
-          <div className="text-center p-4 bg-white dark:bg-gray-800 rounded-lg">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">API Ninjas</h4>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Curated recipes with cuisine categorization</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Guide Sections */}
-      <div className="space-y-12">
-        {guides.map((guide) => (
-          <section key={guide.title} className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center flex-shrink-0">
-                <UtensilsCrossed className="w-5 h-5 text-white" />
+    <>
+      <Header />
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-yellow-50/30 to-orange-50/30 dark:from-gray-950 dark:via-yellow-950/20 dark:to-orange-950/20">
+        <div className="max-w-7xl mx-auto p-6 sm:p-8">
+          {/* Header */}
+          <div className="mb-8">
+            <Link
+              href="/settings/documentation"
+              className="inline-flex items-center gap-2 py-2 px-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-6"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Documentation
+            </Link>
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <UtensilsCrossed className="w-8 h-8 text-white" />
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{guide.title}</h2>
-                <p className="text-gray-600 dark:text-gray-400">{guide.description}</p>
-              </div>
+              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                Recipe Library & Discovery
+              </h1>
+              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                Discover, import, and organize recipes with AI-powered tools and extensive external integrations
+              </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {guide.articles.map((article) => (
-                <a
-                  key={article.title}
-                  href={article.href}
-                  className="group p-4 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-yellow-300 dark:hover:border-yellow-600 hover:shadow-lg transition-all"
-                >
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-yellow-600 transition-colors">
-                    {article.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{article.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-yellow-600 dark:text-yellow-400">{article.readTime}</span>
-                    <Clock className="w-3 h-3 text-gray-400" />
+          </div>
+
+          {/* Guide Sections */}
+          <div className="space-y-12">
+            {guideSections.map((section) => {
+              const Icon = section.icon;
+              return (
+                <div key={section.title} className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200/60 dark:border-gray-700/60 rounded-3xl overflow-hidden shadow-lg">
+                  {/* Section Header */}
+                  <div className={`p-8 bg-gradient-to-r ${section.color} text-white`}>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-bold mb-2">{section.title}</h2>
+                        <p className="text-white/90">{section.description}</p>
+                      </div>
+                    </div>
                   </div>
-                </a>
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
 
-      {/* Pro Tips */}
-      <div className="mt-12 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl border border-blue-200 dark:border-blue-800">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💡 Pro Tips</h3>
-        <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Use specific searches:</strong> Include cuisine type and ingredients for better recipe discovery results</p>
+                  {/* Articles Grid */}
+                  <div className="p-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {section.articles.map((article) => (
+                        <a
+                          key={article.title}
+                          href={article.href}
+                          className="group p-6 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-yellow-300 dark:hover:border-yellow-600 transition-all duration-200 hover:-translate-y-1"
+                        >
+                          <h3 className="font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-yellow-600 dark:group-hover:text-yellow-400 transition-colors">
+                            {article.title}
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                            {article.description}
+                          </p>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-yellow-600 dark:text-yellow-400 font-medium">
+                              {article.readTime}
+                            </span>
+                            <Clock className="w-3 h-3 text-gray-400" />
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Review AI imports:</strong> Always review AI-imported recipes for accuracy before saving</p>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Organize with collections:</strong> Create themed collections like "Quick Weeknight Meals" or "Holiday Desserts"</p>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-            <p><strong>Rate after cooking:</strong> Add ratings and notes after trying recipes to build your personal cookbook</p>
+
+          {/* Pro Tips */}
+          <div className="mt-12 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl border border-blue-200 dark:border-blue-800">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💡 Pro Tips</h3>
+            <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Use specific searches:</strong> Include cuisine type and ingredients for better recipe discovery results</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Review AI imports:</strong> Always review AI-imported recipes for accuracy before saving</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Organize with collections:</strong> Create themed collections like "Quick Weeknight Meals" or "Holiday Desserts"</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
+                <p><strong>Rate after cooking:</strong> Add ratings and notes after trying recipes to build your personal cookbook</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </FeatureLayout>
+    </>
   );
 }
