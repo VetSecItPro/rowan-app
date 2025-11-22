@@ -8,13 +8,12 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { UserPlus, Mail, Lock, User, Heart, Home, Eye, EyeOff, ChevronDown, Check } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, Home, Eye, EyeOff, ChevronDown, Check } from 'lucide-react';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [pronouns, setPronouns] = useState('');
   const [spaceName, setSpaceName] = useState('My Space');
   const [spaceTouched, setSpaceTouched] = useState(false);
   const [colorTheme, setColorTheme] = useState('emerald');
@@ -143,7 +142,6 @@ export default function SignUpPage() {
 
     const { error } = await signUp(email, password, {
       name,
-      pronouns: pronouns || undefined,
       color_theme: colorTheme,
       space_name: spaceName,
       marketing_emails_enabled: emailOptIn,
@@ -340,25 +338,6 @@ export default function SignUpPage() {
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Must be at least 8 characters with uppercase, lowercase, and number
               </p>
-            </div>
-
-            {/* Pronouns Field (Optional) */}
-            <div>
-              <label htmlFor="pronouns" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Pronouns <span className="text-gray-400">(optional)</span>
-              </label>
-              <div className="relative">
-                <Heart className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  id="pronouns"
-                  type="text"
-                  value={pronouns}
-                  onChange={(e) => setPronouns(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                  placeholder="they/them, she/her, he/him, etc."
-                  disabled={isLoading}
-                />
-              </div>
             </div>
 
             {/* Space Name */}

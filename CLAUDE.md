@@ -148,7 +148,53 @@ import { Dropdown } from '@/components/ui/Dropdown';
 - ✅ TaskCard filter dropdown issues
 - ✅ Modal overflow constraints
 
+## MCP Configuration
+
+### Supabase MCP
+**Status**: ✅ Connected
+**Authentication**: Personal Access Token (`[REDACTED_SUPABASE_PAT]`)
+**Configuration**: `.mcp.json` - Local MCP server using `@supabase/mcp-server-supabase@latest`
+**Project**: `SUPABASE_PROJECT_REF`
+
+**Capabilities**:
+- Direct SQL queries and database operations
+- Database migration management
+- Real-time table monitoring
+- RLS policy management
+
+### Vercel MCP
+**Status**: ✅ Connected
+**Authentication**: OAuth via Claude Code
+**Team**: VetSecItPro (`[REDACTED_TEAM_ID]`)
+**Project**: rowan-app (`[REDACTED_PROJECT_ID]`)
+
+**Capabilities**:
+- Direct deployment to Vercel (`vercel deploy`)
+- Deployment monitoring and logs
+- Protected URL access
+- Project management
+
 ## Git Workflow & Deployment
+
+### Hybrid Deployment Strategy
+We use **dual deployment paths** for optimal workflow:
+
+**🚀 Direct Deployment** (Development/Testing):
+```bash
+# Quick iteration cycle
+vercel deploy          # Preview deployment for rapid testing
+vercel deploy --prod   # Direct production deployment (emergency)
+```
+
+**🔄 GitHub Actions** (Official Releases):
+```bash
+# Automated production pipeline
+git push origin main   # Triggers automated deployment
+```
+
+**When to use each**:
+- **Direct Deployment**: Quick prototypes, demos, emergency hotfixes, feature testing
+- **GitHub Actions**: Official releases, team collaboration, automated testing pipeline
 
 ### CRITICAL: Branching Strategy
 **NEVER commit directly to main branch. Always use feature branches.**
