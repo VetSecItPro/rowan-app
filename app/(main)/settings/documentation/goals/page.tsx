@@ -1478,19 +1478,6 @@ export default function GoalsDocumentationPage() {
           </div>
         </div>
 
-        {/* Need Help Section */}
-        <div className="mt-8 p-6 bg-purple-50/60 dark:bg-purple-900/40 backdrop-blur-md border border-purple-200/50 dark:border-purple-800/50 rounded-xl">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Need More Help?</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Can't find what you're looking for? Our support team is here to help you achieve your goals.
-          </p>
-          <Link
-            href="/settings/support"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors text-sm font-medium"
-          >
-            Contact Support
-          </Link>
-        </div>
       </div>
     </div>
     </>

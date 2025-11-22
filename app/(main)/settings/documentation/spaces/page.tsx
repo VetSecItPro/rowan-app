@@ -407,22 +407,6 @@ export default function SpacesDocumentationPage() {
             </div>
           </div>
 
-          {/* Help Section */}
-          <div className="mt-16 max-w-2xl mx-auto text-center">
-            <div className="p-8 bg-teal-50/80 dark:bg-teal-900/50 backdrop-blur-sm border border-teal-200/60 dark:border-teal-800/60 rounded-2xl shadow-lg">
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Need Help with Spaces?</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
-                Setting up collaboration for your family or team? Our support team can help you get everyone connected and working together smoothly.
-              </p>
-              <Link
-                href="/settings/support"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl transition-colors text-sm font-semibold shadow-lg hover:shadow-xl"
-              >
-                <MessageSquare className="w-4 h-4" />
-                Contact Support
-              </Link>
-            </div>
-          </div>
         </div>
       </div>
     </>
