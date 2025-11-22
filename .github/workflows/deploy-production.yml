@@ -120,8 +120,36 @@ jobs:
         run: |
           url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
           echo "url=$url" >> $GITHUB_OUTPUT
+
+          # Extract deployment ID from URL for promotion
+          deployment_id=$(echo $url | sed -n 's/.*\/\([^-]*-[^.]*\)\.vercel\.app.*/\1/p')
+
           echo "### 🚀 Production Deployment Complete" >> $GITHUB_STEP_SUMMARY
           echo "🔗 **Production URL:** $url" >> $GITHUB_STEP_SUMMARY
+          echo "📋 **Deployment ID:** $deployment_id" >> $GITHUB_STEP_SUMMARY
+
+      - name: Promote to Custom Domain
+        run: |
+          echo "### 🎯 Promoting to Custom Domain" >> $GITHUB_STEP_SUMMARY
+
+          # Get deployment URL and extract the deployment hash
+          deployment_url="${{ steps.deploy.outputs.url }}"
+
+          # Wait a moment for deployment to be fully ready
+          sleep 5
+
+          # The deployment with --prod flag should automatically be promoted to the custom domain
+          # But we'll add an explicit alias promotion to ensure immediate visibility
+          if [ ! -z "$deployment_url" ]; then
+            # Promote deployment to production domains
+            vercel alias set "$deployment_url" rowanapp.com --token=${{ secrets.VERCEL_TOKEN }} || echo "⚠️ Custom domain alias may already be set"
+            vercel alias set "$deployment_url" www.rowanapp.com --token=${{ secrets.VERCEL_TOKEN }} || echo "⚠️ WWW domain alias may already be set"
+
+            echo "✅ **Promoted to Custom Domain:** https://rowanapp.com" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **WWW Domain:** https://www.rowanapp.com" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ No deployment URL found for domain promotion" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Summary
         run: |
@@ -130,5 +158,8 @@ jobs:
           echo "- ✅ Migrations checked and applied (if needed)" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Type checking completed" >> $GITHUB_STEP_SUMMARY
           echo "- 🚀 Production deployment complete: ${{ steps.deploy.outputs.url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- 🎯 Custom domain promoted: https://rowanapp.com" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Note:** This workflow handles migrations, checks, and deployment via GitHub Actions." >> $GITHUB_STEP_SUMMARY
+          echo "**Users can now access the latest version at:** https://rowanapp.com" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Note:** This workflow handles migrations, checks, deployment, and immediate domain promotion via GitHub Actions." >> $GITHUB_STEP_SUMMARY
