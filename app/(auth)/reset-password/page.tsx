@@ -1,254 +1,319 @@
 'use client';
 
-// Force dynamic rendering to prevent useContext errors during static generation
-export const dynamic = 'force-dynamic';
-
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { Lock, Eye, EyeOff, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { Lock, Eye, EyeOff, Check, AlertCircle } from 'lucide-react';
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const router = useRouter();
-  const [newPassword, setNewPassword] = useState('');
+  const searchParams = useSearchParams();
+  const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isResetting, setIsResetting] = useState(false);
-  const [resetComplete, setResetComplete] = useState(false);
-  const [error, setError] = useState('');
-  const [isValidToken, setIsValidToken] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  // Check if we have the necessary tokens/session
+  const [hasValidSession, setHasValidSession] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
 
   useEffect(() => {
-    // Check if user has a valid recovery session
     const checkSession = async () => {
       const supabase = createClient();
-      const { data, error } = await supabase.auth.getSession();
-      if (data.session) {
-        setIsValidToken(true);
+      const { data: { session }, error } = await supabase.auth.getSession();
+
+      // Check if user came here from a password reset link
+      const accessToken = searchParams.get('access_token');
+      const refreshToken = searchParams.get('refresh_token');
+
+      if (accessToken && refreshToken) {
+        // User clicked password reset link, set the session
+        try {
+          const { error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
+
+          if (sessionError) {
+            setError('Invalid or expired reset link. Please request a new password reset.');
+          } else {
+            setHasValidSession(true);
+          }
+        } catch (err) {
+          setError('Failed to validate reset link. Please try again.');
+        }
+      } else if (session) {
+        // User is already logged in
+        setHasValidSession(true);
       } else {
-        setError('Invalid or expired reset link. Please request a new password reset.');
+        setError('No valid reset session found. Please request a new password reset.');
       }
+
+      setIsCheckingSession(false);
     };
 
     checkSession();
-  }, []);
+  }, [searchParams]);
 
-  const handleResetPassword = async (e: React.FormEvent) => {
+  const validatePassword = (pwd: string): string[] => {
+    const errors: string[] = [];
+
+    if (pwd.length < 8) {
+      errors.push('Password must be at least 8 characters long');
+    }
+    if (!/[A-Z]/.test(pwd)) {
+      errors.push('Password must contain at least one uppercase letter');
+    }
+    if (!/[a-z]/.test(pwd)) {
+      errors.push('Password must contain at least one lowercase letter');
+    }
+    if (!/\d/.test(pwd)) {
+      errors.push('Password must contain at least one number');
+    }
+
+    return errors;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError(null);
 
-    // Validation
-    if (newPassword.length < 8) {
-      setError('Password must be at least 8 characters long');
+    // Validate password
+    const passwordErrors = validatePassword(password);
+    if (passwordErrors.length > 0) {
+      setError(passwordErrors.join('. '));
       return;
     }
 
-    if (newPassword !== confirmPassword) {
+    // Check password confirmation
+    if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
-    setIsResetting(true);
-
-    const supabase = createClient();
+    setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword,
+      const supabase = createClient();
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: password
       });
 
-      if (error) {
-        setError(error.message);
-      } else {
-        setResetComplete(true);
-        // Redirect to login after 3 seconds
-        setTimeout(() => {
-          router.push('/login');
-        }, 3000);
+      if (updateError) {
+        setError('Failed to update password. Please try again.');
+        return;
       }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred. Please try again.');
+
+      setSuccess(true);
+
+      // Redirect to dashboard after 2 seconds
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 2000);
+
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
     } finally {
-      setIsResetting(false);
+      setIsLoading(false);
     }
   };
 
-  if (!isValidToken && !error) {
+  if (isCheckingSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800 p-4">
-        <div className="w-full max-w-md bg-gray-50 dark:bg-gray-900 rounded-2xl shadow-2xl p-8">
-          <div className="flex items-center justify-center mb-6">
-            <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-950 dark:via-blue-950 dark:to-indigo-950">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
+  if (success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-950 dark:via-blue-950 dark:to-indigo-950 p-4">
+        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
+          <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-400" />
           </div>
-          <p className="text-center text-gray-600 dark:text-gray-400">Verifying reset link...</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            Password Updated!
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            Your password has been successfully updated. Redirecting you to the dashboard...
+          </p>
+          <div className="animate-pulse text-sm text-gray-500 dark:text-gray-500">
+            Please wait...
+          </div>
         </div>
       </div>
     );
   }
 
-  if (resetComplete) {
+  if (!hasValidSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800 p-4">
-        <div className="w-full max-w-md bg-gray-50 dark:bg-gray-900 rounded-2xl shadow-2xl p-8">
-          <div className="flex items-center justify-center mb-6">
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-              <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
-            </div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-950 dark:via-blue-950 dark:to-indigo-950 p-4">
+        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
+          <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
           </div>
-          <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-2">
-            Password Reset Successful!
-          </h2>
-          <p className="text-center text-gray-600 dark:text-gray-400 mb-6">
-            Your password has been updated successfully. Redirecting you to login...
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            Invalid Reset Link
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            {error || 'This password reset link is invalid or has expired. Please request a new one.'}
           </p>
-          <div className="flex justify-center">
-            <Link
-              href="/login"
-              className="btn-touch text-purple-600 dark:text-purple-400 hover:underline text-sm font-medium rounded-md py-2 px-3 active:scale-95"
-            >
-              Go to Login Now →
-            </Link>
-          </div>
+          <Link
+            href="/auth/signin"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors font-medium"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Sign In
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800 p-4">
-      <div className="w-full max-w-md bg-gray-50 dark:bg-gray-900 rounded-2xl shadow-2xl p-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-950 dark:via-blue-950 dark:to-indigo-950 p-4">
+      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
         {/* Header */}
-        <div className="flex items-center justify-center mb-6">
-          <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <Lock className="w-8 h-8 text-purple-600 dark:text-purple-400" />
           </div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            Reset Your Password
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Please enter your new password below
+          </p>
         </div>
 
-        <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-2">
-          Reset Your Password
-        </h2>
-        <p className="text-center text-gray-600 dark:text-gray-400 mb-8">
-          Enter your new password below
-        </p>
-
-        {/* Error Message */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <div className="flex items-start gap-2">
-              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-base md:text-sm font-medium text-red-800 dark:text-red-200">Error</p>
-                <p className="text-sm md:text-xs text-red-700 dark:text-red-300 mt-1">{error}</p>
-                {error.includes('Invalid or expired') && (
-                  <Link
-                    href="/login"
-                    className="btn-touch text-sm md:text-xs text-red-600 dark:text-red-400 hover:underline mt-2 inline-block rounded-md py-1 px-2 active:scale-95"
-                  >
-                    Return to login and request a new reset link →
-                  </Link>
-                )}
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Error Display */}
+          {error && (
+            <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Form */}
-        <form onSubmit={handleResetPassword} className="space-y-5">
           {/* New Password */}
           <div>
-            <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               New Password
             </label>
             <div className="relative">
               <input
-                id="new-password"
+                id="password"
                 type={showPassword ? 'text' : 'password'}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter new password"
-                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-colors"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white pr-12"
+                placeholder="Enter your new password"
                 required
+                minLength={8}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="btn-touch absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 active:scale-95 "
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
               >
-                {showPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Must be at least 8 characters long
-            </p>
           </div>
 
           {/* Confirm Password */}
           <div>
-            <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Confirm New Password
             </label>
             <div className="relative">
               <input
-                id="confirm-password"
+                id="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm new password"
-                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-colors"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white pr-12"
+                placeholder="Confirm your new password"
                 required
+                minLength={8}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="btn-touch absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 active:scale-95 "
-                aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
               >
-                {showConfirmPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
+                {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
+          </div>
+
+          {/* Password Requirements */}
+          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+            <p className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
+              Password Requirements:
+            </p>
+            <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
+              <li>• At least 8 characters long</li>
+              <li>• One uppercase letter (A-Z)</li>
+              <li>• One lowercase letter (a-z)</li>
+              <li>• One number (0-9)</li>
+            </ul>
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={isResetting || !isValidToken}
-            className="btn-touch w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 active:scale-[0.98] "
+            disabled={isLoading || !password || !confirmPassword}
+            className="w-full px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2"
           >
-            {isResetting ? (
+            {isLoading ? (
               <>
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Resetting Password...
+                Updating Password...
               </>
             ) : (
               <>
                 <Lock className="w-5 h-5" />
-                Reset Password
+                Update Password
               </>
             )}
           </button>
         </form>
 
-        {/* Back to Login */}
+        {/* Back to Sign In */}
         <div className="mt-6 text-center">
           <Link
-            href="/login"
-            className="btn-touch inline-block py-2 px-3 text-sm text-purple-600 dark:text-purple-400 hover:underline font-medium rounded-md active:scale-95 "
+            href="/auth/signin"
+            className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
           >
-            ← Back to Login
+            Back to Sign In
           </Link>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-950 dark:via-blue-950 dark:to-indigo-950">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
+        </div>
+      }
+    >
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
