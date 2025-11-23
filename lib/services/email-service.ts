@@ -9,6 +9,9 @@ import ShoppingListEmail from '@/lib/emails/templates/ShoppingListEmail';
 import MealReminderEmail from '@/lib/emails/templates/MealReminderEmail';
 import GeneralReminderEmail from '@/lib/emails/templates/GeneralReminderEmail';
 import SpaceInvitationEmail from '@/lib/emails/templates/SpaceInvitationEmail';
+import { PasswordResetEmail } from '@/lib/emails/templates/password-reset-email';
+import { MagicLinkEmail } from '@/lib/emails/templates/magic-link-email';
+import { EmailVerificationEmail } from '@/lib/emails/templates/email-verification-email';
 
 // Initialize Resend with API key
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -122,6 +125,29 @@ export interface SpaceInvitationData {
   spaceName: string;
   invitationUrl: string;
   expiresAt: string;
+}
+
+// Authentication email interfaces
+export interface PasswordResetData {
+  userEmail: string;
+  resetUrl: string;
+  userName: string;
+  ipAddress?: string;
+  userAgent?: string;
+}
+
+export interface MagicLinkData {
+  userEmail: string;
+  magicLinkUrl: string;
+  userName: string;
+  ipAddress?: string;
+  userAgent?: string;
+}
+
+export interface EmailVerificationData {
+  userEmail: string;
+  verificationUrl: string;
+  userName: string;
 }
 
 
@@ -391,12 +417,120 @@ export async function sendSpaceInvitationEmail(data: SpaceInvitationData): Promi
   }
 }
 
+/**
+ * Send a password reset email
+ */
+export async function sendPasswordResetEmail(data: PasswordResetData): Promise<EmailResult> {
+  try {
+    if (!resend) {
+      console.error('Resend not initialized - missing RESEND_API_KEY');
+      return { success: false, error: 'Email service not configured' };
+    }
+
+    const emailHtml = await render(PasswordResetEmail(data));
+
+    const { data: result, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [data.userEmail],
+      subject: 'Reset your password - Rowan',
+      html: emailHtml,
+      replyTo: REPLY_TO_EMAIL,
+      tags: [
+        { name: 'category', value: 'password-reset' },
+        { name: 'auth_type', value: 'password-reset' }
+      ]
+    });
+
+    if (error) {
+      console.error('Failed to send password reset email:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, messageId: result?.id };
+  } catch (error) {
+    console.error('Error sending password reset email:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+/**
+ * Send a magic link email
+ */
+export async function sendMagicLinkEmail(data: MagicLinkData): Promise<EmailResult> {
+  try {
+    if (!resend) {
+      console.error('Resend not initialized - missing RESEND_API_KEY');
+      return { success: false, error: 'Email service not configured' };
+    }
+
+    const emailHtml = await render(MagicLinkEmail(data));
+
+    const { data: result, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [data.userEmail],
+      subject: 'Sign in to Rowan - Magic Link',
+      html: emailHtml,
+      replyTo: REPLY_TO_EMAIL,
+      tags: [
+        { name: 'category', value: 'magic-link' },
+        { name: 'auth_type', value: 'magic-link' }
+      ]
+    });
+
+    if (error) {
+      console.error('Failed to send magic link email:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, messageId: result?.id };
+  } catch (error) {
+    console.error('Error sending magic link email:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+/**
+ * Send an email verification email
+ */
+export async function sendEmailVerificationEmail(data: EmailVerificationData): Promise<EmailResult> {
+  try {
+    if (!resend) {
+      console.error('Resend not initialized - missing RESEND_API_KEY');
+      return { success: false, error: 'Email service not configured' };
+    }
+
+    const emailHtml = await render(EmailVerificationEmail(data));
+
+    const { data: result, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [data.userEmail],
+      subject: 'Verify your email address - Welcome to Rowan!',
+      html: emailHtml,
+      replyTo: REPLY_TO_EMAIL,
+      tags: [
+        { name: 'category', value: 'email-verification' },
+        { name: 'auth_type', value: 'email-verification' }
+      ]
+    });
+
+    if (error) {
+      console.error('Failed to send email verification email:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, messageId: result?.id };
+  } catch (error) {
+    console.error('Error sending email verification email:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
 
 /**
  * Send multiple emails in batch (for digest processing)
  */
 export async function sendBatchEmails(emails: Array<{
-  type: 'task' | 'event' | 'message' | 'shopping' | 'meal' | 'reminder' | 'invitation';
+  type: 'task' | 'event' | 'message' | 'shopping' | 'meal' | 'reminder' | 'invitation' | 'password-reset' | 'magic-link' | 'email-verification';
   data: any;
 }>): Promise<{ success: number; failed: number; results: EmailResult[] }> {
   const results: EmailResult[] = [];
@@ -427,6 +561,15 @@ export async function sendBatchEmails(emails: Array<{
         break;
       case 'invitation':
         result = await sendSpaceInvitationEmail(email.data);
+        break;
+      case 'password-reset':
+        result = await sendPasswordResetEmail(email.data);
+        break;
+      case 'magic-link':
+        result = await sendMagicLinkEmail(email.data);
+        break;
+      case 'email-verification':
+        result = await sendEmailVerificationEmail(email.data);
         break;
       default:
         result = { success: false, error: 'Unknown email type' };
@@ -483,6 +626,9 @@ export const emailService = {
   sendMealReminderEmail,
   sendGeneralReminderEmail,
   sendSpaceInvitationEmail,
+  sendPasswordResetEmail,
+  sendMagicLinkEmail,
+  sendEmailVerificationEmail,
   sendBatchEmails,
   verifyEmailService,
 };
