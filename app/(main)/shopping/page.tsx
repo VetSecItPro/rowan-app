@@ -13,6 +13,7 @@ import { NewShoppingListModal } from '@/components/shopping/NewShoppingListModal
 import { SaveTemplateModal } from '@/components/shopping/SaveTemplateModal';
 import { TemplatePickerModal } from '@/components/shopping/TemplatePickerModal';
 import { ScheduleTripModal } from '@/components/shopping/ScheduleTripModal';
+import { ShareListModal } from '@/components/shopping/ShareListModal';
 import { FrequentItemsPanel } from '@/components/shopping/FrequentItemsPanel';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
@@ -36,6 +37,8 @@ export default function ShoppingPage() {
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [showScheduleTripModal, setShowScheduleTripModal] = useState(false);
   const [listToSchedule, setListToSchedule] = useState<ShoppingList | null>(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [listToShare, setListToShare] = useState<ShoppingList | null>(null);
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, listId: '' });
 
   const [stats, setStats] = useState({
@@ -346,6 +349,58 @@ export default function ShoppingPage() {
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
     setEditingList(null);
+  }, []);
+
+  // Memoized callback for sharing lists
+  const handleShareList = useCallback((list: ShoppingList) => {
+    // Prevent actions on optimistic lists (temp IDs)
+    if (list.id.startsWith('temp-')) {
+      alert('Please wait for the list to finish saving before sharing.');
+      return;
+    }
+
+    setListToShare(list);
+    setShowShareModal(true);
+  }, []);
+
+  // Memoized callback for updating sharing settings
+  const handleUpdateSharing = useCallback(async (listId: string, isPublic: boolean): Promise<ShoppingList> => {
+    if (!currentSpace) {
+      throw new Error('No current space');
+    }
+
+    const response = await fetch(`/api/shopping/${listId}/sharing`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ isPublic }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to update sharing settings');
+    }
+
+    const result = await response.json();
+    const updatedList = result.data;
+
+    // Update local state
+    setLists(prevLists =>
+      prevLists.map(list =>
+        list.id === listId
+          ? { ...list, is_public: updatedList.is_public, share_token: updatedList.share_token, shared_at: updatedList.shared_at }
+          : list
+      )
+    );
+
+    return updatedList;
+  }, [currentSpace]);
+
+  // Memoized callback for closing share modal
+  const handleCloseShareModal = useCallback(() => {
+    setShowShareModal(false);
+    setListToShare(null);
   }, []);
 
   // Memoized callback for opening new list modal
@@ -880,6 +935,7 @@ export default function ShoppingPage() {
                     onScheduleTrip={handleScheduleTrip}
                     onCreateTask={handleCreateTask}
                     onUpdateQuantity={handleUpdateQuantity}
+                    onShare={handleShareList}
                   />
                 ))}
               </div>
@@ -920,6 +976,12 @@ export default function ShoppingPage() {
               list={listToSchedule}
             />
           )}
+          <ShareListModal
+            isOpen={showShareModal}
+            onClose={handleCloseShareModal}
+            list={listToShare}
+            onUpdateSharing={handleUpdateSharing}
+          />
         </>
       )}
 
