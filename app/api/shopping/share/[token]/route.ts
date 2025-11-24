@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { checkShoppingTokenRateLimit } from '@/lib/ratelimit-shopping';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 
@@ -14,13 +14,13 @@ export async function GET(
   { params }: { params: { token: string } }
 ) {
   try {
-    // Rate limiting with automatic fallback
+    // Specific rate limiting for shopping token access (5 attempts per IP per minute)
     const ip = extractIP(req.headers);
-    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    const { success: rateLimitSuccess } = await checkShoppingTokenRateLimit(ip);
 
     if (!rateLimitSuccess) {
       return NextResponse.json(
-        { error: 'Too many requests. Please try again later.' },
+        { error: 'Too many shopping list access attempts. Please try again later.' },
         { status: 429 }
       );
     }
@@ -30,6 +30,14 @@ export async function GET(
     if (!token) {
       return NextResponse.json(
         { error: 'Share token is required' },
+        { status: 400 }
+      );
+    }
+
+    // Basic token format validation (reject obviously invalid tokens early)
+    if (token.length < 32 || !/^[a-zA-Z0-9_-]+$/.test(token)) {
+      return NextResponse.json(
+        { error: 'Invalid share token format' },
         { status: 400 }
       );
     }
@@ -132,18 +140,27 @@ export async function PATCH(
   { params }: { params: { token: string } }
 ) {
   try {
-    // Rate limiting with automatic fallback
+    // Specific rate limiting for shopping token access (5 attempts per IP per minute)
     const ip = extractIP(req.headers);
-    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    const { success: rateLimitSuccess } = await checkShoppingTokenRateLimit(ip);
 
     if (!rateLimitSuccess) {
       return NextResponse.json(
-        { error: 'Too many requests. Please try again later.' },
+        { error: 'Too many shopping list access attempts. Please try again later.' },
         { status: 429 }
       );
     }
 
     const { token } = params;
+
+    // Basic token format validation (reject obviously invalid tokens early)
+    if (token.length < 32 || !/^[a-zA-Z0-9_-]+$/.test(token)) {
+      return NextResponse.json(
+        { error: 'Invalid share token format' },
+        { status: 400 }
+      );
+    }
+
     const body = await req.json();
     const { itemId, isPurchased } = body;
 
