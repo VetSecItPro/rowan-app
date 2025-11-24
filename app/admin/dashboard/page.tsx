@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
 import {
   Users,
   UserCheck,
@@ -17,7 +18,11 @@ import {
   CheckCircle,
   XCircle,
   Monitor,
-  BarChart3
+  BarChart3,
+  Sun,
+  Moon,
+  ArrowLeft,
+  ExternalLink
 } from 'lucide-react';
 
 interface DashboardStats {
@@ -31,6 +36,7 @@ interface DashboardStats {
 
 export default function AdminDashboardPage() {
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
     activeUsers: 0,
@@ -155,6 +161,15 @@ export default function AdminDashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-6">
             <div className="flex items-center gap-4">
+              <a
+                href="/"
+                className="flex items-center gap-2 px-3 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                title="Back to Rowan App"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="text-sm font-medium">Back to Website</span>
+              </a>
+              <div className="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Shield className="w-6 h-6 text-white" />
               </div>
@@ -168,6 +183,17 @@ export default function AdminDashboardPage() {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-5 h-5" />
+                ) : (
+                  <Moon className="w-5 h-5" />
+                )}
+              </button>
               <button
                 onClick={fetchDashboardData}
                 disabled={isLoading}
@@ -193,48 +219,48 @@ export default function AdminDashboardPage() {
             value={stats.totalUsers}
             icon={Users}
             color="blue"
-            trend="up"
-            trendValue="+12% this week"
+            trend={stats.totalUsers > 0 ? "up" : undefined}
+            trendValue={stats.totalUsers > 0 ? "Growing" : undefined}
           />
           <StatCard
             title="Active Users"
             value={stats.activeUsers}
             icon={UserCheck}
             color="green"
-            trend="up"
-            trendValue="+8% this week"
+            trend={stats.activeUsers > 0 ? "up" : undefined}
+            trendValue={stats.activeUsers > 0 ? "Active" : undefined}
           />
           <StatCard
             title="Beta Users"
             value={`${stats.betaUsers}/30`}
             icon={Shield}
             color="purple"
-            trend="up"
-            trendValue={`${30 - stats.betaUsers} slots left`}
+            trend={stats.betaUsers > 0 ? "up" : undefined}
+            trendValue={stats.betaUsers < 30 ? `${30 - stats.betaUsers} slots left` : "Full"}
           />
           <StatCard
             title="Launch Signups"
             value={stats.launchSignups}
             icon={Mail}
             color="orange"
-            trend="up"
-            trendValue="+15% this week"
+            trend={stats.launchSignups > 0 ? "up" : undefined}
+            trendValue={stats.launchSignups > 0 ? "Interested" : undefined}
           />
           <StatCard
             title="Beta Requests Today"
             value={stats.betaRequestsToday}
             icon={Activity}
             color="red"
-            trend="neutral"
-            trendValue="Today"
+            trend={stats.betaRequestsToday > 0 ? "neutral" : undefined}
+            trendValue={stats.betaRequestsToday > 0 ? "Today" : undefined}
           />
           <StatCard
             title="Signups Today"
             value={stats.signupsToday}
             icon={TrendingUp}
             color="gray"
-            trend="up"
-            trendValue="Today"
+            trend={stats.signupsToday > 0 ? "up" : undefined}
+            trendValue={stats.signupsToday > 0 ? "Today" : undefined}
           />
         </div>
 
@@ -295,26 +321,29 @@ export default function AdminDashboardPage() {
                 Recent Activity
               </h3>
               <div className="space-y-4">
-                {[
-                  { type: 'success', icon: CheckCircle, message: 'New beta user joined: user@example.com', time: '2 minutes ago' },
-                  { type: 'info', icon: Mail, message: '3 new launch notification signups', time: '15 minutes ago' },
-                  { type: 'warning', icon: AlertTriangle, message: 'Beta capacity at 85% (25/30 users)', time: '1 hour ago' },
-                  { type: 'success', icon: UserCheck, message: 'Daily analytics updated successfully', time: '2 hours ago' },
-                  { type: 'error', icon: XCircle, message: 'Failed beta access attempt from 192.168.1.1', time: '3 hours ago' },
-                ].map((activity, index) => (
-                  <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <activity.icon className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
-                      activity.type === 'success' ? 'text-green-500' :
-                      activity.type === 'warning' ? 'text-yellow-500' :
-                      activity.type === 'error' ? 'text-red-500' :
-                      'text-blue-500'
-                    }`} />
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-900 dark:text-white">{activity.message}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{activity.time}</p>
+                {stats.totalUsers > 0 ? (
+                  // Real activity data would go here when available
+                  <div className="text-center py-8">
+                    <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Activity className="w-6 h-6 text-gray-400 dark:text-gray-600" />
                     </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Recent activity will appear here as beta users start using the platform
+                    </p>
                   </div>
-                ))}
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Activity className="w-6 h-6 text-gray-400 dark:text-gray-600" />
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      No recent activity yet
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      Activity feed will populate as users interact with the platform
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
