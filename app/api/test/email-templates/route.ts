@@ -6,13 +6,19 @@ import {
   sendShoppingListEmail,
   sendMealReminderEmail,
   sendGeneralReminderEmail,
+  sendPasswordResetEmail,
+  sendMagicLinkEmail,
+  sendEmailVerificationEmail,
   verifyEmailService,
   type TaskAssignmentData,
   type EventReminderData,
   type NewMessageData,
   type ShoppingListData,
   type MealReminderData,
-  type GeneralReminderData
+  type GeneralReminderData,
+  type PasswordResetData,
+  type MagicLinkData,
+  type EmailVerificationData
 } from '@/lib/services/email-service';
 
 export const dynamic = 'force-dynamic';
@@ -151,6 +157,36 @@ export async function POST(request: NextRequest) {
         result = await sendGeneralReminderEmail(reminderData);
         break;
 
+      case 'password-reset':
+        const passwordResetData: PasswordResetData = {
+          userEmail: email,
+          resetUrl: 'https://rowanapp.com/reset-password?token=test-reset-token-12345',
+          userName: 'Test User',
+          ipAddress: '192.168.1.1',
+          userAgent: 'Chrome on macOS'
+        };
+        result = await sendPasswordResetEmail(passwordResetData);
+        break;
+
+      case 'magic-link':
+        const magicLinkData: MagicLinkData = {
+          userEmail: email,
+          magicLinkUrl: 'https://rowanapp.com/auth/magic?token=test-magic-token-67890',
+          userName: 'Test User',
+          ipAddress: '192.168.1.1',
+          userAgent: 'Safari on iPhone'
+        };
+        result = await sendMagicLinkEmail(magicLinkData);
+        break;
+
+      case 'email-verification':
+        const emailVerificationData: EmailVerificationData = {
+          userEmail: email,
+          verificationUrl: 'https://rowanapp.com/auth/verify?token=test-verify-token-abcdef',
+          userName: 'Test User'
+        };
+        result = await sendEmailVerificationEmail(emailVerificationData);
+        break;
 
       case 'verify':
         result = await verifyEmailService();
@@ -159,7 +195,7 @@ export async function POST(request: NextRequest) {
       default:
         return NextResponse.json({
           error: 'Invalid email type',
-          validTypes: ['task', 'event', 'message', 'shopping', 'meal', 'reminder', 'verify']
+          validTypes: ['task', 'event', 'message', 'shopping', 'meal', 'reminder', 'password-reset', 'magic-link', 'email-verification', 'verify']
         }, { status: 400 });
     }
 
@@ -183,7 +219,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json({
     message: 'Email Templates Test Endpoint',
-    usage: 'POST with { type: "task|event|message|shopping|meal|reminder|verify", email: "test@example.com" }',
+    usage: 'POST with { type: "task|event|message|shopping|meal|reminder|password-reset|magic-link|email-verification|verify", email: "test@example.com" }',
     availableTypes: [
       'task - Task assignment email',
       'event - Event reminder email',
@@ -191,6 +227,9 @@ export async function GET() {
       'shopping - Shopping list notification',
       'meal - Meal reminder email',
       'reminder - General reminder email',
+      'password-reset - Password reset email',
+      'magic-link - Magic link sign-in email',
+      'email-verification - Email verification email',
       'verify - Verify email service'
     ]
   });
