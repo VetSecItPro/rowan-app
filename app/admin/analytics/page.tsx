@@ -380,28 +380,28 @@ export default function AdminAnalyticsPage() {
               <MetricCard
                 title="Total Users"
                 value={analyticsData.summary.totalUsers}
-                change={`+${analyticsData.summary.growthRate}% this month`}
+                change={analyticsData.summary.growthRate > 0 ? `+${analyticsData.summary.growthRate}% this month` : undefined}
                 icon={Users}
                 color="blue"
               />
               <MetricCard
                 title="Beta Users"
                 value={analyticsData.summary.activeBetaUsers}
-                change="Strong engagement"
+                change={analyticsData.summary.activeBetaUsers > 0 ? "Active" : undefined}
                 icon={Shield}
                 color="purple"
               />
               <MetricCard
                 title="Notification Signups"
                 value={analyticsData.summary.totalNotifications}
-                change="+15% this week"
+                change={analyticsData.summary.totalNotifications > 0 ? "Subscribed" : undefined}
                 icon={Mail}
                 color="green"
               />
               <MetricCard
                 title="Conversion Rate"
                 value={`${analyticsData.betaMetrics.conversionRate}%`}
-                change="Above target"
+                change={analyticsData.betaMetrics.conversionRate > 0 ? "Tracked" : undefined}
                 icon={Target}
                 color="orange"
               />
@@ -417,13 +417,7 @@ export default function AdminAnalyticsPage() {
                 </h3>
                 <div className="h-64 flex items-center justify-center">
                   <LineChart
-                    data={[
-                      { date: '2024-10-01', users: 45 },
-                      { date: '2024-10-08', users: 52 },
-                      { date: '2024-10-15', users: 61 },
-                      { date: '2024-10-22', users: 78 },
-                      { date: '2024-10-27', users: 89 }
-                    ]}
+                    data={analyticsData.userGrowth}
                     width={500}
                     height={250}
                     xKey="date"
@@ -441,12 +435,14 @@ export default function AdminAnalyticsPage() {
                 </h3>
                 <div className="h-64 flex items-center justify-center">
                   <PieChartComponent
-                    data={[
-                      { label: 'Homepage', value: 65, color: '#3B82F6' },
-                      { label: 'Features', value: 20, color: '#10B981' },
-                      { label: 'Referral', value: 10, color: '#F59E0B' },
-                      { label: 'Social', value: 5, color: '#EF4444' }
-                    ]}
+                    data={analyticsData.sourceDistribution.map((source, index) => {
+                      const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#F97316'];
+                      return {
+                        label: source.source,
+                        value: source.count,
+                        color: colors[index % colors.length]
+                      };
+                    })}
                     width={250}
                     height={200}
                   />
@@ -464,27 +460,27 @@ export default function AdminAnalyticsPage() {
                     <span className="text-sm text-gray-600 dark:text-gray-400">Approval Rate</span>
                     <div className="flex items-center gap-2">
                       <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                        <div className="bg-green-500 h-2 rounded-full" style={{ width: '75%' }}></div>
+                        <div className="bg-green-500 h-2 rounded-full" style={{ width: `${analyticsData.betaMetrics.approvalRate}%` }}></div>
                       </div>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">75%</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">{analyticsData.betaMetrics.approvalRate}%</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Retention Rate</span>
                     <div className="flex items-center gap-2">
                       <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                        <div className="bg-blue-500 h-2 rounded-full" style={{ width: '85%' }}></div>
+                        <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${analyticsData.betaMetrics.retentionRate}%` }}></div>
                       </div>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">85%</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">{analyticsData.betaMetrics.retentionRate}%</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Activity Score</span>
                     <div className="flex items-center gap-2">
                       <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                        <div className="bg-purple-500 h-2 rounded-full" style={{ width: '70%' }}></div>
+                        <div className="bg-purple-500 h-2 rounded-full" style={{ width: `${(analyticsData.betaMetrics.averageActivityScore / 10) * 100}%` }}></div>
                       </div>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">7.0/10</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">{analyticsData.betaMetrics.averageActivityScore}/10</span>
                     </div>
                   </div>
                 </div>
@@ -498,15 +494,7 @@ export default function AdminAnalyticsPage() {
                 </h3>
                 <div className="h-64 flex items-center justify-center">
                   <BarChart
-                    data={[
-                      { day: 'Mon', activity: 24 },
-                      { day: 'Tue', activity: 32 },
-                      { day: 'Wed', activity: 28 },
-                      { day: 'Thu', activity: 41 },
-                      { day: 'Fri', activity: 38 },
-                      { day: 'Sat', activity: 19 },
-                      { day: 'Sun', activity: 15 }
-                    ]}
+                    data={analyticsData.activityHeatmap}
                     width={400}
                     height={250}
                     xKey="day"
@@ -522,26 +510,40 @@ export default function AdminAnalyticsPage() {
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 Key Insights
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <h4 className="font-medium text-blue-900 dark:text-blue-200 mb-2">Growth Trend</h4>
-                  <p className="text-sm text-blue-700 dark:text-blue-300">
-                    User growth has accelerated by 25% this month, with strong conversion from beta to active users.
+              {analyticsData.summary.totalUsers > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <h4 className="font-medium text-blue-900 dark:text-blue-200 mb-2">Growth Tracking</h4>
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                      Monitoring user growth patterns and engagement metrics as beta program progresses.
+                    </p>
+                  </div>
+                  <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <h4 className="font-medium text-green-900 dark:text-green-200 mb-2">Beta Program</h4>
+                    <p className="text-sm text-green-700 dark:text-green-300">
+                      Tracking beta user onboarding, retention, and feedback for product improvements.
+                    </p>
+                  </div>
+                  <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                    <h4 className="font-medium text-orange-900 dark:text-orange-200 mb-2">Data Collection</h4>
+                    <p className="text-sm text-orange-700 dark:text-orange-300">
+                      Building comprehensive analytics foundation to guide product development decisions.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <BarChart3 className="w-8 h-8 text-gray-400 dark:text-gray-600" />
+                  </div>
+                  <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                    Awaiting Data
+                  </h4>
+                  <p className="text-gray-600 dark:text-gray-400 max-w-sm mx-auto">
+                    Key insights will appear here once beta testers begin using the platform and generating analytics data.
                   </p>
                 </div>
-                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                  <h4 className="font-medium text-green-900 dark:text-green-200 mb-2">Beta Success</h4>
-                  <p className="text-sm text-green-700 dark:text-green-300">
-                    Beta program showing excellent retention with 85% of users remaining active after 30 days.
-                  </p>
-                </div>
-                <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                  <h4 className="font-medium text-orange-900 dark:text-orange-200 mb-2">Optimization</h4>
-                  <p className="text-sm text-orange-700 dark:text-orange-300">
-                    Homepage conversion is strong, but feature pages could benefit from improved messaging.
-                  </p>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         )}

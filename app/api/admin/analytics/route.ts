@@ -185,46 +185,63 @@ export async function GET(req: NextRequest) {
       ? Math.round(((secondHalfNotifications - firstHalfNotifications) / firstHalfNotifications) * 100)
       : 0;
 
-    // Compile analytics response
+    // Compile analytics response in the format expected by the frontend
     const analytics = {
-      timeRange,
-      period: {
-        startDate: startDate.toISOString(),
-        endDate: now.toISOString(),
-        days,
+      userGrowth: dailyData.map(day => ({
+        date: day.date,
+        users: day.userRegistrations,
+        betaUsers: day.betaRequests,
+      })),
+      signupTrends: dailyData.map(day => ({
+        date: day.date,
+        signups: day.userRegistrations,
+        notifications: day.launchNotifications,
+      })),
+      betaMetrics: {
+        conversionRate: betaSignupRate,
+        approvalRate: betaApprovalRate,
+        retentionRate: activeBetaUsers > 0 ? Math.min(100, (activeBetaUsers / betaCapacity) * 100) : 0,
+        averageActivityScore: activeBetaUsers > 0 ? Math.min(10, (activeBetaUsers / 30) * 10) : 0,
       },
-      dailyData,
+      sourceDistribution: Object.entries(sourceDistribution).map(([source, count]) => ({
+        source: source.charAt(0).toUpperCase() + source.slice(1),
+        count: count as number,
+        percentage: totalLaunchNotifications > 0 ? ((count as number / totalLaunchNotifications) * 100) : 0,
+      })),
+      activityHeatmap: dailyData.map(day => ({
+        hour: new Date(day.date).getDay(), // Use day of week as hour for simplification
+        day: new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' }),
+        activity: day.betaRequests + day.launchNotifications + day.userRegistrations,
+      })),
       summary: {
-        totalBetaRequests,
-        approvedBetaRequests,
-        totalLaunchNotifications,
-        totalUserRegistrations,
-        activeBetaUsers,
-        capacityUsage,
-        betaApprovalRate,
-        betaSignupRate,
-        betaGrowthRate,
-        notificationGrowthRate,
+        totalUsers: totalUserRegistrations,
+        totalNotifications: totalLaunchNotifications,
+        totalBetaRequests: totalBetaRequests,
+        activeBetaUsers: activeBetaUsers,
+        growthRate: betaGrowthRate,
+        churnRate: 0, // Calculate churn rate when we have retention data
       },
-      charts: {
-        userActivity: dailyData.map(day => ({
-          date: day.date,
-          value: day.betaRequests + day.launchNotifications + day.userRegistrations,
-        })),
-        betaProgram: [
-          { name: 'Active Users', value: activeBetaUsers },
-          { name: 'Approved Pending', value: approvedBetaRequests - totalUserRegistrations },
-          { name: 'Available Slots', value: betaCapacity - activeBetaUsers },
-        ],
-        sources: Object.entries(sourceDistribution).map(([name, value]) => ({
-          name: name.charAt(0).toUpperCase() + name.slice(1),
-          value,
-        })),
-        conversions: [
-          { stage: 'Beta Requests', value: totalBetaRequests },
-          { stage: 'Approved', value: approvedBetaRequests },
-          { stage: 'Signed Up', value: totalUserRegistrations },
-        ],
+      // Keep the original format for other consumers
+      _legacy: {
+        timeRange,
+        period: {
+          startDate: startDate.toISOString(),
+          endDate: now.toISOString(),
+          days,
+        },
+        dailyData,
+        summary: {
+          totalBetaRequests,
+          approvedBetaRequests,
+          totalLaunchNotifications,
+          totalUserRegistrations,
+          activeBetaUsers,
+          capacityUsage,
+          betaApprovalRate,
+          betaSignupRate,
+          betaGrowthRate,
+          notificationGrowthRate,
+        },
       },
       lastUpdated: new Date().toISOString(),
     };
