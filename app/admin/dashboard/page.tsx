@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
 import {
   Users,
   UserCheck,
@@ -17,7 +18,11 @@ import {
   CheckCircle,
   XCircle,
   Monitor,
-  BarChart3
+  BarChart3,
+  Sun,
+  Moon,
+  ArrowLeft,
+  ExternalLink
 } from 'lucide-react';
 
 interface DashboardStats {
@@ -31,6 +36,7 @@ interface DashboardStats {
 
 export default function AdminDashboardPage() {
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
     activeUsers: 0,
@@ -155,6 +161,15 @@ export default function AdminDashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-6">
             <div className="flex items-center gap-4">
+              <a
+                href="/"
+                className="flex items-center gap-2 px-3 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                title="Back to Rowan App"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="text-sm font-medium">Back to Website</span>
+              </a>
+              <div className="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Shield className="w-6 h-6 text-white" />
               </div>
@@ -168,6 +183,17 @@ export default function AdminDashboardPage() {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-5 h-5" />
+                ) : (
+                  <Moon className="w-5 h-5" />
+                )}
+              </button>
               <button
                 onClick={fetchDashboardData}
                 disabled={isLoading}

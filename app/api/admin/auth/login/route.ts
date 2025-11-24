@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     // Check if admin user exists in our admin_users table
     const { data: adminUser, error: adminError } = await supabase
       .from('admin_users')
-      .select('id, email, role, permissions, is_active, login_count')
+      .select('id, email, admin_level, permissions, is_active, user_id')
       .eq('email', normalizedEmail)
       .eq('is_active', true)
       .single();
@@ -78,17 +78,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Update admin user login tracking
-    const { error: updateError } = await supabase
-      .from('admin_users')
-      .update({
-        last_login: new Date().toISOString(),
-        login_count: (adminUser.login_count || 0) + 1,
-      })
-      .eq('id', adminUser.id);
+    // Update admin user login tracking (if last_login column exists)
+    try {
+      const { error: updateError } = await supabase
+        .from('admin_users')
+        .update({
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', adminUser.id);
 
-    if (updateError) {
-      console.error('Failed to update admin login tracking:', updateError);
+      if (updateError) {
+        console.error('Failed to update admin login tracking:', updateError);
+      }
+    } catch (error) {
+      // Fail silently if column doesn't exist
+      console.log('Admin login tracking update skipped');
     }
 
     // Create admin session token
@@ -96,7 +100,7 @@ export async function POST(req: NextRequest) {
     const sessionData = {
       adminId: adminUser.id,
       email: adminUser.email,
-      role: adminUser.role,
+      role: adminUser.admin_level, // Use admin_level as role
       permissions: adminUser.permissions,
       authUserId: authData.user.id,
       loginTime: Date.now(),
@@ -117,7 +121,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Log successful admin login
-    console.log(`Successful admin login: ${adminUser.email} (${adminUser.role}) from IP: ${ip}`);
+    console.log(`Successful admin login: ${adminUser.email} (${adminUser.admin_level}) from IP: ${ip}`);
 
     // Increment daily analytics for admin logins
     const today = new Date().toISOString().split('T')[0];
@@ -133,7 +137,7 @@ export async function POST(req: NextRequest) {
       admin: {
         id: adminUser.id,
         email: adminUser.email,
-        role: adminUser.role,
+        role: adminUser.admin_level,
         permissions: adminUser.permissions,
       },
       message: 'Successfully authenticated',
