@@ -26,12 +26,15 @@ function ResetPasswordForm() {
       const supabase = createClient();
       const { data: { session }, error } = await supabase.auth.getSession();
 
-      // Check if user came here from a password reset link
+      // Check if user came here from a password reset link (Supabase native)
       const accessToken = searchParams.get('access_token');
       const refreshToken = searchParams.get('refresh_token');
 
+      // Check if user came here from our custom reset link
+      const customToken = searchParams.get('token');
+
       if (accessToken && refreshToken) {
-        // User clicked password reset link, set the session
+        // User clicked Supabase native password reset link
         try {
           const { error: sessionError } = await supabase.auth.setSession({
             access_token: accessToken,
@@ -42,6 +45,20 @@ function ResetPasswordForm() {
             setError('Invalid or expired reset link. Please request a new password reset.');
           } else {
             setHasValidSession(true);
+          }
+        } catch (err) {
+          setError('Failed to validate reset link. Please try again.');
+        }
+      } else if (customToken) {
+        // User clicked our custom reset link - validate the token
+        try {
+          const response = await fetch(`/api/auth/password-reset/verify?token=${customToken}`);
+          const data = await response.json();
+
+          if (data.valid) {
+            setHasValidSession(true);
+          } else {
+            setError(data.error || 'Invalid or expired reset link. Please request a new password reset.');
           }
         } catch (err) {
           setError('Failed to validate reset link. Please try again.');
@@ -98,22 +115,45 @@ function ResetPasswordForm() {
     setIsLoading(true);
 
     try {
-      const supabase = createClient();
+      const customToken = searchParams.get('token');
 
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: password
-      });
+      if (customToken) {
+        // Use our custom password reset API
+        const response = await fetch('/api/auth/password-reset/verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            token: customToken,
+            password: password
+          })
+        });
 
-      if (updateError) {
-        setError('Failed to update password. Please try again.');
-        return;
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          setError(data.error || 'Failed to update password. Please try again.');
+          return;
+        }
+      } else {
+        // Use Supabase's built-in password update (for native reset links)
+        const supabase = createClient();
+        const { error: updateError } = await supabase.auth.updateUser({
+          password: password
+        });
+
+        if (updateError) {
+          setError('Failed to update password. Please try again.');
+          return;
+        }
       }
 
       setSuccess(true);
 
-      // Redirect to dashboard after 2 seconds
+      // Redirect to sign-in page after 2 seconds
       setTimeout(() => {
-        router.push('/dashboard');
+        router.push('/auth/signin');
       }, 2000);
 
     } catch (err) {
@@ -125,7 +165,7 @@ function ResetPasswordForm() {
 
   if (isCheckingSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-950 dark:via-blue-950 dark:to-indigo-950">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50 dark:from-slate-950 dark:via-gray-950 dark:to-zinc-950">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
       </div>
     );
@@ -133,7 +173,7 @@ function ResetPasswordForm() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-950 dark:via-blue-950 dark:to-indigo-950 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50 dark:from-slate-950 dark:via-gray-950 dark:to-zinc-950 p-4">
         <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
           <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-400" />
@@ -154,7 +194,7 @@ function ResetPasswordForm() {
 
   if (!hasValidSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-950 dark:via-blue-950 dark:to-indigo-950 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50 dark:from-slate-950 dark:via-gray-950 dark:to-zinc-950 p-4">
         <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
           <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
@@ -167,7 +207,7 @@ function ResetPasswordForm() {
           </p>
           <Link
             href="/auth/signin"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors font-medium"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Sign In
@@ -178,12 +218,12 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-950 dark:via-blue-950 dark:to-indigo-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50 dark:from-slate-950 dark:via-gray-950 dark:to-zinc-950 p-4">
       <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Lock className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+          <div className="w-16 h-16 bg-slate-100 dark:bg-slate-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-8 h-8 text-slate-600 dark:text-slate-400" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             Reset Your Password
@@ -216,7 +256,7 @@ function ResetPasswordForm() {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white pr-12"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white pr-12"
                 placeholder="Enter your new password"
                 required
                 minLength={8}
@@ -224,7 +264,7 @@ function ResetPasswordForm() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -242,7 +282,7 @@ function ResetPasswordForm() {
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white pr-12"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white pr-12"
                 placeholder="Confirm your new password"
                 required
                 minLength={8}
@@ -250,7 +290,7 @@ function ResetPasswordForm() {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
               >
                 {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -274,7 +314,7 @@ function ResetPasswordForm() {
           <button
             type="submit"
             disabled={isLoading || !password || !confirmPassword}
-            className="w-full px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2"
+            className="w-full px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2"
           >
             {isLoading ? (
               <>
@@ -294,7 +334,7 @@ function ResetPasswordForm() {
         <div className="mt-6 text-center">
           <Link
             href="/auth/signin"
-            className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+            className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
           >
             Back to Sign In
           </Link>
@@ -308,8 +348,8 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-950 dark:via-blue-950 dark:to-indigo-950">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50 dark:from-slate-950 dark:via-gray-950 dark:to-zinc-950">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
         </div>
       }
     >
