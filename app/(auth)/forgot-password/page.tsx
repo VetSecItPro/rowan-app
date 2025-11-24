@@ -96,11 +96,11 @@ export default function ForgotPasswordPage() {
         {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <div className="flex items-start gap-2">
+            <div className="flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-base md:text-sm font-medium text-red-800 dark:text-red-200">Error</p>
-                <p className="text-sm md:text-xs text-red-700 dark:text-red-300 mt-1">{error}</p>
+                <p className="text-sm font-medium text-red-800 dark:text-red-200">Error</p>
+                <p className="text-sm text-red-700 dark:text-red-300 mt-1 leading-relaxed">{error}</p>
               </div>
             </div>
           </div>
@@ -119,7 +119,7 @@ export default function ForgotPasswordPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400 transition-colors"
+                className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400 transition-colors text-base md:text-sm mobile-text-input"
                 placeholder="Enter your email address"
                 required
                 autoComplete="email"
