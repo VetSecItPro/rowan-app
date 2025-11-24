@@ -4,6 +4,7 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookies } from '@/lib/utils/safe-cookies';
+import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto';
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
@@ -36,19 +37,20 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Decode admin session (simplified for now)
+    // Decrypt and validate admin session
     let sessionData;
     try {
-      sessionData = JSON.parse(Buffer.from(adminSession.value, 'base64').toString());
+      sessionData = decryptSessionData(adminSession.value);
 
-      // Check if session is expired
-      if (sessionData.expiresAt < Date.now()) {
+      // Validate session data and check expiration
+      if (!validateSessionData(sessionData)) {
         return NextResponse.json(
-          { error: 'Session expired' },
+          { error: 'Session expired or invalid' },
           { status: 401 }
         );
       }
     } catch (error) {
+      console.error('Admin session decryption failed:', error);
       return NextResponse.json(
         { error: 'Invalid session' },
         { status: 401 }

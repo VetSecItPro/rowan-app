@@ -3406,3 +3406,43 @@ html:not(.dark) .bg-white {
 .animate-sparkle {
   animation: sparkle 5s ease-in-out infinite;
 }
+
+
+/* Mobile Optimization Enhancements */
+/* Mobile-optimized touch targets and form inputs */
+@media (max-width: 768px) {
+  .mobile-touch {
+    min-height: 48px !important;
+    min-width: 48px !important;
+    padding: 12px !important;
+  }
+
+  .mobile-text-input {
+    min-height: 48px !important;
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+
+  .mobile-clickable {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+
+  /* Improve dropdown positioning on mobile */
+  .dropdown-mobile {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 20px !important;
+    left: 20px !important;
+    right: 20px !important;
+    width: auto !important;
+    max-height: 60vh !important;
+    overflow-y: auto !important;
+    transform: none !important;
+  }
+
+  /* Mobile-friendly error messages */
+  .mobile-error-text {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+  }
+}

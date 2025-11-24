@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookies } from '@/lib/utils/safe-cookies';
 import { randomBytes, createHash } from 'crypto';
+import { encryptSessionData } from '@/lib/utils/session-crypto';
 
 const ADMIN_SESSION_DURATION = 24 * 60 * 60; // 24 hours in seconds
 
@@ -107,8 +108,8 @@ export async function POST(req: NextRequest) {
       expiresAt: Date.now() + (ADMIN_SESSION_DURATION * 1000),
     };
 
-    // For now, encode session data in the token itself (encrypted)
-    const sessionPayload = Buffer.from(JSON.stringify(sessionData)).toString('base64');
+    // Encrypt session data using AES-256-GCM
+    const sessionPayload = encryptSessionData(sessionData);
 
     // Set admin session cookie
     const cookieStore = safeCookies();
