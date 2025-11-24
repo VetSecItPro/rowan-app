@@ -36,6 +36,10 @@ export interface ShoppingList {
   created_at: string;
   updated_at: string;
   completed_at?: string;
+  // Sharing properties
+  is_public?: boolean;
+  share_token?: string;
+  shared_at?: string;
 }
 
 export interface CreateListInput {

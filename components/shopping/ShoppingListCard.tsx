@@ -20,9 +20,10 @@ interface ShoppingListCardProps {
   onScheduleTrip?: (list: ShoppingList) => void;
   onCreateTask?: (list: ShoppingList) => void;
   onUpdateQuantity?: (itemId: string, newQuantity: number) => void;
+  onShare?: (list: ShoppingList) => void;
 }
 
-export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompleteList, onSaveAsTemplate, onScheduleTrip, onCreateTask, onUpdateQuantity }: ShoppingListCardProps) {
+export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompleteList, onSaveAsTemplate, onScheduleTrip, onCreateTask, onUpdateQuantity, onShare }: ShoppingListCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [editingQuantities, setEditingQuantities] = useState<Record<string, string>>({});
@@ -275,6 +276,17 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                     className="w-full px-4 py-2 text-left text-emerald-600 dark:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                   >
                     Save as Template
+                  </button>
+                )}
+                {onShare && (
+                  <button
+                    onClick={() => {
+                      onShare(list);
+                      setShowMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-indigo-600 dark:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
+                  >
+                    🔗 Share List
                   </button>
                 )}
                 <button
