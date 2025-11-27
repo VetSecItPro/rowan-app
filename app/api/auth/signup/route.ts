@@ -206,54 +206,67 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create the initial space using service role client
-    const { data: newSpace, error: spaceError } = await supabaseServerClient
-      .from('spaces')
-      .insert({
-        name: spaceName,
-        is_personal: true,
-        auto_created: true,
-        user_id: userId
-      })
-      .select('id')
+    // Check if workspace was already created by database trigger
+    // The trigger on public.users automatically provisions a workspace
+    const { data: existingMembership } = await supabaseServerClient
+      .from('space_members')
+      .select('space_id')
+      .eq('user_id', userId)
       .single();
 
-    if (spaceError || !newSpace) {
-      console.error('Space creation failed:', spaceError);
-      // Clean up the auth user to avoid orphaned accounts
-      try {
-        await supabaseServerClient.auth.admin.deleteUser(userId);
-      } catch (error) {
-        console.error('Failed to cleanup auth user after signup failure:', error);
+    if (existingMembership) {
+      // Workspace already created by trigger - we're done
+      console.log('Workspace already provisioned by trigger for user:', userId);
+    } else {
+      // Fallback: Create the initial space manually (trigger may not have fired)
+      const { data: newSpace, error: spaceError } = await supabaseServerClient
+        .from('spaces')
+        .insert({
+          name: spaceName,
+          is_personal: true,
+          auto_created: true,
+          user_id: userId
+        })
+        .select('id')
+        .single();
+
+      if (spaceError || !newSpace) {
+        console.error('Space creation failed:', spaceError);
+        // Clean up the auth user to avoid orphaned accounts
+        try {
+          await supabaseServerClient.auth.admin.deleteUser(userId);
+        } catch (error) {
+          console.error('Failed to cleanup auth user after signup failure:', error);
+        }
+
+        return NextResponse.json(
+          { error: 'Failed to create initial space. Please try again.' },
+          { status: 500 }
+        );
       }
 
-      return NextResponse.json(
-        { error: 'Failed to create initial space. Please try again.' },
-        { status: 500 }
-      );
-    }
+      const { error: memberError } = await supabaseServerClient
+        .from('space_members')
+        .insert({
+          space_id: newSpace.id,
+          user_id: userId,
+          role: 'owner',
+        });
 
-    const { error: memberError } = await supabaseServerClient
-      .from('space_members')
-      .insert({
-        space_id: newSpace.id,
-        user_id: userId,
-        role: 'owner',
-      });
+      if (memberError) {
+        console.error('Failed to add user to initial space:', memberError);
+        try {
+          await supabaseServerClient.from('spaces').delete().eq('id', newSpace.id);
+          await supabaseServerClient.auth.admin.deleteUser(userId);
+        } catch (error) {
+          console.error('Cleanup after membership failure failed:', error);
+        }
 
-    if (memberError) {
-      console.error('Failed to add user to initial space:', memberError);
-      try {
-        await supabaseServerClient.from('spaces').delete().eq('id', newSpace.id);
-        await supabaseServerClient.auth.admin.deleteUser(userId);
-      } catch (error) {
-        console.error('Cleanup after membership failure failed:', error);
+        return NextResponse.json(
+          { error: 'Failed to finalize account setup. Please try again.' },
+          { status: 500 }
+        );
       }
-
-      return NextResponse.json(
-        { error: 'Failed to finalize account setup. Please try again.' },
-        { status: 500 }
-      );
     }
 
     // Success response
