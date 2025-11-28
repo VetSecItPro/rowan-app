@@ -191,10 +191,11 @@ export async function POST(request: NextRequest) {
     const userId = data.user.id;
     const spaceName = sanitizedProfile.space_name;
 
-    // CRITICAL FIX: Create user record in public.users table first
+    // CRITICAL FIX: Create or update user record in public.users table
+    // Using upsert because auth trigger may have already created a minimal profile
     const { error: publicUserError } = await supabaseServerClient
       .from('users')
-      .insert({
+      .upsert({
         id: userId,
         email: validated.email,
         name: sanitizedProfile.name,
@@ -208,7 +209,7 @@ export async function POST(request: NextRequest) {
         calendar_chore_filter: { categories: [], frequencies: [] },
         created_at: data.user.created_at,
         updated_at: data.user.created_at
-      });
+      }, { onConflict: 'id' });
 
     if (publicUserError) {
       console.error('Public user creation failed:', publicUserError);
