@@ -152,30 +152,23 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Handle leaked/breached password (HIBP check)
-      if (error.message.includes('leaked') ||
-          error.message.includes('breached') ||
-          error.message.includes('pwned') ||
-          error.message.includes('compromised') ||
-          error.message.includes('data breach')) {
-        return NextResponse.json(
-          { error: 'This password has appeared in a data breach. Please choose a different, more secure password.' },
-          { status: 400 }
-        );
-      }
-
-      // Handle password too weak (Supabase's built-in check)
-      if (error.message.includes('weak') || error.message.includes('too short') || error.message.includes('minimum')) {
-        return NextResponse.json(
-          { error: 'Password must be at least 8 characters with uppercase, lowercase, and a number.' },
-          { status: 400 }
-        );
-      }
-
-      // Catch-all for other password errors - show actual message for debugging
+      // Handle password-related errors - show actual Supabase message for clarity
       if (error.message.includes('Password') || error.message.includes('password')) {
+        // Check for leaked/breached password (HIBP check)
+        if (error.message.includes('leaked') ||
+            error.message.includes('breached') ||
+            error.message.includes('pwned') ||
+            error.message.includes('compromised') ||
+            error.message.includes('data breach')) {
+          return NextResponse.json(
+            { error: 'This password has appeared in a data breach. Please choose a different, more secure password.' },
+            { status: 400 }
+          );
+        }
+
+        // For all other password errors, show the actual Supabase error
         return NextResponse.json(
-          { error: `Password error: ${error.message}` },
+          { error: error.message },
           { status: 400 }
         );
       }
