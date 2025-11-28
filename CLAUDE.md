@@ -151,16 +151,38 @@ import { Dropdown } from '@/components/ui/Dropdown';
 ## MCP Configuration
 
 ### Supabase MCP
-**Status**: ✅ Connected
-**Authentication**: Personal Access Token (`[REDACTED_SUPABASE_PAT]`)
-**Configuration**: `.mcp.json` - Local MCP server using `@supabase/mcp-server-supabase@latest`
 **Project**: `SUPABASE_PROJECT_REF`
+**Authentication**: OAuth (browser-based login)
+
+**Correct `.mcp.json` configuration:**
+```json
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=SUPABASE_PROJECT_REF"
+    }
+  }
+}
+```
+
+**If "Needs authentication" appears:**
+1. Restart Claude Code (Cmd+Shift+P → "Reload Window" or restart terminal)
+2. Claude Code will open browser for Supabase OAuth login
+3. Login and authorize access
+4. MCP tools become available
+
+**DO NOT use PAT tokens** - Supabase MCP switched to OAuth in 2025. No headers needed.
 
 **Capabilities**:
 - Direct SQL queries and database operations
 - Database migration management
 - Real-time table monitoring
 - RLS policy management
+
+**Troubleshooting:**
+- If MCP won't connect, remove and re-add: `claude mcp remove supabase -s project && claude mcp add supabase "https://mcp.supabase.com/mcp?project_ref=SUPABASE_PROJECT_REF" --transport http --scope project`
+- Restart Claude Code after any MCP config changes
 
 ### Vercel MCP
 **Status**: ✅ Connected
