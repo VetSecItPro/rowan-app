@@ -4,7 +4,7 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 
-const BETA_PASSWORD = 'RowanApp2025&$&$&$';
+const BETA_PASSWORD = 'rowan-beta-2024';
 const MAX_BETA_USERS = 30;
 
 /**
