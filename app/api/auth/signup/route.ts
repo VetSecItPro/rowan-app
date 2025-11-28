@@ -152,9 +152,30 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      if (error.message.includes('Password') || error.message.includes('password')) {
+      // Handle leaked/breached password (HIBP check)
+      if (error.message.includes('leaked') ||
+          error.message.includes('breached') ||
+          error.message.includes('pwned') ||
+          error.message.includes('compromised') ||
+          error.message.includes('data breach')) {
+        return NextResponse.json(
+          { error: 'This password has appeared in a data breach. Please choose a different, more secure password.' },
+          { status: 400 }
+        );
+      }
+
+      // Handle password too weak (Supabase's built-in check)
+      if (error.message.includes('weak') || error.message.includes('too short') || error.message.includes('minimum')) {
         return NextResponse.json(
           { error: 'Password must be at least 8 characters with uppercase, lowercase, and a number.' },
+          { status: 400 }
+        );
+      }
+
+      // Catch-all for other password errors - show actual message for debugging
+      if (error.message.includes('Password') || error.message.includes('password')) {
+        return NextResponse.json(
+          { error: `Password error: ${error.message}` },
           { status: 400 }
         );
       }
