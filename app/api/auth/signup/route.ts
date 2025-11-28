@@ -76,9 +76,10 @@ export async function POST(request: NextRequest) {
       : { success: true, limit: 3, remaining: 2, reset: Date.now() + 3600000 };
 
     if (!success) {
+      const minutesUntilReset = Math.ceil((reset - Date.now()) / 60000);
       return NextResponse.json(
         {
-          error: 'Too many signup attempts. Please try again later.',
+          error: `Too many signup attempts. Please wait ${minutesUntilReset} minute${minutesUntilReset !== 1 ? 's' : ''} and try again.`,
           resetTime: reset
         },
         {
@@ -132,32 +133,50 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      // Handle specific signup errors
-      if (error.message.includes('User already registered')) {
+      console.error('Supabase auth signup error:', error.message, error);
+
+      // Handle specific signup errors with clear messages
+      if (error.message.includes('User already registered') ||
+          error.message.includes('already been registered') ||
+          error.message.includes('already exists')) {
         return NextResponse.json(
-          { error: 'An account with this email already exists' },
+          { error: 'An account with this email already exists. Please sign in instead.' },
           { status: 409 }
         );
       }
 
-      if (error.message.includes('Invalid email')) {
+      if (error.message.includes('Invalid email') || error.message.includes('invalid email')) {
         return NextResponse.json(
-          { error: 'Invalid email address' },
+          { error: 'Please enter a valid email address.' },
           { status: 400 }
         );
       }
 
-      if (error.message.includes('Password')) {
+      if (error.message.includes('Password') || error.message.includes('password')) {
         return NextResponse.json(
-          { error: 'Password does not meet requirements' },
+          { error: 'Password must be at least 8 characters with uppercase, lowercase, and a number.' },
           { status: 400 }
         );
       }
 
-      // Generic error for other cases
-      console.error('Signup error:', error);
+      if (error.message.includes('rate') || error.message.includes('limit') || error.message.includes('too many')) {
+        return NextResponse.json(
+          { error: 'Too many signup attempts. Please wait a few minutes and try again.' },
+          { status: 429 }
+        );
+      }
+
+      if (error.message.includes('network') || error.message.includes('connection')) {
+        return NextResponse.json(
+          { error: 'Connection error. Please check your internet and try again.' },
+          { status: 503 }
+        );
+      }
+
+      // Log the actual error for debugging but return user-friendly message
+      console.error('Unhandled signup error:', error);
       return NextResponse.json(
-        { error: 'Account creation failed. Please try again.' },
+        { error: `Account creation failed: ${error.message || 'Unknown error'}. Please try again.` },
         { status: 500 }
       );
     }
