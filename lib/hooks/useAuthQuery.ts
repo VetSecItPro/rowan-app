@@ -65,7 +65,7 @@ export function useUserProfile(userId: string | undefined) {
 
       const { data, error } = await supabase
         .from('users')
-        .select('id, email, full_name, display_name, avatar_url, created_at, updated_at, timezone, preferences, is_beta_tester, beta_status, beta_signup_date')
+        .select('id, email, name, avatar_url, created_at, updated_at, timezone, privacy_settings, is_beta_tester, beta_status, beta_signup_date, color_theme')
         .eq('id', userId)
         .single();
 
@@ -93,7 +93,8 @@ export function useUserProfile(userId: string | undefined) {
       // Map database fields to UserProfile interface
       return {
         ...data,
-        name: data.display_name || data.full_name || data.email?.split('@')[0] || 'User'
+        name: data.name || data.email?.split('@')[0] || 'User',
+        preferences: data.privacy_settings || {},
       } as UserProfile;
     },
     enabled: !!userId, // Only run query if userId exists
