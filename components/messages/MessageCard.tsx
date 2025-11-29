@@ -121,14 +121,14 @@ export function MessageCard({
           </p>
         </div>
 
-        {/* Message Bubble */}
+        {/* Message Bubble with Glassmorphism */}
         <div className="relative group/message">
           <div
-            className={`rounded-2xl px-4 py-3 cursor-pointer ${
+            className={`rounded-2xl px-4 py-3 cursor-pointer backdrop-blur-xl ${
               isOwn
-                ? 'rounded-tr-sm bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30'
-                : 'rounded-tl-sm bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750'
-            } border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200`}
+                ? 'rounded-tr-sm bg-blue-500/10 dark:bg-blue-400/10 hover:bg-blue-500/15 dark:hover:bg-blue-400/15 border border-blue-200/40 dark:border-blue-400/20 hover:border-blue-300/60 dark:hover:border-blue-400/30 shadow-sm hover:shadow-md'
+                : 'rounded-tl-sm bg-white/40 dark:bg-gray-700/40 hover:bg-white/60 dark:hover:bg-gray-700/50 border border-gray-200/40 dark:border-gray-600/30 hover:border-gray-300/60 dark:hover:border-gray-500/40 shadow-sm hover:shadow-md'
+            } transition-all duration-200`}
           >
             {/* Invisible hover area overlay to ensure hover works across entire bubble */}
             <div className="absolute inset-0 z-0"></div>
