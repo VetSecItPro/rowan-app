@@ -25,8 +25,11 @@ import {
   Unlock,
   Activity,
   Target,
-  Award
+  Award,
+  Sun,
+  Moon
 } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 interface BetaRequest {
   id: string;
@@ -95,7 +98,14 @@ interface BetaStats {
 
 export default function AdminBetaPage() {
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<'requests' | 'users' | 'feedback' | 'settings'>('requests');
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [betaRequests, setBetaRequests] = useState<BetaRequest[]>([]);
   const [betaUsers, setBetaUsers] = useState<BetaUser[]>([]);
   const [betaFeedback, setBetaFeedback] = useState<BetaFeedback[]>([]);
@@ -318,6 +328,28 @@ export default function AdminBetaPage() {
                   {stats.capacity - stats.activeUsers} slots remaining
                 </div>
               </div>
+              {/* Theme Toggle */}
+              {mounted && (
+                <button
+                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                >
+                  {theme === 'dark' ? (
+                    <Sun className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  ) : (
+                    <Moon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  )}
+                </button>
+              )}
+              {/* Back to Main App */}
+              <a
+                href="/dashboard"
+                className="flex items-center gap-2 px-3 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-sm"
+              >
+                <Globe className="w-4 h-4" />
+                Back to App
+              </a>
               <button
                 onClick={fetchData}
                 disabled={isLoading}

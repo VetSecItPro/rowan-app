@@ -1,8 +1,4 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import '../globals.css';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Rowan Operations Dashboard',
@@ -18,13 +14,11 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Admin layout is nested under root layout - don't define html/body
+  // The root layout already provides ThemeProvider and base styling
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} bg-gray-100 dark:bg-gray-900`}>
-        <div className="min-h-screen">
-          {children}
-        </div>
-      </body>
-    </html>
+    <div className="min-h-screen bg-gray-900">
+      {children}
+    </div>
   );
 }

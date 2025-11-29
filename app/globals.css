@@ -137,14 +137,96 @@ html:not(.dark) .bg-white {
   .shimmer-bg {
     background: linear-gradient(
       90deg,
-      #334155 0%,
-      #475569 25%,
-      #334155 50%,
-      #475569 75%,
-      #334155 100%
+      #1a3a3f 0%,
+      #2d5c5c 25%,
+      #1a3a3f 50%,
+      #2d5c5c 75%,
+      #1a3a3f 100%
     );
     background-size: 200% auto;
-    animation: shimmer 3s linear infinite;
+    animation: shimmer 6s linear infinite;
+  }
+
+  /* User color theme shimmer variants */
+  .shimmer-theme-emerald {
+    background: linear-gradient(90deg, #047857 0%, #10b981 25%, #047857 50%, #10b981 75%, #047857 100%);
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
+  }
+  .shimmer-theme-blue {
+    background: linear-gradient(90deg, #1d4ed8 0%, #3b82f6 25%, #1d4ed8 50%, #3b82f6 75%, #1d4ed8 100%);
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
+  }
+  .shimmer-theme-purple {
+    background: linear-gradient(90deg, #7c3aed 0%, #a855f7 25%, #7c3aed 50%, #a855f7 75%, #7c3aed 100%);
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
+  }
+  .shimmer-theme-pink {
+    background: linear-gradient(90deg, #be185d 0%, #ec4899 25%, #be185d 50%, #ec4899 75%, #be185d 100%);
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
+  }
+  .shimmer-theme-orange {
+    background: linear-gradient(90deg, #c2410c 0%, #f97316 25%, #c2410c 50%, #f97316 75%, #c2410c 100%);
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
+  }
+  .shimmer-theme-rose {
+    background: linear-gradient(90deg, #be123c 0%, #f43f5e 25%, #be123c 50%, #f43f5e 75%, #be123c 100%);
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
+  }
+  .shimmer-theme-cyan {
+    background: linear-gradient(90deg, #0e7490 0%, #06b6d4 25%, #0e7490 50%, #06b6d4 75%, #0e7490 100%);
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
+  }
+  .shimmer-theme-amber {
+    background: linear-gradient(90deg, #b45309 0%, #f59e0b 25%, #b45309 50%, #f59e0b 75%, #b45309 100%);
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
+  }
+  .shimmer-theme-indigo {
+    background: linear-gradient(90deg, #4338ca 0%, #6366f1 25%, #4338ca 50%, #6366f1 75%, #4338ca 100%);
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
+  }
+  .shimmer-theme-teal {
+    background: linear-gradient(90deg, #0f766e 0%, #14b8a6 25%, #0f766e 50%, #14b8a6 75%, #0f766e 100%);
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
+  }
+  .shimmer-theme-red {
+    background: linear-gradient(90deg, #b91c1c 0%, #ef4444 25%, #b91c1c 50%, #ef4444 75%, #b91c1c 100%);
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
+  }
+  .shimmer-theme-lime {
+    background: linear-gradient(90deg, #4d7c0f 0%, #84cc16 25%, #4d7c0f 50%, #84cc16 75%, #4d7c0f 100%);
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
+  }
+  .shimmer-theme-fuchsia {
+    background: linear-gradient(90deg, #a21caf 0%, #d946ef 25%, #a21caf 50%, #d946ef 75%, #a21caf 100%);
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
+  }
+  .shimmer-theme-violet {
+    background: linear-gradient(90deg, #6d28d9 0%, #8b5cf6 25%, #6d28d9 50%, #8b5cf6 75%, #6d28d9 100%);
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
+  }
+  .shimmer-theme-sky {
+    background: linear-gradient(90deg, #0369a1 0%, #0ea5e9 25%, #0369a1 50%, #0ea5e9 75%, #0369a1 100%);
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
+  }
+  .shimmer-theme-slate {
+    background: linear-gradient(90deg, #334155 0%, #64748b 25%, #334155 50%, #64748b 75%, #334155 100%);
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
   }
 
   /* Feature-specific shimmer backgrounds with solid colors */

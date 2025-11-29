@@ -108,7 +108,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="relative bg-gradient-to-t from-purple-200 via-purple-100/50 to-white dark:from-purple-900 dark:via-purple-900/50 dark:to-black pb-20">
+      <section className="relative bg-gradient-to-t from-slate-100 via-gray-50 to-white dark:from-slate-900 dark:via-gray-900/50 dark:to-black pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white text-center mb-16">What You Can Do</h2>
 
