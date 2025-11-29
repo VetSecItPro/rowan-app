@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import { createClient as createServerClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { z } from 'zod';
 import type { Space, SpaceMember, CreateSpaceInput } from '@/lib/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -31,7 +31,7 @@ const UpdateSpaceSchema = z.object({
  * Create a new space and add the creator as owner
  * @param name - Space name
  * @param userId - User ID of the creator
- * @param supabaseClient - Optional Supabase client (uses server client if not provided for API routes)
+ * @param supabaseClient - Optional Supabase client (uses admin client for API routes to bypass RLS)
  * @returns Created space or error
  */
 export async function createSpace(
@@ -40,7 +40,9 @@ export async function createSpace(
   supabaseClient?: SupabaseClient
 ): Promise<{ success: true; data: Space } | { success: false; error: string }> {
   try {
-    const supabase = supabaseClient || createClient();
+    // Use admin client when called from server (supabaseClient provided), otherwise use regular client
+    // Admin client bypasses RLS which is needed for space creation
+    const supabase = supabaseClient ? supabaseAdmin : createClient();
 
     // Validate input
     const validated = CreateSpaceSchema.parse({ name });
