@@ -51,6 +51,7 @@ export function MessageCard({
 }: MessageCardProps) {
   const [reactions, setReactions] = useState<MessageReactionSummary[]>([]);
   const [loadingReaction, setLoadingReaction] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Mock user color (in real app, this would come from user profile)
   const userColor = '#3B82F6'; // Blue for current user
@@ -111,6 +112,13 @@ export function MessageCard({
 
   const colorClasses = getColorClasses(senderColor);
 
+  // Check if message is long (more than ~200 characters or 3-4 lines)
+  const isLongMessage = message.content && message.content.length > 200;
+  const shouldTruncate = isLongMessage && !isExpanded;
+  const displayContent = shouldTruncate
+    ? message.content.substring(0, 200) + '...'
+    : message.content;
+
   return (
     <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
       <div className={`max-w-[85%] sm:max-w-[75%] md:max-w-[70%] lg:max-w-[65%] ${isOwn ? 'items-end' : 'items-start'} flex flex-col`}>
@@ -121,23 +129,31 @@ export function MessageCard({
           </p>
         </div>
 
-        {/* Message Bubble with Glassmorphism */}
+        {/* Message Bubble with Glassmorphism - Pill Shape */}
         <div className="relative group/message">
           <div
-            className={`rounded-2xl px-4 py-3 cursor-pointer backdrop-blur-xl ${
+            className={`rounded-3xl px-5 py-3 cursor-pointer backdrop-blur-xl ${
               isOwn
-                ? 'rounded-tr-sm bg-blue-500/10 dark:bg-blue-400/10 hover:bg-blue-500/15 dark:hover:bg-blue-400/15 border border-blue-200/40 dark:border-blue-400/20 hover:border-blue-300/60 dark:hover:border-blue-400/30 shadow-sm hover:shadow-md'
-                : 'rounded-tl-sm bg-white/40 dark:bg-gray-700/40 hover:bg-white/60 dark:hover:bg-gray-700/50 border border-gray-200/40 dark:border-gray-600/30 hover:border-gray-300/60 dark:hover:border-gray-500/40 shadow-sm hover:shadow-md'
+                ? 'bg-blue-500/10 dark:bg-blue-400/10 hover:bg-blue-500/15 dark:hover:bg-blue-400/15 border border-blue-200/40 dark:border-blue-400/20 hover:border-blue-300/60 dark:hover:border-blue-400/30 shadow-sm hover:shadow-md'
+                : 'bg-white/40 dark:bg-gray-700/40 hover:bg-white/60 dark:hover:bg-gray-700/50 border border-gray-200/40 dark:border-gray-600/30 hover:border-gray-300/60 dark:hover:border-gray-500/40 shadow-sm hover:shadow-md'
             } transition-all duration-200`}
           >
             {/* Invisible hover area overlay to ensure hover works across entire bubble */}
             <div className="absolute inset-0 z-0"></div>
-            {/* Message Content with Markdown Support */}
+            {/* Message Content with Markdown Support and Expand/Collapse */}
             {message.content && (
               <div className="relative z-10 break-words text-gray-900 dark:text-white text-sm prose prose-sm dark:prose-invert max-w-none">
                 <ReactMarkdown>
-                  {message.content}
+                  {displayContent}
                 </ReactMarkdown>
+                {isLongMessage && (
+                  <button
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="mt-1 text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    {isExpanded ? 'Show less' : 'Read more'}
+                  </button>
+                )}
               </div>
             )}
 
