@@ -54,6 +54,9 @@ export async function POST(req: NextRequest) {
     const result = await createSpace(name.trim(), session.user.id, supabase);
 
     if (!result.success) {
+      console.error('[API] Space creation failed:', result.error);
+      console.error('[API] User ID:', session.user.id);
+      console.error('[API] Space name:', name.trim());
       return NextResponse.json(
         { error: result.error },
         { status: 400 }

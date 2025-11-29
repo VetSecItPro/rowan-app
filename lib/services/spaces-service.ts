@@ -57,7 +57,8 @@ export async function createSpace(
       .single();
 
     if (spaceError) {
-      console.error('[spaces-service] createSpace error:', spaceError);
+      console.error('[spaces-service] createSpace INSERT error:', spaceError);
+      console.error('[spaces-service] Error details:', JSON.stringify(spaceError, null, 2));
       throw spaceError;
     }
 
@@ -71,7 +72,10 @@ export async function createSpace(
       });
 
     if (memberError) {
-      console.error('[spaces-service] createSpace member error:', memberError);
+      console.error('[spaces-service] createSpace member INSERT error:', memberError);
+      console.error('[spaces-service] Member error details:', JSON.stringify(memberError, null, 2));
+      console.error('[spaces-service] Space ID:', space.id);
+      console.error('[spaces-service] User ID:', userId);
       // Cleanup: delete the space if member creation failed
       await supabase.from('spaces').delete().eq('id', space.id);
       throw memberError;
