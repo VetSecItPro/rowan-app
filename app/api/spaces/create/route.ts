@@ -50,8 +50,8 @@ export async function POST(req: NextRequest) {
     }
 
 
-    // Create space using service
-    const result = await createSpace(name.trim(), session.user.id);
+    // Create space using service (pass server supabase client)
+    const result = await createSpace(name.trim(), session.user.id, supabase);
 
     if (!result.success) {
       return NextResponse.json(
