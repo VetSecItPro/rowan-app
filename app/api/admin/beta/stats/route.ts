@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import { cookies } from 'next/headers';
+import { safeCookies } from '@/lib/utils/safe-cookies';
+import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto';
+import { withCache, ADMIN_CACHE_TTL } from '@/lib/services/admin-cache-service';
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
+
+// Cache key for beta stats
+const BETA_STATS_CACHE_KEY = 'beta:stats';
 
 /**
  * GET /api/admin/beta/stats
@@ -26,7 +31,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Check admin authentication
-    const cookieStore = cookies();
+    const cookieStore = safeCookies();
     const adminSession = cookieStore.get('admin-session');
 
     if (!adminSession) {
@@ -36,151 +41,170 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Decode admin session
-    let sessionData;
+    // Decrypt and validate admin session (using secure method)
+    let sessionData: { email?: string; adminId?: string; role?: string };
     try {
-      sessionData = JSON.parse(Buffer.from(adminSession.value, 'base64').toString());
+      sessionData = decryptSessionData(adminSession.value);
 
-      // Check if session is expired
-      if (sessionData.expiresAt < Date.now()) {
+      // Validate session data and check expiration
+      if (!validateSessionData(sessionData)) {
         return NextResponse.json(
-          { error: 'Session expired' },
+          { error: 'Session expired or invalid' },
           { status: 401 }
         );
       }
     } catch (error) {
+      console.error('Admin session decryption failed:', error);
       return NextResponse.json(
         { error: 'Invalid session' },
         { status: 401 }
       );
     }
 
-    // Create Supabase client
-    const supabase = createClient();
+    // Check for force refresh query param
+    const { searchParams } = new URL(req.url);
+    const forceRefresh = searchParams.get('refresh') === 'true';
 
-    // Fetch comprehensive beta statistics in parallel
-    const [
-      totalRequestsResult,
-      approvedRequestsResult,
-      pendingRequestsResult,
-      activeUsersResult,
-      recentActivityResult,
-    ] = await Promise.allSettled([
-      // Total beta requests
-      supabase
-        .from('beta_access_requests')
-        .select('*', { count: 'exact', head: true }),
+    // Fetch stats with caching (1 minute TTL)
+    const stats = await withCache(
+      BETA_STATS_CACHE_KEY,
+      async () => {
+        // Fetch comprehensive beta statistics in parallel
+        const [
+          totalRequestsResult,
+          approvedRequestsResult,
+          pendingRequestsResult,
+          activeUsersFromRequestsResult,
+          activeUsersFromUsersTableResult,
+          recentActivityResult,
+        ] = await Promise.allSettled([
+          // Total beta requests
+          supabaseAdmin
+            .from('beta_access_requests')
+            .select('*', { count: 'exact', head: true }),
 
-      // Approved requests
-      supabase
-        .from('beta_access_requests')
-        .select('*', { count: 'exact', head: true })
-        .eq('access_granted', true),
+          // Approved requests
+          supabaseAdmin
+            .from('beta_access_requests')
+            .select('*', { count: 'exact', head: true })
+            .eq('access_granted', true),
 
-      // Pending requests (approved but no user account yet)
-      supabase
-        .from('beta_access_requests')
-        .select('*', { count: 'exact', head: true })
-        .eq('access_granted', true)
-        .is('user_id', null),
+          // Pending requests (approved but no user account yet)
+          supabaseAdmin
+            .from('beta_access_requests')
+            .select('*', { count: 'exact', head: true })
+            .eq('access_granted', true)
+            .is('user_id', null),
 
-      // Active beta users (those who have signed up)
-      supabase
-        .from('beta_access_requests')
-        .select('*', { count: 'exact', head: true })
-        .eq('access_granted', true)
-        .not('user_id', 'is', null),
+          // Active beta users from requests table (those who have signed up)
+          supabaseAdmin
+            .from('beta_access_requests')
+            .select('*', { count: 'exact', head: true })
+            .eq('access_granted', true)
+            .not('user_id', 'is', null),
 
-      // Recent activity (last 10 beta-related activities)
-      supabase
-        .from('beta_access_requests')
-        .select('email, access_granted, created_at, approved_at, user_id')
-        .order('created_at', { ascending: false })
-        .limit(10),
-    ]);
+          // ALSO count actual registered users from the users table
+          // This is more reliable as a fallback
+          supabaseAdmin
+            .from('users')
+            .select('*', { count: 'exact', head: true }),
 
-    // Extract counts safely
-    const totalRequests = totalRequestsResult.status === 'fulfilled' ? (totalRequestsResult.value.count || 0) : 0;
-    const approvedRequests = approvedRequestsResult.status === 'fulfilled' ? (approvedRequestsResult.value.count || 0) : 0;
-    const pendingRequests = pendingRequestsResult.status === 'fulfilled' ? (pendingRequestsResult.value.count || 0) : 0;
-    const activeUsers = activeUsersResult.status === 'fulfilled' ? (activeUsersResult.value.count || 0) : 0;
+          // Recent activity (last 10 beta-related activities)
+          supabaseAdmin
+            .from('beta_access_requests')
+            .select('email, access_granted, created_at, approved_at, user_id')
+            .order('created_at', { ascending: false })
+            .limit(10),
+        ]);
 
-    // Process recent activity
-    let recentActivity: Array<{
-      type: 'request' | 'approval' | 'signup' | 'activity';
-      email: string;
-      timestamp: string;
-      details: string;
-    }> = [];
+        // Extract counts safely
+        const totalRequests = totalRequestsResult.status === 'fulfilled' ? (totalRequestsResult.value.count || 0) : 0;
+        const approvedRequests = approvedRequestsResult.status === 'fulfilled' ? (approvedRequestsResult.value.count || 0) : 0;
+        const pendingRequests = pendingRequestsResult.status === 'fulfilled' ? (pendingRequestsResult.value.count || 0) : 0;
 
-    if (recentActivityResult.status === 'fulfilled' && recentActivityResult.value.data) {
-      recentActivity = recentActivityResult.value.data.map((record: any) => {
-        if (record.user_id) {
-          return {
-            type: 'signup' as const,
-            email: record.email,
-            timestamp: record.approved_at || record.created_at,
-            details: 'completed beta signup and created account',
-          };
-        } else if (record.access_granted) {
-          return {
-            type: 'approval' as const,
-            email: record.email,
-            timestamp: record.approved_at || record.created_at,
-            details: 'was approved for beta access',
-          };
-        } else {
-          return {
-            type: 'request' as const,
-            email: record.email,
-            timestamp: record.created_at,
-            details: 'requested beta access',
-          };
+        // Get user count from both sources and use the higher value (users table is more reliable)
+        const activeUsersFromRequests = activeUsersFromRequestsResult.status === 'fulfilled' ? (activeUsersFromRequestsResult.value.count || 0) : 0;
+        const activeUsersFromTable = activeUsersFromUsersTableResult.status === 'fulfilled' ? (activeUsersFromUsersTableResult.value.count || 0) : 0;
+        const activeUsers = Math.max(activeUsersFromRequests, activeUsersFromTable);
+
+        // Process recent activity
+        let recentActivity: Array<{
+          type: 'request' | 'approval' | 'signup' | 'activity';
+          email: string;
+          timestamp: string;
+          details: string;
+        }> = [];
+
+        if (recentActivityResult.status === 'fulfilled' && recentActivityResult.value.data) {
+          recentActivity = recentActivityResult.value.data.map((record: any) => {
+            if (record.user_id) {
+              return {
+                type: 'signup' as const,
+                email: record.email,
+                timestamp: record.approved_at || record.created_at,
+                details: 'completed beta signup and created account',
+              };
+            } else if (record.access_granted) {
+              return {
+                type: 'approval' as const,
+                email: record.email,
+                timestamp: record.approved_at || record.created_at,
+                details: 'was approved for beta access',
+              };
+            } else {
+              return {
+                type: 'request' as const,
+                email: record.email,
+                timestamp: record.created_at,
+                details: 'requested beta access',
+              };
+            }
+          });
         }
-      });
-    }
 
-    // Calculate metrics
-    const conversionRate = totalRequests > 0 ? Math.round((activeUsers / totalRequests) * 100) : 0;
-    const approvalRate = totalRequests > 0 ? Math.round((approvedRequests / totalRequests) * 100) : 0;
-    const signupRate = approvedRequests > 0 ? Math.round((activeUsers / approvedRequests) * 100) : 0;
+        // Calculate metrics
+        const conversionRate = totalRequests > 0 ? Math.round((activeUsers / totalRequests) * 100) : 0;
+        const approvalRate = totalRequests > 0 ? Math.round((approvedRequests / totalRequests) * 100) : 0;
+        const signupRate = approvedRequests > 0 ? Math.round((activeUsers / approvedRequests) * 100) : 0;
 
-    // Beta program capacity (from plan: 30 users max)
-    const capacity = 30;
-    const capacityUsage = Math.round((activeUsers / capacity) * 100);
+        // Beta program capacity (from plan: 30 users max)
+        const capacity = 30;
+        const capacityUsage = Math.round((activeUsers / capacity) * 100);
 
-    // Calculate average activity score (placeholder - would need user activity data)
-    const averageActivityScore = 7.5; // Mock data - replace with real calculation
+        // Calculate average activity score (placeholder - would need user activity data)
+        const averageActivityScore = 7.5; // Mock data - replace with real calculation
 
-    // Compile comprehensive stats
-    const stats = {
-      totalRequests,
-      approvedRequests,
-      pendingRequests,
-      activeUsers,
-      capacity,
-      conversionRate,
-      approvalRate,
-      signupRate,
-      capacityUsage,
-      averageActivityScore,
-      recentActivity,
-      metrics: {
-        slotsRemaining: capacity - activeUsers,
-        weeklyGrowth: 15, // Mock data - calculate from time-based queries
-        averageTimeToSignup: '2.5 hours', // Mock data
-        passwordSuccessRate: approvalRate,
+        // Log any errors for debugging
+        [totalRequestsResult, approvedRequestsResult, pendingRequestsResult, activeUsersFromRequestsResult, activeUsersFromUsersTableResult, recentActivityResult]
+          .forEach((result, index) => {
+            if (result.status === 'rejected') {
+              console.error(`Beta stat query ${index} failed:`, result.reason);
+            }
+          });
+
+        return {
+          totalRequests,
+          approvedRequests,
+          pendingRequests,
+          activeUsers,
+          capacity,
+          conversionRate,
+          approvalRate,
+          signupRate,
+          capacityUsage,
+          averageActivityScore,
+          recentActivity,
+          metrics: {
+            slotsRemaining: capacity - activeUsers,
+            weeklyGrowth: 15, // Mock data - calculate from time-based queries
+            averageTimeToSignup: '2.5 hours', // Mock data
+            passwordSuccessRate: approvalRate,
+          },
+          lastUpdated: new Date().toISOString(),
+        };
       },
-      lastUpdated: new Date().toISOString(),
-    };
-
-    // Log any errors for debugging
-    [totalRequestsResult, approvedRequestsResult, pendingRequestsResult, activeUsersResult, recentActivityResult]
-      .forEach((result, index) => {
-        if (result.status === 'rejected') {
-          console.error(`Beta stat query ${index} failed:`, result.reason);
-        }
-      });
+      { ttl: ADMIN_CACHE_TTL.dashboardStats, skipCache: forceRefresh }
+    );
 
     // Log admin access
     console.log(`Admin beta stats accessed by: ${sessionData.email} from IP: ${ip}`);

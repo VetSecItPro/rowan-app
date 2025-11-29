@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import {
@@ -10,19 +10,14 @@ import {
   TrendingUp,
   Shield,
   Activity,
-  Database,
-  Clock,
   Download,
   RefreshCw,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
   Monitor,
   BarChart3,
   Sun,
   Moon,
   ArrowLeft,
-  ExternalLink
+  type LucideIcon
 } from 'lucide-react';
 
 interface DashboardStats {
@@ -34,21 +29,125 @@ interface DashboardStats {
   signupsToday: number;
 }
 
+// Memoized StatCard component - prevents re-renders when other stats change
+const StatCard = memo(function StatCard({
+  title,
+  value,
+  icon: Icon,
+  trend,
+  trendValue,
+  color = 'blue'
+}: {
+  title: string;
+  value: number | string;
+  icon: LucideIcon;
+  trend?: 'up' | 'down' | 'neutral';
+  trendValue?: string;
+  color?: 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'gray';
+}) {
+  const colorClasses: Record<string, string> = {
+    blue: 'bg-blue-500',
+    green: 'bg-green-500',
+    purple: 'bg-purple-500',
+    orange: 'bg-orange-500',
+    red: 'bg-red-500',
+    gray: 'bg-gray-500',
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{value}</p>
+          {trend && trendValue && (
+            <div className="flex items-center mt-2">
+              <TrendingUp className={`w-4 h-4 mr-1 ${
+                trend === 'up' ? 'text-green-500 rotate-0' :
+                trend === 'down' ? 'text-red-500 rotate-180' :
+                'text-gray-500'
+              }`} />
+              <span className={`text-sm ${
+                trend === 'up' ? 'text-green-600' :
+                trend === 'down' ? 'text-red-600' :
+                'text-gray-600'
+              }`}>
+                {trendValue}
+              </span>
+            </div>
+          )}
+        </div>
+        <div className={`w-12 h-12 ${colorClasses[color]} rounded-lg flex items-center justify-center`}>
+          <Icon className="w-6 h-6 text-white" />
+        </div>
+      </div>
+    </div>
+  );
+});
+
+// Memoized QuickAction component
+const QuickAction = memo(function QuickAction({
+  title,
+  description,
+  icon: Icon,
+  onClick,
+  variant = 'primary'
+}: {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  onClick: () => void;
+  variant?: 'primary' | 'secondary' | 'danger';
+}) {
+  const variantClasses = {
+    primary: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30',
+    secondary: 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700',
+    danger: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30',
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full p-4 border rounded-lg transition-colors text-left ${variantClasses[variant]}`}
+    >
+      <div className="flex items-start gap-3">
+        <Icon className="w-5 h-5 mt-0.5 flex-shrink-0" />
+        <div>
+          <h4 className="font-medium text-gray-900 dark:text-white">{title}</h4>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{description}</p>
+        </div>
+      </div>
+    </button>
+  );
+});
+
+// Skeleton loader for stats grid
+const StatsSkeleton = memo(function StatsSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+      {[...Array(6)].map((_, i) => (
+        <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 animate-pulse">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20" />
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-16" />
+            </div>
+            <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+});
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
-  const [stats, setStats] = useState<DashboardStats>({
-    totalUsers: 0,
-    activeUsers: 0,
-    betaUsers: 0,
-    launchSignups: 0,
-    betaRequestsToday: 0,
-    signupsToday: 0,
-  });
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       const response = await fetch('/api/admin/dashboard/stats');
       if (response.ok) {
@@ -61,98 +160,14 @@ export default function AdminDashboardPage() {
       setIsLoading(false);
       setLastRefresh(new Date());
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchDashboardData();
     // Refresh every 5 minutes
     const interval = setInterval(fetchDashboardData, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, []);
-
-  const StatCard = ({
-    title,
-    value,
-    icon: Icon,
-    trend,
-    trendValue,
-    color = 'blue'
-  }: {
-    title: string;
-    value: number | string;
-    icon: any;
-    trend?: 'up' | 'down' | 'neutral';
-    trendValue?: string;
-    color?: 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'gray';
-  }) => {
-    const colorClasses: Record<string, string> = {
-      blue: 'bg-blue-500',
-      green: 'bg-green-500',
-      purple: 'bg-purple-500',
-      orange: 'bg-orange-500',
-      red: 'bg-red-500',
-      gray: 'bg-gray-500',
-    };
-
-    return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{value}</p>
-            {trend && trendValue && (
-              <div className="flex items-center mt-2">
-                <TrendingUp className={`w-4 h-4 mr-1 ${
-                  trend === 'up' ? 'text-green-500 rotate-0' :
-                  trend === 'down' ? 'text-red-500 rotate-180' :
-                  'text-gray-500'
-                }`} />
-                <span className={`text-sm ${
-                  trend === 'up' ? 'text-green-600' :
-                  trend === 'down' ? 'text-red-600' :
-                  'text-gray-600'
-                }`}>
-                  {trendValue}
-                </span>
-              </div>
-            )}
-          </div>
-          <div className={`w-12 h-12 ${colorClasses[color]} rounded-lg flex items-center justify-center`}>
-            <Icon className="w-6 h-6 text-white" />
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const QuickAction = ({ title, description, icon: Icon, onClick, variant = 'primary' }: {
-    title: string;
-    description: string;
-    icon: any;
-    onClick: () => void;
-    variant?: 'primary' | 'secondary' | 'danger';
-  }) => {
-    const variantClasses = {
-      primary: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30',
-      secondary: 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700',
-      danger: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30',
-    };
-
-    return (
-      <button
-        onClick={onClick}
-        className={`w-full p-4 border rounded-lg transition-colors text-left ${variantClasses[variant]}`}
-      >
-        <div className="flex items-start gap-3">
-          <Icon className="w-5 h-5 mt-0.5 flex-shrink-0" />
-          <div>
-            <h4 className="font-medium text-gray-900 dark:text-white">{title}</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{description}</p>
-          </div>
-        </div>
-      </button>
-    );
-  };
+  }, [fetchDashboardData]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -212,57 +227,61 @@ export default function AdminDashboardPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
-          <StatCard
-            title="Total Users"
-            value={stats.totalUsers}
-            icon={Users}
-            color="blue"
-            trend={stats.totalUsers > 0 ? "up" : undefined}
-            trendValue={stats.totalUsers > 0 ? "Growing" : undefined}
-          />
-          <StatCard
-            title="Active Users"
-            value={stats.activeUsers}
-            icon={UserCheck}
-            color="green"
-            trend={stats.activeUsers > 0 ? "up" : undefined}
-            trendValue={stats.activeUsers > 0 ? "Active" : undefined}
-          />
-          <StatCard
-            title="Beta Users"
-            value={`${stats.betaUsers}/30`}
-            icon={Shield}
-            color="purple"
-            trend={stats.betaUsers > 0 ? "up" : undefined}
-            trendValue={stats.betaUsers < 30 ? `${30 - stats.betaUsers} slots left` : "Full"}
-          />
-          <StatCard
-            title="Launch Signups"
-            value={stats.launchSignups}
-            icon={Mail}
-            color="orange"
-            trend={stats.launchSignups > 0 ? "up" : undefined}
-            trendValue={stats.launchSignups > 0 ? "Interested" : undefined}
-          />
-          <StatCard
-            title="Beta Requests Today"
-            value={stats.betaRequestsToday}
-            icon={Activity}
-            color="red"
-            trend={stats.betaRequestsToday > 0 ? "neutral" : undefined}
-            trendValue={stats.betaRequestsToday > 0 ? "Today" : undefined}
-          />
-          <StatCard
-            title="Signups Today"
-            value={stats.signupsToday}
-            icon={TrendingUp}
-            color="gray"
-            trend={stats.signupsToday > 0 ? "up" : undefined}
-            trendValue={stats.signupsToday > 0 ? "Today" : undefined}
-          />
-        </div>
+        {/* Stats Grid - Show skeleton while loading */}
+        {isLoading || !stats ? (
+          <StatsSkeleton />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+            <StatCard
+              title="Total Users"
+              value={stats.totalUsers}
+              icon={Users}
+              color="blue"
+              trend={stats.totalUsers > 0 ? "up" : undefined}
+              trendValue={stats.totalUsers > 0 ? "Growing" : undefined}
+            />
+            <StatCard
+              title="Active Users"
+              value={stats.activeUsers}
+              icon={UserCheck}
+              color="green"
+              trend={stats.activeUsers > 0 ? "up" : undefined}
+              trendValue={stats.activeUsers > 0 ? "Active" : undefined}
+            />
+            <StatCard
+              title="Beta Users"
+              value={`${stats.betaUsers}/30`}
+              icon={Shield}
+              color="purple"
+              trend={stats.betaUsers > 0 ? "up" : undefined}
+              trendValue={stats.betaUsers < 30 ? `${30 - stats.betaUsers} slots left` : "Full"}
+            />
+            <StatCard
+              title="Launch Signups"
+              value={stats.launchSignups}
+              icon={Mail}
+              color="orange"
+              trend={stats.launchSignups > 0 ? "up" : undefined}
+              trendValue={stats.launchSignups > 0 ? "Interested" : undefined}
+            />
+            <StatCard
+              title="Beta Requests Today"
+              value={stats.betaRequestsToday}
+              icon={Activity}
+              color="red"
+              trend={stats.betaRequestsToday > 0 ? "neutral" : undefined}
+              trendValue={stats.betaRequestsToday > 0 ? "Today" : undefined}
+            />
+            <StatCard
+              title="Signups Today"
+              value={stats.signupsToday}
+              icon={TrendingUp}
+              color="gray"
+              trend={stats.signupsToday > 0 ? "up" : undefined}
+              trendValue={stats.signupsToday > 0 ? "Today" : undefined}
+            />
+          </div>
+        )}
 
         {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -321,7 +340,7 @@ export default function AdminDashboardPage() {
                 Recent Activity
               </h3>
               <div className="space-y-4">
-                {stats.totalUsers > 0 ? (
+                {stats && stats.totalUsers > 0 ? (
                   // Real activity data would go here when available
                   <div className="text-center py-8">
                     <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -390,7 +409,7 @@ export default function AdminDashboardPage() {
                 <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                 <div>
                   <p className="font-medium text-gray-900 dark:text-white">Beta Program</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{`${stats.betaUsers}/30 active`}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{`${stats?.betaUsers ?? 0}/30 active`}</p>
                 </div>
               </div>
             </div>

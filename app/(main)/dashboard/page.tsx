@@ -985,9 +985,9 @@ export default function DashboardPage() {
   // Show loading state while checking authentication
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white via-purple-100/30 to-purple-200 dark:from-black dark:via-purple-900/30 dark:to-purple-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white via-gray-50 to-slate-100 dark:from-black dark:via-gray-900 dark:to-slate-900">
         <div className="text-center">
-          <div className="inline-block w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <div className="inline-block w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4" />
           <p className="text-gray-600 dark:text-gray-400">Loading...</p>
         </div>
       </div>
@@ -1504,7 +1504,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Daily Check-In Section - Compact Design */}
-          <div className="bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-blue-50/50 dark:from-pink-900/10 dark:via-purple-900/10 dark:to-blue-900/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-pink-200/20 dark:border-pink-500/20 transition-all duration-300">
+          <div className="group bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-blue-50/50 dark:from-pink-900/10 dark:via-purple-900/10 dark:to-blue-900/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.3)] border border-pink-200/20 dark:border-pink-500/20 hover:border-pink-400/50 dark:hover:border-pink-400/50 transition-all duration-300">
             {/* Compact Header with Date, Toggle, and Streak Badge */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
               <div className="flex flex-col gap-1">

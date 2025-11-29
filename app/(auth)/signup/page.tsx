@@ -159,11 +159,9 @@ export default function SignUpPage() {
         setError('Too many signup attempts. Please try again later.');
       } else if (error.message.includes('Invalid email')) {
         setError('Please enter a valid email address.');
-      } else if (error.message.includes('Password')) {
-        setError('Password must be at least 8 characters with uppercase, lowercase, and number.');
       } else {
-        // Generic fallback message - never expose technical details
-        setError('Failed to create account. Please try again.');
+        // Show the actual error message from the API (Supabase errors are already user-friendly)
+        setError(error.message);
       }
       setIsLoading(false);
     } else {
@@ -184,7 +182,7 @@ export default function SignUpPage() {
     <div className="min-h-screen flex transition-all duration-500">
       {/* Left side - Branding */}
       <div
-        className={`hidden lg:flex lg:w-1/2 bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 dark:from-purple-900 dark:via-indigo-900 dark:to-blue-900 flex-col items-center justify-center p-12 relative overflow-hidden transform transition-all duration-700 ${
+        className={`hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 dark:from-emerald-900 dark:via-teal-900 dark:to-cyan-900 flex-col items-center justify-center p-12 relative overflow-hidden transform transition-all duration-700 ${
           mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
         }`}
       >
@@ -441,7 +439,7 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

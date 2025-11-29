@@ -303,6 +303,33 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // CRITICAL: Link user to beta_access_requests for tracking
+    // Find the most recent successful beta access request (with no user_id yet)
+    // and link it to this new user
+    try {
+      const { error: betaLinkError } = await supabaseServerClient
+        .from('beta_access_requests')
+        .update({
+          user_id: userId,
+          email: validated.email,
+          approved_at: new Date().toISOString()
+        })
+        .eq('access_granted', true)
+        .is('user_id', null)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (betaLinkError) {
+        // Non-critical - just log it, don't fail signup
+        console.warn('Failed to link beta access request:', betaLinkError);
+      } else {
+        console.log('Successfully linked beta access request for user:', userId);
+      }
+    } catch (betaError) {
+      // Non-critical - just log it
+      console.warn('Beta access linking error:', betaError);
+    }
+
     // Success response
     return NextResponse.json(
       {

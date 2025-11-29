@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookies } from '@/lib/utils/safe-cookies';
-import { randomBytes, createHash } from 'crypto';
+import { randomBytes } from 'crypto';
 import { encryptSessionData } from '@/lib/utils/session-crypto';
 
 const ADMIN_SESSION_DURATION = 24 * 60 * 60; // 24 hours in seconds
@@ -41,20 +42,23 @@ export async function POST(req: NextRequest) {
     // Normalize email
     const normalizedEmail = email.trim().toLowerCase();
 
-    // Create Supabase client
+    // Create Supabase client for auth operations
     const supabase = createClient();
 
-    // Check if admin user exists in our admin_users table
-    const { data: adminUser, error: adminError } = await supabase
+    // Check if admin user exists in our admin_users table (using admin client to bypass RLS)
+    const { data: adminUser, error: adminError } = await supabaseAdmin
       .from('admin_users')
-      .select('id, email, admin_level, permissions, is_active, user_id')
+      .select('id, email, role, permissions, is_active')
       .eq('email', normalizedEmail)
       .eq('is_active', true)
       .single();
 
+    console.log('Admin user lookup result:', { adminUser, adminError, normalizedEmail });
+
     if (adminError || !adminUser) {
-      // Log failed attempt
+      // Log failed attempt with more detail
       console.warn(`Failed admin login attempt for email: ${normalizedEmail} from IP: ${ip}`);
+      console.warn('Admin error:', adminError);
 
       return NextResponse.json(
         { error: 'Invalid credentials or access denied' },
@@ -81,7 +85,7 @@ export async function POST(req: NextRequest) {
 
     // Update admin user login tracking (if last_login column exists)
     try {
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabaseAdmin
         .from('admin_users')
         .update({
           updated_at: new Date().toISOString(),
@@ -101,7 +105,7 @@ export async function POST(req: NextRequest) {
     const sessionData = {
       adminId: adminUser.id,
       email: adminUser.email,
-      role: adminUser.admin_level, // Use admin_level as role
+      role: adminUser.role,
       permissions: adminUser.permissions,
       authUserId: authData.user.id,
       loginTime: Date.now(),
@@ -112,17 +116,18 @@ export async function POST(req: NextRequest) {
     const sessionPayload = encryptSessionData(sessionData);
 
     // Set admin session cookie
+    // Use path '/' so cookie is available to both /admin pages and /api/admin routes
     const cookieStore = safeCookies();
     cookieStore.set('admin-session', sessionPayload, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: ADMIN_SESSION_DURATION,
-      path: '/admin',
+      path: '/',
     });
 
     // Log successful admin login
-    console.log(`Successful admin login: ${adminUser.email} (${adminUser.admin_level}) from IP: ${ip}`);
+    console.log(`Successful admin login: ${adminUser.email} (${adminUser.role}) from IP: ${ip}`);
 
     // Increment daily analytics for admin logins
     const today = new Date().toISOString().split('T')[0];
@@ -138,7 +143,7 @@ export async function POST(req: NextRequest) {
       admin: {
         id: adminUser.id,
         email: adminUser.email,
-        role: adminUser.admin_level,
+        role: adminUser.role,
         permissions: adminUser.permissions,
       },
       message: 'Successfully authenticated',

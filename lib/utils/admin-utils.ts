@@ -3,6 +3,7 @@
  */
 
 const ADMIN_EMAILS = [
+  'admin@example.com',
   'admin@example.com'
 ];
 

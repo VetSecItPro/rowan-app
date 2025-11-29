@@ -1,4 +1,4 @@
-import { createCipherGCM, createDecipherGCM, randomBytes } from 'crypto';
+import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 
 // Get encryption key from environment - must be 32 bytes for AES-256
 const getEncryptionKey = (): Buffer => {
@@ -23,7 +23,7 @@ export function encryptSessionData(data: object): string {
   try {
     const key = getEncryptionKey();
     const iv = randomBytes(16); // 16 bytes for GCM
-    const cipher = createCipherGCM('aes-256-gcm', key, iv);
+    const cipher = createCipheriv('aes-256-gcm', key, iv) as ReturnType<typeof createCipheriv> & { getAuthTag: () => Buffer };
 
     const plaintext = JSON.stringify(data);
     const encrypted = Buffer.concat([
@@ -57,7 +57,7 @@ export function decryptSessionData(encryptedData: string): object {
     const authTag = combined.subarray(16, 32);
     const encrypted = combined.subarray(32);
 
-    const decipher = createDecipherGCM('aes-256-gcm', key, iv);
+    const decipher = createDecipheriv('aes-256-gcm', key, iv) as ReturnType<typeof createDecipheriv> & { setAuthTag: (tag: Buffer) => void };
     decipher.setAuthTag(authTag);
 
     const decrypted = Buffer.concat([

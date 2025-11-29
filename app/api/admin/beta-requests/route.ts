@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import { cookies } from 'next/headers';
+import { safeCookies } from '@/lib/utils/safe-cookies';
+import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto';
+import { withCache, ADMIN_CACHE_KEYS, ADMIN_CACHE_TTL } from '@/lib/services/admin-cache-service';
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
@@ -26,7 +28,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Check admin authentication
-    const cookieStore = cookies();
+    const cookieStore = safeCookies();
     const adminSession = cookieStore.get('admin-session');
 
     if (!adminSession) {
@@ -36,92 +38,100 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Decode admin session
-    let sessionData;
+    // Decrypt and validate admin session
+    let sessionData: any;
     try {
-      sessionData = JSON.parse(Buffer.from(adminSession.value, 'base64').toString());
+      sessionData = decryptSessionData(adminSession.value);
 
-      // Check if session is expired
-      if (sessionData.expiresAt < Date.now()) {
+      // Validate session data and check expiration
+      if (!validateSessionData(sessionData)) {
         return NextResponse.json(
-          { error: 'Session expired' },
+          { error: 'Session expired or invalid' },
           { status: 401 }
         );
       }
     } catch (error) {
+      console.error('Admin session decryption failed:', error);
       return NextResponse.json(
         { error: 'Invalid session' },
         { status: 401 }
       );
     }
 
-    // Create Supabase client
-    const supabase = createClient();
-
     // Get pagination parameters
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '50');
     const status = searchParams.get('status'); // 'approved', 'pending', or null for all
+    const forceRefresh = searchParams.get('refresh') === 'true';
 
-    let query = supabase
-      .from('beta_access_requests')
-      .select('*', { count: 'exact' })
-      .order('created_at', { ascending: false });
+    // Fetch with caching
+    const { requests, summary, count } = await withCache(
+      ADMIN_CACHE_KEYS.betaRequests(page, status),
+      async () => {
+        let query = supabaseAdmin
+          .from('beta_access_requests')
+          .select('*', { count: 'exact' })
+          .order('created_at', { ascending: false });
 
-    // Apply status filter
-    if (status === 'approved') {
-      query = query.eq('access_granted', true);
-    } else if (status === 'pending') {
-      query = query.eq('access_granted', false);
-    }
+        // Apply status filter
+        if (status === 'approved') {
+          query = query.eq('access_granted', true);
+        } else if (status === 'pending') {
+          query = query.eq('access_granted', false);
+        }
 
-    // Apply pagination
-    const from = (page - 1) * limit;
-    const to = from + limit - 1;
-    query = query.range(from, to);
+        // Apply pagination
+        const from = (page - 1) * limit;
+        const to = from + limit - 1;
+        query = query.range(from, to);
 
-    const { data: betaRequests, error: betaError, count } = await query;
+        const { data: betaRequests, error: betaError, count } = await query;
 
-    if (betaError) {
-      throw new Error(`Failed to fetch beta requests: ${betaError.message}`);
-    }
+        if (betaError) {
+          throw new Error(`Failed to fetch beta requests: ${betaError.message}`);
+        }
 
-    // Transform the data to include additional information
-    const requests = (betaRequests || []).map((request: any) => ({
-      id: request.id,
-      email: request.email,
-      password_attempt: request.password_attempt,
-      ip_address: request.ip_address,
-      user_agent: request.user_agent,
-      access_granted: request.access_granted,
-      user_id: request.user_id,
-      created_at: request.created_at,
-      approved_at: request.approved_at,
-      notes: request.notes,
-    }));
+        // Transform the data to include additional information
+        const requests = (betaRequests || []).map((request: any) => ({
+          id: request.id,
+          email: request.email,
+          password_attempt: request.password_attempt,
+          ip_address: request.ip_address,
+          user_agent: request.user_agent,
+          access_granted: request.access_granted,
+          user_id: request.user_id,
+          created_at: request.created_at,
+          approved_at: request.approved_at,
+          notes: request.notes,
+        }));
 
-    // Get summary statistics
-    const { data: stats, error: statsError } = await supabase
-      .from('beta_access_requests')
-      .select(`
-        access_granted,
-        user_id
-      `);
+        // Get summary statistics
+        const { data: stats, error: statsError } = await supabaseAdmin
+          .from('beta_access_requests')
+          .select(`
+            access_granted,
+            user_id
+          `);
 
-    let summary = {
-      total: 0,
-      approved: 0,
-      pending: 0,
-      with_accounts: 0,
-    };
+        let summary = {
+          total: 0,
+          approved: 0,
+          pending: 0,
+          with_accounts: 0,
+        };
 
-    if (!statsError && stats) {
-      summary.total = stats.length;
-      summary.approved = stats.filter((s: any) => s.access_granted).length;
-      summary.pending = stats.filter((s: any) => !s.access_granted).length;
-      summary.with_accounts = stats.filter((s: any) => s.user_id !== null).length;
-    }
+        if (!statsError && stats) {
+          summary.total = stats.length;
+          summary.approved = stats.filter((s: any) => s.access_granted).length;
+          summary.pending = stats.filter((s: any) => !s.access_granted).length;
+          summary.with_accounts = stats.filter((s: any) => s.user_id !== null).length;
+        }
+
+        return { requests, summary, count: count || 0 };
+      },
+      { ttl: ADMIN_CACHE_TTL.betaRequests, skipCache: forceRefresh }
+    );
 
     // Log admin access
     console.log(`Admin beta requests accessed by: ${sessionData.email} from IP: ${ip}`);
@@ -133,8 +143,8 @@ export async function GET(req: NextRequest) {
       pagination: {
         page,
         limit,
-        total: count || 0,
-        totalPages: Math.ceil((count || 0) / limit),
+        total: count,
+        totalPages: Math.ceil(count / limit),
       },
     });
 
