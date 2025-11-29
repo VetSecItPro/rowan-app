@@ -966,7 +966,7 @@ export default function MessagesPage() {
             </div>
 
             {/* Chat Interface */}
-            <div className="flex-1 bg-gradient-to-br from-white via-emerald-50/30 to-green-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 border border-emerald-200/50 dark:border-gray-700 rounded-3xl overflow-hidden flex flex-col h-[400px] sm:h-[500px] md:h-[600px] shadow-2xl shadow-emerald-500/10 dark:shadow-gray-900/50">
+            <div className="flex-1 bg-gradient-to-br from-white/80 via-emerald-50/40 to-green-50/60 dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-800/90 backdrop-blur-2xl border border-emerald-200/30 dark:border-gray-700/50 rounded-3xl overflow-hidden flex flex-col h-[400px] sm:h-[500px] md:h-[600px] shadow-2xl shadow-emerald-500/10 dark:shadow-gray-900/50">
             {/* Chat Header */}
             <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-emerald-200/30 dark:border-gray-700 bg-gradient-to-r from-emerald-400/10 via-green-400/10 to-teal-400/10 dark:from-gray-800 dark:to-gray-900 backdrop-blur-sm">
               <div className="flex items-center justify-between gap-3">
@@ -1020,11 +1020,11 @@ export default function MessagesPage() {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 space-y-6 bg-gradient-to-b from-emerald-50/20 via-white/50 to-green-50/30 dark:from-gray-900/80 dark:via-gray-900 dark:to-gray-800/90 relative">
-              {/* Subtle Chat Pattern Background */}
-              <div className="absolute inset-0 opacity-20 dark:opacity-10">
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-100/30 via-transparent to-green-100/20 dark:from-gray-800/20 dark:to-gray-700/10"></div>
-                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.03),transparent_50%)] dark:bg-[radial-gradient(circle_at_50%_50%,rgba(55,65,81,0.1),transparent_50%)]"></div>
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 space-y-6 bg-gradient-to-b from-emerald-50/30 via-white/60 to-green-50/40 dark:from-gray-900/70 dark:via-gray-900/80 dark:to-gray-800/70 backdrop-blur-sm relative">
+              {/* Subtle Chat Pattern Background with Glassmorphism */}
+              <div className="absolute inset-0 opacity-30 dark:opacity-15">
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-100/40 via-transparent to-green-100/30 dark:from-gray-800/30 dark:to-gray-700/20"></div>
+                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.05),transparent_50%)] dark:bg-[radial-gradient(circle_at_50%_50%,rgba(55,65,81,0.15),transparent_50%)]"></div>
               </div>
 
               {/* Content */}
