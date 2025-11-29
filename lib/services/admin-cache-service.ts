@@ -1,0 +1,125 @@
+/**
+ * Admin Cache Service
+ *
+ * Server-side caching for admin dashboard data using Upstash Redis.
+ * Reduces database load and improves admin page response times.
+ */
+
+import { Redis } from '@upstash/redis';
+
+// Check if Redis environment variables are available
+const hasRedisConfig = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN;
+
+// Create Redis instance only if environment variables are available
+const redis = hasRedisConfig ? Redis.fromEnv() : null;
+
+// Cache key prefixes
+const CACHE_PREFIX = 'rowan:admin:';
+
+// Cache TTLs (in seconds)
+const CACHE_TTL = {
+  dashboardStats: 60,      // 1 minute for dashboard stats
+  usersList: 120,          // 2 minutes for users list
+  betaRequests: 120,       // 2 minutes for beta requests
+} as const;
+
+interface CacheOptions {
+  ttl?: number;
+  skipCache?: boolean;
+}
+
+/**
+ * Get cached data from Redis
+ */
+export async function getCached<T>(key: string): Promise<T | null> {
+  if (!redis) return null;
+
+  try {
+    const cached = await redis.get<T>(`${CACHE_PREFIX}${key}`);
+    return cached;
+  } catch (error) {
+    console.warn('Redis cache get failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Set cached data in Redis with TTL
+ */
+export async function setCache<T>(key: string, data: T, ttlSeconds: number): Promise<void> {
+  if (!redis) return;
+
+  try {
+    await redis.setex(`${CACHE_PREFIX}${key}`, ttlSeconds, data);
+  } catch (error) {
+    console.warn('Redis cache set failed:', error);
+  }
+}
+
+/**
+ * Invalidate a specific cache key
+ */
+export async function invalidateCache(key: string): Promise<void> {
+  if (!redis) return;
+
+  try {
+    await redis.del(`${CACHE_PREFIX}${key}`);
+  } catch (error) {
+    console.warn('Redis cache invalidation failed:', error);
+  }
+}
+
+/**
+ * Invalidate all admin cache keys matching a pattern
+ */
+export async function invalidateAdminCache(): Promise<void> {
+  if (!redis) return;
+
+  try {
+    // Get all admin cache keys
+    const keys = await redis.keys(`${CACHE_PREFIX}*`);
+    if (keys.length > 0) {
+      await redis.del(...keys);
+    }
+  } catch (error) {
+    console.warn('Redis admin cache invalidation failed:', error);
+  }
+}
+
+/**
+ * Cache wrapper for async functions
+ * Returns cached data if available, otherwise executes function and caches result
+ */
+export async function withCache<T>(
+  key: string,
+  fn: () => Promise<T>,
+  options: CacheOptions = {}
+): Promise<T> {
+  const { ttl = 60, skipCache = false } = options;
+
+  // Skip cache if requested
+  if (skipCache) {
+    return fn();
+  }
+
+  // Try to get cached data
+  const cached = await getCached<T>(key);
+  if (cached !== null) {
+    return cached;
+  }
+
+  // Execute function and cache result
+  const result = await fn();
+  await setCache(key, result, ttl);
+  return result;
+}
+
+// Export cache TTL constants for consistent usage
+export const ADMIN_CACHE_TTL = CACHE_TTL;
+
+// Export cache keys for dashboard
+export const ADMIN_CACHE_KEYS = {
+  dashboardStats: 'dashboard:stats',
+  usersList: (page: number, limit: number) => `users:list:${page}:${limit}`,
+  betaRequests: (page: number, status: string | null) => `beta:requests:${page}:${status || 'all'}`,
+} as const;

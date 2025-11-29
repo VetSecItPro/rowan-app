@@ -48,8 +48,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <body className="antialiased bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50 dark:from-slate-950 dark:via-gray-950 to-stone-950 text-gray-900 dark:text-white" style={{ scrollbarGutter: 'stable' }}>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Inline script to prevent theme flash - runs before React hydrates */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('rowan-theme') || 'dark';
+                  document.documentElement.classList.add(theme);
+                  document.documentElement.style.colorScheme = theme;
+                } catch (e) {
+                  document.documentElement.classList.add('dark');
+                  document.documentElement.style.colorScheme = 'dark';
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body className="antialiased bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50 dark:from-[#0a0a0f] dark:via-[#0c0c12] dark:to-[#0f0f14] text-gray-900 dark:text-white" style={{ scrollbarGutter: 'stable' }}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

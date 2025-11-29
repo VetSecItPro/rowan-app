@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookies } from '@/lib/utils/safe-cookies';
+import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto';
+import { withCache, ADMIN_CACHE_KEYS, ADMIN_CACHE_TTL } from '@/lib/services/admin-cache-service';
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
@@ -36,77 +38,84 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Decode admin session
-    let sessionData;
+    // Decrypt and validate admin session
+    let sessionData: any;
     try {
-      sessionData = JSON.parse(Buffer.from(adminSession.value, 'base64').toString());
+      sessionData = decryptSessionData(adminSession.value);
 
-      // Check if session is expired
-      if (sessionData.expiresAt < Date.now()) {
+      // Validate session data and check expiration
+      if (!validateSessionData(sessionData)) {
         return NextResponse.json(
-          { error: 'Session expired' },
+          { error: 'Session expired or invalid' },
           { status: 401 }
         );
       }
     } catch (error) {
+      console.error('Admin session decryption failed:', error);
       return NextResponse.json(
         { error: 'Invalid session' },
         { status: 401 }
       );
     }
 
-    // Create Supabase client
-    const supabase = createClient();
-
     // Get pagination parameters
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = (page - 1) * limit;
+    const forceRefresh = searchParams.get('refresh') === 'true';
 
-    // Fetch users from auth.users table
-    const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers({
-      page,
-      perPage: limit,
-    });
+    // Fetch users with caching (2 minute TTL)
+    const { users, totalUsers } = await withCache(
+      ADMIN_CACHE_KEYS.usersList(page, limit),
+      async () => {
+        // Fetch users from auth.users table using admin client
+        const { data: authUsers, error: authError } = await supabaseAdmin.auth.admin.listUsers({
+          page,
+          perPage: limit,
+        });
 
-    if (authError) {
-      throw new Error(`Failed to fetch auth users: ${authError.message}`);
-    }
+        if (authError) {
+          throw new Error(`Failed to fetch auth users: ${authError.message}`);
+        }
 
-    // Get beta access information for users
-    const userIds = authUsers.users.map((user: any) => user.id);
+        // Get beta access information for users
+        const userIds = authUsers.users.map((user: any) => user.id);
 
-    let betaUsers: any[] = [];
-    if (userIds.length > 0) {
-      const { data: betaData, error: betaError } = await supabase
-        .from('beta_access_requests')
-        .select('user_id, access_granted')
-        .in('user_id', userIds)
-        .eq('access_granted', true);
+        let betaUsers: any[] = [];
+        if (userIds.length > 0) {
+          const { data: betaData, error: betaError } = await supabaseAdmin
+            .from('beta_access_requests')
+            .select('user_id, access_granted')
+            .in('user_id', userIds)
+            .eq('access_granted', true);
 
-      if (!betaError) {
-        betaUsers = betaData || [];
-      }
-    }
+          if (!betaError) {
+            betaUsers = betaData || [];
+          }
+        }
 
-    // Create a set of beta user IDs for quick lookup
-    const betaUserIds = new Set(betaUsers.map(beta => beta.user_id));
+        // Create a set of beta user IDs for quick lookup
+        const betaUserIds = new Set(betaUsers.map(beta => beta.user_id));
 
-    // Transform users data
-    const users = authUsers.users.map((user: any) => ({
-      id: user.id,
-      email: user.email || '',
-      created_at: user.created_at,
-      last_sign_in_at: user.last_sign_in_at,
-      email_confirmed_at: user.email_confirmed_at,
-      is_beta: betaUserIds.has(user.id),
-      status: user.last_sign_in_at ? 'active' : 'inactive', // Simple status logic
-      user_metadata: user.user_metadata,
-    }));
+        // Transform users data
+        const users = authUsers.users.map((user: any) => ({
+          id: user.id,
+          email: user.email || '',
+          created_at: user.created_at,
+          last_sign_in_at: user.last_sign_in_at,
+          email_confirmed_at: user.email_confirmed_at,
+          is_beta: betaUserIds.has(user.id),
+          status: user.last_sign_in_at ? 'active' : 'inactive',
+          user_metadata: user.user_metadata,
+        }));
 
-    // Get total count for pagination
-    const totalUsers = authUsers.total || users.length;
+        return {
+          users,
+          totalUsers: authUsers.total || users.length,
+        };
+      },
+      { ttl: ADMIN_CACHE_TTL.usersList, skipCache: forceRefresh }
+    );
 
     // Log admin access
     console.log(`Admin users list accessed by: ${sessionData.email} from IP: ${ip}`);

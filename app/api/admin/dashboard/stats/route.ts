@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookies } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto';
+import { withCache, ADMIN_CACHE_KEYS, ADMIN_CACHE_TTL } from '@/lib/services/admin-cache-service';
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
@@ -38,7 +39,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Decrypt and validate admin session
-    let sessionData;
+    let sessionData: { email?: string; adminId?: string; role?: string };
     try {
       sessionData = decryptSessionData(adminSession.value);
 
@@ -57,86 +58,90 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Create Supabase client
-    const supabase = createClient();
+    // Check for force refresh query param
+    const { searchParams } = new URL(req.url);
+    const forceRefresh = searchParams.get('refresh') === 'true';
 
-    // Get current date for today's stats
-    const today = new Date().toISOString().split('T')[0];
+    // Fetch stats with caching (1 minute TTL)
+    const stats = await withCache(
+      ADMIN_CACHE_KEYS.dashboardStats,
+      async () => {
+        // Get current date for today's stats
+        const today = new Date().toISOString().split('T')[0];
 
-    // Fetch statistics in parallel
-    const [
-      totalUsersResult,
-      activeUsersResult,
-      betaUsersResult,
-      launchSignupsResult,
-      betaRequestsTodayResult,
-      signupsTodayResult,
-    ] = await Promise.allSettled([
-      // Total registered users
-      supabase
-        .from('users')
-        .select('*', { count: 'exact', head: true }),
+        // Fetch auth users (source of truth for real user count)
+        const authUsersResult = await supabaseAdmin.auth.admin.listUsers();
+        const authUsers = authUsersResult.data?.users || [];
+        const totalUsers = authUsers.length;
 
-      // Active users (users who logged in in the last 30 days)
-      supabase
-        .from('users')
-        .select('*', { count: 'exact', head: true })
-        .gte('last_sign_in_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
+        // Calculate active users (logged in within last 30 days)
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        const activeUsers = authUsers.filter(user => {
+          const lastSignIn = user.last_sign_in_at ? new Date(user.last_sign_in_at) : null;
+          return lastSignIn && lastSignIn > thirtyDaysAgo;
+        }).length;
 
-      // Beta users (approved beta access requests with user_id)
-      supabase
-        .from('beta_access_requests')
-        .select('*', { count: 'exact', head: true })
-        .eq('access_granted', true)
-        .not('user_id', 'is', null),
+        // Fetch other statistics in parallel
+        const [
+          betaUsersResult,
+          launchSignupsResult,
+          betaRequestsTodayResult,
+          signupsTodayResult,
+        ] = await Promise.allSettled([
+          // Beta users (approved beta access requests with user_id)
+          supabaseAdmin
+            .from('beta_access_requests')
+            .select('*', { count: 'exact', head: true })
+            .eq('access_granted', true)
+            .not('user_id', 'is', null),
 
-      // Launch notification signups
-      supabase
-        .from('launch_notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('subscribed', true),
+          // Launch notification signups
+          supabaseAdmin
+            .from('launch_notifications')
+            .select('*', { count: 'exact', head: true })
+            .eq('subscribed', true),
 
-      // Beta requests today
-      supabase
-        .from('beta_access_requests')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', `${today}T00:00:00.000Z`)
-        .lt('created_at', `${today}T23:59:59.999Z`),
+          // Beta requests today
+          supabaseAdmin
+            .from('beta_access_requests')
+            .select('*', { count: 'exact', head: true })
+            .gte('created_at', `${today}T00:00:00.000Z`)
+            .lt('created_at', `${today}T23:59:59.999Z`),
 
-      // Launch signups today
-      supabase
-        .from('launch_notifications')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', `${today}T00:00:00.000Z`)
-        .lt('created_at', `${today}T23:59:59.999Z`),
-    ]);
+          // Launch signups today
+          supabaseAdmin
+            .from('launch_notifications')
+            .select('*', { count: 'exact', head: true })
+            .gte('created_at', `${today}T00:00:00.000Z`)
+            .lt('created_at', `${today}T23:59:59.999Z`),
+        ]);
 
-    // Extract counts from results (handle errors gracefully)
-    const totalUsers = totalUsersResult.status === 'fulfilled' ? (totalUsersResult.value.count || 0) : 0;
-    const activeUsers = activeUsersResult.status === 'fulfilled' ? (activeUsersResult.value.count || 0) : 0;
-    const betaUsers = betaUsersResult.status === 'fulfilled' ? (betaUsersResult.value.count || 0) : 0;
-    const launchSignups = launchSignupsResult.status === 'fulfilled' ? (launchSignupsResult.value.count || 0) : 0;
-    const betaRequestsToday = betaRequestsTodayResult.status === 'fulfilled' ? (betaRequestsTodayResult.value.count || 0) : 0;
-    const signupsToday = signupsTodayResult.status === 'fulfilled' ? (signupsTodayResult.value.count || 0) : 0;
+        // Extract counts from results (handle errors gracefully)
+        const betaUsers = betaUsersResult.status === 'fulfilled' ? (betaUsersResult.value.count || 0) : 0;
+        const launchSignups = launchSignupsResult.status === 'fulfilled' ? (launchSignupsResult.value.count || 0) : 0;
+        const betaRequestsToday = betaRequestsTodayResult.status === 'fulfilled' ? (betaRequestsTodayResult.value.count || 0) : 0;
+        const signupsToday = signupsTodayResult.status === 'fulfilled' ? (signupsTodayResult.value.count || 0) : 0;
 
-    // Log any errors for debugging
-    [totalUsersResult, activeUsersResult, betaUsersResult, launchSignupsResult, betaRequestsTodayResult, signupsTodayResult]
-      .forEach((result, index) => {
-        if (result.status === 'rejected') {
-          console.error(`Dashboard stat query ${index} failed:`, result.reason);
-        }
-      });
+        // Log any errors for debugging
+        [betaUsersResult, launchSignupsResult, betaRequestsTodayResult, signupsTodayResult]
+          .forEach((result, index) => {
+            if (result.status === 'rejected') {
+              console.error(`Dashboard stat query ${index} failed:`, result.reason);
+            }
+          });
 
-    // Compile statistics
-    const stats = {
-      totalUsers,
-      activeUsers,
-      betaUsers,
-      launchSignups,
-      betaRequestsToday,
-      signupsToday,
-      lastUpdated: new Date().toISOString(),
-    };
+        return {
+          totalUsers,
+          activeUsers,
+          betaUsers,
+          launchSignups,
+          betaRequestsToday,
+          signupsToday,
+          lastUpdated: new Date().toISOString(),
+        };
+      },
+      { ttl: ADMIN_CACHE_TTL.dashboardStats, skipCache: forceRefresh }
+    );
 
     // Log admin dashboard access
     console.log(`Admin dashboard stats accessed by: ${sessionData.email} from IP: ${ip}`);

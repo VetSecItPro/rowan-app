@@ -3,7 +3,8 @@
  */
 
 const ADMIN_EMAILS = [
-  'anouarb@gmail.com'
+  'anouarb@gmail.com',
+  'vetsecitpro@gmail.com'
 ];
 
 /**
