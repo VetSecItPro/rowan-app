@@ -116,7 +116,7 @@
 ### **Food & Recipe APIs**
 #### **Edamam API**
 - **Purpose**: Recipe search, nutritional information
-- **Config**: `NEXT_PUBLIC_EDAMAM_APP_ID` + `NEXT_PUBLIC_EDAMAM_APP_KEY`
+- **Config**: `EDAMAM_APP_ID` + `EDAMAM_APP_KEY` (server-side only)
 
 #### **Spoonacular API**
 - **Purpose**: Advanced recipe features, meal planning
