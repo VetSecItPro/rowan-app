@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { getCategoryForItem } from '@/lib/constants/shopping-categories';
+import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 export interface ShoppingItem {
   id: string;
@@ -59,11 +60,26 @@ export interface CreateItemInput {
   category?: string;
 }
 
+export interface CreateListWithItemsInput extends CreateListInput {
+  items?: CreateItemInput[];
+}
+
+export interface UpdateListInput extends Partial<CreateListInput> {
+  items?: CreateItemInput[];
+}
+
 export interface ShoppingStats {
   totalLists: number;
   activeLists: number;
   itemsThisWeek: number;
   completedLists: number;
+}
+
+interface ShoppingItemFromDB {
+  name: string;
+  category: string | null;
+  created_at: string;
+  list: { space_id: string };
 }
 
 export const shoppingService = {
@@ -91,10 +107,10 @@ export const shoppingService = {
     return data;
   },
 
-  async createList(input: CreateListInput & { items?: any }): Promise<ShoppingList> {
+  async createList(input: CreateListWithItemsInput): Promise<ShoppingList> {
     const supabase = createClient();
     // Remove items field if it exists (items are created separately)
-    const { items, ...listData } = input as any;
+    const { items, ...listData } = input;
 
     const { data, error } = await supabase
       .from('shopping_lists')
@@ -109,11 +125,11 @@ export const shoppingService = {
     return data;
   },
 
-  async updateList(id: string, updates: Partial<CreateListInput> & { items?: any }): Promise<ShoppingList> {
+  async updateList(id: string, updates: UpdateListInput): Promise<ShoppingList> {
     const supabase = createClient();
     // Remove items field if it exists (items are managed separately)
-    const { items, ...updateData } = updates as any;
-    const finalUpdates: any = { ...updateData };
+    const { items, ...updateData } = updates;
+    const finalUpdates: Record<string, unknown> = { ...updateData };
 
     if (updateData.status === 'completed' && !finalUpdates.completed_at) {
       finalUpdates.completed_at = new Date().toISOString();
@@ -180,7 +196,7 @@ export const shoppingService = {
 
   async toggleItem(id: string, checked: boolean): Promise<ShoppingItem> {
     const supabase = createClient();
-    return this.updateItem(id, { checked } as any);
+    return this.updateItem(id, { checked } as Partial<CreateItemInput>);
   },
 
   async deleteItem(id: string): Promise<void> {
@@ -217,7 +233,7 @@ export const shoppingService = {
   },
 
   // Real-time subscription for shopping lists
-  subscribeToLists(spaceId: string, callback: (payload: any) => void) {
+  subscribeToLists(spaceId: string, callback: (payload: RealtimePostgresChangesPayload<{[key: string]: unknown}>) => void): RealtimeChannel {
     const supabase = createClient();
 
     const channel = supabase
@@ -238,7 +254,7 @@ export const shoppingService = {
   },
 
   // Real-time subscription for shopping items
-  subscribeToItems(listId: string, callback: (payload: any) => void) {
+  subscribeToItems(listId: string, callback: (payload: RealtimePostgresChangesPayload<{[key: string]: unknown}>) => void): RealtimeChannel {
     const supabase = createClient();
 
     const channel = supabase
@@ -278,7 +294,7 @@ export const shoppingService = {
     // Count occurrences of each item name (case-insensitive)
     const itemCounts = new Map<string, { count: number; category: string }>();
 
-    data.forEach((item: any) => {
+    data.forEach((item: ShoppingItemFromDB) => {
       const normalizedName = item.name.trim().toLowerCase();
       const existing = itemCounts.get(normalizedName);
 
@@ -318,7 +334,7 @@ export const shoppingService = {
     return data || [];
   },
 
-  async createTemplate(spaceId: string, name: string, description: string, items: any[]) {
+  async createTemplate(spaceId: string, name: string, description: string, items: CreateItemInput[]) {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('shopping_templates')

@@ -85,7 +85,7 @@ export default function AdminAnalyticsPage() {
   }, [timeRange]);
 
   const LineChart = ({ data, width = 400, height = 200, xKey, yKey, color = '#3B82F6' }: {
-    data: any[];
+    data: Array<Record<string, number | string>>;
     width?: number;
     height?: number;
     xKey: string;
@@ -94,14 +94,14 @@ export default function AdminAnalyticsPage() {
   }) => {
     if (!data || data.length === 0) return <div className="text-gray-500">No data available</div>;
 
-    const maxY = Math.max(...data.map(d => d[yKey]));
+    const maxY = Math.max(...data.map(d => Number(d[yKey])));
     const padding = 40;
     const chartWidth = width - padding * 2;
     const chartHeight = height - padding * 2;
 
     const points = data.map((d, i) => {
       const x = padding + (i / (data.length - 1)) * chartWidth;
-      const y = padding + (1 - d[yKey] / maxY) * chartHeight;
+      const y = padding + (1 - Number(d[yKey]) / maxY) * chartHeight;
       return `${x},${y}`;
     }).join(' ');
 
@@ -127,7 +127,7 @@ export default function AdminAnalyticsPage() {
         {/* Data points */}
         {data.map((d, i) => {
           const x = padding + (i / (data.length - 1)) * chartWidth;
-          const y = padding + (1 - d[yKey] / maxY) * chartHeight;
+          const y = padding + (1 - Number(d[yKey]) / maxY) * chartHeight;
           return (
             <circle
               key={i}
@@ -152,7 +152,7 @@ export default function AdminAnalyticsPage() {
   };
 
   const BarChart = ({ data, width = 400, height = 200, xKey, yKey, color = '#10B981' }: {
-    data: any[];
+    data: Array<Record<string, number | string>>;
     width?: number;
     height?: number;
     xKey: string;
@@ -161,7 +161,7 @@ export default function AdminAnalyticsPage() {
   }) => {
     if (!data || data.length === 0) return <div className="text-gray-500">No data available</div>;
 
-    const maxY = Math.max(...data.map(d => d[yKey]));
+    const maxY = Math.max(...data.map(d => Number(d[yKey])));
     const padding = 40;
     const chartWidth = width - padding * 2;
     const chartHeight = height - padding * 2;
@@ -180,7 +180,7 @@ export default function AdminAnalyticsPage() {
         {/* Bars */}
         {data.map((d, i) => {
           const x = padding + (i / data.length) * chartWidth + (chartWidth / data.length - barWidth) / 2;
-          const barHeight = (d[yKey] / maxY) * chartHeight;
+          const barHeight = (Number(d[yKey]) / maxY) * chartHeight;
           const y = height - padding - barHeight;
 
           return (
@@ -285,7 +285,7 @@ export default function AdminAnalyticsPage() {
     title: string;
     value: string | number;
     change?: string;
-    icon: any;
+    icon: React.ComponentType<{ className?: string }>;
     color?: 'blue' | 'green' | 'purple' | 'orange' | 'red';
   }) => {
     const colorClasses: Record<string, string> = {
@@ -342,7 +342,7 @@ export default function AdminAnalyticsPage() {
             <div className="flex items-center gap-3">
               <select
                 value={timeRange}
-                onChange={(e) => setTimeRange(e.target.value as any)}
+                onChange={(e) => setTimeRange(e.target.value as '7d' | '30d' | '90d')}
                 className="px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
               >
                 <option value="7d">Last 7 days</option>

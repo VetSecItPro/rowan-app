@@ -1,7 +1,21 @@
 import { createClient } from '@/lib/supabase/client';
 
+interface TaskCalendarEvent {
+  id: string;
+  task_id: string;
+  event_id: string;
+  is_synced: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+interface CalendarPreferences {
+  auto_sync_tasks: boolean;
+  calendar_task_filter?: string;
+}
+
 export const taskCalendarService = {
-  async syncTaskToCalendar(taskId: string): Promise<any> {
+  async syncTaskToCalendar(taskId: string): Promise<TaskCalendarEvent | null> {
     const supabase = createClient();
     const { data: task } = await supabase.from('tasks').select('*').eq('id', taskId).single();
     if (!task || !task.due_date) return null;
@@ -38,7 +52,7 @@ export const taskCalendarService = {
     await supabase.from('task_calendar_events').delete().eq('task_id', taskId);
   },
 
-  async getCalendarPreferences(userId: string): Promise<any> {
+  async getCalendarPreferences(userId: string): Promise<CalendarPreferences> {
     const supabase = createClient();
     const { data, error } = await supabase.from('users').select('show_tasks_on_calendar, calendar_task_filter').eq('id', userId).single();
     if (error) throw error;

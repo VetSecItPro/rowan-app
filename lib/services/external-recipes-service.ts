@@ -102,11 +102,11 @@ async function searchApiNinjas(query: string): Promise<ExternalRecipe[]> {
 
 /**
  * Search Edamam API (free tier: 10 requests/min, requires API key)
- * Note: This requires NEXT_PUBLIC_EDAMAM_APP_ID and NEXT_PUBLIC_EDAMAM_APP_KEY
+ * Note: This requires EDAMAM_APP_ID and EDAMAM_APP_KEY
  */
 async function searchEdamam(query: string): Promise<ExternalRecipe[]> {
-  const appId = process.env.NEXT_PUBLIC_EDAMAM_APP_ID;
-  const appKey = process.env.NEXT_PUBLIC_EDAMAM_APP_KEY;
+  const appId = process.env.EDAMAM_APP_ID;
+  const appKey = process.env.EDAMAM_APP_KEY;
 
   // Skip if no API credentials
   if (!appId || !appKey) {

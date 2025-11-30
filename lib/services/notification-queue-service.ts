@@ -6,7 +6,7 @@ export interface QueuedNotification {
   user_id: string;
   space_id?: string;
   notification_type: string;
-  notification_data: any;
+  notification_data: Record<string, unknown>;
   delivery_method: 'instant' | 'hourly' | 'daily';
   scheduled_for: string;
   status: 'pending' | 'sent' | 'failed' | 'cancelled';
@@ -28,7 +28,7 @@ export const notificationQueueService = {
     userId: string,
     spaceId: string | null,
     notificationType: string,
-    notificationData: any,
+    notificationData: Record<string, unknown>,
     frequency: NotificationFrequency = 'instant'
   ): Promise<QueuedNotification> {
     const supabase = createClient();
