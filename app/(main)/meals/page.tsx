@@ -99,10 +99,6 @@ const CalendarDayCell = memo(({
   const isCurrentMonth = isSameMonth(day, currentMonth);
   const isToday = isSameDay(day, new Date());
 
-  if (!spaceId) {
-    return <SpacesLoadingState />;
-  }
-
   return (
     <div
       className={`min-h-[120px] p-2 rounded-lg border-2 transition-all ${
