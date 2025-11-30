@@ -52,7 +52,7 @@ export function CheckInSuccess({ isOpen, onClose, mood, streak }: CheckInSuccess
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
       <div className="bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-800 dark:via-purple-900/30 dark:to-pink-900/30 rounded-2xl max-w-md w-full p-8 shadow-2xl border border-pink-200 dark:border-pink-500/30 animate-celebration">
         {/* Close Button */}
         <button

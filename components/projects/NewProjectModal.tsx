@@ -73,7 +73,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
 
   return (
     <div onClick={onClose} className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div onClick={(e) => e.stopPropagation()} className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-2xl sm:max-w-md sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         <div className="sticky top-0 z-10 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">

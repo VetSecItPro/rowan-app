@@ -863,7 +863,7 @@ export default function MealsPage() {
                   className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
                     viewMode === 'calendar'
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
                   }`}
                 >
                   <LayoutGrid className="w-4 h-4" />
@@ -874,7 +874,7 @@ export default function MealsPage() {
                   className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
                     viewMode === 'list'
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
                   }`}
                 >
                   <List className="w-4 h-4" />
@@ -885,7 +885,7 @@ export default function MealsPage() {
                   className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
                     viewMode === 'recipes'
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
                   }`}
                 >
                   <BookOpen className="w-4 h-4" />
@@ -897,7 +897,7 @@ export default function MealsPage() {
               <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl border border-emerald-200 dark:border-emerald-700 w-full sm:w-auto">
                 <Link
                   href="/shopping"
-                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50"
+                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] text-gray-700 dark:text-gray-300 hover:bg-emerald-500 hover:text-white"
                   title="View your shopping lists"
                 >
                   <ShoppingBag className="w-4 h-4" />
@@ -906,7 +906,7 @@ export default function MealsPage() {
                 <button
                   onClick={() => setIsGenerateListOpen(true)}
                   disabled={meals.length === 0}
-                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[120px] text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[120px] text-gray-700 dark:text-gray-300 hover:bg-emerald-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-700 dark:disabled:hover:text-gray-300"
                   title={meals.length === 0 ? 'Plan some meals first' : 'Select multiple meals to combine all recipe ingredients into one shopping list'}
                 >
                   <Plus className="w-4 h-4" />
@@ -918,14 +918,14 @@ export default function MealsPage() {
               <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700 w-full sm:w-auto">
                 <button
                   onClick={handleOpenRecipeModal}
-                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50"
+                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white"
                 >
                   <ChefHat className="w-4 h-4" />
                   <span className="text-sm">Recipe</span>
                 </button>
                 <button
                   onClick={handleOpenMealModal}
-                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] bg-gradient-to-r from-orange-600 to-red-600 text-white"
+                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] bg-gradient-to-r from-orange-600 to-red-600 text-white hover:opacity-90"
                 >
                   <Plus className="w-4 h-4" />
                   <span className="text-sm">Meal</span>
@@ -1159,7 +1159,7 @@ export default function MealsPage() {
                       className={`px-3 sm:px-4 py-2 rounded-lg transition-all font-medium text-sm min-w-[100px] sm:min-w-[120px] ${
                         calendarViewMode === 'week'
                           ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
                       }`}
                     >
                       Current Week
@@ -1169,7 +1169,7 @@ export default function MealsPage() {
                       className={`px-3 sm:px-4 py-2 rounded-lg transition-all font-medium text-sm min-w-[100px] sm:min-w-[130px] ${
                         calendarViewMode === '2weeks'
                           ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
                       }`}
                     >
                       Next Two Weeks
@@ -1179,7 +1179,7 @@ export default function MealsPage() {
                       className={`px-3 sm:px-4 py-2 rounded-lg transition-all font-medium text-sm min-w-[100px] sm:min-w-[130px] ${
                         calendarViewMode === 'month'
                           ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
                       }`}
                     >
                       Current Month

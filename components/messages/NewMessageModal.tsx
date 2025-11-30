@@ -176,7 +176,7 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
     <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={onClose}
       />
 

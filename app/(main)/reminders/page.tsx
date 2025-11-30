@@ -865,7 +865,7 @@ export default function RemindersPage(): JSX.Element {
         /* Show a message if no space exists */
         isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleCloseModal} />
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={handleCloseModal} />
             <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">No Space Available</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">

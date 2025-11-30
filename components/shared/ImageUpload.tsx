@@ -37,6 +37,10 @@ interface ImageUploadProps {
    * Optional CSS class name
    */
   className?: string;
+  /**
+   * Border color theme ('purple' or 'orange')
+   */
+  borderColor?: 'purple' | 'orange';
 }
 
 export default function ImageUpload({
@@ -48,6 +52,7 @@ export default function ImageUpload({
   maxSizeMB = 5,
   aspectRatio = 'square',
   className = '',
+  borderColor = 'purple',
 }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(currentImageUrl || null);
   const [isDragging, setIsDragging] = useState(false);
@@ -210,8 +215,12 @@ export default function ImageUpload({
           ${aspectRatioClasses[aspectRatio]}
           ${
             isDragging
-              ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-              : 'border-gray-300 dark:border-gray-600 hover:border-purple-400 dark:hover:border-purple-500'
+              ? borderColor === 'orange'
+                ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
+                : 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+              : borderColor === 'orange'
+                ? 'border-gray-300 dark:border-gray-600 hover:border-orange-400 dark:hover:border-orange-500'
+                : 'border-gray-300 dark:border-gray-600 hover:border-purple-400 dark:hover:border-purple-500'
           }
           ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}
         `}
