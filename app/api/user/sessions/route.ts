@@ -42,16 +42,12 @@ export async function GET(request: Request) {
     setSentryUser(user);
 
     // Get user sessions - pass the authenticated supabase client
-    console.log('Fetching sessions for user ID:', user.id);
     const result = await getUserSessions(user.id, supabase);
-    console.log('getUserSessions result:', result);
 
     if (!result.success) {
       console.error('getUserSessions failed:', result.error);
       return NextResponse.json({ error: result.error }, { status: 500 });
     }
-
-    console.log('Raw sessions from database:', result.sessions);
 
     // Format sessions for display
     const formattedSessions = result.sessions?.map((session) => ({

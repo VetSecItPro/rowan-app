@@ -1,7 +1,17 @@
 import { createClient } from '@/lib/supabase/client';
+import type { Task } from '@/lib/types';
+
+interface TaskSnoozeHistory {
+  id: string;
+  task_id: string;
+  snoozed_until: string;
+  snoozed_by: string;
+  reason?: string;
+  created_at: string;
+}
 
 export const taskSnoozeService = {
-  async snoozeTask(taskId: string, snoozedUntil: string, userId: string, reason?: string): Promise<any> {
+  async snoozeTask(taskId: string, snoozedUntil: string, userId: string, reason?: string): Promise<Task> {
     const supabase = createClient();
     const { data, error } = await supabase.from('tasks').update({
       is_snoozed: true, snoozed_until: snoozedUntil, snoozed_by: userId
@@ -10,7 +20,7 @@ export const taskSnoozeService = {
     return data;
   },
 
-  async unsnoozeTask(taskId: string): Promise<any> {
+  async unsnoozeTask(taskId: string): Promise<Task> {
     const supabase = createClient();
     const { data, error } = await supabase.from('tasks').update({
       is_snoozed: false, snoozed_until: null, snoozed_by: null
@@ -19,7 +29,7 @@ export const taskSnoozeService = {
     return data;
   },
 
-  async getSnoozeHistory(taskId: string): Promise<any[]> {
+  async getSnoozeHistory(taskId: string): Promise<TaskSnoozeHistory[]> {
     const supabase = createClient();
     const { data, error } = await supabase.from('task_snooze_history').select('*').eq('task_id', taskId).order('created_at', { ascending: false });
     if (error) throw error;
