@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
-import { GoalComment, CreateCommentInput } from '@/lib/services/goals-service';
+import { GoalComment, CreateCommentInput, goalsService } from '@/lib/services/goals-service';
 import { createClient } from '@/lib/supabase/client';
 import { hapticLight, hapticSuccess } from '@/lib/utils/haptics';
 import { cn } from '@/lib/utils';
@@ -47,17 +47,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
   const loadComments = async () => {
     try {
       setLoading(true);
-      const { data: commentsData, error } = await supabase
-        .from('goal_comments')
-        .select(`
-          *,
-          users!goal_comments_user_id_fkey(id, email, full_name, avatar_url)
-        `)
-        .eq('goal_id', goalId)
-        .is('parent_comment_id', null) // Only top-level comments for now
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
+      const commentsData = await goalsService.getGoalComments(goalId);
       setComments(commentsData || []);
 
       // Load reaction counts for each comment
@@ -84,25 +74,15 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
     try {
       setIsSubmitting(true);
 
-      const { data, error } = await supabase
-        .from('goal_comments')
-        .insert([{
-          goal_id: goalId,
-          user_id: user.id,
-          content,
-          content_type: 'text'
-        }])
-        .select(`
-          *,
-          users!goal_comments_user_id_fkey(id, email, full_name, avatar_url)
-        `)
-        .single();
-
-      if (error) throw error;
+      const comment = await goalsService.createComment({
+        goal_id: goalId,
+        content,
+        content_type: 'text'
+      });
 
       hapticSuccess();
       setNewComment('');
-      setComments(prev => [...prev, data]);
+      await loadComments(); // Reload to get updated reaction counts
     } catch (error) {
       console.error('Error adding comment:', error);
     } finally {
@@ -115,17 +95,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
     if (!content || !user) return;
 
     try {
-      const { error } = await supabase
-        .from('goal_comments')
-        .update({
-          content,
-          is_edited: true,
-          edited_at: new Date().toISOString()
-        })
-        .eq('id', commentId)
-        .eq('user_id', user.id); // Ensure user owns the comment
-
-      if (error) throw error;
+      await goalsService.updateComment(commentId, content);
 
       hapticSuccess();
       setEditingComment(null);
@@ -140,13 +110,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
     if (!user) return;
 
     try {
-      const { error } = await supabase
-        .from('goal_comments')
-        .delete()
-        .eq('id', commentId)
-        .eq('user_id', user.id); // Ensure user owns the comment
-
-      if (error) throw error;
+      await goalsService.deleteComment(commentId);
 
       hapticLight();
       setComments(prev => prev.filter(comment => comment.id !== commentId));
@@ -161,35 +125,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
     if (!user) return;
 
     try {
-      // Check if user already reacted with this emoji
-      const { data: existingReaction } = await supabase
-        .from('goal_comment_reactions')
-        .select('id')
-        .eq('comment_id', commentId)
-        .eq('user_id', user.id)
-        .eq('emoji', emoji)
-        .single();
-
-      if (existingReaction) {
-        // Remove reaction
-        const { error } = await supabase
-          .from('goal_comment_reactions')
-          .delete()
-          .eq('id', existingReaction.id);
-
-        if (error) throw error;
-      } else {
-        // Add reaction
-        const { error } = await supabase
-          .from('goal_comment_reactions')
-          .insert([{
-            comment_id: commentId,
-            user_id: user.id,
-            emoji
-          }]);
-
-        if (error) throw error;
-      }
+      await goalsService.toggleCommentReaction(commentId, emoji);
 
       // Reload comments to get updated reaction counts
       await loadComments();
