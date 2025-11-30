@@ -115,7 +115,7 @@ export const householdService = {
   },
 
   async updateChore(id: string, updates: Partial<CreateChoreInput>): Promise<Chore> {
-    const finalUpdates: any = { ...updates };
+    const finalUpdates: Record<string, unknown> = { ...updates };
 
     if (updates.status === 'completed' && !finalUpdates.completed_at) {
       finalUpdates.completed_at = new Date().toISOString();
@@ -206,7 +206,7 @@ export const householdService = {
   },
 
   async updateExpense(id: string, updates: Partial<CreateExpenseInput>): Promise<Expense> {
-    const finalUpdates: any = { ...updates };
+    const finalUpdates: Record<string, unknown> = { ...updates };
 
     if (updates.status === 'paid' && !finalUpdates.paid_at) {
       finalUpdates.paid_at = new Date().toISOString();
