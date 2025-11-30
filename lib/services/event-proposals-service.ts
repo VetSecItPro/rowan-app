@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 export interface TimeSlot {
   start_time: string;
@@ -360,5 +361,57 @@ export const eventProposalsService = {
   ): Promise<void> {
     // Placeholder for notification logic
     console.log(`Notify space ${spaceId} about ${type} for proposal ${proposalId}`);
+  },
+
+  /**
+   * Subscribe to real-time changes for event proposals in a space
+   */
+  subscribeToProposals(
+    spaceId: string,
+    callback: (payload: RealtimePostgresChangesPayload<{[key: string]: unknown}>) => void
+  ): RealtimeChannel {
+    const supabase = createClient();
+
+    const channel = supabase
+      .channel(`event_proposals:${spaceId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'event_proposals',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        callback
+      )
+      .subscribe();
+
+    return channel;
+  },
+
+  /**
+   * Subscribe to real-time changes for proposal votes
+   */
+  subscribeToVotes(
+    proposalId: string,
+    callback: (payload: RealtimePostgresChangesPayload<{[key: string]: unknown}>) => void
+  ): RealtimeChannel {
+    const supabase = createClient();
+
+    const channel = supabase
+      .channel(`event_proposal_votes:${proposalId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'event_proposal_votes',
+          filter: `proposal_id=eq.${proposalId}`,
+        },
+        callback
+      )
+      .subscribe();
+
+    return channel;
   }
 };
