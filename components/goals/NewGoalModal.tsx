@@ -8,6 +8,13 @@ import { Dropdown } from '@/components/ui/Dropdown';
 // 20 family-friendly universal emojis
 const EMOJIS = ['😊', '😂', '❤️', '👍', '🎉', '🙏', '👏', '🤝', '💪', '🌟', '✨', '🎈', '🌸', '🌈', '☀️', '🍕', '☕', '📅', '✅', '🏠'];
 
+interface SpaceMember {
+  id: string;
+  name: string;
+  email: string;
+  avatar_url?: string;
+}
+
 interface NewGoalModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -16,9 +23,10 @@ interface NewGoalModalProps {
   spaceId: string;
   availableGoals?: Goal[]; // Goals that can be selected as dependencies
   selectedTemplate?: GoalTemplate | null;
+  spaceMembers?: SpaceMember[];
 }
 
-export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, availableGoals = [], selectedTemplate }: NewGoalModalProps) {
+export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, availableGoals = [], selectedTemplate, spaceMembers = [] }: NewGoalModalProps) {
   const [formData, setFormData] = useState<CreateGoalInput>({
     space_id: spaceId,
     title: '',
@@ -288,6 +296,27 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
                 onChange={(e) => handleCustomCategoryChange(e.target.value)}
                 placeholder="Enter custom category name"
                 className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 dark:text-white"
+              />
+            </div>
+          )}
+
+          {/* Assigned To */}
+          {spaceMembers.length > 0 && (
+            <div className="relative">
+              <label htmlFor="field-assigned" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                Assigned To
+              </label>
+              <Dropdown
+                value={formData.assigned_to || ''}
+                onChange={(value) => setFormData({ ...formData, assigned_to: value || undefined })}
+                options={[
+                  { value: '', label: 'Unassigned' },
+                  ...spaceMembers.map(member => ({
+                    value: member.id,
+                    label: member.name
+                  }))
+                ]}
+                placeholder="Select a member"
               />
             </div>
           )}
