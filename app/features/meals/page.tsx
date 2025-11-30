@@ -1,6 +1,26 @@
-import { UtensilsCrossed, Calendar, ShoppingCart, BookOpen, Users, Check } from 'lucide-react';
+'use client';
+
+import { useRef } from 'react';
+import { UtensilsCrossed, Calendar, ShoppingCart, BookOpen, Check } from 'lucide-react';
+import { motion, useInView } from 'framer-motion';
 import { Header } from '@/components/layout/Header';
-import Link from 'next/link';
+import { Footer } from '@/components/layout/Footer';
+
+function AnimatedSection({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: false, margin: "-100px" });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 50 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+      transition={{ duration: 0.6, delay, ease: [0.25, 0.4, 0.25, 1] }}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 export default function MealsFeaturePage() {
   return (
@@ -9,68 +29,74 @@ export default function MealsFeaturePage() {
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-meals rounded-3xl mb-6 shadow-xl shadow-orange-500/30 animate-bounce-subtle">
-            <UtensilsCrossed className="w-10 h-10 text-white" />
+        <AnimatedSection>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-meals rounded-3xl mb-6 shadow-xl shadow-orange-500/30 animate-bounce-subtle">
+              <UtensilsCrossed className="w-10 h-10 text-white" />
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+              Meal Planning
+            </h1>
+
+            <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
+              Plan meals for your space with a visual calendar. Create recipes, schedule meals for specific days, and organize your family's meal planning.
+            </p>
           </div>
-
-          <h1 className="text-6xl md:text-7xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-            Meal Planning
-          </h1>
-
-          <p className="text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Plan meals for your space with a visual calendar. Create recipes, schedule meals for specific days, and organize your family's meal planning.
-          </p>
-        </div>
-
+        </AnimatedSection>
 
         {/* Key Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
-            <div className="w-14 h-14 bg-orange-500 rounded-2xl flex items-center justify-center mb-6">
-              <Calendar className="w-7 h-7 text-white" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Weekly Planning</h3>
-            <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-              Plan meals for the entire week. Drag and drop recipes to different days effortlessly.
-            </p>
-          </div>
-
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
-            <div className="w-14 h-14 bg-red-500 rounded-2xl flex items-center justify-center mb-6">
-              <BookOpen className="w-7 h-7 text-white" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Recipe Library</h3>
-            <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-              Save your favorite recipes with ingredients, steps, and photos. Build your family cookbook.
-            </p>
-          </div>
-
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
-            <div className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center mb-6">
-              <ShoppingCart className="w-7 h-7 text-white" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Auto Shopping Lists</h3>
-            <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-              Generate shopping lists automatically from your meal plan. Never forget ingredients.
-            </p>
-          </div>
+          {[
+            {
+              icon: Calendar,
+              color: 'bg-orange-500',
+              title: 'Weekly Planning',
+              description: 'Plan meals for the entire week. Drag and drop recipes to different days effortlessly.'
+            },
+            {
+              icon: BookOpen,
+              color: 'bg-red-500',
+              title: 'Recipe Library',
+              description: 'Save your favorite recipes with ingredients, steps, and photos. Build your family cookbook.'
+            },
+            {
+              icon: ShoppingCart,
+              color: 'bg-emerald-500',
+              title: 'Auto Shopping Lists',
+              description: 'Generate shopping lists automatically from your meal plan. Never forget ingredients.'
+            }
+          ].map((feature, index) => (
+            <AnimatedSection key={feature.title} delay={index * 0.1}>
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
+                <div className={`w-14 h-14 ${feature.color} rounded-2xl flex items-center justify-center mb-6`}>
+                  <feature.icon className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{feature.title}</h3>
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
+            </AnimatedSection>
+          ))}
         </div>
       </section>
 
       {/* What You Can Do Section */}
       <section className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/30 dark:to-red-950/30 py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Everything you need
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
-              Complete meal planning tools for busy families
-            </p>
-          </div>
+          <AnimatedSection>
+            <div className="text-center mb-16">
+              <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                Everything You Need
+              </h2>
+              <p className="text-xl text-gray-600 dark:text-gray-400">
+                Complete meal planning tools for busy families
+              </p>
+            </div>
+          </AnimatedSection>
 
-          <div className="space-y-6 max-w-3xl mx-auto">
+          <div className="space-y-4 max-w-3xl mx-auto">
             {[
               'Plan meals on a visual calendar view',
               'Create and save unlimited recipes with ingredients',
@@ -78,15 +104,16 @@ export default function MealsFeaturePage() {
               'Assign meal types (breakfast, lunch, dinner, snack)',
               'View planned meals in calendar, list, or recipe format',
               'Search through meals and recipes',
-              'Track statistics for meals this week and saved recipes',
-              'Navigate through months to plan ahead',
+              'Track statistics for meals this week and saved recipes'
             ].map((feature, index) => (
-              <div key={index} className="flex items-start gap-4 bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-                <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mt-1">
-                  <Check className="w-4 h-4 text-white" />
+              <AnimatedSection key={index} delay={index * 0.05}>
+                <div className="flex items-start gap-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 dark:border-gray-700/50">
+                  <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mt-1">
+                    <Check className="w-4 h-4 text-white" />
+                  </div>
+                  <p className="text-lg text-gray-900 dark:text-white font-medium">{feature}</p>
                 </div>
-                <p className="text-lg text-gray-900 dark:text-white font-medium">{feature}</p>
-              </div>
+              </AnimatedSection>
             ))}
           </div>
         </div>
@@ -95,95 +122,50 @@ export default function MealsFeaturePage() {
       {/* Use Cases Section */}
       <section className="py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              How you might use meal planning
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
-              Common ways to organize family meals
-            </p>
-          </div>
+          <AnimatedSection>
+            <div className="text-center mb-16">
+              <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                Perfect For
+              </h2>
+              <p className="text-xl text-gray-600 dark:text-gray-400">
+                Common ways to organize family meals
+              </p>
+            </div>
+          </AnimatedSection>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-            <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Daily Meals</h3>
-              <ul className="space-y-3 text-gray-600 dark:text-gray-400">
-                <li className="flex items-start gap-3">
-                  <UtensilsCrossed className="w-5 h-5 text-orange-500 mt-1 flex-shrink-0" />
-                  <span>Plan weekly breakfast, lunch, and dinner</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <UtensilsCrossed className="w-5 h-5 text-orange-500 mt-1 flex-shrink-0" />
-                  <span>Create recipe collections for easy planning</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <UtensilsCrossed className="w-5 h-5 text-orange-500 mt-1 flex-shrink-0" />
-                  <span>Schedule leftovers and meal prep days</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <UtensilsCrossed className="w-5 h-5 text-orange-500 mt-1 flex-shrink-0" />
-                  <span>Track dietary preferences and restrictions</span>
-                </li>
-              </ul>
-            </div>
+            <AnimatedSection delay={0.2}>
+              <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-2xl p-8 border border-orange-200/50 dark:border-orange-700/50">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Daily Meals</h3>
+                <ul className="space-y-3 text-gray-700 dark:text-gray-300">
+                  {['Plan weekly breakfast, lunch, and dinner', 'Create recipe collections for easy planning', 'Schedule leftovers and meal prep days', 'Track dietary preferences and restrictions'].map((item) => (
+                    <li key={item} className="flex items-start gap-3">
+                      <UtensilsCrossed className="w-5 h-5 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </AnimatedSection>
 
-            <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Special Occasions</h3>
-              <ul className="space-y-3 text-gray-600 dark:text-gray-400">
-                <li className="flex items-start gap-3">
-                  <Calendar className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                  <span>Holiday meal planning and preparation</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Calendar className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                  <span>Birthday parties and celebrations</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Calendar className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                  <span>Family gatherings and potluck coordination</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Calendar className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                  <span>Vacation and travel meal planning</span>
-                </li>
-              </ul>
-            </div>
+            <AnimatedSection delay={0.4}>
+              <div className="bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 rounded-2xl p-8 border border-red-200/50 dark:border-red-700/50">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Special Occasions</h3>
+                <ul className="space-y-3 text-gray-700 dark:text-gray-300">
+                  {['Holiday meal planning and preparation', 'Birthday parties and celebrations', 'Family gatherings and potluck coordination', 'Vacation and travel meal planning'].map((item) => (
+                    <li key={item} className="flex items-start gap-3">
+                      <Calendar className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </AnimatedSection>
           </div>
         </div>
       </section>
 
-
-      {/* CTA Section */}
-      <section className="bg-gradient-to-r from-orange-600 to-red-600 py-24">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-5xl font-bold text-white mb-6">
-            Interested in trying Rowan?
-          </h2>
-          <p className="text-xl text-orange-100 mb-8">
-            We're currently developing Rowan's meal planning features
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/"
-              className="px-8 py-4 bg-white text-orange-600 rounded-full font-semibold hover:bg-orange-50 transition-all shadow-xl text-lg"
-            >
-              Request Beta Access
-            </Link>
-            <Link
-              href="/"
-              className="px-8 py-4 bg-orange-700/50 border border-orange-400 text-white rounded-full font-semibold hover:bg-orange-600/50 transition-all text-lg"
-            >
-              Get Notified When Ready
-            </Link>
-          </div>
-          <p className="text-orange-200 text-sm mt-6">
-            Currently in development
-          </p>
-        </div>
-      </section>
-
-      {/* Footer Spacer */}
-      <div className="h-20"></div>
+      <Footer />
     </div>
   );
 }
