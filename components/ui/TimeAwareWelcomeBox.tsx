@@ -29,60 +29,19 @@ export function TimeAwareWelcomeBox({
   const [isHovered, setIsHovered] = useState(false);
   const [elements, setElements] = useState<Array<{id: number, x: number, y: number, delay: number, size: number, speedX: number, speedY: number, opacity: number, rotation: number}>>([]);
 
-  // Generate time-aware floating elements with smart positioning to avoid text and weather widget
+  // Generate elegant corner accents - strategically positioned, never overlapping text
   useEffect(() => {
-    const elementCount = timePeriod === 'morning' ? 8 : timePeriod === 'afternoon' ? 6 : timePeriod === 'evening' ? 10 : 12;
-    const newElements = Array.from({ length: elementCount }, (_, i) => {
-      // Create exclusion zones to avoid:
-      // 1. Text content in center (40-60% horizontally, 25-75% vertically)
-      // 2. Weather widget in bottom-right corner (75-100% horizontally, 75-100% vertically)
-      let x, y;
-
-      // Better distribution across 6 zones for more even spacing
-      const zone = i % 6;
-
-      switch (zone) {
-        case 0: // Top-left corner
-          x = Math.random() * 25; // Left 25%
-          y = Math.random() * 20; // Top 20%
-          break;
-        case 1: // Top-center (avoid text)
-          x = 15 + Math.random() * 25; // 15-40% (before text starts)
-          y = Math.random() * 15; // Top 15%
-          break;
-        case 2: // Top-right corner (safe from weather widget)
-          x = 75 + Math.random() * 20; // 75-95% (leave 5% margin)
-          y = Math.random() * 20; // Top 20%
-          break;
-        case 3: // Left side (avoid center text)
-          x = Math.random() * 15; // Left 15% (narrower to avoid text)
-          y = 25 + Math.random() * 50; // 25-75% (middle band)
-          break;
-        case 4: // Right side (avoid weather widget)
-          x = 80 + Math.random() * 15; // 80-95% (avoid weather area)
-          y = 15 + Math.random() * 45; // 15-60% (avoid weather widget)
-          break;
-        case 5: // Bottom-left (safe zone)
-          x = Math.random() * 35; // Left 35% (wider than right due to weather widget)
-          y = 80 + Math.random() * 15; // Bottom 15% (leave margin)
-          break;
-        default:
-          x = Math.random() * 20;
-          y = Math.random() * 20;
-      }
-
-      return {
-        id: i,
-        x,
-        y,
-        delay: Math.random() * 12, // Increased delay for more staggered animations
-        size: Math.random() * 12 + 18, // Slightly larger but consistent (18-30px)
-        speedX: (Math.random() - 0.5) * 0.6, // Much slower movement
-        speedY: (Math.random() - 0.5) * 0.6,
-        opacity: Math.random() * 0.2 + 0.5, // More visible but less variation (0.5-0.7)
-        rotation: Math.random() * 360
-      };
-    });
+    // Only 4 elegant corner elements - one in each corner, far from center
+    const newElements = [
+      // Top-left corner
+      { id: 0, x: 8, y: 12, delay: 0, size: 48, speedX: 0, speedY: 0, opacity: 0.25, rotation: 0 },
+      // Top-right corner
+      { id: 1, x: 88, y: 10, delay: 1, size: 40, speedX: 0, speedY: 0, opacity: 0.2, rotation: 45 },
+      // Bottom-left corner
+      { id: 2, x: 6, y: 85, delay: 2, size: 44, speedX: 0, speedY: 0, opacity: 0.22, rotation: 180 },
+      // Bottom-right (above weather) - smaller and higher to avoid weather widget
+      { id: 3, x: 85, y: 55, delay: 3, size: 36, speedX: 0, speedY: 0, opacity: 0.18, rotation: 270 },
+    ];
     setElements(newElements);
   }, [timePeriod]);
 
@@ -131,37 +90,36 @@ export function TimeAwareWelcomeBox({
 
   // Using sophisticated Heroicons instead of basic SVG components
 
-  // Get the appropriate icon component for current time period (deterministic, sophisticated Heroicons)
+  // Get the appropriate icon for each corner - one unique icon per corner
   const getTimeIcon = (element: any) => {
+    const opacity = element.opacity * 100;
     const iconProps = {
       width: element.size,
       height: element.size,
-      className: `opacity-${Math.round(element.opacity * 100)} transition-all duration-1000 ${
-        isHovered ? 'scale-125' : ''
+      className: `transition-all duration-700 ${
+        isHovered ? 'scale-110 opacity-40' : `opacity-${opacity >= 25 ? 25 : 20}`
       } ${
-        timePeriod === 'morning' ? 'text-amber-200 stroke-[1.5]' :
-        timePeriod === 'afternoon' ? 'text-sky-100 stroke-[1.5]' :
-        timePeriod === 'evening' ? 'text-violet-200 stroke-[1.5]' :
-        'text-indigo-200 stroke-[1.5]'
+        timePeriod === 'morning' ? 'text-yellow-200/40 stroke-[1.5]' :
+        timePeriod === 'afternoon' ? 'text-sky-200/40 stroke-[1.5]' :
+        timePeriod === 'evening' ? 'text-orange-200/40 stroke-[1.5]' :
+        'text-indigo-200/40 stroke-[2]'
       }`
     };
 
-    // Use element ID to deterministically assign icon types for variety
-    const iconVariant = element.id % 3; // 0, 1, or 2 for 3 variants
-
+    // Assign one unique icon to each corner based on time of day
     switch (timePeriod) {
       case 'morning':
-        // Morning: Sun icons only (sophisticated, warm colors)
-        return <SunIcon {...iconProps} />;
+        // Morning: Sun in corners with subtle rays
+        return element.id % 2 === 0 ? <SunIcon {...iconProps} /> : <SparklesIcon {...iconProps} />;
       case 'afternoon':
-        // Afternoon: Mix of sun and clouds (clean, bright)
-        return iconVariant === 0 ? <SunIcon {...iconProps} /> : <CloudIcon {...iconProps} />;
+        // Afternoon: Sun and clouds alternating
+        return element.id % 2 === 0 ? <SunIcon {...iconProps} /> : <CloudIcon {...iconProps} />;
       case 'evening':
-        // Evening: Sparkles and moon only (elegant, mystical)
-        return iconVariant === 0 ? <SparklesIcon {...iconProps} /> : <MoonIcon {...iconProps} />;
+        // Evening: Sunset sparkles and early moon
+        return element.id % 2 === 0 ? <SparklesIcon {...iconProps} /> : <MoonIcon {...iconProps} />;
       case 'night':
-        // Night: Moon and sparkles only (sophisticated, dreamy)
-        return iconVariant === 0 ? <MoonIcon {...iconProps} /> : <SparklesIcon {...iconProps} />;
+        // Night: Moon and stars
+        return element.id % 2 === 0 ? <MoonIcon {...iconProps} /> : <SparklesIcon {...iconProps} />;
       default:
         return <SparklesIcon {...iconProps} />;
     }
@@ -190,29 +148,22 @@ export function TimeAwareWelcomeBox({
         </div>
       </div>
 
-      {/* Time-Aware Floating Elements - positioned to avoid text overlap */}
+      {/* Elegant Corner Accents - Fixed positions, subtle animations */}
       <div className="absolute inset-0 pointer-events-none z-0">
         {elements.map((element) => (
           <div
             key={element.id}
-            className={`absolute animate-float-elegant transition-all duration-1000 ${
-              timePeriod === 'morning' ? 'animate-bounce-gentle' :
-              timePeriod === 'afternoon' ? 'animate-drift' :
-              timePeriod === 'evening' ? 'animate-twinkle' :
-              'animate-sparkle'
-            }`}
+            className="absolute animate-pulse"
             style={{
               left: `${element.x}%`,
               top: `${element.y}%`,
               animationDelay: `${element.delay}s`,
-              animationDuration: `${timePeriod === 'morning' ? 8 + element.delay * 0.8 :
-                                 timePeriod === 'afternoon' ? 15 + element.delay * 1.0 :
-                                 timePeriod === 'evening' ? 12 + element.delay * 0.9 :
-                                 18 + element.delay * 1.2}s`,
-              transform: `translate(${element.speedX * 6}px, ${element.speedY * 6}px) rotate(${element.rotation}deg)`,
-              filter: timePeriod === 'night' ? `drop-shadow(0 0 ${element.size/3}px rgba(255,255,255,0.3))` :
-                      timePeriod === 'morning' ? `drop-shadow(0 0 ${element.size/4}px rgba(255,215,0,0.4))` :
-                      `drop-shadow(0 0 ${element.size/5}px rgba(255,255,255,0.2))`
+              animationDuration: '8s',
+              transform: `rotate(${element.rotation}deg)`,
+              filter: timePeriod === 'night' ? `drop-shadow(0 0 12px rgba(255,255,255,0.15))` :
+                      timePeriod === 'morning' ? `drop-shadow(0 0 10px rgba(255,215,0,0.2))` :
+                      timePeriod === 'evening' ? `drop-shadow(0 0 14px rgba(255,140,0,0.2))` :
+                      `drop-shadow(0 0 8px rgba(255,255,255,0.15))`
             }}
           >
             {getTimeIcon(element)}
