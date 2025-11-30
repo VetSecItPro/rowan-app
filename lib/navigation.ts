@@ -84,11 +84,4 @@ export const NAVIGATION_ITEMS: NavItem[] = [
     gradient: 'bg-gradient-to-r from-pink-500 to-purple-500',
     description: 'Track your mood',
   },
-  {
-    name: 'Year in Review',
-    href: '/year-in-review',
-    icon: Sparkles,
-    gradient: 'bg-gradient-to-r from-yellow-500 to-orange-500',
-    description: 'Annual insights',
-  },
 ];
