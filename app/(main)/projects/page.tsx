@@ -29,6 +29,7 @@ import { budgetAlertsService } from '@/lib/services/budget-alerts-service';
 import { billsService, type Bill, type CreateBillInput } from '@/lib/services/bills-service';
 import { budgetTemplatesService, type BudgetTemplate, type BudgetTemplateCategory } from '@/lib/services/budget-templates-service';
 import type { Project } from '@/lib/services/project-tracking-service';
+import { createClient } from '@/lib/supabase/client';
 
 type TabType = 'projects' | 'budgets' | 'expenses' | 'bills' | 'receipts';
 
@@ -110,6 +111,91 @@ export default function ProjectsPage() {
 
     loadTemplates();
   }, []);
+
+  // Real-time subscriptions for multi-user collaboration
+  useEffect(() => {
+    if (!currentSpace) return;
+
+    const supabase = createClient();
+    const channels: any[] = [];
+
+    // Subscribe to expenses changes
+    const expensesChannel = supabase
+      .channel(`projects_expenses:${currentSpace.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'expenses',
+          filter: `space_id=eq.${currentSpace.id}`,
+        },
+        () => {
+          loadData(); // Reload all data when expenses change
+        }
+      )
+      .subscribe();
+    channels.push(expensesChannel);
+
+    // Subscribe to budgets changes
+    const budgetsChannel = supabase
+      .channel(`projects_budgets:${currentSpace.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'budgets',
+          filter: `space_id=eq.${currentSpace.id}`,
+        },
+        () => {
+          loadData(); // Reload all data when budget changes
+        }
+      )
+      .subscribe();
+    channels.push(budgetsChannel);
+
+    // Subscribe to projects changes
+    const projectsChannel = supabase
+      .channel(`projects_projects:${currentSpace.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'projects',
+          filter: `space_id=eq.${currentSpace.id}`,
+        },
+        () => {
+          loadData(); // Reload all data when projects change
+        }
+      )
+      .subscribe();
+    channels.push(projectsChannel);
+
+    // Subscribe to bills changes
+    const billsChannel = supabase
+      .channel(`projects_bills:${currentSpace.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'bills',
+          filter: `space_id=eq.${currentSpace.id}`,
+        },
+        () => {
+          loadData(); // Reload all data when bills change
+        }
+      )
+      .subscribe();
+    channels.push(billsChannel);
+
+    // Cleanup subscriptions on unmount
+    return () => {
+      channels.forEach(channel => supabase.removeChannel(channel));
+    };
+  }, [currentSpace, loadData]);
 
   const handleCreateProject = useCallback(async (data: CreateProjectInput) => {
     try {
