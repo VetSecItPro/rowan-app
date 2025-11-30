@@ -170,7 +170,12 @@ export function Header() {
                       {user.name.charAt(0).toUpperCase()}
                     </div>
                   )}
-                  <span className="flex-1">{user.name}</span>
+                  <div className="flex flex-col items-start flex-1 min-w-0">
+                    <span className="text-sm truncate max-w-[100px]">{user.name}</span>
+                    {currentSpace && (
+                      <span className="text-[10px] opacity-75 truncate max-w-[100px]">{currentSpace.name}</span>
+                    )}
+                  </div>
                   <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
