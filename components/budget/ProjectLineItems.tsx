@@ -19,10 +19,17 @@ import {
 import { format, parseISO } from 'date-fns';
 import type { ProjectLineItem } from '@/lib/services/project-tracking-service';
 
+interface CostBreakdownItem {
+  category: string;
+  item_count: number;
+  total_estimated: number;
+  total_actual: number;
+}
+
 interface ProjectLineItemsProps {
   projectId: string;
   lineItems: ProjectLineItem[];
-  costBreakdown: any[];
+  costBreakdown: CostBreakdownItem[];
   onRefresh: () => void;
 }
 
@@ -56,7 +63,8 @@ export function ProjectLineItems({
   );
 
   const sortedItems = [...filteredItems].sort((a, b) => {
-    let aValue: any, bValue: any;
+    let aValue: string | number;
+    let bValue: string | number;
 
     switch (sortBy) {
       case 'category':
@@ -187,7 +195,7 @@ export function ProjectLineItems({
 
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e) => setSortBy(e.target.value as 'category' | 'cost' | 'date')}
             className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
           >
             <option value="category">Sort by Category</option>

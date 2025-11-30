@@ -53,12 +53,9 @@ export async function POST(req: NextRequest) {
       .eq('is_active', true)
       .single();
 
-    console.log('Admin user lookup result:', { adminUser, adminError, normalizedEmail });
-
     if (adminError || !adminUser) {
-      // Log failed attempt with more detail
-      console.warn(`Failed admin login attempt for email: ${normalizedEmail} from IP: ${ip}`);
-      console.warn('Admin error:', adminError);
+      // Log failed attempt (sanitized - no admin data exposed)
+      console.warn(`Failed admin login attempt from IP: ${ip}`);
 
       return NextResponse.json(
         { error: 'Invalid credentials or access denied' },
