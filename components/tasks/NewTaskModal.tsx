@@ -199,7 +199,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
 
   return (
     <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
 
         {/* Loading Overlay for Space Creation */}

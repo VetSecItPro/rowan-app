@@ -265,11 +265,9 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
                   })
                 ) : (
                   <div className="flex flex-col items-center justify-center py-4 text-center">
-                    <Plus className="w-6 h-6 text-gray-300 dark:text-gray-600 mb-1" />
-                    <p className="text-[10px] text-gray-400 dark:text-gray-500 mb-2">No meals</p>
                     <button
                       onClick={() => onAddMeal(day)}
-                      className="px-2 py-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-[10px] rounded-lg transition-all shadow-sm"
+                      className="px-2 py-1 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-orange-500 hover:text-white hover:border-orange-500 text-[10px] rounded-lg transition-all"
                     >
                       Add Meal
                     </button>
@@ -281,10 +279,9 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
               {dayMeals.length > 0 && (
                 <button
                   onClick={() => onAddMeal(day)}
-                  className="w-full mt-1.5 py-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-[10px] text-gray-500 dark:text-gray-400 hover:border-orange-500 hover:text-orange-600 dark:hover:text-orange-400 transition-colors flex items-center justify-center gap-1"
+                  className="w-full mt-1.5 py-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-[10px] text-gray-500 dark:text-gray-400 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-all flex items-center justify-center"
                 >
-                  <Plus className="w-3 h-3" />
-                  Add
+                  Add Meal
                 </button>
               )}
             </div>

@@ -167,7 +167,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
 
   return (
     <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-4xl lg:max-w-5xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         <div className="sticky top-0 z-10 bg-gradient-to-r from-emerald-500 to-emerald-600 flex items-center justify-between px-4 sm:px-6 py-5 border-b border-emerald-600">
           <h2 className="text-xl sm:text-2xl font-bold text-white">

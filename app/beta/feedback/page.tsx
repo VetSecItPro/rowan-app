@@ -360,7 +360,7 @@ export default function BetaFeedbackPage() {
 
       {/* Submit Feedback Modal - We'll create this as a separate component */}
       {showSubmitForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
           <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
             {/* Modal content will go here - we'll create this as a separate component */}
             <div className="p-6">

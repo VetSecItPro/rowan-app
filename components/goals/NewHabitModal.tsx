@@ -136,7 +136,7 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
   return (
     <div className="fixed inset-0 sm:flex sm:items-center sm:justify-center sm:p-4" style={{ zIndex: 9999 }}>
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal Container with Glassmorphism */}
       <div className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-2xl shadow-2xl flex flex-col overflow-hidden" style={{ zIndex: 10000, maxHeight: '90vh' }}>

@@ -329,7 +329,7 @@ export function BudgetVarianceCard({
       {showBudgetAdjust && (
         <>
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40"
             onClick={() => setShowBudgetAdjust(false)}
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

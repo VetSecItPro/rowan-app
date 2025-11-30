@@ -195,7 +195,7 @@ export function UnifiedDetailsModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
       {/* Ultra-Wide Modal for Family Collaboration */}
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full max-w-7xl h-full max-h-[95vh] overflow-hidden rounded-none sm:rounded-2xl shadow-2xl flex flex-col">

@@ -164,7 +164,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
 
   return (
     <div className="fixed inset-0 sm:flex sm:items-center sm:justify-center sm:p-4" style={{ zIndex: 9999 }}>
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-[600px] sm:h-auto sm:min-h-[600px] sm:rounded-2xl shadow-2xl flex flex-col" style={{ maxHeight: '90vh' }}>
         {/* Header */}
         <div className="sticky top-0 z-10 bg-indigo-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
