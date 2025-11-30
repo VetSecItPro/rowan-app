@@ -14,11 +14,10 @@ import { BulkActionsToolbar } from '@/components/reminders/BulkActionsToolbar';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { remindersService, Reminder, CreateReminderInput } from '@/lib/services/reminders-service';
 import { CTAButton } from '@/components/ui/EnhancedButton';
+import { useRemindersRealtime } from '@/hooks/useRemindersRealtime';
 
 export default function RemindersPage(): JSX.Element {
   const { currentSpace, user, loading: authLoading } = useAuthWithSpaces();
-  const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -33,6 +32,29 @@ export default function RemindersPage(): JSX.Element {
   const [displayLimit, setDisplayLimit] = useState(20); // Pagination: show 20 items initially
 
   const ITEMS_PER_PAGE = 20;
+
+  // Real-time hook - replaces manual loadReminders
+  const {
+    reminders: realtimeReminders,
+    loading: realtimeLoading,
+    error: realtimeError,
+    setReminders,
+  } = useRemindersRealtime({
+    spaceId: currentSpace?.id || '',
+    filters: {
+      status: statusFilter !== 'all' ? [statusFilter] : undefined,
+      assignedTo: assignmentFilter === 'mine' ? user?.id : assignmentFilter === 'unassigned' ? 'none' : undefined,
+      category: categoryFilter !== 'all' ? [categoryFilter] : undefined,
+      priority: priorityFilter !== 'all' ? [priorityFilter] : undefined,
+    },
+    onReminderAdded: (reminder) => console.log('[RemindersPage] Reminder added via real-time:', reminder.title),
+    onReminderUpdated: (reminder) => console.log('[RemindersPage] Reminder updated via real-time:', reminder.title),
+    onReminderDeleted: (reminderId) => console.log('[RemindersPage] Reminder deleted via real-time:', reminderId),
+  });
+
+  // Use real-time reminders and loading state
+  const reminders = realtimeReminders;
+  const loading = authLoading || realtimeLoading;
 
   // Memoized filtered reminders - expensive filtering operation
   const filteredReminders = useMemo(() => {
@@ -141,46 +163,13 @@ export default function RemindersPage(): JSX.Element {
     setDisplayLimit(ITEMS_PER_PAGE);
   }, [statusFilter, assignmentFilter, categoryFilter, priorityFilter, searchQuery, sortBy, ITEMS_PER_PAGE]);
 
-  // Stable reference to loadReminders
-  const loadReminders = useCallback(async () => {
-    // Don't load data if auth is still loading
-    if (authLoading) {
-      return;
-    }
-
-    // Don't load data if user doesn't have a space yet (after auth has loaded)
-    if (!currentSpace || !user) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const [remindersData, statsData] = await Promise.all([
-        remindersService.getReminders(currentSpace.id),
-        remindersService.getReminderStats(currentSpace.id),
-      ]);
-
-      setReminders(remindersData);
-
-    } catch (error) {
-      console.error('Failed to load reminders:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentSpace, user, authLoading]);
-
-  useEffect(() => {
-    loadReminders();
-  }, [loadReminders]);
-
   // Memoized callback for creating/updating reminders
   const handleCreateReminder = useCallback(async (reminderData: CreateReminderInput) => {
     try {
       // Check if we're updating an existing reminder (has an id) or creating a new one
       if (editingReminder && editingReminder.id) {
         await remindersService.updateReminder(editingReminder.id, reminderData);
-        loadReminders();
+        // Real-time will handle the update automatically
       } else {
         // Create new reminder with optimistic update
         const tempId = `temp_${Date.now()}_${Math.random()}`;
@@ -207,7 +196,7 @@ export default function RemindersPage(): JSX.Element {
           // Make the actual API call
           const newReminder = await remindersService.createReminder(reminderData);
 
-          // Replace optimistic item with real one
+          // Replace optimistic item with real one (real-time will also update, but this is faster)
           setReminders(prevReminders =>
             prevReminders.map(reminder =>
               reminder.id === tempId ? newReminder : reminder
@@ -227,7 +216,7 @@ export default function RemindersPage(): JSX.Element {
       // Could add toast notification here for better UX
       alert('Failed to save reminder. Please try again.');
     }
-  }, [editingReminder, user]);
+  }, [editingReminder, user, setReminders]);
 
   // Memoized callback for status changes
   const handleStatusChange = useCallback(async (reminderId: string, status: string) => {
@@ -238,14 +227,14 @@ export default function RemindersPage(): JSX.Element {
       )
     );
 
-    // Update in background
+    // Update in background - real-time will also update but optimistic is faster
     try {
       await remindersService.updateReminder(reminderId, { status: status as 'active' | 'completed' | 'snoozed' });
     } catch (error) {
       console.error('Failed to update reminder status:', error);
-      loadReminders(); // Revert on error
+      // Real-time will revert to server state automatically
     }
-  }, [loadReminders]);
+  }, [setReminders]);
 
   // Memoized callback for deleting reminders
   const handleDeleteReminder = useCallback(async (reminderId: string) => {
@@ -254,23 +243,23 @@ export default function RemindersPage(): JSX.Element {
 
     try {
       await remindersService.deleteReminder(reminderId);
+      // Real-time will handle the delete confirmation
     } catch (error) {
       console.error('Failed to delete reminder:', error);
-      // Revert optimistic update on error
-      loadReminders();
+      // Real-time will revert to server state automatically
     }
-  }, [loadReminders]);
+  }, [setReminders]);
 
   // Memoized callback for snoozing reminders
   const handleSnoozeReminder = useCallback(async (reminderId: string, minutes: number) => {
     if (!user) return;
     try {
       await remindersService.snoozeReminder(reminderId, minutes, user.id);
-      loadReminders();
+      // Real-time will handle the update automatically
     } catch (error) {
       console.error('Failed to snooze reminder:', error);
     }
-  }, [loadReminders, user]);
+  }, [user]);
 
   // Memoized callback for editing reminders
   const handleEditReminder = useCallback((reminder: Reminder) => {
@@ -329,8 +318,8 @@ export default function RemindersPage(): JSX.Element {
 
   const handleBulkOperationComplete = useCallback(() => {
     setSelectedReminderIds(new Set());
-    loadReminders();
-  }, [loadReminders]);
+    // Real-time will handle the updates automatically
+  }, []);
 
   const selectedReminders = useMemo(() => {
     return reminders.filter((r) => selectedReminderIds.has(r.id));
@@ -341,6 +330,19 @@ export default function RemindersPage(): JSX.Element {
       <PageErrorBoundary>
         <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
+          {/* Error State */}
+          {realtimeError && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="text-red-900 dark:text-red-100 font-semibold">Connection Error</h3>
+                <p className="text-red-700 dark:text-red-300 text-sm mt-1">
+                  {realtimeError.message || 'Failed to connect to real-time updates. Your data may not be up to date.'}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Header */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
