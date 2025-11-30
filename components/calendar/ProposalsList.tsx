@@ -20,7 +20,6 @@ export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, on
 
   useEffect(() => {
     loadProposals();
-    setupRealtimeSubscription();
   }, [spaceId, selectedStatus]);
 
   const loadProposals = async () => {
@@ -36,40 +35,22 @@ export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, on
     }
   };
 
-  const setupRealtimeSubscription = () => {
+  // Real-time subscriptions for multi-user collaboration
+  useEffect(() => {
+    if (!spaceId) return;
+
     const supabase = createClient();
 
-    const channel = supabase
-      .channel('event_proposals_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'event_proposals',
-          filter: `space_id=eq.${spaceId}`
-        },
-        () => {
-          loadProposals();
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'event_proposal_votes'
-        },
-        () => {
-          loadProposals();
-        }
-      )
-      .subscribe();
+    // Subscribe to proposal changes using service method
+    const proposalsChannel = eventProposalsService.subscribeToProposals(spaceId, () => {
+      loadProposals(); // Reload when proposals change
+    });
 
+    // Cleanup subscription on unmount
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(proposalsChannel);
     };
-  };
+  }, [spaceId]);
 
   const handleApprove = async (proposalId: string) => {
     // Find the proposal
