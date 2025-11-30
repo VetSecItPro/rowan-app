@@ -29,6 +29,13 @@ export interface Meal {
   meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
   scheduled_date: string;
   notes?: string;
+  assigned_to?: string;
+  assignee?: {
+    id: string;
+    name: string;
+    email: string;
+    avatar_url?: string;
+  };
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -71,7 +78,7 @@ export const mealsService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('meals')
-      .select('*, recipe:recipes(*)')
+      .select('*, recipe:recipes(*), assignee:users!meals_assigned_to_fkey(id, name, email, avatar_url)')
       .eq('space_id', spaceId)
       .order('scheduled_date', { ascending: true });
 
@@ -81,9 +88,9 @@ export const mealsService = {
 
   async getMealById(id: string): Promise<Meal | null> {
     const supabase = createClient();
-    const { data, error } = await supabase
+    const { data, error} = await supabase
       .from('meals')
-      .select('*, recipe:recipes(*)')
+      .select('*, recipe:recipes(*), assignee:users!meals_assigned_to_fkey(id, name, email, avatar_url)')
       .eq('id', id)
       .single();
 
