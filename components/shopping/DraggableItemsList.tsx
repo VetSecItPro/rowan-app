@@ -122,9 +122,25 @@ function SortableItem({ item, onToggle }: SortableItemProps) {
         <p className={`text-sm font-medium ${item.checked ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'}`}>
           {item.name}
         </p>
-        {item.quantity > 1 && (
-          <p className="text-xs text-gray-500 dark:text-gray-400">Qty: {item.quantity}</p>
-        )}
+        <div className="flex items-center gap-2">
+          {item.quantity > 1 && (
+            <p className="text-xs text-gray-500 dark:text-gray-400">Qty: {item.quantity}</p>
+          )}
+          {item.assignee && (
+            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-900/30 rounded-full">
+              {item.assignee.avatar_url ? (
+                <img src={item.assignee.avatar_url} alt={item.assignee.name} className="w-3 h-3 rounded-full object-cover" />
+              ) : (
+                <div className="w-3 h-3 rounded-full bg-gradient-shopping flex items-center justify-center">
+                  <span className="text-[6px] font-semibold text-white">
+                    {item.assignee.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
+              <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-medium">{item.assignee.name}</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
