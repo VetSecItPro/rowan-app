@@ -807,7 +807,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                 >
                   Cancel
                 </button>
-                <button type="submit" className="px-6 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg transition-all">
+                <button type="submit" className="px-6 py-2 bg-gradient-meals hover:opacity-90 text-white rounded-lg transition-all font-medium shadow-md hover:shadow-lg">
                   {editRecipe ? 'Save' : 'Create'}
                 </button>
               </div>
