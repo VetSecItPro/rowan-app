@@ -162,12 +162,28 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
             />
           </div>
         </div>
-        <div className="flex items-center justify-between">
-          <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-            goal.status === 'completed' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' :
-            goal.status === 'active' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' :
-            'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300'
-          }`}>{goal.status}</span>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+              goal.status === 'completed' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' :
+              goal.status === 'active' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' :
+              'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300'
+            }`}>{goal.status}</span>
+            {goal.assignee && (
+              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 rounded-full">
+                {goal.assignee.avatar_url ? (
+                  <img src={goal.assignee.avatar_url} alt={goal.assignee.name} className="w-4 h-4 rounded-full object-cover" />
+                ) : (
+                  <div className="w-4 h-4 rounded-full bg-gradient-goals flex items-center justify-center">
+                    <span className="text-[8px] font-semibold text-white">
+                      {goal.assignee.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+                <span className="text-xs text-indigo-700 dark:text-indigo-300 font-medium">{goal.assignee.name}</span>
+              </div>
+            )}
+          </div>
           {goal.target_date && <span className="text-xs text-gray-500">{formatDate(goal.target_date, 'MMM d, yyyy')}</span>}
         </div>
       </div>

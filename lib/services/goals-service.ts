@@ -87,6 +87,13 @@ export interface Goal {
   priority_order?: number;
   is_pinned?: boolean;
   target_date?: string;
+  assigned_to?: string; // User ID assigned to work on this goal
+  assignee?: { // Populated user data for assigned_to
+    id: string;
+    name: string;
+    email: string;
+    avatar_url?: string;
+  };
   milestones?: Milestone[];
   collaborators?: GoalCollaborator[];
   created_by: string;
@@ -105,6 +112,7 @@ export interface CreateGoalInput {
   visibility?: 'private' | 'shared';
   template_id?: string;
   target_date?: string;
+  assigned_to?: string; // User ID to assign this goal to
   depends_on_goal_id?: string; // Optional dependency
 }
 
@@ -321,24 +329,58 @@ export const goalsService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('goals')
-      .select('*, milestones:goal_milestones(*)')
+      .select(`
+        *,
+        milestones:goal_milestones(*),
+        assignee:assigned_to (
+          id,
+          name,
+          email,
+          avatar_url
+        )
+      `)
       .eq('space_id', spaceId)
       .order('is_pinned', { ascending: false })
       .order('priority_order', { ascending: true });
 
     if (error) throw error;
-    return data || [];
+
+    // Map the data to handle null assignee
+    const mappedData = (data || []).map((goal: any) => ({
+      ...goal,
+      assignee: goal.assignee || undefined,
+    }));
+
+    return mappedData;
   },
 
   async getGoalById(id: string): Promise<Goal | null> {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('goals')
-      .select('*, milestones:goal_milestones(*)')
+      .select(`
+        *,
+        milestones:goal_milestones(*),
+        assignee:assigned_to (
+          id,
+          name,
+          email,
+          avatar_url
+        )
+      `)
       .eq('id', id)
       .single();
 
     if (error) throw error;
+
+    // Map the data to handle null assignee
+    if (data) {
+      return {
+        ...data,
+        assignee: data.assignee || undefined,
+      };
+    }
+
     return data;
   },
 
