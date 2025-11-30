@@ -137,7 +137,7 @@ export function NewBillModal({
   return (
     <>
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 animate-fade-in"
+        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 animate-fade-in"
         onClick={onClose}
       />
 

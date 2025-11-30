@@ -89,6 +89,22 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Validate file type
+      const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+      if (!validTypes.includes(file.type)) {
+        alert('Please upload a valid image file (PNG, JPG, or JPEG)');
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        alert('Image size must be less than 5MB');
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        return;
+      }
+
       setRecipeImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -304,7 +320,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
 
   return (
     <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-gradient-meals px-4 sm:px-6 py-4">
@@ -407,10 +423,10 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
 
               {/* Image Upload */}
               <div>
-                <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer text-center">
                   Upload Recipe Image
                 </label>
-                <div className="space-y-3 max-w-md">
+                <div className="space-y-3 max-w-md mx-auto">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -426,7 +442,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                     <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400">
                       <ImageIcon className="w-8 h-8" />
                       <span className="font-medium text-sm">Click to upload</span>
-                      <span className="text-xs">PNG, JPG, or JPEG</span>
+                      <span className="text-xs">PNG, JPG, or JPEG (max 5MB)</span>
                     </div>
                   </button>
 
@@ -635,6 +651,8 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                 <input
                   type="text"
                   required
+                  minLength={3}
+                  maxLength={100}
                   value={formData.name}
                   id="field-3"
               onChange={(e) =>  setFormData({ ...formData, name: e.target.value })}
@@ -660,9 +678,21 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   <label htmlFor="field-5" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Prep Time (min)</label>
                   <input
                     type="number"
-                    value={formData.prep_time || ''}
+                    min="0"
+                    step="1"
+                    value={formData.prep_time ?? ''}
+                    placeholder="0"
                     id="field-5"
-              onChange={(e) =>  setFormData({ ...formData, prep_time: e.target.value ? parseInt(e.target.value) : undefined })}
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value);
+                      setFormData({ ...formData, prep_time: e.target.value && value >= 0 ? value : undefined });
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '+') {
+                        e.preventDefault();
+                      }
+                    }}
                     className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                   />
                 </div>
@@ -670,9 +700,21 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   <label htmlFor="field-6" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Cook Time (min)</label>
                   <input
                     type="number"
-                    value={formData.cook_time || ''}
+                    min="0"
+                    step="1"
+                    value={formData.cook_time ?? ''}
+                    placeholder="0"
                     id="field-6"
-              onChange={(e) =>  setFormData({ ...formData, cook_time: e.target.value ? parseInt(e.target.value) : undefined })}
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value);
+                      setFormData({ ...formData, cook_time: e.target.value && value >= 0 ? value : undefined });
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '+') {
+                        e.preventDefault();
+                      }
+                    }}
                     className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                   />
                 </div>
@@ -680,9 +722,21 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   <label htmlFor="field-7" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Servings</label>
                   <input
                     type="number"
-                    value={formData.servings || ''}
+                    min="1"
+                    step="1"
+                    value={formData.servings ?? ''}
+                    placeholder="0"
                     id="field-7"
-              onChange={(e) =>  setFormData({ ...formData, servings: e.target.value ? parseInt(e.target.value) : undefined })}
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value);
+                      setFormData({ ...formData, servings: e.target.value && value >= 0 ? value : undefined });
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '+') {
+                        e.preventDefault();
+                      }
+                    }}
                     className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
                   />
                 </div>
@@ -752,8 +806,9 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                     currentImageUrl={formData.image_url}
                     onUploadSuccess={(url) => setFormData({ ...formData, image_url: url })}
                     uploadEndpoint="/api/upload/recipe"
-                    maxSizeMB={10}
+                    maxSizeMB={5}
                     aspectRatio="landscape"
+                    borderColor="orange"
                   />
                 </div>
               </div>
