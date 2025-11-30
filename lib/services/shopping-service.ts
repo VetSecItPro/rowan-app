@@ -11,6 +11,12 @@ export interface ShoppingItem {
   category?: string;
   sort_order?: number;
   assigned_to?: string;
+  assignee?: {
+    id: string;
+    name: string;
+    email: string;
+    avatar_url?: string;
+  };
   estimated_price?: number;
   actual_price?: number;
   recipe_source_id?: string;
@@ -87,7 +93,7 @@ export const shoppingService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('shopping_lists')
-      .select('*, items:shopping_items(*)')
+      .select('*, items:shopping_items(*, assignee:users!shopping_items_assigned_to_fkey(id, name, email, avatar_url))')
       .eq('space_id', spaceId)
       .order('created_at', { ascending: false });
 
@@ -99,7 +105,7 @@ export const shoppingService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('shopping_lists')
-      .select('*, items:shopping_items(*)')
+      .select('*, items:shopping_items(*, assignee:users!shopping_items_assigned_to_fkey(id, name, email, avatar_url))')
       .eq('id', id)
       .single();
 
