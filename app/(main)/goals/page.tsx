@@ -78,6 +78,7 @@ export default function GoalsPage() {
   const goalsRef = useRef<Goal[]>([]);
   const userActionsRef = useRef<Set<string>>(new Set()); // Track user-initiated actions
   const [loading, setLoading] = useState(true);
+  const [spaceMembers, setSpaceMembers] = useState<Array<{ id: string; name: string; email: string; avatar_url?: string }>>([]);
   const [viewMode, setViewMode] = useState<ViewMode>('goals');
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
   const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
@@ -280,13 +281,27 @@ export default function GoalsPage() {
 
     try {
       setLoading(true);
-      const [goalsData, milestonesData] = await Promise.all([
+      const supabase = createClient();
+
+      const [goalsData, milestonesData, membersResult] = await Promise.all([
         goalsService.getGoals(currentSpace.id),
         goalsService.getAllMilestones(currentSpace.id),
+        supabase
+          .from('space_members')
+          .select('user:users(id, name, email, avatar_url)')
+          .eq('space_id', currentSpace.id)
       ]);
 
       setGoals(goalsData);
       setMilestones(milestonesData);
+
+      // Map space members data
+      if (membersResult.data) {
+        const members = membersResult.data
+          .map((m: any) => m.user)
+          .filter((u: any) => u != null);
+        setSpaceMembers(members);
+      }
 
     } catch (error) {
       console.error('Failed to load data:', error);
@@ -1038,6 +1053,7 @@ export default function GoalsPage() {
         spaceId={spaceId}
         availableGoals={goals.filter(g => g.status === 'active')}
         selectedTemplate={selectedTemplate}
+        spaceMembers={spaceMembers}
       />
       <NewMilestoneModal
         isOpen={isMilestoneModalOpen}
