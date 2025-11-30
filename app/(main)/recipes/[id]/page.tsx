@@ -2,19 +2,24 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft, Clock, Users, ChefHat, ExternalLink, Edit, Trash2, Loader2, Calendar } from 'lucide-react';
+import { ArrowLeft, Clock, Users, ChefHat, ExternalLink, Edit, Trash2, Loader2, Calendar, ShoppingCart } from 'lucide-react';
 import { mealsService, type Recipe } from '@/lib/services/meals-service';
+import { shoppingService } from '@/lib/services/shopping-service';
+import { useAuth } from '@/lib/contexts/auth-context';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { toast } from 'sonner';
 import Link from 'next/link';
 
 export default function RecipeDetailPage() {
   const router = useRouter();
   const params = useParams();
   const recipeId = params?.id as string;
+  const { currentSpace } = useAuth();
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [addingToShoppingList, setAddingToShoppingList] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState(false);
 
   useEffect(() => {
@@ -44,13 +49,68 @@ export default function RecipeDetailPage() {
     setDeleting(true);
     try {
       await mealsService.deleteRecipe(recipe.id);
-      alert('Recipe deleted successfully');
+      toast.success('Recipe deleted successfully');
       router.push('/recipes');
     } catch (error) {
       console.error('Failed to delete recipe:', error);
-      alert('Failed to delete recipe. Please try again.');
+      toast.error('Failed to delete recipe. Please try again.');
       setDeleting(false);
     }
+  };
+
+  const handleAddToShoppingList = async () => {
+    if (!recipe || !currentSpace) {
+      toast.error('Unable to add to shopping list');
+      return;
+    }
+
+    setAddingToShoppingList(true);
+    try {
+      // Create shopping list with recipe name
+      const list = await shoppingService.createList({
+        space_id: currentSpace.id,
+        title: `${recipe.name} Ingredients`,
+        description: `Ingredients for ${recipe.name}`,
+        status: 'active',
+      });
+
+      // Parse and add each ingredient as a shopping item
+      const ingredients = parseIngredients();
+      if (ingredients.length > 0) {
+        await Promise.all(
+          ingredients.map((ingredient: any) => {
+            const itemName = ingredient.amount && ingredient.unit
+              ? `${ingredient.amount} ${ingredient.unit} ${ingredient.name}`
+              : ingredient.name;
+
+            return shoppingService.createItem({
+              list_id: list.id,
+              name: itemName,
+              quantity: 1,
+            });
+          })
+        );
+      }
+
+      toast.success(`Added ${ingredients.length} ingredients to shopping list!`);
+      router.push('/shopping');
+    } catch (error) {
+      console.error('Failed to add to shopping list:', error);
+      toast.error('Failed to add ingredients to shopping list');
+    } finally {
+      setAddingToShoppingList(false);
+    }
+  };
+
+  // Parse ingredients to handle both string and object formats
+  const parseIngredients = () => {
+    if (!recipe || !recipe.ingredients) return [];
+    return recipe.ingredients.map((ing: any) => {
+      if (typeof ing === 'string') {
+        return { name: ing, amount: '', unit: '' };
+      }
+      return ing;
+    });
   };
 
   if (loading) {
@@ -84,17 +144,6 @@ export default function RecipeDetailPage() {
       </div>
     );
   }
-
-  // Parse ingredients to handle both string and object formats
-  const parseIngredients = () => {
-    if (!recipe.ingredients) return [];
-    return recipe.ingredients.map((ing: any) => {
-      if (typeof ing === 'string') {
-        return { name: ing, amount: '', unit: '' };
-      }
-      return ing;
-    });
-  };
 
   const ingredients = parseIngredients();
 
@@ -272,11 +321,28 @@ export default function RecipeDetailPage() {
           </div>
         </div>
 
-        {/* Add to Meal Plan Button */}
-        <div className="mt-8 flex justify-center">
+        {/* Action Buttons */}
+        <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+          <button
+            onClick={handleAddToShoppingList}
+            disabled={addingToShoppingList}
+            className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg font-medium transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {addingToShoppingList ? (
+              <>
+                <Loader2 className="w-6 h-6 animate-spin" />
+                Adding...
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="w-6 h-6" />
+                Add to Shopping List
+              </>
+            )}
+          </button>
           <Link
             href={`/meals?recipe=${recipe.id}`}
-            className="px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all shadow-lg hover:shadow-xl flex items-center gap-3 text-lg"
+            className="px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3 text-lg"
           >
             <Calendar className="w-6 h-6" />
             Add to Meal Plan
