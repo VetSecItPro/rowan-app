@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 // Expense Types
 export interface Expense {
@@ -245,4 +246,71 @@ export const projectsService = {
   },
 
   // Removed: getHouseholdStats - moved to household page to combine choresService and projectsService
+
+  /**
+   * Subscribe to real-time expense changes for a space
+   * Enables multi-user collaboration by syncing expenses instantly
+   *
+   * @param spaceId - The space ID to subscribe to
+   * @param callback - Function called when expenses change (INSERT/UPDATE/DELETE)
+   * @returns RealtimeChannel - Channel object to unsubscribe later
+   *
+   * @example
+   * ```typescript
+   * const channel = projectsService.subscribeToExpenses(spaceId, (payload) => {
+   *   if (payload.eventType === 'INSERT') {
+   *     setExpenses(prev => [...prev, payload.new]);
+   *   }
+   * });
+   * // Later: cleanup
+   * supabase.removeChannel(channel);
+   * ```
+   */
+  subscribeToExpenses(
+    spaceId: string,
+    callback: (payload: RealtimePostgresChangesPayload<{[key: string]: unknown}>) => void
+  ): RealtimeChannel {
+    const supabase = createClient();
+    return supabase
+      .channel(`expenses:${spaceId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'expenses',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        callback
+      )
+      .subscribe();
+  },
+
+  /**
+   * Subscribe to real-time budget changes for a space
+   * Enables multi-user collaboration on budget settings
+   *
+   * @param spaceId - The space ID to subscribe to
+   * @param callback - Function called when budget changes (INSERT/UPDATE/DELETE)
+   * @returns RealtimeChannel - Channel object to unsubscribe later
+   */
+  subscribeTobudget(
+    spaceId: string,
+    callback: (payload: RealtimePostgresChangesPayload<{[key: string]: unknown}>) => void
+  ): RealtimeChannel {
+    const supabase = createClient();
+    return supabase
+      .channel(`budgets:${spaceId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'budgets',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        callback
+      )
+      .subscribe();
+  },
 };
