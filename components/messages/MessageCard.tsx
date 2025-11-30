@@ -238,16 +238,18 @@ export function MessageCard({
               </div>
             )}
 
-            {/* Add Reaction Button (when no reactions) */}
+            {/* Add Reaction Button (when no reactions) - Move below message */}
             {reactions.length === 0 && (
               <div className="relative z-10 mt-2 opacity-0 group-hover/message:opacity-60 transition-opacity">
                 <ReactionPicker onSelectEmoji={handleAddReaction} />
               </div>
             )}
 
-            {/* Message Actions - Enhanced Hover Experience */}
-            <div className="absolute -top-2 -right-2 z-20 opacity-0 invisible group-hover/message:opacity-100 group-hover/message:visible transition-all duration-200 transform translate-y-1 group-hover/message:translate-y-0 pointer-events-none">
-              <div className="flex items-center gap-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-1 pointer-events-auto">
+            {/* Message Actions - Enhanced Hover Experience - Moved to left side to avoid emoji conflict */}
+            <div className={`absolute -top-2 z-20 opacity-0 invisible group-hover/message:opacity-100 group-hover/message:visible transition-all duration-200 transform translate-y-1 group-hover/message:translate-y-0 pointer-events-none ${
+              isOwn ? '-left-2' : '-right-2'
+            }`}>
+              <div className="flex items-center gap-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-full shadow-lg border border-gray-200 dark:border-gray-700 p-1.5 pointer-events-auto">
                 {/* Edit Button - Always show for own messages, or if user has edit permissions */}
                 {isOwn && (
                   <button
@@ -257,9 +259,9 @@ export function MessageCard({
                     }}
                     title="Edit message"
                     aria-label="Edit message"
-                    className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/40 transition-all duration-200 group/edit"
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/40 transition-all duration-200 group/edit"
                   >
-                    <Edit3 className="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover/edit:text-blue-600 dark:group-hover/edit:text-blue-400 transition-colors" />
+                    <Edit3 className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400 group-hover/edit:text-blue-600 dark:group-hover/edit:text-blue-400 transition-colors" />
                   </button>
                 )}
 
@@ -272,9 +274,9 @@ export function MessageCard({
                     }}
                     title="Delete message"
                     aria-label="Delete message"
-                    className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-red-50 dark:hover:bg-red-900/40 transition-all duration-200 group/delete"
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 dark:hover:bg-red-900/40 transition-all duration-200 group/delete"
                   >
-                    <Trash2 className="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover/delete:text-red-600 dark:group-hover/delete:text-red-400 transition-colors" />
+                    <Trash2 className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400 group-hover/delete:text-red-600 dark:group-hover/delete:text-red-400 transition-colors" />
                   </button>
                 )}
 
@@ -287,9 +289,9 @@ export function MessageCard({
                     }}
                     title="Pin message"
                     aria-label="Pin message"
-                    className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-yellow-50 dark:hover:bg-yellow-900/40 transition-all duration-200 group/pin"
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-yellow-50 dark:hover:bg-yellow-900/40 transition-all duration-200 group/pin"
                   >
-                    <Pin className="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover/pin:text-yellow-600 dark:group-hover/pin:text-yellow-400 transition-colors" />
+                    <Pin className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400 group-hover/pin:text-yellow-600 dark:group-hover/pin:text-yellow-400 transition-colors" />
                   </button>
                 )}
 
@@ -302,9 +304,9 @@ export function MessageCard({
                     }}
                     title="Forward message"
                     aria-label="Forward message"
-                    className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-green-50 dark:hover:bg-green-900/40 transition-all duration-200 group/forward"
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-green-50 dark:hover:bg-green-900/40 transition-all duration-200 group/forward"
                   >
-                    <Forward className="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover/forward:text-green-600 dark:group-hover/forward:text-green-400 transition-colors" />
+                    <Forward className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400 group-hover/forward:text-green-600 dark:group-hover/forward:text-green-400 transition-colors" />
                   </button>
                 )}
               </div>
