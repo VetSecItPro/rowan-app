@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
+import type { Task, Expense } from '@/lib/types';
+import type { Goal } from '@/lib/services/goals-service';
 
 // ==================== TYPES ====================
 
@@ -26,6 +28,23 @@ export interface Tag {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+}
+
+// Helper interfaces for nested query results
+interface TagRelation {
+  tags: Tag;
+}
+
+interface ExpenseRelation {
+  expenses: Expense;
+}
+
+interface GoalRelation {
+  goals: Goal;
+}
+
+interface TaskRelation {
+  tasks: Task;
 }
 
 export interface CreateCustomCategoryInput {
@@ -292,7 +311,7 @@ export async function getExpenseTags(expenseId: string): Promise<Tag[]> {
     .eq('expense_id', expenseId);
 
   if (error) throw error;
-  return (data || []).map((item: any) => item.tags);
+  return (data || []).map((item: TagRelation) => item.tags);
 }
 
 /**
@@ -329,16 +348,16 @@ export async function removeTagFromExpense(expenseId: string, tagId: string): Pr
 /**
  * Gets all expenses with a specific tag
  */
-export async function getExpensesByTag(tagId: string): Promise<any[]> {
+export async function getExpensesByTag(tagId: string): Promise<Expense[]> {
   const supabase = createClient();
 
-  const { data, error } = await supabase
+  const { data, error} = await supabase
     .from('expense_tags')
     .select('expense_id, expenses(*)')
     .eq('tag_id', tagId);
 
   if (error) throw error;
-  return (data || []).map((item: any) => item.expenses);
+  return (data || []).map((item: ExpenseRelation) => item.expenses);
 }
 
 // ==================== GOAL TAGS ====================
@@ -355,7 +374,7 @@ export async function getGoalTags(goalId: string): Promise<Tag[]> {
     .eq('goal_id', goalId);
 
   if (error) throw error;
-  return (data || []).map((item: any) => item.tags);
+  return (data || []).map((item: TagRelation) => item.tags);
 }
 
 /**
@@ -385,13 +404,13 @@ export async function removeTagFromGoal(goalId: string, tagId: string): Promise<
 /**
  * Gets all goals with a specific tag
  */
-export async function getGoalsByTag(tagId: string): Promise<any[]> {
+export async function getGoalsByTag(tagId: string): Promise<Goal[]> {
   const supabase = createClient();
 
   const { data, error } = await supabase.from('goal_tags').select('goal_id, goals(*)').eq('tag_id', tagId);
 
   if (error) throw error;
-  return (data || []).map((item: any) => item.goals);
+  return (data || []).map((item: GoalRelation) => item.goals);
 }
 
 // ==================== TASK TAGS ====================
@@ -408,7 +427,7 @@ export async function getTaskTags(taskId: string): Promise<Tag[]> {
     .eq('task_id', taskId);
 
   if (error) throw error;
-  return (data || []).map((item: any) => item.tags);
+  return (data || []).map((item: TagRelation) => item.tags);
 }
 
 /**
@@ -438,13 +457,13 @@ export async function removeTagFromTask(taskId: string, tagId: string): Promise<
 /**
  * Gets all tasks with a specific tag
  */
-export async function getTasksByTag(tagId: string): Promise<any[]> {
+export async function getTasksByTag(tagId: string): Promise<Task[]> {
   const supabase = createClient();
 
   const { data, error } = await supabase.from('task_tags').select('task_id, tasks(*)').eq('tag_id', tagId);
 
   if (error) throw error;
-  return (data || []).map((item: any) => item.tasks);
+  return (data || []).map((item: TaskRelation) => item.tasks);
 }
 
 // ==================== REPORTING & FILTERING ====================
@@ -469,12 +488,12 @@ export async function getExpenseStatsByCategory(
   if (error) throw error;
 
   // Group by category
-  const stats = (data || []).reduce((acc: any, expense: any) => {
+  const stats = (data || []).reduce((acc: Record<string, { category: string; total: number; count: number }>, expense: Expense) => {
     const cat = expense.category || 'Uncategorized';
     if (!acc[cat]) {
       acc[cat] = { category: cat, total: 0, count: 0 };
     }
-    acc[cat].total += parseFloat(expense.amount);
+    acc[cat].total += parseFloat(String(expense.amount));
     acc[cat].count += 1;
     return acc;
   }, {});
@@ -503,7 +522,7 @@ export async function getExpenseStatsByTag(
     // Filter by date if provided
     let filteredExpenses = expenses;
     if (startDate || endDate) {
-      filteredExpenses = expenses.filter((expense: any) => {
+      filteredExpenses = expenses.filter((expense: Expense) => {
         const expenseDate = expense.date;
         if (startDate && expenseDate < startDate) return false;
         if (endDate && expenseDate > endDate) return false;
@@ -512,7 +531,7 @@ export async function getExpenseStatsByTag(
     }
 
     if (filteredExpenses.length > 0) {
-      const total = filteredExpenses.reduce((sum: number, exp: any) => sum + parseFloat(exp.amount), 0);
+      const total = filteredExpenses.reduce((sum: number, exp: Expense) => sum + parseFloat(String(exp.amount)), 0);
       results.push({
         tag,
         total,
@@ -531,9 +550,9 @@ export async function searchByTags(
   spaceId: string,
   tagNames: string[]
 ): Promise<{
-  expenses: any[];
-  goals: any[];
-  tasks: any[];
+  expenses: Expense[];
+  goals: Goal[];
+  tasks: Task[];
 }> {
   const supabase = createClient();
 
