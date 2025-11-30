@@ -23,7 +23,13 @@ const nextConfig = {
     return 'build-' + Date.now();
   },
   experimental: {
-    optimizePackageImports: ['lucide-react'],
+    optimizePackageImports: ['lucide-react', 'framer-motion'],
+    webpackBuildWorker: true,
+  },
+
+  // Performance optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
   },
 
   // Image optimization settings
