@@ -42,6 +42,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { YearInReviewData } from '@/lib/services/year-in-review-service';
+import { SpaceSelector } from '@/components/spaces/SpaceSelector';
 import { cn } from '@/lib/utils';
 
 // =====================================================
@@ -58,7 +59,7 @@ interface YearInReviewDashboardProps {
 // =====================================================
 
 export function YearInReviewDashboard({ year, className }: YearInReviewDashboardProps) {
-  const { currentSpace } = useAuth();
+  const { currentSpace, spaces, switchSpace, user } = useAuth();
   const [data, setData] = useState<YearInReviewData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -146,10 +147,23 @@ export function YearInReviewDashboard({ year, className }: YearInReviewDashboard
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center gap-2 mb-2">
           <Sparkles className="w-8 h-8 text-yellow-500" />
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold text-white drop-shadow-lg">
             Your {selectedYear} Year in Review
           </h1>
         </div>
+
+        {/* Space Selector */}
+        {currentSpace && spaces.length > 0 && user && (
+          <div className="flex justify-center mb-6">
+            <SpaceSelector
+              spaces={spaces}
+              currentSpace={currentSpace}
+              onSpaceChange={switchSpace}
+              userColorTheme={user.color_theme}
+              variant="compact"
+            />
+          </div>
+        )}
         {error ? (
           <div className="max-w-2xl mx-auto">
             <p className="text-lg text-muted-foreground mb-2">
