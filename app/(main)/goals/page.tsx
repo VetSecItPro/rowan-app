@@ -97,6 +97,7 @@ export default function GoalsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [assignmentFilter, setAssignmentFilter] = useState<'all' | 'assigned-to-me' | 'unassigned'>('all');
   const [focusMode, setFocusMode] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; action: 'delete-goal' | 'delete-milestone'; id: string }>({ isOpen: false, action: 'delete-goal', id: '' });
 
@@ -108,7 +109,7 @@ export default function GoalsPage() {
     userEmail: user?.email,
   });
 
-  // Memoized filtered goals with search, status, and focus mode
+  // Memoized filtered goals with search, status, assignment, and focus mode
   const filteredGoals = useMemo(() => {
     let filtered = goals;
 
@@ -117,6 +118,15 @@ export default function GoalsPage() {
       filtered = filtered.filter(g => {
         if (statusFilter === 'active') return g.status === 'active';
         if (statusFilter === 'completed') return g.status === 'completed';
+        return true;
+      });
+    }
+
+    // Apply assignment filter
+    if (assignmentFilter !== 'all') {
+      filtered = filtered.filter(g => {
+        if (assignmentFilter === 'assigned-to-me') return g.assigned_to === user?.id;
+        if (assignmentFilter === 'unassigned') return !g.assigned_to;
         return true;
       });
     }
@@ -136,7 +146,7 @@ export default function GoalsPage() {
     }
 
     return filtered;
-  }, [goals, searchQuery, statusFilter, focusMode]);
+  }, [goals, searchQuery, statusFilter, assignmentFilter, focusMode, user?.id]);
 
   // Memoized filtered milestones with search
   const filteredMilestones = useMemo(() => {
@@ -876,39 +886,78 @@ export default function GoalsPage() {
                 </span>
               </div>
 
-              {/* Status Filter - Segmented Buttons - Only show for goals view */}
-              <div className={`bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 w-fit ${viewMode !== 'goals' ? 'invisible' : ''}`}>
-                <button
-                  onClick={() => setStatusFilter('all')}
-                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
-                    statusFilter === 'all'
-                      ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
-                  }`}
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => setStatusFilter('active')}
-                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
-                    statusFilter === 'active'
-                      ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
-                  }`}
-                >
-                  Active
-                </button>
-                <button
-                  onClick={() => setStatusFilter('completed')}
-                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[80px] ${
-                    statusFilter === 'completed'
-                      ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
-                  }`}
-                >
-                  Completed
-                </button>
-              </div>
+              {/* Filter Controls Container - Only show for goals view */}
+              {viewMode === 'goals' && (
+                <div className="flex flex-col sm:flex-row gap-2">
+                  {/* Status Filter */}
+                  <div className="bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 w-fit">
+                    <button
+                      onClick={() => setStatusFilter('all')}
+                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
+                        statusFilter === 'all'
+                          ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                      }`}
+                    >
+                      All
+                    </button>
+                    <button
+                      onClick={() => setStatusFilter('active')}
+                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
+                        statusFilter === 'active'
+                          ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                      }`}
+                    >
+                      Active
+                    </button>
+                    <button
+                      onClick={() => setStatusFilter('completed')}
+                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[80px] ${
+                        statusFilter === 'completed'
+                          ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                      }`}
+                    >
+                      Completed
+                    </button>
+                  </div>
+
+                  {/* Assignment Filter */}
+                  <div className="bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 w-fit">
+                    <button
+                      onClick={() => setAssignmentFilter('all')}
+                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
+                        assignmentFilter === 'all'
+                          ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                      }`}
+                    >
+                      All
+                    </button>
+                    <button
+                      onClick={() => setAssignmentFilter('assigned-to-me')}
+                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[80px] ${
+                        assignmentFilter === 'assigned-to-me'
+                          ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                      }`}
+                    >
+                      Mine
+                    </button>
+                    <button
+                      onClick={() => setAssignmentFilter('unassigned')}
+                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[100px] ${
+                        assignmentFilter === 'unassigned'
+                          ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                      }`}
+                    >
+                      Unassigned
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Focus Mode Toggle */}
               {viewMode === 'goals' && filteredGoals.length > 3 && (
