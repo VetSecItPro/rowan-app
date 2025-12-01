@@ -24,16 +24,18 @@ export const activityFeedService = {
 
     try {
       // Fetch recent data from all relevant tables concurrently
-      const [tasks, goals, messages, events, checkIns, shoppingLists, meals, expenses, projects] = await Promise.all([
+      const [tasks, goals, messages, events, checkIns, shoppingLists, meals, expenses, projects, reminders, chores] = await Promise.all([
         supabase.from('tasks').select('id, title, status, created_by, created_at, updated_at, users!tasks_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('goals').select('id, title, status, created_by, created_at, updated_at, users!goals_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('messages').select('id, content, sender_id, created_at, users!messages_sender_id_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('calendar_events').select('id, title, created_by, created_at, updated_at, users!calendar_events_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('daily_check_ins').select('id, mood, created_at, user_id, users(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('shopping_lists').select('id, name, status, created_by, created_at, updated_at, users!shopping_lists_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
-        supabase.from('meals').select('id, title, created_by, created_at, updated_at, users!meals_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
+        supabase.from('meals').select('id, name, meal_type, created_by, created_at, updated_at, recipe:recipes(name), users!meals_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('expenses').select('id, description, created_by, created_at, updated_at, users!expenses_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('projects').select('id, name, status, created_by, created_at, updated_at, users!projects_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
+        supabase.from('reminders').select('id, title, status, created_by, created_at, updated_at, users!reminders_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
+        supabase.from('chores').select('id, title, status, created_by, created_at, updated_at, users!chores_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
       ]);
 
       // Process tasks
@@ -145,11 +147,12 @@ export const activityFeedService = {
       if (meals.data) {
         meals.data.forEach((meal: any) => {
           const user = meal.users as any;
+          const mealTitle = meal.recipe?.name || meal.name || `${meal.meal_type} meal`;
           activities.push({
             id: `meal-${meal.id}`,
             type: 'meal',
             action: 'created',
-            title: meal.title,
+            title: mealTitle,
             user_name: user?.name || user?.email || 'Unknown',
             user_id: meal.created_by,
             user_avatar: user?.avatar_url,
@@ -192,6 +195,40 @@ export const activityFeedService = {
         });
       }
 
+      // Process reminders
+      if (reminders.data) {
+        reminders.data.forEach((reminder: any) => {
+          const user = reminder.users as any;
+          activities.push({
+            id: `reminder-${reminder.id}`,
+            type: 'reminder',
+            action: reminder.status === 'completed' ? 'completed' : 'created',
+            title: reminder.title,
+            user_name: user?.name || user?.email || 'Unknown',
+            user_id: reminder.created_by,
+            user_avatar: user?.avatar_url,
+            created_at: reminder.status === 'completed' ? reminder.updated_at : reminder.created_at,
+          });
+        });
+      }
+
+      // Process chores
+      if (chores.data) {
+        chores.data.forEach((chore: any) => {
+          const user = chore.users as any;
+          activities.push({
+            id: `chore-${chore.id}`,
+            type: 'task', // Use 'task' type to group with tasks in the UI
+            action: chore.status === 'completed' ? 'completed' : 'created',
+            title: chore.title,
+            user_name: user?.name || user?.email || 'Unknown',
+            user_id: chore.created_by,
+            user_avatar: user?.avatar_url,
+            created_at: chore.status === 'completed' ? chore.updated_at : chore.created_at,
+          });
+        });
+      }
+
       // Sort all activities by created_at (most recent first)
       activities.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
@@ -215,7 +252,7 @@ export const activityFeedService = {
     const channels: RealtimeChannel[] = [];
 
     // Tables to monitor for activity
-    const tables = ['tasks', 'goals', 'messages', 'calendar_events', 'daily_check_ins', 'shopping_lists', 'meals', 'expenses', 'projects'];
+    const tables = ['tasks', 'goals', 'messages', 'calendar_events', 'daily_check_ins', 'shopping_lists', 'meals', 'expenses', 'projects', 'reminders', 'chores'];
 
     tables.forEach(table => {
       const channel = supabase
