@@ -3,8 +3,9 @@
 import { useState, useEffect, useMemo, memo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MessageSquare } from 'lucide-react';
 import { NAVIGATION_ITEMS, type NavItem } from '@/lib/navigation';
+import { useAuth } from '@/hooks/useAuth';
 
 const SIDEBAR_STORAGE_KEY = 'sidebar-expanded';
 
@@ -85,6 +86,10 @@ export function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false); // Start collapsed for faster initial render
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+  const { user } = useAuth();
+
+  // Check if user is admin
+  const isAdmin = user?.email === 'vetsecitpro@gmail.com';
 
   // Load saved state from localStorage
   useEffect(() => {
@@ -156,6 +161,30 @@ export function Sidebar() {
             />
           ))}
         </ul>
+
+        {/* Admin Section - Only visible to admin */}
+        {isAdmin && (
+          <div className="mt-6 pt-6 border-t border-gray-200/50 dark:border-gray-700/30 px-2">
+            {isExpanded && (
+              <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2 mb-2 block">
+                Admin
+              </span>
+            )}
+            <ul className="space-y-1">
+              <NavItemComponent
+                item={{
+                  name: 'Beta Feedback',
+                  href: '/admin/beta-feedback',
+                  icon: MessageSquare,
+                  gradient: 'bg-gradient-to-r from-orange-500 to-red-500',
+                  description: 'Manage feedback',
+                }}
+                isActive={pathname === '/admin/beta-feedback' || pathname.startsWith('/admin/beta-feedback')}
+                isExpanded={isExpanded}
+              />
+            </ul>
+          </div>
+        )}
       </nav>
 
       {/* Footer gradient fade */}

@@ -328,9 +328,17 @@ function ConversationItem({
   };
 
   return (
-    <button
+    <div
       onClick={onClick}
-      className={`group w-full px-4 py-3 flex items-start gap-3 border-b border-gray-100 dark:border-gray-800 transition-colors ${
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
+      className={`group w-full px-4 py-3 flex items-start gap-3 border-b border-gray-100 dark:border-gray-800 transition-colors cursor-pointer ${
         isActive
           ? 'bg-green-50 dark:bg-green-900/20 border-l-4 border-l-green-600'
           : 'hover:bg-gray-50 dark:hover:bg-gray-800 border-l-4 border-l-transparent'
@@ -454,6 +462,6 @@ function ConversationItem({
           )}
         </div>
       </div>
-    </button>
+    </div>
   );
 }

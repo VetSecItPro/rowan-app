@@ -22,68 +22,34 @@ export function TimeAwareWelcomeBox({
   const timePeriod = useTimePeriod();
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  // Time-specific photo search queries for Unsplash
+  // Hourly changing images - get current hour for seed
+  const currentHour = useMemo(() => {
+    return new Date().getHours();
+  }, []);
+
   const timeBasedConfig = useMemo(() => {
-    switch (timePeriod) {
-      case 'morning':
-        return {
-          query: 'morning,sunrise,dawn,coffee,peaceful',
-          overlay: 'bg-gradient-to-t from-black/60 via-black/30 to-black/20',
-          textColor: 'text-white',
-        };
-      case 'afternoon':
-        return {
-          query: 'afternoon,sunny,bright,daylight,nature',
-          overlay: 'bg-gradient-to-t from-black/60 via-black/30 to-black/20',
-          textColor: 'text-white',
-        };
-      case 'evening':
-        return {
-          query: 'sunset,evening,dusk,golden-hour,sky',
-          overlay: 'bg-gradient-to-t from-black/70 via-black/40 to-black/20',
-          textColor: 'text-white',
-        };
-      case 'night':
-        return {
-          query: 'night,stars,moon,darkness,peaceful',
-          overlay: 'bg-gradient-to-t from-black/70 via-black/40 to-black/20',
-          textColor: 'text-white',
-        };
-      default:
-        return {
-          query: 'nature,peaceful,scenic,beautiful',
-          overlay: 'bg-gradient-to-t from-black/60 via-black/30 to-black/20',
-          textColor: 'text-white',
-        };
-    }
-  }, [timePeriod]);
+    return {
+      overlay: 'bg-gradient-to-t from-black/70 via-black/40 to-black/20',
+      textColor: 'text-white',
+    };
+  }, []);
 
-  const { query, overlay, textColor } = timeBasedConfig;
+  const { overlay, textColor } = timeBasedConfig;
 
-  // Using Picsum Photos API for reliable, fast image loading
-  // Seed ensures same image per time period for consistency
-  const getSeed = () => {
-    switch (timePeriod) {
-      case 'morning': return 'morning-sunrise';
-      case 'afternoon': return 'afternoon-sunny';
-      case 'evening': return 'evening-sunset';
-      case 'night': return 'night-stars';
-      default: return 'default-nature';
-    }
-  };
-
-  const imageUrl = `https://picsum.photos/seed/${getSeed()}/1600/400`;
+  // Using Picsum Photos API with hourly seed for changing images
+  // Seed changes every hour to get a new random image
+  const imageUrl = `https://picsum.photos/seed/hour-${currentHour}/1600/400`;
 
   return (
     <div
       className={`group relative overflow-hidden rounded-2xl transition-all duration-700 hover:scale-[1.01] shadow-2xl ${className}`}
     >
       {/* Background Image */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         <img
           src={imageUrl}
           alt={`${timePeriod} background`}
-          className={`w-full h-full object-cover transition-all duration-1000 ${
+          className={`w-full h-full object-contain transition-all duration-1000 ${
             imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
           }`}
           onLoad={() => setImageLoaded(true)}
@@ -172,9 +138,9 @@ export function TimeAwareWelcomeBox({
       {/* Interactive Hover Effects */}
       <div className={`absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
 
-      {/* Weather Widget */}
-      <div className="absolute bottom-4 right-4 z-20 opacity-95 hover:opacity-100 transition-all duration-300">
-        <div className="backdrop-blur-md bg-black/40 rounded-lg p-3 border border-white/30 shadow-lg shadow-black/30">
+      {/* Weather Widget - Flush right edge, blends with black borders */}
+      <div className="absolute bottom-0 right-0 z-20 opacity-80 hover:opacity-100 transition-all duration-300">
+        <div className="backdrop-blur-sm bg-black/60 rounded-tl-lg p-3 border-l border-t border-white/10 shadow-lg shadow-black/50">
           <WeatherBadge
             eventTime={new Date().toISOString()}
             location="Wylie, Texas, United States"
@@ -196,46 +162,24 @@ export function CompactTimeAwareWelcome({
   userName?: string;
   className?: string;
 }) {
-  const timePeriod = useTimePeriod();
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  const timeBasedConfig = useMemo(() => {
-    switch (timePeriod) {
-      case 'morning':
-        return { query: 'morning,sunrise,coffee' };
-      case 'afternoon':
-        return { query: 'afternoon,sunny,bright' };
-      case 'evening':
-        return { query: 'sunset,evening,dusk' };
-      case 'night':
-        return { query: 'night,stars,moon' };
-      default:
-        return { query: 'nature,peaceful' };
-    }
-  }, [timePeriod]);
+  // Hourly changing images - get current hour for seed
+  const currentHour = useMemo(() => {
+    return new Date().getHours();
+  }, []);
 
-  const { query } = timeBasedConfig;
-
-  const getSeed = () => {
-    switch (timePeriod) {
-      case 'morning': return 'morning-sunrise';
-      case 'afternoon': return 'afternoon-sunny';
-      case 'evening': return 'evening-sunset';
-      case 'night': return 'night-stars';
-      default: return 'default-nature';
-    }
-  };
-
-  const imageUrl = `https://picsum.photos/seed/${getSeed()}/800/200`;
+  // Using Picsum Photos API with hourly seed for changing images
+  const imageUrl = `https://picsum.photos/seed/hour-${currentHour}/800/200`;
 
   return (
     <div className={`relative overflow-hidden rounded-xl shadow-lg ${className}`}>
       {/* Background Image */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         <img
           src={imageUrl}
           alt={`${timePeriod} background`}
-          className={`w-full h-full object-cover transition-opacity duration-1000 ${
+          className={`w-full h-full object-contain transition-opacity duration-1000 ${
             imageLoaded ? 'opacity-100' : 'opacity-0'
           }`}
           onLoad={() => setImageLoaded(true)}
