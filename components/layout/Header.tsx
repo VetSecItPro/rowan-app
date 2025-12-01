@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { HamburgerMenu } from '@/components/navigation/HamburgerMenu';
 import { ComprehensiveNotificationCenter } from '@/components/notifications/ComprehensiveNotificationCenter';
+import { FeedbackButton } from '@/components/feedback/FeedbackButton';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { LogOut, User as UserIcon, ChevronDown, Plus, Trophy, Shield } from 'lucide-react';
 import { SpaceSelector } from '@/components/spaces/SpaceSelector';
@@ -75,8 +76,9 @@ export function Header() {
 
           {/* Menu, Theme Toggle & Auth Buttons */}
           <div className="flex items-center gap-4">
-            {/* Grouped: Hamburger Menu, Notifications, Settings, and Theme */}
+            {/* Grouped: Feedback, Hamburger Menu, Notifications, Settings, and Theme */}
             <div className="flex items-center space-x-0.5">
+              <FeedbackButton />
               <HamburgerMenu />
 
               {/* Only show Settings and Notifications for logged-in users */}
