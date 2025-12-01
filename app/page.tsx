@@ -345,6 +345,19 @@ export default function HomePage() {
                   );
                 })}
               </div>
+
+              {/* Veteran-Owned Business Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 1.1 }}
+                className="flex items-center justify-center gap-2 mt-6"
+              >
+                <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Veteran-Owned Business
+                </span>
+              </motion.div>
             </motion.div>
           </motion.div>
         </div>
