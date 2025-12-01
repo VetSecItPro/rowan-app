@@ -60,9 +60,19 @@ export function TimeAwareWelcomeBox({
 
   const { query, overlay, textColor } = timeBasedConfig;
 
-  // Unsplash Source API URL - generates random photo based on keywords
-  // Using 1600x400 for a wide banner format
-  const imageUrl = `https://source.unsplash.com/1600x400/?${query}`;
+  // Using Picsum Photos API for reliable, fast image loading
+  // Seed ensures same image per time period for consistency
+  const getSeed = () => {
+    switch (timePeriod) {
+      case 'morning': return 'morning-sunrise';
+      case 'afternoon': return 'afternoon-sunny';
+      case 'evening': return 'evening-sunset';
+      case 'night': return 'night-stars';
+      default: return 'default-nature';
+    }
+  };
+
+  const imageUrl = `https://picsum.photos/seed/${getSeed()}/1600/400`;
 
   return (
     <div
@@ -205,7 +215,18 @@ export function CompactTimeAwareWelcome({
   }, [timePeriod]);
 
   const { query } = timeBasedConfig;
-  const imageUrl = `https://source.unsplash.com/800x200/?${query}`;
+
+  const getSeed = () => {
+    switch (timePeriod) {
+      case 'morning': return 'morning-sunrise';
+      case 'afternoon': return 'afternoon-sunny';
+      case 'evening': return 'evening-sunset';
+      case 'night': return 'night-stars';
+      default: return 'default-nature';
+    }
+  };
+
+  const imageUrl = `https://picsum.photos/seed/${getSeed()}/800/200`;
 
   return (
     <div className={`relative overflow-hidden rounded-xl shadow-lg ${className}`}>
