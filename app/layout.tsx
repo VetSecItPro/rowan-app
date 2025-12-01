@@ -38,7 +38,7 @@ export const viewport: Viewport = {
   userScalable: true,
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#fafafa' },
-    { media: '(prefers-color-scheme: dark)', color: '#000000' }
+    { media: '(prefers-color-scheme: dark)', color: '#111827' }
   ],
 };
 
@@ -68,7 +68,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50 dark:from-[#0a0a0f] dark:via-[#0c0c12] dark:to-[#0f0f14] text-gray-900 dark:text-white" style={{ scrollbarGutter: 'stable' }}>
+      <body className="antialiased bg-gradient-to-br from-gray-50 via-slate-50 to-stone-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 text-gray-900 dark:text-white" style={{ scrollbarGutter: 'stable' }}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
