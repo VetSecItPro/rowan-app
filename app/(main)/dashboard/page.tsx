@@ -22,6 +22,8 @@ import { WeeklyInsights } from '@/components/checkins/WeeklyInsights';
 import { CheckInSuccess } from '@/components/checkins/CheckInSuccess';
 import { Tooltip } from '@/components/shared/Tooltip';
 import { createClient } from '@/lib/supabase/client';
+import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
+import { motion } from 'framer-motion';
 import {
   CheckSquare,
   Calendar,
@@ -161,6 +163,27 @@ interface EnhancedDashboardStats {
     trend: number;
   };
 }
+
+// Animation variants for scroll animations
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } }
+};
 
 // Progress Bar Component - Memoized
 const ProgressBar = memo(function ProgressBar({ value, max, color = 'blue', showLabel = true }: { value: number; max: number; color?: string; showLabel?: boolean }) {
@@ -1026,11 +1049,18 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <div className="stats-grid-mobile gap-4 sm:gap-6">
+              <motion.div
+                variants={staggerContainer}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                className="stats-grid-mobile gap-4 sm:gap-6"
+              >
                 {/* Tasks & Chores Card */}
-                <Link
+                <motion.div variants={fadeInUp}>
+                  <Link
                   href="/tasks"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-blue-500 dark:hover:border-blue-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-blue-500 dark:hover:border-blue-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px]"
                 >
                   <div className="flex items-start justify-between mb-3 sm:mb-4">
                     <div className="flex-1">
@@ -1090,11 +1120,13 @@ export default function DashboardPage() {
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </Link>
+                </motion.div>
 
                 {/* Calendar Card */}
+                <motion.div variants={fadeInUp}>
                 <Link
                   href="/calendar"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-purple-500 dark:hover:border-purple-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-purple-500 dark:hover:border-purple-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px]"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1141,11 +1173,13 @@ export default function DashboardPage() {
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </Link>
+                </motion.div>
 
                 {/* Reminders Card */}
+                <motion.div variants={fadeInUp}>
                 <Link
                   href="/reminders"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-pink-500 dark:hover:border-pink-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-pink-500 dark:hover:border-pink-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px]"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1200,11 +1234,13 @@ export default function DashboardPage() {
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </Link>
+                </motion.div>
 
                 {/* Messages Card */}
+                <motion.div variants={fadeInUp}>
                 <Link
                   href="/messages"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-green-500 dark:hover:border-green-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-green-500 dark:hover:border-green-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px]"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1256,11 +1292,13 @@ export default function DashboardPage() {
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </Link>
+                </motion.div>
 
                 {/* Shopping Card */}
+                <motion.div variants={fadeInUp}>
                 <Link
                   href="/shopping"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-teal-500 dark:hover:border-teal-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-teal-500 dark:hover:border-teal-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px]"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1308,11 +1346,13 @@ export default function DashboardPage() {
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </Link>
+                </motion.div>
 
                 {/* Meals Card */}
+                <motion.div variants={fadeInUp}>
                 <Link
                   href="/meals"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-orange-500 dark:hover:border-orange-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-orange-500 dark:hover:border-orange-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px]"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1359,11 +1399,13 @@ export default function DashboardPage() {
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </Link>
+                </motion.div>
 
                 {/* Projects & Budget Card */}
+                <motion.div variants={fadeInUp}>
                 <Link
                   href="/projects"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-yellow-500 dark:hover:border-yellow-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-yellow-500 dark:hover:border-yellow-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px]"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1421,11 +1463,13 @@ export default function DashboardPage() {
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </Link>
+                </motion.div>
 
                 {/* Goals Card */}
+                <motion.div variants={fadeInUp}>
                 <Link
                   href="/goals"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-indigo-500 dark:hover:border-indigo-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-indigo-500 dark:hover:border-indigo-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px]"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1493,7 +1537,8 @@ export default function DashboardPage() {
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </Link>
-              </div>
+                </motion.div>
+              </motion.div>
             )}
           </div>
 
@@ -1503,8 +1548,16 @@ export default function DashboardPage() {
             <span>Real-time updates</span>
           </div>
 
-          {/* Daily Check-In Section - Compact Design */}
-          <div className="group bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-blue-50/50 dark:from-pink-900/10 dark:via-purple-900/10 dark:to-blue-900/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.3)] border border-pink-200/20 dark:border-pink-500/20 hover:border-pink-400/50 dark:hover:border-pink-400/50 transition-all duration-300">
+          {/* Daily Check-In & Activity Feed - Split Layout */}
+          <motion.div
+            variants={scaleIn}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+          >
+            {/* Left: Daily Check-In */}
+            <div className="group bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-blue-50/50 dark:from-pink-900/10 dark:via-purple-900/10 dark:to-blue-900/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.3)] border border-pink-200/20 dark:border-pink-500/20 hover:border-pink-400/50 dark:hover:border-pink-400/50 transition-all duration-300">
             {/* Compact Header with Date, Toggle, and Streak Badge */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
               <div className="flex flex-col gap-1">
@@ -1685,7 +1738,7 @@ export default function DashboardPage() {
                     <button
                       onClick={() => handleMoodSelect(mood.value)}
                       className={`group relative flex flex-col items-center gap-2 transition-all duration-300 transform ${
-                        isSelected ? 'scale-110' : 'hover:scale-105 active:scale-95'
+                        isSelected ? 'scale-125' : 'hover:scale-150 active:scale-110'
                       }`}
                       title={mood.label}
                     >
@@ -1728,6 +1781,102 @@ export default function DashboardPage() {
                 );
               })}
             </div>
+
+            {/* Quick Preview Section - Show today's check-in if exists */}
+            {(() => {
+              const today = getCurrentDateString();
+              const todayCheckIn = recentCheckIns.find(c => c.user_id === user?.id && c.date === today);
+              const last7Days = recentCheckIns.filter(c => c.user_id === user?.id).slice(0, 7);
+
+              if (todayCheckIn && !selectedMood) {
+                return (
+                  <div className="mt-4 p-4 bg-gradient-to-br from-white/60 to-purple-50/60 dark:from-gray-800/60 dark:to-purple-900/20 backdrop-blur-sm rounded-xl border border-purple-200/50 dark:border-purple-700/30">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">{moodOptions.find(m => m.value === todayCheckIn.mood)?.emoji}</span>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                            Feeling {moodOptions.find(m => m.value === todayCheckIn.mood)?.label} today
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            Checked in {formatTimestamp(todayCheckIn.created_at, 'h:mm a')}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setSelectedMood(todayCheckIn.mood as typeof selectedMood);
+                          setCheckInExpanded(true);
+                        }}
+                        className="px-3 py-1.5 text-xs font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-colors"
+                      >
+                        Update
+                      </button>
+                    </div>
+
+                    {/* Show gratitude/highlights if exists */}
+                    {todayCheckIn.gratitude && (
+                      <div className="mt-3 p-3 bg-pink-50 dark:bg-pink-900/20 rounded-lg border border-pink-200 dark:border-pink-700/30">
+                        <p className="text-xs font-medium text-pink-700 dark:text-pink-300 mb-1 flex items-center gap-1">
+                          <Heart className="w-3 h-3" />
+                          Grateful for:
+                        </p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">{todayCheckIn.gratitude}</p>
+                      </div>
+                    )}
+
+                    {todayCheckIn.highlights && (
+                      <div className="mt-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-700/30">
+                        <p className="text-xs font-medium text-yellow-700 dark:text-yellow-300 mb-1 flex items-center gap-1">
+                          <Sparkles className="w-3 h-3" />
+                          Highlight:
+                        </p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">{todayCheckIn.highlights}</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              // If not checked in today, show 7-day mood trend
+              if (!todayCheckIn && last7Days.length > 0) {
+                return (
+                  <div className="mt-4 p-4 bg-gradient-to-br from-white/60 to-blue-50/60 dark:from-gray-800/60 dark:to-blue-900/20 backdrop-blur-sm rounded-xl border border-blue-200/50 dark:border-blue-700/30">
+                    <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-3">
+                      Your mood over the last 7 days
+                    </p>
+                    <div className="flex items-end justify-between gap-1 h-16 mb-2">
+                      {last7Days.reverse().map((checkIn, idx) => {
+                        const moodColors: Record<string, string> = {
+                          great: 'bg-green-500',
+                          good: 'bg-blue-500',
+                          okay: 'bg-gray-400',
+                          meh: 'bg-amber-500',
+                          rough: 'bg-purple-500'
+                        };
+                        const moodHeights: Record<string, string> = {
+                          great: 'h-full',
+                          good: 'h-4/5',
+                          okay: 'h-3/5',
+                          meh: 'h-2/5',
+                          rough: 'h-1/5'
+                        };
+                        return (
+                          <div key={idx} className="flex-1 flex flex-col items-center gap-1">
+                            <div className={`w-full ${moodHeights[checkIn.mood]} ${moodColors[checkIn.mood]} rounded-t transition-all hover:opacity-80`} />
+                            <span className="text-[10px] text-gray-500 dark:text-gray-400">
+                              {format(new Date(checkIn.date), 'EEE')[0]}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              }
+
+              return null;
+            })()}
 
             {/* Smart Conditional Expansion */}
             {checkInExpanded && selectedMood && (
@@ -2055,6 +2204,19 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
+
+            {/* Right: Activity Feed */}
+            <div className="group bg-gradient-to-br from-slate-50/50 via-gray-50/50 to-stone-50/50 dark:from-slate-900/10 dark:via-gray-900/10 dark:to-stone-900/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(148,163,184,0.3)] border border-gray-200/20 dark:border-gray-500/20 hover:border-gray-400/50 dark:hover:border-gray-400/50 transition-all duration-300">
+              {/* Header */}
+              <div className="flex items-center gap-2 mb-4">
+                <Activity className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Recent Activity</h2>
+              </div>
+
+              {/* Activity Feed Component */}
+              {currentSpace && <ActivityFeed spaceId={currentSpace.id} limit={50} />}
+            </div>
+          </motion.div>
         </div>
       </div>
 
