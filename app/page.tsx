@@ -171,10 +171,10 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 relative overflow-hidden">
       {/* Animated mesh gradient background */}
       <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 dark:from-gray-900 dark:via-blue-950/20 dark:to-cyan-950/20" />
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-blue-50/40 to-cyan-50/40 dark:from-gray-900 dark:via-blue-950/20 dark:to-cyan-950/20" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/20 dark:bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-400/20 dark:bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
@@ -184,7 +184,7 @@ export default function HomePage() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
-        className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-800/50"
+        className="sticky top-0 z-50 bg-gray-50/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-800/50"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
@@ -393,8 +393,10 @@ export default function HomePage() {
       <footer className="relative bg-gradient-to-b from-transparent to-gray-100/50 dark:to-gray-900/50 border-t border-gray-200/50 dark:border-gray-800/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between py-8 gap-4">
-            <div className="text-gray-600 dark:text-gray-400">
-              Rowan © 2025
+            <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+              <span>Rowan © 2025</span>
+              <span className="text-gray-400 dark:text-gray-600">•</span>
+              <span className="text-sm">Veteran Owned Business</span>
             </div>
             <div className="flex items-center gap-6">
               <Link href="/privacy" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
