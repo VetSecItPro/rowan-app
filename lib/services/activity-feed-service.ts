@@ -32,7 +32,7 @@ export const activityFeedService = {
         supabase.from('daily_check_ins').select('id, mood, created_at, user_id, users(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('shopping_lists').select('id, name, status, created_by, created_at, updated_at, users!shopping_lists_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('meals').select('id, name, meal_type, created_by, created_at, updated_at, recipe:recipes(name), users!meals_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
-        supabase.from('expenses').select('id, description, created_by, created_at, updated_at, users!expenses_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
+        supabase.from('expenses').select('id, title, amount, category, created_by, created_at, updated_at, users!expenses_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('projects').select('id, name, status, created_by, created_at, updated_at, users!projects_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('reminders').select('id, title, status, created_by, created_at, updated_at, users!reminders_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('chores').select('id, title, status, created_by, created_at, updated_at, users!chores_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
@@ -165,11 +165,12 @@ export const activityFeedService = {
       if (expenses.data) {
         expenses.data.forEach((expense: any) => {
           const user = expense.users as any;
+          const expenseTitle = `${expense.title || 'Expense'} ($${expense.amount})`;
           activities.push({
             id: `expense-${expense.id}`,
             type: 'expense',
             action: 'created',
-            title: expense.description,
+            title: expenseTitle,
             user_name: user?.name || user?.email || 'Unknown',
             user_id: expense.created_by,
             user_avatar: user?.avatar_url,
