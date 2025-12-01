@@ -24,12 +24,16 @@ export const activityFeedService = {
 
     try {
       // Fetch recent data from all relevant tables concurrently
-      const [tasks, goals, messages, events, checkIns] = await Promise.all([
+      const [tasks, goals, messages, events, checkIns, shoppingLists, meals, expenses, projects] = await Promise.all([
         supabase.from('tasks').select('id, title, status, created_by, created_at, updated_at, users!tasks_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('goals').select('id, title, status, created_by, created_at, updated_at, users!goals_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('messages').select('id, content, sender_id, created_at, users!messages_sender_id_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('calendar_events').select('id, title, created_by, created_at, updated_at, users!calendar_events_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('daily_check_ins').select('id, mood, created_at, user_id, users(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
+        supabase.from('shopping_lists').select('id, name, status, created_by, created_at, updated_at, users!shopping_lists_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
+        supabase.from('meals').select('id, title, created_by, created_at, updated_at, users!meals_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
+        supabase.from('expenses').select('id, description, created_by, created_at, updated_at, users!expenses_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
+        supabase.from('projects').select('id, name, status, created_by, created_at, updated_at, users!projects_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
       ]);
 
       // Process tasks
@@ -116,6 +120,74 @@ export const activityFeedService = {
             user_id: checkIn.user_id,
             user_avatar: user?.avatar_url,
             created_at: checkIn.created_at,
+          });
+        });
+      }
+
+      // Process shopping lists
+      if (shoppingLists.data) {
+        shoppingLists.data.forEach((list: any) => {
+          const user = list.users as any;
+          activities.push({
+            id: `shopping-${list.id}`,
+            type: 'shopping',
+            action: list.status === 'completed' ? 'completed' : 'created',
+            title: list.name,
+            user_name: user?.name || user?.email || 'Unknown',
+            user_id: list.created_by,
+            user_avatar: user?.avatar_url,
+            created_at: list.status === 'completed' ? list.updated_at : list.created_at,
+          });
+        });
+      }
+
+      // Process meals
+      if (meals.data) {
+        meals.data.forEach((meal: any) => {
+          const user = meal.users as any;
+          activities.push({
+            id: `meal-${meal.id}`,
+            type: 'meal',
+            action: 'created',
+            title: meal.title,
+            user_name: user?.name || user?.email || 'Unknown',
+            user_id: meal.created_by,
+            user_avatar: user?.avatar_url,
+            created_at: meal.created_at,
+          });
+        });
+      }
+
+      // Process expenses
+      if (expenses.data) {
+        expenses.data.forEach((expense: any) => {
+          const user = expense.users as any;
+          activities.push({
+            id: `expense-${expense.id}`,
+            type: 'expense',
+            action: 'created',
+            title: expense.description,
+            user_name: user?.name || user?.email || 'Unknown',
+            user_id: expense.created_by,
+            user_avatar: user?.avatar_url,
+            created_at: expense.created_at,
+          });
+        });
+      }
+
+      // Process projects
+      if (projects.data) {
+        projects.data.forEach((project: any) => {
+          const user = project.users as any;
+          activities.push({
+            id: `project-${project.id}`,
+            type: 'project',
+            action: project.status === 'completed' ? 'completed' : 'created',
+            title: project.name,
+            user_name: user?.name || user?.email || 'Unknown',
+            user_id: project.created_by,
+            user_avatar: user?.avatar_url,
+            created_at: project.status === 'completed' ? project.updated_at : project.created_at,
           });
         });
       }

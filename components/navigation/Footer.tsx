@@ -21,7 +21,11 @@ export function Footer() {
             />
             <div className="flex flex-col items-start">
               <span className="text-lg font-semibold gradient-text">Rowan</span>
-              <span className="text-xs text-gray-500 dark:text-gray-400">© {currentYear}</span>
+              <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                <span>© {currentYear}</span>
+                <span>•</span>
+                <span>Veteran Owned Business</span>
+              </div>
             </div>
           </div>
 
