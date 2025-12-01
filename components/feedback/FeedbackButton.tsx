@@ -34,21 +34,17 @@ export function FeedbackButton() {
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setShowDropdown(!showDropdown)}
-          className="btn-touch p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative group"
+          className="btn-touch px-4 py-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white font-medium transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg relative group"
           aria-label="Feedback Menu"
           title="Feedback Menu"
         >
-          <MessageSquare className="w-5 h-5" />
+          <MessageSquare className="w-4 h-4" />
+          <span className="text-sm">Beta Feedback</span>
 
-          {/* Beta badge */}
-          <span className="absolute -top-1 -right-1 flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-          </span>
-
-          {/* Tooltip */}
-          <span className="absolute right-0 top-full mt-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-            Beta Feedback
+          {/* Beta pulse indicator */}
+          <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-300 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-200"></span>
           </span>
         </button>
 

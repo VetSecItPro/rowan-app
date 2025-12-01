@@ -35,6 +35,7 @@ export default function AdminBetaFeedbackPage() {
   }>({});
   const [selectedFeedback, setSelectedFeedback] = useState<FeedbackSubmission | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [hideResolved, setHideResolved] = useState(true); // Hide resolved by default
 
   useEffect(() => {
     loadFeedback();
@@ -156,8 +157,14 @@ export default function AdminBetaFeedbackPage() {
     }
   };
 
+  // Filter feedback based on hideResolved toggle
+  const displayedFeedback = hideResolved
+    ? feedback.filter(f => f.status !== FeedbackStatus.RESOLVED && f.status !== FeedbackStatus.WONT_FIX)
+    : feedback;
+
   const stats = {
     total: feedback.length,
+    active: feedback.filter(f => f.status !== FeedbackStatus.RESOLVED && f.status !== FeedbackStatus.WONT_FIX).length,
     new: feedback.filter(f => f.status === FeedbackStatus.NEW).length,
     inProgress: feedback.filter(f => f.status === FeedbackStatus.IN_PROGRESS).length,
     resolved: feedback.filter(f => f.status === FeedbackStatus.RESOLVED).length,
@@ -208,13 +215,20 @@ export default function AdminBetaFeedbackPage() {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4 mb-8">
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-3 mb-2">
                 <MessageSquare className="w-5 h-5 text-gray-500" />
                 <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Total</span>
               </div>
               <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</div>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-indigo-500 dark:border-indigo-600 ring-2 ring-indigo-200 dark:ring-indigo-900">
+              <div className="flex items-center gap-3 mb-2">
+                <AlertCircle className="w-5 h-5 text-indigo-500" />
+                <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">Active</span>
+              </div>
+              <div className="text-2xl font-bold text-indigo-600">{stats.active}</div>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-3 mb-2">
@@ -260,6 +274,18 @@ export default function AdminBetaFeedbackPage() {
                 <Filter className="w-4 h-4 text-gray-500" />
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filters:</span>
               </div>
+
+              {/* Hide Resolved Toggle */}
+              <label className="flex items-center gap-2 px-3 py-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-300 dark:border-indigo-700 rounded-lg cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={hideResolved}
+                  onChange={(e) => setHideResolved(e.target.checked)}
+                  className="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <span className="text-sm font-medium text-indigo-700 dark:text-indigo-300">Hide Completed</span>
+              </label>
+
               <select
                 value={filter.status || ''}
                 onChange={(e) => setFilter({ ...filter, status: e.target.value as FeedbackStatus || undefined })}
@@ -322,7 +348,7 @@ export default function AdminBetaFeedbackPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {feedback.map((item) => (
+                  {displayedFeedback.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         <div className="flex items-center gap-2">
