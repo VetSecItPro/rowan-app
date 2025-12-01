@@ -736,3 +736,59 @@ export interface UpdateUserProgressInput {
   onboarding_completed?: boolean;
   space_setup_completed?: boolean;
 }
+
+// =============================================
+// FEEDBACK TYPES
+// =============================================
+
+export enum FeedbackType {
+  BUG = 'bug',
+  FEATURE_REQUEST = 'feature_request',
+  UI_UX = 'ui_ux',
+  GENERAL = 'general',
+}
+
+export enum FeedbackStatus {
+  NEW = 'new',
+  IN_PROGRESS = 'in_progress',
+  RESOLVED = 'resolved',
+  WONT_FIX = 'wont_fix',
+}
+
+export interface FeedbackSubmission {
+  id: string;
+  user_id: string;
+  space_id: string | null;
+  feedback_type: FeedbackType | null;
+  feature_name: string | null;
+  page_url: string | null;
+  description: string;
+  screenshot_url: string | null;
+  browser_info: Record<string, any> | null;
+  status: FeedbackStatus;
+  admin_notes: string | null;
+  created_at: string;
+  updated_at: string;
+
+  // Joined fields
+  user?: {
+    id: string;
+    name: string | null;
+    email: string;
+    avatar_url: string | null;
+  };
+}
+
+export interface CreateFeedbackInput {
+  feedback_type?: FeedbackType;
+  feature_name?: string;
+  page_url?: string;
+  description: string;
+  screenshot?: File;
+  browser_info?: Record<string, any>;
+}
+
+export interface UpdateFeedbackInput {
+  status?: FeedbackStatus;
+  admin_notes?: string;
+}

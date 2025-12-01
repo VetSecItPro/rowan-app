@@ -71,6 +71,7 @@ export async function middleware(req: NextRequest) {
     '/goals',
     '/settings',
     '/invitations',
+    '/feedback',
   ];
 
   const isProtectedPath = protectedPaths.some(path =>
@@ -170,6 +171,7 @@ export const config = {
     '/goals/:path*',
     '/settings/:path*',
     '/invitations/:path*',
+    '/feedback/:path*',
     '/login',
     '/signup',
   ],
