@@ -1862,11 +1862,8 @@ export default function DashboardPage() {
                           rough: 'h-1/5'
                         };
                         return (
-                          <div key={idx} className="flex-1 flex flex-col items-center gap-1">
+                          <div key={idx} className="flex-1">
                             <div className={`w-full ${moodHeights[checkIn.mood]} ${moodColors[checkIn.mood]} rounded-t transition-all hover:opacity-80`} />
-                            <span className="text-[10px] text-gray-500 dark:text-gray-400">
-                              {format(new Date(checkIn.date), 'EEE')[0]}
-                            </span>
                           </div>
                         );
                       })}

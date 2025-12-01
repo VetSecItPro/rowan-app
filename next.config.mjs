@@ -25,6 +25,7 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
     webpackBuildWorker: true,
+    instrumentationHook: false,
   },
 
   // Performance optimizations
