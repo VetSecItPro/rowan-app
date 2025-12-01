@@ -568,6 +568,9 @@ export default function MealsPage() {
   const handleAddMealForDate = useCallback((date: Date, mealType?: string) => {
     if (!spaceId) return;
 
+    // Format date as yyyy-MM-dd to avoid timezone issues
+    const formattedDate = format(date, 'yyyy-MM-dd');
+
     // Pre-populate meal modal with selected date and meal type
     setEditingMeal({
       id: '',
@@ -576,7 +579,7 @@ export default function MealsPage() {
       recipe: undefined,
       name: '',
       meal_type: (mealType as 'breakfast' | 'lunch' | 'dinner' | 'snack') || 'dinner',
-      scheduled_date: date.toISOString(),
+      scheduled_date: formattedDate,
       notes: '',
       created_by: '',
       created_at: new Date().toISOString(),
@@ -622,6 +625,9 @@ export default function MealsPage() {
       setIsRecipeModalOpen(false);
       setRecipeModalInitialTab('manual');
 
+      // Format date as yyyy-MM-dd to avoid timezone issues
+      const formattedDate = format(new Date(), 'yyyy-MM-dd');
+
       // Pre-populate the meal modal with the newly added recipe
       setEditingMeal({
         id: '', // Empty ID indicates this is a new meal
@@ -630,7 +636,7 @@ export default function MealsPage() {
         recipe: savedRecipe,
         name: '',
         meal_type: 'dinner',
-        scheduled_date: new Date().toISOString(),
+        scheduled_date: formattedDate,
         notes: '',
         created_by: '',
         created_at: new Date().toISOString(),
@@ -683,6 +689,9 @@ export default function MealsPage() {
   const handlePlanMealFromRecipe = useCallback((recipe: Recipe) => {
     if (!spaceId) return;
 
+    // Format date as yyyy-MM-dd to avoid timezone issues
+    const formattedDate = format(new Date(), 'yyyy-MM-dd');
+
     // Create a new meal state with pre-selected recipe
     setEditingMeal({
       id: '', // Empty ID indicates this is a new meal
@@ -691,7 +700,7 @@ export default function MealsPage() {
       recipe: recipe,
       name: '',
       meal_type: 'dinner',
-      scheduled_date: new Date().toISOString(),
+      scheduled_date: formattedDate,
       notes: '',
       created_by: '',
       created_at: new Date().toISOString(),
