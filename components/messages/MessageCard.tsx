@@ -129,17 +129,22 @@ export function MessageCard({
           </p>
         </div>
 
-        {/* Message Bubble with Glassmorphism - Pill Shape */}
-        <div className="relative group/message">
+        {/* Message Bubble with Glassmorphism - Pill Shape with Dynamic Sizing */}
+        <div className="relative group/message z-10 w-fit">
           <div
-            className={`rounded-3xl px-5 py-3 cursor-pointer backdrop-blur-xl ${
+            className={`relative rounded-3xl cursor-pointer backdrop-blur-xl ${
+              // Dynamic padding based on content length
+              message.content && message.content.length < 20
+                ? 'px-4 py-2' // Small padding for short messages
+                : message.content && message.content.length < 80
+                ? 'px-4 py-2.5' // Medium padding
+                : 'px-5 py-3' // Full padding for longer messages
+            } ${
               isOwn
                 ? 'bg-blue-500/10 dark:bg-blue-400/10 hover:bg-blue-500/15 dark:hover:bg-blue-400/15 border border-blue-200/40 dark:border-blue-400/20 hover:border-blue-300/60 dark:hover:border-blue-400/30 shadow-sm hover:shadow-md'
                 : 'bg-white/40 dark:bg-gray-700/40 hover:bg-white/60 dark:hover:bg-gray-700/50 border border-gray-200/40 dark:border-gray-600/30 hover:border-gray-300/60 dark:hover:border-gray-500/40 shadow-sm hover:shadow-md'
             } transition-all duration-200`}
           >
-            {/* Invisible hover area overlay to ensure hover works across entire bubble */}
-            <div className="absolute inset-0 z-0"></div>
             {/* Message Content with Markdown Support and Expand/Collapse */}
             {message.content && (
               <div className="relative z-10 break-words text-gray-900 dark:text-white text-sm prose prose-sm dark:prose-invert max-w-none">
@@ -214,7 +219,7 @@ export function MessageCard({
               </div>
             )}
 
-            {/* Reactions Display */}
+            {/* Reactions Display - Only show existing reactions */}
             {reactions.length > 0 && (
               <div className="relative z-10 flex flex-wrap gap-1 mt-2">
                 {reactions.map((reaction) => (
@@ -233,22 +238,15 @@ export function MessageCard({
                     <span>{reaction.count}</span>
                   </button>
                 ))}
-                {/* Add Reaction Button */}
-                <ReactionPicker onSelectEmoji={handleAddReaction} />
               </div>
             )}
 
-            {/* Add Reaction Button (when no reactions) - Move below message */}
-            {reactions.length === 0 && (
-              <div className="relative z-10 mt-2 opacity-0 group-hover/message:opacity-60 transition-opacity">
-                <ReactionPicker onSelectEmoji={handleAddReaction} />
-              </div>
-            )}
+          </div>
 
-            {/* Message Actions - Enhanced Hover Experience - Moved to left side to avoid emoji conflict */}
-            <div className={`absolute -top-2 z-20 opacity-0 invisible group-hover/message:opacity-100 group-hover/message:visible transition-all duration-200 transform translate-y-1 group-hover/message:translate-y-0 pointer-events-none ${
-              isOwn ? '-left-2' : '-right-2'
-            }`}>
+          {/* Message Actions - Enhanced Hover Experience with Persistent Toolbar */}
+          <div className={`absolute -top-12 z-[100] opacity-0 invisible group-hover/message:opacity-100 group-hover/message:visible hover:opacity-100 hover:visible transition-all duration-300 pointer-events-none ${
+            isOwn ? 'left-0' : 'right-0'
+          }`}>
               <div className="flex items-center gap-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-full shadow-lg border border-gray-200 dark:border-gray-700 p-1.5 pointer-events-auto">
                 {/* Edit Button - Always show for own messages, or if user has edit permissions */}
                 {isOwn && (
@@ -309,9 +307,15 @@ export function MessageCard({
                     <Forward className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400 group-hover/forward:text-green-600 dark:group-hover/forward:text-green-400 transition-colors" />
                   </button>
                 )}
+
+                {/* Add Reaction Button - Emoji Picker */}
+                {!message.id.startsWith('temp-') && (
+                  <div className="w-8 h-8 flex items-center justify-center">
+                    <ReactionPicker onSelectEmoji={handleAddReaction} />
+                  </div>
+                )}
               </div>
             </div>
-          </div>
         </div>
       </div>
     </div>
