@@ -6,6 +6,8 @@ import { verifySpaceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { createShoppingListSchema } from '@/lib/validations/shopping-schemas';
+import { ZodError } from 'zod';
 
 /**
  * GET /api/shopping
@@ -119,17 +121,29 @@ export async function POST(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(session.user);
 
-    // Parse request body
+    // Parse and validate request body
     const body = await req.json();
-    const { space_id, title } = body;
 
-    // Validate required fields
-    if (!space_id || !title) {
-      return NextResponse.json(
-        { error: 'space_id and title are required' },
-        { status: 400 }
-      );
+    let validatedData;
+    try {
+      validatedData = createShoppingListSchema.parse(body);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return NextResponse.json(
+          {
+            error: 'Validation failed',
+            details: error.issues.map(issue => ({
+              field: issue.path.join('.'),
+              message: issue.message
+            }))
+          },
+          { status: 400 }
+        );
+      }
+      throw error;
     }
+
+    const { space_id, title } = validatedData;
 
     // Verify user has access to this space
     try {

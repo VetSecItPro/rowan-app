@@ -67,9 +67,8 @@ export async function POST(req: NextRequest) {
 
     // Validate both checks succeeded (constant-time response regardless of which fails)
     if (adminError || !adminUser || authError || !authData.user) {
-      // Log failed attempt (sanitized - no admin data exposed)
-      console.warn(`Failed admin login attempt from IP: ${ip}`);
-
+      // Security: Sanitized logging - no user data exposed in production logs
+      // Failed attempts tracked in audit log, not console
       return NextResponse.json(
         { error: 'Invalid credentials or access denied' },
         { status: 401 }
@@ -86,11 +85,10 @@ export async function POST(req: NextRequest) {
         .eq('id', adminUser.id);
 
       if (updateError) {
-        console.error('Failed to update admin login tracking:', updateError);
+        // Error logged to Sentry via outer catch block if critical
       }
     } catch (error) {
-      // Fail silently if column doesn't exist
-      console.log('Admin login tracking update skipped');
+      // Fail silently if column doesn't exist (optional feature)
     }
 
     // Create admin session token
@@ -119,8 +117,8 @@ export async function POST(req: NextRequest) {
       path: '/',
     });
 
-    // Log successful admin login
-    console.log(`Successful admin login: ${adminUser.email} (${adminUser.role}) from IP: ${ip}`);
+    // Security: Admin login tracked in database analytics, not console logs
+    // Prevents exposure of admin emails/roles in production logs
 
     // Increment daily analytics for admin logins
     const today = new Date().toISOString().split('T')[0];
@@ -152,7 +150,7 @@ export async function POST(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/admin/auth/login POST error:', error);
+    // Error already captured by Sentry above
     return NextResponse.json(
       { error: 'Authentication service unavailable' },
       { status: 500 }

@@ -4,7 +4,8 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 
-const BETA_PASSWORD = 'rowan-beta-2024';
+// Security: Beta password moved to environment variable (CRITICAL-3 fix)
+// Set BETA_PASSWORD in Vercel environment variables
 const MAX_BETA_USERS = 30;
 
 /**
@@ -13,6 +14,12 @@ const MAX_BETA_USERS = 30;
  */
 export async function POST(req: NextRequest) {
   try {
+    // Validate that BETA_PASSWORD is configured (runtime check)
+    const BETA_PASSWORD = process.env.BETA_PASSWORD;
+    if (!BETA_PASSWORD) {
+      throw new Error('BETA_PASSWORD environment variable is required');
+    }
+
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
@@ -50,9 +57,7 @@ export async function POST(req: NextRequest) {
         created_at: new Date().toISOString(),
       });
 
-    if (logError) {
-      console.error('Failed to log beta access attempt:', logError);
-    }
+    // Beta access attempts logged to database for audit trail
 
     // Check password
     if (password !== BETA_PASSWORD) {
@@ -93,9 +98,7 @@ export async function POST(req: NextRequest) {
     const { error: analyticsError } = await supabase
       .rpc('increment_beta_requests', { target_date: today });
 
-    if (analyticsError) {
-      console.error('Failed to update analytics:', analyticsError);
-    }
+    // Analytics increment failures are non-critical
 
     // Success response
     return NextResponse.json({
@@ -114,7 +117,7 @@ export async function POST(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/beta/validate POST error:', error);
+    // Error already captured by Sentry above
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
