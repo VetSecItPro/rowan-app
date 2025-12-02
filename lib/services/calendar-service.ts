@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { sanitizeSearchInput } from '@/lib/utils';
 
 export interface CalendarEvent {
   id: string;
@@ -289,13 +290,20 @@ export const calendarService = {
 
   async searchEvents(spaceId: string, query: string): Promise<CalendarEvent[]> {
     const supabase = createClient();
-    const { data, error } = await supabase
+    let eventsQuery = supabase
       .from('events')
       .select('*')
       .eq('space_id', spaceId)
-      .is('deleted_at', null)
-      .or(`title.ilike.%${query}%,description.ilike.%${query}%,location.ilike.%${query}%`)
-      .order('start_time', { ascending: true });
+      .is('deleted_at', null);
+
+    // Search in title, description, and location (sanitized to prevent SQL injection)
+    const sanitizedQuery = sanitizeSearchInput(query);
+    if (sanitizedQuery) {
+      eventsQuery = eventsQuery.or(`title.ilike.%${sanitizedQuery}%,description.ilike.%${sanitizedQuery}%,location.ilike.%${sanitizedQuery}%`);
+    }
+
+    eventsQuery = eventsQuery.order('start_time', { ascending: true });
+    const { data, error } = await eventsQuery;
 
     if (error) throw error;
     return data || [];
