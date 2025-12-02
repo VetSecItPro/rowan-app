@@ -57,9 +57,7 @@ export async function POST(req: NextRequest) {
         created_at: new Date().toISOString(),
       });
 
-    if (logError) {
-      console.error('Failed to log beta access attempt:', logError);
-    }
+    // Beta access attempts logged to database for audit trail
 
     // Check password
     if (password !== BETA_PASSWORD) {
@@ -100,9 +98,7 @@ export async function POST(req: NextRequest) {
     const { error: analyticsError } = await supabase
       .rpc('increment_beta_requests', { target_date: today });
 
-    if (analyticsError) {
-      console.error('Failed to update analytics:', analyticsError);
-    }
+    // Analytics increment failures are non-critical
 
     // Success response
     return NextResponse.json({
@@ -121,7 +117,7 @@ export async function POST(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/beta/validate POST error:', error);
+    // Error already captured by Sentry above
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
