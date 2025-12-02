@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto';
+import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 
 export async function middleware(req: NextRequest) {
   let response = NextResponse.next({
@@ -72,8 +72,8 @@ export async function middleware(req: NextRequest) {
     }
 
     try {
-      // Decrypt and validate admin session
-      const sessionData = decryptSessionData(adminSessionCookie);
+      // Decrypt and validate admin session (async with Web Crypto API)
+      const sessionData = await decryptSessionData(adminSessionCookie);
 
       if (!validateSessionData(sessionData)) {
         // Invalid or expired session - redirect to admin login

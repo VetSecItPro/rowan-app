@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Breadcrumbs } from '@/components/admin/Breadcrumbs';
 import {
   Users,
   Search,
@@ -12,7 +13,6 @@ import {
   Calendar,
   User,
   Settings,
-  ArrowLeft,
   Eye,
   MoreVertical,
   UserCheck,
@@ -85,25 +85,18 @@ export default function AdminUsersPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-6">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => router.push('/admin/dashboard')}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              </button>
-              <div className="flex items-center gap-3">
-                <Users className="w-8 h-8 text-blue-600" />
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    User Management
-                  </h1>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Manage registered users and beta access requests
-                  </p>
-                </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <Breadcrumbs currentPage="User Management" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Users className="w-8 h-8 text-blue-600" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  User Management
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Manage registered users and beta access requests
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">

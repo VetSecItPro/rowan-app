@@ -4,7 +4,7 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookies } from '@/lib/utils/safe-cookies';
-import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto';
+import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { withCache, ADMIN_CACHE_KEYS, ADMIN_CACHE_TTL } from '@/lib/services/admin-cache-service';
 
 // Force dynamic rendering for admin authentication
@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     // Decrypt and validate admin session
     let sessionData: { email?: string; adminId?: string; role?: string };
     try {
-      sessionData = decryptSessionData(adminSession.value);
+      sessionData = await decryptSessionData(adminSession.value);
 
       // Validate session data and check expiration
       if (!validateSessionData(sessionData)) {

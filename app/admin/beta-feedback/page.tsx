@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Header } from '@/components/layout/Header';
+import { Breadcrumbs } from '@/components/admin/Breadcrumbs';
 import {
   MessageSquare,
   Filter,
@@ -174,48 +174,46 @@ export default function AdminBetaFeedbackPage() {
 
   if (loading) {
     return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-          <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full"></div>
-        </div>
-      </>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+      </div>
     );
   }
 
   return (
-    <>
-      <Header />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto p-6 sm:p-8">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-lg">
-                  <TestTube className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                    Beta Testing Dashboard
-                  </h1>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Manage beta feedback and bug reports
-                  </p>
-                </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Header */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <Breadcrumbs currentPage="Beta Feedback" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <TestTube className="w-8 h-8 text-purple-600" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Beta Testing Dashboard
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Manage beta feedback and bug reports
+                </p>
               </div>
-              <button
-                onClick={exportToCSV}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-              >
-                <Download className="w-4 h-4" />
-                Export CSV
-              </button>
             </div>
+            <button
+              onClick={exportToCSV}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              Export CSV
+            </button>
           </div>
+        </div>
+      </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4 mb-8">
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4 mb-8">
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-3 mb-2">
                 <MessageSquare className="w-5 h-5 text-gray-500" />
@@ -265,10 +263,10 @@ export default function AdminBetaFeedbackPage() {
               </div>
               <div className="text-2xl font-bold text-purple-600">{stats.features}</div>
             </div>
-          </div>
+        </div>
 
-          {/* Filters */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 mb-6">
+        {/* Filters */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 mb-6">
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-2">
                 <Filter className="w-4 h-4 text-gray-500" />
@@ -315,11 +313,11 @@ export default function AdminBetaFeedbackPage() {
                 onChange={(e) => setFilter({ ...filter, search: e.target.value || undefined })}
                 className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1 min-w-[200px]"
               />
-            </div>
           </div>
+        </div>
 
-          {/* Feedback Table */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        {/* Feedback Table */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50 dark:bg-gray-700">
@@ -433,8 +431,7 @@ export default function AdminBetaFeedbackPage() {
                     No feedback submissions match your filters.
                   </p>
                 </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -618,6 +615,6 @@ export default function AdminBetaFeedbackPage() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

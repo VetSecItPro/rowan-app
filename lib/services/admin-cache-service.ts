@@ -17,10 +17,14 @@ const redis = hasRedisConfig ? Redis.fromEnv() : null;
 const CACHE_PREFIX = 'rowan:admin:';
 
 // Cache TTLs (in seconds)
+// Optimized for admin dashboard performance - aggressive caching since admin data changes infrequently
 const CACHE_TTL = {
-  dashboardStats: 60,      // 1 minute for dashboard stats
-  usersList: 120,          // 2 minutes for users list
-  betaRequests: 120,       // 2 minutes for beta requests
+  dashboardStats: 300,     // 5 minutes for dashboard stats (rarely changes)
+  usersList: 600,          // 10 minutes for users list (infrequent updates)
+  betaRequests: 600,       // 10 minutes for beta requests (infrequent updates)
+  analytics: 900,          // 15 minutes for analytics (expensive queries, historical data)
+  betaStats: 300,          // 5 minutes for beta stats
+  notificationStats: 300,  // 5 minutes for notification stats
 } as const;
 
 interface CacheOptions {
@@ -122,4 +126,7 @@ export const ADMIN_CACHE_KEYS = {
   dashboardStats: 'dashboard:stats',
   usersList: (page: number, limit: number) => `users:list:${page}:${limit}`,
   betaRequests: (page: number, status: string | null) => `beta:requests:${page}:${status || 'all'}`,
+  analytics: (range: string) => `analytics:${range}`,
+  betaStats: 'beta:stats',
+  notificationStats: 'notifications:stats',
 } as const;
