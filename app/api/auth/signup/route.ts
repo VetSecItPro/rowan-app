@@ -98,13 +98,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validated = SignUpSchema.parse(body);
 
-    // Simple text sanitization to prevent XSS (avoid DOMPurify during build)
-    const stripTags = (str: string) => str.replace(/<[^>]*>/g, '').trim();
+    // Sanitize user input to prevent XSS attacks
+    const { sanitizePlainText } = await import('@/lib/sanitize');
 
     const sanitizedProfile = {
       ...validated.profile,
-      name: stripTags(validated.profile.name),
-      space_name: validated.profile.space_name ? stripTags(validated.profile.space_name) : undefined,
+      name: sanitizePlainText(validated.profile.name),
+      space_name: validated.profile.space_name ? sanitizePlainText(validated.profile.space_name) : undefined,
     };
 
     // Create Supabase client (runtime only)
