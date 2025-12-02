@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { feedbackService } from '@/lib/services/feedback-service';
+import { sanitizePlainText, sanitizeUrl } from '@/lib/sanitize';
 import { FeedbackType } from '@/lib/types';
 
 export async function GET(request: NextRequest) {
@@ -86,14 +87,19 @@ export async function POST(request: NextRequest) {
       feedbackType = feedbackTypeRaw as FeedbackType;
     }
 
+    // Sanitize user input to prevent XSS attacks
+    const sanitizedDescription = sanitizePlainText(description);
+    const sanitizedFeatureName = featureName ? sanitizePlainText(featureName) : undefined;
+    const sanitizedPageUrl = pageUrl ? sanitizeUrl(pageUrl) : undefined;
+
     // Submit feedback using service
     const result = await feedbackService.submitFeedback({
       user_id: user.id,
       space_id: spaceId || undefined,
       feedback_type: feedbackType,
-      feature_name: featureName || undefined,
-      page_url: pageUrl || undefined,
-      description: description.trim(),
+      feature_name: sanitizedFeatureName,
+      page_url: sanitizedPageUrl,
+      description: sanitizedDescription,
       screenshot: screenshot || undefined,
       browser_info: browserInfo,
     });

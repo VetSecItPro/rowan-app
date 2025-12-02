@@ -43,11 +43,12 @@ export async function POST(request: NextRequest) {
           .toLowerCase()
           .trim(),
         password: z.string()
-          .min(8, 'Password must be at least 8 characters')
+          .min(12, 'Password must be at least 12 characters')
           .max(128, 'Password too long')
           .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
           .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-          .regex(/[0-9]/, 'Password must contain at least one number'),
+          .regex(/[0-9]/, 'Password must contain at least one number')
+          .regex(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character'),
         profile: z.object({
           name: z.string()
             .min(1, 'Name is required')
@@ -97,13 +98,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validated = SignUpSchema.parse(body);
 
-    // Simple text sanitization to prevent XSS (avoid DOMPurify during build)
-    const stripTags = (str: string) => str.replace(/<[^>]*>/g, '').trim();
+    // Sanitize user input to prevent XSS attacks
+    const { sanitizePlainText } = await import('@/lib/sanitize');
 
     const sanitizedProfile = {
       ...validated.profile,
-      name: stripTags(validated.profile.name),
-      space_name: validated.profile.space_name ? stripTags(validated.profile.space_name) : undefined,
+      name: sanitizePlainText(validated.profile.name),
+      space_name: validated.profile.space_name ? sanitizePlainText(validated.profile.space_name) : undefined,
     };
 
     // Create Supabase client (runtime only)
