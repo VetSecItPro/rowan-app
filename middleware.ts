@@ -121,6 +121,28 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
+  // Check beta access expiration for logged-in users
+  if (isProtectedPath && session?.user?.email) {
+    try {
+      const { data: isValid } = await supabase.rpc('is_beta_access_valid', {
+        user_email: session.user.email
+      });
+
+      if (isValid === false) {
+        // Beta access expired - redirect to beta-expired page
+        await supabase.auth.signOut();
+        const redirectUrl = new URL('/beta-expired', req.url);
+        const res = NextResponse.redirect(redirectUrl);
+        res.cookies.delete('sb-access-token');
+        res.cookies.delete('sb-refresh-token');
+        return res;
+      }
+    } catch (error) {
+      console.error('Beta validation error:', error);
+      // Allow access if validation fails to prevent lockout
+    }
+  }
+
   // Auth pages - redirect to dashboard if already logged in
   const authPaths = ['/login', '/signup'];
   const isAuthPath = authPaths.includes(req.nextUrl.pathname);
