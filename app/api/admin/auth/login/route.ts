@@ -7,6 +7,7 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookies } from '@/lib/utils/safe-cookies';
 import { randomBytes } from 'crypto';
 import { encryptSessionData } from '@/lib/utils/session-crypto';
+import { createClient as createStandaloneClient } from '@supabase/supabase-js';
 
 const ADMIN_SESSION_DURATION = 24 * 60 * 60; // 24 hours in seconds
 
@@ -42,6 +43,12 @@ export async function POST(req: NextRequest) {
     // Normalize email
     const normalizedEmail = email.trim().toLowerCase();
 
+    // Create a standalone auth client (not cookie-based, can authenticate directly)
+    const authClient = createStandaloneClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
     // IMPORTANT: Always perform both checks to prevent timing attacks
     // Check admin user existence AND perform auth in parallel, then validate both
     const [adminCheckResult, authResult] = await Promise.all([
@@ -52,8 +59,8 @@ export async function POST(req: NextRequest) {
         .eq('email', normalizedEmail)
         .eq('is_active', true)
         .single(),
-      // Always perform password authentication using admin client (has service role access)
-      supabaseAdmin.auth.signInWithPassword({
+      // Verify password using standalone client (not cookie-based)
+      authClient.auth.signInWithPassword({
         email: normalizedEmail,
         password: password,
       }),
