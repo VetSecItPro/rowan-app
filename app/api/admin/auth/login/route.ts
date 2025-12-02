@@ -45,37 +45,33 @@ export async function POST(req: NextRequest) {
     // Create Supabase client for auth operations
     const supabase = createClient();
 
-    // Check if admin user exists in our admin_users table (using admin client to bypass RLS)
-    const { data: adminUser, error: adminError } = await supabaseAdmin
-      .from('admin_users')
-      .select('id, email, role, permissions, is_active')
-      .eq('email', normalizedEmail)
-      .eq('is_active', true)
-      .single();
+    // IMPORTANT: Always perform both checks to prevent timing attacks
+    // Check admin user existence AND perform auth in parallel, then validate both
+    const [adminCheckResult, authResult] = await Promise.all([
+      // Check if admin user exists in our admin_users table (using admin client to bypass RLS)
+      supabaseAdmin
+        .from('admin_users')
+        .select('id, email, role, permissions, is_active')
+        .eq('email', normalizedEmail)
+        .eq('is_active', true)
+        .single(),
+      // Always perform password authentication (prevents timing attack by ensuring constant-time response)
+      supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password: password,
+      }),
+    ]);
 
-    if (adminError || !adminUser) {
+    const { data: adminUser, error: adminError } = adminCheckResult;
+    const { data: authData, error: authError } = authResult;
+
+    // Validate both checks succeeded (constant-time response regardless of which fails)
+    if (adminError || !adminUser || authError || !authData.user) {
       // Log failed attempt (sanitized - no admin data exposed)
       console.warn(`Failed admin login attempt from IP: ${ip}`);
 
       return NextResponse.json(
         { error: 'Invalid credentials or access denied' },
-        { status: 401 }
-      );
-    }
-
-    // For this demo, we'll check against the regular Supabase auth
-    // In production, you'd want a separate admin auth system
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email: normalizedEmail,
-      password: password,
-    });
-
-    if (authError || !authData.user) {
-      // Log failed attempt
-      console.warn(`Failed admin login attempt for email: ${normalizedEmail} from IP: ${ip}`);
-
-      return NextResponse.json(
-        { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
