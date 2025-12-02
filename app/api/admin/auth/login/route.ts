@@ -42,9 +42,6 @@ export async function POST(req: NextRequest) {
     // Normalize email
     const normalizedEmail = email.trim().toLowerCase();
 
-    // Create Supabase client for auth operations
-    const supabase = createClient();
-
     // IMPORTANT: Always perform both checks to prevent timing attacks
     // Check admin user existence AND perform auth in parallel, then validate both
     const [adminCheckResult, authResult] = await Promise.all([
@@ -55,8 +52,8 @@ export async function POST(req: NextRequest) {
         .eq('email', normalizedEmail)
         .eq('is_active', true)
         .single(),
-      // Always perform password authentication (prevents timing attack by ensuring constant-time response)
-      supabase.auth.signInWithPassword({
+      // Always perform password authentication using admin client (has service role access)
+      supabaseAdmin.auth.signInWithPassword({
         email: normalizedEmail,
         password: password,
       }),
@@ -123,7 +120,7 @@ export async function POST(req: NextRequest) {
     // Increment daily analytics for admin logins
     const today = new Date().toISOString().split('T')[0];
     try {
-      const { error: analyticsError } = await supabase
+      const { error: analyticsError } = await supabaseAdmin
         .rpc('increment_admin_logins', { target_date: today });
     } catch (error) {
       // Fail silently if function doesn't exist
