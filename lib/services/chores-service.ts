@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { sanitizeSearchInput } from '@/lib/utils';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import type { Chore } from '@/lib/types';
 
@@ -80,8 +81,11 @@ export const choresService = {
         query = query.eq('assigned_to', options.assigned_to);
       }
       if (options?.search) {
-        // Search in title and description
-        query = query.or(`title.ilike.%${options.search}%,description.ilike.%${options.search}%`);
+        // Search in title and description (sanitized to prevent SQL injection)
+        const sanitizedSearch = sanitizeSearchInput(options.search);
+        if (sanitizedSearch) {
+          query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%`);
+        }
       }
 
       // Try to order by sort_order first, fallback to created_at if column doesn't exist

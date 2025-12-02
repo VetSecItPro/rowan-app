@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { sanitizeSearchInput } from '@/lib/utils';
 import type { FeedbackSubmission, CreateFeedbackInput, UpdateFeedbackInput, FeedbackStatus } from '@/lib/types';
 
 export const feedbackService = {
@@ -139,7 +140,11 @@ export const feedbackService = {
       }
 
       if (filters?.search) {
-        query = query.or(`description.ilike.%${filters.search}%,feature_name.ilike.%${filters.search}%`);
+        // Search in description and feature_name (sanitized to prevent SQL injection)
+        const sanitizedSearch = sanitizeSearchInput(filters.search);
+        if (sanitizedSearch) {
+          query = query.or(`description.ilike.%${sanitizedSearch}%,feature_name.ilike.%${sanitizedSearch}%`);
+        }
       }
 
       const { data, error } = await query;
