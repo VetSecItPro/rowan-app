@@ -37,6 +37,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   const { user } = useAuth();
   const { activeSpace } = useSpaces();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const modalContentRef = useRef<HTMLDivElement>(null);
 
   const [feedbackType, setFeedbackType] = useState<FeedbackType | ''>('');
   const [featureName, setFeatureName] = useState('');
@@ -47,10 +48,14 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  // Auto-populate page URL
+  // Auto-populate page URL and scroll to top
   useEffect(() => {
     if (isOpen && typeof window !== 'undefined') {
       setPageUrl(window.location.href);
+      // Scroll modal content to top when opened
+      if (modalContentRef.current) {
+        modalContentRef.current.scrollTop = 0;
+      }
     }
   }, [isOpen]);
 
@@ -175,19 +180,22 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 rounded-xl shadow-2xl">
+      <div
+        ref={modalContentRef}
+        className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-white dark:bg-gray-900 rounded-xl shadow-2xl my-auto"
+      >
         {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+        <div className="sticky top-0 z-10 flex items-center justify-between p-6 bg-gradient-to-r from-blue-600 to-purple-600">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Send Feedback</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Help us improve Rowan by sharing your thoughts</p>
+            <h2 className="text-2xl font-bold text-white">Send Feedback</h2>
+            <p className="text-sm text-blue-100 mt-1">Help us improve Rowan by sharing your thoughts</p>
           </div>
           <button
             onClick={onClose}
-            className="btn-touch p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="text-white hover:text-blue-100 transition-colors"
             aria-label="Close"
           >
-            <X className="w-5 h-5" />
+            <X className="w-6 h-6" />
           </button>
         </div>
 
@@ -204,12 +212,16 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
           {/* Feedback Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Feedback Type <span className="text-gray-400">(optional)</span>
+              Feedback Type <span className="text-red-500">*</span>
             </label>
             <select
               value={feedbackType}
               onChange={(e) => setFeedbackType(e.target.value as FeedbackType)}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+              required
+              className="w-full pl-4 pr-12 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent appearance-none bg-[length:1.5em_1.5em] bg-[right_0.5rem_center] bg-no-repeat"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`
+              }}
             >
               <option value="">Select type...</option>
               {FEEDBACK_TYPE_OPTIONS.map((option) => (
@@ -223,12 +235,16 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
           {/* Feature/Page */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Feature/Page <span className="text-gray-400">(optional)</span>
+              Feature/Page <span className="text-red-500">*</span>
             </label>
             <select
               value={featureName}
               onChange={(e) => setFeatureName(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+              required
+              className="w-full pl-4 pr-12 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent appearance-none bg-[length:1.5em_1.5em] bg-[right_0.5rem_center] bg-no-repeat"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`
+              }}
             >
               <option value="">Select feature...</option>
               {FEATURE_OPTIONS.map((option) => (

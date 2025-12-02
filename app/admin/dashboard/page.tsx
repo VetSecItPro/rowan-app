@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
+import { useQuery } from '@tanstack/react-query';
 import {
   Users,
   UserCheck,
@@ -17,6 +18,7 @@ import {
   Sun,
   Moon,
   ArrowLeft,
+  MessageSquare,
   type LucideIcon
 } from 'lucide-react';
 
@@ -85,36 +87,41 @@ const StatCard = memo(function StatCard({
   );
 });
 
-// Memoized QuickAction component
+// Memoized QuickAction component - Professional minimal design
 const QuickAction = memo(function QuickAction({
   title,
   description,
   icon: Icon,
   onClick,
-  variant = 'primary'
+  iconColor = 'text-gray-600 dark:text-gray-400'
 }: {
   title: string;
   description: string;
   icon: LucideIcon;
   onClick: () => void;
-  variant?: 'primary' | 'secondary' | 'danger';
+  iconColor?: string;
 }) {
-  const variantClasses = {
-    primary: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30',
-    secondary: 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700',
-    danger: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30',
-  };
-
   return (
     <button
       onClick={onClick}
-      className={`w-full p-4 border rounded-lg transition-colors text-left ${variantClasses[variant]}`}
+      className="w-full p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md transition-all duration-200 text-left group"
     >
-      <div className="flex items-start gap-3">
-        <Icon className="w-5 h-5 mt-0.5 flex-shrink-0" />
-        <div>
-          <h4 className="font-medium text-gray-900 dark:text-white">{title}</h4>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{description}</p>
+      <div className="flex items-start gap-4">
+        <div className="flex-shrink-0 mt-0.5">
+          <Icon className={`w-5 h-5 ${iconColor} group-hover:scale-110 transition-transform duration-200`} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            {title}
+          </h4>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+            {description}
+          </p>
+        </div>
+        <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
         </div>
       </div>
     </button>
@@ -143,31 +150,26 @@ const StatsSkeleton = memo(function StatsSkeleton() {
 export default function AdminDashboardPage() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [mounted, setMounted] = useState(false);
 
-  const fetchDashboardData = useCallback(async () => {
-    try {
-      const response = await fetch('/api/admin/dashboard/stats');
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data.stats);
-      }
-    } catch (error) {
-      console.error('Failed to fetch dashboard data:', error);
-    } finally {
-      setIsLoading(false);
-      setLastRefresh(new Date());
-    }
+  // Prevent hydration mismatch with theme
+  useEffect(() => {
+    setMounted(true);
   }, []);
 
-  useEffect(() => {
-    fetchDashboardData();
-    // Refresh every 5 minutes
-    const interval = setInterval(fetchDashboardData, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, [fetchDashboardData]);
+  // Use React Query with stale-while-revalidate for instant loading
+  const { data: stats, isLoading, refetch } = useQuery({
+    queryKey: ['admin-dashboard-stats'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/dashboard/stats');
+      if (!response.ok) throw new Error('Failed to fetch stats');
+      const data = await response.json();
+      return data.stats as DashboardStats;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes (matches server cache)
+    gcTime: 15 * 60 * 1000, // 15 minutes in cache
+    refetchInterval: 5 * 60 * 1000, // Auto-refetch every 5 minutes in background
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -198,28 +200,27 @@ export default function AdminDashboardPage() {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              {mounted && (
+                <button
+                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                  className="flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                >
+                  {theme === 'dark' ? (
+                    <Sun className="w-5 h-5" />
+                  ) : (
+                    <Moon className="w-5 h-5" />
+                  )}
+                </button>
+              )}
               <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-              >
-                {theme === 'dark' ? (
-                  <Sun className="w-5 h-5" />
-                ) : (
-                  <Moon className="w-5 h-5" />
-                )}
-              </button>
-              <button
-                onClick={fetchDashboardData}
+                onClick={() => refetch()}
                 disabled={isLoading}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
               >
                 <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
                 Refresh
               </button>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                Last updated: {lastRefresh.toLocaleTimeString()}
-              </span>
             </div>
           </div>
         </div>
@@ -283,82 +284,99 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Content Grid */}
+        {/* Content Grid - Side by side layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Quick Actions */}
-          <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Quick Actions
-              </h3>
-              <div className="space-y-3">
-                <QuickAction
-                  title="User Management"
-                  description="View and manage all registered users"
-                  icon={Users}
-                  onClick={() => router.push('/admin/users')}
-                />
-                <QuickAction
-                  title="Beta Program"
-                  description="Monitor beta access requests and users"
-                  icon={Shield}
-                  onClick={() => router.push('/admin/users?tab=beta')}
-                />
-                <QuickAction
-                  title="Launch Notifications"
-                  description="Manage launch notification subscribers"
-                  icon={Mail}
-                  onClick={() => router.push('/admin/notifications')}
-                />
-                <QuickAction
-                  title="Analytics Dashboard"
-                  description="View comprehensive usage analytics"
-                  icon={BarChart3}
-                  onClick={() => router.push('/admin/analytics')}
-                />
-                <QuickAction
-                  title="System Health"
-                  description="Monitor system performance and status"
-                  icon={Monitor}
-                  onClick={() => router.push('/admin/health')}
-                />
-                <QuickAction
-                  title="Export Data"
-                  description="Download user data and analytics"
-                  icon={Download}
-                  onClick={() => window.open('/api/admin/export/users', '_blank')}
-                  variant="secondary"
-                />
-              </div>
+          {/* Quick Actions - Left Column */}
+          <div className="lg:col-span-1 flex flex-col">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Quick Actions
+            </h3>
+            <div className="space-y-2 flex-1">
+              <QuickAction
+                title="User Management"
+                description="View and manage all registered users"
+                icon={Users}
+                iconColor="text-blue-600 dark:text-blue-400"
+                onClick={() => router.push('/admin/users')}
+              />
+              <QuickAction
+                title="Beta Program"
+                description="Monitor beta access requests and users"
+                icon={Shield}
+                iconColor="text-purple-600 dark:text-purple-400"
+                onClick={() => router.push('/admin/users?tab=beta')}
+              />
+              <QuickAction
+                title="Launch Notifications"
+                description="Manage launch notification subscribers"
+                icon={Mail}
+                iconColor="text-green-600 dark:text-green-400"
+                onClick={() => router.push('/admin/notifications')}
+              />
+              <QuickAction
+                title="Analytics Dashboard"
+                description="View comprehensive usage analytics"
+                icon={BarChart3}
+                iconColor="text-cyan-600 dark:text-cyan-400"
+                onClick={() => router.push('/admin/analytics')}
+              />
+              <QuickAction
+                title="Beta Feedback"
+                description="View and manage beta tester feedback"
+                icon={MessageSquare}
+                iconColor="text-indigo-600 dark:text-indigo-400"
+                onClick={() => router.push('/admin/beta-feedback')}
+              />
+              <QuickAction
+                title="User Feedback"
+                description="View all user feedback and issues"
+                icon={MessageSquare}
+                iconColor="text-pink-600 dark:text-pink-400"
+                onClick={() => router.push('/admin/feedback')}
+              />
+              <QuickAction
+                title="System Health"
+                description="Monitor system performance and status"
+                icon={Monitor}
+                iconColor="text-emerald-600 dark:text-emerald-400"
+                onClick={() => router.push('/admin/health')}
+              />
+              <QuickAction
+                title="Export Data"
+                description="Download user data and analytics"
+                icon={Download}
+                iconColor="text-slate-600 dark:text-slate-400"
+                onClick={() => window.open('/api/admin/export/users', '_blank')}
+              />
             </div>
           </div>
 
-          {/* Recent Activity */}
-          <div className="lg:col-span-2">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          {/* Recent Activity - Right Column (Full Height) */}
+          <div className="lg:col-span-2 flex flex-col">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex-1 flex flex-col">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 Recent Activity
               </h3>
-              <div className="space-y-4">
+              <div className="flex-1 flex items-center justify-center">
                 {stats && stats.totalUsers > 0 ? (
                   // Real activity data would go here when available
-                  <div className="text-center py-8">
-                    <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Activity className="w-6 h-6 text-gray-400 dark:text-gray-600" />
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Activity className="w-8 h-8 text-gray-400 dark:text-gray-600" />
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       Recent activity will appear here as beta users start using the platform
                     </p>
                   </div>
                 ) : (
-                  <div className="text-center py-8">
-                    <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Activity className="w-6 h-6 text-gray-400 dark:text-gray-600" />
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Activity className="w-8 h-8 text-gray-400 dark:text-gray-600" />
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       No recent activity yet
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
                       Activity feed will populate as users interact with the platform
                     </p>
                   </div>

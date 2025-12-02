@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChevronRight, LayoutDashboard } from 'lucide-react';
 
 interface HealthMetric {
   name: string;
@@ -43,15 +45,15 @@ const StatusIndicator = ({ status }: { status: 'healthy' | 'warning' | 'critical
 // Health metric card component
 const HealthMetricCard = ({ metric }: { metric: HealthMetric }) => (
   <Card>
-    <CardContent className="p-4">
-      <div className="flex items-center justify-between mb-2">
+    <CardContent className="px-6 pt-6 pb-6">
+      <div className="flex items-center justify-between mb-3">
         <h3 className="font-medium text-gray-900 dark:text-gray-100">{metric.name}</h3>
         <StatusIndicator status={metric.status} />
       </div>
-      <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">
+      <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
         {metric.value}
       </div>
-      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
         {metric.description}
       </p>
       <p className="text-xs text-gray-500 dark:text-gray-500">
@@ -83,6 +85,7 @@ const PerformanceMetricRow = ({ metric }: { metric: PerformanceMetric }) => (
 );
 
 export default function SystemHealthPage() {
+  const router = useRouter();
   const [healthData, setHealthData] = useState<SystemHealth | null>(null);
   const [performanceData, setPerformanceData] = useState<PerformanceMetric[]>([]);
   const [loading, setLoading] = useState(true);
@@ -180,6 +183,19 @@ export default function SystemHealthPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
       <div className="max-w-7xl mx-auto">
+        {/* Breadcrumb Navigation */}
+        <div className="mb-6">
+          <button
+            onClick={() => router.push('/admin/dashboard')}
+            className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            <span>Admin Dashboard</span>
+            <ChevronRight className="w-4 h-4" />
+            <span className="text-gray-900 dark:text-gray-100 font-medium">System Health</span>
+          </button>
+        </div>
+
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -209,7 +225,7 @@ export default function SystemHealthPage() {
         {/* Overall Status */}
         {healthData && (
           <Card className="mb-8">
-            <CardContent className="p-6">
+            <CardContent className="px-6 pt-6 pb-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <StatusIndicator status={healthData.overall} />
@@ -219,7 +235,7 @@ export default function SystemHealthPage() {
                         {healthData.overall.charAt(0).toUpperCase() + healthData.overall.slice(1)}
                       </span>
                     </h2>
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <p className="text-gray-600 dark:text-gray-400 mt-1">
                       Uptime: {healthData.uptime} | Version: {healthData.version} | Environment: {healthData.environment}
                     </p>
                   </div>
@@ -284,7 +300,7 @@ export default function SystemHealthPage() {
 
         {/* Emergency Contact Info */}
         <Card className="mt-8 border-yellow-200 dark:border-yellow-800">
-          <CardContent className="p-6">
+          <CardContent className="px-6 pt-6 pb-6">
             <div className="flex items-center mb-4">
               <div className="w-3 h-3 rounded-full bg-yellow-500 mr-3"></div>
               <h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-100">
@@ -294,7 +310,7 @@ export default function SystemHealthPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-yellow-800 dark:text-yellow-200 mb-2">
-                  <strong>Critical Issues:</strong> Automatically logged to Sentry and admin notifications
+                  <strong>Error Tracking:</strong> Issues are automatically logged to Sentry for debugging
                 </p>
                 <p className="text-yellow-800 dark:text-yellow-200">
                   <strong>Rate Limiting:</strong> Monitored via Upstash Redis with auto-scaling
@@ -305,7 +321,7 @@ export default function SystemHealthPage() {
                   <strong>Database:</strong> Supabase connection health monitored continuously
                 </p>
                 <p className="text-yellow-800 dark:text-yellow-200">
-                  <strong>Monitoring:</strong> Real-time alerts for response times &gt; 2s or error rates &gt; 5%
+                  <strong>Alerts:</strong> Automatic notifications if response times &gt; 2s or error rates &gt; 5%
                 </p>
               </div>
             </div>

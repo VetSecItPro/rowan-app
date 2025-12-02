@@ -5,8 +5,7 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookies } from '@/lib/utils/safe-cookies';
-import { randomBytes } from 'crypto';
-import { encryptSessionData } from '@/lib/utils/session-crypto';
+import { encryptSessionData } from '@/lib/utils/session-crypto-edge';
 import { createClient as createStandaloneClient } from '@supabase/supabase-js';
 
 const ADMIN_SESSION_DURATION = 24 * 60 * 60; // 24 hours in seconds
@@ -95,8 +94,7 @@ export async function POST(req: NextRequest) {
       // Fail silently if column doesn't exist (optional feature)
     }
 
-    // Create admin session token
-    const sessionToken = randomBytes(32).toString('hex');
+    // Create admin session data
     const sessionData = {
       adminId: adminUser.id,
       email: adminUser.email,
@@ -107,8 +105,8 @@ export async function POST(req: NextRequest) {
       expiresAt: Date.now() + (ADMIN_SESSION_DURATION * 1000),
     };
 
-    // Encrypt session data using AES-256-GCM
-    const sessionPayload = encryptSessionData(sessionData);
+    // Encrypt session data using AES-256-GCM (Web Crypto API)
+    const sessionPayload = await encryptSessionData(sessionData);
 
     // Set admin session cookie
     // Use path '/' so cookie is available to both /admin pages and /api/admin routes

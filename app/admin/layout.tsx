@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { AdminQueryProvider } from '@/lib/providers/query-client-provider';
 
 export const metadata: Metadata = {
   title: 'Rowan Operations Dashboard',
@@ -17,8 +18,10 @@ export default function AdminLayout({
   // Admin layout is nested under root layout - don't define html/body
   // The root layout already provides ThemeProvider and base styling
   return (
-    <div className="min-h-screen bg-gray-900">
-      {children}
-    </div>
+    <AdminQueryProvider>
+      <div className="min-h-screen bg-gray-900">
+        {children}
+      </div>
+    </AdminQueryProvider>
   );
 }
