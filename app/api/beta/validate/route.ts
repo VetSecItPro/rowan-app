@@ -4,7 +4,8 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 
-const BETA_PASSWORD = 'rowan-beta-2024';
+// Security: Beta password moved to environment variable (CRITICAL-3 fix)
+// Set BETA_PASSWORD in Vercel environment variables
 const MAX_BETA_USERS = 30;
 
 /**
@@ -13,6 +14,12 @@ const MAX_BETA_USERS = 30;
  */
 export async function POST(req: NextRequest) {
   try {
+    // Validate that BETA_PASSWORD is configured (runtime check)
+    const BETA_PASSWORD = process.env.BETA_PASSWORD;
+    if (!BETA_PASSWORD) {
+      throw new Error('BETA_PASSWORD environment variable is required');
+    }
+
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
