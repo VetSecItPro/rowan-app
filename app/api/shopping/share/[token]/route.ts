@@ -133,7 +133,9 @@ export async function GET(
 /**
  * PATCH /api/shopping/share/[token]
  * Update item purchased status (public access)
- * Allows anyone with the share token to check off items
+ * Allows anyone with the share token to check off items (if not read-only)
+ *
+ * Security: Only allows updating is_purchased field, not item details
  */
 export async function PATCH(
   req: NextRequest,
@@ -164,6 +166,7 @@ export async function PATCH(
     const body = await req.json();
     const { itemId, isPurchased } = body;
 
+    // Validate input - only allow boolean updates to is_purchased
     if (!itemId || typeof isPurchased !== 'boolean') {
       return NextResponse.json(
         { error: 'itemId and isPurchased are required' },
@@ -173,10 +176,10 @@ export async function PATCH(
 
     const supabase = createClient();
 
-    // Verify the list is public and get list ID
+    // Verify the list is public, not read-only, and get list ID
     const { data: shoppingList, error: listError } = await supabase
       .from('shopping_lists')
-      .select('id')
+      .select('id, share_read_only')
       .eq('share_token', token)
       .eq('is_public', true)
       .single();
@@ -188,7 +191,16 @@ export async function PATCH(
       );
     }
 
-    // Update item
+    // Check if list is shared as read-only
+    if (shoppingList.share_read_only) {
+      return NextResponse.json(
+        { error: 'This shopping list is shared as read-only. You cannot modify items.' },
+        { status: 403 }
+      );
+    }
+
+    // Security: ONLY allow updating is_purchased field
+    // Prevents modification of item name, quantity, notes, etc.
     const { error: updateError } = await supabase
       .from('shopping_items')
       .update({

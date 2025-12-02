@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { sanitizeSearchInput } from '@/lib/utils';
 
 /**
  * Task Templates Service
@@ -90,12 +91,19 @@ export const taskTemplatesService = {
   async searchTemplates(spaceId: string, query: string): Promise<TaskTemplate[]> {
     const supabase = createClient();
     try {
-      const { data, error } = await supabase
+      let templatesQuery = supabase
         .from('task_templates')
         .select('*')
-        .eq('space_id', spaceId)
-        .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
-        .order('use_count', { ascending: false });
+        .eq('space_id', spaceId);
+
+      // Search in name and description (sanitized to prevent SQL injection)
+      const sanitizedQuery = sanitizeSearchInput(query);
+      if (sanitizedQuery) {
+        templatesQuery = templatesQuery.or(`name.ilike.%${sanitizedQuery}%,description.ilike.%${sanitizedQuery}%`);
+      }
+
+      templatesQuery = templatesQuery.order('use_count', { ascending: false });
+      const { data, error } = await templatesQuery;
 
       if (error) throw error;
       return data || [];

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 import { enhancedNotificationService } from './enhanced-notification-service';
+import { sanitizeSearchInput } from '@/lib/utils';
 import type { CreateTaskInput, UpdateTaskInput } from '@/lib/validations/task-schemas';
 import type {
   Task,
@@ -105,9 +106,12 @@ export const tasksService = {
         query = query.eq('created_by', options.created_by);
       }
 
-      // Search in title and description
+      // Search in title and description (sanitized to prevent SQL injection)
       if (options?.search) {
-        query = query.or(`title.ilike.%${options.search}%,description.ilike.%${options.search}%`);
+        const sanitizedSearch = sanitizeSearchInput(options.search);
+        if (sanitizedSearch) {
+          query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%`);
+        }
       }
 
       // Apply sorting

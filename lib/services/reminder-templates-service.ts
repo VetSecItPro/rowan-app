@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { sanitizeSearchInput } from '@/lib/utils';
 import { z } from 'zod';
 
 // =============================================
@@ -458,12 +459,19 @@ export const reminderTemplatesService = {
   async searchTemplates(spaceId: string, query: string): Promise<ReminderTemplate[]> {
     const supabase = createClient();
 
-    const { data, error } = await supabase
+    let templatesQuery = supabase
       .from('reminder_templates')
       .select('*')
-      .or(`is_system_template.eq.true,space_id.eq.${spaceId}`)
-      .or(`name.ilike.%${query}%,description.ilike.%${query}%,template_title.ilike.%${query}%`)
-      .order('usage_count', { ascending: false });
+      .or(`is_system_template.eq.true,space_id.eq.${spaceId}`);
+
+    // Search in name, description, and template_title (sanitized to prevent SQL injection)
+    const sanitizedQuery = sanitizeSearchInput(query);
+    if (sanitizedQuery) {
+      templatesQuery = templatesQuery.or(`name.ilike.%${sanitizedQuery}%,description.ilike.%${sanitizedQuery}%,template_title.ilike.%${sanitizedQuery}%`);
+    }
+
+    templatesQuery = templatesQuery.order('usage_count', { ascending: false});
+    const { data, error } = await templatesQuery;
 
     if (error) {
       console.error('Error searching templates:', error);

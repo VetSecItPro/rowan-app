@@ -1,6 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto';
 
 export async function middleware(req: NextRequest) {
   let response = NextResponse.next({
@@ -56,6 +57,41 @@ export async function middleware(req: NextRequest) {
   );
 
   const { data: { session } } = await supabase.auth.getSession();
+
+  // Admin routes - require admin authentication
+  const isAdminPath = req.nextUrl.pathname.startsWith('/admin');
+  const isAdminLoginPath = req.nextUrl.pathname === '/admin/login';
+
+  if (isAdminPath && !isAdminLoginPath) {
+    // Verify admin session
+    const adminSessionCookie = req.cookies.get('admin-session')?.value;
+
+    if (!adminSessionCookie) {
+      // No admin session - redirect to admin login
+      return NextResponse.redirect(new URL('/admin/login', req.url));
+    }
+
+    try {
+      // Decrypt and validate admin session
+      const sessionData = decryptSessionData(adminSessionCookie);
+
+      if (!validateSessionData(sessionData)) {
+        // Invalid or expired session - redirect to admin login
+        const response = NextResponse.redirect(new URL('/admin/login', req.url));
+        // Clear invalid cookie
+        response.cookies.delete('admin-session');
+        return response;
+      }
+
+      // Admin session valid - continue
+    } catch (error) {
+      // Decryption failed - invalid session
+      console.error('Admin session validation failed:', error);
+      const response = NextResponse.redirect(new URL('/admin/login', req.url));
+      response.cookies.delete('admin-session');
+      return response;
+    }
+  }
 
   // Protected routes - require authentication
   const protectedPaths = [
@@ -172,6 +208,7 @@ export const config = {
     '/settings/:path*',
     '/invitations/:path*',
     '/feedback/:path*',
+    '/admin/:path*', // Admin routes now protected
     '/login',
     '/signup',
   ],
