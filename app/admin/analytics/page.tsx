@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Breadcrumbs } from '@/components/admin/Breadcrumbs';
 import {
   BarChart3,
   TrendingUp,
@@ -11,7 +12,6 @@ import {
   Calendar,
   Download,
   RefreshCw,
-  ArrowLeft,
   PieChart,
   Activity,
   Globe,
@@ -318,25 +318,18 @@ export default function AdminAnalyticsPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-6">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => router.push('/admin/dashboard')}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              </button>
-              <div className="flex items-center gap-3">
-                <BarChart3 className="w-8 h-8 text-blue-600" />
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Analytics Dashboard
-                  </h1>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Data insights and trends analysis
-                  </p>
-                </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <Breadcrumbs currentPage="Analytics" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <BarChart3 className="w-8 h-8 text-blue-600" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Analytics Dashboard
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Data insights and trends analysis
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">

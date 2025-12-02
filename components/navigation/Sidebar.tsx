@@ -26,19 +26,24 @@ const NavItemComponent = memo(function NavItemComponent({
       <Link
         href={item.href}
         prefetch={true}
-        className={`group relative flex items-center gap-3 px-2 py-2.5 rounded-xl transition-all duration-200 ${
+        className={`group relative flex items-center gap-3 px-2.5 py-3 rounded-lg transition-all duration-200 ${
           isActive
-            ? 'bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-800/50 shadow-sm'
-            : 'hover:bg-gray-50/80 dark:hover:bg-gray-800/40'
+            ? 'bg-gradient-to-r from-blue-50/80 to-indigo-50/60 dark:from-blue-900/20 dark:to-indigo-900/10 shadow-sm border border-blue-100 dark:border-blue-800/30'
+            : 'hover:bg-gray-100/60 dark:hover:bg-gray-800/50 hover:shadow-sm border border-transparent'
         }`}
       >
-        {/* Icon with gradient background */}
+        {/* Icon with refined gradient background and shadow */}
         <div
-          className={`relative flex-shrink-0 w-9 h-9 rounded-xl ${item.gradient} flex items-center justify-center shadow-md transition-transform duration-200 group-hover:scale-105 ${
-            isActive ? 'shadow-lg ring-2 ring-white/20' : ''
+          className={`relative flex-shrink-0 w-10 h-10 rounded-lg ${item.gradient} flex items-center justify-center shadow-lg transition-all duration-200 group-hover:scale-110 group-hover:shadow-xl ${
+            isActive ? 'shadow-2xl ring-2 ring-white/30 dark:ring-white/20 scale-105' : 'shadow-md'
           }`}
+          style={{
+            boxShadow: isActive
+              ? '0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1), inset 0 2px 4px 0 rgba(255, 255, 255, 0.1)'
+              : '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1), inset 0 2px 4px 0 rgba(255, 255, 255, 0.1)'
+          }}
         >
-          <Icon className="w-[18px] h-[18px] text-white drop-shadow-sm" />
+          <Icon className="w-5 h-5 text-white drop-shadow-md" />
           {isActive && (
             <div className="absolute inset-0 rounded-xl bg-white/10 animate-pulse" />
           )}
@@ -47,7 +52,7 @@ const NavItemComponent = memo(function NavItemComponent({
         {/* Label with smooth width transition */}
         <div
           className={`overflow-hidden transition-all duration-300 ease-out ${
-            isExpanded ? 'w-36 opacity-100' : 'w-0 opacity-0'
+            isExpanded ? 'w-44 opacity-100' : 'w-0 opacity-0'
           }`}
         >
           <p
@@ -73,9 +78,9 @@ const NavItemComponent = memo(function NavItemComponent({
           </div>
         )}
 
-        {/* Active indicator bar */}
+        {/* Active indicator bar - refined */}
         {isActive && (
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-r-full shadow-lg shadow-blue-500/30" />
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-600 via-indigo-600 to-purple-600 rounded-r-full shadow-lg" />
         )}
       </Link>
     </li>
@@ -126,7 +131,7 @@ export function Sidebar() {
   return (
     <aside
       className={`hidden md:flex flex-col h-screen sticky top-0 bg-gradient-to-b from-white/90 via-white/80 to-gray-50/90 dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-950/90 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-700/30 transition-all duration-300 ease-out shadow-xl shadow-gray-200/20 dark:shadow-black/20 ${
-        isExpanded ? 'w-56' : 'w-[60px]'
+        isExpanded ? 'w-64' : 'w-[60px]'
       }`}
     >
       {/* Header with subtle branding */}
@@ -151,26 +156,29 @@ export function Sidebar() {
 
       {/* Navigation Items */}
       <nav className="flex-1 py-3 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
-        <ul className="space-y-1 px-2">
-          {NAVIGATION_ITEMS.map((item, index) => (
-            <NavItemComponent
-              key={item.href}
-              item={item}
-              isActive={activeStates[index]}
-              isExpanded={isExpanded}
-            />
-          ))}
-        </ul>
+        {/* Features Section with subtle background */}
+        <div className="mx-2 mb-3 rounded-xl bg-gradient-to-b from-gray-50/40 to-transparent dark:from-gray-800/20 dark:to-transparent p-2">
+          <ul className="space-y-1.5">
+            {NAVIGATION_ITEMS.map((item, index) => (
+              <NavItemComponent
+                key={item.href}
+                item={item}
+                isActive={activeStates[index]}
+                isExpanded={isExpanded}
+              />
+            ))}
+          </ul>
+        </div>
 
         {/* Admin Section - Only visible to admin */}
         {isAdmin && (
-          <div className="mt-6 pt-6 border-t border-gray-200/50 dark:border-gray-700/30 px-2">
+          <div className="mt-4 mx-2 rounded-xl bg-gradient-to-b from-orange-50/30 to-transparent dark:from-orange-900/10 dark:to-transparent p-2">
             {isExpanded && (
-              <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2 mb-2 block">
+              <span className="text-xs font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 px-2 mb-3 block">
                 Admin
               </span>
             )}
-            <ul className="space-y-1">
+            <ul className="space-y-1.5">
               <NavItemComponent
                 item={{
                   name: 'Beta Feedback',

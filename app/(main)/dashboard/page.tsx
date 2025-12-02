@@ -1554,10 +1554,10 @@ export default function DashboardPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:min-h-[600px]"
           >
             {/* Left: Daily Check-In */}
-            <div className="group bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-blue-50/50 dark:from-pink-900/10 dark:via-purple-900/10 dark:to-blue-900/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.3)] border border-pink-200/20 dark:border-pink-500/20 hover:border-pink-400/50 dark:hover:border-pink-400/50 transition-all duration-300">
+            <div className="group bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-blue-50/50 dark:from-pink-900/10 dark:via-purple-900/10 dark:to-blue-900/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.3)] border border-pink-200/20 dark:border-pink-500/20 hover:border-pink-400/50 dark:hover:border-pink-400/50 transition-all duration-300 flex flex-col">
             {/* Compact Header with Date, Toggle, and Streak Badge */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
               <div className="flex flex-col gap-1">
@@ -1600,12 +1600,17 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Streak Badge */}
-                {checkInStats && checkInStats.currentStreak > 0 && (
-                  <Tooltip content={`You've checked in ${checkInStats.currentStreak} days in a row! Keep it up!`}>
+                {checkInStats && (
+                  <Tooltip content={checkInStats.currentStreak > 0
+                    ? `You've checked in ${checkInStats.currentStreak} days in a row! Keep it up!`
+                    : 'Start your check-in streak today!'
+                  }>
                     <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-100 to-yellow-100 dark:from-orange-900/30 dark:to-yellow-900/30 rounded-full cursor-help">
                       <Zap className="w-3.5 h-3.5 text-orange-500" />
                       <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{checkInStats.currentStreak}</span>
-                      <span className="text-xs text-gray-600 dark:text-gray-400 hidden sm:inline">day streak</span>
+                      <span className="text-xs text-gray-600 dark:text-gray-400 hidden sm:inline">
+                        {checkInStats.currentStreak === 0 ? 'start streak' : 'day streak'}
+                      </span>
                     </div>
                   </Tooltip>
                 )}
@@ -1615,25 +1620,26 @@ export default function DashboardPage() {
             {/* Check-In Mode */}
             {viewMode === 'checkin' && (
               <>
-                {/* Partner Moods - Side by Side */}
-                {recentCheckIns.length > 0 && (
-                  <div className="flex items-center gap-3 mb-4 px-2">
-                    {(() => {
-                      const today = getCurrentDateString();
-                      const userToday = recentCheckIns.find(c => c.user_id === user?.id && c.date === today);
-                      const partnerToday = recentCheckIns.find(c => c.user_id !== user?.id && c.date === today);
-                      const userEmoji = userToday ? moodOptions.find(m => m.value === userToday.mood)?.emoji : null;
-                      const partnerEmoji = partnerToday ? moodOptions.find(m => m.value === partnerToday.mood)?.emoji : null;
+                {/* Partner Moods - Side by Side with Placeholder */}
+                <div className="flex items-center gap-3 mb-4 px-2">
+                  {(() => {
+                    const today = getCurrentDateString();
+                    const userToday = recentCheckIns.find(c => c.user_id === user?.id && c.date === today);
+                    const partnerToday = recentCheckIns.find(c => c.user_id !== user?.id && c.date === today);
+                    const userEmoji = userToday ? moodOptions.find(m => m.value === userToday.mood)?.emoji : null;
+                    const partnerEmoji = partnerToday ? moodOptions.find(m => m.value === partnerToday.mood)?.emoji : null;
 
-                      return (
-                        <>
-                          {userEmoji && (
-                            <div className="flex items-center gap-2 px-3 py-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md rounded-full border border-pink-200/50 dark:border-pink-700/50">
-                              <span className="text-xl">{userEmoji}</span>
-                              <span className="text-xs font-medium text-gray-700 dark:text-gray-300">You</span>
-                            </div>
-                          )}
-                          {partnerEmoji && partnerToday && (
+                    return (
+                      <>
+                        {userEmoji && (
+                          <div className="flex items-center gap-2 px-3 py-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md rounded-full border border-pink-200/50 dark:border-pink-700/50">
+                            <span className="text-xl">{userEmoji}</span>
+                            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">You</span>
+                          </div>
+                        )}
+
+                        {/* Partner mood or placeholder */}
+                        {partnerEmoji && partnerToday ? (
                             <>
                               <div className="flex items-center gap-2 px-3 py-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md rounded-full border border-purple-200/50 dark:border-purple-700/50">
                                 <span className="text-xl">{partnerEmoji}</span>
@@ -1681,12 +1687,16 @@ export default function DashboardPage() {
                                 )}
                               </div>
                             </>
-                          )}
-                        </>
-                      );
-                    })()}
-                  </div>
-                )}
+                          ) : userEmoji ? (
+                            <div className="flex items-center gap-2 px-3 py-2 bg-gray-100/60 dark:bg-gray-700/60 backdrop-blur-md rounded-full border border-gray-300/50 dark:border-gray-600/50">
+                              <span className="text-xl">💭</span>
+                              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Partner hasn't checked in yet</span>
+                            </div>
+                          ) : null}
+                      </>
+                    );
+                  })()}
+                </div>
 
                 {/* Elegant Mood Selector - Apple-Inspired Design */}
                 <div className="flex items-center justify-center gap-3 sm:gap-4 w-full mb-3">
@@ -2203,15 +2213,17 @@ export default function DashboardPage() {
           </div>
 
             {/* Right: Activity Feed */}
-            <div className="group bg-gradient-to-br from-slate-50/50 via-gray-50/50 to-stone-50/50 dark:from-slate-900/10 dark:via-gray-900/10 dark:to-stone-900/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(148,163,184,0.3)] border border-gray-200/20 dark:border-gray-500/20 hover:border-gray-400/50 dark:hover:border-gray-400/50 transition-all duration-300">
+            <div className="group bg-gradient-to-br from-slate-50/50 via-gray-50/50 to-stone-50/50 dark:from-slate-900/10 dark:via-gray-900/10 dark:to-stone-900/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(148,163,184,0.3)] border border-gray-200/20 dark:border-gray-500/20 hover:border-gray-400/50 dark:hover:border-gray-400/50 transition-all duration-300 flex flex-col">
               {/* Header */}
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-2 mb-4 flex-shrink-0">
                 <Activity className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Recent Activity</h2>
               </div>
 
-              {/* Activity Feed Component */}
-              {currentSpace && <ActivityFeed spaceId={currentSpace.id} limit={50} />}
+              {/* Activity Feed Component - Scrollable */}
+              <div className="flex-1 overflow-y-auto min-h-0 -mx-2 px-2 custom-scrollbar">
+                {currentSpace && <ActivityFeed spaceId={currentSpace.id} limit={50} />}
+              </div>
             </div>
           </motion.div>
         </div>
