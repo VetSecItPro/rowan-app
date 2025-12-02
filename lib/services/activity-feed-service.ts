@@ -129,16 +129,15 @@ export const activityFeedService = {
       // Process shopping lists
       if (shoppingLists.data) {
         shoppingLists.data.forEach((list: any) => {
-          const user = list.users as any;
           activities.push({
             id: `shopping-${list.id}`,
             type: 'shopping',
-            action: list.status === 'completed' ? 'completed' : 'created',
+            action: 'created',
             title: list.name,
-            user_name: user?.name || user?.email || 'Unknown',
+            user_name: 'Unknown', // User lookup removed - table has no FK
             user_id: list.created_by,
-            user_avatar: user?.avatar_url,
-            created_at: list.status === 'completed' ? list.updated_at : list.created_at,
+            user_avatar: undefined,
+            created_at: list.created_at,
           });
         });
       }
