@@ -1,0 +1,57 @@
+/**
+ * Limit Warnings API Route
+ * GET /api/subscriptions/warnings - Get usage warnings for approaching limits
+ *
+ * IMPORTANT: Server-side only - requires authentication
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { getLimitWarnings } from '@/lib/services/feature-access-service';
+
+/**
+ * GET handler - Get warnings for limits that user is approaching (>80% usage)
+ */
+export async function GET(request: NextRequest) {
+  try {
+    // Get authenticated user
+    const supabase = createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Get query parameter for threshold (default 0.8 = 80%)
+    const searchParams = request.nextUrl.searchParams;
+    const thresholdParam = searchParams.get('threshold');
+    const threshold = thresholdParam ? parseFloat(thresholdParam) : 0.8;
+
+    // Validate threshold
+    if (isNaN(threshold) || threshold <= 0 || threshold > 1) {
+      return NextResponse.json(
+        { error: 'Threshold must be between 0 and 1' },
+        { status: 400 }
+      );
+    }
+
+    // Get limit warnings
+    const warnings = await getLimitWarnings(user.id, threshold);
+
+    return NextResponse.json(warnings, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'private, max-age=60', // Cache for 1 minute
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching limit warnings:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch limit warnings' },
+      { status: 500 }
+    );
+  }
+}
