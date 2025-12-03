@@ -62,23 +62,27 @@ export function PricingCard({
       </div>
 
       {/* Price */}
-      <div className="mb-6">
+      <div className="mb-6 min-h-[120px]">
         {isFree ? (
           <div className="flex items-baseline">
             <span className="text-5xl font-bold text-gray-900 dark:text-white">Free</span>
           </div>
         ) : (
-          <div className="flex items-baseline">
-            <span className="text-5xl font-bold text-gray-900 dark:text-white">${price}</span>
-            <span className="ml-2 text-gray-600 dark:text-gray-400">
-              /{period === 'monthly' ? 'mo' : 'year'}
-            </span>
-          </div>
-        )}
-        {!isFree && period === 'annual' && (
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            ${(annualPrice / 12).toFixed(2)}/mo billed annually
-          </p>
+          <>
+            <div className="flex items-baseline">
+              <span className="text-5xl font-bold text-gray-900 dark:text-white">${price}</span>
+              <span className="ml-2 text-gray-600 dark:text-gray-400">
+                /{period === 'monthly' ? 'mo' : 'year'}
+              </span>
+            </div>
+            <div className="mt-1 h-5">
+              {period === 'annual' && (
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  ${(annualPrice / 12).toFixed(2)}/mo billed annually
+                </p>
+              )}
+            </div>
+          </>
         )}
       </div>
 
