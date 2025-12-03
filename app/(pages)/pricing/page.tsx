@@ -15,6 +15,11 @@ export default function PricingPage() {
   const router = useRouter();
   const [period, setPeriod] = useState<'monthly' | 'annual'>('monthly');
 
+  const handlePeriodChange = (newPeriod: 'monthly' | 'annual') => {
+    console.log('[PricingPage] Period changing from', period, 'to', newPeriod);
+    setPeriod(newPeriod);
+  };
+
   const handleSelectPlan = (tier: 'free' | 'pro' | 'family') => {
     if (tier === 'free') {
       router.push('/signup');
@@ -52,7 +57,7 @@ export default function PricingPage() {
 
           {/* Pricing Toggle */}
           <div className="mt-12">
-            <PricingToggle value={period} onChange={setPeriod} />
+            <PricingToggle value={period} onChange={handlePeriodChange} />
           </div>
 
           {/* Pricing Cards */}
