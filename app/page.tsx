@@ -205,6 +205,9 @@ export default function HomePage() {
             </Link>
 
             <div className="flex items-center gap-4">
+              <Link href="/pricing" className="hidden md:block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+                Pricing
+              </Link>
               <a href="#features" className="hidden md:block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
                 Features
               </a>
