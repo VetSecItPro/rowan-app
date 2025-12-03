@@ -17,8 +17,10 @@ export function PricingToggle({ onChange, defaultPeriod = 'monthly' }: PricingTo
   const [period, setPeriod] = useState<'monthly' | 'annual'>(defaultPeriod);
 
   const handleToggle = (newPeriod: 'monthly' | 'annual') => {
-    setPeriod(newPeriod);
-    onChange(newPeriod);
+    if (newPeriod !== period) {
+      setPeriod(newPeriod);
+      onChange(newPeriod);
+    }
   };
 
   return (
