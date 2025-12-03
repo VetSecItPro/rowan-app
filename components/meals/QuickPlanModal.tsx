@@ -21,7 +21,7 @@ const mealTypeOptions = [
 export function QuickPlanModal({ isOpen, onClose, onPlan, recipeName }: QuickPlanModalProps) {
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [selectedMealType, setSelectedMealType] = useState('dinner');
-  const [createShoppingList, setCreateShoppingList] = useState(true);
+  const [createShoppingList, setCreateShoppingList] = useState(false);
   const [isPlanning, setIsPlanning] = useState(false);
 
   const handlePlan = async () => {
