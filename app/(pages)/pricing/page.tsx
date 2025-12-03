@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PricingCard } from '@/components/pricing/PricingCard';
 import { PricingToggle } from '@/components/pricing/PricingToggle';
-import { Sparkles } from 'lucide-react';
+import Image from 'next/image';
 
 export default function PricingPage() {
   const router = useRouter();
@@ -32,8 +32,14 @@ export default function PricingPage() {
         <div className="mx-auto max-w-7xl">
           {/* Header */}
           <div className="text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
-              <Sparkles className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
+              <Image
+                src="/rowan-icon.png"
+                alt="Rowan"
+                width={64}
+                height={64}
+                className="rounded-2xl"
+              />
             </div>
             <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
               The family command center that works
