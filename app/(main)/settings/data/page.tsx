@@ -22,7 +22,7 @@ import {
   Loader2,
   ArrowLeft,
 } from 'lucide-react';
-import { formatBytes } from '@/lib/services/storage-service';
+import { formatBytes } from '@/lib/utils/format';
 import type { StorageUsage } from '@/lib/services/storage-service';
 
 interface StorageFile {
