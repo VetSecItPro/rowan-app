@@ -14,6 +14,7 @@ interface PricingToggleProps {
 
 export function PricingToggle({ value, onChange }: PricingToggleProps) {
   const handleToggle = (newPeriod: 'monthly' | 'annual') => {
+    console.log('[PricingToggle] Clicked:', newPeriod, 'Current:', value);
     onChange(newPeriod);
   };
 
