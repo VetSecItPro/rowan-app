@@ -29,18 +29,22 @@ export function PricingToggle({ onChange, defaultPeriod = 'monthly' }: PricingTo
         onClick={() => handleToggle('monthly')}
         className={`px-4 py-2 text-sm font-medium transition-colors ${
           period === 'monthly'
-            ? 'text-blue-600 dark:text-blue-400'
+            ? 'text-emerald-600 dark:text-emerald-400'
             : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
         }`}
       >
         Monthly
       </button>
 
-      <div className="relative">
+      <button
+        onClick={() => handleToggle(period === 'monthly' ? 'annual' : 'monthly')}
+        className="relative"
+        aria-label={`Switch to ${period === 'monthly' ? 'annual' : 'monthly'} billing`}
+      >
         {/* Toggle Switch */}
         <div className="flex h-8 w-16 items-center rounded-full bg-gray-200 dark:bg-gray-700 p-1">
           <motion.div
-            className="h-6 w-6 rounded-full bg-blue-600 dark:bg-blue-500 shadow-md"
+            className="h-6 w-6 rounded-full bg-emerald-600 dark:bg-emerald-500 shadow-md"
             animate={{
               x: period === 'monthly' ? 0 : 32,
             }}
@@ -51,13 +55,13 @@ export function PricingToggle({ onChange, defaultPeriod = 'monthly' }: PricingTo
             }}
           />
         </div>
-      </div>
+      </button>
 
       <button
         onClick={() => handleToggle('annual')}
         className={`px-4 py-2 text-sm font-medium transition-colors ${
           period === 'annual'
-            ? 'text-blue-600 dark:text-blue-400'
+            ? 'text-emerald-600 dark:text-emerald-400'
             : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
         }`}
       >
