@@ -9,8 +9,11 @@ export function BetaFeedbackButton() {
   const { user } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Only show for beta testers
-  if (!user?.is_beta_tester || user.beta_status !== 'approved') {
+  // Show for beta testers or admin
+  const isAdmin = user?.email === 'admin@example.com';
+  const isBetaTester = user?.is_beta_tester && user.beta_status === 'approved';
+
+  if (!isBetaTester && !isAdmin) {
     return null;
   }
 
