@@ -1,7 +1,15 @@
 # Monetization Implementation TODO List
 **Created**: December 2, 2024
-**Status**: Ready for Implementation
+**Last Updated**: December 3, 2024
+**Status**: Phase 3 Complete - Ready for Phase 4
 **Target Launch**: 1-2 months (post-beta completion)
+
+## Implementation Progress
+- ✅ **Phase 1: Foundation & Database Schema** - Completed December 3, 2024 (PR #53)
+- ✅ **Phase 2: Stripe Integration Setup** - Completed December 3, 2024 (PR #53)
+- ✅ **Phase 3: Service Layer & Business Logic** - Completed December 3, 2024 (PR #54)
+- 🔄 **Phase 4: API Routes & Stripe Webhooks** - In Progress
+- ⏳ **Phases 5-12** - Pending
 
 ---
 
@@ -24,126 +32,127 @@
 ---
 
 ## Phase 1: Foundation & Database Schema
+**✅ COMPLETED** - December 3, 2024 (PR #53)
 
 ### 1.1 Database Schema Updates
-**Branch**: `feature/monetization-database-schema`
+**Branch**: `feature/monetization-database-schema` ✅ MERGED
 
 **Tasks:**
-- [ ] Create migration file: `supabase/migrations/YYYYMMDD_add_subscription_schema.sql`
-- [ ] Add subscription columns to auth.users (or create separate subscriptions table):
-  - [ ] `subscription_tier TEXT DEFAULT 'free'` (values: 'free', 'pro', 'family')
-  - [ ] `subscription_status TEXT DEFAULT 'active'` (values: 'active', 'past_due', 'canceled', 'paused')
-  - [ ] `stripe_customer_id TEXT`
-  - [ ] `stripe_subscription_id TEXT`
-  - [ ] `subscription_started_at TIMESTAMPTZ`
-  - [ ] `subscription_ends_at TIMESTAMPTZ` (for canceled subscriptions with grace period)
-  - [ ] `subscription_period TEXT DEFAULT 'monthly'` (values: 'monthly', 'annual')
-- [ ] Create `subscription_events` table for analytics:
-  - [ ] `id UUID PRIMARY KEY`
-  - [ ] `user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE`
-  - [ ] `event_type TEXT NOT NULL` ('upgrade', 'downgrade', 'cancel', 'reactivate', 'payment_failed')
-  - [ ] `from_tier TEXT`
-  - [ ] `to_tier TEXT`
-  - [ ] `trigger_source TEXT` ('task_limit', 'calendar_blocked', 'pricing_page', 'upgrade_modal')
-  - [ ] `metadata JSONB` (for additional context)
-  - [ ] `created_at TIMESTAMPTZ DEFAULT NOW()`
-  - [ ] Add index on `user_id` and `created_at`
-- [ ] Create `daily_usage` table for rate limiting:
-  - [ ] `id UUID PRIMARY KEY`
-  - [ ] `user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE`
-  - [ ] `date DATE DEFAULT CURRENT_DATE`
-  - [ ] `tasks_created INTEGER DEFAULT 0`
-  - [ ] `messages_sent INTEGER DEFAULT 0`
-  - [ ] `quick_actions_used INTEGER DEFAULT 0`
-  - [ ] `shopping_list_updates INTEGER DEFAULT 0`
-  - [ ] `UNIQUE(user_id, date)`
-  - [ ] Add index on `user_id` and `date`
-- [ ] Create helper functions:
-  - [ ] `get_user_subscription_tier(user_id UUID) RETURNS TEXT`
-  - [ ] `check_feature_access(user_id UUID, feature_name TEXT) RETURNS BOOLEAN`
-  - [ ] `get_daily_usage_count(user_id UUID, usage_type TEXT) RETURNS INTEGER`
-  - [ ] `increment_usage_count(user_id UUID, usage_type TEXT) RETURNS VOID`
-  - [ ] `record_subscription_event(user_id UUID, event_type TEXT, from_tier TEXT, to_tier TEXT, trigger_source TEXT, metadata JSONB) RETURNS VOID`
-- [ ] Add RLS policies:
-  - [ ] Users can read their own subscription data
-  - [ ] Users can read their own usage data
-  - [ ] Only authenticated users can access subscription functions
-  - [ ] Subscription events are read-only for users
-- [ ] Create rollback migration script
-- [ ] Test migration locally with `supabase db reset`
-- [ ] Verify all indexes and constraints are created
-- [ ] Document schema in migration file comments
+- [x] Create migration file: `supabase/migrations/YYYYMMDD_add_subscription_schema.sql`
+- [x] Add subscription columns to auth.users (or create separate subscriptions table):
+  - [x] `subscription_tier TEXT DEFAULT 'free'` (values: 'free', 'pro', 'family')
+  - [x] `subscription_status TEXT DEFAULT 'active'` (values: 'active', 'past_due', 'canceled', 'paused')
+  - [x] `stripe_customer_id TEXT`
+  - [x] `stripe_subscription_id TEXT`
+  - [x] `subscription_started_at TIMESTAMPTZ`
+  - [x] `subscription_ends_at TIMESTAMPTZ` (for canceled subscriptions with grace period)
+  - [x] `subscription_period TEXT DEFAULT 'monthly'` (values: 'monthly', 'annual')
+- [x] Create `subscription_events` table for analytics:
+  - [x] `id UUID PRIMARY KEY`
+  - [x] `user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE`
+  - [x] `event_type TEXT NOT NULL` ('upgrade', 'downgrade', 'cancel', 'reactivate', 'payment_failed')
+  - [x] `from_tier TEXT`
+  - [x] `to_tier TEXT`
+  - [x] `trigger_source TEXT` ('task_limit', 'calendar_blocked', 'pricing_page', 'upgrade_modal')
+  - [x] `metadata JSONB` (for additional context)
+  - [x] `created_at TIMESTAMPTZ DEFAULT NOW()`
+  - [x] Add index on `user_id` and `created_at`
+- [x] Create `daily_usage` table for rate limiting:
+  - [x] `id UUID PRIMARY KEY`
+  - [x] `user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE`
+  - [x] `date DATE DEFAULT CURRENT_DATE`
+  - [x] `tasks_created INTEGER DEFAULT 0`
+  - [x] `messages_sent INTEGER DEFAULT 0`
+  - [x] `quick_actions_used INTEGER DEFAULT 0`
+  - [x] `shopping_list_updates INTEGER DEFAULT 0`
+  - [x] `UNIQUE(user_id, date)`
+  - [x] Add index on `user_id` and `date`
+- [x] Create helper functions:
+  - [x] `get_user_subscription_tier(user_id UUID) RETURNS TEXT`
+  - [x] `check_feature_access(user_id UUID, feature_name TEXT) RETURNS BOOLEAN`
+  - [x] `get_daily_usage_count(user_id UUID, usage_type TEXT) RETURNS INTEGER`
+  - [x] `increment_usage_count(user_id UUID, usage_type TEXT) RETURNS VOID`
+  - [x] `record_subscription_event(user_id UUID, event_type TEXT, from_tier TEXT, to_tier TEXT, trigger_source TEXT, metadata JSONB) RETURNS VOID`
+- [x] Add RLS policies:
+  - [x] Users can read their own subscription data
+  - [x] Users can read their own usage data
+  - [x] Only authenticated users can access subscription functions
+  - [x] Subscription events are read-only for users
+- [x] Create rollback migration script
+- [x] Test migration locally with `supabase db reset`
+- [x] Verify all indexes and constraints are created
+- [x] Document schema in migration file comments
 
 **Testing Checklist:**
-- [ ] Run migration on local database
-- [ ] Verify all columns created with correct types
-- [ ] Test helper functions with sample data
-- [ ] Verify RLS policies work correctly
-- [ ] Test rollback migration
-- [ ] Document any breaking changes (should be none)
+- [x] Run migration on local database
+- [x] Verify all columns created with correct types
+- [x] Test helper functions with sample data
+- [x] Verify RLS policies work correctly
+- [x] Test rollback migration
+- [x] Document any breaking changes (should be none)
 
 **PR Requirements:**
-- [ ] Migration tested locally
-- [ ] Rollback script included
-- [ ] Schema documentation in migration file
-- [ ] No impact on existing functionality verified
+- [x] Migration tested locally
+- [x] Rollback script included
+- [x] Schema documentation in migration file
+- [x] No impact on existing functionality verified
 
 ---
 
 ### 1.2 TypeScript Types & Interfaces
-**Branch**: `feature/monetization-types`
+**Branch**: `feature/monetization-types` ✅ MERGED
 
 **Tasks:**
-- [ ] Create `lib/types/subscription.ts`:
-  - [ ] `SubscriptionTier` type ('free' | 'pro' | 'family')
-  - [ ] `SubscriptionStatus` type ('active' | 'past_due' | 'canceled' | 'paused')
-  - [ ] `SubscriptionPeriod` type ('monthly' | 'annual')
-  - [ ] `Subscription` interface with all subscription fields
-  - [ ] `SubscriptionEvent` interface for analytics
-  - [ ] `DailyUsage` interface for rate limiting
-  - [ ] `UsageType` type ('tasks_created' | 'messages_sent' | 'quick_actions_used' | 'shopping_list_updates')
-  - [ ] `TriggerSource` type ('task_limit' | 'calendar_blocked' | 'pricing_page' | 'upgrade_modal')
-- [ ] Create `lib/types/stripe.ts`:
-  - [ ] `StripeProduct` interface (id, name, description, price)
-  - [ ] `StripeCheckoutSession` interface
-  - [ ] `StripeWebhookEvent` interface
-  - [ ] `StripePriceInfo` interface (monthly/annual prices)
-- [ ] Update `lib/types.ts` to export new types
-- [ ] Add JSDoc comments for all types/interfaces
+- [x] Create `lib/types/subscription.ts`:
+  - [x] `SubscriptionTier` type ('free' | 'pro' | 'family')
+  - [x] `SubscriptionStatus` type ('active' | 'past_due' | 'canceled' | 'paused')
+  - [x] `SubscriptionPeriod` type ('monthly' | 'annual')
+  - [x] `Subscription` interface with all subscription fields
+  - [x] `SubscriptionEvent` interface for analytics
+  - [x] `DailyUsage` interface for rate limiting
+  - [x] `UsageType` type ('tasks_created' | 'messages_sent' | 'quick_actions_used' | 'shopping_list_updates')
+  - [x] `TriggerSource` type ('task_limit' | 'calendar_blocked' | 'pricing_page' | 'upgrade_modal')
+- [x] Create `lib/types/stripe.ts`:
+  - [x] `StripeProduct` interface (id, name, description, price)
+  - [x] `StripeCheckoutSession` interface
+  - [x] `StripeWebhookEvent` interface
+  - [x] `StripePriceInfo` interface (monthly/annual prices)
+- [x] Update `lib/types.ts` to export new types
+- [x] Add JSDoc comments for all types/interfaces
 
 **Testing Checklist:**
-- [ ] TypeScript compiles without errors: `npx tsc --noEmit`
-- [ ] All types properly exported
-- [ ] No circular dependencies
+- [x] TypeScript compiles without errors: `npx tsc --noEmit`
+- [x] All types properly exported
+- [x] No circular dependencies
 
 **PR Requirements:**
-- [ ] Types documented with JSDoc
-- [ ] Exports verified in lib/types.ts
-- [ ] TypeScript compilation passes
+- [x] Types documented with JSDoc
+- [x] Exports verified in lib/types.ts
+- [x] TypeScript compilation passes
 
 ---
 
 ### 1.3 Environment Variables Setup
-**Branch**: `feature/monetization-env-vars`
+**Branch**: `feature/monetization-env-vars` ✅ MERGED
 
 **Tasks:**
-- [ ] Add to `.env.local` (local development):
-  - [ ] `STRIPE_SECRET_KEY=sk_test_...` (test mode key)
-  - [ ] `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...` (test mode key)
-  - [ ] `STRIPE_WEBHOOK_SECRET=whsec_...` (for webhook verification)
-  - [ ] `STRIPE_PRO_MONTHLY_PRICE_ID=price_...`
-  - [ ] `STRIPE_PRO_ANNUAL_PRICE_ID=price_...`
-  - [ ] `STRIPE_FAMILY_MONTHLY_PRICE_ID=price_...`
-  - [ ] `STRIPE_FAMILY_ANNUAL_PRICE_ID=price_...`
-- [ ] Update `.env.example` with placeholder values:
-  - [ ] Add comments explaining each variable
-  - [ ] Include link to Stripe dashboard for key locations
-- [ ] Document in `docs/setup/STRIPE_SETUP.md`:
-  - [ ] How to create Stripe account
-  - [ ] How to get API keys
-  - [ ] How to create products and prices
-  - [ ] How to set up webhook endpoint
-  - [ ] Test mode vs production mode differences
+- [x] Add to `.env.local` (local development):
+  - [x] `STRIPE_SECRET_KEY=sk_test_...` (test mode key)
+  - [x] `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...` (test mode key)
+  - [x] `STRIPE_WEBHOOK_SECRET=whsec_...` (for webhook verification)
+  - [x] `STRIPE_PRO_MONTHLY_PRICE_ID=price_...`
+  - [x] `STRIPE_PRO_ANNUAL_PRICE_ID=price_...`
+  - [x] `STRIPE_FAMILY_MONTHLY_PRICE_ID=price_...`
+  - [x] `STRIPE_FAMILY_ANNUAL_PRICE_ID=price_...`
+- [x] Update `.env.example` with placeholder values:
+  - [x] Add comments explaining each variable
+  - [x] Include link to Stripe dashboard for key locations
+- [x] Document in `docs/setup/STRIPE_SETUP.md`:
+  - [x] How to create Stripe account
+  - [x] How to get API keys
+  - [x] How to create products and prices
+  - [x] How to set up webhook endpoint
+  - [x] Test mode vs production mode differences
 
 **Production Deployment (DO NOT DO YET - documented for later):**
 - [ ] Add production keys to Vercel environment variables
@@ -151,193 +160,195 @@
 - [ ] Test webhook delivery to production URL
 
 **Testing Checklist:**
-- [ ] `.env.local` variables load correctly
-- [ ] `.env.example` is up to date
-- [ ] Documentation is clear and complete
-- [ ] No secret keys committed to git
+- [x] `.env.local` variables load correctly
+- [x] `.env.example` is up to date
+- [x] Documentation is clear and complete
+- [x] No secret keys committed to git
 
 **PR Requirements:**
-- [ ] `.env.example` updated (no secrets)
-- [ ] Documentation included
-- [ ] `.gitignore` includes `.env.local`
+- [x] `.env.example` updated (no secrets)
+- [x] Documentation included
+- [x] `.gitignore` includes `.env.local`
 
 ---
 
 ## Phase 2: Stripe Integration Setup
+**✅ COMPLETED** - December 3, 2024 (PR #53)
 
 ### 2.1 Stripe Product Configuration (Manual Setup)
-**No code changes - documentation only**
+**No code changes - documentation only** ✅ COMPLETE
 
 **Create in Stripe Dashboard (Test Mode):**
-- [ ] Create Product: "Rowan Pro"
-  - [ ] Description: "Everything you need for household collaboration"
-  - [ ] Add monthly price: $11.99/month
-  - [ ] Add annual price: $119/year
-  - [ ] Copy price IDs to `.env.local`
-- [ ] Create Product: "Rowan Family"
-  - [ ] Description: "Complete family organization for up to 6 users"
-  - [ ] Add monthly price: $17.99/month
-  - [ ] Add annual price: $179/year
-  - [ ] Copy price IDs to `.env.local`
-- [ ] Configure webhook endpoint (for later):
-  - [ ] URL: `https://rowan.app/api/webhooks/stripe`
-  - [ ] Events to listen for:
-    - [ ] `checkout.session.completed`
-    - [ ] `customer.subscription.updated`
-    - [ ] `customer.subscription.deleted`
-    - [ ] `invoice.payment_failed`
-    - [ ] `invoice.payment_succeeded`
-  - [ ] Copy webhook secret to `.env.local`
+- [x] Create Product: "Rowan Pro"
+  - [x] Description: "Everything you need for household collaboration"
+  - [x] Add monthly price: $11.99/month
+  - [x] Add annual price: $119/year
+  - [x] Copy price IDs to `.env.local`
+- [x] Create Product: "Rowan Family"
+  - [x] Description: "Complete family organization for up to 6 users"
+  - [x] Add monthly price: $17.99/month
+  - [x] Add annual price: $179/year
+  - [x] Copy price IDs to `.env.local`
+- [x] Configure webhook endpoint (for later):
+  - [x] URL: `https://rowan.app/api/webhooks/stripe`
+  - [x] Events to listen for:
+    - [x] `checkout.session.completed`
+    - [x] `customer.subscription.updated`
+    - [x] `customer.subscription.deleted`
+    - [x] `invoice.payment_failed`
+    - [x] `invoice.payment_succeeded`
+  - [x] Copy webhook secret to `.env.local`
 
 **Documentation:**
-- [ ] Create `docs/setup/STRIPE_PRODUCTS.md`
-- [ ] Include screenshots of product setup
-- [ ] Document price IDs for reference
-- [ ] Explain webhook configuration
+- [x] Create `docs/setup/STRIPE_PRODUCTS.md`
+- [x] Include screenshots of product setup
+- [x] Document price IDs for reference
+- [x] Explain webhook configuration
 
 ---
 
 ### 2.2 Stripe API Integration
-**Branch**: `feature/stripe-integration`
+**Branch**: `feature/stripe-integration` ✅ MERGED
 
 **Tasks:**
-- [ ] Install Stripe SDK: `npm install stripe @stripe/stripe-js`
-- [ ] Create `lib/stripe/client.ts`:
-  - [ ] Initialize Stripe client with secret key
-  - [ ] Export typed Stripe instance
-  - [ ] Add error handling for missing keys
-- [ ] Create `lib/stripe/products.ts`:
-  - [ ] `STRIPE_PRODUCTS` constant with tier → price ID mapping
-  - [ ] `getPriceId(tier: SubscriptionTier, period: SubscriptionPeriod)` function
-  - [ ] `getProductInfo(tier: SubscriptionTier)` function (name, description, features)
-- [ ] Create `lib/stripe/checkout.ts`:
-  - [ ] `createCheckoutSession(userId, email, tier, period)` function
-  - [ ] Handle customer creation or retrieval
-  - [ ] Set success/cancel URLs
-  - [ ] Include metadata (user_id, tier, period)
-  - [ ] Return session ID
-- [ ] Create `lib/stripe/webhooks.ts`:
-  - [ ] `verifyWebhookSignature(payload, signature)` function
-  - [ ] `handleCheckoutCompleted(session)` function
-  - [ ] `handleSubscriptionUpdated(subscription)` function
-  - [ ] `handleSubscriptionDeleted(subscription)` function
-  - [ ] `handlePaymentFailed(invoice)` function
-- [ ] Add comprehensive error handling and logging
+- [x] Install Stripe SDK: `npm install stripe @stripe/stripe-js`
+- [x] Create `lib/stripe/client.ts`:
+  - [x] Initialize Stripe client with secret key
+  - [x] Export typed Stripe instance
+  - [x] Add error handling for missing keys
+- [x] Create `lib/stripe/products.ts`:
+  - [x] `STRIPE_PRODUCTS` constant with tier → price ID mapping
+  - [x] `getPriceId(tier: SubscriptionTier, period: SubscriptionPeriod)` function
+  - [x] `getProductInfo(tier: SubscriptionTier)` function (name, description, features)
+- [x] Create `lib/stripe/checkout.ts`:
+  - [x] `createCheckoutSession(userId, email, tier, period)` function
+  - [x] Handle customer creation or retrieval
+  - [x] Set success/cancel URLs
+  - [x] Include metadata (user_id, tier, period)
+  - [x] Return session ID
+- [x] Create `lib/stripe/webhooks.ts`:
+  - [x] `verifyWebhookSignature(payload, signature)` function
+  - [x] `handleCheckoutCompleted(session)` function
+  - [x] `handleSubscriptionUpdated(subscription)` function
+  - [x] `handleSubscriptionDeleted(subscription)` function
+  - [x] `handlePaymentFailed(invoice)` function
+- [x] Add comprehensive error handling and logging
 
 **Testing Checklist:**
-- [ ] Stripe client initializes correctly
-- [ ] Product info returns correct data
-- [ ] Price IDs map correctly
-- [ ] Error handling catches missing env vars
-- [ ] TypeScript types are correct
+- [x] Stripe client initializes correctly
+- [x] Product info returns correct data
+- [x] Price IDs map correctly
+- [x] Error handling catches missing env vars
+- [x] TypeScript types are correct
 
 **PR Requirements:**
-- [ ] All functions documented with JSDoc
-- [ ] Error handling implemented
-- [ ] TypeScript compilation passes
-- [ ] No secrets in code (only env vars)
+- [x] All functions documented with JSDoc
+- [x] Error handling implemented
+- [x] TypeScript compilation passes
+- [x] No secrets in code (only env vars)
 
 ---
 
 ### 2.3 Stripe API Routes
-**Branch**: `feature/stripe-api-routes`
+**Branch**: `feature/stripe-api-routes` ✅ MERGED
 
 **Tasks:**
-- [ ] Create `app/api/stripe/create-checkout-session/route.ts`:
-  - [ ] POST handler with authentication check
-  - [ ] Validate request body with Zod schema (tier, period)
-  - [ ] Get user from Supabase session
-  - [ ] Call `createCheckoutSession()` from lib/stripe/checkout
-  - [ ] Return session ID and publishable key
-  - [ ] Add rate limiting (Upstash Redis)
-  - [ ] Comprehensive error handling
-  - [ ] Log all requests for debugging
-- [ ] Create `app/api/webhooks/stripe/route.ts`:
-  - [ ] POST handler (no authentication - Stripe verified)
-  - [ ] Verify webhook signature
-  - [ ] Parse webhook event
-  - [ ] Route to appropriate handler based on event type
-  - [ ] Return 200 OK to acknowledge receipt
-  - [ ] Log all webhook events
-  - [ ] Handle errors gracefully (return 200 even on errors to avoid retries)
-- [ ] Create `app/api/subscription/status/route.ts`:
-  - [ ] GET handler with authentication
-  - [ ] Return user's subscription info from database
-  - [ ] Include usage stats
-  - [ ] Cache response for 5 minutes
-- [ ] Create `app/api/subscription/cancel/route.ts`:
-  - [ ] POST handler with authentication
-  - [ ] Cancel subscription in Stripe
-  - [ ] Update database status to 'canceled'
-  - [ ] Record subscription event
-  - [ ] Send cancellation email (optional)
-  - [ ] Return updated subscription info
+- [x] Create `app/api/stripe/create-checkout-session/route.ts`:
+  - [x] POST handler with authentication check
+  - [x] Validate request body with Zod schema (tier, period)
+  - [x] Get user from Supabase session
+  - [x] Call `createCheckoutSession()` from lib/stripe/checkout
+  - [x] Return session ID and publishable key
+  - [x] Add rate limiting (Upstash Redis)
+  - [x] Comprehensive error handling
+  - [x] Log all requests for debugging
+- [x] Create `app/api/webhooks/stripe/route.ts`:
+  - [x] POST handler (no authentication - Stripe verified)
+  - [x] Verify webhook signature
+  - [x] Parse webhook event
+  - [x] Route to appropriate handler based on event type
+  - [x] Return 200 OK to acknowledge receipt
+  - [x] Log all webhook events
+  - [x] Handle errors gracefully (return 200 even on errors to avoid retries)
+- [x] Create `app/api/subscription/status/route.ts`:
+  - [x] GET handler with authentication
+  - [x] Return user's subscription info from database
+  - [x] Include usage stats
+  - [x] Cache response for 5 minutes
+- [x] Create `app/api/subscription/cancel/route.ts`:
+  - [x] POST handler with authentication
+  - [x] Cancel subscription in Stripe
+  - [x] Update database status to 'canceled'
+  - [x] Record subscription event
+  - [x] Send cancellation email (optional)
+  - [x] Return updated subscription info
 
 **Zod Validation Schemas:**
-- [ ] `CreateCheckoutSessionSchema`:
-  - [ ] `tier`: enum ['pro', 'family']
-  - [ ] `period`: enum ['monthly', 'annual']
-- [ ] `CancelSubscriptionSchema`:
-  - [ ] `reason`: optional string (for analytics)
+- [x] `CreateCheckoutSessionSchema`:
+  - [x] `tier`: enum ['pro', 'family']
+  - [x] `period`: enum ['monthly', 'annual']
+- [x] `CancelSubscriptionSchema`:
+  - [x] `reason`: optional string (for analytics)
 
 **Security Checklist:**
-- [ ] All routes have proper authentication (except webhooks)
-- [ ] Webhook signature verification implemented
-- [ ] Rate limiting on checkout creation (5 requests/minute)
-- [ ] Input validation with Zod
-- [ ] SQL injection prevention (use parameterized queries)
-- [ ] No sensitive data in error responses
+- [x] All routes have proper authentication (except webhooks)
+- [x] Webhook signature verification implemented
+- [x] Rate limiting on checkout creation (5 requests/minute)
+- [x] Input validation with Zod
+- [x] SQL injection prevention (use parameterized queries)
+- [x] No sensitive data in error responses
 
 **Testing Checklist:**
-- [ ] Test create-checkout-session with valid data
-- [ ] Test with invalid tier/period (should reject)
-- [ ] Test without authentication (should reject)
-- [ ] Test webhook with valid signature
-- [ ] Test webhook with invalid signature (should reject)
-- [ ] Test subscription status endpoint
-- [ ] Test cancel endpoint
+- [x] Test create-checkout-session with valid data
+- [x] Test with invalid tier/period (should reject)
+- [x] Test without authentication (should reject)
+- [x] Test webhook with valid signature
+- [x] Test webhook with invalid signature (should reject)
+- [x] Test subscription status endpoint
+- [x] Test cancel endpoint
 
 **PR Requirements:**
-- [ ] All routes tested locally
-- [ ] Error handling verified
-- [ ] Security checklist completed
-- [ ] Documentation in route files
+- [x] All routes tested locally
+- [x] Error handling verified
+- [x] Security checklist completed
+- [x] Documentation in route files
 
 ---
 
 ## Phase 3: Service Layer & Business Logic
+**✅ COMPLETED** - December 3, 2024 (PR #54)
 
 ### 3.1 Subscription Service Layer
-**Branch**: `feature/subscription-service`
+**Branch**: `feature/phase3-service-layer` ✅ MERGED
 
 **Tasks:**
-- [ ] Create `lib/services/subscription-service.ts`:
-  - [ ] `getUserSubscription(userId: string): Promise<Subscription>`
-  - [ ] `updateSubscription(userId: string, data: Partial<Subscription>): Promise<void>`
-  - [ ] `cancelSubscription(userId: string, reason?: string): Promise<void>`
-  - [ ] `reactivateSubscription(userId: string): Promise<void>`
-  - [ ] `recordSubscriptionEvent(userId: string, event: SubscriptionEvent): Promise<void>`
-  - [ ] All functions use Supabase client
-  - [ ] Comprehensive error handling
-  - [ ] Return structured error objects
-- [ ] Create `lib/services/usage-service.ts`:
-  - [ ] `getDailyUsage(userId: string, date?: Date): Promise<DailyUsage>`
-  - [ ] `incrementUsage(userId: string, usageType: UsageType): Promise<void>`
-  - [ ] `checkUsageLimit(userId: string, usageType: UsageType): Promise<boolean>`
-  - [ ] `resetDailyUsage(userId: string): Promise<void>` (for testing)
-  - [ ] Use atomic increments to prevent race conditions
-- [ ] Create `lib/services/feature-access-service.ts`:
-  - [ ] `checkFeatureAccess(userId: string, feature: string): Promise<boolean>`
-  - [ ] `getFeatureLimits(tier: SubscriptionTier): FeatureLimits`
-  - [ ] `canCreateTask(userId: string): Promise<boolean>`
-  - [ ] `canCreateCalendarEvent(userId: string): Promise<boolean>`
-  - [ ] `canSendMessage(userId: string): Promise<boolean>`
-  - [ ] `canUseQuickAction(userId: string): Promise<boolean>`
-  - [ ] `canUploadPhoto(userId: string): Promise<boolean>`
-  - [ ] Cache tier info to reduce database queries
+- [x] Create `lib/services/subscription-service.ts`:
+  - [x] `getUserSubscription(userId: string): Promise<Subscription>`
+  - [x] `updateSubscription(userId: string, data: Partial<Subscription>): Promise<void>`
+  - [x] `cancelSubscription(userId: string, reason?: string): Promise<void>`
+  - [x] `reactivateSubscription(userId: string): Promise<void>`
+  - [x] `recordSubscriptionEvent(userId: string, event: SubscriptionEvent): Promise<void>`
+  - [x] All functions use Supabase client
+  - [x] Comprehensive error handling
+  - [x] Return structured error objects
+- [x] Create `lib/services/usage-service.ts`:
+  - [x] `getDailyUsage(userId: string, date?: Date): Promise<DailyUsage>`
+  - [x] `incrementUsage(userId: string, usageType: UsageType): Promise<void>`
+  - [x] `checkUsageLimit(userId: string, usageType: UsageType): Promise<boolean>`
+  - [x] `resetDailyUsage(userId: string): Promise<void>` (for testing)
+  - [x] Use atomic increments to prevent race conditions
+- [x] Create `lib/services/feature-access-service.ts`:
+  - [x] `checkFeatureAccess(userId: string, feature: string): Promise<boolean>`
+  - [x] `getFeatureLimits(tier: SubscriptionTier): FeatureLimits`
+  - [x] `canCreateTask(userId: string): Promise<boolean>`
+  - [x] `canCreateCalendarEvent(userId: string): Promise<boolean>`
+  - [x] `canSendMessage(userId: string): Promise<boolean>`
+  - [x] `canUseQuickAction(userId: string): Promise<boolean>`
+  - [x] `canUploadPhoto(userId: string): Promise<boolean>`
+  - [x] Cache tier info to reduce database queries
 
 **Feature Limits Configuration:**
-- [ ] Create `lib/config/feature-limits.ts`:
+- [x] Create `lib/config/feature-limits.ts`:
   ```typescript
   export const FEATURE_LIMITS = {
     free: {
@@ -392,23 +403,33 @@
   ```
 
 **Testing Checklist:**
-- [ ] Test getUserSubscription with existing user
-- [ ] Test updateSubscription with valid data
-- [ ] Test feature access checks for each tier
-- [ ] Test usage increment and limit checks
-- [ ] Test concurrent usage increments (race conditions)
-- [ ] Verify error handling for invalid inputs
+- [x] Test getUserSubscription with existing user
+- [x] Test updateSubscription with valid data
+- [x] Test feature access checks for each tier
+- [x] Test usage increment and limit checks
+- [x] Test concurrent usage increments (race conditions)
+- [x] Verify error handling for invalid inputs
 
 **PR Requirements:**
-- [ ] Service functions documented
-- [ ] Feature limits clearly defined
-- [ ] All services tested
-- [ ] No breaking changes to existing code
+- [x] Service functions documented
+- [x] Feature limits clearly defined
+- [x] All services tested
+- [x] No breaking changes to existing code
+
+**Implementation Notes (December 3, 2024):**
+- ✅ Created `lib/config/feature-limits.ts` with complete tier definitions
+- ✅ Created `lib/services/subscription-service.ts` with all CRUD operations
+- ✅ Created `lib/services/usage-service.ts` with atomic usage tracking
+- ✅ Created `lib/services/feature-access-service.ts` with comprehensive access control
+- ✅ Fixed UsageType naming mismatch (tasks_created, messages_sent, etc.)
+- ✅ Fixed storageGB type to be `number | undefined`
+- ✅ All files passed TypeScript compilation
+- ✅ PR #54 merged successfully
 
 ---
 
 ### 3.2 Middleware for Feature Gating
-**Branch**: `feature/feature-gating-middleware`
+**Branch**: `feature/feature-gating-middleware` ⏳ PENDING (Phase 4)
 
 **Tasks:**
 - [ ] Create `lib/middleware/subscription-check.ts`:
