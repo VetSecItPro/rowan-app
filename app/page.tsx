@@ -238,7 +238,7 @@ export default function HomePage() {
               >
                 <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                  Your Life Management Platform
+                  Your Life Management Hub
                 </span>
               </motion.div>
 
