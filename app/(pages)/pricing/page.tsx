@@ -34,7 +34,7 @@ export default function PricingPage() {
           <div className="text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
               <Image
-                src="/rowan-icon.png"
+                src="/rowan-logo.png"
                 alt="Rowan"
                 width={64}
                 height={64}
@@ -52,7 +52,7 @@ export default function PricingPage() {
 
           {/* Pricing Toggle */}
           <div className="mt-12">
-            <PricingToggle onChange={setPeriod} defaultPeriod={period} />
+            <PricingToggle value={period} onChange={setPeriod} />
           </div>
 
           {/* Pricing Cards */}
