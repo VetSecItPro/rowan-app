@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend only if API key is available (build-time safe)
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Create Supabase admin client for server-side operations
 const supabaseAdmin = createClient(
@@ -127,6 +128,14 @@ export async function GET(request: Request) {
     const authHeader = request.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Verify Resend is configured
+    if (!resend) {
+      return NextResponse.json(
+        { error: 'Resend API not configured' },
+        { status: 500 }
+      );
     }
 
     const emailsSent = {
