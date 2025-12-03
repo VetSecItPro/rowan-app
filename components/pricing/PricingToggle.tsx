@@ -5,22 +5,16 @@
  * Monthly/Annual billing period switcher
  */
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 interface PricingToggleProps {
+  value: 'monthly' | 'annual';
   onChange: (period: 'monthly' | 'annual') => void;
-  defaultPeriod?: 'monthly' | 'annual';
 }
 
-export function PricingToggle({ onChange, defaultPeriod = 'monthly' }: PricingToggleProps) {
-  const [period, setPeriod] = useState<'monthly' | 'annual'>(defaultPeriod);
-
+export function PricingToggle({ value, onChange }: PricingToggleProps) {
   const handleToggle = (newPeriod: 'monthly' | 'annual') => {
-    if (newPeriod !== period) {
-      setPeriod(newPeriod);
-      onChange(newPeriod);
-    }
+    onChange(newPeriod);
   };
 
   return (
@@ -28,7 +22,7 @@ export function PricingToggle({ onChange, defaultPeriod = 'monthly' }: PricingTo
       <button
         onClick={() => handleToggle('monthly')}
         className={`px-4 py-2 text-sm font-medium transition-colors ${
-          period === 'monthly'
+          value === 'monthly'
             ? 'text-emerald-600 dark:text-emerald-400'
             : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
         }`}
@@ -42,7 +36,7 @@ export function PricingToggle({ onChange, defaultPeriod = 'monthly' }: PricingTo
           <motion.div
             className="h-6 w-6 rounded-full bg-emerald-600 dark:bg-emerald-500 shadow-md"
             animate={{
-              x: period === 'monthly' ? 0 : 32,
+              x: value === 'monthly' ? 0 : 32,
             }}
             transition={{
               type: 'spring',
@@ -56,7 +50,7 @@ export function PricingToggle({ onChange, defaultPeriod = 'monthly' }: PricingTo
       <button
         onClick={() => handleToggle('annual')}
         className={`px-4 py-2 text-sm font-medium transition-colors ${
-          period === 'annual'
+          value === 'annual'
             ? 'text-emerald-600 dark:text-emerald-400'
             : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
         }`}
@@ -65,7 +59,7 @@ export function PricingToggle({ onChange, defaultPeriod = 'monthly' }: PricingTo
       </button>
 
       {/* Save Badge */}
-      {period === 'annual' && (
+      {value === 'annual' && (
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
