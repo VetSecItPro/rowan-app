@@ -3,6 +3,7 @@
 import { UtensilsCrossed, Clock, MoreVertical, CheckSquare } from 'lucide-react';
 import { Meal } from '@/lib/services/meals-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
+import { parseDateString } from '@/lib/utils/date';
 import { useState } from 'react';
 
 interface MealCardProps {
@@ -23,7 +24,7 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
   const typeColor = mealTypeColors[meal.meal_type] || 'bg-gray-500';
 
   // Check if meal is in the past
-  const mealDate = new Date(meal.scheduled_date);
+  const mealDate = parseDateString(meal.scheduled_date);
   const now = new Date();
   const isPastMeal = mealDate < now;
 

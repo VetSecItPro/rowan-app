@@ -25,7 +25,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
   });
   const [isMealTypeOpen, setIsMealTypeOpen] = useState(false);
   const [isRecipeSelectorOpen, setIsRecipeSelectorOpen] = useState(false);
-  const [createShoppingList, setCreateShoppingList] = useState(true);
+  const [createShoppingList, setCreateShoppingList] = useState(false);
   const [recipeSearch, setRecipeSearch] = useState('');
   const [cuisineFilter, setCuisineFilter] = useState<string | null>(null);
   const [difficultyFilter, setDifficultyFilter] = useState<string | null>(null);
