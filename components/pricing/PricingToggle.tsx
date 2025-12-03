@@ -36,12 +36,8 @@ export function PricingToggle({ onChange, defaultPeriod = 'monthly' }: PricingTo
         Monthly
       </button>
 
-      <button
-        onClick={() => handleToggle(period === 'monthly' ? 'annual' : 'monthly')}
-        className="relative"
-        aria-label={`Switch to ${period === 'monthly' ? 'annual' : 'monthly'} billing`}
-      >
-        {/* Toggle Switch */}
+      <div className="relative">
+        {/* Toggle Switch - Visual Only */}
         <div className="flex h-8 w-16 items-center rounded-full bg-gray-200 dark:bg-gray-700 p-1">
           <motion.div
             className="h-6 w-6 rounded-full bg-emerald-600 dark:bg-emerald-500 shadow-md"
@@ -55,7 +51,7 @@ export function PricingToggle({ onChange, defaultPeriod = 'monthly' }: PricingTo
             }}
           />
         </div>
-      </button>
+      </div>
 
       <button
         onClick={() => handleToggle('annual')}
