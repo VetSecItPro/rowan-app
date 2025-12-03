@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { X, ShoppingBag, Check, Loader2 } from 'lucide-react';
 import { Meal } from '@/lib/services/meals-service';
-import { format } from 'date-fns';
+import { formatDateString } from '@/lib/utils/date';
 import { showSuccess } from '@/lib/utils/toast';
 
 interface GenerateListModalProps {
@@ -240,7 +240,7 @@ export function GenerateListModal({
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                         <span>
-                          {format(new Date(meal.scheduled_date), 'MMM d, yyyy')}
+                          {formatDateString(meal.scheduled_date)}
                         </span>
                         {meal.recipe && (
                           <>

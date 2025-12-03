@@ -4,6 +4,7 @@ import { useMemo, memo, useState, useCallback } from 'react';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, addWeeks, subWeeks } from 'date-fns';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Sunrise, Sun, Moon, Cookie, CheckSquare, Square, Trash2, ShoppingBag } from 'lucide-react';
 import { Meal } from '@/lib/services/meals-service';
+import { parseDateString } from '@/lib/utils/date';
 
 interface TwoWeekCalendarViewProps {
   currentWeek: Date;
@@ -48,7 +49,7 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
   const mealsByDate = useMemo(() => {
     const grouped = new Map<string, Meal[]>();
     meals.forEach(meal => {
-      const dateKey = format(new Date(meal.scheduled_date), 'yyyy-MM-dd');
+      const dateKey = meal.scheduled_date;
       if (!grouped.has(dateKey)) {
         grouped.set(dateKey, []);
       }
@@ -220,7 +221,7 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
                     const config = MEAL_TYPE_CONFIG[meal.meal_type];
                     const Icon = config.icon;
                     const isSelected = selectedMealIds.has(meal.id);
-                    const mealDate = new Date(meal.scheduled_date);
+                    const mealDate = parseDateString(meal.scheduled_date);
                     const now = new Date();
                     const isPastMeal = mealDate < now;
 
