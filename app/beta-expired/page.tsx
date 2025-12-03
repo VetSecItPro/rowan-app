@@ -60,16 +60,16 @@ export default function BetaExpiredPage() {
           {/* Actions */}
           <div className="space-y-3">
             <Link
-              href="/"
+              href="/upgrade"
               className="block w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 text-center shadow-md hover:shadow-lg"
             >
-              Return to Homepage
+              Upgrade Your Account
             </Link>
             <Link
-              href="/signup"
+              href="/"
               className="block w-full py-3 px-4 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 text-center"
             >
-              Join Waitlist for Launch
+              Return to Homepage
             </Link>
           </div>
         </div>
