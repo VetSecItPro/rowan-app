@@ -5,7 +5,6 @@
  * Displays a single pricing tier with features and CTA
  */
 
-import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 
 export interface PricingCardProps {
@@ -37,13 +36,13 @@ export function PricingCard({
   const isFree = tier === 'free';
 
   return (
-    <motion.div
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.2 }}
-      className={`relative flex flex-col rounded-2xl border-2 p-8 shadow-lg transition-shadow hover:shadow-xl ${
+    <div
+      className={`relative flex flex-col rounded-2xl border-2 p-8 shadow-lg transition-all duration-300 hover:-translate-y-1 ${
         popular
-          ? 'border-emerald-500 dark:border-emerald-400'
-          : 'border-gray-200 dark:border-gray-700'
+          ? 'border-emerald-500 dark:border-emerald-400 hover:shadow-emerald-500/50 hover:shadow-2xl'
+          : tier === 'family'
+            ? 'border-gray-200 dark:border-gray-700 hover:shadow-indigo-500/30 hover:shadow-2xl'
+            : 'border-gray-200 dark:border-gray-700 hover:shadow-gray-400/40 hover:shadow-2xl'
       } ${isFree ? 'bg-white dark:bg-gray-800' : 'bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900'}`}
     >
       {/* Popular Badge */}
@@ -115,6 +114,6 @@ export function PricingCard({
           ))}
         </ul>
       </div>
-    </motion.div>
+    </div>
   );
 }
