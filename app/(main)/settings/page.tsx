@@ -20,6 +20,7 @@ import {
   TwoFactorAuth,
   PrivacyDataManager,
 } from '@/components/ui/DynamicSettingsComponents';
+import { DataManagementTab } from '@/components/settings/DataManagementTab';
 import { Toggle } from '@/components/ui/Toggle';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 import { createClient } from '@/lib/supabase/client';
@@ -69,7 +70,7 @@ import {
   FolderOpen
 } from 'lucide-react';
 
-type SettingsTab = 'profile' | 'security' | 'privacy-data' | 'documentation' | 'analytics';
+type SettingsTab = 'profile' | 'security' | 'privacy-data' | 'data-management' | 'documentation' | 'analytics';
 type UserRole = 'Admin' | 'Member' | 'Viewer';
 type ExportStatus = 'idle' | 'pending' | 'processing' | 'ready';
 
@@ -801,7 +802,8 @@ export default function SettingsPage() {
   const tabs = [
     { id: 'profile' as SettingsTab, name: 'Profile & Spaces', icon: User, description: 'Manage your personal information and spaces' },
     { id: 'security' as SettingsTab, name: 'Security', icon: Shield, description: 'Password and authentication' },
-    { id: 'privacy-data' as SettingsTab, name: 'Privacy & Data', icon: Lock, description: 'Privacy settings and data management' },
+    { id: 'privacy-data' as SettingsTab, name: 'Privacy & Compliance', icon: Lock, description: 'Privacy settings and compliance' },
+    { id: 'data-management' as SettingsTab, name: 'Data Management', icon: Database, description: 'Storage usage and file management' },
     { id: 'documentation' as SettingsTab, name: 'Documentation', icon: BookOpen, description: 'Browse our guides and tutorials' },
     { id: 'analytics' as SettingsTab, name: 'Analytics', icon: BarChart3, description: 'Track productivity trends' },
   ];
@@ -1257,6 +1259,8 @@ export default function SettingsPage() {
                 {/* Privacy & Data Tab */}
                 {activeTab === 'privacy-data' && <PrivacyDataManager />}
 
+                {/* Data Management Tab */}
+                {activeTab === 'data-management' && <DataManagementTab />}
 
                 {/* Analytics Tab */}
                 {activeTab === 'analytics' && (
