@@ -1971,6 +1971,395 @@ The infrastructure costs support sustainable growth while maintaining healthy pr
 
 ---
 
+## Strategic Monetization Discussion - December 2, 2024
+
+### Final Pricing & Tier Strategy
+
+After comprehensive market analysis and strategic discussion, the following pricing strategy was finalized:
+
+#### **Tier Structure**
+- **Free Tier**: Permanently limited features (not time-gated)
+- **Pro Tier**: $11.99/month ($119/year with 17% discount) - 2 users maximum
+- **Family Tier**: $17.99/month ($179/year with 17% discount) - 6 users maximum
+
+#### **Tier Naming Decision**
+
+**Decision: Use "Pro" instead of "Couple"**
+
+**Rationale:**
+- **Inclusivity**: "Pro" works for any two-person household configuration (couples, roommates, siblings, co-parents, business partners, caregiving pairs)
+- **Market Standard**: SaaS industry norm (Spotify Pro, Canva Pro, Notion Pro)
+- **Professional Positioning**: Suggests enhanced features and capabilities
+- **Scalable Messaging**: "Go Pro" is universally understood call-to-action
+- **Avoids Norm-Defining Language**: "Couple" heavily implies romantic partnerships with heteronormative connotations
+
+### Feature Allocation Strategy
+
+#### **Free Tier: "Just Enough to See What You're Missing"**
+
+**Core Features (Limited):**
+- ✅ Tasks: 25 active tasks maximum (archived don't count)
+- ✅ Calendar: View-only (cannot create events)
+- ✅ Shopping List: 1 list, 15 items maximum
+- ✅ Messages: 50 message history (older auto-delete)
+- ✅ Quick Actions: 3 per day limit
+- ✅ Spaces: 1 space only (household)
+- ✅ Dark Mode: Yes
+- ✅ Mobile Responsive: Yes (PWA)
+
+**Explicitly Blocked Features:**
+- ❌ Reminders (upgrade required)
+- ❌ Meal Planning (upgrade required)
+- ❌ Goals & Habits (upgrade required)
+- ❌ Household Management (chores, inventory, maintenance)
+- ❌ Photo uploads (storage costs money)
+- ❌ Calendar creation (view-only)
+- ❌ Real-time sync (30-second delay on free tier)
+- ❌ Recurring tasks (one-time only)
+- ❌ AI features (recipe import, smart suggestions)
+- ❌ Export data
+- ❌ Integrations (Google Calendar, etc.)
+
+**Rate Limits:**
+- Task creation: 5 per day
+- Message sending: 20 per day
+- Shopping list updates: 10 per day
+
+**Pain Points (Intentional):**
+- "Upgrade to create calendar events" banner when viewing calendar
+- "You've used 23/25 tasks" persistent notification
+- "Unlock unlimited tasks with Pro" upsell in task list
+- "Quick Actions remaining today: 1/3" counter
+
+#### **Pro Tier: Everything a Couple/Roommates/Partners Need**
+
+**All Free Features PLUS:**
+- ✅ Unlimited tasks, calendar events, messages
+- ✅ Reminders (location-based, time-based)
+- ✅ Meal Planning (weekly planner, recipes)
+- ✅ Goals & Habits (tracking, streaks)
+- ✅ Household Management (chores, inventory, maintenance)
+- ✅ Photo uploads (5GB storage)
+- ✅ Real-time sync (instant updates)
+- ✅ Recurring tasks & events
+- ✅ Calendar creation (unlimited calendars)
+- ✅ Shopping Lists (unlimited lists)
+- ✅ Quick Actions (unlimited)
+- ✅ Export data (CSV, PDF)
+- ✅ Email support (24-48 hour response)
+
+**Still Blocked (Family-only):**
+- ❌ More than 2 users
+- ❌ Multiple spaces (only 1 household)
+- ❌ Advanced delegation (assign to specific people)
+- ❌ AI features (reserved for Family)
+- ❌ Priority support
+- ❌ External integrations
+
+#### **Family Tier: Everything + Built for Larger Households**
+
+**All Pro Features PLUS:**
+- ✅ Up to 6 users (vs 2 in Pro)
+- ✅ Multiple spaces (manage multiple households)
+- ✅ Advanced delegation (assign to specific family members)
+- ✅ AI recipe import (photo/URL → structured recipe)
+- ✅ Receipt scanning (auto-categorize expenses)
+- ✅ External integrations (Google Calendar sync, Alexa, etc.)
+- ✅ Priority support (12-hour response time)
+- ✅ 15GB storage (more photos, documents)
+- ✅ Family analytics (who's doing what, completion rates)
+- ✅ Custom categories (household items, chores, etc.)
+
+### Free Tier Strategy: Permanently Limited vs Time-Gated
+
+**Decision: Permanently Limited Free Tier (NOT time-gated trial)**
+
+**Rationale:**
+
+**Time-Gated Trial Risks:**
+- ❌ High friction: Users haven't formed habits in 1-2 weeks
+- ❌ Cart abandonment: Forcing decision too early = most will leave
+- ❌ Bad first impression: "This app is nagging me already"
+- ❌ No viral growth: Free users can't refer friends long-term
+- ❌ Churn trap: Users who pay too early churn fast
+
+**Permanently Limited Free Tier Benefits:**
+- ✅ Long-term conversion funnel: Users hit limits naturally over time
+- ✅ Habit formation: 25 tasks might work for 1 month, but eventually they need more
+- ✅ Viral growth: Free users refer friends indefinitely
+- ✅ Organic urgency: "I can't add more tasks" is stronger than "trial expired"
+- ✅ Market standard: Spotify, Todoist, Trello all use this model
+- ✅ Lower support burden: Users self-select when ready to pay
+
+**Conversion Triggers:**
+1. User hits 25-task limit during busy week → "I need Pro"
+2. Partner wants to join → "Let's add them with Pro"
+3. User tries to create calendar event → "Wait, I can't? Upgrading now"
+4. User wants meal planning for the week → "This would save so much time, worth $11.99"
+
+### User Experience & Design Philosophy
+
+**Core Principles:**
+1. **Elegant, Non-Aggressive**: Upgrade prompts should be enticing, not pushy
+2. **Embedded Flows**: Stripe checkout embedded in website (no redirects)
+3. **Professional Polish**: Smooth, seamless experience throughout
+4. **User-Friendly Messaging**: Encouraging and marketable language
+5. **Apple-Level Design**: Clean, spacious, minimalist pricing page
+
+**Upgrade Modal Design:**
+- **Trigger**: User hits constraint (task limit, calendar blocked, etc.)
+- **Tone**: "Unlock this feature" not "You can't do this"
+- **Design**: Clean modal with benefit-focused copy
+- **CTA**: "Upgrade to Pro" (primary button) vs "Not Now" (text link)
+- **No Annoyance**: Once per session, dismissible, non-blocking
+
+**Example Modal Copy:**
+```
+[Icon: Sparkles]
+Unlock Unlimited Tasks
+
+You've reached your 25-task limit on the free plan.
+Upgrade to Pro to create unlimited tasks and unlock:
+• Meal planning & recipes
+• Reminders & habits
+• Real-time collaboration
+• 5GB photo storage
+
+[Primary Button: Upgrade to Pro - $11.99/mo]
+[Text Link: Not now]
+```
+
+### Payment Flow Architecture
+
+**Path 1: Free User → Pro/Family (In-App Upgrade)**
+1. User on Free tier hits limit (25 tasks, calendar blocked, etc.)
+2. Elegant modal appears with benefits
+3. Click "Upgrade to Pro" → **Pricing page** with Pro tier pre-selected
+4. Click "Continue to Payment"
+5. **Embedded Stripe Checkout** (no redirect, stays on rowan.app)
+6. Payment success → **Instant feature unlock**
+7. Confirmation email sent
+8. Redirect to dashboard with success notification
+
+**Path 2: New User → Direct to Pro/Family (Signup → Payment)**
+1. Land on homepage, click "Pricing" in nav
+2. View pricing page, click "Upgrade to Pro"
+3. **Create account first** (email/password, verification)
+4. After email verification → **Embedded Stripe Checkout**
+5. Payment → Account activated with Pro access
+6. Welcome email with onboarding checklist
+7. Redirect to dashboard
+
+**Payment Flow Key Features:**
+- ✅ **Session persistence**: No re-login required throughout flow
+- ✅ **Embedded checkout**: Stripe Elements embedded in Rowan interface
+- ✅ **Progress indication**: Clear steps shown to user
+- ✅ **Error handling**: Graceful error messages, retry options
+- ✅ **Security**: PCI-compliant via Stripe Elements
+- ✅ **Mobile optimized**: Touch-friendly, responsive design
+
+### Apple-Style Pricing Page Design
+
+**Visual Design Principles:**
+- **Hero Section**: Large, clean headline: "The family command center that works"
+- **Minimalist Color Palette**: White/gray background, single accent color (brand blue)
+- **Spacious Layout**: Generous whitespace, not cramped
+- **High-Quality Imagery**: Photo-realistic backgrounds
+- **Typography**: System fonts (SF Pro on Apple devices), clear hierarchy
+- **Smooth Animations**: Subtle fade-ins, hover states, scroll-triggered reveals
+
+**3-Column Pricing Card Layout:**
+```
+┌─────────────┬─────────────┬─────────────┐
+│    FREE     │  PRO ← ⭐   │   FAMILY    │
+│             │  POPULAR    │             │
+│    $0       │   $11.99/mo │  $17.99/mo  │
+│             │             │             │
+│ • 25 tasks  │ • Unlimited │ • Unlimited │
+│ • View cal  │ • All Pro   │ • All Pro   │
+│ • Messages  │ • Reminders │ • 6 users   │
+│             │ • Meal plan │ • AI import │
+│             │             │ • Priority  │
+│   START     │   UPGRADE   │   UPGRADE   │
+└─────────────┴─────────────┴─────────────┘
+```
+
+**Key Page Elements:**
+- **"Popular" badge** on Pro tier (guides choice)
+- **Annual pricing toggle** at top: Monthly / Annual (save 17%)
+- **Feature comparison table** below cards (expandable)
+- **Social proof**: "Join 10,000+ families staying organized"
+- **Trust signals**: "Cancel anytime" • "30-day money-back guarantee"
+- **FAQ section** below pricing (addresses objections)
+
+### Stripe Integration Strategy
+
+**Setup (One-Time):**
+1. Stripe Account: Connect business bank account to Stripe
+2. Product Setup: Create products in Stripe Dashboard:
+   - Pro Monthly ($11.99/month)
+   - Pro Annual ($119/year)
+   - Family Monthly ($17.99/month)
+   - Family Annual ($179/year)
+3. Webhook Endpoint: `POST /api/webhooks/stripe`
+4. Environment Variables: Store Stripe keys in Vercel
+
+**Payment Processing Flow:**
+1. Frontend calls API: `POST /api/create-checkout-session`
+2. API creates Stripe Checkout Session with user email and selected tier
+3. **Embedded Stripe Elements** render payment form in modal
+4. User enters card details (Stripe handles PCI compliance)
+5. Stripe processes payment → transfers to bank account (T+2 days)
+6. Stripe webhook notifies app: `checkout.session.completed`
+7. Webhook handler updates Supabase user record:
+   - `subscription_tier` = 'pro' or 'family'
+   - `stripe_customer_id`, `stripe_subscription_id`
+   - `subscription_started_at`, `subscription_status` = 'active'
+8. User redirected to dashboard with Pro/Family features unlocked
+
+**Money Flow:**
+- Customer Card → Stripe (2.9% + $0.30 fee) → Your Bank Account
+- Example: $11.99 → Stripe keeps $0.65 → You receive $11.34
+- Payout Schedule: Daily automatic transfers (T+2 days)
+
+**Stripe Automatic Management:**
+- ✅ Recurring monthly charges
+- ✅ Failed payment retries (3 attempts)
+- ✅ Subscription cancellations
+- ✅ Proration (upgrade mid-month)
+- ✅ Invoices & receipt emails
+
+### Database Schema Requirements
+
+**New Tables & Columns Needed:**
+
+```sql
+-- Add subscription fields to users table (or create subscriptions table)
+ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_tier TEXT DEFAULT 'free';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status TEXT DEFAULT 'active';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_started_at TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_ends_at TIMESTAMPTZ;
+
+-- Create subscription events table for analytics
+CREATE TABLE IF NOT EXISTS subscription_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id),
+  event_type TEXT NOT NULL, -- 'upgrade', 'downgrade', 'cancel', 'reactivate'
+  from_tier TEXT,
+  to_tier TEXT,
+  trigger_source TEXT, -- 'task_limit', 'calendar_blocked', 'pricing_page'
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create usage tracking table for rate limiting
+CREATE TABLE IF NOT EXISTS daily_usage (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id),
+  date DATE DEFAULT CURRENT_DATE,
+  tasks_created INTEGER DEFAULT 0,
+  messages_sent INTEGER DEFAULT 0,
+  quick_actions_used INTEGER DEFAULT 0,
+  shopping_list_updates INTEGER DEFAULT 0,
+  UNIQUE(user_id, date)
+);
+```
+
+### Conversion & Churn Tracking
+
+**Metrics to Track:**
+
+**Conversion Metrics:**
+1. Free → Pro conversion rate (target: 3-5%)
+2. Free → Family conversion rate (target: 1-2%)
+3. Time to conversion (how long on free tier before upgrading)
+4. Upgrade trigger (which feature limit caused upgrade)
+5. Pricing page visits (already tracking via `upgrade_page_visits`)
+
+**Churn Metrics:**
+1. Monthly churn rate (target: <5%)
+2. Churn by tier (Pro vs Family)
+3. Churn reason (ask on cancellation survey)
+4. Time to churn (how long subscribed before canceling)
+5. Failed payment recovery rate (how many return after payment fails)
+
+**Analytics Dashboard Views:**
+- Daily signups (free)
+- Daily upgrades (by tier)
+- Monthly Recurring Revenue (MRR)
+- Churn rate (last 30 days)
+- Lifetime Value (LTV) per tier
+- Customer Acquisition Cost (CAC)
+
+### Implementation Mandates
+
+**Safety & Security First:**
+1. ✅ Implement feature branch workflow (no direct commits to main)
+2. ✅ Test all changes locally before deploying
+3. ✅ Create database migrations with rollback capability
+4. ✅ Use feature flags for gradual rollout if needed
+5. ✅ No breaking changes to existing functionality
+6. ✅ Comprehensive error handling and logging
+7. ✅ Input validation on all payment-related endpoints
+8. ✅ Rate limiting on subscription APIs
+9. ✅ Stripe webhook signature verification
+10. ✅ Secure storage of Stripe keys (environment variables only)
+
+**User Experience Requirements:**
+1. ✅ Elegant, enticing upgrade modals (not aggressive)
+2. ✅ Embedded Stripe checkout (no redirects)
+3. ✅ Smooth, professional flow throughout
+4. ✅ User-friendly, encouraging messaging
+5. ✅ Clear value proposition at every upgrade touchpoint
+6. ✅ Mobile-optimized payment flow
+7. ✅ Accessible design (WCAG 2.1 AA compliant)
+8. ✅ Dark mode support for pricing page and modals
+9. ✅ Loading states for all async operations
+10. ✅ Success/error feedback with clear next steps
+
+### Revenue Projections (Finalized)
+
+**Year 1 Expected Performance:**
+- **Expected Revenue**: $334,200 (probability-weighted)
+- **Expected Profit**: $219,200 (after infrastructure costs)
+- **Expected Personal Income**: ~$164,000 (after taxes)
+
+**Conservative Scenario (40% probability):**
+- 1,300 paying customers by Year 1
+- $240,000 ARR
+- $110,000 personal income
+
+**Realistic Scenario (45% probability):**
+- 1,700 paying customers by Year 1
+- $360,000 ARR
+- $180,000 personal income
+
+**Optimistic Scenario (15% probability):**
+- 2,100 paying customers by Year 1
+- $504,000 ARR
+- $265,000 personal income
+
+**Year 2 Growth:**
+- Conservative: $680,000 ARR (~$420k personal income)
+- Realistic: $1,080,000 ARR (~$680k personal income)
+- Optimistic: $1,560,000 ARR (~$1M personal income)
+
+### Next Steps for Implementation
+
+A comprehensive, detailed implementation todo list will be created to execute this strategy with:
+- Safe, strategic implementation approach
+- Feature branch workflow with PR review checkpoints
+- Rollback capabilities at every stage
+- No breaking changes to existing functionality
+- Professional, elegant user experience
+- Security-first architecture
+
+**Target Launch**: 1-2 months (post-beta testing completion)
+
+---
+
 **Document End**
 
+*Last Updated: December 2, 2024*
 *For questions or updates to this analysis, contact the strategy team.*

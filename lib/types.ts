@@ -6,6 +6,52 @@
 export type { CreateTaskInput, UpdateTaskInput as UpdateTaskInputZod } from './validations/task-schemas';
 
 // =============================================
+// RE-EXPORTS: SUBSCRIPTION & STRIPE TYPES
+// =============================================
+
+// Subscription types
+export type {
+  SubscriptionTier,
+  SubscriptionStatus,
+  SubscriptionPeriod,
+  Subscription,
+  SubscriptionEventType,
+  TriggerSource,
+  SubscriptionEvent,
+  UsageType,
+  DailyUsage,
+  FeatureLimits,
+  FeatureLimitsMap,
+  SubscriptionStatusResponse,
+  CreateCheckoutSessionRequest,
+  CreateCheckoutSessionResponse,
+  CancelSubscriptionRequest,
+  CancelSubscriptionResponse,
+  ChangePlanRequest,
+  ChangePlanResponse,
+  FeatureAvailability,
+  UsageCheckResult,
+} from './types/subscription';
+
+// Stripe types
+export type {
+  StripeProduct,
+  StripePrice,
+  StripePriceInfo,
+  StripeCheckoutSessionConfig,
+  StripeCheckoutSession,
+  StripeCustomer,
+  StripeSubscription,
+  StripeInvoice,
+  StripeWebhookEventType,
+  StripeWebhookEvent,
+  WebhookHandlerResult,
+  StripeErrorType,
+  StripeError,
+  StripePaymentMethod,
+} from './types/stripe';
+
+// =============================================
 // ENUMS
 // =============================================
 
