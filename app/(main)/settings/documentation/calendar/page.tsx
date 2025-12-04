@@ -391,6 +391,12 @@ const guideSections: GuideSection[] = [
         href: '#outlook-calendar-integration',
       },
       {
+        title: 'Connecting Cozi Family Calendar',
+        description: 'Import your Cozi family calendar events into Rowan',
+        readTime: '4 min read',
+        href: '#cozi-calendar-integration',
+      },
+      {
         title: 'Importing ICS Calendar Feeds',
         description: 'Import events from any ICS/iCalendar URL (one-way sync)',
         readTime: '4 min read',
@@ -3055,6 +3061,104 @@ export default function CalendarDocumentationPage() {
             </a>
           </section>
 
+          {/* Cozi Calendar Integration */}
+          <section id="cozi-calendar-integration" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-white" />
+              </div>
+              Connecting Cozi Family Calendar
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                Cozi is a popular family calendar app. You can import your Cozi calendar events into Rowan to see everything in one place.
+              </p>
+
+              <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4 border border-orange-200 dark:border-orange-800 mb-6">
+                <div className="flex items-start gap-2">
+                  <Info className="w-5 h-5 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-orange-900 dark:text-orange-100">
+                    <strong>One-Way Import:</strong> Cozi events are imported into Rowan. Changes you make in Rowan won&apos;t sync back to Cozi.
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 mb-6">
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">How to Connect Cozi</h4>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 text-white font-bold">1</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Sign in to Cozi</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Go to <a href="https://my.cozi.com" target="_blank" rel="noopener noreferrer" className="text-orange-600 dark:text-orange-400 underline hover:no-underline">my.cozi.com</a> and sign in to your account.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 text-white font-bold">2</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Open Shared Calendars Settings</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Go to <strong>Settings → Shared Cozi Calendars</strong>.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 text-white font-bold">3</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Enable Sharing</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Toggle the calendar from &quot;Unshared&quot; to &quot;Shared&quot; for the family member calendar you want to import. You can share individual family members or &quot;All family members&quot;.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 text-white font-bold">4</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Copy the Calendar URL</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Click <strong>&quot;VIEW OR SEND COZI URL&quot;</strong> then click <strong>&quot;COPY COZI URL&quot;</strong> to copy the calendar address.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 text-white font-bold">5</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Connect in Rowan</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">In Rowan, go to <strong>Settings → Integrations</strong>, click <strong>&quot;Connect&quot;</strong> next to Cozi, and paste the URL.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 text-white font-bold">✓</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Connected!</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Your Cozi events will be imported immediately and sync automatically every 15 minutes.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Multiple Family Members</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                You can connect multiple Cozi calendars if you want separate calendars for different family members:
+              </p>
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-6">
+                <li><strong>All Family Members</strong> - One combined calendar with everyone&apos;s events</li>
+                <li><strong>Individual calendars</strong> - Separate URLs for each family member (Mom, Dad, Kids, etc.)</li>
+              </ul>
+
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-blue-900 dark:text-blue-100">
+                    <strong>Tip:</strong> When connecting, you can optionally enter a family member name (e.g., &quot;Mom&quot; or &quot;Kids&quot;) to help identify the calendar in Rowan.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
           {/* ICS Feed Import */}
           <section id="ics-feed-import" className="scroll-mt-24">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
@@ -3204,6 +3308,14 @@ export default function CalendarDocumentationPage() {
                   <div>
                     <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Microsoft Outlook - 15 minutes</h4>
                     <p className="text-sm text-gray-700 dark:text-gray-300">Uses Microsoft Graph API with delta sync for efficient updates.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                  <Clock className="w-6 h-6 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Cozi Calendar - 15 minutes</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">Imports events from Cozi&apos;s ICS feed. One-way sync only.</p>
                   </div>
                 </div>
 

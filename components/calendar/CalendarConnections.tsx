@@ -111,6 +111,11 @@ export function CalendarConnections() {
   const [icsUrl, setIcsUrl] = useState('');
   const [icsName, setIcsName] = useState('');
 
+  // Cozi modal state
+  const [showCoziModal, setShowCoziModal] = useState(false);
+  const [coziUrl, setCoziUrl] = useState('');
+  const [coziFamilyMember, setCoziFamilyMember] = useState('');
+
   const fetchConnections = useCallback(async () => {
     if (!currentSpace?.id) {
       setLoading(false);
@@ -186,13 +191,17 @@ export function CalendarConnections() {
       setIcsUrl('');
       setIcsName('');
       setShowIcsModal(true);
+    } else if (provider === 'cozi') {
+      // Cozi uses its own URL input modal
+      setCoziUrl('');
+      setCoziFamilyMember('');
+      setShowCoziModal(true);
     } else if (provider === 'google' || provider === 'outlook') {
       // Google and Outlook use OAuth email hint modal
       setSelectedProvider(provider);
       setEmailInput('');
       setShowEmailModal(true);
     }
-    // Cozi is disabled (Coming Soon)
   };
 
   // Handle ICS feed connection
@@ -247,6 +256,58 @@ export function CalendarConnections() {
     } catch (err) {
       console.error('[CalendarConnections] ICS connect error:', err);
       setError(err instanceof Error ? err.message : 'Failed to connect ICS feed');
+    } finally {
+      setConnecting(null);
+    }
+  };
+
+  // Handle Cozi calendar connection
+  const handleCoziConnect = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!currentSpace?.id) return;
+
+    const trimmedUrl = coziUrl.trim();
+    const trimmedMember = coziFamilyMember.trim();
+
+    if (!trimmedUrl) {
+      setError('Please enter your Cozi calendar URL');
+      return;
+    }
+
+    // Basic URL validation
+    try {
+      new URL(trimmedUrl.replace('webcal://', 'https://'));
+    } catch {
+      setError('Please enter a valid URL');
+      return;
+    }
+
+    setConnecting('cozi');
+    setShowCoziModal(false);
+
+    try {
+      const response = await fetch('/api/calendar/connect/cozi', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: trimmedUrl,
+          family_member: trimmedMember || undefined,
+          space_id: currentSpace.id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || data.details || data.hint || 'Failed to connect Cozi calendar');
+      }
+
+      setSuccess(`Cozi calendar "${data.calendar_name}" connected successfully! Imported ${data.initial_sync?.events_imported || 0} events.`);
+      fetchConnections();
+    } catch (err) {
+      console.error('[CalendarConnections] Cozi connect error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to connect Cozi calendar');
     } finally {
       setConnecting(null);
     }
@@ -618,20 +679,14 @@ export function CalendarConnections() {
                   ) : (
                     <button
                       onClick={() => handleConnectClick(provider)}
-                      disabled={connecting === provider || provider === 'cozi'}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        provider !== 'cozi'
-                          ? 'bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50'
-                          : 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
-                      }`}
+                      disabled={connecting === provider}
+                      className="px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50"
                     >
                       {connecting === provider ? (
                         <span className="flex items-center gap-2">
                           <Loader2 className="h-4 w-4 animate-spin" />
                           Connecting...
                         </span>
-                      ) : provider === 'cozi' ? (
-                        'Coming Soon'
                       ) : (
                         'Connect'
                       )}
@@ -982,6 +1037,129 @@ export function CalendarConnections() {
 
               <p className="text-xs text-center text-gray-500 dark:text-gray-400">
                 Common sources: Google Calendar, Outlook, school/organization calendars, sports schedules
+              </p>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Cozi Calendar Modal */}
+      {showCoziModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          onClick={() => setShowCoziModal(false)}
+        >
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div
+            className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className={`px-6 py-4 ${PROVIDER_CONFIG.cozi.bgColor}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white/20 rounded-lg">
+                    <Calendar className={`h-5 w-5 ${PROVIDER_CONFIG.cozi.color}`} />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Connect Cozi Calendar
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setShowCoziModal(false)}
+                  className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <form onSubmit={handleCoziConnect} className="p-6 space-y-4">
+              <div className="rounded-lg bg-orange-50 dark:bg-orange-900/20 p-3 text-sm">
+                <p className="font-medium text-orange-800 dark:text-orange-200 mb-1">
+                  One-Way Import from Cozi
+                </p>
+                <p className="text-orange-700 dark:text-orange-300 text-xs">
+                  Events from your Cozi calendar will be imported into Rowan. Changes you make in Rowan won&apos;t sync back to Cozi.
+                </p>
+              </div>
+
+              <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-3 text-sm">
+                <p className="font-medium text-blue-800 dark:text-blue-200 mb-2">
+                  How to get your Cozi calendar URL:
+                </p>
+                <ol className="text-blue-700 dark:text-blue-300 text-xs space-y-1 list-decimal list-inside">
+                  <li>Sign in to <a href="https://my.cozi.com" target="_blank" rel="noopener noreferrer" className="underline hover:no-underline">my.cozi.com</a></li>
+                  <li>Go to <strong>Settings → Shared Cozi Calendars</strong></li>
+                  <li>Toggle sharing to &quot;Shared&quot; for the calendar you want</li>
+                  <li>Click &quot;VIEW OR SEND COZI URL&quot; → &quot;COPY COZI URL&quot;</li>
+                </ol>
+              </div>
+
+              {/* Family Member Name (Optional) */}
+              <div>
+                <label
+                  htmlFor="cozi-member"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Family Member (Optional)
+                </label>
+                <input
+                  type="text"
+                  id="cozi-member"
+                  value={coziFamilyMember}
+                  onChange={(e) => setCoziFamilyMember(e.target.value)}
+                  placeholder="e.g., Mom, Dad, Kids, All Family"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Leave blank for &quot;Cozi Family Calendar&quot;
+                </p>
+              </div>
+
+              {/* URL Input */}
+              <div>
+                <label
+                  htmlFor="cozi-url"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Cozi Calendar URL
+                </label>
+                <div className="relative">
+                  <Link className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="url"
+                    id="cozi-url"
+                    value={coziUrl}
+                    onChange={(e) => setCoziUrl(e.target.value)}
+                    placeholder="https://...cozi.com/..."
+                    className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCoziModal(false)}
+                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!coziUrl.trim()}
+                  className="flex-1 px-4 py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Connect Cozi
+                </button>
+              </div>
+
+              <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+                The calendar will sync automatically every 15 minutes
               </p>
             </form>
           </div>
