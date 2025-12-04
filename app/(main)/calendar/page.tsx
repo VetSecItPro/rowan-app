@@ -4,7 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, List, X } from 'lucide-react';
+import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, List, X, RefreshCw } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { EventCard } from '@/components/calendar/EventCard';
@@ -55,6 +55,29 @@ export default function CalendarPage() {
   // Location state for weather display
   const [userLocation, setUserLocation] = useState<string | null>(null);
   const [locationLoading, setLocationLoading] = useState(true);
+
+  // Calendar sync state - initialize from localStorage for instant display
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [hasCalendarConnection, setHasCalendarConnection] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('rowan_calendar_connected') === 'true';
+    }
+    return false;
+  });
+  const [calendarConnectionId, setCalendarConnectionId] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('rowan_calendar_connection_id');
+    }
+    return null;
+  });
+  const [lastSyncTime, setLastSyncTime] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('rowan_calendar_last_sync');
+    }
+    return null;
+  });
+  const [connectionChecked, setConnectionChecked] = useState(false);
+  const [syncTooltipVisible, setSyncTooltipVisible] = useState(false);
 
   // Ref for search input
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -163,18 +186,47 @@ export default function CalendarPage() {
 
     try {
       setLoading(true);
-      const eventsData = await calendarService.getEvents(currentSpace.id);
+      // Use getEventsWithRecurring to expand recurring events into individual occurrences
+      // This generates virtual event instances for each occurrence in the date range
+      const startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - 1); // Include past month
+      const endDate = new Date();
+      endDate.setMonth(endDate.getMonth() + 3); // Include next 3 months
 
-      setEvents(eventsData);
+      const eventsData = await calendarService.getEventsWithRecurring(
+        currentSpace.id,
+        startDate,
+        endDate
+      );
+
+      setEvents(eventsData as CalendarEvent[]);
 
       // Load linked shopping lists for all events
+      // For recurring event occurrences, use the series_id (master event ID) to lookup shopping lists
       const linkedListsMap: Record<string, any> = {};
+      const processedEventIds = new Set<string>();
+
       await Promise.all(
         eventsData.map(async (event) => {
           try {
-            const linkedLists = await shoppingIntegrationService.getShoppingListsForEvent(event.id);
+            // For recurring occurrences, use series_id; for regular events, use id
+            // Type assertion needed because recurring occurrences have extra properties
+            const lookupId = ('series_id' in event ? (event as unknown as { series_id: string }).series_id : null) || event.id;
+
+            // Skip if we've already processed this master event
+            if (processedEventIds.has(lookupId)) {
+              // Copy the shopping list reference for this occurrence
+              if (linkedListsMap[lookupId]) {
+                linkedListsMap[event.id] = linkedListsMap[lookupId];
+              }
+              return;
+            }
+            processedEventIds.add(lookupId);
+
+            const linkedLists = await shoppingIntegrationService.getShoppingListsForEvent(lookupId);
             if (linkedLists && linkedLists.length > 0) {
               linkedListsMap[event.id] = linkedLists[0]; // For now, just take the first linked list
+              linkedListsMap[lookupId] = linkedLists[0]; // Also store under master ID for other occurrences
             }
           } catch (error) {
             console.error(`Failed to load shopping list for event ${event.id}:`, error);
@@ -305,6 +357,81 @@ export default function CalendarPage() {
     setCurrentMonth(new Date());
   }, []);
 
+  // Check for calendar connections - runs in background, caches to localStorage
+  const checkCalendarConnection = useCallback(async () => {
+    if (!currentSpace) return;
+
+    try {
+      const response = await fetch(`/api/calendar/connect/google?space_id=${currentSpace.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        const activeConnection = data.connections?.find(
+          (c: { sync_status: string }) => c.sync_status === 'active' || c.sync_status === 'syncing'
+        );
+        if (activeConnection) {
+          setHasCalendarConnection(true);
+          setCalendarConnectionId(activeConnection.id);
+          setLastSyncTime(activeConnection.last_sync_at);
+          // Cache to localStorage for instant display on next visit
+          localStorage.setItem('rowan_calendar_connected', 'true');
+          localStorage.setItem('rowan_calendar_connection_id', activeConnection.id);
+          if (activeConnection.last_sync_at) {
+            localStorage.setItem('rowan_calendar_last_sync', activeConnection.last_sync_at);
+          }
+        } else {
+          setHasCalendarConnection(false);
+          setCalendarConnectionId(null);
+          // Clear cache
+          localStorage.removeItem('rowan_calendar_connected');
+          localStorage.removeItem('rowan_calendar_connection_id');
+          localStorage.removeItem('rowan_calendar_last_sync');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to check calendar connection:', error);
+    } finally {
+      setConnectionChecked(true);
+    }
+  }, [currentSpace]);
+
+  // Sync calendar
+  const handleSyncCalendar = useCallback(async () => {
+    if (!calendarConnectionId || isSyncing) return;
+
+    setIsSyncing(true);
+    try {
+      const response = await fetch('/api/calendar/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          connection_id: calendarConnectionId,
+          sync_type: 'incremental',
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Reload events to show synced items
+        loadEvents();
+        const syncTime = new Date().toISOString();
+        setLastSyncTime(syncTime);
+        // Cache for instant display on next visit
+        localStorage.setItem('rowan_calendar_last_sync', syncTime);
+        // Show success briefly (could add toast notification)
+        console.log(`Sync complete: ${data.events_synced} events processed`);
+      } else if (response.status === 429) {
+        console.log('Rate limited - please wait before syncing again');
+      } else {
+        console.error('Sync failed:', data.error);
+      }
+    } catch (error) {
+      console.error('Sync error:', error);
+    } finally {
+      setIsSyncing(false);
+    }
+  }, [calendarConnectionId, isSyncing, loadEvents]);
+
   // Helper to get events for a specific date
   const getEventsForDate = useCallback((date: Date) => {
     const dateKey = format(date, 'yyyy-MM-dd');
@@ -339,6 +466,11 @@ export default function CalendarPage() {
   useEffect(() => {
     loadEvents();
   }, [loadEvents]);
+
+  // Check for calendar connections on mount
+  useEffect(() => {
+    checkCalendarConnection();
+  }, [checkCalendarConnection]);
 
   // Merge realtime events with local events
   useEffect(() => {
@@ -695,6 +827,44 @@ export default function CalendarPage() {
               {/* View Mode Toggle and Today Button */}
               <div className="flex items-center gap-2">
 
+                {/* Sync Button - Show if connected (from cache or API) */}
+                {hasCalendarConnection && (
+                  <div className="relative">
+                    <button
+                      onClick={handleSyncCalendar}
+                      disabled={isSyncing || !calendarConnectionId}
+                      onMouseEnter={() => setSyncTooltipVisible(true)}
+                      onMouseLeave={() => setSyncTooltipVisible(false)}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
+                        isSyncing || !calendarConnectionId
+                          ? 'bg-gray-400 text-white cursor-not-allowed'
+                          : 'bg-green-600 text-white hover:bg-green-700'
+                      }`}
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                      {isSyncing ? 'Syncing...' : 'Sync'}
+                    </button>
+                    {/* Instant tooltip - no delay */}
+                    {syncTooltipVisible && (
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50 pointer-events-none">
+                        <div className="bg-gray-900 dark:bg-gray-700 text-white text-xs px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
+                          <div className="font-medium">Sync with Google Calendar</div>
+                          {lastSyncTime && (
+                            <div className="text-gray-300 mt-0.5">
+                              Last synced: {new Date(lastSyncTime).toLocaleTimeString()}
+                            </div>
+                          )}
+                          {!connectionChecked && (
+                            <div className="text-yellow-300 mt-0.5">Verifying connection...</div>
+                          )}
+                          {/* Tooltip arrow */}
+                          <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-gray-700 rotate-45" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Today Button - Only show for calendar views */}
                 {viewMode !== 'proposal' && viewMode !== 'list' && (
                   <button
@@ -1033,10 +1203,10 @@ export default function CalendarPage() {
                             {dayEvents.length === 0 && isCurrentMonth && (
                               <button
                                 onClick={() => setIsModalOpen(true)}
-                                className="hidden sm:block w-full text-center py-2 px-2 text-xs font-semibold bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-all duration-200 transform hover:scale-105 shadow-sm border-2 border-purple-500"
+                                className="hidden sm:block w-full text-center py-1.5 px-2 text-xs font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors duration-200"
                                 title="Create new event"
                               >
-                                + Add Event
+                                Add Event
                               </button>
                             )}
                           </div>
