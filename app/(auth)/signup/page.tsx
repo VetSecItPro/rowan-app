@@ -121,8 +121,8 @@ export default function SignUpPage() {
     setError('');
 
     // Frontend validation matching backend requirements
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters long');
+    if (password.length < 12) {
+      setError('Password must be at least 12 characters long');
       return;
     }
     if (!/[A-Z]/.test(password)) {
@@ -135,6 +135,10 @@ export default function SignUpPage() {
     }
     if (!/[0-9]/.test(password)) {
       setError('Password must contain at least one number');
+      return;
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      setError('Password must contain at least one special character (!@#$%^&*(),.?":{}|<>)');
       return;
     }
 
@@ -314,9 +318,9 @@ export default function SignUpPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  minLength={8}
+                  minLength={12}
                   className="w-full pl-11 pr-12 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                  placeholder="••••••••"
+                  placeholder="••••••••••••"
                   disabled={isLoading}
                   autoComplete="new-password"
                 />
@@ -334,7 +338,7 @@ export default function SignUpPage() {
                 </button>
               </div>
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Must be at least 8 characters with uppercase, lowercase, and number
+                Must be at least 12 characters with uppercase, lowercase, number, and special character
               </p>
             </div>
 

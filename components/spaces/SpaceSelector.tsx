@@ -247,9 +247,9 @@ export function SpaceSelector({
       : `text-sm font-bold ${getThemeColorClass(userColorTheme)}`;
 
     return (
-      <div className={singleSpaceClasses}>
+      <div className={`${singleSpaceClasses} w-[160px]`}>
         <Home className={iconClasses} />
-        <span className={textClasses}>
+        <span className={`${textClasses} truncate max-w-[100px]`}>
           {currentSpace.name}
         </span>
       </div>
@@ -263,19 +263,19 @@ export function SpaceSelector({
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className={variant === 'header'
-          ? `flex items-center gap-2 px-3 py-2 rounded-full text-white font-medium transition-all hover:opacity-90 active:scale-95 min-w-[120px] ${getHeaderBackgroundClass(userColorTheme)}`
-          : "flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          ? `flex items-center gap-2 px-3 py-2 rounded-full text-white font-medium transition-all hover:opacity-90 active:scale-95 w-[160px] ${getHeaderBackgroundClass(userColorTheme)}`
+          : "flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors w-[160px]"
         }
       >
-        <Home className={variant === 'header' ? "w-4 h-4 text-white/90" : "w-4 h-4 text-gray-600 dark:text-gray-400"} />
+        <Home className={variant === 'header' ? "w-4 h-4 text-white/90 flex-shrink-0" : "w-4 h-4 text-gray-600 dark:text-gray-400 flex-shrink-0"} />
         <span className={variant === 'header'
-          ? "text-sm font-medium text-white flex-1 text-center"
-          : `text-sm font-bold ${currentSpace ? getThemeColorClass(userColorTheme) : 'text-gray-900 dark:text-white'}`
+          ? "text-sm font-medium text-white flex-1 text-center truncate"
+          : `text-sm font-bold truncate ${currentSpace ? getThemeColorClass(userColorTheme) : 'text-gray-900 dark:text-white'}`
         }>
           {currentSpace ? currentSpace.name : 'No Space'}
         </span>
         <ChevronDown
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''} ${
+          className={`w-4 h-4 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''} ${
             variant === 'header' ? 'text-white/90' : 'text-gray-600 dark:text-gray-400'
           }`}
         />
