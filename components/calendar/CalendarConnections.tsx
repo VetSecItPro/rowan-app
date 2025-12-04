@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
-import { Calendar, RefreshCw, Unlink, AlertCircle, CheckCircle, Clock, Loader2, X, Mail } from 'lucide-react';
+import { Calendar, RefreshCw, Unlink, AlertCircle, CheckCircle, Clock, Loader2, X, Mail, Key, ExternalLink } from 'lucide-react';
 
 interface CalendarConnection {
   id: string;
@@ -84,6 +84,11 @@ export function CalendarConnections() {
   const [emailInput, setEmailInput] = useState('');
   const [selectedProvider, setSelectedProvider] = useState<'google' | 'apple' | 'cozi' | null>(null);
 
+  // Apple-specific state for app-specific password
+  const [showAppleModal, setShowAppleModal] = useState(false);
+  const [appleEmail, setAppleEmail] = useState('');
+  const [applePassword, setApplePassword] = useState('');
+
   const fetchConnections = useCallback(async () => {
     if (!currentSpace?.id) {
       setLoading(false);
@@ -136,16 +141,82 @@ export function CalendarConnections() {
     }
   }, [fetchConnections]);
 
-  // Opens the email prompt modal
+  // Opens the appropriate modal based on provider
   const handleConnectClick = (provider: 'google' | 'apple' | 'cozi') => {
     if (!currentSpace?.id) {
       setError('No space selected. Please select a space first.');
       return;
     }
-    setSelectedProvider(provider);
-    setEmailInput('');
-    setShowEmailModal(true);
     setError(null);
+
+    if (provider === 'apple') {
+      // Apple uses app-specific password modal
+      setAppleEmail('');
+      setApplePassword('');
+      setShowAppleModal(true);
+    } else {
+      // Google uses OAuth email hint modal
+      setSelectedProvider(provider);
+      setEmailInput('');
+      setShowEmailModal(true);
+    }
+  };
+
+  // Handle Apple CalDAV connection (app-specific password flow)
+  const handleAppleConnect = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!currentSpace?.id) return;
+
+    const trimmedEmail = appleEmail.trim().toLowerCase();
+    const trimmedPassword = applePassword.trim();
+
+    if (!trimmedEmail || !trimmedPassword) {
+      setError('Please enter both email and app-specific password');
+      return;
+    }
+
+    if (!isValidEmail(trimmedEmail)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    // Validate app-specific password format (xxxx-xxxx-xxxx-xxxx)
+    const passwordPattern = /^[a-z]{4}-[a-z]{4}-[a-z]{4}-[a-z]{4}$/i;
+    if (!passwordPattern.test(trimmedPassword)) {
+      setError('Invalid app-specific password format. Expected: xxxx-xxxx-xxxx-xxxx');
+      return;
+    }
+
+    setConnecting('apple');
+    setShowAppleModal(false);
+
+    try {
+      const response = await fetch('/api/calendar/connect/apple', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: trimmedEmail,
+          app_specific_password: trimmedPassword,
+          space_id: currentSpace.id,
+          sync_direction: 'bidirectional',
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || data.details || 'Failed to connect Apple Calendar');
+      }
+
+      setSuccess('Apple Calendar connected successfully! Initial sync will begin shortly.');
+      fetchConnections();
+    } catch (err) {
+      console.error('[CalendarConnections] Apple connect error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to connect Apple Calendar');
+    } finally {
+      setConnecting(null);
+    }
   };
 
   // Validates email format
@@ -457,9 +528,9 @@ export function CalendarConnections() {
                   ) : (
                     <button
                       onClick={() => handleConnectClick(provider)}
-                      disabled={connecting === provider || provider !== 'google'}
+                      disabled={connecting === provider || provider === 'cozi'}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        provider === 'google'
+                        provider !== 'cozi'
                           ? 'bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50'
                           : 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
                       }`}
@@ -469,10 +540,10 @@ export function CalendarConnections() {
                           <Loader2 className="h-4 w-4 animate-spin" />
                           Connecting...
                         </span>
-                      ) : provider === 'google' ? (
-                        'Connect'
-                      ) : (
+                      ) : provider === 'cozi' ? (
                         'Coming Soon'
+                      ) : (
+                        'Connect'
                       )}
                     </button>
                   )}
@@ -580,6 +651,131 @@ export function CalendarConnections() {
 
               <p className="text-xs text-center text-gray-500 dark:text-gray-400">
                 You&apos;ll be redirected to {selectedProvider === 'google' ? 'Google' : selectedProvider === 'apple' ? 'Apple' : 'Cozi'} to authorize access to your calendar.
+              </p>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Apple Calendar Modal (App-Specific Password) */}
+      {showAppleModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          onClick={() => setShowAppleModal(false)}
+        >
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div
+            className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className={`px-6 py-4 ${PROVIDER_CONFIG.apple.bgColor}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white/20 rounded-lg">
+                    <Calendar className={`h-5 w-5 ${PROVIDER_CONFIG.apple.color}`} />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Connect Apple Calendar
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setShowAppleModal(false)}
+                  className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <form onSubmit={handleAppleConnect} className="p-6 space-y-4">
+              <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 p-3 text-sm">
+                <p className="font-medium text-amber-800 dark:text-amber-200 mb-1">
+                  App-Specific Password Required
+                </p>
+                <p className="text-amber-700 dark:text-amber-300 text-xs">
+                  Apple Calendar requires an app-specific password for third-party apps.
+                  <a
+                    href="https://appleid.apple.com/account/manage"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 ml-1 text-amber-800 dark:text-amber-200 underline hover:no-underline"
+                  >
+                    Generate one at appleid.apple.com
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </p>
+              </div>
+
+              {/* Email Input */}
+              <div>
+                <label
+                  htmlFor="apple-email"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Apple ID Email
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="email"
+                    id="apple-email"
+                    value={appleEmail}
+                    onChange={(e) => setAppleEmail(e.target.value)}
+                    placeholder="yourname@icloud.com"
+                    className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
+                    autoFocus
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
+
+              {/* App-Specific Password Input */}
+              <div>
+                <label
+                  htmlFor="apple-password"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  App-Specific Password
+                </label>
+                <div className="relative">
+                  <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    id="apple-password"
+                    value={applePassword}
+                    onChange={(e) => setApplePassword(e.target.value)}
+                    placeholder="xxxx-xxxx-xxxx-xxxx"
+                    className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400 font-mono"
+                    autoComplete="off"
+                  />
+                </div>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Format: xxxx-xxxx-xxxx-xxxx (16 lowercase letters with dashes)
+                </p>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAppleModal(false)}
+                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!appleEmail.trim() || !applePassword.trim()}
+                  className="flex-1 px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Connect
+                </button>
+              </div>
+
+              <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+                Your credentials are encrypted and stored securely. We never see your password.
               </p>
             </form>
           </div>
