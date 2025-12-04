@@ -30,7 +30,7 @@ export const activityFeedService = {
         supabase.from('messages').select('id, content, sender_id, created_at, users!messages_sender_id_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('calendar_events').select('id, title, created_by, created_at, updated_at').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('daily_check_ins').select('id, mood, created_at, user_id').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
-        supabase.from('shopping_lists').select('id, name, created_by, created_at, updated_at').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
+        supabase.from('shopping_lists').select('id, title, created_by, created_at, updated_at').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('meals').select('id, name, meal_type, created_by, created_at, updated_at').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('expenses').select('id, title, amount, category, created_by, created_at, updated_at').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('projects').select('id, name, status, created_by, created_at, updated_at, users!projects_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
@@ -133,7 +133,7 @@ export const activityFeedService = {
             id: `shopping-${list.id}`,
             type: 'shopping',
             action: 'created',
-            title: list.name,
+            title: list.title || 'Shopping List',
             user_name: 'Unknown', // User lookup removed - table has no FK
             user_id: list.created_by,
             user_avatar: undefined,
