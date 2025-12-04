@@ -5,7 +5,7 @@
 // ENUMS (matching database types)
 // =============================================================================
 
-export type CalendarProvider = 'google' | 'apple' | 'cozi';
+export type CalendarProvider = 'google' | 'apple' | 'outlook' | 'ics' | 'cozi';
 
 export type SyncStatus = 'active' | 'syncing' | 'error' | 'token_expired' | 'disconnected';
 
@@ -325,6 +325,182 @@ export interface CalDAVCalendar {
   description?: string;
   timezone?: string;
   color?: string;
+}
+
+// =============================================================================
+// MICROSOFT OUTLOOK TYPES (Microsoft Graph API)
+// =============================================================================
+
+export interface OutlookCalendarEvent {
+  id: string;
+  subject: string;
+  body?: {
+    contentType: 'text' | 'html';
+    content: string;
+  };
+  bodyPreview?: string;
+  start: {
+    dateTime: string;
+    timeZone: string;
+  };
+  end: {
+    dateTime: string;
+    timeZone: string;
+  };
+  location?: {
+    displayName: string;
+    address?: {
+      street?: string;
+      city?: string;
+      state?: string;
+      countryOrRegion?: string;
+      postalCode?: string;
+    };
+  };
+  isAllDay: boolean;
+  showAs: 'free' | 'tentative' | 'busy' | 'oof' | 'workingElsewhere' | 'unknown';
+  type: 'singleInstance' | 'occurrence' | 'exception' | 'seriesMaster';
+  recurrence?: OutlookRecurrence;
+  seriesMasterId?: string;
+  attendees?: OutlookAttendee[];
+  organizer?: {
+    emailAddress: {
+      name?: string;
+      address: string;
+    };
+  };
+  isReminderOn: boolean;
+  reminderMinutesBeforeStart?: number;
+  webLink: string;
+  createdDateTime: string;
+  lastModifiedDateTime: string;
+  changeKey: string; // ETag equivalent
+  categories?: string[];
+}
+
+export interface OutlookAttendee {
+  type: 'required' | 'optional' | 'resource';
+  status: {
+    response: 'none' | 'organizer' | 'tentativelyAccepted' | 'accepted' | 'declined' | 'notResponded';
+    time?: string;
+  };
+  emailAddress: {
+    name?: string;
+    address: string;
+  };
+}
+
+export interface OutlookRecurrence {
+  pattern: {
+    type: 'daily' | 'weekly' | 'absoluteMonthly' | 'relativeMonthly' | 'absoluteYearly' | 'relativeYearly';
+    interval: number;
+    daysOfWeek?: ('sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday')[];
+    dayOfMonth?: number;
+    month?: number;
+    firstDayOfWeek?: 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
+    index?: 'first' | 'second' | 'third' | 'fourth' | 'last';
+  };
+  range: {
+    type: 'endDate' | 'noEnd' | 'numbered';
+    startDate: string;
+    endDate?: string;
+    numberOfOccurrences?: number;
+    recurrenceTimeZone?: string;
+  };
+}
+
+export interface OutlookCalendar {
+  id: string;
+  name: string;
+  color?: 'auto' | 'lightBlue' | 'lightGreen' | 'lightOrange' | 'lightGray' | 'lightYellow' | 'lightTeal' | 'lightPink' | 'lightBrown' | 'lightRed' | 'maxColor';
+  changeKey: string;
+  canShare: boolean;
+  canViewPrivateItems: boolean;
+  canEdit: boolean;
+  owner?: {
+    name?: string;
+    address: string;
+  };
+  isDefaultCalendar?: boolean;
+}
+
+export interface OutlookDeltaResponse {
+  '@odata.context': string;
+  '@odata.deltaLink'?: string;
+  '@odata.nextLink'?: string;
+  value: OutlookCalendarEvent[];
+}
+
+export interface OutlookWebhookNotification {
+  subscriptionId: string;
+  subscriptionExpirationDateTime: string;
+  changeType: 'created' | 'updated' | 'deleted';
+  resource: string;
+  resourceData?: {
+    '@odata.type': string;
+    '@odata.id': string;
+    '@odata.etag': string;
+    id: string;
+  };
+  clientState?: string;
+  tenantId: string;
+}
+
+export interface OutlookOAuthCallbackParams {
+  code: string;
+  state: string;
+  error?: string;
+  error_description?: string;
+}
+
+// =============================================================================
+// ICS FEED TYPES
+// =============================================================================
+
+export interface ICSFeedConfig {
+  url: string;
+  name: string;
+  refresh_interval_minutes: number;
+  last_etag?: string;
+  last_modified?: string;
+}
+
+export interface ICSFeedEvent {
+  uid: string;
+  summary: string;
+  description?: string;
+  location?: string;
+  dtstart: string;
+  dtend?: string;
+  dtstamp: string;
+  rrule?: string;
+  recurrenceId?: string;
+  status?: 'TENTATIVE' | 'CONFIRMED' | 'CANCELLED';
+  categories?: string[];
+  url?: string;
+  organizer?: string;
+  lastModified?: string;
+  created?: string;
+  sequence?: number;
+}
+
+export interface ICSImportResult {
+  success: boolean;
+  feed_url: string;
+  events_imported: number;
+  events_updated: number;
+  events_removed: number;
+  errors: string[];
+  last_modified?: string;
+  etag?: string;
+}
+
+export interface ICSFeedConnection extends CalendarConnection {
+  provider: 'ics';
+  ics_url: string;
+  ics_name: string;
+  ics_last_etag: string | null;
+  ics_event_count: number;
 }
 
 // =============================================================================
