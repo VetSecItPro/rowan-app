@@ -3,17 +3,20 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
-import { Calendar, RefreshCw, Unlink, AlertCircle, CheckCircle, Clock, Loader2, X, Mail, Key, ExternalLink } from 'lucide-react';
+import { Calendar, RefreshCw, Unlink, AlertCircle, CheckCircle, Clock, Loader2, X, Mail, Key, ExternalLink, Link } from 'lucide-react';
 
 interface CalendarConnection {
   id: string;
-  provider: 'google' | 'apple' | 'cozi';
+  provider: 'google' | 'apple' | 'outlook' | 'ics' | 'cozi';
   provider_account_id: string | null;
   sync_status: 'active' | 'syncing' | 'error' | 'token_expired' | 'disconnected';
   sync_direction: 'bidirectional' | 'inbound_only' | 'outbound_only';
   last_sync_at: string | null;
   last_error_message: string | null;
   created_at: string;
+  // ICS-specific fields
+  ics_url?: string;
+  ics_name?: string;
 }
 
 const PROVIDER_CONFIG = {
@@ -30,6 +33,20 @@ const PROVIDER_CONFIG = {
     color: 'text-gray-700 dark:text-gray-300',
     bgColor: 'bg-gray-50 dark:bg-gray-800/50',
     description: 'Sync with iCloud Calendar via CalDAV',
+  },
+  outlook: {
+    name: 'Microsoft Outlook',
+    icon: '/icons/outlook-calendar.svg',
+    color: 'text-sky-600 dark:text-sky-400',
+    bgColor: 'bg-sky-50 dark:bg-sky-900/20',
+    description: 'Sync with Outlook.com or Microsoft 365 Calendar',
+  },
+  ics: {
+    name: 'ICS Feed',
+    icon: '/icons/ics-feed.svg',
+    color: 'text-purple-600 dark:text-purple-400',
+    bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+    description: 'Import from any ICS calendar feed URL',
   },
   cozi: {
     name: 'Cozi',
@@ -79,15 +96,20 @@ export function CalendarConnections() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Email prompt modal state
+  // Email prompt modal state (for OAuth providers)
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailInput, setEmailInput] = useState('');
-  const [selectedProvider, setSelectedProvider] = useState<'google' | 'apple' | 'cozi' | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState<'google' | 'outlook' | null>(null);
 
   // Apple-specific state for app-specific password
   const [showAppleModal, setShowAppleModal] = useState(false);
   const [appleEmail, setAppleEmail] = useState('');
   const [applePassword, setApplePassword] = useState('');
+
+  // ICS feed modal state
+  const [showIcsModal, setShowIcsModal] = useState(false);
+  const [icsUrl, setIcsUrl] = useState('');
+  const [icsName, setIcsName] = useState('');
 
   const fetchConnections = useCallback(async () => {
     if (!currentSpace?.id) {
@@ -135,6 +157,11 @@ export function CalendarConnections() {
       fetchConnections();
       // Clear URL params
       window.history.replaceState({}, '', window.location.pathname);
+    } else if (successParam === 'outlook_connected') {
+      setSuccess('Outlook Calendar connected successfully! Starting initial sync...');
+      fetchConnections();
+      // Clear URL params
+      window.history.replaceState({}, '', window.location.pathname);
     } else if (errorParam) {
       setError(messageParam || `Failed to connect: ${errorParam}`);
       window.history.replaceState({}, '', window.location.pathname);
@@ -142,7 +169,7 @@ export function CalendarConnections() {
   }, [fetchConnections]);
 
   // Opens the appropriate modal based on provider
-  const handleConnectClick = (provider: 'google' | 'apple' | 'cozi') => {
+  const handleConnectClick = (provider: 'google' | 'apple' | 'outlook' | 'ics' | 'cozi') => {
     if (!currentSpace?.id) {
       setError('No space selected. Please select a space first.');
       return;
@@ -154,11 +181,74 @@ export function CalendarConnections() {
       setAppleEmail('');
       setApplePassword('');
       setShowAppleModal(true);
-    } else {
-      // Google uses OAuth email hint modal
+    } else if (provider === 'ics') {
+      // ICS uses URL input modal
+      setIcsUrl('');
+      setIcsName('');
+      setShowIcsModal(true);
+    } else if (provider === 'google' || provider === 'outlook') {
+      // Google and Outlook use OAuth email hint modal
       setSelectedProvider(provider);
       setEmailInput('');
       setShowEmailModal(true);
+    }
+    // Cozi is disabled (Coming Soon)
+  };
+
+  // Handle ICS feed connection
+  const handleIcsConnect = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!currentSpace?.id) return;
+
+    const trimmedUrl = icsUrl.trim();
+    const trimmedName = icsName.trim();
+
+    if (!trimmedUrl) {
+      setError('Please enter an ICS feed URL');
+      return;
+    }
+
+    if (!trimmedName) {
+      setError('Please enter a name for this calendar');
+      return;
+    }
+
+    // Basic URL validation
+    try {
+      new URL(trimmedUrl.replace('webcal://', 'https://'));
+    } catch {
+      setError('Please enter a valid URL');
+      return;
+    }
+
+    setConnecting('ics');
+    setShowIcsModal(false);
+
+    try {
+      const response = await fetch('/api/calendar/connect/ics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: trimmedUrl,
+          name: trimmedName,
+          space_id: currentSpace.id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || data.details || 'Failed to connect ICS feed');
+      }
+
+      setSuccess(`ICS feed "${data.feed_name}" connected successfully! Imported ${data.initial_sync?.events_imported || 0} events.`);
+      fetchConnections();
+    } catch (err) {
+      console.error('[CalendarConnections] ICS connect error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to connect ICS feed');
+    } finally {
+      setConnecting(null);
     }
   };
 
@@ -420,7 +510,7 @@ export function CalendarConnections() {
 
       {/* Provider Cards */}
       <div className="grid gap-4">
-        {(['google', 'apple', 'cozi'] as const).map((provider) => {
+        {(['google', 'apple', 'outlook', 'cozi', 'ics'] as const).map((provider) => {
           const config = PROVIDER_CONFIG[provider];
           const connection = getConnectionForProvider(provider);
           const isConnected = connection && connection.sync_status !== 'disconnected';
@@ -608,13 +698,18 @@ export function CalendarConnections() {
                       This can be a Gmail address or a Google Workspace account.
                     </span>
                   )}
+                  {selectedProvider === 'outlook' && (
+                    <span className="block mt-2 text-xs text-gray-500 dark:text-gray-500">
+                      This can be an Outlook.com, Hotmail, Live, or Microsoft 365 account.
+                    </span>
+                  )}
                 </p>
 
                 <label
                   htmlFor="calendar-email"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
-                  {selectedProvider === 'google' ? 'Google Account Email' : 'Email Address'}
+                  {selectedProvider === 'google' ? 'Google Account Email' : selectedProvider === 'outlook' ? 'Microsoft Account Email' : 'Email Address'}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -623,7 +718,7 @@ export function CalendarConnections() {
                     id="calendar-email"
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
-                    placeholder={selectedProvider === 'google' ? 'yourname@gmail.com' : 'email@example.com'}
+                    placeholder={selectedProvider === 'google' ? 'yourname@gmail.com' : selectedProvider === 'outlook' ? 'yourname@outlook.com' : 'email@example.com'}
                     className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
                     autoFocus
                     autoComplete="email"
@@ -650,7 +745,7 @@ export function CalendarConnections() {
               </div>
 
               <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-                You&apos;ll be redirected to {selectedProvider === 'google' ? 'Google' : selectedProvider === 'apple' ? 'Apple' : 'Cozi'} to authorize access to your calendar.
+                You&apos;ll be redirected to {selectedProvider === 'google' ? 'Google' : selectedProvider === 'outlook' ? 'Microsoft' : 'the provider'} to authorize access to your calendar.
               </p>
             </form>
           </div>
@@ -776,6 +871,117 @@ export function CalendarConnections() {
 
               <p className="text-xs text-center text-gray-500 dark:text-gray-400">
                 Your credentials are encrypted and stored securely. We never see your password.
+              </p>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ICS Feed Modal */}
+      {showIcsModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          onClick={() => setShowIcsModal(false)}
+        >
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div
+            className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className={`px-6 py-4 ${PROVIDER_CONFIG.ics.bgColor}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white/20 rounded-lg">
+                    <Link className={`h-5 w-5 ${PROVIDER_CONFIG.ics.color}`} />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Import ICS Calendar Feed
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setShowIcsModal(false)}
+                  className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <form onSubmit={handleIcsConnect} className="p-6 space-y-4">
+              <div className="rounded-lg bg-purple-50 dark:bg-purple-900/20 p-3 text-sm">
+                <p className="font-medium text-purple-800 dark:text-purple-200 mb-1">
+                  One-Way Import
+                </p>
+                <p className="text-purple-700 dark:text-purple-300 text-xs">
+                  Events from the ICS feed will be imported into Rowan. Changes you make in Rowan won&apos;t sync back to the original calendar.
+                </p>
+              </div>
+
+              {/* Calendar Name Input */}
+              <div>
+                <label
+                  htmlFor="ics-name"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Calendar Name
+                </label>
+                <input
+                  type="text"
+                  id="ics-name"
+                  value={icsName}
+                  onChange={(e) => setIcsName(e.target.value)}
+                  placeholder="e.g., Work Calendar, Sports Schedule"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
+                  autoFocus
+                />
+              </div>
+
+              {/* URL Input */}
+              <div>
+                <label
+                  htmlFor="ics-url"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  ICS Feed URL
+                </label>
+                <div className="relative">
+                  <Link className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="url"
+                    id="ics-url"
+                    value={icsUrl}
+                    onChange={(e) => setIcsUrl(e.target.value)}
+                    placeholder="https://example.com/calendar.ics or webcal://..."
+                    className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
+                  />
+                </div>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Supports HTTPS and webcal:// URLs. The feed will be synced every 15 minutes.
+                </p>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowIcsModal(false)}
+                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!icsUrl.trim() || !icsName.trim()}
+                  className="flex-1 px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Import Feed
+                </button>
+              </div>
+
+              <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+                Common sources: Google Calendar, Outlook, school/organization calendars, sports schedules
               </p>
             </form>
           </div>

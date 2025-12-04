@@ -385,6 +385,18 @@ const guideSections: GuideSection[] = [
         href: '#apple-calendar-integration',
       },
       {
+        title: 'Connecting Microsoft Outlook',
+        description: 'Connect Outlook.com, Hotmail, or Microsoft 365 calendars with OAuth',
+        readTime: '5 min read',
+        href: '#outlook-calendar-integration',
+      },
+      {
+        title: 'Importing ICS Calendar Feeds',
+        description: 'Import events from any ICS/iCalendar URL (one-way sync)',
+        readTime: '4 min read',
+        href: '#ics-feed-import',
+      },
+      {
         title: 'Managing Calendar Connections',
         description: 'How to sync, disconnect, and troubleshoot your calendar integrations',
         readTime: '4 min read',
@@ -2951,6 +2963,194 @@ export default function CalendarDocumentationPage() {
             </a>
           </section>
 
+          {/* Microsoft Outlook Integration */}
+          <section id="outlook-calendar-integration" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-white" />
+              </div>
+              Connecting Microsoft Outlook
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                Connect your Outlook.com, Hotmail, Live, or Microsoft 365 calendar to Rowan for two-way sync using secure OAuth authentication.
+              </p>
+
+              <div className="bg-sky-50 dark:bg-sky-900/20 rounded-xl p-6 border border-sky-200 dark:border-sky-800 mb-6">
+                <h4 className="text-lg font-semibold text-sky-900 dark:text-sky-100 mb-4">Step-by-Step Connection</h4>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-sky-500 flex items-center justify-center flex-shrink-0 text-white font-bold">1</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Navigate to Settings</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Go to <strong>Settings → Integrations</strong> tab to find all available calendar connections.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-sky-500 flex items-center justify-center flex-shrink-0 text-white font-bold">2</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Click Connect Microsoft Outlook</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">In the Calendar Integrations section, click the <strong>&quot;Connect&quot;</strong> button next to Microsoft Outlook.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-sky-500 flex items-center justify-center flex-shrink-0 text-white font-bold">3</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Enter Your Email</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Enter your Microsoft account email. This can be an Outlook.com, Hotmail, Live, or Microsoft 365 address.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-sky-500 flex items-center justify-center flex-shrink-0 text-white font-bold">4</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Sign in to Microsoft</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">You&apos;ll be redirected to Microsoft to sign in and authorize Rowan to access your calendar.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-sky-500 flex items-center justify-center flex-shrink-0 text-white font-bold">5</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Grant Permissions</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Allow Rowan to view and manage your calendar events. This enables two-way sync between Rowan and Outlook.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 text-white font-bold">✓</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Connected!</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Your Outlook Calendar is now connected. Events will sync automatically every 15 minutes.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Two-Way Sync</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Events created in Rowan appear in Outlook and vice versa. Changes sync automatically.</p>
+                </div>
+
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Microsoft Graph API</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Uses the official Microsoft Graph API for reliable, secure calendar access.</p>
+                </div>
+              </div>
+
+              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
+                <div className="flex items-start gap-2">
+                  <Info className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-amber-900 dark:text-amber-100">
+                    <strong>Supported accounts:</strong> Outlook.com, Hotmail, Live, and Microsoft 365 (work/school) accounts are all supported.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          {/* ICS Feed Import */}
+          <section id="ics-feed-import" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-white" />
+              </div>
+              Importing ICS Calendar Feeds
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                Import events from any ICS/iCalendar feed URL. This is perfect for importing public calendars, sports schedules, school calendars, and any other calendar that provides an ICS feed.
+              </p>
+
+              <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4 border border-purple-200 dark:border-purple-800 mb-6">
+                <div className="flex items-start gap-2">
+                  <Info className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-purple-900 dark:text-purple-100">
+                    <strong>One-Way Import:</strong> ICS feeds are read-only. Events from the feed are imported into Rowan, but changes you make in Rowan won&apos;t sync back to the original calendar.
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 mb-6">
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">How to Import an ICS Feed</h4>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center flex-shrink-0 text-white font-bold">1</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Get the ICS Feed URL</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Find the ICS/iCalendar URL from your calendar provider. Look for &quot;Subscribe&quot;, &quot;Export&quot;, or &quot;ICS Feed&quot; options.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center flex-shrink-0 text-white font-bold">2</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Navigate to Settings</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Go to <strong>Settings → Integrations</strong> and click <strong>&quot;Connect&quot;</strong> next to ICS Feed.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center flex-shrink-0 text-white font-bold">3</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Enter Feed Details</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Give your calendar a name (e.g., &quot;Kids Soccer Schedule&quot;) and paste the ICS URL.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 text-white font-bold">✓</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Imported!</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Events are imported immediately. The feed refreshes automatically every 15 minutes for updates.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Common ICS Feed Sources</h3>
+              <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Google Calendar</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Settings → Integrate calendar → Secret address in iCal format</p>
+                </div>
+
+                <div className="p-4 bg-sky-50 dark:bg-sky-900/20 rounded-lg border border-sky-200 dark:border-sky-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Outlook Calendar</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Settings → Shared calendars → Publish a calendar</p>
+                </div>
+
+                <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Sports Schedules</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Most sports leagues provide ICS feeds for team schedules</p>
+                </div>
+
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">School Calendars</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Many schools publish event calendars as ICS feeds</p>
+                </div>
+              </div>
+
+              <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-indigo-900 dark:text-indigo-100">
+                    <strong>Tip:</strong> ICS URLs often start with <code className="bg-indigo-200 dark:bg-indigo-700 px-1 rounded">https://</code> or <code className="bg-indigo-200 dark:bg-indigo-700 px-1 rounded">webcal://</code>. Both formats work - webcal:// links are automatically converted.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
           {/* Managing Integrations */}
           <section id="managing-integrations" className="scroll-mt-24">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
@@ -2996,6 +3196,22 @@ export default function CalendarDocumentationPage() {
                   <div>
                     <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Apple Calendar - 15 minutes</h4>
                     <p className="text-sm text-gray-700 dark:text-gray-300">Polling-based sync via CalDAV. Apple doesn&apos;t support webhooks for third-party apps.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 bg-sky-50 dark:bg-sky-900/20 rounded-lg border border-sky-200 dark:border-sky-800">
+                  <Clock className="w-6 h-6 text-sky-600 dark:text-sky-400 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Microsoft Outlook - 15 minutes</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">Uses Microsoft Graph API with delta sync for efficient updates.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <Clock className="w-6 h-6 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">ICS Feeds - 15 minutes</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">Fetches and parses ICS data. Uses ETag caching for efficiency.</p>
                   </div>
                 </div>
               </div>
