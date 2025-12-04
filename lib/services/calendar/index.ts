@@ -3,6 +3,8 @@
 
 export { googleCalendarService } from './google-calendar-service';
 export { appleCalDAVService } from './apple-caldav-service';
+export { outlookCalendarService } from './outlook-calendar-service';
+export { icsImportService } from './ics-import-service';
 export { eventMapper } from './event-mapper';
 export { calendarSyncService } from './calendar-sync-service';
 
@@ -20,6 +22,9 @@ export type {
   SyncError,
   GoogleCalendarEvent,
   GoogleCalendarList,
+  OutlookCalendarEvent,
+  OutlookCalendar,
+  OutlookDeltaResponse,
   RowanEventSnapshot,
   ExternalEventSnapshot,
   TokenRefreshResult,

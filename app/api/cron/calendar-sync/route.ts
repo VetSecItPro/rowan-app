@@ -54,9 +54,9 @@ export async function GET(request: Request) {
 
     // Filter by provider if specified
     if (provider !== 'all') {
-      if (!['google', 'apple', 'cozi'].includes(provider)) {
+      if (!['google', 'apple', 'outlook', 'ics', 'cozi'].includes(provider)) {
         return NextResponse.json(
-          { error: 'Invalid provider. Use: google, apple, cozi, or all' },
+          { error: 'Invalid provider. Use: google, apple, outlook, ics, cozi, or all' },
           { status: 400 }
         );
       }
@@ -193,6 +193,12 @@ function getNextSyncMinutes(provider: CalendarProvider): number {
       return 15;
     case 'apple':
       // Apple requires polling (15 minutes as per user preference)
+      return 15;
+    case 'outlook':
+      // Outlook has webhooks, so polling is backup (15 minutes)
+      return 15;
+    case 'ics':
+      // ICS feeds are read-only, sync every 15 minutes to match other providers
       return 15;
     case 'cozi':
       // Cozi has no delta sync support (30 minutes)
