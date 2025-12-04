@@ -368,6 +368,31 @@ const guideSections: GuideSection[] = [
     ],
   },
   {
+    title: 'External Calendar Integrations',
+    icon: Share2,
+    color: 'from-cyan-500 to-cyan-600',
+    articles: [
+      {
+        title: 'Connecting Google Calendar',
+        description: 'Step-by-step guide to connect your Google Calendar with Rowan for two-way sync',
+        readTime: '5 min read',
+        href: '#google-calendar-integration',
+      },
+      {
+        title: 'Connecting Apple Calendar',
+        description: 'How to set up Apple Calendar (iCloud) integration using app-specific passwords',
+        readTime: '6 min read',
+        href: '#apple-calendar-integration',
+      },
+      {
+        title: 'Managing Calendar Connections',
+        description: 'How to sync, disconnect, and troubleshoot your calendar integrations',
+        readTime: '4 min read',
+        href: '#managing-integrations',
+      },
+    ],
+  },
+  {
     title: 'Tips & Best Practices',
     icon: Lightbulb,
     color: 'from-rose-500 to-rose-600',
@@ -2712,6 +2737,302 @@ export default function CalendarDocumentationPage() {
                   <div className="text-sm text-emerald-900 dark:text-emerald-100">
                     <strong>Quality of Life:</strong> Small feature, huge impact! Set your preferred view once and forget about it. Rowan adapts to YOUR workflow, not the other way around.
                   </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          {/* Google Calendar Integration */}
+          <section id="google-calendar-integration" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-white" />
+              </div>
+              Connecting Google Calendar
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                Connect your Google Calendar to Rowan to see all your events in one place and create events that sync back to Google.
+              </p>
+
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 mb-6">
+                <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-4">Step-by-Step Connection</h4>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0 text-white font-bold">1</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Navigate to Settings</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Go to <strong>Settings → Integrations</strong> tab to find all available calendar connections.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0 text-white font-bold">2</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Click Connect Google Calendar</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">In the Calendar Integrations section, click the <strong>&quot;Connect&quot;</strong> button next to Google Calendar.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0 text-white font-bold">3</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Sign in to Google</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">A popup will open asking you to sign in to your Google account. Select the account with the calendar you want to connect.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0 text-white font-bold">4</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Grant Permissions</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Allow Rowan to view and manage your calendar events. This enables two-way sync between Rowan and Google Calendar.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 text-white font-bold">✓</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Connected!</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Your Google Calendar is now connected. Events will sync automatically every 15 minutes, or click the green <strong>Sync</strong> button on the Calendar page to sync immediately.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Two-Way Sync</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Events created in Rowan appear in Google Calendar and vice versa. Changes sync automatically.</p>
+                </div>
+
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Real-Time Updates</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Google uses webhooks to push changes instantly. No waiting for the next sync cycle.</p>
+                </div>
+              </div>
+
+              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
+                <div className="flex items-start gap-2">
+                  <Info className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-amber-900 dark:text-amber-100">
+                    <strong>Note:</strong> You can connect multiple Google accounts if needed. Each connection syncs independently to your current space.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          {/* Apple Calendar Integration */}
+          <section id="apple-calendar-integration" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-white" />
+              </div>
+              Connecting Apple Calendar
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                Connect your Apple Calendar (iCloud) to Rowan using an app-specific password. This allows secure access to your calendar without sharing your main Apple ID password.
+              </p>
+
+              <div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-4 border border-red-200 dark:border-red-800 mb-6">
+                <div className="flex items-start gap-2">
+                  <Info className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-red-900 dark:text-red-100">
+                    <strong>Requires Two-Factor Authentication:</strong> You must have two-factor authentication enabled on your Apple ID to create app-specific passwords. This is a security requirement from Apple.
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 mb-6">
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Part 1: Generate an App-Specific Password</h4>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0 text-white font-bold">1</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Visit Apple ID Website</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Go to <strong>appleid.apple.com</strong> and sign in with your Apple ID.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0 text-white font-bold">2</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Go to Security Section</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Navigate to <strong>Sign-In and Security → App-Specific Passwords</strong>.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0 text-white font-bold">3</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Generate New Password</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Click the <strong>+</strong> button to create a new app-specific password. Name it <strong>&quot;Rowan&quot;</strong> for easy identification.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0 text-white font-bold">4</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Copy the Password</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Apple will show you a password in the format <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">xxxx-xxxx-xxxx-xxxx</code>. Copy this - you won&apos;t see it again!</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 mb-6">
+                <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-4">Part 2: Connect to Rowan</h4>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0 text-white font-bold">5</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Open Rowan Settings</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">In Rowan, go to <strong>Settings → Integrations</strong> tab.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0 text-white font-bold">6</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Click Connect Apple Calendar</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Find Apple Calendar in the list and click <strong>&quot;Connect&quot;</strong>.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0 text-white font-bold">7</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Enter Your Credentials</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Enter your Apple ID email and paste the app-specific password you generated.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 text-white font-bold">✓</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Connected!</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Your Apple Calendar is now connected. Events sync automatically every 15 minutes via polling.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Secure Storage</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Your credentials are stored securely in an encrypted vault - never in plain text.</p>
+                </div>
+
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">CalDAV Protocol</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Uses the standard CalDAV protocol, the same method used by Apple&apos;s own apps.</p>
+                </div>
+              </div>
+
+              <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-indigo-900 dark:text-indigo-100">
+                    <strong>Tip:</strong> If you ever need to revoke access, simply delete the &quot;Rowan&quot; app-specific password from your Apple ID account. The calendar will disconnect automatically.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          {/* Managing Integrations */}
+          <section id="managing-integrations" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center">
+                <Share2 className="w-5 h-5 text-white" />
+              </div>
+              Managing Calendar Connections
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                Once connected, you can manage your calendar integrations from the Calendar page or Settings.
+              </p>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Manual Syncing</h3>
+              <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800 mb-6">
+                <p className="text-gray-700 dark:text-gray-300 mb-4">
+                  Click the green <strong>Sync</strong> button in the Calendar page header to manually sync all connected calendars immediately.
+                </p>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-lg border border-green-300 dark:border-green-700">
+                    <h5 className="font-medium text-gray-900 dark:text-white mb-1">Single Calendar</h5>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Tooltip shows &quot;Sync with Google Calendar&quot; or &quot;Sync with Apple Calendar&quot;</p>
+                  </div>
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-lg border border-green-300 dark:border-green-700">
+                    <h5 className="font-medium text-gray-900 dark:text-white mb-1">Multiple Calendars</h5>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Tooltip shows &quot;Sync with 2 Calendars&quot; and lists all providers (Google, Apple)</p>
+                  </div>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Automatic Sync Schedule</h3>
+              <div className="grid gap-4 mb-6">
+                <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Google Calendar - 15 minutes</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">Primary sync via webhooks (instant). Polling backup every 15 minutes for reliability.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <Clock className="w-6 h-6 text-gray-600 dark:text-gray-400 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Apple Calendar - 15 minutes</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">Polling-based sync via CalDAV. Apple doesn&apos;t support webhooks for third-party apps.</p>
+                  </div>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Disconnecting a Calendar</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                To disconnect a calendar integration:
+              </p>
+              <ol className="list-decimal list-inside space-y-2 text-gray-700 dark:text-gray-300 mb-6">
+                <li>Go to <strong>Settings → Integrations</strong></li>
+                <li>Find the calendar you want to disconnect</li>
+                <li>Click the <strong>&quot;Disconnect&quot;</strong> button</li>
+                <li>Confirm the disconnection</li>
+              </ol>
+              <p className="text-gray-700 dark:text-gray-300 mb-6">
+                Events that were synced will remain in Rowan but will no longer update from the external calendar.
+              </p>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Troubleshooting</h3>
+              <div className="space-y-4">
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                  <h4 className="font-semibold text-amber-900 dark:text-amber-100 mb-2">Events not syncing?</h4>
+                  <ul className="text-sm text-amber-800 dark:text-amber-200 list-disc list-inside space-y-1">
+                    <li>Try clicking the manual Sync button</li>
+                    <li>Check that the calendar is still connected in Settings → Integrations</li>
+                    <li>For Google: Try disconnecting and reconnecting</li>
+                    <li>For Apple: Verify your app-specific password is still valid</li>
+                  </ul>
+                </div>
+
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                  <h4 className="font-semibold text-amber-900 dark:text-amber-100 mb-2">Connection showing &quot;Error&quot; status?</h4>
+                  <ul className="text-sm text-amber-800 dark:text-amber-200 list-disc list-inside space-y-1">
+                    <li>The connection will automatically retry on the next sync cycle</li>
+                    <li>If the error persists, disconnect and reconnect the calendar</li>
+                    <li>For Apple: You may need to generate a new app-specific password</li>
+                  </ul>
                 </div>
               </div>
             </div>
