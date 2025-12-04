@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
-import { Calendar, RefreshCw, Unlink, AlertCircle, CheckCircle, Clock, Loader2, X, Mail, Key, ExternalLink, Link } from 'lucide-react';
+import { Calendar, RefreshCw, Unlink, AlertCircle, CheckCircle, Clock, Loader2, X, Mail, Key, ExternalLink, Link, Upload, FileText } from 'lucide-react';
 
 interface CalendarConnection {
   id: string;
@@ -110,6 +110,9 @@ export function CalendarConnections() {
   const [showIcsModal, setShowIcsModal] = useState(false);
   const [icsUrl, setIcsUrl] = useState('');
   const [icsName, setIcsName] = useState('');
+  const [icsMode, setIcsMode] = useState<'url' | 'file'>('url');
+  const [icsFile, setIcsFile] = useState<File | null>(null);
+  const [icsFileContent, setIcsFileContent] = useState('');
 
   // Cozi modal state
   const [showCoziModal, setShowCoziModal] = useState(false);
@@ -204,22 +207,98 @@ export function CalendarConnections() {
     }
   };
 
-  // Handle ICS feed connection
+  // Handle ICS file selection
+  const handleIcsFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.name.endsWith('.ics') && !file.type.includes('calendar')) {
+      setError('Please select a valid .ics file');
+      return;
+    }
+
+    // Validate file size (1MB max)
+    if (file.size > 1024 * 1024) {
+      setError('File is too large. Maximum size is 1MB.');
+      return;
+    }
+
+    setIcsFile(file);
+
+    // Read file content
+    try {
+      const content = await file.text();
+      setIcsFileContent(content);
+      // Auto-fill name from file name if empty
+      if (!icsName) {
+        setIcsName(file.name.replace('.ics', ''));
+      }
+    } catch (err) {
+      console.error('Failed to read ICS file:', err);
+      setError('Failed to read the ICS file');
+    }
+  };
+
+  // Handle ICS feed connection (URL mode) or file upload
   const handleIcsConnect = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!currentSpace?.id) return;
 
-    const trimmedUrl = icsUrl.trim();
     const trimmedName = icsName.trim();
-
-    if (!trimmedUrl) {
-      setError('Please enter an ICS feed URL');
-      return;
-    }
 
     if (!trimmedName) {
       setError('Please enter a name for this calendar');
+      return;
+    }
+
+    // Handle file upload mode
+    if (icsMode === 'file') {
+      if (!icsFileContent) {
+        setError('Please select an ICS file to upload');
+        return;
+      }
+
+      setConnecting('ics');
+      setShowIcsModal(false);
+
+      try {
+        const response = await fetch('/api/calendar/import/ics-file', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ics_content: icsFileContent,
+            space_id: currentSpace.id,
+            file_name: icsFile?.name || trimmedName,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || data.details || 'Failed to import ICS file');
+        }
+
+        setSuccess(`ICS file imported successfully! ${data.events_imported} events added.`);
+        // Reset file state
+        setIcsFile(null);
+        setIcsFileContent('');
+        setIcsMode('url');
+      } catch (err) {
+        console.error('[CalendarConnections] ICS file import error:', err);
+        setError(err instanceof Error ? err.message : 'Failed to import ICS file');
+      } finally {
+        setConnecting(null);
+      }
+      return;
+    }
+
+    // Handle URL mode
+    const trimmedUrl = icsUrl.trim();
+
+    if (!trimmedUrl) {
+      setError('Please enter an ICS feed URL');
       return;
     }
 
@@ -965,12 +1044,43 @@ export function CalendarConnections() {
 
             {/* Modal Body */}
             <form onSubmit={handleIcsConnect} className="p-6 space-y-4">
+              {/* Mode Toggle */}
+              <div className="flex rounded-xl bg-gray-100 dark:bg-gray-700 p-1">
+                <button
+                  type="button"
+                  onClick={() => setIcsMode('url')}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                    icsMode === 'url'
+                      ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 shadow-sm'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  }`}
+                >
+                  <Link className="h-4 w-4" />
+                  Subscribe to URL
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIcsMode('file')}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                    icsMode === 'file'
+                      ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 shadow-sm'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  }`}
+                >
+                  <Upload className="h-4 w-4" />
+                  Upload File
+                </button>
+              </div>
+
               <div className="rounded-lg bg-purple-50 dark:bg-purple-900/20 p-3 text-sm">
                 <p className="font-medium text-purple-800 dark:text-purple-200 mb-1">
-                  One-Way Import
+                  {icsMode === 'url' ? 'One-Way Subscription' : 'One-Time Import'}
                 </p>
                 <p className="text-purple-700 dark:text-purple-300 text-xs">
-                  Events from the ICS feed will be imported into Rowan. Changes you make in Rowan won&apos;t sync back to the original calendar.
+                  {icsMode === 'url'
+                    ? 'Events from the ICS feed will be imported into Rowan and synced every 15 minutes. Changes you make in Rowan won\'t sync back.'
+                    : 'Events from the ICS file will be imported once. Upload new files to add more events.'
+                  }
                 </p>
               </div>
 
@@ -993,29 +1103,83 @@ export function CalendarConnections() {
                 />
               </div>
 
-              {/* URL Input */}
-              <div>
-                <label
-                  htmlFor="ics-url"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  ICS Feed URL
-                </label>
-                <div className="relative">
-                  <Link className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="url"
-                    id="ics-url"
-                    value={icsUrl}
-                    onChange={(e) => setIcsUrl(e.target.value)}
-                    placeholder="https://example.com/calendar.ics or webcal://..."
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
-                  />
+              {/* URL Input (URL mode) */}
+              {icsMode === 'url' && (
+                <div>
+                  <label
+                    htmlFor="ics-url"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
+                    ICS Feed URL
+                  </label>
+                  <div className="relative">
+                    <Link className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <input
+                      type="url"
+                      id="ics-url"
+                      value={icsUrl}
+                      onChange={(e) => setIcsUrl(e.target.value)}
+                      placeholder="https://example.com/calendar.ics or webcal://..."
+                      className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Supports HTTPS and webcal:// URLs. The feed will be synced every 15 minutes.
+                  </p>
                 </div>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  Supports HTTPS and webcal:// URLs. The feed will be synced every 15 minutes.
-                </p>
-              </div>
+              )}
+
+              {/* File Upload (File mode) */}
+              {icsMode === 'file' && (
+                <div>
+                  <label
+                    htmlFor="ics-file"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
+                    ICS File
+                  </label>
+                  <label
+                    htmlFor="ics-file"
+                    className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${
+                      icsFile
+                        ? 'border-purple-400 bg-purple-50 dark:bg-purple-900/20'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-purple-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    {icsFile ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <FileText className="h-8 w-8 text-purple-500" />
+                        <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
+                          {icsFile.name}
+                        </span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          Click to change file
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <Upload className="h-8 w-8 text-gray-400" />
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                          Drop .ics file here or click to browse
+                        </span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          Maximum file size: 1MB
+                        </span>
+                      </div>
+                    )}
+                    <input
+                      id="ics-file"
+                      type="file"
+                      accept=".ics,text/calendar"
+                      className="hidden"
+                      onChange={handleIcsFileSelect}
+                    />
+                  </label>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Upload .ics files from email invites or exported calendars.
+                  </p>
+                </div>
+              )}
 
               {/* Modal Actions */}
               <div className="flex gap-3 pt-2">
@@ -1028,15 +1192,22 @@ export function CalendarConnections() {
                 </button>
                 <button
                   type="submit"
-                  disabled={!icsUrl.trim() || !icsName.trim()}
+                  disabled={
+                    !icsName.trim() ||
+                    (icsMode === 'url' && !icsUrl.trim()) ||
+                    (icsMode === 'file' && !icsFileContent)
+                  }
                   className="flex-1 px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Import Feed
+                  {icsMode === 'url' ? 'Subscribe to Feed' : 'Import File'}
                 </button>
               </div>
 
               <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-                Common sources: Google Calendar, Outlook, school/organization calendars, sports schedules
+                {icsMode === 'url'
+                  ? 'Common sources: Google Calendar, Outlook, school/organization calendars, sports schedules'
+                  : 'Upload .ics files from email invites, exported calendars, or calendar apps'
+                }
               </p>
             </form>
           </div>

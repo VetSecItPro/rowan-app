@@ -3165,24 +3165,40 @@ export default function CalendarDocumentationPage() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
-              Importing ICS Calendar Feeds
+              Importing ICS Calendars
             </h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-                Import events from any ICS/iCalendar feed URL. This is perfect for importing public calendars, sports schedules, school calendars, and any other calendar that provides an ICS feed.
+                Import events from ICS/iCalendar sources - either by subscribing to a feed URL (for automatic updates) or by uploading a .ics file (for one-time imports).
               </p>
+
+              <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Subscribe to URL</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Connect to a live calendar feed that updates automatically every 15 minutes.</p>
+                </div>
+
+                <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Upload File</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">One-time import from a .ics file. Great for email invites or exported calendars.</p>
+                </div>
+              </div>
 
               <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4 border border-purple-200 dark:border-purple-800 mb-6">
                 <div className="flex items-start gap-2">
                   <Info className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-purple-900 dark:text-purple-100">
-                    <strong>One-Way Import:</strong> ICS feeds are read-only. Events from the feed are imported into Rowan, but changes you make in Rowan won&apos;t sync back to the original calendar.
+                    <strong>One-Way Import:</strong> ICS sources are read-only. Events are imported into Rowan, but changes you make in Rowan won&apos;t sync back to the original calendar.
                   </div>
                 </div>
               </div>
 
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Method 1: Subscribe to a Feed URL</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                Use this method when you have a calendar that provides a subscription URL. The calendar will stay in sync automatically.
+              </p>
               <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 mb-6">
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">How to Import an ICS Feed</h4>
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">How to Subscribe to an ICS Feed</h4>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center flex-shrink-0 text-white font-bold">1</div>
@@ -3203,6 +3219,14 @@ export default function CalendarDocumentationPage() {
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center flex-shrink-0 text-white font-bold">3</div>
                     <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Select &quot;Subscribe to URL&quot;</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Make sure the &quot;Subscribe to URL&quot; tab is selected in the modal.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center flex-shrink-0 text-white font-bold">4</div>
+                    <div>
                       <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Enter Feed Details</h5>
                       <p className="text-sm text-gray-700 dark:text-gray-300">Give your calendar a name (e.g., &quot;Kids Soccer Schedule&quot;) and paste the ICS URL.</p>
                     </div>
@@ -3211,8 +3235,57 @@ export default function CalendarDocumentationPage() {
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 text-white font-bold">✓</div>
                     <div>
-                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Imported!</h5>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Subscribed!</h5>
                       <p className="text-sm text-gray-700 dark:text-gray-300">Events are imported immediately. The feed refreshes automatically every 15 minutes for updates.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Method 2: Upload an ICS File</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                Use this method for one-time imports from .ics files, such as email calendar invites or exported calendars.
+              </p>
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 mb-6">
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">How to Upload an ICS File</h4>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center flex-shrink-0 text-white font-bold">1</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Get Your .ics File</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Save the .ics file from an email invite, or export it from another calendar app.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center flex-shrink-0 text-white font-bold">2</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Navigate to Settings</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Go to <strong>Settings → Integrations</strong> and click <strong>&quot;Connect&quot;</strong> next to ICS Feed.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center flex-shrink-0 text-white font-bold">3</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Select &quot;Upload File&quot;</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Click the &quot;Upload File&quot; tab in the modal.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center flex-shrink-0 text-white font-bold">4</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Upload the File</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">Enter a calendar name, then drag and drop your .ics file or click to browse. Maximum file size is 1MB.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 text-white font-bold">✓</div>
+                    <div>
+                      <h5 className="font-semibold text-gray-900 dark:text-white mb-1">Imported!</h5>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">All events from the file are imported into Rowan. Upload additional files to add more events.</p>
                     </div>
                   </div>
                 </div>

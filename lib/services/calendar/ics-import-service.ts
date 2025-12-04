@@ -421,6 +421,112 @@ async function syncICSFeed(
 }
 
 /**
+ * Import events directly from ICS file content (one-time import, no connection)
+ */
+async function importICSFile(
+  icsContent: string,
+  spaceId: string,
+  userId: string,
+  fileName?: string
+): Promise<{
+  success: boolean;
+  eventsImported: number;
+  error?: string;
+}> {
+  try {
+    // Validate it looks like ICS data
+    if (!icsContent.includes('BEGIN:VCALENDAR')) {
+      return {
+        success: false,
+        eventsImported: 0,
+        error: 'File does not appear to be valid ICS/iCalendar data'
+      };
+    }
+
+    // Parse ICS data
+    const events = parseICSData(icsContent);
+
+    if (events.length === 0) {
+      return {
+        success: false,
+        eventsImported: 0,
+        error: 'No events found in the ICS file'
+      };
+    }
+
+    const supabase = await createClient();
+    let eventsImported = 0;
+
+    // Import each event
+    for (const event of events) {
+      const { error } = await supabase.from('events').insert({
+        space_id: spaceId,
+        title: event.summary,
+        description: event.description || null,
+        location: event.location || null,
+        start_time: event.start.toISOString(),
+        end_time: event.end.toISOString(),
+        is_all_day: event.isAllDay,
+        source: 'ics_file_import',
+        created_by: userId,
+        // Store file name in metadata for reference
+        metadata: fileName ? { imported_from: fileName } : null,
+      });
+
+      if (!error) {
+        eventsImported++;
+      }
+    }
+
+    return {
+      success: true,
+      eventsImported,
+    };
+  } catch (error) {
+    console.error('[ICS File Import] Error:', error);
+    return {
+      success: false,
+      eventsImported: 0,
+      error: error instanceof Error ? error.message : 'Failed to import ICS file'
+    };
+  }
+}
+
+/**
+ * Validate ICS file content
+ */
+function validateICSContent(content: string): {
+  valid: boolean;
+  eventCount?: number;
+  calendarName?: string;
+  error?: string;
+} {
+  try {
+    if (!content.includes('BEGIN:VCALENDAR')) {
+      return { valid: false, error: 'Content does not appear to be valid ICS data' };
+    }
+
+    const jcalData = ICAL.parse(content);
+    const component = new ICAL.Component(jcalData);
+
+    // Get calendar name
+    const calNameProp = component.getFirstProperty('x-wr-calname');
+    const calendarName = calNameProp ? calNameProp.getFirstValue() : undefined;
+
+    // Count events
+    const events = component.getAllSubcomponents('vevent');
+
+    return {
+      valid: true,
+      eventCount: events.length,
+      calendarName: calendarName as string | undefined,
+    };
+  } catch {
+    return { valid: false, error: 'Failed to parse ICS data - invalid format' };
+  }
+}
+
+/**
  * Test an ICS feed URL by fetching and parsing it
  */
 async function testICSFeed(url: string): Promise<{
@@ -468,7 +574,9 @@ async function testICSFeed(url: string): Promise<{
 
 export const icsImportService = {
   validateICSUrl,
+  validateICSContent,
   testICSFeed,
   syncICSFeed,
   parseICSData,
+  importICSFile,
 };
