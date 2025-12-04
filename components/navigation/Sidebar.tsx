@@ -88,7 +88,7 @@ const NavItemComponent = memo(function NavItemComponent({
 });
 
 export function Sidebar() {
-  const [isExpanded, setIsExpanded] = useState(false); // Start collapsed for faster initial render
+  const [isExpanded, setIsExpanded] = useState(true); // Start expanded by default for new users
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { user } = useAuth();
@@ -102,6 +102,10 @@ export function Sidebar() {
     const saved = localStorage.getItem(SIDEBAR_STORAGE_KEY);
     if (saved !== null) {
       setIsExpanded(saved === 'true');
+    } else {
+      // First time user - default to expanded and save it
+      setIsExpanded(true);
+      localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
     }
   }, []);
 
@@ -124,7 +128,7 @@ export function Sidebar() {
   // Render placeholder during SSR to prevent layout shift
   if (!mounted) {
     return (
-      <aside className="hidden md:flex flex-col h-screen sticky top-0 w-[60px] bg-white/60 dark:bg-gray-900/60 border-r border-gray-200/30 dark:border-gray-800/30" />
+      <aside className="hidden md:flex flex-col h-screen sticky top-0 w-64 bg-white/60 dark:bg-gray-900/60 border-r border-gray-200/30 dark:border-gray-800/30" />
     );
   }
 
