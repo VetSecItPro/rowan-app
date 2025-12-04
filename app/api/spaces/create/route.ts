@@ -5,6 +5,8 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { getUserTier } from '@/lib/services/subscription-service';
+import { getFeatureLimit } from '@/lib/config/feature-limits';
 
 /**
  * POST /api/spaces/create
@@ -49,6 +51,39 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Check space limit based on user's subscription tier
+    const userTier = await getUserTier(session.user.id);
+    const maxSpaces = getFeatureLimit(userTier, 'maxSpaces') as number;
+
+    // Count user's current spaces (where they are the owner)
+    const { count: currentSpaceCount, error: countError } = await supabase
+      .from('space_members')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', session.user.id)
+      .eq('role', 'owner');
+
+    if (countError) {
+      console.error('[API] Error counting user spaces:', countError);
+      return NextResponse.json(
+        { error: 'Failed to check space limit' },
+        { status: 500 }
+      );
+    }
+
+    const spaceCount = currentSpaceCount || 0;
+    if (spaceCount >= maxSpaces) {
+      const tierName = userTier === 'free' ? 'Free' : userTier === 'pro' ? 'Pro' : 'Family';
+      return NextResponse.json(
+        {
+          error: `You've reached the maximum of ${maxSpaces} space${maxSpaces === 1 ? '' : 's'} for the ${tierName} plan. Upgrade to create more spaces.`,
+          code: 'SPACE_LIMIT_REACHED',
+          currentCount: spaceCount,
+          limit: maxSpaces,
+          tier: userTier,
+        },
+        { status: 403 }
+      );
+    }
 
     // Create space using service (pass server supabase client)
     const result = await createSpace(name.trim(), session.user.id, supabase);

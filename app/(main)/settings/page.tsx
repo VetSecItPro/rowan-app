@@ -21,6 +21,7 @@ import {
   PrivacyDataManager,
 } from '@/components/ui/DynamicSettingsComponents';
 import { DataManagementTab } from '@/components/settings/DataManagementTab';
+import { CalendarConnections } from '@/components/calendar/CalendarConnections';
 import { Toggle } from '@/components/ui/Toggle';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 import { createClient } from '@/lib/supabase/client';
@@ -67,10 +68,11 @@ import {
   Loader2,
   Edit,
   Receipt,
-  FolderOpen
+  FolderOpen,
+  Link2
 } from 'lucide-react';
 
-type SettingsTab = 'profile' | 'security' | 'privacy-data' | 'data-management' | 'documentation' | 'analytics';
+type SettingsTab = 'profile' | 'security' | 'privacy-data' | 'data-management' | 'integrations' | 'documentation' | 'analytics';
 type UserRole = 'Admin' | 'Member' | 'Viewer';
 type ExportStatus = 'idle' | 'pending' | 'processing' | 'ready';
 
@@ -804,6 +806,7 @@ export default function SettingsPage() {
     { id: 'security' as SettingsTab, name: 'Security', icon: Shield, description: 'Password and authentication' },
     { id: 'privacy-data' as SettingsTab, name: 'Privacy & Compliance', icon: Lock, description: 'Privacy settings and compliance' },
     { id: 'data-management' as SettingsTab, name: 'Data Management', icon: Database, description: 'Storage usage and file management' },
+    { id: 'integrations' as SettingsTab, name: 'Integrations', icon: Link2, description: 'Connect external calendars' },
     { id: 'documentation' as SettingsTab, name: 'Documentation', icon: BookOpen, description: 'Browse our guides and tutorials' },
     { id: 'analytics' as SettingsTab, name: 'Analytics', icon: BarChart3, description: 'Track productivity trends' },
   ];
@@ -1261,6 +1264,9 @@ export default function SettingsPage() {
 
                 {/* Data Management Tab */}
                 {activeTab === 'data-management' && <DataManagementTab />}
+
+                {/* Integrations Tab */}
+                {activeTab === 'integrations' && <CalendarConnections />}
 
                 {/* Analytics Tab */}
                 {activeTab === 'analytics' && (

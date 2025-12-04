@@ -9,10 +9,10 @@ import { HamburgerMenu } from '@/components/navigation/HamburgerMenu';
 import { ComprehensiveNotificationCenter } from '@/components/notifications/ComprehensiveNotificationCenter';
 import { FeedbackButton } from '@/components/feedback/FeedbackButton';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { LogOut, User as UserIcon, ChevronDown, Plus, Trophy, Shield } from 'lucide-react';
+import { useSpaces } from '@/lib/contexts/spaces-context';
+import { LogOut, User as UserIcon, ChevronDown, Trophy, Shield } from 'lucide-react';
 import { SpaceSelector } from '@/components/spaces/SpaceSelector';
 import { hasAdminAccess } from '@/lib/utils/admin-utils';
-import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
 
 const COLOR_THEMES = {
   emerald: 'bg-emerald-500',
@@ -26,9 +26,9 @@ const COLOR_THEMES = {
 };
 
 export function Header() {
-  const { user, signOut, currentSpace, spaces, switchSpace } = useAuth();
+  const { user, signOut } = useAuth();
+  const { currentSpace, spaces, switchSpace } = useSpaces();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -48,11 +48,6 @@ export function Header() {
     await signOut();
     setIsDropdownOpen(false);
     router.push('/login');
-  };
-
-  const handleCreateSpace = () => {
-    setShowCreateSpaceModal(true);
-    setIsDropdownOpen(false);
   };
 
   return (
@@ -172,12 +167,7 @@ export function Header() {
                       {user.name.charAt(0).toUpperCase()}
                     </div>
                   )}
-                  <div className="flex flex-col items-start flex-1 min-w-0">
-                    <span className="text-sm truncate max-w-[100px]">{user.name}</span>
-                    {currentSpace && (
-                      <span className="text-[10px] opacity-75 truncate max-w-[100px]">{currentSpace.name}</span>
-                    )}
-                  </div>
+                  <span className="text-sm truncate max-w-[100px]">{user.name}</span>
                   <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
@@ -215,14 +205,6 @@ export function Header() {
                     </div>
 
                     {/* Navigation Items */}
-                    <button
-                      onClick={handleCreateSpace}
-                      className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors active:scale-[0.98]"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Create New Space
-                    </button>
-
                     <Link
                       href="/settings"
                       onClick={() => setIsDropdownOpen(false)}
@@ -275,13 +257,6 @@ export function Header() {
         </div>
       </div>
       </header>
-
-      {/* Create Space Modal */}
-      <CreateSpaceModal
-        isOpen={showCreateSpaceModal}
-        onClose={() => setShowCreateSpaceModal(false)}
-        onSpaceCreated={() => setShowCreateSpaceModal(false)}
-      />
     </>
   );
 }
