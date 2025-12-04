@@ -64,11 +64,13 @@ export default function CalendarPage() {
     }
     return false;
   });
-  const [calendarConnectionId, setCalendarConnectionId] = useState<string | null>(() => {
+  // Store all active calendar connections (supports multiple providers)
+  const [calendarConnections, setCalendarConnections] = useState<Array<{ id: string; provider: string; last_sync_at: string | null }>>(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('rowan_calendar_connection_id');
+      const cached = localStorage.getItem('rowan_calendar_connections');
+      return cached ? JSON.parse(cached) : [];
     }
-    return null;
+    return [];
   });
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(() => {
     if (typeof window !== 'undefined') {
@@ -358,79 +360,140 @@ export default function CalendarPage() {
   }, []);
 
   // Check for calendar connections - runs in background, caches to localStorage
+  // Fetches all providers (Google, Apple, Cozi) and stores active connections
   const checkCalendarConnection = useCallback(async () => {
     if (!currentSpace) return;
 
     try {
-      const response = await fetch(`/api/calendar/connect/google?space_id=${currentSpace.id}`);
-      if (response.ok) {
-        const data = await response.json();
-        const activeConnection = data.connections?.find(
-          (c: { sync_status: string }) => c.sync_status === 'active' || c.sync_status === 'syncing'
-        );
-        if (activeConnection) {
-          setHasCalendarConnection(true);
-          setCalendarConnectionId(activeConnection.id);
-          setLastSyncTime(activeConnection.last_sync_at);
-          // Cache to localStorage for instant display on next visit
-          localStorage.setItem('rowan_calendar_connected', 'true');
-          localStorage.setItem('rowan_calendar_connection_id', activeConnection.id);
-          if (activeConnection.last_sync_at) {
-            localStorage.setItem('rowan_calendar_last_sync', activeConnection.last_sync_at);
+      // Fetch connections from all providers in parallel
+      const providers = ['google', 'apple'] as const; // Add 'cozi' when integrated
+      const responses = await Promise.all(
+        providers.map(provider =>
+          fetch(`/api/calendar/connect/${provider}?space_id=${currentSpace.id}`)
+            .then(res => res.ok ? res.json() : { connections: [] })
+            .catch(() => ({ connections: [] }))
+        )
+      );
+
+      // Collect all active connections across all providers
+      const activeConnections: Array<{ id: string; provider: string; last_sync_at: string | null }> = [];
+      let mostRecentSyncTime: string | null = null;
+
+      responses.forEach((data, index) => {
+        const provider = providers[index];
+        const providerConnections = data.connections || [];
+
+        providerConnections.forEach((c: { id: string; sync_status: string; last_sync_at: string | null }) => {
+          if (c.sync_status === 'active' || c.sync_status === 'syncing') {
+            activeConnections.push({
+              id: c.id,
+              provider,
+              last_sync_at: c.last_sync_at,
+            });
+
+            // Track most recent sync time across all connections
+            if (c.last_sync_at) {
+              if (!mostRecentSyncTime || new Date(c.last_sync_at) > new Date(mostRecentSyncTime)) {
+                mostRecentSyncTime = c.last_sync_at;
+              }
+            }
           }
-        } else {
-          setHasCalendarConnection(false);
-          setCalendarConnectionId(null);
-          // Clear cache
-          localStorage.removeItem('rowan_calendar_connected');
-          localStorage.removeItem('rowan_calendar_connection_id');
-          localStorage.removeItem('rowan_calendar_last_sync');
+        });
+      });
+
+      if (activeConnections.length > 0) {
+        setHasCalendarConnection(true);
+        setCalendarConnections(activeConnections);
+        setLastSyncTime(mostRecentSyncTime);
+        // Cache to localStorage for instant display on next visit
+        localStorage.setItem('rowan_calendar_connected', 'true');
+        localStorage.setItem('rowan_calendar_connections', JSON.stringify(activeConnections));
+        if (mostRecentSyncTime) {
+          localStorage.setItem('rowan_calendar_last_sync', mostRecentSyncTime);
         }
+      } else {
+        setHasCalendarConnection(false);
+        setCalendarConnections([]);
+        // Clear cache
+        localStorage.removeItem('rowan_calendar_connected');
+        localStorage.removeItem('rowan_calendar_connections');
+        localStorage.removeItem('rowan_calendar_last_sync');
       }
     } catch (error) {
-      console.error('Failed to check calendar connection:', error);
+      console.error('Failed to check calendar connections:', error);
     } finally {
       setConnectionChecked(true);
     }
   }, [currentSpace]);
 
-  // Sync calendar
+  // Sync all connected calendars (Google, Apple, etc.)
   const handleSyncCalendar = useCallback(async () => {
-    if (!calendarConnectionId || isSyncing) return;
+    if (calendarConnections.length === 0 || isSyncing) return;
 
     setIsSyncing(true);
+    let totalEventsSynced = 0;
+    let hasError = false;
+
     try {
-      const response = await fetch('/api/calendar/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          connection_id: calendarConnectionId,
-          sync_type: 'incremental',
-        }),
+      // Sync all connections in parallel for efficiency
+      const syncPromises = calendarConnections.map(async (connection) => {
+        try {
+          const response = await fetch('/api/calendar/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              connection_id: connection.id,
+              sync_type: 'incremental',
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            console.log(`[${connection.provider}] Sync complete: ${data.events_synced} events processed`);
+            return { success: true, events: data.events_synced || 0, provider: connection.provider };
+          } else if (response.status === 429) {
+            console.log(`[${connection.provider}] Rate limited - please wait before syncing again`);
+            return { success: false, events: 0, provider: connection.provider, rateLimited: true };
+          } else {
+            console.error(`[${connection.provider}] Sync failed:`, data.error);
+            return { success: false, events: 0, provider: connection.provider, error: data.error };
+          }
+        } catch (error) {
+          console.error(`[${connection.provider}] Sync error:`, error);
+          return { success: false, events: 0, provider: connection.provider, error };
+        }
       });
 
-      const data = await response.json();
+      const results = await Promise.all(syncPromises);
 
-      if (response.ok && data.success) {
-        // Reload events to show synced items
+      // Aggregate results
+      results.forEach((result) => {
+        if (result.success) {
+          totalEventsSynced += result.events;
+        } else {
+          hasError = true;
+        }
+      });
+
+      // If at least one sync succeeded, reload events and update sync time
+      if (results.some(r => r.success)) {
         loadEvents();
         const syncTime = new Date().toISOString();
         setLastSyncTime(syncTime);
-        // Cache for instant display on next visit
         localStorage.setItem('rowan_calendar_last_sync', syncTime);
-        // Show success briefly (could add toast notification)
-        console.log(`Sync complete: ${data.events_synced} events processed`);
-      } else if (response.status === 429) {
-        console.log('Rate limited - please wait before syncing again');
-      } else {
-        console.error('Sync failed:', data.error);
+        console.log(`Total sync complete: ${totalEventsSynced} events across ${calendarConnections.length} calendar(s)`);
+      }
+
+      if (hasError) {
+        console.warn('Some calendars failed to sync - check individual provider logs above');
       }
     } catch (error) {
       console.error('Sync error:', error);
     } finally {
       setIsSyncing(false);
     }
-  }, [calendarConnectionId, isSyncing, loadEvents]);
+  }, [calendarConnections, isSyncing, loadEvents]);
 
   // Helper to get events for a specific date
   const getEventsForDate = useCallback((date: Date) => {
@@ -832,11 +895,11 @@ export default function CalendarPage() {
                   <div className="relative">
                     <button
                       onClick={handleSyncCalendar}
-                      disabled={isSyncing || !calendarConnectionId}
+                      disabled={isSyncing || calendarConnections.length === 0}
                       onMouseEnter={() => setSyncTooltipVisible(true)}
                       onMouseLeave={() => setSyncTooltipVisible(false)}
                       className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
-                        isSyncing || !calendarConnectionId
+                        isSyncing || calendarConnections.length === 0
                           ? 'bg-gray-400 text-white cursor-not-allowed'
                           : 'bg-green-600 text-white hover:bg-green-700'
                       }`}
@@ -848,7 +911,16 @@ export default function CalendarPage() {
                     {syncTooltipVisible && (
                       <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50 pointer-events-none">
                         <div className="bg-gray-900 dark:bg-gray-700 text-white text-xs px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
-                          <div className="font-medium">Sync with Google Calendar</div>
+                          <div className="font-medium">
+                            Sync with {calendarConnections.length === 1
+                              ? `${calendarConnections[0].provider.charAt(0).toUpperCase() + calendarConnections[0].provider.slice(1)} Calendar`
+                              : `${calendarConnections.length} Calendars`}
+                          </div>
+                          {calendarConnections.length > 1 && (
+                            <div className="text-gray-300 mt-0.5">
+                              {calendarConnections.map(c => c.provider.charAt(0).toUpperCase() + c.provider.slice(1)).join(', ')}
+                            </div>
+                          )}
                           {lastSyncTime && (
                             <div className="text-gray-300 mt-0.5">
                               Last synced: {new Date(lastSyncTime).toLocaleTimeString()}
