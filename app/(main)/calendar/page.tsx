@@ -4,7 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, List, X, RefreshCw } from 'lucide-react';
+import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, List, X, RefreshCw, Archive } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { EventCard } from '@/components/calendar/EventCard';
@@ -23,6 +23,7 @@ import type { UnifiedCalendarItem, UnifiedCalendarFilters as FilterState } from 
 import { NewEventModal } from '@/components/calendar/NewEventModal';
 import { EventDetailModal } from '@/components/calendar/EventDetailModal';
 import { EventProposalModal } from '@/components/calendar/EventProposalModal';
+import { BulkEventManager } from '@/components/calendar/BulkEventManager';
 import { EnhancedDayView } from '@/components/calendar/EnhancedDayView';
 import { EnhancedWeekView } from '@/components/calendar/EnhancedWeekView';
 import { TemplateLibrary } from '@/components/calendar/TemplateLibrary';
@@ -58,6 +59,7 @@ export default function CalendarPage() {
   const [activeAction, setActiveAction] = useState<'quick-add' | 'templates' | 'propose' | 'new-event'>('new-event');
   const [statusFilter, setStatusFilter] = useState<'all' | 'not-started' | 'in-progress' | 'completed'>('all');
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, eventId: '' });
+  const [isBulkManagerOpen, setIsBulkManagerOpen] = useState(false);
 
   // Phase 9: Unified calendar items state (tasks, meals, reminders alongside events)
   const [selectedUnifiedItem, setSelectedUnifiedItem] = useState<UnifiedCalendarItem | null>(null);
@@ -998,6 +1000,16 @@ export default function CalendarPage() {
                   </button>
                 )}
 
+                {/* Manage Events Button - Bulk delete & trash */}
+                <button
+                  onClick={() => setIsBulkManagerOpen(true)}
+                  className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center gap-1.5"
+                  title="Manage events (bulk delete, trash)"
+                >
+                  <Archive className="w-3.5 h-3.5" />
+                  Manage
+                </button>
+
                 {/* View Mode Toggle - Always visible */}
                 <div className="bg-gray-100 dark:bg-gray-800 border border-purple-300 dark:border-purple-600 rounded-lg p-0.5 flex gap-0.5">
                   <button
@@ -1857,6 +1869,7 @@ export default function CalendarPage() {
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           onSave={handleCreateEvent}
+          onDelete={handleDeleteEvent}
           editEvent={editingEvent}
           spaceId={currentSpace.id}
         />
@@ -1868,6 +1881,8 @@ export default function CalendarPage() {
           isOpen={!!detailEvent}
           onClose={() => setDetailEvent(null)}
           event={detailEvent}
+          onEdit={handleEditEvent}
+          onDelete={handleDeleteEvent}
         />
       )}
 
@@ -1901,6 +1916,17 @@ export default function CalendarPage() {
           onClose={() => setIsTemplateLibraryOpen(false)}
           spaceId={currentSpace.id}
           onSelectTemplate={handleSelectTemplate}
+        />
+      )}
+
+      {/* Bulk Event Manager Modal */}
+      {currentSpace && (
+        <BulkEventManager
+          isOpen={isBulkManagerOpen}
+          onClose={() => setIsBulkManagerOpen(false)}
+          spaceId={currentSpace.id}
+          events={events}
+          onEventsDeleted={loadEvents}
         />
       )}
 

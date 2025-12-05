@@ -163,6 +163,92 @@ export const calendarService = {
     }
   },
 
+  /**
+   * Bulk delete events (soft delete by default)
+   */
+  async deleteEvents(ids: string[], permanent = false): Promise<{ deleted: number; errors: string[] }> {
+    const supabase = createClient();
+    let deleted = 0;
+    const errors: string[] = [];
+
+    if (permanent) {
+      // Permanent bulk delete
+      const { error, count } = await supabase
+        .from('events')
+        .delete()
+        .in('id', ids);
+
+      if (error) {
+        errors.push(`Bulk delete failed: ${error.message}`);
+      } else {
+        deleted = count || ids.length;
+      }
+    } else {
+      // Soft bulk delete (30-day retention)
+      const { error, count } = await supabase
+        .from('events')
+        .update({
+          deleted_at: new Date().toISOString()
+        })
+        .in('id', ids);
+
+      if (error) {
+        errors.push(`Bulk delete failed: ${error.message}`);
+      } else {
+        deleted = count || ids.length;
+      }
+    }
+
+    return { deleted, errors };
+  },
+
+  /**
+   * Delete all events from a specific source (e.g., imported from Google Calendar)
+   */
+  async deleteEventsBySource(spaceId: string, source: string, permanent = false): Promise<{ deleted: number; errors: string[] }> {
+    const supabase = createClient();
+
+    // First get all event IDs from this source
+    const { data: events, error: fetchError } = await supabase
+      .from('events')
+      .select('id')
+      .eq('space_id', spaceId)
+      .eq('event_type', source)
+      .is('deleted_at', null);
+
+    if (fetchError) {
+      return { deleted: 0, errors: [`Failed to fetch events: ${fetchError.message}`] };
+    }
+
+    if (!events || events.length === 0) {
+      return { deleted: 0, errors: [] };
+    }
+
+    const ids = events.map(e => e.id);
+    return this.deleteEvents(ids, permanent);
+  },
+
+  /**
+   * Permanently delete all soft-deleted events (admin function)
+   */
+  async purgeDeletedEvents(spaceId: string): Promise<{ deleted: number; errors: string[] }> {
+    const supabase = createClient();
+    const errors: string[] = [];
+
+    const { error, count } = await supabase
+      .from('events')
+      .delete()
+      .eq('space_id', spaceId)
+      .not('deleted_at', 'is', null);
+
+    if (error) {
+      errors.push(`Purge failed: ${error.message}`);
+      return { deleted: 0, errors };
+    }
+
+    return { deleted: count || 0, errors };
+  },
+
   async restoreEvent(id: string): Promise<CalendarEvent> {
     const supabase = createClient();
     const { data, error } = await supabase
