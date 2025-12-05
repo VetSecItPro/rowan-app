@@ -1,9 +1,10 @@
 // Unified Calendar Mapper Service
-// Phase 9: Maps tasks, meals, reminders to unified calendar items
+// Phase 9: Maps tasks, meals, reminders, goals to unified calendar items
 
 import type { Task } from '@/lib/types';
 import type { Meal } from '@/lib/services/meals-service';
 import type { Reminder } from '@/lib/services/reminders-service';
+import type { Goal } from '@/lib/services/goals-service';
 import type { CalendarEvent } from '@/lib/services/calendar-service';
 import type {
   UnifiedCalendarItem,
@@ -163,6 +164,53 @@ export const unifiedCalendarMapper = {
   },
 
   /**
+   * Map a goal to a unified calendar item
+   * Only maps goals with a target_date set
+   */
+  mapGoal(goal: Goal): UnifiedCalendarItem | null {
+    // Skip goals without target dates
+    if (!goal.target_date) {
+      return null;
+    }
+
+    // Goals appear as all-day items on their target date
+    const targetDate = new Date(goal.target_date);
+    targetDate.setHours(0, 0, 0, 0);
+
+    // Map priority from goal format to unified format
+    let priority: 'low' | 'medium' | 'high' | 'urgent' | undefined;
+    if (goal.priority === 'p1') priority = 'urgent';
+    else if (goal.priority === 'p2') priority = 'high';
+    else if (goal.priority === 'p3') priority = 'medium';
+    else if (goal.priority === 'p4') priority = 'low';
+
+    return {
+      id: `goal-${goal.id}`,
+      originalId: goal.id,
+      itemType: 'goal',
+      title: goal.title,
+      description: goal.description,
+      startTime: targetDate.toISOString(),
+      endTime: undefined, // Goals are target dates (point-in-time)
+      isAllDay: true, // Goals appear as all-day items
+      category: goal.category,
+      status: goal.status,
+      priority,
+      assignedTo: goal.assigned_to,
+      createdBy: goal.created_by,
+      metadata: {
+        progress: goal.progress,
+        visibility: goal.visibility,
+        is_pinned: goal.is_pinned,
+        milestones: goal.milestones,
+        completed_at: goal.completed_at,
+        assignee: goal.assignee,
+      },
+      originalItem: goal,
+    };
+  },
+
+  /**
    * Batch map multiple events to unified items
    */
   mapEvents(events: CalendarEvent[]): UnifiedCalendarItem[] {
@@ -197,6 +245,16 @@ export const unifiedCalendarMapper = {
   },
 
   /**
+   * Batch map multiple goals to unified items
+   * Filters out goals without target_date
+   */
+  mapGoals(goals: Goal[]): UnifiedCalendarItem[] {
+    return goals
+      .map((goal) => this.mapGoal(goal))
+      .filter((item): item is UnifiedCalendarItem => item !== null);
+  },
+
+  /**
    * Get the original item from a unified calendar item
    * Returns typed result based on itemType
    */
@@ -211,11 +269,23 @@ export const unifiedCalendarMapper = {
     ? Meal
     : T extends 'reminder'
     ? Reminder
+    : T extends 'goal'
+    ? Goal
     : never {
     if (item.itemType !== expectedType) {
       throw new Error(`Expected item type ${expectedType} but got ${item.itemType}`);
     }
-    return item.originalItem as any;
+    return item.originalItem as T extends 'event'
+      ? CalendarEvent
+      : T extends 'task'
+      ? Task
+      : T extends 'meal'
+      ? Meal
+      : T extends 'reminder'
+      ? Reminder
+      : T extends 'goal'
+      ? Goal
+      : never;
   },
 
   /**
