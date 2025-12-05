@@ -12,6 +12,10 @@ export { calendarSyncService } from './calendar-sync-service';
 export { unifiedCalendarMapper } from './unified-calendar-mapper';
 export { unifiedCalendarService } from './unified-calendar-service';
 
+// Phase 11: Event Countdowns
+export { countdownService } from './countdown-service';
+export type { CountdownItem, CountdownResult } from './countdown-service';
+
 // Re-export types for convenience
 export type {
   CalendarProvider,
