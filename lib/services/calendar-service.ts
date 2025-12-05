@@ -16,10 +16,12 @@ export interface CalendarEvent {
   status: 'not-started' | 'in-progress' | 'completed';
   assigned_to?: string;
   created_by?: string;
-  custom_color?: string; // NEW: Custom hex color
-  timezone?: string; // NEW: Event timezone
-  deleted_at?: string; // NEW: Soft delete timestamp
-  deleted_by?: string; // NEW: Who deleted it
+  custom_color?: string; // Custom hex color
+  timezone?: string; // Event timezone
+  deleted_at?: string; // Soft delete timestamp
+  deleted_by?: string; // Who deleted it
+  show_countdown?: boolean; // Display as countdown widget on dashboard
+  countdown_label?: string; // Custom countdown label (e.g., "Birthday!", "Vacation!")
   created_at: string;
   updated_at: string;
 }
@@ -36,8 +38,10 @@ export interface CreateEventInput {
   location?: string;
   category?: 'work' | 'personal' | 'family' | 'health' | 'social';
   assigned_to?: string;
-  custom_color?: string; // NEW: Custom hex color
-  timezone?: string; // NEW: Event timezone
+  custom_color?: string; // Custom hex color
+  timezone?: string; // Event timezone
+  show_countdown?: boolean; // Display as countdown widget
+  countdown_label?: string; // Custom countdown label
 }
 
 export interface EventStats {

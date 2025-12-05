@@ -8,14 +8,15 @@ import {
   UtensilsCrossed,
   Bell,
   AlertCircle,
-  Clock,
   MapPin,
   ChevronRight,
   Loader2,
   Sun,
   Coffee,
-  Moon
+  Moon,
+  Clock
 } from 'lucide-react';
+import { WeatherBadge } from '@/components/calendar/WeatherBadge';
 import Link from 'next/link';
 import { format, isToday, isPast, parseISO, startOfDay, endOfDay } from 'date-fns';
 import { calendarService, type CalendarEvent } from '@/lib/services/calendar-service';
@@ -119,7 +120,7 @@ const Section = memo(function Section({
             {title}
           </h4>
           {count > 0 && (
-            <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-1.5 py-0.5 rounded-full">
+            <span className="text-xs bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full font-semibold">
               {count}
             </span>
           )}
@@ -211,6 +212,9 @@ const MealItem = memo(function MealItem({ meal }: { meal: Meal }) {
 
 // Reminder item component
 const ReminderItem = memo(function ReminderItem({ reminder, isOverdue }: { reminder: Reminder; isOverdue?: boolean }) {
+  // Use remind_at or reminder_time field
+  const remindAt = reminder.remind_at || reminder.reminder_time;
+
   return (
     <div className={`flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
       isOverdue ? 'border-l-2 border-red-500' : ''
@@ -223,9 +227,9 @@ const ReminderItem = memo(function ReminderItem({ reminder, isOverdue }: { remin
       }`}>
         {reminder.title}
       </p>
-      {reminder.reminder_time && (
+      {remindAt && (
         <span className="text-xs text-gray-500 dark:text-gray-400">
-          {format(parseISO(reminder.reminder_time), 'h:mm a')}
+          {format(parseISO(remindAt), 'h:mm a')}
         </span>
       )}
     </div>
@@ -332,17 +336,23 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
           return (order[a.meal_type] || 4) - (order[b.meal_type] || 4);
         });
 
-        // Filter active reminders for today
+        // Filter active reminders for today (use remind_at field, not reminder_time)
         const todayReminders = allReminders.filter(reminder => {
-          if (reminder.status !== 'active' || !reminder.reminder_time) return false;
-          const reminderDate = reminder.reminder_time.split('T')[0];
+          // Check completed status (not 'status' field)
+          if (reminder.completed) return false;
+          // Use remind_at field for the reminder time
+          const remindAt = reminder.remind_at || reminder.reminder_time;
+          if (!remindAt) return false;
+          const reminderDate = remindAt.split('T')[0];
           return reminderDate === todayStr;
         });
 
         // Filter overdue reminders
         const overdueReminders = allReminders.filter(reminder => {
-          if (reminder.status !== 'active' || !reminder.reminder_time) return false;
-          const reminderTime = parseISO(reminder.reminder_time);
+          if (reminder.completed) return false;
+          const remindAt = reminder.remind_at || reminder.reminder_time;
+          if (!remindAt) return false;
+          const reminderTime = parseISO(remindAt);
           return isPast(reminderTime) && !isToday(reminderTime);
         });
 
@@ -405,11 +415,11 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
       className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden ${className}`}
     >
       {/* Header */}
-      <div className="px-4 sm:px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800">
+      <div className="px-4 sm:px-6 py-4 border-b border-teal-100 dark:border-teal-800/50 bg-gradient-to-r from-teal-100 via-cyan-100 to-sky-100 dark:from-teal-900/40 dark:via-cyan-900/40 dark:to-sky-900/40">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-              <Sun className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
+              <Sun className="w-5 h-5 text-teal-600 dark:text-teal-400" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -420,9 +430,19 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
               </p>
             </div>
           </div>
-          <div className="hidden sm:flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-            <Clock className="w-3.5 h-3.5" />
-            {format(new Date(), 'h:mm a')}
+          {/* Weather + Time display - right side of header */}
+          <div className="hidden sm:flex items-center gap-4">
+            {/* Weather - flat horizontal layout for header */}
+            <WeatherBadge
+              eventTime={new Date().toISOString()}
+              location="Wylie, Texas, United States"
+              display="header"
+            />
+            {/* Time */}
+            <div className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 border-l border-gray-200 dark:border-gray-700 pl-4">
+              <Clock className="w-4 h-4" />
+              <span className="font-medium">{format(new Date(), 'h:mm a')}</span>
+            </div>
           </div>
         </div>
       </div>
