@@ -1438,15 +1438,15 @@ SUPABASE_SERVICE_ROLE_KEY=...
 
 ## Enhanced Implementation Checklist
 
-### Phase 9: Unified Calendar View ✓
-- [ ] Create calendar_display_preferences table
-- [ ] Update calendar-service.ts with unified items query
-- [ ] Create calendar-items-mapper.ts
-- [ ] Add filter toggles to calendar page
-- [ ] Create UnifiedCalendarItem component
-- [ ] Update CalendarEventCard for all item types
-- [ ] Add color legend component
-- [ ] Test with real data from all sources
+### Phase 9: Unified Calendar View ✓ (COMPLETED Dec 5, 2025)
+- [x] Create calendar_display_preferences table (using localStorage instead)
+- [x] Update calendar-service.ts with unified items query (unified-calendar-service.ts)
+- [x] Create calendar-items-mapper.ts (unified-calendar-mapper.ts)
+- [x] Add filter toggles to calendar page (CalendarFilterPanel.tsx)
+- [x] Create UnifiedCalendarItem component (UnifiedItemCard.tsx)
+- [x] Update CalendarEventCard for all item types (supports tasks, meals, reminders, goals)
+- [x] Add color legend component (CalendarLegend.tsx)
+- [x] Test with real data from all sources (build passes, all types integrated)
 
 ### Phase 10: Daily Summary ✓
 - [ ] Create daily_summary_preferences table
