@@ -2,6 +2,35 @@
 
 > **CRITICAL**: All code must be correct on first attempt. Security is foundational.
 
+## Development Philosophy (MAIN MANDATE)
+
+**Work slowly, safely, strategically, and comprehensively.**
+
+### Core Principles
+1. **Safety First** - Every change must be implemented carefully to avoid breaking existing functionality elsewhere in the app
+2. **No Band-Aid Fixes** - When troubleshooting, think around the whole problem. Understand root causes before implementing solutions
+3. **Clean Code** - Push quality code that we can be proud of. Minimize technical debt at all times
+4. **Comprehensive Thinking** - Consider the full impact of changes across the entire codebase before implementing
+5. **Strategic Implementation** - Plan changes thoughtfully rather than rushing to implement
+
+### Implementation Standards
+- **Before writing code:** Understand how the change affects other parts of the app
+- **Before fixing bugs:** Investigate the root cause, not just the symptom
+- **Before refactoring:** Ensure all dependent code is identified and updated
+- **Before merging:** Verify nothing is broken in related features
+
+### Troubleshooting Approach
+1. **Go slow** - Rushed fixes create more problems
+2. **Think holistically** - Consider the entire system, not just the immediate issue
+3. **Find root causes** - Don't mask symptoms with quick patches
+4. **Test thoroughly** - Verify the fix doesn't break anything else
+5. **Document learnings** - Prevent the same issue from recurring
+
+### Quality Over Speed
+- A well-implemented feature that takes longer is better than a rushed feature that creates tech debt
+- Every line of code should serve a clear purpose
+- When in doubt, ask questions and clarify requirements before coding
+
 ## Stack
 Next.js 15 App Router · Supabase (DB + Auth) · TypeScript strict · Tailwind · Zod · Upstash Redis · Resend
 
