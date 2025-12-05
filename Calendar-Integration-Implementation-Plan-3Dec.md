@@ -1,15 +1,49 @@
 # Calendar Integration Implementation Plan
-**Multi-Platform Bidirectional Sync: Google Calendar, Apple CalDAV, Cozi**
+**Multi-Platform Bidirectional Sync + Competitive Feature Enhancements**
 
 ## Overview
 
-Implement seamless bidirectional calendar synchronization between Rowan and three external calendar providers (Google Calendar, Apple CalDAV, and Cozi) with automatic conflict resolution where external calendars win.
+Implement seamless bidirectional calendar synchronization between Rowan and external calendar providers, plus competitive features from Skylight, Cozi, and other family calendar apps.
 
 **User Requirements:**
 - All three platforms from the start
 - Two-way bidirectional sync
 - External calendar wins on conflicts (Google/Apple/Cozi is master)
 - Industry best practice for token storage (Supabase Vault with AES-256 encryption)
+
+---
+
+## Competitive Analysis Summary
+
+### Current Rowan Calendar Features (Implemented)
+- ✅ Family event creation and management
+- ✅ Google Calendar sync (OAuth)
+- ✅ Outlook Calendar sync (OAuth)
+- ✅ ICS feed import (any calendar)
+- ✅ Cozi calendar import
+- ✅ Color-coded events
+- ✅ Space-based family sharing
+- ✅ Real-time updates
+
+### Feature Gap Analysis vs Competitors
+
+| Feature | Skylight | Cozi | Rowan | Priority |
+|---------|----------|------|-------|----------|
+| AI Schedule Parser (emails/PDFs → events) | ✅ Sidekick | ❌ | ❌ | High |
+| "Today" Morning Summary | ✅ | ✅ Cozi Today | ❌ | High |
+| Weather on Events | ✅ | ❌ | ❌ | Medium |
+| Meal Planning on Calendar | ✅ | ❌ | Partial | Medium |
+| Event Countdowns | ✅ | ❌ | ❌ | Medium |
+| Chore Rewards/Stars | ✅ | ❌ | ❌ | Medium |
+| Birthday Tracker | ❌ | ✅ | ❌ | Low |
+| Event Comments/Notes | TimeTree | ❌ | ❌ | Low |
+| Family Member Color Coding | ✅ | ✅ | Partial | Medium |
+| Tasks on Calendar | ❌ | ❌ | ❌ | High |
+| Reminders on Calendar | ❌ | ❌ | ❌ | High |
+
+### Rowan's Unique Advantage
+Already has integrated: Tasks, Meals, Shopping Lists, Reminders, Goals, Projects
+→ Can display ALL of these on the calendar (competitors can't)
 
 ---
 
@@ -274,9 +308,144 @@ END:VCALENDAR
 
 ---
 
-## Phase 4: Cozi Integration (Week 4)
+## Phase 4: Microsoft Outlook Integration (Week 4)
 
-### 4.1 Feasibility Assessment
+### 4.1 OAuth 2.0 Flow (Microsoft Identity Platform)
+
+**Authentication:**
+- OAuth 2.0 via Microsoft Identity Platform (Azure AD)
+- Endpoint: `https://login.microsoftonline.com/common/oauth2/v2.0/authorize`
+- Scopes: `Calendars.ReadWrite`, `User.Read`, `offline_access`
+- Works with: Microsoft 365, Outlook.com, Exchange Online
+
+**Environment Variables:**
+```bash
+MICROSOFT_CLIENT_ID=xxx
+MICROSOFT_CLIENT_SECRET=xxx
+MICROSOFT_REDIRECT_URI=https://yourdomain.com/api/calendar/callback/outlook
+```
+
+**Files to create:**
+- `/app/api/calendar/connect/outlook/route.ts` - POST: Generate OAuth URL
+- `/app/api/calendar/callback/outlook/route.ts` - GET: Handle OAuth callback
+- `/lib/services/calendar/outlook-calendar-service.ts` - Microsoft Graph API wrapper
+
+**OAuth Sequence:**
+1. User clicks "Connect Outlook Calendar"
+2. Generate state token (store in Redis with 15-min TTL)
+3. Redirect to Microsoft authorization URL
+4. Microsoft redirects back with auth code + state
+5. Verify state token matches
+6. Exchange code for access + refresh tokens
+7. Store encrypted tokens in Supabase Vault
+8. Create connection record with `provider: 'outlook'`
+9. Trigger initial full sync
+
+### 4.2 Microsoft Graph Calendar API
+
+**API Endpoints:**
+- List calendars: `GET /me/calendars`
+- List events: `GET /me/calendars/{id}/events`
+- Get event: `GET /me/events/{id}`
+- Create event: `POST /me/calendars/{id}/events`
+- Update event: `PATCH /me/events/{id}`
+- Delete event: `DELETE /me/events/{id}`
+
+**Delta Sync (Change Tracking):**
+- Microsoft Graph supports delta queries for efficient sync
+- Initial: `GET /me/calendarView/delta?startDateTime=X&endDateTime=Y`
+- Subsequent: Use `@odata.deltaLink` from previous response
+- Returns only changed events since last sync
+
+**Webhooks (Subscriptions):**
+- Create subscription: `POST /subscriptions`
+- Resource: `/me/events`
+- Notification URL: `/api/webhooks/outlook-calendar`
+- Expiration: Max 4230 minutes (roughly 3 days)
+- Must renew before expiration
+
+### 4.3 Sync Strategy
+
+**Same as Google Calendar:**
+- Bidirectional sync with external wins on conflicts
+- Initial full sync followed by incremental delta sync
+- Webhook for real-time updates
+- Cron backup every 15 minutes
+
+**Rate Limiting:**
+- Microsoft Graph: 10,000 requests per 10 minutes per app
+- Per-user: 10,000 requests per 10 minutes
+- Implement exponential backoff on 429 responses
+
+---
+
+## Phase 5: ICS Feed Import (Week 5)
+
+### 5.1 ICS Feed Architecture
+
+**Use Cases:**
+- School calendars (Canvas, Schoology, PowerSchool)
+- Sports leagues (TeamSnap, SportsEngine)
+- Church/community calendars
+- Any service that exports `.ics` feeds
+
+**Files to create:**
+- `/app/api/calendar/ics/import/route.ts` - POST: Import ICS URL
+- `/app/api/calendar/ics/refresh/route.ts` - POST: Manual refresh
+- `/lib/services/calendar/ics-import-service.ts` - ICS parsing and import
+
+### 5.2 ICS Import Flow
+
+**User Flow:**
+1. User clicks "Import ICS Feed"
+2. Enter ICS URL (e.g., `https://school.edu/calendar.ics`)
+3. Validate URL is accessible and returns valid ICS
+4. Parse ICS and display preview (event count, date range)
+5. User confirms import
+6. Store feed URL in `calendar_connections` with `provider: 'ics'`
+7. Import all events
+8. Schedule periodic refresh
+
+**ICS Parsing:**
+- Use `ical.js` npm package for parsing
+- Handle: VEVENT, VTIMEZONE, RRULE (recurring events)
+- Convert to Rowan event format
+- Deduplicate by UID
+
+### 5.3 Sync Strategy (One-Way Only)
+
+**Important:** ICS feeds are READ-ONLY (inbound only)
+- No outbound sync (can't push changes to ICS feeds)
+- Refresh every 30 minutes via cron
+- Full re-import on each refresh (ICS has no delta sync)
+- Events marked as `external_source: 'ics'` and `sync_locked: true`
+
+**Cron Configuration:**
+```json
+{
+  "path": "/api/cron/calendar-sync?provider=ics",
+  "schedule": "*/30 * * * *"
+}
+```
+
+### 5.4 Database Updates
+
+**Update `calendar_connections` provider enum:**
+```sql
+ALTER TYPE calendar_provider ADD VALUE 'outlook';
+ALTER TYPE calendar_provider ADD VALUE 'ics';
+```
+
+**ICS-specific fields:**
+- `ics_url`: URL of the ICS feed
+- `ics_last_etag`: ETag for conditional requests
+- `ics_event_count`: Number of events in feed
+
+---
+
+## Phase 6: Cozi Integration (Week 6)
+
+### 6.1 Feasibility Assessment
 
 **Decision Tree:**
 ```
@@ -292,7 +461,7 @@ Can py-cozi wrapper be installed and run?
     └─ Document limitation in user docs
 ```
 
-### 4.2 Python Bridge (If Viable)
+### 6.2 Python Bridge (If Viable)
 
 **Architecture:**
 ```
@@ -330,7 +499,7 @@ async def list_events(email: str, password: str, start: str, end: str):
 - Protect with API key authentication
 - Rate limit aggressively (10 req/min)
 
-### 4.3 Sync Strategy (No Delta Sync)
+### 6.3 Sync Strategy (No Delta Sync)
 
 **Challenge:** Cozi has NO sync tokens or delta sync
 
@@ -345,7 +514,7 @@ async def list_events(email: str, password: str, start: str, end: str):
 - Poll every **30 minutes** (expensive full syncs)
 - Use cron job: `/api/cron/calendar-sync?provider=cozi`
 
-### 4.4 Fallback Plan
+### 6.4 Fallback Plan
 
 **If py-cozi is NOT viable:**
 1. Mark Cozi as "Coming Soon" in UI
@@ -356,9 +525,9 @@ async def list_events(email: str, password: str, start: str, end: str):
 
 ---
 
-## Phase 5: Background Jobs & Webhooks (Week 5)
+## Phase 7: Background Jobs & Webhooks (Week 7)
 
-### 5.1 Cron Jobs
+### 7.1 Cron Jobs
 
 **Files to create:**
 - `/app/api/cron/calendar-sync/route.ts` - Main sync cron job
@@ -398,7 +567,7 @@ async def list_events(email: str, password: str, start: str, end: str):
    - Release lock
 4. Log results to `calendar_sync_logs`
 
-### 5.2 Real-time Triggers
+### 7.2 Real-time Triggers
 
 **Database Trigger:**
 - Runs after INSERT/UPDATE on `events` table
@@ -416,7 +585,7 @@ Priority (1-10, lower = higher priority):
 └─ Future events → 7
 ```
 
-### 5.3 Queue Processing
+### 7.3 Queue Processing
 
 **Queue Worker (runs in cron jobs):**
 1. Fetch pending items (status='pending', ordered by priority)
@@ -434,9 +603,9 @@ Priority (1-10, lower = higher priority):
 
 ---
 
-## Phase 6: UI & User Experience (Week 6)
+## Phase 8: UI & User Experience (Week 8)
 
-### 6.1 Connection Management Page
+### 8.1 Connection Management Page
 
 **Location:** `/app/(main)/settings/integrations/page.tsx`
 
@@ -448,7 +617,7 @@ Priority (1-10, lower = higher priority):
 - Sync stats: last sync time, events synced, conflicts resolved
 - Manual sync button (rate limited to 10/hour)
 
-### 6.2 OAuth Connection Flow
+### 8.2 OAuth Connection Flow
 
 **User Journey:**
 1. Click "Connect Google Calendar"
@@ -459,7 +628,7 @@ Priority (1-10, lower = higher priority):
 6. Completion: "✓ Google Calendar connected! 120 events synced."
 7. Dashboard shows sync status
 
-### 6.3 Conflict Resolution UI
+### 8.3 Conflict Resolution UI
 
 **When conflicts occur:**
 - Show in-app notification: "Calendar sync conflict detected"
@@ -473,7 +642,7 @@ Priority (1-10, lower = higher priority):
 - Filter by: Resolved, Pending, All
 - Export to CSV
 
-### 6.4 Sync Status Dashboard
+### 8.4 Sync Status Dashboard
 
 **Components:**
 - Connection cards (one per provider)
@@ -799,6 +968,577 @@ SUPABASE_SERVICE_ROLE_KEY=...
 
 ---
 
+## Phase 9: Unified Calendar View - Tasks, Meals & Reminders
+
+**Goal:** Display tasks, meals, and reminders directly on the calendar view (Rowan's unique advantage)
+
+### 9.1 Database Changes
+
+**Migration: `20251204000001_add_calendar_display_preferences.sql`**
+- Create `calendar_display_preferences` table
+- Columns: user_id, space_id, show_tasks, show_meals, show_reminders, show_goals, show_shopping_trips
+- Default all to true for new users
+- Add toggle states per category
+
+**No schema changes needed for existing tables** - they already have dates:
+- `tasks.due_date` - display on calendar
+- `meals.scheduled_date` - display on calendar
+- `reminders.due_at` - display on calendar
+- `goals.target_date` - display on calendar
+
+### 9.2 Service Layer Updates
+
+**Update `/lib/services/calendar/calendar-service.ts`**
+- Add `getUnifiedCalendarItems(spaceId, startDate, endDate)` function
+- Fetch events, tasks, meals, reminders, goals in parallel
+- Return unified array with `item_type` discriminator
+- Support filtering by item types based on user preferences
+
+**Create `/lib/services/calendar/calendar-items-mapper.ts`**
+- Map each item type to unified calendar item format
+- Standardize: id, title, start, end, color, item_type, metadata
+- Tasks: Use due_date as start, no end time (all-day marker)
+- Meals: Use scheduled_date + meal_type time (breakfast=8am, lunch=12pm, dinner=6pm)
+- Reminders: Use due_at as start time
+
+### 9.3 UI Components
+
+**Update `/app/(main)/calendar/page.tsx`**
+- Add filter toggles: Events | Tasks | Meals | Reminders | Goals
+- Persist filter state in localStorage
+- Show item count badges on each filter
+
+**Create `/components/calendar/UnifiedCalendarItem.tsx`**
+- Render different item types with distinct styling
+- Events: Standard calendar event style
+- Tasks: Checkbox + title, strikethrough when complete
+- Meals: Food icon + meal name + meal type badge
+- Reminders: Bell icon + title + time
+- Goals: Target icon + title + progress indicator
+
+**Update `/components/calendar/CalendarEventCard.tsx`**
+- Support rendering all item types
+- Click to open appropriate detail modal
+- Quick actions: Complete task, mark reminder done
+
+### 9.4 Color Coding System
+
+**Define consistent color scheme:**
+- Events: Purple (existing)
+- Tasks: Blue
+- Meals: Orange
+- Reminders: Pink
+- Goals: Indigo
+- Shopping: Emerald
+
+**Add legend component** showing what each color means
+
+---
+
+## Phase 10: Daily Summary & Morning Notifications
+
+**Goal:** "Good morning! Today you have 3 events, 2 tasks due, and it's Pizza Night"
+
+### 10.1 Database Schema
+
+**Migration: `20251204000002_create_daily_summary_preferences.sql`**
+- Create `daily_summary_preferences` table
+- Columns: user_id, space_id, enabled, delivery_time, delivery_method, timezone
+- delivery_method: 'push', 'email', 'both'
+- Default delivery_time: 07:00 local time
+
+**Migration: `20251204000003_create_notification_history.sql`**
+- Create `notification_history` table
+- Track sent notifications for analytics and deduplication
+- Columns: user_id, notification_type, sent_at, content_hash, delivery_status
+
+### 10.2 Summary Generation Service
+
+**Create `/lib/services/notifications/daily-summary-service.ts`**
+- `generateDailySummary(userId, spaceId, date)` function
+- Aggregate: events count, tasks due, meals planned, reminders, birthdays
+- Format into human-readable message
+- Include "highlight" of the day (biggest event, special occasion)
+
+**Summary content structure:**
+- Greeting based on time of day
+- Weather summary (if enabled)
+- Today's events list (top 5)
+- Tasks due today (with urgency indicator)
+- Scheduled meals
+- Reminders for today
+- Upcoming birthdays/anniversaries (next 7 days)
+- Motivational closer
+
+### 10.3 Delivery Infrastructure
+
+**Create `/app/api/cron/daily-summary/route.ts`**
+- Runs daily at 6:00 AM UTC
+- Batch process users by timezone
+- Generate and send summaries
+- Log delivery status
+
+**Email delivery via Resend:**
+- Create email template: `emails/daily-summary.tsx`
+- Use React Email for templating
+- Include unsubscribe link
+- Track open rates
+
+**Push notification delivery:**
+- Integrate with existing notification system
+- Support web push (PWA)
+- Support mobile push (future)
+
+### 10.4 User Preferences UI
+
+**Add to Settings → Notifications page:**
+- Enable/disable daily summary toggle
+- Delivery time picker (hour selector)
+- Delivery method selection
+- Preview sample summary button
+- Test send button
+
+---
+
+## Phase 11: Event Countdowns Widget
+
+**Goal:** "5 days until Birthday Party!" displayed prominently
+
+### 11.1 Database Schema
+
+**Migration: `20251204000004_add_countdown_events.sql`**
+- Add `show_countdown` boolean to `calendar_events` table
+- Add `countdown_label` optional text field
+- Default show_countdown = false
+- Index on show_countdown for efficient queries
+
+### 11.2 Countdown Service
+
+**Create `/lib/services/calendar/countdown-service.ts`**
+- `getActiveCountdowns(spaceId, limit)` function
+- Query events with show_countdown=true and start_date > now
+- Calculate days remaining
+- Sort by days remaining (ascending)
+- Return top N countdowns
+
+**Countdown calculation logic:**
+- Days remaining (not hours/minutes for simplicity)
+- "Today!" for events happening today
+- "Tomorrow" for next day
+- "X days" for 2+ days out
+- Support weeks/months for distant events
+
+### 11.3 UI Components
+
+**Create `/components/calendar/CountdownWidget.tsx`**
+- Display 3-5 active countdowns
+- Large number display (days remaining)
+- Event title below
+- Click to view event details
+- Celebratory animation at "Today!"
+
+**Create `/components/calendar/CountdownCard.tsx`**
+- Individual countdown item
+- Circular progress indicator (days remaining / total days)
+- Color based on urgency (green → yellow → red)
+- Optional custom emoji/icon
+
+**Dashboard integration:**
+- Add CountdownWidget to dashboard layout
+- Position near calendar or as standalone section
+- Collapsible/expandable
+
+### 11.4 Event Creation Enhancement
+
+**Update event creation modal:**
+- Add "Show countdown" toggle
+- Add custom label field (optional)
+- Suggest countdown for birthdays, holidays, trips
+- Auto-enable for events tagged as "special"
+
+---
+
+## Phase 12: Weather Integration for Events
+
+**Goal:** Show weather forecast on outdoor/travel events
+
+### 12.1 Weather API Integration
+
+**Select provider:** OpenWeatherMap (free tier: 1000 calls/day)
+- Alternative: WeatherAPI.com, Tomorrow.io
+- Store API key in environment variables
+
+**Create `/lib/services/weather/weather-service.ts`**
+- `getWeatherForecast(lat, lng, date)` function
+- Cache forecasts in Redis (1 hour TTL for near-term, longer for future)
+- Return: temperature, conditions, icon, precipitation chance
+- Handle API rate limits with exponential backoff
+
+### 12.2 Location Handling
+
+**Event location geocoding:**
+- Use event.location field if present
+- Geocode address to lat/lng using free geocoding API
+- Cache geocoding results (addresses rarely change)
+- Fallback to space default location if no event location
+
+**Create `/lib/services/location/geocoding-service.ts`**
+- `geocodeAddress(address)` function
+- Use OpenStreetMap Nominatim (free, no API key)
+- Cache results in database or Redis
+
+### 12.3 Weather Display
+
+**Update `/components/calendar/CalendarEventCard.tsx`**
+- Show weather icon for events with location
+- Display temperature and conditions
+- Only show for events within 14-day forecast window
+- Indicate "forecast not available" for distant events
+
+**Create `/components/calendar/WeatherBadge.tsx`**
+- Weather icon (sun, cloud, rain, snow, etc.)
+- Temperature display (°F or °C based on user preference)
+- Precipitation chance if > 30%
+- Tooltip with detailed forecast
+
+### 12.4 Smart Weather Alerts
+
+**Create `/lib/services/weather/weather-alert-service.ts`**
+- Check weather before outdoor events
+- Send notification if rain/snow predicted for outdoor events
+- Suggest rescheduling or bringing umbrella
+- Trigger 24 hours before event
+
+**Event categorization:**
+- Add `is_outdoor` boolean to events
+- Auto-detect from event title keywords (picnic, hike, game, etc.)
+- Manual toggle in event creation
+
+---
+
+## Phase 13: AI Event Parser (Sidekick Clone)
+
+**Goal:** Paste email/text → automatically create calendar event
+
+### 13.1 AI Integration
+
+**Use Claude API for parsing:**
+- Extract: event title, date, time, location, description
+- Handle various input formats: emails, texts, screenshots (future)
+- Return structured event data
+
+**Create `/lib/services/ai/event-parser-service.ts`**
+- `parseEventFromText(text)` function
+- Send text to Claude with structured output prompt
+- Parse response into event object
+- Validate parsed data with Zod schema
+- Return confidence score
+
+**Prompt engineering:**
+- System prompt: "Extract calendar event details from the following text"
+- Request JSON output with specific fields
+- Handle ambiguous dates ("next Tuesday", "this weekend")
+- Extract recurring patterns ("every Monday")
+
+### 13.2 Input Methods
+
+**Create `/components/calendar/QuickAddEvent.tsx`**
+- Text area for pasting email/text
+- "Parse" button to trigger AI
+- Preview parsed event before saving
+- Edit capability for corrections
+- "Save to Calendar" button
+
+**Future enhancements (not in scope):**
+- Email forwarding integration
+- Screenshot/image OCR
+- Voice input
+
+### 13.3 API Endpoint
+
+**Create `/app/api/calendar/parse-event/route.ts`**
+- POST endpoint accepting text input
+- Rate limit: 20 requests/hour per user
+- Call AI service and return parsed event
+- Log usage for analytics
+
+### 13.4 User Flow
+
+1. User clicks "Quick Add" or pastes into input
+2. AI parses text in background (1-3 seconds)
+3. Show parsed event preview with editable fields
+4. User confirms or edits details
+5. Event created with `source: 'ai_parsed'` metadata
+6. Show success message with undo option
+
+---
+
+## Phase 14: Chore Rewards & Gamification
+
+**Goal:** Kids earn stars/points for completing chores
+
+### 14.1 Database Schema
+
+**Migration: `20251204000005_create_rewards_system.sql`**
+- Create `reward_points` table (user_id, space_id, points, level)
+- Create `point_transactions` table (user_id, source_type, source_id, points, reason, created_at)
+- Create `rewards_catalog` table (space_id, name, description, cost_points, image_url, is_active)
+- Create `reward_redemptions` table (user_id, reward_id, redeemed_at, status)
+
+**Update chores table:**
+- Add `point_value` integer column (default: 10)
+- Add `bonus_multiplier` for streaks
+
+### 14.2 Points Service
+
+**Create `/lib/services/rewards/points-service.ts`**
+- `awardPoints(userId, sourceType, sourceId, points, reason)` function
+- `getPointsBalance(userId, spaceId)` function
+- `getPointsHistory(userId, spaceId, limit)` function
+- `redeemReward(userId, rewardId)` function
+
+**Points earning rules:**
+- Complete chore: +10 points (configurable per chore)
+- Complete task: +5 points
+- Daily streak bonus: +5 per day (max +25 at 5-day streak)
+- Weekly goal completion: +50 points
+- Perfect week (all chores done): +100 points
+
+### 14.3 Rewards Catalog
+
+**Create `/components/rewards/RewardsCatalog.tsx`**
+- Display available rewards with point costs
+- Show user's current point balance
+- "Redeem" button with confirmation
+- Categories: Screen Time, Treats, Activities, Money
+
+**Default rewards (customizable by parents):**
+- 30 min extra screen time: 50 points
+- Choose dinner: 100 points
+- Skip one chore: 75 points
+- $5 allowance bonus: 200 points
+- Family movie pick: 150 points
+
+### 14.4 Gamification UI
+
+**Create `/components/rewards/PointsDisplay.tsx`**
+- Current points balance (prominently displayed)
+- Level/badge system (Starter → Helper → Champion → Superstar)
+- Progress to next level
+- Recent transactions preview
+
+**Create `/components/rewards/LeaderboardWidget.tsx`**
+- Family member rankings (weekly/monthly)
+- Points earned this period
+- Streak displays
+- Celebratory animations for achievements
+
+**Update chore completion flow:**
+- Show "+10 points!" animation on completion
+- Sound effect (optional, user can disable)
+- Confetti for streak milestones
+
+---
+
+## Phase 15: Birthday & Anniversary Tracker
+
+**Goal:** Never forget important dates with automatic yearly reminders
+
+### 15.1 Database Schema
+
+**Migration: `20251204000006_create_special_dates.sql`**
+- Create `special_dates` table
+- Columns: id, space_id, person_name, date_type (birthday, anniversary, memorial), date (month/day only), year_started (optional for anniversaries), notes, notify_days_before, created_by
+- date_type enum: 'birthday', 'anniversary', 'memorial', 'custom'
+
+### 15.2 Special Dates Service
+
+**Create `/lib/services/calendar/special-dates-service.ts`**
+- `getUpcomingSpecialDates(spaceId, days)` function
+- `addSpecialDate(data)` function
+- `calculateAge(birthYear, date)` for birthdays
+- `calculateYears(startYear, date)` for anniversaries
+- Auto-generate annual calendar events
+
+### 15.3 UI Components
+
+**Create `/app/(main)/calendar/birthdays/page.tsx`**
+- List view of all special dates
+- Sort by upcoming/all/by person
+- Add/edit/delete functionality
+- Import from contacts (future)
+
+**Create `/components/calendar/SpecialDateCard.tsx`**
+- Person name and photo (optional)
+- Date and type
+- Days until next occurrence
+- Age/years display
+- Quick edit button
+
+**Update calendar view:**
+- Show birthday cake icon on birthday dates
+- Show heart icon on anniversary dates
+- Automatic all-day events generated yearly
+
+### 15.4 Notifications
+
+**Reminder configuration:**
+- Default: 7 days before, 1 day before, day of
+- Customizable per special date
+- Email and/or push notification
+- Include gift idea suggestions (optional)
+
+---
+
+## Phase 16: Event Comments & Family Notes
+
+**Goal:** Family members can comment on shared events (like TimeTree)
+
+### 16.1 Database Schema
+
+**Migration: `20251204000007_create_event_comments.sql`**
+- Create `event_comments` table
+- Columns: id, event_id, user_id, content, created_at, updated_at, parent_id (for replies)
+- RLS: Only space members can read/write
+- Soft delete support
+
+### 16.2 Comments Service
+
+**Create `/lib/services/calendar/event-comments-service.ts`**
+- `getEventComments(eventId)` function
+- `addComment(eventId, userId, content, parentId?)` function
+- `updateComment(commentId, content)` function
+- `deleteComment(commentId)` function
+- Real-time subscription for new comments
+
+### 16.3 UI Components
+
+**Create `/components/calendar/EventComments.tsx`**
+- Comments section in event detail modal
+- Threaded replies support
+- User avatar + name + timestamp
+- Edit/delete own comments
+- "Add comment" input at bottom
+
+**Create `/components/calendar/CommentInput.tsx`**
+- Text input with mention support (@family_member)
+- Emoji picker (optional)
+- Submit button
+- Character limit indicator
+
+### 16.4 Notifications
+
+**Comment notification rules:**
+- Notify event creator when someone comments
+- Notify mentioned users
+- Notify previous commenters on same event
+- Configurable: all comments vs mentions only
+
+---
+
+## Enhanced Implementation Checklist
+
+### Phase 9: Unified Calendar View ✓
+- [ ] Create calendar_display_preferences table
+- [ ] Update calendar-service.ts with unified items query
+- [ ] Create calendar-items-mapper.ts
+- [ ] Add filter toggles to calendar page
+- [ ] Create UnifiedCalendarItem component
+- [ ] Update CalendarEventCard for all item types
+- [ ] Add color legend component
+- [ ] Test with real data from all sources
+
+### Phase 10: Daily Summary ✓
+- [ ] Create daily_summary_preferences table
+- [ ] Create notification_history table
+- [ ] Build daily-summary-service.ts
+- [ ] Create daily summary email template
+- [ ] Create cron job for summary generation
+- [ ] Add preferences UI in Settings
+- [ ] Test email delivery via Resend
+- [ ] Add preview and test send functionality
+
+### Phase 11: Event Countdowns ✓
+- [ ] Add show_countdown and countdown_label to events
+- [ ] Create countdown-service.ts
+- [ ] Build CountdownWidget component
+- [ ] Build CountdownCard component
+- [ ] Add to dashboard layout
+- [ ] Update event creation modal
+- [ ] Add celebratory animations
+- [ ] Test with various date ranges
+
+### Phase 12: Weather Integration ✓
+- [ ] Set up OpenWeatherMap API
+- [ ] Create weather-service.ts with caching
+- [ ] Create geocoding-service.ts
+- [ ] Build WeatherBadge component
+- [ ] Update CalendarEventCard with weather
+- [ ] Add weather alert notifications
+- [ ] Add is_outdoor event flag
+- [ ] Test with various locations
+
+### Phase 13: AI Event Parser ✓
+- [ ] Create event-parser-service.ts with Claude
+- [ ] Build QuickAddEvent component
+- [ ] Create parse-event API endpoint
+- [ ] Add rate limiting
+- [ ] Build preview/edit flow
+- [ ] Test with various input formats
+- [ ] Add usage analytics
+- [ ] Handle edge cases gracefully
+
+### Phase 14: Chore Rewards ✓
+- [ ] Create rewards system tables
+- [ ] Add point_value to chores
+- [ ] Build points-service.ts
+- [ ] Create RewardsCatalog component
+- [ ] Create PointsDisplay component
+- [ ] Create LeaderboardWidget component
+- [ ] Add completion animations
+- [ ] Set up default rewards catalog
+- [ ] Add parent admin controls
+
+### Phase 15: Birthday Tracker ✓
+- [ ] Create special_dates table
+- [ ] Build special-dates-service.ts
+- [ ] Create birthdays management page
+- [ ] Build SpecialDateCard component
+- [ ] Auto-generate yearly events
+- [ ] Set up reminder notifications
+- [ ] Add calendar view integration
+- [ ] Import from contacts (stretch goal)
+
+### Phase 16: Event Comments ✓
+- [ ] Create event_comments table
+- [ ] Build event-comments-service.ts
+- [ ] Create EventComments component
+- [ ] Create CommentInput component
+- [ ] Add real-time updates
+- [ ] Set up comment notifications
+- [ ] Add mention support
+- [ ] Test threading and replies
+
+---
+
+## Priority Roadmap Summary
+
+**Phase 1 - Quick Wins (Highest Impact):**
+1. Phase 9: Unified Calendar View (leverage existing data)
+2. Phase 10: Daily Summary (high user engagement)
+3. Phase 11: Event Countdowns (visible, fun feature)
+
+**Phase 2 - Differentiation:**
+4. Phase 12: Weather Integration
+5. Phase 13: AI Event Parser (Skylight Sidekick competitor)
+6. Phase 15: Birthday Tracker
+
+**Phase 3 - Engagement & Gamification:**
+7. Phase 14: Chore Rewards (family engagement)
+8. Phase 16: Event Comments (collaboration)
+
+---
+
 ## References
 
 - [Google Calendar API Documentation](https://developers.google.com/workspace/calendar/api/v3/reference)
@@ -807,3 +1547,7 @@ SUPABASE_SERVICE_ROLE_KEY=...
 - [Supabase Vault Documentation](https://supabase.com/docs/guides/database/vault)
 - [OAuth 2.0 Security Best Practices](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics)
 - [Two-Way Sync Patterns](https://www.stacksync.com/blog/mastering-two-way-sync-key-concepts-and-implementation-strategies/)
+- [Skylight Calendar Features](https://skylightframe.com/calendar)
+- [Cozi Family Organizer](https://www.cozi.com/)
+- [OpenWeatherMap API](https://openweathermap.org/api)
+- [Claude API Documentation](https://docs.anthropic.com/)
