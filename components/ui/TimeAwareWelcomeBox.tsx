@@ -1,8 +1,7 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { useTimePeriod } from './SmartBackgroundCanvas';
-import { WeatherBadge } from '@/components/calendar/WeatherBadge';
 
 interface TimeAwareWelcomeBoxProps {
   greetingText: string;
@@ -96,36 +95,6 @@ export function TimeAwareWelcomeBox({
           </h1>
         </div>
 
-        {/* Enhanced Date & Time Display */}
-        <div className="flex flex-col items-center justify-center gap-3 sm:gap-4">
-          <div
-            className={`${textColor} text-xl sm:text-2xl font-semibold animate-fade-in-up tracking-wide`}
-            style={{
-              animationDelay: '0.8s',
-              textShadow: '0 2px 12px rgba(0,0,0,0.8)'
-            }}
-          >
-            {new Date().toLocaleDateString('en-US', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}
-          </div>
-          <div
-            className={`${textColor}/90 text-lg sm:text-xl font-medium animate-fade-in-up`}
-            style={{
-              animationDelay: '1s',
-              textShadow: '0 2px 8px rgba(0,0,0,0.8)'
-            }}
-          >
-            {new Date().toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              minute: '2-digit',
-              hour12: true
-            })}
-          </div>
-        </div>
       </div>
 
       {/* Children Content */}
@@ -137,17 +106,6 @@ export function TimeAwareWelcomeBox({
 
       {/* Interactive Hover Effects */}
       <div className={`absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
-
-      {/* Weather Widget - Flush right edge, blends with black borders */}
-      <div className="absolute bottom-0 right-0 z-20 opacity-80 hover:opacity-100 transition-all duration-300">
-        <div className="backdrop-blur-sm bg-black/60 rounded-tl-lg p-3 border-l border-t border-white/10 shadow-lg shadow-black/50">
-          <WeatherBadge
-            eventTime={new Date().toISOString()}
-            location="Wylie, Texas, United States"
-            display="medium"
-          />
-        </div>
-      </div>
     </div>
   );
 }
@@ -211,29 +169,6 @@ export function CompactTimeAwareWelcome({
           >
             {greetingText}{userName ? `, ${userName}!` : '!'}
           </h1>
-          {currentDate && (
-            <p className="text-white/80 text-sm sm:text-base mt-1" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
-              {currentDate}
-            </p>
-          )}
-        </div>
-        <div className="text-white/70 text-sm hidden sm:block" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
-          {new Date().toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-          })}
-        </div>
-      </div>
-
-      {/* Weather Widget - Compact version */}
-      <div className="absolute bottom-0 right-0 z-20 opacity-70 hover:opacity-100 transition-opacity duration-300">
-        <div className="backdrop-blur-sm bg-black/50 rounded-tl-lg px-2 py-1.5 border-l border-t border-white/10">
-          <WeatherBadge
-            eventTime={new Date().toISOString()}
-            location="Wylie, Texas, United States"
-            display="compact"
-          />
         </div>
       </div>
     </div>

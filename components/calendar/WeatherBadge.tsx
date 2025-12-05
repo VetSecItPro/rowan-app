@@ -16,7 +16,7 @@ const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 interface WeatherBadgeProps {
   eventTime: string;
   location?: string;
-  display?: 'compact' | 'medium' | 'full';
+  display?: 'compact' | 'medium' | 'full' | 'header';
 }
 
 export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherBadgeProps) {
@@ -139,6 +139,32 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
   const tempF = toFahrenheit(weather.temp);
   const feelsLikeF = toFahrenheit(weather.feelsLike);
   const windMph = toMph(weather.windSpeed);
+
+  // Header mode: horizontal flat layout for TodayAtAGlance header
+  if (display === 'header') {
+    return (
+      <div className="flex items-center gap-3 text-sm">
+        <span className="text-base">{emoji}</span>
+        <span className="font-semibold text-gray-900 dark:text-white">{tempF}°F</span>
+        <span className="text-gray-500 dark:text-gray-400 text-xs">feels {feelsLikeF}°</span>
+        <span className="text-gray-500 dark:text-gray-400 text-xs capitalize">{weather.description}</span>
+        <span className="text-gray-400 dark:text-gray-500 text-xs">💧{weather.humidity}%</span>
+        <span className="text-gray-400 dark:text-gray-500 text-xs">💨{windMph}mph</span>
+        {alert && (
+          <AlertTriangle
+            className={`w-3 h-3 ${
+              alert.severity === 'severe'
+                ? 'text-red-500'
+                : alert.severity === 'warning'
+                ? 'text-orange-500'
+                : 'text-blue-500'
+            }`}
+            title={alert.title}
+          />
+        )}
+      </div>
+    );
+  }
 
   if (display === 'compact') {
     return (

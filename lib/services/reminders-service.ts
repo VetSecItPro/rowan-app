@@ -9,9 +9,11 @@ export interface Reminder {
   category?: 'bills' | 'health' | 'work' | 'personal' | 'household';
   reminder_type?: 'time' | 'location';
   reminder_time?: string;
+  remind_at?: string; // Database field for reminder time
   location?: string;
   priority?: 'low' | 'medium' | 'high' | 'urgent';
   status: 'active' | 'completed' | 'snoozed';
+  completed?: boolean; // Database field for completion status
   snooze_until?: string;
   snoozed_by?: string; // User ID who snoozed this reminder
   snoozer?: {

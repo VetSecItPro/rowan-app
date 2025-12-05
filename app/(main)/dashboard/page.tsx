@@ -57,6 +57,7 @@ import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import { CompactTimeAwareWelcome } from '@/components/ui/TimeAwareWelcomeBox';
 import { TodayAtAGlance } from '@/components/dashboard/TodayAtAGlance';
+import { CountdownWidget } from '@/components/calendar/CountdownWidget';
 import { CTAButton } from '@/components/ui/EnhancedButton';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -996,10 +997,12 @@ export default function DashboardPage() {
   }, [user]);
 
   // Greeting function - Memoized
+  // Night: 9PM-5AM, Morning: 5AM-12PM, Afternoon: 12PM-5PM, Evening: 5PM-9PM
   const greetingText = useMemo(() => {
     const hour = new Date().getHours();
+    if (hour >= 21 || hour < 5) return 'Good night';
     if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
+    if (hour < 17) return 'Good afternoon';
     return 'Good evening';
   }, []);
 
@@ -2231,6 +2234,18 @@ export default function DashboardPage() {
               </div>
             </div>
           </motion.div>
+
+          {/* Event Countdowns Widget - Compact grid below Check-in and Activity */}
+          {spaceId && (
+            <div className="mt-6">
+              <CountdownWidget
+                spaceId={spaceId}
+                maxItems={4}
+                onEventClick={(eventId) => router.push(`/calendar?event=${eventId}`)}
+                onAddCountdown={() => router.push('/calendar')}
+              />
+            </div>
+          )}
         </div>
       </div>
 

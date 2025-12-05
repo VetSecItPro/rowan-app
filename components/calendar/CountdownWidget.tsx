@@ -1,0 +1,169 @@
+'use client';
+
+import { useEffect, useState, useCallback } from 'react';
+import { Timer, CalendarPlus, RefreshCw } from 'lucide-react';
+import { CountdownCard } from './CountdownCard';
+import { countdownService, type CountdownItem } from '@/lib/services/calendar/countdown-service';
+
+interface CountdownWidgetProps {
+  spaceId: string;
+  maxItems?: number;
+  showHeader?: boolean;
+  onEventClick?: (eventId: string) => void;
+  onAddCountdown?: () => void;
+}
+
+/**
+ * Dashboard widget displaying upcoming event countdowns
+ * Compact grid layout - 2x2 on desktop, stacked on mobile
+ */
+export function CountdownWidget({
+  spaceId,
+  maxItems = 4,
+  showHeader = true,
+  onEventClick,
+  onAddCountdown,
+}: CountdownWidgetProps) {
+  const [countdowns, setCountdowns] = useState<CountdownItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchCountdowns = useCallback(async () => {
+    if (!spaceId) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    const result = await countdownService.getActiveCountdowns(spaceId, maxItems);
+
+    if (result.error) {
+      setError(result.error);
+    } else {
+      setCountdowns(result.countdowns);
+    }
+
+    setIsLoading(false);
+  }, [spaceId, maxItems]);
+
+  useEffect(() => {
+    fetchCountdowns();
+
+    // Refresh every minute to keep countdowns accurate
+    const interval = setInterval(fetchCountdowns, 60000);
+    return () => clearInterval(interval);
+  }, [fetchCountdowns]);
+
+  const handleEventClick = (countdown: CountdownItem) => {
+    if (onEventClick) {
+      onEventClick(countdown.event.id);
+    }
+  };
+
+  // Loading skeleton - grid layout
+  if (isLoading) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+        {showHeader && (
+          <div className="mb-3 flex items-center justify-between">
+            <div className="h-5 w-28 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700" />
+            <div className="h-6 w-6 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700" />
+          </div>
+        )}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="h-20 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800"
+              style={{ animationDelay: `${i * 50}ms` }}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-4 dark:border-red-900/50 dark:bg-red-900/20">
+        {showHeader && (
+          <div className="mb-2 flex items-center gap-2 text-red-700 dark:text-red-400">
+            <Timer className="h-4 w-4" />
+            <h3 className="text-sm font-semibold">Countdowns</h3>
+          </div>
+        )}
+        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        <button
+          onClick={fetchCountdowns}
+          className="mt-2 flex items-center gap-1.5 rounded-lg bg-red-100 px-2.5 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
+        >
+          <RefreshCw className="h-3 w-3" />
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  // Empty state - compact
+  if (countdowns.length === 0) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-4 dark:border-gray-800 dark:from-gray-900 dark:to-gray-800">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+            <Timer className="h-4 w-4" />
+            <span className="text-sm font-medium">No upcoming countdowns</span>
+          </div>
+          {onAddCountdown && (
+            <button
+              onClick={onAddCountdown}
+              className="flex items-center gap-1.5 rounded-lg bg-purple-100 px-3 py-1.5 text-xs font-medium text-purple-700 transition-colors hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:hover:bg-purple-900/50"
+            >
+              <CalendarPlus className="h-3.5 w-3.5" />
+              Add
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+      {showHeader && (
+        <div className="mb-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+            <Timer className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+            <h3 className="text-sm font-semibold">Upcoming Events</h3>
+            <span className="rounded-full bg-purple-100 px-1.5 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
+              {countdowns.length}
+            </span>
+          </div>
+          {onAddCountdown && (
+            <div className="relative group">
+              <button
+                onClick={onAddCountdown}
+                className="flex items-center gap-1 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-purple-600 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-purple-400"
+              >
+                <CalendarPlus className="h-4 w-4" />
+              </button>
+              <span className="absolute right-0 top-full mt-1 px-2 py-1 text-xs font-medium text-white bg-gray-800 dark:bg-gray-700 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
+                Add countdown
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Grid layout: 2 cols on mobile, 4 cols on sm+ */}
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {countdowns.map((countdown) => (
+          <CountdownCard
+            key={countdown.id}
+            countdown={countdown}
+            onClick={() => handleEventClick(countdown)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
