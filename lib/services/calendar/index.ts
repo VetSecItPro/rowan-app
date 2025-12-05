@@ -8,6 +8,10 @@ export { icsImportService } from './ics-import-service';
 export { eventMapper } from './event-mapper';
 export { calendarSyncService } from './calendar-sync-service';
 
+// Phase 9: Unified Calendar View
+export { unifiedCalendarMapper } from './unified-calendar-mapper';
+export { unifiedCalendarService } from './unified-calendar-service';
+
 // Re-export types for convenience
 export type {
   CalendarProvider,
