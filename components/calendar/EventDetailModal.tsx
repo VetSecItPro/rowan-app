@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Calendar, Clock, MapPin, MessageCircle, Paperclip, Users } from 'lucide-react';
+import { X, Calendar, Clock, MapPin, MessageCircle, Paperclip, Users, Edit, Trash2 } from 'lucide-react';
 import { CalendarEvent } from '@/lib/services/calendar-service';
 import { EventCommentThread } from './EventCommentThread';
 import { AttachmentGallery } from './AttachmentGallery';
@@ -12,12 +12,15 @@ interface EventDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   event: CalendarEvent;
+  onEdit?: (event: CalendarEvent) => void;
+  onDelete?: (eventId: string) => void;
 }
 
 type TabType = 'comments' | 'attachments';
 
-export function EventDetailModal({ isOpen, onClose, event }: EventDetailModalProps) {
+export function EventDetailModal({ isOpen, onClose, event, onEdit, onDelete }: EventDetailModalProps) {
   const [activeTab, setActiveTab] = useState<TabType>('comments');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   if (!isOpen) return null;
 
@@ -75,13 +78,38 @@ export function EventDetailModal({ isOpen, onClose, event }: EventDetailModalPro
               </div>
               <h2 className="text-lg sm:text-xl font-bold">{event.title}</h2>
             </div>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-purple-700 transition-colors"
-              aria-label="Close modal"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-1">
+              {onEdit && (
+                <button
+                  onClick={() => {
+                    onClose();
+                    onEdit(event);
+                  }}
+                  className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-purple-700 transition-colors"
+                  aria-label="Edit event"
+                  title="Edit event"
+                >
+                  <Edit className="w-4 h-4" />
+                </button>
+              )}
+              {onDelete && (
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-red-600 transition-colors"
+                  aria-label="Delete event"
+                  title="Delete event"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+              <button
+                onClick={onClose}
+                className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-purple-700 transition-colors"
+                aria-label="Close modal"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {/* Event Meta Info */}
@@ -160,6 +188,46 @@ export function EventDetailModal({ isOpen, onClose, event }: EventDetailModalPro
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowDeleteConfirm(false)} />
+          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full p-6">
+            <div className="text-center">
+              <div className="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+                <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                Delete Event
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                Are you sure you want to delete &quot;{event.title}&quot;? This event will be moved to trash and can be restored within 30 days.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="flex-1 px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    if (onDelete) {
+                      onDelete(event.id);
+                      setShowDeleteConfirm(false);
+                      onClose();
+                    }
+                  }}
+                  className="flex-1 px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

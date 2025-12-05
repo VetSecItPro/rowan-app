@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Smile, Image as ImageIcon, Paperclip, Calendar, ChevronDown, ShoppingCart } from 'lucide-react';
+import { X, Smile, Image as ImageIcon, Paperclip, Calendar, ChevronDown, ShoppingCart, Trash2 } from 'lucide-react';
 import { CreateEventInput, CalendarEvent } from '@/lib/services/calendar-service';
 import { eventAttachmentsService } from '@/lib/services/event-attachments-service';
 import { shoppingService, ShoppingList } from '@/lib/services/shopping-service';
@@ -14,6 +14,7 @@ interface NewEventModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (event: CreateEventInput) => Promise<CalendarEvent | void>;
+  onDelete?: (eventId: string) => void;
   editEvent?: CalendarEvent | null;
   spaceId: string;
 }
@@ -49,7 +50,7 @@ const ALLOWED_FILE_TYPES = [
 
 const ALLOWED_FILE_EXTENSIONS = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.txt', '.csv', '.zip'];
 
-export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: NewEventModalProps) {
+export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, spaceId }: NewEventModalProps) {
   const [formData, setFormData] = useState<CreateEventInput>({
     space_id: spaceId,
     title: '',
@@ -745,6 +746,22 @@ export function NewEventModal({ isOpen, onClose, onSave, editEvent, spaceId }: N
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700">
+            {/* Delete button - only shown when editing */}
+            {editEvent && onDelete && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm(`Are you sure you want to delete "${editEvent.title}"? This event will be moved to trash.`)) {
+                    onDelete(editEvent.id);
+                    onClose();
+                  }
+                }}
+                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors font-medium"
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete
+              </button>
+            )}
             <button
               type="button"
               onClick={onClose}
