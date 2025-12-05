@@ -156,12 +156,15 @@ export function TimeAwareWelcomeBox({
 export function CompactTimeAwareWelcome({
   greetingText,
   userName,
+  currentDate,
   className = ''
 }: {
   greetingText: string;
   userName?: string;
+  currentDate?: string;
   className?: string;
 }) {
+  const timePeriod = useTimePeriod();
   const [imageLoaded, setImageLoaded] = useState(false);
 
   // Hourly changing images - get current hour for seed
@@ -170,17 +173,17 @@ export function CompactTimeAwareWelcome({
   }, []);
 
   // Using Picsum Photos API with hourly seed for changing images
-  const imageUrl = `https://picsum.photos/seed/hour-${currentHour}/800/200`;
+  const imageUrl = `https://picsum.photos/seed/hour-${currentHour}/1200/300`;
 
   return (
-    <div className={`relative overflow-hidden rounded-xl shadow-lg ${className}`}>
+    <div className={`group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 ${className}`}>
       {/* Background Image */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         <img
           src={imageUrl}
           alt={`${timePeriod} background`}
-          className={`w-full h-full object-contain transition-opacity duration-1000 ${
-            imageLoaded ? 'opacity-100' : 'opacity-0'
+          className={`w-full h-full object-cover transition-all duration-1000 ${
+            imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
           }`}
           onLoad={() => setImageLoaded(true)}
         />
@@ -189,19 +192,49 @@ export function CompactTimeAwareWelcome({
           <div className="absolute inset-0 bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 animate-pulse" />
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20" />
       </div>
 
-      <div className="relative z-10 p-4">
-        <span
-          className="text-white font-black drop-shadow-lg tracking-tight text-2xl font-serif"
-          style={{
-            textShadow: '0 2px 12px rgba(0,0,0,0.8)',
-            fontFamily: '"Playfair Display", "Georgia", serif'
-          }}
-        >
-          {greetingText}{userName ? `, ${userName}!` : '!'}
-        </span>
+      {/* Subtle shimmer effect */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 animate-shimmer" />
+      </div>
+
+      <div className="relative z-10 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <h1
+            className="text-white font-black drop-shadow-lg tracking-tight text-xl sm:text-2xl font-serif"
+            style={{
+              textShadow: '0 2px 12px rgba(0,0,0,0.8)',
+              fontFamily: '"Playfair Display", "Georgia", serif'
+            }}
+          >
+            {greetingText}{userName ? `, ${userName}!` : '!'}
+          </h1>
+          {currentDate && (
+            <p className="text-white/80 text-sm sm:text-base mt-1" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
+              {currentDate}
+            </p>
+          )}
+        </div>
+        <div className="text-white/70 text-sm hidden sm:block" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
+          {new Date().toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+          })}
+        </div>
+      </div>
+
+      {/* Weather Widget - Compact version */}
+      <div className="absolute bottom-0 right-0 z-20 opacity-70 hover:opacity-100 transition-opacity duration-300">
+        <div className="backdrop-blur-sm bg-black/50 rounded-tl-lg px-2 py-1.5 border-l border-t border-white/10">
+          <WeatherBadge
+            eventTime={new Date().toISOString()}
+            location="Wylie, Texas, United States"
+            display="compact"
+          />
+        </div>
       </div>
     </div>
   );

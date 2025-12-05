@@ -12,6 +12,13 @@ import { ProposalsList } from '@/components/calendar/ProposalsList';
 import { MiniCalendar } from '@/components/calendar/MiniCalendar';
 import { QuickAddEvent } from '@/components/calendar/QuickAddEvent';
 
+// Phase 9: Unified Calendar View imports
+import { UnifiedCalendarFilters } from '@/components/calendar/UnifiedCalendarFilters';
+import { UnifiedCalendarLegendCompact } from '@/components/calendar/UnifiedCalendarLegend';
+import { UnifiedCalendarItemCard } from '@/components/calendar/UnifiedCalendarItemCard';
+import { useUnifiedCalendar } from '@/lib/hooks/useUnifiedCalendar';
+import type { UnifiedCalendarItem, UnifiedCalendarFilters as FilterState } from '@/lib/types/unified-calendar-item';
+
 // Import components directly to fix clickability issues
 import { NewEventModal } from '@/components/calendar/NewEventModal';
 import { EventDetailModal } from '@/components/calendar/EventDetailModal';
@@ -51,6 +58,9 @@ export default function CalendarPage() {
   const [activeAction, setActiveAction] = useState<'quick-add' | 'templates' | 'propose' | 'new-event'>('new-event');
   const [statusFilter, setStatusFilter] = useState<'all' | 'not-started' | 'in-progress' | 'completed'>('all');
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, eventId: '' });
+
+  // Phase 9: Unified calendar items state (tasks, meals, reminders alongside events)
+  const [selectedUnifiedItem, setSelectedUnifiedItem] = useState<UnifiedCalendarItem | null>(null);
 
   // Location state for weather display
   const [userLocation, setUserLocation] = useState<string | null>(null);
@@ -92,6 +102,46 @@ export default function CalendarPage() {
     currentSpace?.id,
     user?.id
   );
+
+  // Phase 9: Unified calendar hook - fetches tasks, meals, reminders for calendar display
+  // Date range: from start of current month view to 3 months ahead
+  const unifiedDateRange = useMemo(() => {
+    const start = startOfMonth(currentMonth);
+    const end = endOfMonth(addMonths(currentMonth, 2));
+    return { start, end };
+  }, [currentMonth]);
+
+  const {
+    items: unifiedItems,
+    itemsByDate: unifiedItemsByDate,
+    counts: unifiedCounts,
+    isLoading: unifiedLoading,
+    filters: unifiedFilters,
+    setFilters: setUnifiedFilters,
+    refresh: refreshUnifiedItems,
+  } = useUnifiedCalendar({
+    spaceId: currentSpace?.id || '',
+    startDate: unifiedDateRange.start,
+    endDate: unifiedDateRange.end,
+    autoFetch: !!currentSpace?.id,
+  });
+
+  // Handler for clicking unified calendar items
+  const handleUnifiedItemClick = useCallback((item: UnifiedCalendarItem) => {
+    setSelectedUnifiedItem(item);
+    // For events, open the edit modal (events are also included for color consistency)
+    if (item.itemType === 'event' && item.originalItem) {
+      setEditingEvent(item.originalItem as CalendarEvent);
+      setIsModalOpen(true);
+    }
+    // For other item types, we could navigate to their respective pages or show a detail modal
+  }, []);
+
+  // Get unified items for a specific date
+  const getUnifiedItemsForDate = useCallback((date: Date): UnifiedCalendarItem[] => {
+    const dateKey = format(date, 'yyyy-MM-dd');
+    return unifiedItemsByDate.get(dateKey) || [];
+  }, [unifiedItemsByDate]);
 
   // Memoize filtered events (consistent across all views)
   const filteredEvents = useMemo(() => {
@@ -1080,6 +1130,21 @@ export default function CalendarPage() {
               </div>
             </div>
 
+            {/* Phase 9: Unified Calendar Filters - Toggle visibility of tasks, meals, reminders */}
+            {viewMode !== 'proposal' && (
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Show on Calendar:</span>
+                  <UnifiedCalendarLegendCompact className="ml-2" />
+                </div>
+                <UnifiedCalendarFilters
+                  filters={unifiedFilters}
+                  onFilterChange={setUnifiedFilters}
+                  counts={unifiedCounts}
+                  compact={true}
+                />
+              </div>
+            )}
 
             {/* Calendar Content with Sidebar */}
             <div className="flex gap-6">
@@ -1192,8 +1257,12 @@ export default function CalendarPage() {
                     {/* Calendar days */}
                     {calendarDays.map((day, index) => {
                       const dayEvents = getEventsForDate(day);
+                      // Phase 9: Get unified items (tasks, meals, reminders) for this day
+                      const dayUnifiedItems = getUnifiedItemsForDate(day).filter(item => item.itemType !== 'event');
                       const isCurrentMonth = isSameMonth(day, currentMonth);
                       const isToday = isSameDay(day, new Date());
+                      // Calculate total items for "more" indicator
+                      const totalItems = dayEvents.length + dayUnifiedItems.length;
 
                       return (
                         <div
@@ -1267,12 +1336,22 @@ export default function CalendarPage() {
                                 </div>
                               );
                             })}
-                            {dayEvents.length > 2 && (
+                            {/* Phase 9: Show unified items (tasks, meals, reminders) */}
+                            {dayEvents.length < 2 && dayUnifiedItems.slice(0, 2 - dayEvents.length).map((item) => (
+                              <UnifiedCalendarItemCard
+                                key={item.id}
+                                item={item}
+                                compact={true}
+                                onClick={handleUnifiedItemClick}
+                              />
+                            ))}
+                            {/* Show "more" indicator if there are more items than displayed */}
+                            {totalItems > 2 && (
                               <p className="text-[10px] text-gray-500 dark:text-gray-400 text-center">
-                                +{dayEvents.length - 2} more
+                                +{totalItems - 2} more
                               </p>
                             )}
-                            {dayEvents.length === 0 && isCurrentMonth && (
+                            {totalItems === 0 && isCurrentMonth && (
                               <button
                                 onClick={() => setIsModalOpen(true)}
                                 className="hidden sm:block w-full text-center py-1.5 px-2 text-xs font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors duration-200"

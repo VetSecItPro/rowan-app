@@ -9,6 +9,7 @@ import ShoppingListEmail from '@/lib/emails/templates/ShoppingListEmail';
 import MealReminderEmail from '@/lib/emails/templates/MealReminderEmail';
 import GeneralReminderEmail from '@/lib/emails/templates/GeneralReminderEmail';
 import SpaceInvitationEmail from '@/lib/emails/templates/SpaceInvitationEmail';
+import DailyDigestEmail from '@/lib/emails/templates/DailyDigestEmail';
 import { PasswordResetEmail } from '@/lib/emails/templates/password-reset-email';
 import { MagicLinkEmail } from '@/lib/emails/templates/magic-link-email';
 import { EmailVerificationEmail } from '@/lib/emails/templates/email-verification-email';
@@ -148,6 +149,45 @@ export interface EmailVerificationData {
   userEmail: string;
   verificationUrl: string;
   userName: string;
+}
+
+export interface DailyDigestData {
+  recipientEmail: string;
+  recipientName: string;
+  date: string;
+  spaceName: string;
+  spaceId: string;
+  events: Array<{
+    id: string;
+    title: string;
+    start_time: string;
+    end_time?: string;
+    location?: string;
+    all_day?: boolean;
+  }>;
+  tasksDue: Array<{
+    id: string;
+    title: string;
+    priority: 'low' | 'normal' | 'high' | 'urgent';
+    due_date?: string;
+  }>;
+  overdueTasks: Array<{
+    id: string;
+    title: string;
+    priority: 'low' | 'normal' | 'high' | 'urgent';
+    due_date?: string;
+  }>;
+  meals: Array<{
+    id: string;
+    meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+    recipe_name: string;
+  }>;
+  reminders: Array<{
+    id: string;
+    title: string;
+    reminder_time?: string;
+  }>;
+  greeting: string;
 }
 
 
@@ -525,6 +565,53 @@ export async function sendEmailVerificationEmail(data: EmailVerificationData): P
   }
 }
 
+/**
+ * Send a daily digest email
+ */
+export async function sendDailyDigestEmail(data: DailyDigestData): Promise<EmailResult> {
+  try {
+    if (!resend) {
+      console.error('Resend not initialized - missing RESEND_API_KEY');
+      return { success: false, error: 'Email service not configured' };
+    }
+
+    const emailHtml = await render(DailyDigestEmail({
+      recipientName: data.recipientName,
+      date: data.date,
+      spaceName: data.spaceName,
+      spaceId: data.spaceId,
+      events: data.events,
+      tasksDue: data.tasksDue,
+      overdueTasks: data.overdueTasks,
+      meals: data.meals,
+      reminders: data.reminders,
+      greeting: data.greeting,
+    }));
+
+    const { data: result, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [data.recipientEmail],
+      subject: `Your Daily Digest for ${data.date}`,
+      html: emailHtml,
+      replyTo: REPLY_TO_EMAIL,
+      tags: [
+        { name: 'category', value: 'daily-digest' },
+        { name: 'space_id', value: data.spaceId }
+      ]
+    });
+
+    if (error) {
+      console.error('Failed to send daily digest email:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, messageId: result?.id };
+  } catch (error) {
+    console.error('Error sending daily digest email:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
 
 /**
  * Send multiple emails in batch (for digest processing)
@@ -626,6 +713,7 @@ export const emailService = {
   sendMealReminderEmail,
   sendGeneralReminderEmail,
   sendSpaceInvitationEmail,
+  sendDailyDigestEmail,
   sendPasswordResetEmail,
   sendMagicLinkEmail,
   sendEmailVerificationEmail,

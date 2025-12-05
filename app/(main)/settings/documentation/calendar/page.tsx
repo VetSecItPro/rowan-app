@@ -331,6 +331,43 @@ const guideSections: GuideSection[] = [
     ],
   },
   {
+    title: 'Unified Calendar View',
+    icon: LayoutGrid,
+    color: 'from-violet-500 to-violet-600',
+    articles: [
+      {
+        title: 'Introduction to Unified View',
+        description: 'See events, tasks, meals, and reminders all in one calendar view',
+        readTime: '4 min read',
+        href: '#unified-intro',
+      },
+      {
+        title: 'Item Types & Color Coding',
+        description: 'Understand the color-coded system: Purple events, Blue tasks, Orange meals, Pink reminders',
+        readTime: '3 min read',
+        href: '#unified-colors',
+      },
+      {
+        title: 'Filtering Item Types',
+        description: 'Toggle visibility of different item types to focus on what matters',
+        readTime: '3 min read',
+        href: '#unified-filters',
+      },
+      {
+        title: 'Item Cards & Details',
+        description: 'View item details including time, status, priority, and custom colors',
+        readTime: '4 min read',
+        href: '#unified-cards',
+      },
+      {
+        title: 'Unified Calendar Legend',
+        description: 'Quick reference for understanding item type colors and icons',
+        readTime: '2 min read',
+        href: '#unified-legend',
+      },
+    ],
+  },
+  {
     title: 'Mobile & Accessibility',
     icon: Users,
     color: 'from-pink-500 to-pink-600',
@@ -547,6 +584,10 @@ export default function CalendarDocumentationPage() {
                   <div className="flex items-start gap-2">
                     <Zap className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <span><strong>Keyboard Shortcuts</strong> - Lightning-fast navigation</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <LayoutGrid className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span><strong>Unified View</strong> - See events, tasks, meals & reminders together</span>
                   </div>
                 </div>
               </div>
@@ -1999,6 +2040,242 @@ export default function CalendarDocumentationPage() {
   </a>
 </section>
 
+          {/* UNIFIED CALENDAR VIEW SECTION */}
+          <section id="unified-intro" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <LayoutGrid className="w-8 h-8 text-violet-500" />
+              Introduction to Unified Calendar View
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+                The Unified Calendar View combines all your scheduled items - events, tasks, meals, and reminders - into a single, comprehensive calendar view. Instead of switching between different sections of Rowan, you can now see everything that's happening in your life at a glance.
+              </p>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">What's Included</h3>
+              <div className="grid gap-4 mb-6">
+                <div className="flex items-start gap-3 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <span className="text-2xl">📅</span>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Calendar Events</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">Regular calendar events with times, locations, and descriptions. Shown in purple.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <span className="text-2xl">✓</span>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Tasks with Due Dates</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">Tasks that have a due date appear on that date. Shown in blue with status indicators.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                  <span className="text-2xl">🍽️</span>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Scheduled Meals</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">Meals planned for specific dates. Shown in orange with meal type (breakfast, lunch, dinner, snack).</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg border border-pink-200 dark:border-pink-800">
+                  <span className="text-2xl">🔔</span>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Reminders</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">Reminders with scheduled times appear at their reminder time. Shown in pink.</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-violet-50 dark:bg-violet-900/20 rounded-xl p-4 border border-violet-200 dark:border-violet-800">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-violet-600 dark:text-violet-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-violet-900 dark:text-violet-100">
+                    <strong>Pro Tip:</strong> The unified view automatically fetches items for the current month plus 2 months ahead, so you can plan ahead without needing to refresh.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="unified-colors" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <Palette className="w-8 h-8 text-violet-500" />
+              Item Types & Color Coding
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+                Each item type has its own distinctive color to help you quickly identify what's on your calendar:
+              </p>
+              <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                <div className="p-4 rounded-lg bg-purple-100 dark:bg-purple-900/30 border-2 border-purple-500">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xl">📅</span>
+                    <h4 className="font-bold text-purple-900 dark:text-purple-100">Events - Purple</h4>
+                  </div>
+                  <p className="text-sm text-purple-800 dark:text-purple-200">Calendar events, appointments, meetings, activities</p>
+                </div>
+                <div className="p-4 rounded-lg bg-blue-100 dark:bg-blue-900/30 border-2 border-blue-500">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xl">✓</span>
+                    <h4 className="font-bold text-blue-900 dark:text-blue-100">Tasks - Blue</h4>
+                  </div>
+                  <p className="text-sm text-blue-800 dark:text-blue-200">To-do items with due dates, action items, assignments</p>
+                </div>
+                <div className="p-4 rounded-lg bg-orange-100 dark:bg-orange-900/30 border-2 border-orange-500">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xl">🍽️</span>
+                    <h4 className="font-bold text-orange-900 dark:text-orange-100">Meals - Orange</h4>
+                  </div>
+                  <p className="text-sm text-orange-800 dark:text-orange-200">Breakfast, lunch, dinner, snacks planned for specific dates</p>
+                </div>
+                <div className="p-4 rounded-lg bg-pink-100 dark:bg-pink-900/30 border-2 border-pink-500">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xl">🔔</span>
+                    <h4 className="font-bold text-pink-900 dark:text-pink-100">Reminders - Pink</h4>
+                  </div>
+                  <p className="text-sm text-pink-800 dark:text-pink-200">Time-based reminders, notifications, alerts</p>
+                </div>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Meal Time Mapping</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                Meals are automatically placed at appropriate times on the calendar:
+              </p>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+                <li><strong>Breakfast:</strong> 8:00 AM</li>
+                <li><strong>Lunch:</strong> 12:00 PM (noon)</li>
+                <li><strong>Dinner:</strong> 6:00 PM</li>
+                <li><strong>Snack:</strong> 3:00 PM</li>
+              </ul>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="unified-filters" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <Filter className="w-8 h-8 text-violet-500" />
+              Filtering Item Types
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+                Use the filter buttons at the top of the calendar to toggle visibility of different item types. This helps you focus on what matters most at any given time.
+              </p>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Filter Controls</h3>
+              <ul className="space-y-3 text-gray-700 dark:text-gray-300 mb-6">
+                <li><strong>Individual Toggles:</strong> Click on Events, Tasks, Meals, or Reminders buttons to show/hide that type</li>
+                <li><strong>Show All:</strong> Click "Show All" to display all item types at once</li>
+                <li><strong>Hide All:</strong> Click "Hide All" to hide all item types (button toggles between Show/Hide based on state)</li>
+                <li><strong>Item Counts:</strong> Each filter button shows the count of items in the current view</li>
+              </ul>
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 mb-6">
+                <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-3">Filter Button States</h4>
+                <div className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
+                  <p><strong>Active (colored):</strong> Item type is visible on calendar</p>
+                  <p><strong>Inactive (gray):</strong> Item type is hidden from calendar</p>
+                  <p><strong>Hover tooltips:</strong> Instant tooltips show "Show [type]s" or "Hide [type]s"</p>
+                </div>
+              </div>
+              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-amber-900 dark:text-amber-100">
+                    <strong>Use Case:</strong> Focus on meal planning by hiding events and tasks. Or review just your tasks for the week by filtering out meals and reminders.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="unified-cards" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <Info className="w-8 h-8 text-violet-500" />
+              Item Cards & Details
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+                Each item on the unified calendar is displayed as a card with relevant information. Cards adapt to the view mode - compact in month/week views, detailed in day/agenda views.
+              </p>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Card Information</h3>
+              <ul className="space-y-2 text-gray-700 dark:text-gray-300 mb-6">
+                <li><strong>Icon:</strong> Type indicator (📅 event, ✓ task, 🍽️ meal, 🔔 reminder)</li>
+                <li><strong>Title:</strong> Item name or description</li>
+                <li><strong>Time:</strong> Start time, end time, or "All day" for full-day items</li>
+                <li><strong>Priority:</strong> "Urgent" or "High" badges for high-priority items</li>
+                <li><strong>Status:</strong> Task status (pending, in-progress, blocked, completed)</li>
+                <li><strong>Category:</strong> Meal type or item category</li>
+                <li><strong>Location:</strong> Event location if available</li>
+                <li><strong>Recurring:</strong> ↻ symbol for recurring items</li>
+              </ul>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Compact vs Full View</h3>
+              <div className="grid gap-4 mb-6">
+                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Compact View (Month/Week)</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Shows icon, title, and priority indicator. Hover for full title tooltip.</p>
+                </div>
+                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Full View (Day/Agenda)</h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Shows all details including description preview, time range, location, status, and category badges.</p>
+                </div>
+              </div>
+              <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-green-900 dark:text-green-100">
+                    <strong>Completed items:</strong> Tasks and reminders marked as completed appear with strikethrough text and reduced opacity for easy identification.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
+
+          <section id="unified-legend" className="scroll-mt-24">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+              <Star className="w-8 h-8 text-violet-500" />
+              Unified Calendar Legend
+            </h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+                A compact legend is available next to the filter buttons to quickly reference what each color represents. Hover over the stacked dots to see the full legend.
+              </p>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Legend Components</h3>
+              <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-700 mb-6">
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">Events</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">Tasks</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">Meals</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-pink-500"></div>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">Reminders</span>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-violet-50 dark:bg-violet-900/20 rounded-xl p-4 border border-violet-200 dark:border-violet-800">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-violet-600 dark:text-violet-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-violet-900 dark:text-violet-100">
+                    <strong>Quick Reference:</strong> The compact legend shows stacked colored dots. Hover over them to see the full legend popover with icons and labels.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium mt-6">
+              ↑ Back to top
+            </a>
+          </section>
 
           {/* Continue with more sections... */}
           <section id="status-categories" className="scroll-mt-24">

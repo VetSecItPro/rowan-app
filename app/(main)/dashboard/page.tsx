@@ -55,7 +55,8 @@ import { SpaceSelector } from '@/components/spaces/SpaceSelector';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
-import { TimeAwareWelcomeBox } from '@/components/ui/TimeAwareWelcomeBox';
+import { CompactTimeAwareWelcome } from '@/components/ui/TimeAwareWelcomeBox';
+import { TodayAtAGlance } from '@/components/dashboard/TodayAtAGlance';
 import { CTAButton } from '@/components/ui/EnhancedButton';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -1029,13 +1030,17 @@ export default function DashboardPage() {
       >
       <div className="min-h-screen p-4 sm:p-6 md:p-8">
         <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4">
-          {/* Enhanced Time-Aware Welcome Header */}
-          <TimeAwareWelcomeBox
+          {/* Compact Time-Aware Welcome Header */}
+          <CompactTimeAwareWelcome
             greetingText={greetingText}
             userName={user?.name}
             currentDate={currentDate}
           />
 
+          {/* Today at a Glance - Shows today's events, tasks, meals, reminders */}
+          {spaceId && (
+            <TodayAtAGlance spaceId={spaceId} />
+          )}
 
           {/* Enhanced Feature Cards - 8 Cards */}
           <div>
