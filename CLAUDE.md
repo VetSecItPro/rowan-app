@@ -271,6 +271,7 @@ git push origin main   # Triggers automated deployment
     - Confidently advise: "This feature is complete and ready to merge"
     - **ASK USER**: "Ready to merge PR into main?" before merging
     - After merge: GitHub Actions automatically deploys to production
+11. **AFTER MERGE - Delete local branch:** `git checkout main && git pull && git branch -d feature/description`
 
 **Standard commit format:**
 ```bash
@@ -282,6 +283,53 @@ feat(scope): description
 Co-Authored-By: Claude <noreply@anthropic.com>
 EOF
 )"
+```
+
+### Branch Cleanup (MANDATORY)
+
+**GitHub Settings:** Auto-delete on merge is ENABLED
+- Remote branches are automatically deleted when PR is merged
+- No manual remote cleanup needed
+
+**After Every PR Merge:**
+```bash
+git checkout main
+git pull origin main
+git branch -d feature/your-branch   # Delete local branch
+```
+
+**Why This Matters:**
+- Stale branches become outdated and can break code if merged later
+- Old branches may delete newer features (happened with 6,000+ lines lost)
+- Clean repo = clear understanding of what's active vs abandoned
+
+**Before Merging Any Old Branch:**
+1. Check how far behind main: `git rev-list --count branch..main`
+2. Check what would be deleted: `git diff main..branch --stat`
+3. If branch deletes files that exist in main = **DO NOT MERGE** (branch is stale)
+4. If branch is >10 commits behind = **Rebase or recreate from main**
+
+**Periodic Cleanup (if needed):**
+```bash
+# Delete all local branches already merged to main
+git branch --merged main | grep -v "main" | xargs git branch -d
+
+# Prune stale remote references
+git fetch --prune
+```
+
+**Safe Branch Analysis Before Merge:**
+```bash
+# 1. How many commits behind main?
+git rev-list --count feature/branch..main
+
+# 2. What files would change (look for deletions of main's files)?
+git diff main..feature/branch --stat
+
+# 3. Are key files identical or different?
+git diff main:path/to/file feature/branch:path/to/file
+
+# If deletions > additions AND deletes files main has = STALE, delete branch
 ```
 
 ## Feature Colors
