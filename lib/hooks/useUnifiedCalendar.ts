@@ -13,6 +13,53 @@ import {
   type UnifiedItemType,
 } from '@/lib/types/unified-calendar-item';
 
+// =============================================================================
+// LOCALSTORAGE PERSISTENCE FOR FILTER PREFERENCES
+// =============================================================================
+
+const FILTER_STORAGE_KEY = 'rowan-calendar-filters';
+
+/**
+ * Load filters from localStorage
+ */
+function loadFiltersFromStorage(): UnifiedCalendarFilters | null {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const stored = localStorage.getItem(FILTER_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Validate that parsed object has the expected shape
+      if (
+        typeof parsed === 'object' &&
+        typeof parsed.showEvents === 'boolean' &&
+        typeof parsed.showTasks === 'boolean' &&
+        typeof parsed.showMeals === 'boolean' &&
+        typeof parsed.showReminders === 'boolean' &&
+        typeof parsed.showGoals === 'boolean'
+      ) {
+        return parsed;
+      }
+    }
+  } catch (error) {
+    console.warn('[useUnifiedCalendar] Failed to load filters from localStorage:', error);
+  }
+  return null;
+}
+
+/**
+ * Save filters to localStorage
+ */
+function saveFiltersToStorage(filters: UnifiedCalendarFilters): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filters));
+  } catch (error) {
+    console.warn('[useUnifiedCalendar] Failed to save filters to localStorage:', error);
+  }
+}
+
 interface UseUnifiedCalendarOptions {
   spaceId: string;
   startDate: Date;
@@ -20,6 +67,8 @@ interface UseUnifiedCalendarOptions {
   initialFilters?: UnifiedCalendarFilters;
   includeCompleted?: boolean;
   autoFetch?: boolean;
+  /** Whether to persist filters to localStorage (default: true) */
+  persistFilters?: boolean;
 }
 
 interface UseUnifiedCalendarReturn {
@@ -70,6 +119,7 @@ export function useUnifiedCalendar({
   initialFilters = DEFAULT_UNIFIED_FILTERS,
   includeCompleted = false,
   autoFetch = true,
+  persistFilters = true,
 }: UseUnifiedCalendarOptions): UseUnifiedCalendarReturn {
   const [items, setItems] = useState<UnifiedCalendarItem[]>([]);
   const [counts, setCounts] = useState<Record<UnifiedItemType, number>>({
@@ -81,7 +131,23 @@ export function useUnifiedCalendar({
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<UnifiedCalendarFilters>(initialFilters);
+
+  // Initialize filters from localStorage or use defaults
+  const [filters, setFiltersState] = useState<UnifiedCalendarFilters>(() => {
+    if (persistFilters) {
+      const stored = loadFiltersFromStorage();
+      if (stored) return stored;
+    }
+    return initialFilters;
+  });
+
+  // Wrapper to persist filters when they change
+  const setFilters = useCallback((newFilters: UnifiedCalendarFilters) => {
+    setFiltersState(newFilters);
+    if (persistFilters) {
+      saveFiltersToStorage(newFilters);
+    }
+  }, [persistFilters]);
 
   // Memoize date range keys to avoid unnecessary fetches
   const dateRangeKey = useMemo(() => {

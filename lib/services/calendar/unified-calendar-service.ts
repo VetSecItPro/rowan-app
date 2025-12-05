@@ -6,6 +6,7 @@ import { calendarService } from '@/lib/services/calendar-service';
 import { tasksService } from '@/lib/services/tasks-service';
 import { mealsService } from '@/lib/services/meals-service';
 import { remindersService } from '@/lib/services/reminders-service';
+import { goalsService } from '@/lib/services/goals-service';
 import { unifiedCalendarMapper } from './unified-calendar-mapper';
 import type {
   UnifiedCalendarItem,
@@ -102,6 +103,20 @@ export const unifiedCalendarService = {
           .catch((error) => {
             console.error('[UnifiedCalendar] Error fetching reminders:', error);
             errors.push('Failed to fetch reminders');
+          })
+      );
+    }
+
+    // Fetch goals with target dates
+    if (filters.showGoals) {
+      fetchPromises.push(
+        this.fetchGoals(spaceId, startDate, endDate, includeCompleted)
+          .then((items) => {
+            allItems.push(...items);
+          })
+          .catch((error) => {
+            console.error('[UnifiedCalendar] Error fetching goals:', error);
+            errors.push('Failed to fetch goals');
           })
       );
     }
@@ -224,6 +239,35 @@ export const unifiedCalendarService = {
       return unifiedCalendarMapper.filterByDateRange(mappedItems, startDate, endDate);
     } catch (error) {
       console.error('[UnifiedCalendar] fetchReminders error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Fetch and map goals with target dates
+   */
+  async fetchGoals(
+    spaceId: string,
+    startDate: Date,
+    endDate: Date,
+    includeCompleted: boolean
+  ): Promise<UnifiedCalendarItem[]> {
+    try {
+      // Get goals using the existing service
+      const goals = await goalsService.getGoals(spaceId);
+
+      // Filter out completed if not including them
+      const filteredGoals = includeCompleted
+        ? goals
+        : goals.filter((g) => g.status !== 'completed' && g.status !== 'cancelled');
+
+      // Map to unified items (mapper filters out goals without target_date)
+      const mappedItems = unifiedCalendarMapper.mapGoals(filteredGoals);
+
+      // Filter by date range
+      return unifiedCalendarMapper.filterByDateRange(mappedItems, startDate, endDate);
+    } catch (error) {
+      console.error('[UnifiedCalendar] fetchGoals error:', error);
       throw error;
     }
   },
