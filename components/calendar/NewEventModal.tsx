@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Smile, Image as ImageIcon, Paperclip, Calendar, ChevronDown, ShoppingCart, Trash2 } from 'lucide-react';
+import { X, Smile, Image as ImageIcon, Paperclip, Calendar, ChevronDown, ShoppingCart, Trash2, Timer } from 'lucide-react';
 import { CreateEventInput, CalendarEvent } from '@/lib/services/calendar-service';
 import { eventAttachmentsService } from '@/lib/services/event-attachments-service';
 import { shoppingService, ShoppingList } from '@/lib/services/shopping-service';
@@ -72,6 +72,8 @@ export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, sp
   const [linkToShopping, setLinkToShopping] = useState(false);
   const [selectedListId, setSelectedListId] = useState('');
   const [shoppingLists, setShoppingLists] = useState<ShoppingList[]>([]);
+  const [showCountdown, setShowCountdown] = useState(false);
+  const [countdownLabel, setCountdownLabel] = useState('');
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -108,6 +110,10 @@ export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, sp
         setSelectedDaysOfWeek([]);
         setSelectedDaysOfMonth([]);
       }
+
+      // Set countdown fields
+      setShowCountdown(editEvent.show_countdown || false);
+      setCountdownLabel(editEvent.countdown_label || '');
     } else {
       setFormData({
         space_id: spaceId,
@@ -123,13 +129,17 @@ export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, sp
       setSelectedDaysOfWeek([]);
       setSelectedDaysOfMonth([]);
     }
-    // Reset attachments and shopping link when modal opens/closes
+    // Reset attachments, shopping link, and countdown when modal opens/closes
     setAttachedImages([]);
     setAttachedFiles([]);
     setShowEmojiPicker(false);
     setDateError('');
     setLinkToShopping(false);
     setSelectedListId('');
+    if (!editEvent) {
+      setShowCountdown(false);
+      setCountdownLabel('');
+    }
   }, [editEvent, spaceId, isOpen]);
 
   // Load shopping lists on mount
@@ -194,6 +204,8 @@ export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, sp
         recurrence_pattern: recurrencePattern,
         location: formData.location || undefined,
         category: formData.category,
+        show_countdown: showCountdown,
+        countdown_label: showCountdown && countdownLabel ? countdownLabel : undefined,
       };
 
       // Save the event and get the created event back
@@ -713,6 +725,46 @@ export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, sp
             </div>
           )}
 
+          {/* Countdown Widget Toggle */}
+          <div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showCountdown}
+                onChange={(e) => setShowCountdown(e.target.checked)}
+                className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                <Timer className="w-4 h-4" />
+                Show as Countdown
+              </span>
+            </label>
+            <p className="ml-6 mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Display a countdown to this event on your dashboard
+            </p>
+          </div>
+
+          {/* Countdown Label Input */}
+          {showCountdown && (
+            <div className="space-y-3 p-3 sm:p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-700">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Countdown Label (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={countdownLabel}
+                  onChange={(e) => setCountdownLabel(e.target.value)}
+                  placeholder="e.g., Birthday!, Vacation, Wedding Day"
+                  maxLength={50}
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                />
+                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                  A custom label to display instead of the event title. Leave empty to use the event title.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Category */}
           <div>

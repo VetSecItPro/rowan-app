@@ -46,40 +46,41 @@ export function SmartBackgroundCanvas({
   }, []);
 
   // Time-aware color calculation
+  // Night: 9PM-5AM, Morning: 5AM-12PM, Afternoon: 12PM-5PM, Evening: 5PM-9PM
   const timeBasedColors = useMemo((): TimeBasedColors => {
     const hour = new Date().getHours();
 
-    if (hour >= 5 && hour < 12) {
-      // Morning: warmer, energetic colors
+    if (hour >= 21 || hour < 5) {
+      // Night (9PM-5AM): deep, calming colors
+      return {
+        primary: 'indigo',
+        secondary: 'blue',
+        accent: 'purple',
+        period: 'night'
+      };
+    } else if (hour < 12) {
+      // Morning (5AM-12PM): warmer, energetic colors
       return {
         primary: 'orange',
         secondary: 'yellow',
         accent: 'pink',
         period: 'morning'
       };
-    } else if (hour >= 12 && hour < 17) {
-      // Afternoon: bright, clear colors
+    } else if (hour < 17) {
+      // Afternoon (12PM-5PM): bright, clear colors
       return {
         primary: 'blue',
         secondary: 'cyan',
         accent: 'indigo',
         period: 'afternoon'
       };
-    } else if (hour >= 17 && hour < 21) {
-      // Evening: sophisticated, purple tones
+    } else {
+      // Evening (5PM-9PM): sophisticated, purple tones
       return {
         primary: 'purple',
         secondary: 'indigo',
         accent: 'violet',
         period: 'evening'
-      };
-    } else {
-      // Night: deep, calming colors
-      return {
-        primary: 'indigo',
-        secondary: 'blue',
-        accent: 'purple',
-        period: 'night'
       };
     }
   }, []);
@@ -189,16 +190,17 @@ export function SmartBackgroundCanvas({
 }
 
 // Utility hook for getting current time period
+// Night: 9PM-5AM, Morning: 5AM-12PM, Afternoon: 12PM-5PM, Evening: 5PM-9PM
 export function useTimePeriod() {
-  const [period, setPeriod] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('evening');
+  const [period, setPeriod] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('night');
 
   useEffect(() => {
     const updatePeriod = () => {
       const hour = new Date().getHours();
-      if (hour >= 5 && hour < 12) setPeriod('morning');
-      else if (hour >= 12 && hour < 17) setPeriod('afternoon');
-      else if (hour >= 17 && hour < 21) setPeriod('evening');
-      else setPeriod('night');
+      if (hour >= 21 || hour < 5) setPeriod('night');
+      else if (hour < 12) setPeriod('morning');
+      else if (hour < 17) setPeriod('afternoon');
+      else setPeriod('evening');
     };
 
     updatePeriod();
