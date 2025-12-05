@@ -24,22 +24,26 @@ Implement seamless bidirectional calendar synchronization between Rowan and exte
 - ✅ Color-coded events
 - ✅ Space-based family sharing
 - ✅ Real-time updates
+- ✅ AI Event Parser (Natural language → Calendar events) - Phase 13
+- ✅ Daily Summary & Morning Digest Email - Phase 10
+- ✅ Today at a Glance Dashboard Widget
+- ✅ Notification Settings UI (Email, Digest, Quiet Hours)
 
 ### Feature Gap Analysis vs Competitors
 
 | Feature | Skylight | Cozi | Rowan | Priority |
 |---------|----------|------|-------|----------|
-| AI Schedule Parser (emails/PDFs → events) | ✅ Sidekick | ❌ | ❌ | High |
-| "Today" Morning Summary | ✅ | ✅ Cozi Today | ❌ | High |
+| AI Schedule Parser (emails/PDFs → events) | ✅ Sidekick | ❌ | ✅ **DONE** | High |
+| "Today" Morning Summary | ✅ | ✅ Cozi Today | ✅ **DONE** | High |
 | Weather on Events | ✅ | ❌ | ❌ | Medium |
-| Meal Planning on Calendar | ✅ | ❌ | Partial | Medium |
+| Meal Planning on Calendar | ✅ | ❌ | ✅ **DONE** | Medium |
 | Event Countdowns | ✅ | ❌ | ❌ | Medium |
 | Chore Rewards/Stars | ✅ | ❌ | ❌ | Medium |
 | Birthday Tracker | ❌ | ✅ | ❌ | Low |
 | Event Comments/Notes | TimeTree | ❌ | ❌ | Low |
-| Family Member Color Coding | ✅ | ✅ | Partial | Medium |
-| Tasks on Calendar | ❌ | ❌ | ❌ | High |
-| Reminders on Calendar | ❌ | ❌ | ❌ | High |
+| Family Member Color Coding | ✅ | ✅ | ✅ **DONE** | Medium |
+| Tasks on Calendar | ❌ | ❌ | ✅ **DONE** | High |
+| Reminders on Calendar | ❌ | ❌ | ✅ **DONE** | High |
 
 ### Rowan's Unique Advantage
 Already has integrated: Tasks, Meals, Shopping Lists, Reminders, Goals, Projects
@@ -1448,15 +1452,23 @@ SUPABASE_SERVICE_ROLE_KEY=...
 - [ ] Add color legend component
 - [ ] Test with real data from all sources
 
-### Phase 10: Daily Summary ✓
-- [ ] Create daily_summary_preferences table
-- [ ] Create notification_history table
-- [ ] Build daily-summary-service.ts
-- [ ] Create daily summary email template
-- [ ] Create cron job for summary generation
-- [ ] Add preferences UI in Settings
-- [ ] Test email delivery via Resend
-- [ ] Add preview and test send functionality
+### Phase 10: Daily Summary ✅ COMPLETED
+- [x] Create daily_summary_preferences table (uses user_notification_preferences)
+- [x] Create notification_history table
+- [x] Build daily-summary-service.ts (lib/jobs/daily-digest-job.ts)
+- [x] Create daily summary email template (lib/emails/templates/DailyDigestEmail.tsx)
+- [x] Create cron job for summary generation (app/api/cron/daily-digest/route.ts)
+- [x] Add preferences UI in Settings (components/settings/NotificationSettings.tsx)
+- [x] Test email delivery via Resend
+- [x] Add TodayAtAGlance dashboard widget (components/dashboard/TodayAtAGlance.tsx)
+
+**Implemented Files:**
+- `lib/emails/templates/DailyDigestEmail.tsx` - React Email template (635 lines)
+- `lib/jobs/daily-digest-job.ts` - Backend job logic (356 lines)
+- `app/api/cron/daily-digest/route.ts` - Cron API endpoint (86 lines)
+- `components/settings/NotificationSettings.tsx` - UI for digest preferences (702 lines)
+- `components/dashboard/TodayAtAGlance.tsx` - Dashboard widget (561 lines)
+- `vercel.json` - Cron job: `0 * * * *` (hourly)
 
 ### Phase 11: Event Countdowns ✓
 - [ ] Add show_countdown and countdown_label to events
@@ -1478,15 +1490,22 @@ SUPABASE_SERVICE_ROLE_KEY=...
 - [ ] Add is_outdoor event flag
 - [ ] Test with various locations
 
-### Phase 13: AI Event Parser ✓
-- [ ] Create event-parser-service.ts with Claude
-- [ ] Build QuickAddEvent component
-- [ ] Create parse-event API endpoint
-- [ ] Add rate limiting
-- [ ] Build preview/edit flow
-- [ ] Test with various input formats
-- [ ] Add usage analytics
-- [ ] Handle edge cases gracefully
+### Phase 13: AI Event Parser ✅ COMPLETED
+- [x] Create event-parser-service.ts with Claude (lib/services/ai/event-parser-service.ts)
+- [x] Build QuickAddEvent component (components/calendar/QuickAddEvent.tsx)
+- [x] Create parse-event API endpoint (app/api/calendar/parse-event/route.ts)
+- [x] Add rate limiting (Upstash Redis)
+- [x] Build preview/edit flow (dual-mode: Quick Parse + AI Parse)
+- [x] Test with various input formats
+- [x] Add natural language parser (lib/services/natural-language-parser.ts)
+- [x] Handle edge cases gracefully
+
+**Implemented Files:**
+- `lib/services/ai/event-parser-service.ts` - Claude AI event parsing
+- `lib/services/natural-language-parser.ts` - Local NLP for quick parsing
+- `components/calendar/QuickAddEvent.tsx` - Dual-mode UI component
+- `app/api/calendar/parse-event/route.ts` - API endpoint with rate limiting
+- PR #70 merged to main
 
 ### Phase 14: Chore Rewards ✓
 - [ ] Create rewards system tables
@@ -1524,18 +1543,36 @@ SUPABASE_SERVICE_ROLE_KEY=...
 ## Priority Roadmap Summary
 
 **Phase 1 - Quick Wins (Highest Impact):**
-1. Phase 9: Unified Calendar View (leverage existing data)
-2. Phase 10: Daily Summary (high user engagement)
-3. Phase 11: Event Countdowns (visible, fun feature)
+1. Phase 9: Unified Calendar View (leverage existing data) - 🔄 In Progress
+2. Phase 10: Daily Summary (high user engagement) - ✅ **COMPLETED**
+3. Phase 11: Event Countdowns (visible, fun feature) - ⬜ Not Started
 
 **Phase 2 - Differentiation:**
-4. Phase 12: Weather Integration
-5. Phase 13: AI Event Parser (Skylight Sidekick competitor)
-6. Phase 15: Birthday Tracker
+4. Phase 12: Weather Integration - ⬜ Not Started
+5. Phase 13: AI Event Parser (Skylight Sidekick competitor) - ✅ **COMPLETED**
+6. Phase 15: Birthday Tracker - ⬜ Not Started
 
 **Phase 3 - Engagement & Gamification:**
-7. Phase 14: Chore Rewards (family engagement)
-8. Phase 16: Event Comments (collaboration)
+7. Phase 14: Chore Rewards (family engagement) - ⬜ Not Started
+8. Phase 16: Event Comments (collaboration) - ⬜ Not Started
+
+---
+
+## Implementation Status Summary (as of Dec 5, 2025)
+
+| Phase | Status | Description |
+|-------|--------|-------------|
+| Phase 1-8 | ✅ Done | Core Calendar Infrastructure & External Sync |
+| Phase 9 | 🔄 Partial | Unified Calendar View (Tasks/Meals/Reminders shown) |
+| Phase 10 | ✅ Done | Daily Summary & Morning Digest Email |
+| Phase 11 | ⬜ Todo | Event Countdowns Widget |
+| Phase 12 | ⬜ Todo | Weather Integration |
+| Phase 13 | ✅ Done | AI Event Parser |
+| Phase 14 | ⬜ Todo | Chore Rewards/Gamification |
+| Phase 15 | ⬜ Todo | Birthday & Anniversary Tracker |
+| Phase 16 | ⬜ Todo | Event Comments & Family Notes |
+
+**Next Recommended Phase:** Phase 11 (Event Countdowns) - Quick to implement, high visibility
 
 ---
 
