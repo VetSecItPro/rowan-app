@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ratelimit } from '@/lib/ratelimit';
+import { checkAuthRateLimit } from '@/lib/ratelimit';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
@@ -18,9 +18,9 @@ const PasswordResetVerifySchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting: 5 attempts per hour per IP
+    // Rate limiting: 5 attempts per hour per IP (uses fallback if Redis unavailable)
     const ip = request.ip ?? request.headers.get('x-forwarded-for') ?? 'anonymous';
-    const { success: rateLimitPassed } = await ratelimit.limit(`password-reset-verify:${ip}`);
+    const { success: rateLimitPassed } = await checkAuthRateLimit(`password-reset-verify:${ip}`);
 
     if (!rateLimitPassed) {
       return NextResponse.json(
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
     console.error('Password reset verification error:', error);
 
     if (error instanceof z.ZodError) {
-      const firstError = error.errors[0];
+      const firstError = error.issues[0];
       return NextResponse.json(
         { error: firstError.message },
         { status: 400 }
