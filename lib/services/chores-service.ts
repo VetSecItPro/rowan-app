@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/client';
 import { sanitizeSearchInput } from '@/lib/utils';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import type { Chore } from '@/lib/types';
+import { pointsService } from '@/lib/services/rewards';
+import type { PointTransaction } from '@/lib/types/rewards';
 
 // Chore Types - using main types file interface
 
@@ -407,5 +409,88 @@ export const choresService = {
       myChores: chores.filter(c => c.assigned_to === currentUserId && c.status === 'pending').length,
       partnerChores: chores.filter(c => c.assigned_to !== currentUserId && c.status === 'pending').length,
     };
+  },
+
+  /**
+   * Complete a chore and award points
+   *
+   * @param choreId - Chore ID to complete
+   * @param userId - User who completed the chore
+   * @returns Promise with updated chore and reward info
+   */
+  async completeChoreWithRewards(
+    choreId: string,
+    userId: string
+  ): Promise<{
+    chore: Chore;
+    pointsAwarded: number;
+    streakBonus: number;
+    newStreak: number;
+    transaction: PointTransaction;
+  }> {
+    const supabase = createClient();
+
+    // Get the chore first
+    const chore = await this.getChoreById(choreId);
+    if (!chore) {
+      throw new Error('Chore not found');
+    }
+
+    if (chore.status === 'completed') {
+      throw new Error('Chore is already completed');
+    }
+
+    // Update the chore status
+    const updatedChore = await this.updateChore(choreId, {
+      status: 'completed',
+      completed_at: new Date().toISOString(),
+    });
+
+    // Get point value from chore (falls back to default if not set)
+    const basePoints = (chore as any).point_value || 10;
+
+    // Award points with streak tracking
+    try {
+      const result = await pointsService.awardChorePoints(
+        userId,
+        chore.space_id,
+        choreId,
+        chore.title,
+        basePoints
+      );
+
+      return {
+        chore: updatedChore,
+        pointsAwarded: basePoints + result.streakBonus,
+        streakBonus: result.streakBonus,
+        newStreak: result.newStreak,
+        transaction: result.transaction,
+      };
+    } catch (pointsError) {
+      // Points award failed, but chore is still completed
+      console.error('Failed to award points for chore completion:', pointsError);
+      // Return without points info - chore is completed at least
+      return {
+        chore: updatedChore,
+        pointsAwarded: 0,
+        streakBonus: 0,
+        newStreak: 0,
+        transaction: {} as PointTransaction,
+      };
+    }
+  },
+
+  /**
+   * Uncomplete a chore (revert to pending)
+   * Note: This does NOT refund points - points are earned when completing
+   *
+   * @param choreId - Chore ID to uncomplete
+   * @returns Promise<Chore> - Updated chore
+   */
+  async uncompleteChore(choreId: string): Promise<Chore> {
+    return this.updateChore(choreId, {
+      status: 'pending',
+      completed_at: null,
+    });
   },
 };
