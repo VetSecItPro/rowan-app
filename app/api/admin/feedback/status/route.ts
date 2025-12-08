@@ -135,7 +135,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json(
         {
           error: 'Validation error',
-          details: error.errors.map(e => e.message)
+          details: error.issues.map((issue: z.ZodIssue) => issue.message)
         },
         { status: 400 }
       );
@@ -250,7 +250,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error: 'Validation error',
-          details: error.errors.map(e => e.message)
+          details: error.issues.map((issue: z.ZodIssue) => issue.message)
         },
         { status: 400 }
       );

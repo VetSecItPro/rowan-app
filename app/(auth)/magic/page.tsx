@@ -15,7 +15,7 @@ function MagicLinkHandler() {
 
   useEffect(() => {
     const handleMagicLink = async () => {
-      const token = searchParams.get('token');
+      const token = searchParams?.get('token');
 
       if (!token) {
         setStatus('error');
@@ -49,9 +49,9 @@ function MagicLinkHandler() {
         const supabase = createClient();
         
         // Try to get session from URL parameters
-        const accessToken = searchParams.get('access_token');
-        const refreshToken = searchParams.get('refresh_token');
-        const type = searchParams.get('type');
+        const accessToken = searchParams?.get('access_token');
+        const refreshToken = searchParams?.get('refresh_token');
+        const type = searchParams?.get('type');
 
         if (accessToken && refreshToken && type === 'magiclink') {
           // This is a Supabase magic link - use it directly

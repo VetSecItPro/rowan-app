@@ -161,7 +161,7 @@ export class InAppNotificationsService {
       }
 
       const counts: Record<string, number> = {};
-      data?.forEach(item => {
+      data?.forEach((item: { type: string }) => {
         counts[item.type] = (counts[item.type] || 0) + 1;
       });
 

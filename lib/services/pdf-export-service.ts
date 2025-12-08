@@ -274,7 +274,7 @@ export async function exportMonthlyExpenseSummary(
   const categoryTotals: Record<string, { total: number; count: number; expenses: Expense[] }> = {};
   let grandTotal = 0;
 
-  expenses?.forEach((expense) => {
+  expenses?.forEach((expense: Expense) => {
     const category = expense.category || 'Uncategorized';
     if (!categoryTotals[category]) {
       categoryTotals[category] = { total: 0, count: 0, expenses: [] };
@@ -408,7 +408,7 @@ export async function exportProjectCostReport(projectId: string): Promise<void> 
 
   // Calculate totals by category
   const categoryTotals: Record<string, number> = {};
-  expenses?.forEach((expense) => {
+  expenses?.forEach((expense: Expense) => {
     const category = expense.category || 'Uncategorized';
     categoryTotals[category] = (categoryTotals[category] || 0) + parseFloat(expense.amount.toString());
   });
@@ -510,7 +510,7 @@ export async function exportProjectCostReport(projectId: string): Promise<void> 
         ${
           expenses
             ?.map(
-              (expense) => `
+              (expense: Expense) => `
           <tr>
             <td>${expense.date ? format(new Date(expense.date), 'MMM dd, yyyy') : '-'}</td>
             <td>${expense.description || expense.title}</td>

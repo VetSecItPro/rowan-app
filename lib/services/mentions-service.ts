@@ -302,7 +302,7 @@ export async function getMentionableUsers(
         email: user.email,
       };
     })
-    .filter((u): u is MentionableUser => u !== null);
+    .filter((u: MentionableUser | null): u is MentionableUser => u !== null);
 
   return mentionableUsers;
 }

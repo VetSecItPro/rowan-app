@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ratelimit } from '@/lib/ratelimit';
+import { checkAuthRateLimit } from '@/lib/ratelimit';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
@@ -11,9 +11,9 @@ const MagicLinkVerifySchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting: 10 attempts per hour per IP
+    // Rate limiting: 5 attempts per hour per IP (uses fallback if Redis unavailable)
     const ip = request.ip ?? request.headers.get('x-forwarded-for') ?? 'anonymous';
-    const { success: rateLimitPassed } = await ratelimit.limit(`magic-link-verify:${ip}`);
+    const { success: rateLimitPassed } = await checkAuthRateLimit(`magic-link-verify:${ip}`);
 
     if (!rateLimitPassed) {
       return NextResponse.json(

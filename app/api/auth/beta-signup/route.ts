@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'Validation error',
-          details: error.errors.map(e => e.message)
+          details: error.issues.map((issue: z.ZodIssue) => issue.message)
         },
         { status: 400 }
       );

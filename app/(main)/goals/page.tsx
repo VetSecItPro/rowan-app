@@ -63,6 +63,7 @@ const BadgesWidget = dynamicImport(() => import('@/components/goals/badges/Badge
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput, GoalTemplate, CreateCheckInInput } from '@/lib/services/goals-service';
 import { createClient } from '@/lib/supabase/client';
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import { usePresence } from '@/lib/hooks/usePresence';
 import { OnlineUsersIndicator, PresenceIndicator } from '@/components/shared/PresenceIndicator';
@@ -196,26 +197,26 @@ export default function GoalsPage() {
           table: 'goals',
           filter: `space_id=eq.${currentSpace.id}`
         },
-        (payload) => {
-          const goalId = (payload.new as any)?.id || (payload.old as any)?.id;
-          const isUserAction = goalId && userActionsRef.current.has(goalId);
+        (payload: RealtimePostgresChangesPayload<{[key: string]: unknown}>) => {
+          const goalId = (payload.new as Record<string, unknown>)?.id || (payload.old as Record<string, unknown>)?.id;
+          const isUserAction = goalId && userActionsRef.current.has(goalId as string);
 
           if (payload.eventType === 'INSERT') {
-            const newGoal = payload.new as Goal;
+            const newGoal = payload.new as unknown as Goal;
             setGoals(prev => [...prev, newGoal]);
             if (!isUserAction) {
               toast.info(`New goal added: ${newGoal.title}`);
             }
           } else if (payload.eventType === 'UPDATE') {
-            const updatedGoal = payload.new as Goal;
+            const updatedGoal = payload.new as unknown as Goal;
             setGoals(prev => prev.map(g => g.id === updatedGoal.id ? updatedGoal : g));
             if (!isUserAction) {
               toast.info(`Goal updated: ${updatedGoal.title}`);
             }
             // Clean up action tracking
-            if (goalId) userActionsRef.current.delete(goalId);
+            if (goalId) userActionsRef.current.delete(goalId as string);
           } else if (payload.eventType === 'DELETE') {
-            const deletedId = payload.old.id;
+            const deletedId = (payload.old as Record<string, unknown>).id as string;
             setGoals(prev => prev.filter(g => g.id !== deletedId));
             if (!isUserAction) {
               toast.info('A goal was removed');
@@ -237,17 +238,17 @@ export default function GoalsPage() {
           schema: 'public',
           table: 'goal_milestones'
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<{[key: string]: unknown}>) => {
           // Check if milestone belongs to a goal in current space
           const belongsToCurrentSpace = (milestone: Milestone) => {
             return goalsRef.current.some(g => g.id === milestone.goal_id);
           };
 
-          const milestoneId = (payload.new as any)?.id || (payload.old as any)?.id;
-          const isUserAction = milestoneId && userActionsRef.current.has(milestoneId);
+          const milestoneId = (payload.new as Record<string, unknown>)?.id || (payload.old as Record<string, unknown>)?.id;
+          const isUserAction = milestoneId && userActionsRef.current.has(milestoneId as string);
 
           if (payload.eventType === 'INSERT') {
-            const newMilestone = payload.new as Milestone;
+            const newMilestone = payload.new as unknown as Milestone;
             if (belongsToCurrentSpace(newMilestone)) {
               setMilestones(prev => [...prev, newMilestone]);
               if (!isUserAction) {
@@ -255,16 +256,16 @@ export default function GoalsPage() {
               }
             }
           } else if (payload.eventType === 'UPDATE') {
-            const updatedMilestone = payload.new as Milestone;
+            const updatedMilestone = payload.new as unknown as Milestone;
             if (belongsToCurrentSpace(updatedMilestone)) {
               setMilestones(prev => prev.map(m => m.id === updatedMilestone.id ? updatedMilestone : m));
               if (!isUserAction) {
                 toast.info(`Milestone updated: ${updatedMilestone.title}`);
               }
             }
-            if (milestoneId) userActionsRef.current.delete(milestoneId);
+            if (milestoneId) userActionsRef.current.delete(milestoneId as string);
           } else if (payload.eventType === 'DELETE') {
-            const deletedId = payload.old.id;
+            const deletedId = (payload.old as Record<string, unknown>).id as string;
             setMilestones(prev => prev.filter(m => m.id !== deletedId));
             if (!isUserAction) {
               toast.info('A milestone was removed');

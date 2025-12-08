@@ -280,11 +280,11 @@ export const mealsService = {
           table: 'meals',
           filter: `space_id=eq.${spaceId}`,
         },
-        (payload) => {
+        (payload: { eventType: string; new: Record<string, unknown>; old: Record<string, unknown> }) => {
           callback({
             eventType: payload.eventType as 'INSERT' | 'UPDATE' | 'DELETE',
-            new: payload.new as Meal | null,
-            old: payload.old as Meal | null,
+            new: payload.new as unknown as Meal | null,
+            old: payload.old as unknown as Meal | null,
           });
         }
       )
@@ -318,11 +318,11 @@ export const mealsService = {
           table: 'recipes',
           filter: `space_id=eq.${spaceId}`,
         },
-        (payload) => {
+        (payload: { eventType: string; new: Record<string, unknown>; old: Record<string, unknown> }) => {
           callback({
             eventType: payload.eventType as 'INSERT' | 'UPDATE' | 'DELETE',
-            new: payload.new as Recipe | null,
-            old: payload.old as Recipe | null,
+            new: payload.new as unknown as Recipe | null,
+            old: payload.old as unknown as Recipe | null,
           });
         }
       )

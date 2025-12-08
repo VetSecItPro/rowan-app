@@ -378,6 +378,9 @@ export async function getEvents(
   const data = await response.json();
 
   return {
+    '@odata.context': data['@odata.context'] || '',
+    '@odata.deltaLink': data['@odata.deltaLink'],
+    '@odata.nextLink': data['@odata.nextLink'],
     value: data.value || [],
     deltaLink: data['@odata.deltaLink'],
     nextLink: data['@odata.nextLink'],
@@ -753,11 +756,15 @@ export async function syncCalendar(
 
     return {
       success: true,
+      connection_id: connectionId,
+      sync_type: syncType,
+      events_created: eventsCreated,
+      events_updated: eventsUpdated,
+      events_deleted: eventsDeleted,
       eventsProcessed,
-      eventsCreated,
-      eventsUpdated,
-      eventsDeleted,
-      syncDuration: Date.now() - startTime,
+      conflicts_detected: 0,
+      errors: [],
+      duration_ms: Date.now() - startTime,
     };
   } catch (error) {
     console.error('[Outlook Sync] Error:', error);
@@ -773,11 +780,20 @@ export async function syncCalendar(
 
     return {
       success: false,
+      connection_id: connectionId,
+      sync_type: syncType,
+      events_created: eventsCreated,
+      events_updated: eventsUpdated,
+      events_deleted: eventsDeleted,
       eventsProcessed,
-      error: {
-        code: 'SYNC_FAILED',
-        message: error instanceof Error ? error.message : 'Unknown sync error',
-      },
+      conflicts_detected: 0,
+      errors: [{
+        operation: 'update' as const,
+        error_code: 'SYNC_FAILED',
+        error_message: error instanceof Error ? error.message : 'Unknown sync error',
+        recoverable: true,
+      }],
+      duration_ms: Date.now() - startTime,
     };
   }
 }

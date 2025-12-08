@@ -35,7 +35,7 @@ const FEEDBACK_TYPE_OPTIONS = [
 
 export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   const { user } = useAuth();
-  const { activeSpace } = useSpaces();
+  const { currentSpace } = useSpaces();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const modalContentRef = useRef<HTMLDivElement>(null);
 
@@ -140,7 +140,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
     try {
       const formData = new FormData();
       formData.append('user_id', user.id);
-      if (activeSpace) formData.append('space_id', activeSpace.id);
+      if (currentSpace) formData.append('space_id', currentSpace.id);
       if (feedbackType) formData.append('feedback_type', feedbackType);
       if (featureName) formData.append('feature_name', featureName);
       if (pageUrl) formData.append('page_url', pageUrl);

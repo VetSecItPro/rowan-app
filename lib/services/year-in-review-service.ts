@@ -458,8 +458,9 @@ export class YearInReviewService {
       .gte('created_at', yearStart.toISOString())
       .lte('created_at', yearEnd.toISOString());
 
-    const categoryCount = taskCategories?.reduce((acc: Record<string, number>, task: Task) => {
-      acc[task.category] = (acc[task.category] || 0) + 1;
+    const categoryCount = taskCategories?.reduce((acc: Record<string, number>, task: { category?: string | null }) => {
+      const cat = task.category || 'general';
+      acc[cat] = (acc[cat] || 0) + 1;
       return acc;
     }, {} as Record<string, number>) || {};
 

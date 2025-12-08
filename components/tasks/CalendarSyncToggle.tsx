@@ -59,11 +59,13 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
       } else {
         // Sync to calendar
         const result = await taskCalendarService.syncTaskToCalendar(taskId);
-        setSyncStatus({
-          isSynced: true,
-          eventId: result.event_id,
-          lastSyncedAt: new Date().toISOString(),
-        });
+        if (result) {
+          setSyncStatus({
+            isSynced: true,
+            eventId: result.event_id,
+            lastSyncedAt: new Date().toISOString(),
+          });
+        }
       }
     } catch (error: any) {
       console.error('Error toggling sync:', error);

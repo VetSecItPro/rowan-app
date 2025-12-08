@@ -3,6 +3,29 @@ import type { BadgeProgress } from '@/lib/types';
 
 const supabase = createClient();
 
+// Internal type helpers for achievement calculations
+interface GoalIdRow {
+  id: string;
+}
+
+interface UpdateDateRow {
+  created_at: string;
+}
+
+interface MilestoneRow {
+  id: string;
+  goal_id: string;
+}
+
+interface GoalDurationRow {
+  created_at: string;
+  completed_at: string | null;
+}
+
+interface GoalCategoryRow {
+  category: string | null;
+}
+
 // Adapted types to work with existing schema
 export interface AchievementBadge {
   id: string;
@@ -219,7 +242,7 @@ async function calculateMilestonesCompletedProgress(
     return { current: 0, target, percentage: 0 };
   }
 
-  const goalIds = goals.map((g) => g.id);
+  const goalIds = goals.map((g: GoalIdRow) => g.id);
   const { count } = await supabase
     .from('goal_milestones')
     .select('*', { count: 'exact', head: true })
@@ -250,7 +273,7 @@ async function calculateStreakDaysProgress(
     return { current: 0, target, percentage: 0 };
   }
 
-  const goalIds = goals.map((g) => g.id);
+  const goalIds = goals.map((g: GoalIdRow) => g.id);
   const { data: updates } = await supabase
     .from('goal_updates')
     .select('created_at')
@@ -266,13 +289,13 @@ async function calculateStreakDaysProgress(
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const updateDates = updates.map((u) => {
+  const updateDates = updates.map((u: UpdateDateRow) => {
     const d = new Date(u.created_at);
     d.setHours(0, 0, 0, 0);
     return d.getTime();
   });
 
-  const uniqueDates = [...new Set(updateDates)].sort((a, b) => b - a);
+  const uniqueDates = ([...new Set(updateDates)] as number[]).sort((a, b) => b - a);
 
   for (let i = 0; i < uniqueDates.length; i++) {
     const expectedDate = new Date(today);
@@ -309,7 +332,7 @@ async function calculateWeeklyCheckinsProgress(
     return { current: 0, target, percentage: 0 };
   }
 
-  const goalIds = goals.map((g) => g.id);
+  const goalIds = goals.map((g: GoalIdRow) => g.id);
   const { data: updates } = await supabase
     .from('goal_updates')
     .select('created_at')
@@ -322,7 +345,7 @@ async function calculateWeeklyCheckinsProgress(
 
   // Group updates by week
   const weeks = new Set<string>();
-  updates.forEach((u) => {
+  updates.forEach((u: UpdateDateRow) => {
     const date = new Date(u.created_at);
     const weekStart = new Date(date);
     weekStart.setDate(date.getDate() - date.getDay());
@@ -376,7 +399,7 @@ async function calculateDurationProgress(
     return { current: 0, target: 1, percentage: 0 };
   }
 
-  const hasLongGoal = goals.some((goal) => {
+  const hasLongGoal = goals.some((goal: GoalDurationRow) => {
     const created = new Date(goal.created_at);
     const completed = new Date(goal.completed_at!);
     const durationDays = Math.floor(
@@ -409,7 +432,7 @@ async function calculateCategoriesProgress(
     return { current: 0, target, percentage: 0 };
   }
 
-  const categories = new Set(goals.map((g) => g.category));
+  const categories = new Set(goals.map((g: GoalCategoryRow) => g.category));
   const current = categories.size;
 
   return {
@@ -436,7 +459,7 @@ async function calculateQuickWinProgress(
     return { current: 0, target: 1, percentage: 0 };
   }
 
-  const hasQuickWin = goals.some((goal) => {
+  const hasQuickWin = goals.some((goal: GoalDurationRow) => {
     const created = new Date(goal.created_at);
     const completed = new Date(goal.completed_at!);
     const durationHours =
@@ -469,7 +492,7 @@ async function calculateFastGoalsProgress(
     return { current: 0, target: targetCount, percentage: 0 };
   }
 
-  const fastGoals = goals.filter((goal) => {
+  const fastGoals = goals.filter((goal: GoalDurationRow) => {
     const created = new Date(goal.created_at);
     const completed = new Date(goal.completed_at!);
     const durationDays = Math.floor(
@@ -546,7 +569,7 @@ async function calculatePerfectGoalProgress(
       .eq('goal_id', goal.id);
 
     if (milestones && milestones.length > 0) {
-      const allCompleted = milestones.every((m) => m.completed);
+      const allCompleted = milestones.every((m: { completed: boolean }) => m.completed);
       if (allCompleted) {
         perfectGoals.push(goal.id);
       }

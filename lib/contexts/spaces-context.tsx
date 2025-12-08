@@ -131,7 +131,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
     if (!user?.id) return;
     if (hasInitializedSpace) return;
     if (authLoading) return;
-    if (spacesQuery.isLoading || spacesQuery.isFetching) return;
+    if (spacesQuery.isLoading || spacesQuery.isRefetching) return;
 
     if (!spacesQuery.spaces?.length) {
       setHasInitializedSpace(true);
@@ -143,13 +143,16 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    switchSpace(spacesQuery.spaces[0]);
+    const firstSpace = spacesQuery.spaces[0];
+    if (firstSpace && firstSpace.role) {
+      switchSpace(firstSpace as Space & { role: string });
+    }
     setHasInitializedSpace(true);
   }, [
     authLoading,
     hasInitializedSpace,
     spacesQuery.currentSpace,
-    spacesQuery.isFetching,
+    spacesQuery.isRefetching,
     spacesQuery.isLoading,
     spacesQuery.spaces,
     switchSpace,

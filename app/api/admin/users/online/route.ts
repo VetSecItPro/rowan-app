@@ -8,6 +8,35 @@ import { cookies } from 'next/headers';
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
 
+// Type definitions for this route's database queries
+interface AdminUser {
+  id: string;
+  email: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  is_beta_tester: boolean | null;
+  beta_status: string | null;
+  beta_signup_date: string | null;
+  created_at: string;
+  updated_at: string;
+  last_seen: string | null;
+  is_online: boolean | null;
+}
+
+interface BetaAccessRequest {
+  user_id: string | null;
+  email: string;
+  access_granted: boolean | null;
+  created_at: string;
+  approved_at: string | null;
+}
+
+interface BetaTesterActivity {
+  user_id: string;
+  activity_type: string;
+  created_at: string;
+}
+
 /**
  * GET /api/admin/users/online
  * Get all users with their online presence status
@@ -93,28 +122,34 @@ export async function GET(req: NextRequest) {
       .order('created_at', { ascending: false });
 
     // Combine data
-    const enrichedUsers = users?.map(user => {
-      const betaRequest = betaRequests?.find(req => req.user_id === user.id || req.email === user.email);
-      const hasRecentActivity = recentActivity?.some(activity =>
-        activity.user_id === user.id &&
-        new Date(activity.created_at).getTime() > Date.now() - 5 * 60 * 1000
+    const enrichedUsers = (users as AdminUser[] | null)?.map((user: AdminUser) => {
+      const betaRequest = (betaRequests as BetaAccessRequest[] | null)?.find(
+        (req: BetaAccessRequest) => req.user_id === user.id || req.email === user.email
+      );
+      const hasRecentActivity = (recentActivity as BetaTesterActivity[] | null)?.some(
+        (activity: BetaTesterActivity) =>
+          activity.user_id === user.id &&
+          new Date(activity.created_at).getTime() > Date.now() - 5 * 60 * 1000
       );
 
       return {
         ...user,
         beta_request: betaRequest,
         is_online: hasRecentActivity || false,
-        last_activity: recentActivity?.find(a => a.user_id === user.id)?.created_at
+        last_activity: (recentActivity as BetaTesterActivity[] | null)?.find(
+          (a: BetaTesterActivity) => a.user_id === user.id
+        )?.created_at
       };
     });
 
     // Calculate stats
+    const typedUsers = users as AdminUser[] | null;
     const stats = {
-      total_users: users?.length || 0,
-      online_users: enrichedUsers?.filter(u => u.is_online).length || 0,
-      beta_testers: users?.filter(u => u.is_beta_tester).length || 0,
-      approved_beta: users?.filter(u => u.is_beta_tester && u.beta_status === 'approved').length || 0,
-      new_today: users?.filter(u =>
+      total_users: typedUsers?.length || 0,
+      online_users: enrichedUsers?.filter((u) => u.is_online).length || 0,
+      beta_testers: typedUsers?.filter((u: AdminUser) => u.is_beta_tester).length || 0,
+      approved_beta: typedUsers?.filter((u: AdminUser) => u.is_beta_tester && u.beta_status === 'approved').length || 0,
+      new_today: typedUsers?.filter((u: AdminUser) =>
         new Date(u.created_at).toDateString() === new Date().toDateString()
       ).length || 0
     };

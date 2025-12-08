@@ -26,7 +26,7 @@ export const shoppingTokenRateLimit = new Ratelimit({
 /**
  * Check rate limit for shopping list token access with fallback
  */
-export async function checkShoppingTokenRateLimit(ip: string): Promise<{ success: boolean; limit?: number; remaining?: number; reset?: Date }> {
+export async function checkShoppingTokenRateLimit(ip: string): Promise<{ success: boolean; limit?: number; remaining?: number; reset?: Date | number }> {
   try {
     return await shoppingTokenRateLimit.limit(ip);
   } catch (error) {

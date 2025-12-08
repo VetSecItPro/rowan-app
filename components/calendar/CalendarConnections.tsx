@@ -57,7 +57,7 @@ const PROVIDER_CONFIG = {
   },
 };
 
-const STATUS_CONFIG = {
+const STATUS_CONFIG: Record<string, { icon: typeof CheckCircle; color: string; label: string; animate?: boolean }> = {
   active: {
     icon: CheckCircle,
     color: 'text-green-600 dark:text-green-400',

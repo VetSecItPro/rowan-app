@@ -69,7 +69,8 @@ async function createCalDAVClient(credentials: AppleCredentials): Promise<DAVCli
     defaultAccountType: 'caldav',
   });
 
-  return client;
+  // Cast to DAVClient - createDAVClient returns a compatible type
+  return client as unknown as DAVClient;
 }
 
 async function getAuthenticatedClient(connectionId: string): Promise<DAVClient> {
@@ -289,9 +290,11 @@ export async function createEvent(
     iCalString: iCalData,
   });
 
+  // Extract etag from result - tsdav returns Response with url
+  const resultObj = result as unknown as { url?: string; etag?: string };
   return {
-    url: result.url || `${calendar.url}${uid}.ics`,
-    etag: result.etag || '',
+    url: resultObj.url || `${calendar.url}${uid}.ics`,
+    etag: resultObj.etag || '',
     data: iCalData,
     calendarData: parseICalendar(iCalData),
   };
@@ -504,11 +507,11 @@ function unescapeICalText(text: string): string {
 function mapDAVCalendar(calendar: DAVCalendar): CalDAVCalendar {
   return {
     url: calendar.url,
-    displayName: calendar.displayName || 'Calendar',
-    ctag: calendar.ctag || '',
+    displayName: typeof calendar.displayName === 'string' ? calendar.displayName : 'Calendar',
+    ctag: typeof calendar.ctag === 'string' ? calendar.ctag : '',
     syncToken: calendar.syncToken,
-    description: calendar.description,
-    timezone: calendar.timezone,
+    description: typeof calendar.description === 'string' ? calendar.description : undefined,
+    timezone: typeof calendar.timezone === 'string' ? calendar.timezone : undefined,
     color: undefined, // tsdav doesn't expose color directly
   };
 }

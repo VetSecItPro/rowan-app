@@ -170,8 +170,8 @@ export function subscribeToUpcomingBills(
         table: 'events',
         filter: `space_id=eq.${spaceId}`,
       },
-      async (payload) => {
-        const event = payload.new as any;
+      async (payload: { new: Record<string, unknown> }) => {
+        const event = payload.new as { event_type?: string; expense_id?: string; id?: string };
         if (event.event_type === 'bill_due' && event.expense_id) {
           // Fetch full bill details
           const bills = await getUpcomingBills(spaceId, 30);

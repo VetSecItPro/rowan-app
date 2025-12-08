@@ -110,7 +110,7 @@ export async function exportAllUserData(userId: string): Promise<ExportResult> {
     exportData.partnerships = partnerships || [];
 
     // Get partnership IDs for filtering other data
-    const partnershipIds = (partnerships || []).map(p => p.partnership_id);
+    const partnershipIds = (partnerships || []).map((p: { partnership_id: string }) => p.partnership_id);
 
     if (partnershipIds.length > 0) {
       // Get expenses
@@ -185,7 +185,7 @@ export async function exportAllUserData(userId: string): Promise<ExportResult> {
 
       // Get shopping items (if there are lists)
       if (shoppingLists && shoppingLists.length > 0) {
-        const listIds = shoppingLists.map(l => l.id);
+        const listIds = shoppingLists.map((l: { id: string }) => l.id);
         const { data: shoppingItems } = await supabase
           .from('shopping_items')
           .select('*')

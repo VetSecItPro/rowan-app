@@ -155,7 +155,7 @@ export function Header() {
                   {user.avatar_url ? (
                     <Image
                       src={user.avatar_url}
-                      alt={user.name}
+                      alt={user.name || 'User'}
                       width={24}
                       height={24}
                       className="w-6 h-6 rounded-full object-cover border border-white/20"
@@ -164,7 +164,7 @@ export function Header() {
                     />
                   ) : (
                     <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-semibold">
-                      {user.name.charAt(0).toUpperCase()}
+                      {(user.name || 'U').charAt(0).toUpperCase()}
                     </div>
                   )}
                   <span className="text-sm truncate max-w-[100px]">{user.name}</span>
@@ -180,7 +180,7 @@ export function Header() {
                         {user.avatar_url ? (
                           <Image
                             src={user.avatar_url}
-                            alt={user.name}
+                            alt={user.name || 'User'}
                             width={32}
                             height={32}
                             className="w-8 h-8 rounded-full object-cover"
@@ -190,7 +190,7 @@ export function Header() {
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold ${
                             COLOR_THEMES[user.color_theme as keyof typeof COLOR_THEMES] || 'bg-purple-600'
                           }`}>
-                            {user.name.charAt(0).toUpperCase()}
+                            {(user.name || 'U').charAt(0).toUpperCase()}
                           </div>
                         )}
                         <div className="flex-1 min-w-0">

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { RealtimeChannel } from '@supabase/supabase-js';
+import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import type { Task } from '@/lib/types';
 
 interface UseTaskRealtimeOptions {
@@ -141,38 +141,21 @@ export function useTaskRealtime({
     let channel: RealtimeChannel;
     let accessCheckInterval: NodeJS.Timeout;
 
-    // Timeout wrapper to prevent hanging operations
-    function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
-      return Promise.race([
-        promise,
-        new Promise<T>((_, reject) =>
-          setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
-        )
-      ]);
-    }
-
     // Verify user still has access to this space
     async function verifyAccess(): Promise<boolean> {
       try {
-        // Add 8-second timeout to individual operations
-        const { data: { user }, error: authError } = await withTimeout(
-          supabase.auth.getUser(),
-          8000
-        );
+        const { data: authData, error: authError } = await supabase.auth.getUser();
 
-        if (authError || !user) {
+        if (authError || !authData?.user) {
           return false;
         }
 
-        const { data: membership, error: memberError } = await withTimeout(
-          supabase
-            .from('space_members')
-            .select('user_id')
-            .eq('space_id', spaceId)
-            .eq('user_id', user.id)
-            .single(),
-          8000
-        );
+        const { data: membership, error: memberError } = await supabase
+          .from('space_members')
+          .select('user_id')
+          .eq('space_id', spaceId)
+          .eq('user_id', authData.user.id)
+          .single();
 
         return !memberError && !!membership;
       } catch (err) {
@@ -230,11 +213,11 @@ export function useTaskRealtime({
           query = query.eq('assigned_to', filters.assignedTo);
         }
 
-        const { data, error: fetchError } = await withTimeout(query, 10000); // 10 second timeout for data fetch
+        const { data, error: fetchError } = await query;
 
         if (fetchError) throw fetchError;
 
-        setTasks(data || []);
+        setTasks((data as Task[]) || []);
       } catch (err) {
         setError(err as Error);
       } finally {
@@ -253,7 +236,7 @@ export function useTaskRealtime({
             table: 'tasks',
             filter: `space_id=eq.${spaceId}`,
           },
-          (payload) => {
+          (payload: RealtimePostgresChangesPayload<Task>) => {
             const newTask = payload.new as Task;
 
             if (taskFilter(newTask)) {
@@ -272,7 +255,7 @@ export function useTaskRealtime({
             table: 'tasks',
             filter: `space_id=eq.${spaceId}`,
           },
-          (payload) => {
+          (payload: RealtimePostgresChangesPayload<Task>) => {
             const updatedTask = payload.new as Task;
 
             if (taskFilter(updatedTask)) {
@@ -295,7 +278,7 @@ export function useTaskRealtime({
             table: 'tasks',
             filter: `space_id=eq.${spaceId}`,
           },
-          (payload) => {
+          (payload: RealtimePostgresChangesPayload<Task>) => {
             const deletedTaskId = (payload.old as Task).id;
             // Add to batch queue for deletes
             updateQueueRef.current.deletes.push(deletedTaskId);
