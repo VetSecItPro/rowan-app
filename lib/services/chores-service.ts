@@ -17,7 +17,8 @@ export interface CreateChoreInput {
   due_date?: string;
   notes?: string;
   sort_order?: number;
-  created_by: string; // Required field that was missing!
+  created_by: string;
+  point_value?: number; // Points awarded for completing this chore (default: 10)
 }
 
 export interface UpdateChoreInput {

@@ -58,6 +58,7 @@ import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import { CompactTimeAwareWelcome } from '@/components/ui/TimeAwareWelcomeBox';
 import { TodayAtAGlance } from '@/components/dashboard/TodayAtAGlance';
 import { CountdownWidget } from '@/components/calendar/CountdownWidget';
+import { PointsDisplay, LeaderboardWidget } from '@/components/rewards';
 import { CTAButton } from '@/components/ui/EnhancedButton';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -2243,6 +2244,24 @@ export default function DashboardPage() {
                 maxItems={4}
                 onEventClick={(eventId) => router.push(`/calendar?event=${eventId}`)}
                 onAddCountdown={() => router.push('/calendar')}
+              />
+            </div>
+          )}
+
+          {/* Rewards Section - Points & Leaderboard */}
+          {spaceId && user && (
+            <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <PointsDisplay
+                userId={user.id}
+                spaceId={spaceId}
+                variant="full"
+                showStreak={true}
+              />
+              <LeaderboardWidget
+                spaceId={spaceId}
+                currentUserId={user.id}
+                period="week"
+                maxEntries={5}
               />
             </div>
           )}
