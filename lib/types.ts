@@ -720,6 +720,7 @@ export interface CreateChoreInput {
   status?: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed';
   due_date?: string;
   calendar_sync?: boolean;
+  point_value?: number; // Points awarded for completing this chore (default: 10)
 }
 
 export interface UpdateChoreInput {
@@ -727,6 +728,7 @@ export interface UpdateChoreInput {
   description?: string;
   frequency?: string;
   assigned_to?: string;
+  point_value?: number;
 }
 
 // =============================================

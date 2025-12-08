@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { pointsService } from '@/lib/services/rewards';
 import { LEVEL_DEFINITIONS } from '@/lib/types/rewards';
 import type { LeaderboardEntry } from '@/lib/types/rewards';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 interface LeaderboardWidgetProps {
   spaceId: string;
@@ -107,24 +108,49 @@ export function LeaderboardWidget({
       {/* Header */}
       <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-            🏆 Leaderboard
-          </h3>
+          <Tooltip content="See who's earning the most points! Complete tasks and chores to climb the rankings." position="right">
+            <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2 cursor-help">
+              🏆 Family Points Ranking
+            </h3>
+          </Tooltip>
           {/* Period Selector */}
           <div className="flex gap-1">
-            {(['week', 'month', 'all'] as const).map((p) => (
+            <Tooltip content="Points earned since Sunday" position="bottom">
               <button
-                key={p}
-                onClick={() => setActivePeriod(p)}
+                onClick={() => setActivePeriod('week')}
                 className={`px-2 py-1 text-xs rounded-md transition-colors ${
-                  activePeriod === p
+                  activePeriod === 'week'
                     ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
                     : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
-                {p === 'week' ? 'Week' : p === 'month' ? 'Month' : 'All'}
+                Week
               </button>
-            ))}
+            </Tooltip>
+            <Tooltip content="Points earned this calendar month" position="bottom">
+              <button
+                onClick={() => setActivePeriod('month')}
+                className={`px-2 py-1 text-xs rounded-md transition-colors ${
+                  activePeriod === 'month'
+                    ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                Month
+              </button>
+            </Tooltip>
+            <Tooltip content="Total points earned all time" position="bottom">
+              <button
+                onClick={() => setActivePeriod('all')}
+                className={`px-2 py-1 text-xs rounded-md transition-colors ${
+                  activePeriod === 'all'
+                    ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                All
+              </button>
+            </Tooltip>
           </div>
         </div>
       </div>
@@ -186,11 +212,15 @@ export function LeaderboardWidget({
                     {isCurrentUser && <span className="text-xs ml-1">(you)</span>}
                   </p>
                   <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                    <span>{levelDef.name}</span>
+                    <Tooltip content={`Level ${entry.level} - Keep earning points to level up!`} position="bottom">
+                      <span className="cursor-help">{levelDef.name}</span>
+                    </Tooltip>
                     {entry.current_streak > 0 && (
                       <>
                         <span>•</span>
-                        <span className="text-orange-500">🔥 {entry.current_streak}</span>
+                        <Tooltip content={`${entry.current_streak} day streak - Completing chores daily!`} position="bottom">
+                          <span className="text-orange-500 cursor-help">🔥 {entry.current_streak}</span>
+                        </Tooltip>
                       </>
                     )}
                   </div>
