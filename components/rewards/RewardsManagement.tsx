@@ -154,6 +154,8 @@ export function RewardsManagement({
           space_id: spaceId,
           created_by: userId,
           ...sanitizedData,
+          // Convert null to undefined for the CreateRewardInput type
+          max_redemptions_per_week: sanitizedData.max_redemptions_per_week ?? undefined,
         });
       }
 

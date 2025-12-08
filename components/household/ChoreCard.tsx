@@ -33,17 +33,17 @@ export function ChoreCard({ chore, onStatusChange, onEdit, onDelete }: ChoreCard
               newStatus = 'pending';
             }
             onStatusChange(chore.id, newStatus);
-          }} className={`mt-1 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center ${
+          }} className={`mt-0.5 flex-shrink-0 w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-colors ${
             chore.status === 'completed' ? 'bg-green-500 border-green-500' :
             chore.status === 'in-progress' ? 'bg-amber-500 border-amber-500' :
             chore.status === 'blocked' ? 'bg-red-500 border-red-500' :
             chore.status === 'on-hold' ? 'bg-purple-500 border-purple-500' :
             'border-gray-300 dark:border-gray-600'
           }`}>
-            {chore.status === 'completed' && <Check className="w-3 h-3 text-white" />}
-            {chore.status === 'in-progress' && <Clock className="w-3 h-3 text-white" />}
-            {chore.status === 'blocked' && <AlertCircle className="w-3 h-3 text-white" />}
-            {chore.status === 'on-hold' && <Pause className="w-3 h-3 text-white" />}
+            {chore.status === 'completed' && <Check className="w-4 h-4 text-white" />}
+            {chore.status === 'in-progress' && <Clock className="w-4 h-4 text-white" />}
+            {chore.status === 'blocked' && <AlertCircle className="w-4 h-4 text-white" />}
+            {chore.status === 'on-hold' && <Pause className="w-4 h-4 text-white" />}
           </button>
           <div className="flex-1">
             <h3 className={`font-semibold text-gray-900 dark:text-white ${chore.status === 'completed' ? 'line-through opacity-60' : ''}`}>{chore.title}</h3>
