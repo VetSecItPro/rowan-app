@@ -17,10 +17,16 @@ import {
   Loader2,
   Save,
   AlertCircle,
-  Info
+  Info,
+  BellRing,
+  BellOff,
+  Send,
+  CheckCircle2,
+  AlertTriangle
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { pushService } from '@/lib/services/push-service';
 
 interface NotificationPreferences {
   id: string;
@@ -237,41 +243,6 @@ const TimezoneSelector = memo(function TimezoneSelector({
   );
 });
 
-// Frequency selector
-const FrequencySelector = memo(function FrequencySelector({
-  value,
-  onChange
-}: {
-  value: string;
-  onChange: (value: 'instant' | 'hourly' | 'daily') => void;
-}) {
-  const options = [
-    { value: 'instant', label: 'Instant', description: 'Get notified immediately' },
-    { value: 'hourly', label: 'Hourly', description: 'Batched every hour' },
-    { value: 'daily', label: 'Daily', description: 'Once per day summary' }
-  ];
-
-  return (
-    <div className="grid grid-cols-3 gap-2">
-      {options.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          onClick={() => onChange(option.value as 'instant' | 'hourly' | 'daily')}
-          className={`
-            px-3 py-2 text-sm rounded-lg border transition-all
-            ${value === option.value
-              ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
-              : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
-            }
-          `}
-        >
-          <p className="font-medium">{option.label}</p>
-        </button>
-      ))}
-    </div>
-  );
-});
 
 export function NotificationSettings() {
   const { user, currentSpace } = useAuthWithSpaces();
@@ -281,6 +252,15 @@ export function NotificationSettings() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+
+  // Push notification state
+  const [pushSupported, setPushSupported] = useState(false);
+  const [pushPermission, setPushPermission] = useState<NotificationPermission>('default');
+  const [pushSubscribed, setPushSubscribed] = useState(false);
+  const [pushLoading, setPushLoading] = useState(false);
+  const [pushTestLoading, setPushTestLoading] = useState(false);
+  const [pushError, setPushError] = useState<string | null>(null);
+  const [pushTestSuccess, setPushTestSuccess] = useState(false);
 
   // Load preferences
   useEffect(() => {
@@ -329,6 +309,80 @@ export function NotificationSettings() {
 
     loadPreferences();
   }, [user, currentSpace?.id]);
+
+  // Initialize push notifications
+  useEffect(() => {
+    async function initPush() {
+      const supported = pushService.isSupported();
+      setPushSupported(supported);
+
+      if (supported) {
+        setPushPermission(pushService.getPermissionStatus());
+        const subscription = await pushService.getCurrentSubscription();
+        setPushSubscribed(!!subscription);
+      }
+    }
+
+    initPush();
+  }, []);
+
+  // Handle push subscription toggle
+  const handlePushToggle = useCallback(async () => {
+    setPushLoading(true);
+    setPushError(null);
+
+    try {
+      if (pushSubscribed) {
+        // Unsubscribe
+        const success = await pushService.unsubscribe();
+        if (success) {
+          setPushSubscribed(false);
+        } else {
+          setPushError('Failed to disable push notifications');
+        }
+      } else {
+        // Subscribe
+        const subscription = await pushService.subscribe();
+        if (subscription) {
+          setPushSubscribed(true);
+          setPushPermission('granted');
+        }
+      }
+    } catch (err) {
+      console.error('Push toggle error:', err);
+      if (err instanceof Error) {
+        if (err.message.includes('denied')) {
+          setPushError('Notifications are blocked. Please enable them in your browser settings.');
+          setPushPermission('denied');
+        } else {
+          setPushError(err.message);
+        }
+      }
+    } finally {
+      setPushLoading(false);
+    }
+  }, [pushSubscribed]);
+
+  // Send test push notification
+  const handleTestPush = useCallback(async () => {
+    setPushTestLoading(true);
+    setPushError(null);
+
+    try {
+      const result = await pushService.sendTestNotification();
+      if (result.success) {
+        setPushTestSuccess(true);
+        setTimeout(() => setPushTestSuccess(false), 3000);
+      } else {
+        setPushError(result.error || 'Failed to send test notification');
+      }
+    } catch (err) {
+      console.error('Test push error:', err);
+      setPushError(err instanceof Error ? err.message : 'Failed to send test notification');
+    } finally {
+      setPushTestLoading(false);
+    }
+  }, []);
 
   // Update preference
   const updatePreference = useCallback(<K extends keyof NotificationPreferences>(
@@ -455,6 +509,99 @@ export function NotificationSettings() {
         </div>
       )}
 
+      {/* Push Notifications */}
+      <Section
+        title="Push Notifications"
+        description="Get notified in real-time on this device"
+        icon={BellRing}
+      >
+        {!pushSupported ? (
+          <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-medium text-amber-800 dark:text-amber-200">Not Supported</p>
+                <p className="text-amber-700 dark:text-amber-300">
+                  Push notifications are not supported in this browser. Try using Chrome, Firefox, or Safari.
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : pushPermission === 'denied' ? (
+          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div className="flex items-start gap-3">
+              <BellOff className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-medium text-red-800 dark:text-red-200">Notifications Blocked</p>
+                <p className="text-red-700 dark:text-red-300">
+                  Push notifications have been blocked. To enable them, click the lock icon in your browser&apos;s address bar and allow notifications.
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <SettingRow
+              label="Enable Push Notifications"
+              description="Receive instant notifications on this device"
+            >
+              {pushLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin text-purple-600" />
+              ) : (
+                <Toggle
+                  enabled={pushSubscribed}
+                  onChange={handlePushToggle}
+                />
+              )}
+            </SettingRow>
+
+            {pushSubscribed && (
+              <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+                <SettingRow
+                  label="Test Notification"
+                  description="Send a test push to verify it's working"
+                  icon={Send}
+                >
+                  <button
+                    onClick={handleTestPush}
+                    disabled={pushTestLoading}
+                    className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                      pushTestSuccess
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                        : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-900/50'
+                    }`}
+                  >
+                    {pushTestLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : pushTestSuccess ? (
+                      <>
+                        <CheckCircle2 className="w-4 h-4" />
+                        Sent!
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        Send Test
+                      </>
+                    )}
+                  </button>
+                </SettingRow>
+              </div>
+            )}
+
+            {pushError && (
+              <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                {pushError}
+              </div>
+            )}
+          </>
+        )}
+      </Section>
+
       {/* Email Notifications */}
       <Section
         title="Email Notifications"
@@ -522,27 +669,42 @@ export function NotificationSettings() {
         </div>
       </Section>
 
-      {/* Daily Digest */}
+      {/* AI-Powered Daily Digest - Featured Section */}
       <Section
-        title="Daily Digest"
-        description="Receive a morning summary of your day"
+        title="AI Daily Briefing"
+        description="Your personalized morning assistant"
         icon={Calendar}
       >
-        <div className="p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg mb-4">
-          <div className="flex items-start gap-2">
-            <Info className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
-            <div className="text-sm text-purple-700 dark:text-purple-300">
-              <p className="font-medium">Morning Briefing Email</p>
-              <p className="text-purple-600 dark:text-purple-400">
-                Get a daily email with your events, tasks due, meals planned, and reminders for the day.
+        <div className="p-4 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border border-purple-200 dark:border-purple-800 rounded-xl mb-4">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+              <span className="text-lg">✨</span>
+            </div>
+            <div className="text-sm">
+              <p className="font-semibold text-purple-900 dark:text-purple-100">JARVIS-Style Morning Briefing</p>
+              <p className="text-purple-700 dark:text-purple-300 mt-1">
+                Wake up to a personalized email that reads like your own AI assistant. Get a conversational
+                summary of your day followed by a quick-reference schedule - events, tasks, meals, and reminders
+                all in one beautiful email.
               </p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-purple-300">
+                  AI-Powered
+                </span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 dark:bg-indigo-800 text-indigo-700 dark:text-indigo-300">
+                  Personalized
+                </span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-300">
+                  Once Daily
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
         <SettingRow
-          label="Enable Daily Digest"
-          description="Receive a summary each morning"
+          label="Enable Daily Briefing"
+          description="Receive your AI-powered morning summary"
         >
           <Toggle
             enabled={preferences.digest_enabled}
@@ -550,10 +712,10 @@ export function NotificationSettings() {
           />
         </SettingRow>
 
-        <div className={`space-y-4 pt-2 ${!preferences.digest_enabled ? 'opacity-50 pointer-events-none' : ''}`}>
+        <div className={`space-y-4 pt-3 ${!preferences.digest_enabled ? 'opacity-50 pointer-events-none' : ''}`}>
           <SettingRow
             label="Delivery Time"
-            description="When to send your daily digest"
+            description="Choose when to receive your briefing"
             icon={Clock}
           >
             <TimePicker
@@ -565,7 +727,7 @@ export function NotificationSettings() {
 
           <SettingRow
             label="Timezone"
-            description="Your local timezone for delivery"
+            description="Your local timezone"
             icon={Sun}
           >
             <TimezoneSelector
@@ -615,22 +777,6 @@ export function NotificationSettings() {
         </div>
       </Section>
 
-      {/* Notification Frequency */}
-      <Section
-        title="Notification Frequency"
-        description="How often to receive notifications"
-        icon={Bell}
-      >
-        <FrequencySelector
-          value={preferences.notification_frequency}
-          onChange={(v) => updatePreference('notification_frequency', v)}
-        />
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-          {preferences.notification_frequency === 'instant' && 'You\'ll receive notifications as they happen.'}
-          {preferences.notification_frequency === 'hourly' && 'Notifications will be batched and sent every hour.'}
-          {preferences.notification_frequency === 'daily' && 'You\'ll receive a single daily summary of all notifications.'}
-        </p>
-      </Section>
 
       {/* In-App Notifications */}
       <Section

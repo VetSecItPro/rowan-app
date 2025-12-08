@@ -190,6 +190,48 @@ export interface DailyDigestData {
   greeting: string;
 }
 
+// AI-Enhanced Daily Digest Data
+export interface AIDailyDigestData {
+  recipientEmail: string;
+  recipientName: string;
+  date: string;
+  spaceName: string;
+  spaceId: string;
+  events: Array<{
+    id: string;
+    title: string;
+    start_time: string;
+    end_time?: string;
+    location?: string;
+    all_day?: boolean;
+  }>;
+  tasksDue: Array<{
+    id: string;
+    title: string;
+    priority: 'low' | 'normal' | 'high' | 'urgent';
+    due_date?: string;
+  }>;
+  overdueTasks: Array<{
+    id: string;
+    title: string;
+    priority: 'low' | 'normal' | 'high' | 'urgent';
+    due_date?: string;
+  }>;
+  meals: Array<{
+    id: string;
+    meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+    recipe_name: string;
+  }>;
+  reminders: Array<{
+    id: string;
+    title: string;
+    reminder_time?: string;
+  }>;
+  narrativeIntro: string;
+  closingMessage: string;
+  aiGenerated: boolean;
+}
+
 
 /**
  * Send a task assignment email notification
@@ -612,6 +654,59 @@ export async function sendDailyDigestEmail(data: DailyDigestData): Promise<Email
   }
 }
 
+/**
+ * Send an AI-enhanced daily digest email
+ */
+export async function sendAIDailyDigestEmail(data: AIDailyDigestData): Promise<EmailResult> {
+  try {
+    if (!resend) {
+      console.error('Resend not initialized - missing RESEND_API_KEY');
+      return { success: false, error: 'Email service not configured' };
+    }
+
+    // Import and use the AI Daily Digest template
+    const AIDailyDigestEmail = (await import('@/lib/emails/templates/AIDailyDigestEmail')).default;
+
+    const emailHtml = await render(AIDailyDigestEmail({
+      recipientName: data.recipientName,
+      date: data.date,
+      spaceName: data.spaceName,
+      spaceId: data.spaceId,
+      events: data.events,
+      tasksDue: data.tasksDue,
+      overdueTasks: data.overdueTasks,
+      meals: data.meals,
+      reminders: data.reminders,
+      narrativeIntro: data.narrativeIntro,
+      closingMessage: data.closingMessage,
+      aiGenerated: data.aiGenerated,
+    }));
+
+    const { data: result, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [data.recipientEmail],
+      subject: `Your Daily Briefing for ${data.date}`,
+      html: emailHtml,
+      replyTo: REPLY_TO_EMAIL,
+      tags: [
+        { name: 'category', value: 'ai-daily-digest' },
+        { name: 'space_id', value: data.spaceId },
+        { name: 'ai_generated', value: data.aiGenerated ? 'true' : 'false' }
+      ]
+    });
+
+    if (error) {
+      console.error('Failed to send AI daily digest email:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, messageId: result?.id };
+  } catch (error) {
+    console.error('Error sending AI daily digest email:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
 
 /**
  * Send multiple emails in batch (for digest processing)
@@ -714,6 +809,7 @@ export const emailService = {
   sendGeneralReminderEmail,
   sendSpaceInvitationEmail,
   sendDailyDigestEmail,
+  sendAIDailyDigestEmail,
   sendPasswordResetEmail,
   sendMagicLinkEmail,
   sendEmailVerificationEmail,
