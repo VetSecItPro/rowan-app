@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Smile, ChevronDown, Repeat, Calendar, User, Clock, MessageSquare, Tag, Star, Users, CheckSquare, Home, Loader2 } from 'lucide-react';
+import { X, Smile, ChevronDown, Repeat, Calendar, User, Clock, MessageSquare, Tag, Star, Users, CheckSquare, Home, Loader2, Trophy } from 'lucide-react';
 import { CreateTaskInput, CreateChoreInput, Task, Chore } from '@/lib/types';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { taskRecurrenceService } from '@/lib/services/task-recurrence-service';
@@ -63,6 +63,7 @@ export function UnifiedItemModal({
     estimated_hours: '',
     tags: '',
     frequency: 'once', // Add missing frequency field for chores
+    point_value: 10, // Default points for chores
   });
 
   // UI state
@@ -124,7 +125,8 @@ export function UnifiedItemModal({
         assigned_to: editItem.assigned_to || '',
         estimated_hours: (editItem as any).estimated_hours || '',
         tags: (editItem as any).tags || '',
-        frequency: (editItem as any).frequency || 'once', // Add missing frequency field for chores
+        frequency: (editItem as any).frequency || 'once',
+        point_value: (editItem as any).point_value || 10,
       });
     } else {
       // Reset for new items and set to defaultType
@@ -140,7 +142,8 @@ export function UnifiedItemModal({
         assigned_to: '',
         estimated_hours: '',
         tags: '',
-        frequency: 'once', // Add missing frequency field for chores
+        frequency: 'once',
+        point_value: 10,
       });
     }
     setActiveSection('basic');
@@ -284,7 +287,7 @@ export function UnifiedItemModal({
         due_date: formData.due_date || null,
         created_by: userId || '',
         calendar_sync: calendarSync,
-        // Don't send: category, tags, estimated_hours, quick_note, priority
+        point_value: formData.point_value || 10,
       } as CreateChoreInput;
 
       // Handle recurring tasks
@@ -575,6 +578,35 @@ export function UnifiedItemModal({
                       placeholder="Select status..."
                     />
                   </div>
+
+                  {/* Points Value - Only for Chores */}
+                  {itemType === 'chore' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <span className="flex items-center gap-2">
+                          <Trophy className="w-4 h-4 text-amber-500" />
+                          Points Reward
+                        </span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          value={formData.point_value}
+                          onChange={(e) => handleInputChange('point_value', e.target.value)}
+                          placeholder="10"
+                          min="1"
+                          max="1000"
+                          className="w-full px-4 py-3 pr-16 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
+                        />
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-600 dark:text-amber-400 text-sm font-medium">
+                          pts
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Points earned when this chore is completed
+                      </p>
+                    </div>
+                  )}
 
                   {/* Estimated Hours */}
                   <div>

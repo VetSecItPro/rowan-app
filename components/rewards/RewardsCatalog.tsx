@@ -6,6 +6,7 @@
 import { useEffect, useState } from 'react';
 import { rewardsService, pointsService } from '@/lib/services/rewards';
 import type { RewardCatalogItem } from '@/lib/types/rewards';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 interface RewardsCatalogProps {
   spaceId: string;
@@ -14,13 +15,13 @@ interface RewardsCatalogProps {
   onRedemption?: () => void;
 }
 
-const CATEGORY_CONFIG: Record<string, { label: string; icon: string }> = {
-  screen_time: { label: 'Screen Time', icon: '📱' },
-  treats: { label: 'Treats', icon: '🍦' },
-  activities: { label: 'Activities', icon: '🎮' },
-  money: { label: 'Money', icon: '💵' },
-  privileges: { label: 'Privileges', icon: '✨' },
-  other: { label: 'Other', icon: '🎁' },
+const CATEGORY_CONFIG: Record<string, { label: string; icon: string; tooltip: string }> = {
+  screen_time: { label: 'Screen Time', icon: '📱', tooltip: 'Extra screen time, gaming hours, or device access' },
+  treats: { label: 'Treats', icon: '🍦', tooltip: 'Snacks, desserts, and special food treats' },
+  activities: { label: 'Activities', icon: '🎮', tooltip: 'Fun activities like outings, games, or special experiences' },
+  money: { label: 'Money', icon: '💵', tooltip: 'Allowance bonuses or spending money' },
+  privileges: { label: 'Privileges', icon: '✨', tooltip: 'Special permissions like staying up late or picking dinner' },
+  other: { label: 'Other', icon: '🎁', tooltip: 'Miscellaneous rewards and surprises' },
 };
 
 export function RewardsCatalog({
@@ -121,15 +122,19 @@ export function RewardsCatalog({
         {/* Header */}
         <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              🎁 Rewards Shop
-            </h3>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 dark:bg-amber-900/30 rounded-full">
-              <span className="font-semibold text-amber-700 dark:text-amber-300">
-                {userPoints.toLocaleString()}
-              </span>
-              <span className="text-amber-600 dark:text-amber-400 text-sm">pts</span>
-            </div>
+            <Tooltip content="Spend your hard-earned points on rewards! Click any reward to redeem." position="right">
+              <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2 cursor-help">
+                🎁 Rewards Shop
+              </h3>
+            </Tooltip>
+            <Tooltip content="Your spendable points balance. Earn more by completing tasks and chores!" position="left">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 dark:bg-amber-900/30 rounded-full cursor-help">
+                <span className="font-semibold text-amber-700 dark:text-amber-300">
+                  {userPoints.toLocaleString()}
+                </span>
+                <span className="text-amber-600 dark:text-amber-400 text-sm">pts</span>
+              </div>
+            </Tooltip>
           </div>
         </div>
 
@@ -150,18 +155,19 @@ export function RewardsCatalog({
               {categories.map((cat) => {
                 const config = CATEGORY_CONFIG[cat] || CATEGORY_CONFIG.other;
                 return (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-3 py-1.5 text-sm rounded-full whitespace-nowrap transition-colors flex items-center gap-1 ${
-                      selectedCategory === cat
-                        ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                    }`}
-                  >
-                    <span>{config.icon}</span>
-                    {config.label}
-                  </button>
+                  <Tooltip key={cat} content={config.tooltip} position="bottom">
+                    <button
+                      onClick={() => setSelectedCategory(cat)}
+                      className={`px-3 py-1.5 text-sm rounded-full whitespace-nowrap transition-colors flex items-center gap-1 ${
+                        selectedCategory === cat
+                          ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      <span>{config.icon}</span>
+                      {config.label}
+                    </button>
+                  </Tooltip>
                 );
               })}
             </div>
@@ -227,9 +233,11 @@ export function RewardsCatalog({
                     {/* Weekly Limit Badge */}
                     {reward.max_redemptions_per_week && (
                       <div className="absolute top-2 right-2">
-                        <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-1.5 py-0.5 rounded">
-                          {reward.max_redemptions_per_week}/wk
-                        </span>
+                        <Tooltip content={`Can only redeem ${reward.max_redemptions_per_week} time${reward.max_redemptions_per_week > 1 ? 's' : ''} per week`} position="left">
+                          <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-1.5 py-0.5 rounded cursor-help">
+                            {reward.max_redemptions_per_week}/wk
+                          </span>
+                        </Tooltip>
                       </div>
                     )}
 
