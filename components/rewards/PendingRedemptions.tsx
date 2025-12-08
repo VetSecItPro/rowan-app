@@ -238,12 +238,12 @@ export function PendingRedemptions({
                     {user?.avatar_url ? (
                       <img
                         src={user.avatar_url}
-                        alt={user.display_name || 'User'}
+                        alt={user.name || 'User'}
                         className="w-10 h-10 rounded-full object-cover"
                       />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-medium">
-                        {(user?.display_name || 'U').charAt(0).toUpperCase()}
+                        {(user?.name || 'U').charAt(0).toUpperCase()}
                       </div>
                     )}
                   </div>
@@ -253,7 +253,7 @@ export function PendingRedemptions({
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <p className="text-sm font-medium text-gray-900 dark:text-white">
-                          {user?.display_name || 'Family Member'}
+                          {user?.name || 'Family Member'}
                         </p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           wants{' '}

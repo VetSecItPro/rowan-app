@@ -55,23 +55,23 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
   };
 
   return (
-    <div className="group relative bg-white/10 dark:bg-black/40 backdrop-blur-lg backdrop-saturate-150 border border-white/20 dark:border-white/10 rounded-xl p-6 hover:bg-white/15 dark:hover:bg-black/50 hover:border-white/30 dark:hover:border-white/20 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+    <div className="group relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 hover:shadow-md transition-shadow">
       <div className="flex items-start gap-3 mb-4">
         {/* Three-state checkbox */}
         <div className="relative group">
           <button
             onClick={handleCheckboxClick}
             aria-label={`Toggle goal status: ${goalState === 'not-started' ? 'Not Started' : goalState === 'in-progress' ? 'In Progress' : 'Completed'}`}
-            className={`btn-touch min-w-[44px] min-h-[44px] rounded-lg border-2 flex items-center justify-center transition-all active:scale-95 hover:scale-110 ${
+            className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
               goalState === 'completed'
                 ? 'bg-green-500 border-green-500'
                 : goalState === 'in-progress'
                 ? 'bg-amber-500 border-amber-500'
-                : 'bg-transparent border-red-500'
-            } goals-status-toggle goals-magnetic-hover goals-ripple-effect hover-lift shimmer-indigo`}
+                : 'bg-transparent border-gray-300 dark:border-gray-600'
+            }`}
           >
-            {goalState === 'completed' && <Check className="w-5 h-5 text-white" />}
-            {goalState === 'in-progress' && <div className="w-3 h-3 bg-white rounded-full" />}
+            {goalState === 'completed' && <Check className="w-4 h-4 text-white" />}
+            {goalState === 'in-progress' && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
           </button>
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
             {goalState === 'not-started' ? 'Not Started' : goalState === 'in-progress' ? 'In Progress' : 'Completed'}
@@ -94,7 +94,7 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
             <button
               onClick={() => setShowMenu(!showMenu)}
               aria-label="Goal options menu"
-              className="btn-touch min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95 hover-lift shimmer-indigo active-press"
+              className="p-2 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
             >
               <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
@@ -105,11 +105,11 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="w-48 dropdown-mobile absolute right-0 mt-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-xl z-20 overflow-hidden">
+              <div className="w-48 absolute right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20 overflow-hidden">
                 {onCheckIn && goal.status === 'active' && (
                   <button
                     onClick={() => { onCheckIn(goal); setShowMenu(false); }}
-                    className="btn-touch w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors flex items-center gap-2 active:scale-[0.98] hover-lift shimmer-blue active-press"
+                    className="w-full px-4 py-2 text-left text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors flex items-center gap-2"
                   >
                     Check In
                   </button>
@@ -117,7 +117,7 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
                 {onShowHistory && (
                   <button
                     onClick={() => { onShowHistory(goal); setShowMenu(false); }}
-                    className="btn-touch w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors flex items-center gap-2 active:scale-[0.98] hover-lift shimmer-purple active-press"
+                    className="w-full px-4 py-2 text-left text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors flex items-center gap-2"
                   >
                     <History className="w-4 h-4" />
                     Check-In History
@@ -126,7 +126,7 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
                 {onFrequencySettings && goal.status === 'active' && (
                   <button
                     onClick={() => { onFrequencySettings(goal); setShowMenu(false); }}
-                    className="btn-touch w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors flex items-center gap-2 active:scale-[0.98] hover-lift shimmer-indigo active-press"
+                    className="w-full px-4 py-2 text-left text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors flex items-center gap-2"
                   >
                     <Settings className="w-4 h-4" />
                     Check-In Settings
@@ -134,13 +134,13 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
                 )}
                 <button
                   onClick={() => { onEdit(goal); setShowMenu(false); }}
-                  className="btn-touch w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 active:scale-[0.98] hover-lift shimmer-indigo active-press"
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
                 >
                   Edit Goal
                 </button>
                 <button
                   onClick={() => { onDelete(goal.id); setShowMenu(false); }}
-                  className="btn-touch w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-2 active:scale-[0.98] hover-lift shimmer-red active-press"
+                  className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-2"
                 >
                   Delete Goal
                 </button>

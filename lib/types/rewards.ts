@@ -132,7 +132,7 @@ export interface RewardRedemption {
   reward?: RewardCatalogItem;
   user?: {
     id: string;
-    display_name: string;
+    name: string;
     avatar_url: string | null;
   };
 }
@@ -150,7 +150,7 @@ export interface CreateRedemptionInput {
 
 export interface LeaderboardEntry {
   user_id: string;
-  display_name: string;
+  name: string;
   avatar_url: string | null;
   points: number;
   level: number;

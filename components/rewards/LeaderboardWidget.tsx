@@ -187,12 +187,12 @@ export function LeaderboardWidget({
                   {entry.avatar_url ? (
                     <img
                       src={entry.avatar_url}
-                      alt={entry.display_name}
+                      alt={entry.name}
                       className="w-10 h-10 rounded-full object-cover"
                     />
                   ) : (
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-medium">
-                      {entry.display_name.charAt(0).toUpperCase()}
+                      {entry.name.charAt(0).toUpperCase()}
                     </div>
                   )}
                   {/* Level Badge */}
@@ -208,7 +208,7 @@ export function LeaderboardWidget({
                       ? 'text-amber-700 dark:text-amber-300'
                       : 'text-gray-900 dark:text-white'
                   }`}>
-                    {entry.display_name}
+                    {entry.name}
                     {isCurrentUser && <span className="text-xs ml-1">(you)</span>}
                   </p>
                   <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">

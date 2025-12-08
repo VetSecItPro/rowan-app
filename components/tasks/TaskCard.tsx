@@ -106,13 +106,13 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
             onClick={handleStatusClick}
             title={getStatusTooltip()}
             aria-label={`Toggle task status: ${statusLabel.text}`}
-            className={`mt-0.5 flex-shrink-0 btn-icon-small rounded flex items-center justify-center transition-colors ${getCheckboxStyle()}`}
+            className={`mt-0.5 flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${getCheckboxStyle()}`}
           >
             {task.status === 'completed' && (
-              <CheckSquare className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
+              <CheckSquare className="w-4 h-4 text-white" />
             )}
             {task.status === 'in-progress' && (
-              <Clock className="w-3 h-3 text-white" />
+              <Clock className="w-4 h-4 text-white" />
             )}
           </button>
 

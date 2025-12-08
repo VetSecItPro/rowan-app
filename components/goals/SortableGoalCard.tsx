@@ -92,7 +92,7 @@ export function SortableGoalCard({
         {...listeners}
         className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-2 opacity-0 group-hover/sortable:opacity-100 transition-opacity cursor-grab active:cursor-grabbing z-10"
       >
-        <div className="btn-touch w-11 h-11 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all active:scale-95 hover-lift shimmer-indigo active-press hover:shadow-md">
+        <div className="w-8 h-8 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
           <GripVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
         </div>
       </div>
@@ -103,10 +103,10 @@ export function SortableGoalCard({
         {onTogglePin && (
           <button
             onClick={handlePinClick}
-            className={`btn-touch min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all active:scale-95 hover-lift shimmer-indigo active-press ${
+            className={`p-2 flex items-center justify-center rounded-lg transition-colors ${
               goal.is_pinned
-                ? 'bg-yellow-500 text-white hover:bg-yellow-600 hover:shadow-lg'
-                : 'bg-gray-200/50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:shadow-md'
+                ? 'bg-yellow-500 text-white hover:bg-yellow-600'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
             title={goal.is_pinned ? 'Unpin goal' : 'Pin goal'}
           >
@@ -118,10 +118,10 @@ export function SortableGoalCard({
         {onPriorityChange && (
           <button
             onClick={handlePriorityClick}
-            className={`btn-touch px-4 py-3 min-h-[44px] rounded-lg font-bold text-xs transition-all active:scale-95 hover-lift shimmer-indigo active-press ${
+            className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-colors ${
               priorityInfo.color
-                ? `${priorityInfo.color} hover:shadow-lg`
-                : 'bg-gray-200/50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:shadow-md'
+                ? priorityInfo.color
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
             title="Click to change priority"
           >

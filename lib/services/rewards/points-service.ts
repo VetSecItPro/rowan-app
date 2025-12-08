@@ -470,7 +470,7 @@ export const pointsService = {
 
       entries.push({
         user_id: user.id,
-        display_name: user.name || 'Unknown',
+        name: user.name || 'Unknown',
         avatar_url: user.avatar_url,
         points: pointsRecord?.points || 0,
         level: pointsRecord?.level || 1,
