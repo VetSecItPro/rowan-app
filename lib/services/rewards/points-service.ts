@@ -408,7 +408,7 @@ export const pointsService = {
       .from('space_members')
       .select(`
         user_id,
-        users!inner(id, display_name, avatar_url)
+        users!inner(id, name, avatar_url)
       `)
       .eq('space_id', spaceId);
 
@@ -431,7 +431,7 @@ export const pointsService = {
     const entries: LeaderboardEntry[] = [];
 
     for (const member of members) {
-      const user = member.users as { id: string; display_name: string; avatar_url: string | null };
+      const user = member.users as { id: string; name: string; avatar_url: string | null };
 
       // Get points record
       const { data: pointsRecord } = await supabase
@@ -470,7 +470,7 @@ export const pointsService = {
 
       entries.push({
         user_id: user.id,
-        display_name: user.display_name || 'Unknown',
+        display_name: user.name || 'Unknown',
         avatar_url: user.avatar_url,
         points: pointsRecord?.points || 0,
         level: pointsRecord?.level || 1,

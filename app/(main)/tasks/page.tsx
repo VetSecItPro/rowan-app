@@ -33,6 +33,8 @@ import { CalendarSyncToggle } from '@/components/tasks/CalendarSyncToggle';
 import { ChoreRotationConfig } from '@/components/tasks/ChoreRotationConfig';
 import { TaskCardSkeleton } from '@/components/ui/Skeleton';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
+import { PointsDisplay } from '@/components/rewards';
+import { pointsService } from '@/lib/services/rewards';
 
 type TaskType = 'task' | 'chore';
 type TaskOrChore = (Task & { type: 'task' }) | (Chore & { type: 'chore' });
@@ -425,12 +427,22 @@ export default function TasksPage() {
         );
 
         try {
-          // Update on server
-          const updateData: any = { status };
-          if (status === 'completed') {
-            updateData.completed_at = new Date().toISOString();
+          // If completing, use the rewards-enabled method
+          if (status === 'completed' && user) {
+            const result = await choresService.completeChoreWithRewards(itemId, user.id);
+            // Show points earned notification (if points were awarded)
+            if (result.pointsAwarded > 0) {
+              console.log(`🎉 Earned ${result.pointsAwarded} points! (${result.streakBonus > 0 ? `+${result.streakBonus} streak bonus` : 'no streak bonus'})`);
+              // TODO: Show toast notification with points earned
+            }
+          } else {
+            // For other status changes, use regular update
+            const updateData: any = { status };
+            if (status === 'completed') {
+              updateData.completed_at = new Date().toISOString();
+            }
+            await choresService.updateChore(itemId, updateData);
           }
-          await choresService.updateChore(itemId, updateData);
           // Real-time subscription will handle the final sync
         } catch (error) {
           // Revert optimistic update on error - real-time will handle sync
@@ -438,22 +450,37 @@ export default function TasksPage() {
           throw error;
         }
       } else {
+        // Get the task title for points awarding
+        const task = tasks.find(t => t.id === itemId);
+
         // Optimistic update for tasks - update UI immediately
         setTasks(prevTasks =>
-          prevTasks.map(task =>
-            task.id === itemId
+          prevTasks.map(t =>
+            t.id === itemId
               ? {
-                  ...task,
+                  ...t,
                   status: status as any,
                   updated_at: new Date().toISOString()
                 }
-              : task
+              : t
           )
         );
 
         try {
           // Update on server
           await tasksService.updateTask(itemId, { status });
+
+          // Award points for completing tasks
+          if (status === 'completed' && user && spaceId && task) {
+            try {
+              await pointsService.awardTaskPoints(user.id, spaceId, itemId, task.title);
+              console.log(`🎉 Earned 5 points for completing task!`);
+              // TODO: Show toast notification with points earned
+            } catch (pointsError) {
+              // Points failed but task is still completed - don't fail the whole operation
+              console.error('Failed to award points for task:', pointsError);
+            }
+          }
           // Real-time subscription will handle the final sync
         } catch (error) {
           // Revert optimistic update on error
@@ -489,7 +516,7 @@ export default function TasksPage() {
         [itemId]: { ...prev[itemId], statusChanging: false }
       }));
     }
-  }, [currentSpace, setTasks, setChores, refreshTasks, refreshChores]);
+  }, [currentSpace, setTasks, setChores, refreshTasks, refreshChores, user, spaceId, tasks]);
 
   const handleDeleteItem = useCallback(async (itemId: string, type?: 'task' | 'chore') => {
     // Set loading state for this specific item
@@ -629,6 +656,16 @@ export default function TasksPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              {/* Points Display - Compact */}
+              {user && spaceId && (
+                <PointsDisplay
+                  userId={user.id}
+                  spaceId={spaceId}
+                  variant="compact"
+                  showStreak={true}
+                />
+              )}
+
               <div className="flex gap-3">
                 <button
                   onClick={() => handleOpenModal('task')}

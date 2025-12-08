@@ -4,3 +4,5 @@
 export { PointsDisplay } from './PointsDisplay';
 export { LeaderboardWidget } from './LeaderboardWidget';
 export { RewardsCatalog } from './RewardsCatalog';
+export { RewardsManagement } from './RewardsManagement';
+export { PendingRedemptions } from './PendingRedemptions';
