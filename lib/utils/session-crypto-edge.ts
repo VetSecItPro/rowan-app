@@ -58,9 +58,12 @@ function getEncryptionKey(): Uint8Array {
  * Import key for Web Crypto API
  */
 async function importKey(keyData: Uint8Array): Promise<CryptoKey> {
+  // Create a new ArrayBuffer copy to ensure compatibility with Web Crypto API
+  const buffer = new ArrayBuffer(keyData.length);
+  new Uint8Array(buffer).set(keyData);
   return await crypto.subtle.importKey(
     'raw',
-    keyData,
+    buffer,
     { name: 'AES-GCM' },
     false,
     ['encrypt', 'decrypt']
@@ -84,14 +87,19 @@ export async function encryptSessionData(data: object): Promise<string> {
 
     // Encrypt the data
     const plaintext = stringToBytes(JSON.stringify(data));
+    // Create new ArrayBuffer copies for Web Crypto API compatibility
+    const ivBuffer = new ArrayBuffer(iv.length);
+    new Uint8Array(ivBuffer).set(iv);
+    const plaintextBuffer = new ArrayBuffer(plaintext.length);
+    new Uint8Array(plaintextBuffer).set(plaintext);
     const encrypted = await crypto.subtle.encrypt(
       {
         name: 'AES-GCM',
-        iv: iv,
+        iv: ivBuffer,
         tagLength: 128, // 16 bytes auth tag
       },
       key,
-      plaintext
+      plaintextBuffer
     );
 
     // Combine version + iv + encrypted data (includes auth tag)
@@ -138,15 +146,19 @@ export async function decryptSessionData(encryptedData: string): Promise<object>
     const keyData = getEncryptionKey();
     const key = await importKey(keyData);
 
-    // Decrypt
+    // Decrypt - create new ArrayBuffer copies for Web Crypto API compatibility
+    const ivBuffer = new ArrayBuffer(iv.length);
+    new Uint8Array(ivBuffer).set(iv);
+    const encryptedBuffer = new ArrayBuffer(encrypted.length);
+    new Uint8Array(encryptedBuffer).set(encrypted);
     const decrypted = await crypto.subtle.decrypt(
       {
         name: 'AES-GCM',
-        iv: iv,
+        iv: ivBuffer,
         tagLength: 128,
       },
       key,
-      encrypted
+      encryptedBuffer
     );
 
     const decryptedBytes = new Uint8Array(decrypted);
@@ -162,18 +174,20 @@ export async function decryptSessionData(encryptedData: string): Promise<object>
 /**
  * Validates session data integrity and expiration
  */
-export function validateSessionData(sessionData: any): boolean {
+export function validateSessionData(sessionData: unknown): sessionData is { adminId: string; email: string; expiresAt: number } {
   if (!sessionData || typeof sessionData !== 'object') {
     return false;
   }
 
+  const data = sessionData as Record<string, unknown>;
+
   // Check required fields
-  if (!sessionData.adminId || !sessionData.email || !sessionData.expiresAt) {
+  if (!data.adminId || !data.email || !data.expiresAt) {
     return false;
   }
 
   // Check expiration
-  if (Date.now() > sessionData.expiresAt) {
+  if (typeof data.expiresAt === 'number' && Date.now() > data.expiresAt) {
     return false;
   }
 

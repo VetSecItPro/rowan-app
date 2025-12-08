@@ -151,16 +151,17 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
         <span className="text-gray-400 dark:text-gray-500 text-xs">💧{weather.humidity}%</span>
         <span className="text-gray-400 dark:text-gray-500 text-xs">💨{windMph}mph</span>
         {alert && (
-          <AlertTriangle
-            className={`w-3 h-3 ${
-              alert.severity === 'severe'
-                ? 'text-red-500'
-                : alert.severity === 'warning'
-                ? 'text-orange-500'
-                : 'text-blue-500'
-            }`}
-            title={alert.title}
-          />
+          <span title={alert.title}>
+            <AlertTriangle
+              className={`w-3 h-3 ${
+                alert.severity === 'severe'
+                  ? 'text-red-500'
+                  : alert.severity === 'warning'
+                  ? 'text-orange-500'
+                  : 'text-blue-500'
+              }`}
+            />
+          </span>
         )}
       </div>
     );

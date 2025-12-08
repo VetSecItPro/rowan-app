@@ -74,7 +74,7 @@ async function calculateCategoryVariance(
 
   if (error) throw error;
 
-  const actualAmount = expenses?.reduce((sum, exp) => sum + parseFloat(exp.amount.toString()), 0) || 0;
+  const actualAmount = expenses?.reduce((sum: number, exp: { amount: number }) => sum + parseFloat(exp.amount.toString()), 0) || 0;
   const variance = actualAmount - budgetAmount;
   const variancePercentage = budgetAmount > 0 ? (variance / budgetAmount) * 100 : 0;
   const { status, color } = getVarianceStatus(variancePercentage);
@@ -132,7 +132,7 @@ export async function getMonthVariance(spaceId: string, date: Date): Promise<Mon
 
   // Calculate variance for each category
   const categoryVariances = await Promise.all(
-    budgets.map((budget) =>
+    budgets.map((budget: { category: string; amount: number }) =>
       calculateCategoryVariance(
         spaceId,
         budget.category,

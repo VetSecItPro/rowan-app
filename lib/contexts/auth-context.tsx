@@ -12,7 +12,7 @@ import {
   type UserProfile
 } from '@/lib/hooks/useAuthQuery';
 import { createClient } from '@/lib/supabase/client';
-import type { Session } from '@supabase/supabase-js';
+import type { Session, AuthChangeEvent } from '@supabase/supabase-js';
 import type { Space } from '@/lib/types';
 
 /**
@@ -72,7 +72,7 @@ function InnerAuthProvider({ children }: { children: ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
       handleAuthStateChange(event, session);
     });
 

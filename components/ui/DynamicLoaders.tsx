@@ -249,14 +249,14 @@ export function withDynamicLoading<T extends object>(
  */
 export function withProgressiveLoading<T extends object>(
   importFn: () => Promise<{ default: ComponentType<T> }>,
-  skeleton: ComponentType,
+  Skeleton: ComponentType,
   options?: {
     delay?: number;
     ssr?: boolean;
   }
 ) {
   return dynamic(importFn, {
-    loading: skeleton,
+    loading: () => <Skeleton />,
     ssr: options?.ssr ?? true,
   });
 }

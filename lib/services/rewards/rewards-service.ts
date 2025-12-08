@@ -538,7 +538,7 @@ export const rewardsService = {
     }
 
     const totalRedemptions = redemptions?.length || 0;
-    const totalPointsSpent = (redemptions || []).reduce((sum, r) => sum + r.points_spent, 0);
+    const totalPointsSpent = (redemptions || []).reduce((sum: number, r: { points_spent: number }) => sum + r.points_spent, 0);
 
     // Count by reward
     const rewardCounts: Record<string, { name: string; count: number }> = {};

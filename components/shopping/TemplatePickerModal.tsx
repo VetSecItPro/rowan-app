@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { X, FileText, ShoppingCart, Plus, Loader2 } from 'lucide-react';
-import { shoppingService } from '@/lib/services/shopping-service';
+import { shoppingService, type TemplateItemInput } from '@/lib/services/shopping-service';
 import { Tooltip } from '@/components/ui/Tooltip';
 
 interface Template {
   id: string;
   name: string;
   description: string;
-  items: any[];
+  items: TemplateItemInput[] | string;
   created_at: string;
 }
 

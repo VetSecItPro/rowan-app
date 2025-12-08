@@ -87,8 +87,27 @@ export async function GET(req: NextRequest) {
     }
 
     // Get engagement metrics (votes and comments count) for each feedback item
+    interface FeedbackItem {
+      id: string;
+      title: string;
+      description?: string;
+      category?: string;
+      priority?: string;
+      status?: string;
+      user_id: string;
+      created_at: string;
+      updated_at?: string;
+      admin_response?: string;
+      admin_notes?: string;
+      users: {
+        id: string;
+        email: string;
+        full_name?: string;
+        avatar_url?: string;
+      };
+    }
     const feedbackWithMetrics = await Promise.all(
-      (feedback || []).map(async (item) => {
+      (feedback || []).map(async (item: FeedbackItem) => {
         // Get votes count
         const { count: votesCount, error: votesError } = await supabase
           .from('beta_feedback_votes')

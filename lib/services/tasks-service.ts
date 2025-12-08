@@ -9,7 +9,7 @@ import type {
   TaskQueryOptions,
   PaginatedResponse,
 } from '@/lib/types';
-import type { RealtimeChannel } from '@supabase/supabase-js';
+import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 /**
  * Tasks Service
@@ -539,17 +539,17 @@ export const tasksService = {
       }
 
       const total = data.length;
-      const completed = data.filter(t => t.status === 'completed').length;
-      const inProgress = data.filter(t => t.status === 'in-progress').length;
-      const pending = data.filter(t => t.status === 'pending').length;
-      const blocked = data.filter(t => t.status === 'blocked').length;
-      const onHold = data.filter(t => t.status === 'on-hold').length;
+      const completed = data.filter((t: Task) => t.status === 'completed').length;
+      const inProgress = data.filter((t: Task) => t.status === 'in-progress').length;
+      const pending = data.filter((t: Task) => t.status === 'pending').length;
+      const blocked = data.filter((t: Task) => t.status === 'blocked').length;
+      const onHold = data.filter((t: Task) => t.status === 'on-hold').length;
 
       const byPriority = {
-        low: data.filter(t => t.priority === 'low').length,
-        medium: data.filter(t => t.priority === 'medium').length,
-        high: data.filter(t => t.priority === 'high').length,
-        urgent: data.filter(t => t.priority === 'urgent').length,
+        low: data.filter((t: Task) => t.priority === 'low').length,
+        medium: data.filter((t: Task) => t.priority === 'medium').length,
+        high: data.filter((t: Task) => t.priority === 'high').length,
+        urgent: data.filter((t: Task) => t.priority === 'urgent').length,
       };
 
       return {
@@ -604,7 +604,7 @@ export const tasksService = {
           table: 'tasks',
           filter: `space_id=eq.${spaceId}`,
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<Task>) => {
           callback({
             eventType: payload.eventType as 'INSERT' | 'UPDATE' | 'DELETE',
             new: payload.new as Task | null,

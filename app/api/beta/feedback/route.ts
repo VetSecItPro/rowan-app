@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user's votes
-    const feedbackIds = feedbackData?.map(f => f.id) || [];
+    const feedbackIds = feedbackData?.map((f: { id: string }) => f.id) || [];
     const { data: userVotes } = await supabase
       .from('beta_feedback_votes')
       .select('feedback_id, vote_type')
@@ -78,15 +78,34 @@ export async function GET(request: NextRequest) {
       .select('feedback_id')
       .in('feedback_id', feedbackIds);
 
-    const votesMap = new Map(userVotes?.map(v => [v.feedback_id, v.vote_type]) || []);
-    const commentsCountMap = new Map();
-    commentCounts?.forEach(comment => {
+    const votesMap = new Map(userVotes?.map((v: { feedback_id: string; vote_type: string }) => [v.feedback_id, v.vote_type]) || []);
+    const commentsCountMap = new Map<string, number>();
+    commentCounts?.forEach((comment: { feedback_id: string }) => {
       const count = commentsCountMap.get(comment.feedback_id) || 0;
       commentsCountMap.set(comment.feedback_id, count + 1);
     });
 
     // Transform the data
-    const feedback = feedbackData?.map(item => ({
+    interface FeedbackUser {
+      display_name?: string | null;
+      full_name?: string | null;
+      email: string;
+    }
+    interface FeedbackItem {
+      id: string;
+      title: string;
+      description?: string;
+      category?: string;
+      severity?: string;
+      priority?: string;
+      status?: string;
+      page_url?: string;
+      upvotes?: number;
+      downvotes?: number;
+      created_at: string;
+      users: FeedbackUser;
+    }
+    const feedback = feedbackData?.map((item: FeedbackItem) => ({
       id: item.id,
       title: item.title,
       description: item.description,

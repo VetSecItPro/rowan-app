@@ -316,8 +316,8 @@ export async function getBudgetProgressWithGoals(spaceId: string): Promise<Budge
     else if (percentageSpent > 80) status = 'warning';
 
     const categoryLinkedGoals = budgetLinks
-      .filter(link => link.budget_category === category.name)
-      .map(link => linkedGoals?.find(goal => goal.id === link.goal_id))
+      .filter((link: { budget_category: string }) => link.budget_category === category.name)
+      .map((link: { goal_id: string }) => linkedGoals?.find((goal: Goal) => goal.id === link.goal_id))
       .filter(Boolean) as Goal[];
 
     progress.push({

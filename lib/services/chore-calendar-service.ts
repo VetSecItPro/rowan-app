@@ -24,7 +24,7 @@ export const choreCalendarService = {
     if (eventError) throw eventError;
 
     // Create sync records for tracking
-    const syncRecords = insertedEvents.map(event => ({
+    const syncRecords = insertedEvents.map((event: { id: string }) => ({
       chore_id: choreId,
       event_id: event.id,
       is_synced: true,
@@ -53,7 +53,7 @@ export const choreCalendarService = {
 
     if (syncRecords && syncRecords.length > 0) {
       // Delete the events
-      const eventIds = syncRecords.map(record => record.event_id);
+      const eventIds = syncRecords.map((record: { event_id: string }) => record.event_id);
       await supabase.from('events').delete().in('id', eventIds);
     }
 

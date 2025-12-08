@@ -88,7 +88,7 @@ export async function getSpendingTrends(
   // Group expenses by period
   const trendsMap = new Map<string, { total: number; count: number }>();
 
-  expenses?.forEach((expense) => {
+  expenses?.forEach((expense: { created_at: string; amount: number }) => {
     const expenseDate = new Date(expense.created_at);
     const period = format(expenseDate, dateFormat);
 
@@ -156,7 +156,7 @@ export async function getCategorySpending(
   const categoryMap = new Map<string, { total: number; count: number }>();
   let totalSpent = 0;
 
-  expenses?.forEach((expense) => {
+  expenses?.forEach((expense: { category: string | null; amount: number }) => {
     const category = expense.category || 'Uncategorized';
     const existing = categoryMap.get(category) || { total: 0, count: 0 };
     categoryMap.set(category, {
@@ -206,7 +206,7 @@ export async function getBudgetVariances(
   const spendingMap = new Map(categorySpending.map(c => [c.category, c.total]));
 
   // Calculate variances
-  const variances: BudgetVariance[] = budgetCategories?.map((budget) => {
+  const variances: BudgetVariance[] = budgetCategories?.map((budget: { category_name: string; allocated_amount: number }) => {
     const spent = spendingMap.get(budget.category_name) || 0;
     const variance = budget.allocated_amount - spent;
     const variance_percentage = budget.allocated_amount > 0
@@ -308,8 +308,8 @@ export async function getMonthOverMonthComparison(
   if (currentData.error) throw currentData.error;
   if (previousData.error) throw previousData.error;
 
-  const current_month = currentData.data?.reduce((sum, e) => sum + e.amount, 0) || 0;
-  const previous_month = previousData.data?.reduce((sum, e) => sum + e.amount, 0) || 0;
+  const current_month = currentData.data?.reduce((sum: number, e: { amount: number }) => sum + e.amount, 0) || 0;
+  const previous_month = previousData.data?.reduce((sum: number, e: { amount: number }) => sum + e.amount, 0) || 0;
   const change = current_month - previous_month;
   const change_percentage = previous_month > 0
     ? Math.round((change / previous_month) * 10000) / 100

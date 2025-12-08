@@ -66,6 +66,14 @@ export interface CreateItemInput {
   category?: string;
 }
 
+// For templates - items without list_id
+export interface TemplateItemInput {
+  name: string;
+  quantity?: number;
+  unit?: string;
+  category?: string;
+}
+
 export interface CreateListWithItemsInput extends CreateListInput {
   items?: CreateItemInput[];
 }
@@ -340,7 +348,7 @@ export const shoppingService = {
     return data || [];
   },
 
-  async createTemplate(spaceId: string, name: string, description: string, items: CreateItemInput[]) {
+  async createTemplate(spaceId: string, name: string, description: string, items: TemplateItemInput[]) {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('shopping_templates')

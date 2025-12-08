@@ -121,7 +121,7 @@ export function Sidebar() {
   // Memoize active states
   const activeStates = useMemo(() => {
     return NAVIGATION_ITEMS.map(item =>
-      pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
+      pathname === item.href || (item.href !== '/dashboard' && pathname?.startsWith(item.href))
     );
   }, [pathname]);
 
@@ -167,7 +167,7 @@ export function Sidebar() {
               <NavItemComponent
                 key={item.href}
                 item={item}
-                isActive={activeStates[index]}
+                isActive={activeStates[index] ?? false}
                 isExpanded={isExpanded}
               />
             ))}
@@ -191,7 +191,7 @@ export function Sidebar() {
                   gradient: 'bg-gradient-to-r from-orange-500 to-red-500',
                   description: 'Manage feedback',
                 }}
-                isActive={pathname === '/admin/beta-feedback' || pathname.startsWith('/admin/beta-feedback')}
+                isActive={pathname === '/admin/beta-feedback' || (pathname?.startsWith('/admin/beta-feedback') ?? false)}
                 isExpanded={isExpanded}
               />
             </ul>

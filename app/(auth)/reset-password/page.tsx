@@ -27,11 +27,11 @@ function ResetPasswordForm() {
       const { data: { session }, error } = await supabase.auth.getSession();
 
       // Check if user came here from a password reset link (Supabase native)
-      const accessToken = searchParams.get('access_token');
-      const refreshToken = searchParams.get('refresh_token');
+      const accessToken = searchParams?.get('access_token');
+      const refreshToken = searchParams?.get('refresh_token');
 
       // Check if user came here from our custom reset link
-      const customToken = searchParams.get('token');
+      const customToken = searchParams?.get('token');
 
       if (accessToken && refreshToken) {
         // User clicked Supabase native password reset link
@@ -115,7 +115,7 @@ function ResetPasswordForm() {
     setIsLoading(true);
 
     try {
-      const customToken = searchParams.get('token');
+      const customToken = searchParams?.get('token');
 
       if (customToken) {
         // Use our custom password reset API

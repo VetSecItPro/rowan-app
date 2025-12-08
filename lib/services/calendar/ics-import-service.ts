@@ -172,12 +172,17 @@ function parseICSData(icsData: string): ParsedICSEvent[] {
 
         // Get last modified if available
         const lastModifiedProp = vevent.getFirstProperty('last-modified');
-        const lastModified = lastModifiedProp ?
-          (ICAL.Time.fromData(lastModifiedProp.getFirstValue())).toJSDate() : undefined;
+        let lastModified: Date | undefined;
+        if (lastModifiedProp) {
+          const lastModifiedValue = lastModifiedProp.getFirstValue();
+          if (lastModifiedValue && typeof lastModifiedValue === 'object' && 'toJSDate' in lastModifiedValue) {
+            lastModified = (lastModifiedValue as { toJSDate: () => Date }).toJSDate();
+          }
+        }
 
         // Get recurrence rule if present
         const rruleProp = vevent.getFirstProperty('rrule');
-        const recurrence = rruleProp ? rruleProp.getFirstValue().toString() : undefined;
+        const recurrence = rruleProp ? String(rruleProp.getFirstValue()) : undefined;
 
         events.push({
           uid: event.uid || `generated-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -251,9 +256,15 @@ async function syncICSFeed(
       console.log(`[ICS Sync] Feed not modified for connection ${connectionId}`);
       return {
         success: true,
+        connection_id: connectionId,
+        sync_type: 'incremental',
+        events_created: 0,
+        events_updated: 0,
+        events_deleted: 0,
         eventsProcessed: 0,
-        syncType: 'incremental',
-        duration: Date.now() - startTime,
+        conflicts_detected: 0,
+        errors: [],
+        duration_ms: Date.now() - startTime,
       };
     }
 
@@ -267,8 +278,13 @@ async function syncICSFeed(
       .select('id, rowan_event_id, external_event_id')
       .eq('connection_id', connectionId);
 
-    const existingMap = new Map(
-      (existingMappings || []).map(m => [m.external_event_id, m])
+    interface EventMapping {
+      id: string;
+      rowan_event_id: string;
+      external_event_id: string;
+    }
+    const existingMap = new Map<string, EventMapping>(
+      (existingMappings || []).map((m: EventMapping) => [m.external_event_id, m])
     );
 
     // Track which external IDs we've seen
@@ -384,9 +400,15 @@ async function syncICSFeed(
 
     return {
       success: true,
+      connection_id: connectionId,
+      sync_type: forceFullSync ? 'full' : 'incremental',
+      events_created: eventsCreated,
+      events_updated: eventsUpdated,
+      events_deleted: eventsDeleted,
       eventsProcessed: eventsCreated + eventsUpdated + eventsDeleted,
-      syncType: forceFullSync ? 'full' : 'incremental',
-      duration: Date.now() - startTime,
+      conflicts_detected: 0,
+      errors: [],
+      duration_ms: Date.now() - startTime,
     };
   } catch (error) {
     console.error('[ICS Sync] Sync failed:', error);
@@ -409,13 +431,20 @@ async function syncICSFeed(
 
     return {
       success: false,
+      connection_id: connectionId,
+      sync_type: forceFullSync ? 'full' : 'incremental',
+      events_created: 0,
+      events_updated: 0,
+      events_deleted: 0,
       eventsProcessed: 0,
-      syncType: forceFullSync ? 'full' : 'incremental',
-      duration: Date.now() - startTime,
-      error: {
-        code: 'ICS_SYNC_FAILED',
-        message: error instanceof Error ? error.message : 'Failed to sync ICS feed',
-      },
+      conflicts_detected: 0,
+      errors: [{
+        operation: 'update' as const,
+        error_code: 'ICS_SYNC_FAILED',
+        error_message: error instanceof Error ? error.message : 'Failed to sync ICS feed',
+        recoverable: true,
+      }],
+      duration_ms: Date.now() - startTime,
     };
   }
 }

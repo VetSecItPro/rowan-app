@@ -200,7 +200,7 @@ export const deduplicatedRequests = {
 
     const resolved = await Promise.all(promises);
     resolved.forEach(({ spaceId, members }) => {
-      results[spaceId] = members;
+      results[spaceId] = Array.isArray(members) ? members : [];
     });
 
     return results;

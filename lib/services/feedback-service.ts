@@ -276,7 +276,7 @@ export const feedbackService = {
         return { success: false, error: error.message };
       }
 
-      const stats = data.reduce((acc, item) => {
+      const stats = data.reduce((acc: Record<FeedbackStatus, number>, item: { status: string }) => {
         const status = item.status as FeedbackStatus;
         acc[status] = (acc[status] || 0) + 1;
         return acc;

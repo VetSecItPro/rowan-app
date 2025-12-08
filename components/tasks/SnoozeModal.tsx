@@ -14,11 +14,11 @@ interface SnoozeModalProps {
 
 interface SnoozeHistory {
   id: string;
+  task_id: string;
   snoozed_until: string;
-  snoozed_at: string;
   snoozed_by: string;
-  unsnoozed_at: string | null;
-  reason: string | null;
+  reason?: string;
+  created_at: string;
 }
 
 export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: SnoozeModalProps) {
@@ -210,19 +210,15 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
                         <span className="text-gray-700 dark:text-gray-300">
                           Snoozed until {new Date(item.snoozed_until).toLocaleString()}
                         </span>
-                        <span className={`px-2 py-0.5 rounded ${
-                          item.unsnoozed_at
-                            ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-                            : 'bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
-                        }`}>
-                          {item.unsnoozed_at ? 'Unsnoozed' : 'Active'}
+                        <span className="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300">
+                          Snoozed
                         </span>
                       </div>
                       {item.reason && (
                         <p className="text-gray-500 mt-1">Reason: {item.reason}</p>
                       )}
                       <p className="text-gray-400 mt-1">
-                        Set on {new Date(item.snoozed_at).toLocaleDateString()}
+                        Set on {new Date(item.created_at).toLocaleDateString()}
                       </p>
                     </div>
                   ))}

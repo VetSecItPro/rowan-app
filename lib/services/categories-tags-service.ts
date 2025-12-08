@@ -217,7 +217,7 @@ export async function getCategoryHierarchy(spaceId: string): Promise<CustomCateg
   if (error) throw error;
 
   // Build hierarchy (parent categories only at top level)
-  return (categories || []).filter((cat) => !cat.parent_category_id);
+  return (categories || []).filter((cat: { parent_category_id: string | null }) => !cat.parent_category_id);
 }
 
 // ==================== TAGS ====================
@@ -524,6 +524,7 @@ export async function getExpenseStatsByTag(
     if (startDate || endDate) {
       filteredExpenses = expenses.filter((expense: Expense) => {
         const expenseDate = expense.date;
+        if (!expenseDate) return false;
         if (startDate && expenseDate < startDate) return false;
         if (endDate && expenseDate > endDate) return false;
         return true;
@@ -565,7 +566,7 @@ export async function searchByTags(
 
   if (tagsError) throw tagsError;
 
-  const tagIds = (tags || []).map((t) => t.id);
+  const tagIds = (tags || []).map((t: { id: string }) => t.id);
 
   if (tagIds.length === 0) {
     return { expenses: [], goals: [], tasks: [] };
@@ -573,9 +574,9 @@ export async function searchByTags(
 
   // Get all items with these tags
   const [expenses, goals, tasks] = await Promise.all([
-    Promise.all(tagIds.map((id) => getExpensesByTag(id))).then((results) => results.flat()),
-    Promise.all(tagIds.map((id) => getGoalsByTag(id))).then((results) => results.flat()),
-    Promise.all(tagIds.map((id) => getTasksByTag(id))).then((results) => results.flat()),
+    Promise.all(tagIds.map((id: string) => getExpensesByTag(id))).then((results) => results.flat()),
+    Promise.all(tagIds.map((id: string) => getGoalsByTag(id))).then((results) => results.flat()),
+    Promise.all(tagIds.map((id: string) => getTasksByTag(id))).then((results) => results.flat()),
   ]);
 
   return {

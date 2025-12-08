@@ -137,15 +137,15 @@ export async function GET(req: NextRequest) {
           const dateStr = date.toISOString().split('T')[0];
 
           // Count events for this day
-          const betaRequestsCount = betaRequests.filter((req: any) =>
+          const betaRequestsCount = betaRequests.filter((req: { created_at: string }) =>
             req.created_at.startsWith(dateStr)
           ).length;
 
-          const launchNotificationsCount = launchNotifications.filter((notif: any) =>
+          const launchNotificationsCount = launchNotifications.filter((notif: { created_at: string }) =>
             notif.created_at.startsWith(dateStr)
           ).length;
 
-          const userRegistrationsCount = userRegistrations.filter((user: any) =>
+          const userRegistrationsCount = userRegistrations.filter((user: { approved_at?: string | null }) =>
             user.approved_at && user.approved_at.startsWith(dateStr)
           ).length;
 
@@ -159,7 +159,7 @@ export async function GET(req: NextRequest) {
 
             // Calculate success metrics
         const totalBetaRequests = betaRequests.length;
-        const approvedBetaRequests = betaRequests.filter((req: any) => req.access_granted).length;
+        const approvedBetaRequests = betaRequests.filter((req: { access_granted?: boolean }) => req.access_granted).length;
         const totalLaunchNotifications = launchNotifications.length;
         const totalUserRegistrations = userRegistrations.length;
 
@@ -169,11 +169,11 @@ export async function GET(req: NextRequest) {
         const capacityUsage = Math.round((activeBetaUsers / betaCapacity) * 100);
 
         // Source distribution for launch notifications
-        const sourceDistribution = launchNotifications.reduce((acc: any, notif: any) => {
+        const sourceDistribution = launchNotifications.reduce((acc: Record<string, number>, notif: { source?: string }) => {
           const source = notif.source || 'direct';
           acc[source] = (acc[source] || 0) + 1;
           return acc;
-        }, {});
+        }, {} as Record<string, number>);
 
         // Conversion rates
         const betaApprovalRate = totalBetaRequests > 0 ? Math.round((approvedBetaRequests / totalBetaRequests) * 100) : 0;

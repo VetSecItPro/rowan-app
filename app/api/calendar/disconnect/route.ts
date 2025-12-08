@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
 
       if (mappings && mappings.length > 0) {
         // Remove external_source from these events but keep the events
-        const rowanEventIds = mappings.map((m) => m.rowan_event_id);
+        const rowanEventIds = mappings.map((m: { rowan_event_id: string }) => m.rowan_event_id);
         const { error: updateError } = await supabase
           .from('events')
           .update({
