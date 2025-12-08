@@ -1,15 +1,24 @@
 // Countdown Service
-// Phase 11: Manages event countdowns for dashboard display
+// Phase 11 + Phase 15: Manages unified countdowns from events AND important dates
 
 import { createClient } from '@/lib/supabase/client';
 import type { CalendarEvent } from '@/lib/services/calendar-service';
+import type { ImportantDate, ImportantDateType } from '@/lib/types/important-dates';
+
+/**
+ * Source type for countdown items
+ */
+export type CountdownSource = 'event' | 'important_date';
 
 /**
  * Countdown item with calculated time remaining
+ * Unified type supporting both calendar events and important dates
  */
 export interface CountdownItem {
   id: string;
-  event: CalendarEvent;
+  source: CountdownSource;
+  event?: CalendarEvent;
+  importantDate?: ImportantDate;
   label: string;
   targetDate: Date;
   daysRemaining: number;
@@ -18,6 +27,10 @@ export interface CountdownItem {
   isToday: boolean;
   isPast: boolean;
   formattedCountdown: string;
+  // Additional fields for important dates
+  emoji?: string;
+  dateType?: ImportantDateType;
+  years?: number | null;
 }
 
 /**
@@ -120,6 +133,7 @@ function eventToCountdown(event: CalendarEvent): CountdownItem {
 
   return {
     id: event.id,
+    source: 'event',
     event,
     label: event.countdown_label || event.title,
     targetDate,
@@ -132,33 +146,142 @@ function eventToCountdown(event: CalendarEvent): CountdownItem {
   };
 }
 
+/**
+ * Calculate the next occurrence of a recurring date (for important dates)
+ */
+function getNextOccurrence(month: number, day: number): Date {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+
+  // Create date for this year
+  let nextDate = new Date(currentYear, month - 1, day);
+
+  // If the date has passed this year, use next year
+  if (nextDate < now) {
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const checkDate = new Date(currentYear, month - 1, day);
+    if (checkDate.getTime() !== today.getTime()) {
+      nextDate = new Date(currentYear + 1, month - 1, day);
+    }
+  }
+
+  return nextDate;
+}
+
+/**
+ * Calculate years/age from a starting year
+ */
+function calculateYears(yearStarted: number | null, month: number, day: number): number | null {
+  if (!yearStarted) return null;
+
+  const nextOcc = getNextOccurrence(month, day);
+  return nextOcc.getFullYear() - yearStarted;
+}
+
+/**
+ * Transform an important date into a countdown item
+ */
+function importantDateToCountdown(date: ImportantDate): CountdownItem {
+  const targetDate = getNextOccurrence(date.month, date.day_of_month);
+  const { days, hours, minutes, isToday, isPast } = calculateTimeRemaining(targetDate);
+  const years = calculateYears(date.year_started, date.month, date.day_of_month);
+
+  // Build display label
+  let label = date.countdown_label || date.person_name || date.title;
+  if (date.date_type === 'birthday' && years !== null) {
+    label = `${label} turns ${years}`;
+  } else if (date.date_type === 'anniversary' && years !== null) {
+    label = `${label} (${years} years)`;
+  }
+
+  return {
+    id: `important_date_${date.id}`,
+    source: 'important_date',
+    importantDate: date,
+    label,
+    targetDate,
+    daysRemaining: days,
+    hoursRemaining: hours,
+    minutesRemaining: minutes,
+    isToday,
+    isPast,
+    formattedCountdown: formatCountdown(days, hours, minutes, isToday, isPast),
+    emoji: date.emoji,
+    dateType: date.date_type,
+    years,
+  };
+}
+
 export const countdownService = {
   /**
-   * Get active countdowns for a space
-   * Returns future events with show_countdown enabled, sorted by date
+   * Get active countdowns for a space (UNIFIED)
+   * Aggregates from both calendar events AND important dates
+   * Returns items sorted by days remaining, limited to max items
    */
-  async getActiveCountdowns(spaceId: string, limit: number = 5): Promise<CountdownResult> {
+  async getActiveCountdowns(spaceId: string, limit: number = 6): Promise<CountdownResult> {
     try {
       const supabase = createClient();
       const now = new Date().toISOString();
 
-      const { data: events, error } = await supabase
+      // Fetch calendar events with show_countdown enabled
+      const eventsPromise = supabase
         .from('calendar_events')
         .select('*')
         .eq('space_id', spaceId)
         .eq('show_countdown', true)
         .gte('start_time', now)
         .order('start_time', { ascending: true })
-        .limit(limit);
+        .limit(limit * 2); // Fetch more, we'll merge and limit later
 
-      if (error) {
-        console.error('[CountdownService] Error fetching countdowns:', error);
-        return { countdowns: [], error: 'Failed to fetch countdowns' };
+      // Fetch important dates with show_on_countdown enabled
+      const importantDatesPromise = supabase
+        .from('important_dates')
+        .select('*')
+        .eq('space_id', spaceId)
+        .eq('show_on_countdown', true)
+        .eq('is_active', true);
+
+      const [eventsResult, importantDatesResult] = await Promise.all([
+        eventsPromise,
+        importantDatesPromise,
+      ]);
+
+      if (eventsResult.error) {
+        console.error('[CountdownService] Error fetching events:', eventsResult.error);
       }
 
-      const countdowns = (events || []).map(eventToCountdown);
+      if (importantDatesResult.error) {
+        console.error('[CountdownService] Error fetching important dates:', importantDatesResult.error);
+      }
 
-      return { countdowns };
+      // Transform events to countdown items
+      const eventCountdowns: CountdownItem[] = (eventsResult.data || []).map(eventToCountdown);
+
+      // Transform important dates to countdown items (only if within countdown window)
+      const importantDateCountdowns: CountdownItem[] = (importantDatesResult.data || [])
+        .map((date: ImportantDate) => {
+          const countdown = importantDateToCountdown(date);
+          // Only include if within the countdown_days_before window
+          if (countdown.daysRemaining <= date.countdown_days_before && !countdown.isPast) {
+            return countdown;
+          }
+          return null;
+        })
+        .filter((c: CountdownItem | null): c is CountdownItem => c !== null);
+
+      // Merge and sort by days remaining (closest first)
+      const allCountdowns = [...eventCountdowns, ...importantDateCountdowns]
+        .filter((c) => !c.isPast)
+        .sort((a, b) => {
+          // Sort by days remaining, then by hours/minutes for same-day items
+          if (a.daysRemaining !== b.daysRemaining) {
+            return a.daysRemaining - b.daysRemaining;
+          }
+          return a.hoursRemaining * 60 + a.minutesRemaining - (b.hoursRemaining * 60 + b.minutesRemaining);
+        })
+        .slice(0, limit);
+
+      return { countdowns: allCountdowns };
     } catch (error) {
       console.error('[CountdownService] Unexpected error:', error);
       return { countdowns: [], error: 'An unexpected error occurred' };

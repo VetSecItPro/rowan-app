@@ -55,7 +55,14 @@ export function CountdownWidget({
 
   const handleEventClick = (countdown: CountdownItem) => {
     if (onEventClick) {
-      onEventClick(countdown.event.id);
+      // For events, pass the event ID; for important dates, pass the extracted ID
+      if (countdown.source === 'event' && countdown.event) {
+        onEventClick(countdown.event.id);
+      } else if (countdown.source === 'important_date') {
+        // Extract the original ID from "important_date_<uuid>"
+        const dateId = countdown.id.replace('important_date_', '');
+        onEventClick(dateId);
+      }
     }
   };
 
@@ -69,8 +76,8 @@ export function CountdownWidget({
             <div className="h-6 w-6 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700" />
           </div>
         )}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
             <div
               key={i}
               className="h-20 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800"
@@ -154,8 +161,8 @@ export function CountdownWidget({
         </div>
       )}
 
-      {/* Grid layout: 2 cols on mobile, 4 cols on sm+ */}
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      {/* Grid layout: 2 cols on mobile, 3 cols on sm, 6 cols on lg */}
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {countdowns.map((countdown) => (
           <CountdownCard
             key={countdown.id}

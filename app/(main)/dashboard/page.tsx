@@ -1066,10 +1066,10 @@ export default function DashboardPage() {
                 className="stats-grid-mobile gap-4 sm:gap-6"
               >
                 {/* Tasks & Chores Card */}
-                <motion.div variants={fadeInUp}>
+                <motion.div variants={fadeInUp} className="h-full">
                   <Link
                   href="/tasks"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-blue-500 dark:hover:border-blue-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px]"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-blue-500 dark:hover:border-blue-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                 >
                   <div className="flex items-start justify-between mb-3 sm:mb-4">
                     <div className="flex-1">
@@ -1132,10 +1132,10 @@ export default function DashboardPage() {
                 </motion.div>
 
                 {/* Calendar Card */}
-                <motion.div variants={fadeInUp}>
+                <motion.div variants={fadeInUp} className="h-full">
                 <Link
                   href="/calendar"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-purple-500 dark:hover:border-purple-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px]"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-purple-500 dark:hover:border-purple-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1185,10 +1185,10 @@ export default function DashboardPage() {
                 </motion.div>
 
                 {/* Reminders Card */}
-                <motion.div variants={fadeInUp}>
+                <motion.div variants={fadeInUp} className="h-full">
                 <Link
                   href="/reminders"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-pink-500 dark:hover:border-pink-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px]"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-pink-500 dark:hover:border-pink-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1246,10 +1246,10 @@ export default function DashboardPage() {
                 </motion.div>
 
                 {/* Messages Card */}
-                <motion.div variants={fadeInUp}>
+                <motion.div variants={fadeInUp} className="h-full">
                 <Link
                   href="/messages"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-green-500 dark:hover:border-green-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px]"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-green-500 dark:hover:border-green-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1304,10 +1304,10 @@ export default function DashboardPage() {
                 </motion.div>
 
                 {/* Shopping Card */}
-                <motion.div variants={fadeInUp}>
+                <motion.div variants={fadeInUp} className="h-full">
                 <Link
                   href="/shopping"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-teal-500 dark:hover:border-teal-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px]"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-teal-500 dark:hover:border-teal-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1358,10 +1358,10 @@ export default function DashboardPage() {
                 </motion.div>
 
                 {/* Meals Card */}
-                <motion.div variants={fadeInUp}>
+                <motion.div variants={fadeInUp} className="h-full">
                 <Link
                   href="/meals"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-orange-500 dark:hover:border-orange-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px]"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-orange-500 dark:hover:border-orange-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1411,10 +1411,10 @@ export default function DashboardPage() {
                 </motion.div>
 
                 {/* Projects & Budget Card */}
-                <motion.div variants={fadeInUp}>
+                <motion.div variants={fadeInUp} className="h-full">
                 <Link
                   href="/projects"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-yellow-500 dark:hover:border-yellow-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px]"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-yellow-500 dark:hover:border-yellow-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1475,10 +1475,10 @@ export default function DashboardPage() {
                 </motion.div>
 
                 {/* Goals Card */}
-                <motion.div variants={fadeInUp}>
+                <motion.div variants={fadeInUp} className="h-full">
                 <Link
                   href="/goals"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-indigo-500 dark:hover:border-indigo-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px]"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-indigo-500 dark:hover:border-indigo-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -2236,12 +2236,12 @@ export default function DashboardPage() {
             </div>
           </motion.div>
 
-          {/* Event Countdowns Widget - Compact grid below Check-in and Activity */}
+          {/* Unified Countdown Widget - Events + Important Dates */}
           {spaceId && (
             <div className="mt-6">
               <CountdownWidget
                 spaceId={spaceId}
-                maxItems={4}
+                maxItems={6}
                 onEventClick={(eventId) => router.push(`/calendar?event=${eventId}`)}
                 onAddCountdown={() => router.push('/calendar')}
               />

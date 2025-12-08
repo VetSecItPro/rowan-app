@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import { format, subDays, startOfDay, endOfDay } from 'date-fns';
+import { format, subDays, startOfDay, endOfDay, parseISO } from 'date-fns';
 import { getCurrentDateString } from '@/lib/utils/date-utils';
 
 export interface DailyCheckIn {
@@ -199,23 +199,31 @@ export const checkInsService = {
     const monthAgo = subDays(now, 30);
 
     // Calculate current streak
+    // Use string comparison directly to avoid timezone issues
+    // Dates are stored as 'yyyy-MM-dd' strings
     let currentStreak = 0;
+    const today = getCurrentDateString(); // e.g. '2025-12-08'
+
+    // Get unique sorted date strings (most recent first)
     const sortedDates = checkIns
-      .map((c: { date: string }) => new Date(c.date))
-      .sort((a: Date, b: Date) => b.getTime() - a.getTime());
+      .map((c: { date: string }) => c.date)
+      .sort((a: string, b: string) => b.localeCompare(a));
 
     if (sortedDates.length > 0) {
-      let checkDate = new Date();
-      for (const checkInDate of sortedDates) {
-        const checkInDay = format(checkInDate, 'yyyy-MM-dd');
-        const expectedDay = format(checkDate, 'yyyy-MM-dd');
+      // Start from today and work backwards
+      let expectedDate = today;
 
-        if (checkInDay === expectedDay) {
+      for (const checkInDate of sortedDates) {
+        if (checkInDate === expectedDate) {
           currentStreak++;
-          checkDate = subDays(checkDate, 1);
-        } else {
+          // Calculate previous day using parseISO to get proper Date object
+          const prevDate = subDays(parseISO(expectedDate), 1);
+          expectedDate = format(prevDate, 'yyyy-MM-dd');
+        } else if (checkInDate < expectedDate) {
+          // This check-in is older than expected, streak is broken
           break;
         }
+        // If checkInDate > expectedDate, skip (duplicate or future date)
       }
     }
 
@@ -236,8 +244,11 @@ export const checkInsService = {
     });
 
     // Count check-ins by time period
-    const thisWeek = checkIns.filter((c: { date: string }) => new Date(c.date) >= weekAgo).length;
-    const thisMonth = checkIns.filter((c: { date: string }) => new Date(c.date) >= monthAgo).length;
+    // Use parseISO to properly handle date strings in local timezone
+    const weekAgoStr = format(weekAgo, 'yyyy-MM-dd');
+    const monthAgoStr = format(monthAgo, 'yyyy-MM-dd');
+    const thisWeek = checkIns.filter((c: { date: string }) => c.date >= weekAgoStr).length;
+    const thisMonth = checkIns.filter((c: { date: string }) => c.date >= monthAgoStr).length;
 
     return {
       currentStreak,

@@ -199,7 +199,7 @@ export const rewardsService = {
       .select(`
         *,
         reward:rewards_catalog(*),
-        user:users!reward_redemptions_user_id_fkey(id, display_name, avatar_url)
+        user:users!reward_redemptions_user_id_fkey(id, name, avatar_url)
       `)
       .eq('space_id', spaceId)
       .order('created_at', { ascending: false });

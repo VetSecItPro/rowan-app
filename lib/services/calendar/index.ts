@@ -16,6 +16,15 @@ export { unifiedCalendarService } from './unified-calendar-service';
 export { countdownService } from './countdown-service';
 export type { CountdownItem, CountdownResult } from './countdown-service';
 
+// Phase 15: Important Dates (Birthdays, Anniversaries, etc.)
+export { importantDatesService } from './important-dates-service';
+export type {
+  ImportantDate,
+  ImportantDateWithMeta,
+  CreateImportantDateInput,
+  UpdateImportantDateInput,
+} from './important-dates-service';
+
 // Re-export types for convenience
 export type {
   CalendarProvider,
