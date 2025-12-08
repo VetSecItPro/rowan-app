@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import { sendDailyDigestEmail, DailyDigestData } from '@/lib/services/email-service';
+import { sendAIDailyDigestEmail, AIDailyDigestData, DailyDigestData } from '@/lib/services/email-service';
+import { digestGeneratorService, DigestInput } from '@/lib/services/ai/digest-generator-service';
 import { logger } from '@/lib/logger';
 
 // Create admin Supabase client for server-side operations
@@ -134,8 +135,12 @@ export async function processDailyDigest(): Promise<DigestResult> {
         // Fetch today's data for the user
         const digestData = await fetchDigestData(pref.user_id, spaceId, pref.digest_timezone);
 
-        // Determine greeting based on time of day in user's timezone
-        const greeting = getGreeting(pref.digest_time);
+        // Determine time of day for AI context
+        const timeOfDay = getTimeOfDay(pref.digest_time);
+        const dayOfWeek = new Intl.DateTimeFormat('en-US', {
+          weekday: 'long',
+          timeZone: pref.digest_timezone || 'America/Chicago',
+        }).format(now);
 
         // Format the date for the email
         const dateFormatter = new Intl.DateTimeFormat('en-US', {
@@ -147,8 +152,45 @@ export async function processDailyDigest(): Promise<DigestResult> {
         });
         const formattedDate = dateFormatter.format(now);
 
-        // Send the email
-        const emailData: DailyDigestData = {
+        // Prepare AI input
+        const aiInput: DigestInput = {
+          recipientName: (profile as UserProfile).name || 'there',
+          date: formattedDate,
+          dayOfWeek,
+          timeOfDay,
+          events: digestData.events,
+          tasksDue: digestData.tasksDue,
+          overdueTasks: digestData.overdueTasks,
+          meals: digestData.meals,
+          reminders: digestData.reminders,
+          timezone: pref.digest_timezone || 'America/Chicago',
+        };
+
+        // Generate AI content with fallback
+        let aiContent;
+        const aiResult = await digestGeneratorService.generateDigest(aiInput);
+
+        if (aiResult.success) {
+          aiContent = aiResult.data;
+          logger.info('AI digest generated successfully', {
+            component: 'DailyDigestJob',
+            action: 'ai_generate',
+            userId: pref.user_id,
+            aiGenerated: true,
+          });
+        } else {
+          // Fallback to template-based content
+          aiContent = digestGeneratorService.generateFallbackDigest(aiInput);
+          logger.warn('AI digest failed, using fallback', {
+            component: 'DailyDigestJob',
+            action: 'ai_fallback',
+            userId: pref.user_id,
+            error: aiResult.error,
+          });
+        }
+
+        // Send the email with AI content
+        const emailData: AIDailyDigestData = {
           recipientEmail: (profile as UserProfile).email,
           recipientName: (profile as UserProfile).name || 'there',
           date: formattedDate,
@@ -159,10 +201,12 @@ export async function processDailyDigest(): Promise<DigestResult> {
           overdueTasks: digestData.overdueTasks,
           meals: digestData.meals,
           reminders: digestData.reminders,
-          greeting,
+          narrativeIntro: aiContent.narrativeIntro,
+          closingMessage: aiContent.closingMessage,
+          aiGenerated: aiContent.aiGenerated,
         };
 
-        const emailResult = await sendDailyDigestEmail(emailData);
+        const emailResult = await sendAIDailyDigestEmail(emailData);
 
         if (emailResult.success) {
           result.emailsSent++;
@@ -231,16 +275,16 @@ function shouldSendDigest(digestTime: string, timezone: string, now: Date): bool
 }
 
 /**
- * Get greeting based on time of day
+ * Get time of day based on digest time
  */
-function getGreeting(digestTime: string): string {
+function getTimeOfDay(digestTime: string): 'morning' | 'afternoon' | 'evening' {
   try {
     const [hours] = digestTime.split(':').map(Number);
-    if (hours < 12) return 'Good morning';
-    if (hours < 17) return 'Good afternoon';
-    return 'Good evening';
+    if (hours < 12) return 'morning';
+    if (hours < 17) return 'afternoon';
+    return 'evening';
   } catch {
-    return 'Hello';
+    return 'morning';
   }
 }
 
