@@ -228,7 +228,7 @@ export const calendarService = {
       return { deleted: 0, errors: [] };
     }
 
-    const ids = events.map(e => e.id);
+    const ids = events.map((e: { id: string }) => e.id);
     return this.deleteEvents(ids, permanent);
   },
 

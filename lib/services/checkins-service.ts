@@ -201,8 +201,8 @@ export const checkInsService = {
     // Calculate current streak
     let currentStreak = 0;
     const sortedDates = checkIns
-      .map(c => new Date(c.date))
-      .sort((a, b) => b.getTime() - a.getTime());
+      .map((c: { date: string }) => new Date(c.date))
+      .sort((a: Date, b: Date) => b.getTime() - a.getTime());
 
     if (sortedDates.length > 0) {
       let checkDate = new Date();
@@ -228,16 +228,16 @@ export const checkInsService = {
       rough: 0,
     };
 
-    checkIns.forEach(checkIn => {
+    checkIns.forEach((checkIn: { mood?: string; date: string }) => {
       const mood = checkIn.mood?.toLowerCase();
-      if (mood in moodDistribution) {
+      if (mood && mood in moodDistribution) {
         moodDistribution[mood as keyof typeof moodDistribution]++;
       }
     });
 
     // Count check-ins by time period
-    const thisWeek = checkIns.filter(c => new Date(c.date) >= weekAgo).length;
-    const thisMonth = checkIns.filter(c => new Date(c.date) >= monthAgo).length;
+    const thisWeek = checkIns.filter((c: { date: string }) => new Date(c.date) >= weekAgo).length;
+    const thisMonth = checkIns.filter((c: { date: string }) => new Date(c.date) >= monthAgo).length;
 
     return {
       currentStreak,

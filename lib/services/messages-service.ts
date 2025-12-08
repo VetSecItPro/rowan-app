@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import { RealtimeChannel } from '@supabase/supabase-js';
+import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { FileUploadResult } from './file-upload-service';
 import { enhancedNotificationService } from './enhanced-notification-service';
 
@@ -297,9 +297,9 @@ export const messagesService = {
     weekStart.setHours(0, 0, 0, 0);
 
     return {
-      thisWeek: messages.filter(m => new Date(m.created_at) >= weekStart).length,
-      unread: messages.filter(m => !m.read).length,
-      today: messages.filter(m => new Date(m.created_at) >= today).length,
+      thisWeek: messages.filter((m: Message) => new Date(m.created_at) >= weekStart).length,
+      unread: messages.filter((m: Message) => !m.read).length,
+      today: messages.filter((m: Message) => new Date(m.created_at) >= today).length,
       total: messages.length,
       conversations: conversations.length,
     };
@@ -355,7 +355,7 @@ export const messagesService = {
     if (error) throw error;
 
     // Map to include reply_count from thread_reply_count
-    return (data || []).map(msg => ({
+    return (data || []).map((msg: MessageWithAttachments) => ({
       ...msg,
       reply_count: msg.thread_reply_count || 0,
     }));
@@ -435,7 +435,7 @@ export const messagesService = {
     // Group reactions by emoji
     const reactionMap = new Map<string, MessageReactionSummary>();
 
-    (data || []).forEach((reaction) => {
+    (data || []).forEach((reaction: MessageReaction) => {
       const existing = reactionMap.get(reaction.emoji);
       if (existing) {
         existing.count++;
@@ -562,7 +562,7 @@ export const messagesService = {
           table: 'messages',
           filter: `conversation_id=eq.${conversationId}`,
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<Message>) => {
           if (callbacks.onInsert) {
             callbacks.onInsert(payload.new as Message);
           }
@@ -576,7 +576,7 @@ export const messagesService = {
           table: 'messages',
           filter: `conversation_id=eq.${conversationId}`,
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<Message>) => {
           if (callbacks.onUpdate) {
             callbacks.onUpdate(payload.new as Message);
           }
@@ -590,9 +590,9 @@ export const messagesService = {
           table: 'messages',
           filter: `conversation_id=eq.${conversationId}`,
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<Message>) => {
           if (callbacks.onDelete) {
-            callbacks.onDelete(payload.old.id);
+            callbacks.onDelete((payload.old as Message).id);
           }
         }
       )
@@ -620,7 +620,7 @@ export const messagesService = {
           table: 'conversations',
           filter: `id=eq.${conversationId}`,
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<Conversation>) => {
           onUpdate(payload.new as Conversation);
         }
       )
@@ -768,7 +768,7 @@ export const messagesService = {
 
     // Get unread counts for each conversation
     const conversationsWithUnread = await Promise.all(
-      conversations.map(async (conv) => {
+      conversations.map(async (conv: Conversation) => {
         const { count } = await supabase
           .from('messages')
           .select('*', { count: 'exact', head: true })
@@ -951,7 +951,7 @@ export const messagesService = {
           table: 'conversations',
           filter: `space_id=eq.${spaceId}`,
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<Conversation>) => {
           if (callbacks.onInsert) {
             callbacks.onInsert(payload.new as Conversation);
           }
@@ -965,7 +965,7 @@ export const messagesService = {
           table: 'conversations',
           filter: `space_id=eq.${spaceId}`,
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<Conversation>) => {
           if (callbacks.onUpdate) {
             callbacks.onUpdate(payload.new as Conversation);
           }
@@ -979,9 +979,9 @@ export const messagesService = {
           table: 'conversations',
           filter: `space_id=eq.${spaceId}`,
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<Conversation>) => {
           if (callbacks.onDelete) {
-            callbacks.onDelete(payload.old.id);
+            callbacks.onDelete((payload.old as Conversation).id);
           }
         }
       )

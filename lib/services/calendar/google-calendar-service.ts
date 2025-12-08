@@ -272,13 +272,13 @@ export async function listCalendars(connectionId: string): Promise<GoogleCalenda
   return (data.items || []).map((item) => ({
     id: item.id || '',
     summary: item.summary || '',
-    description: item.description,
-    primary: item.primary,
+    description: item.description ?? undefined,
+    primary: item.primary ?? undefined,
     accessRole: item.accessRole as GoogleCalendarList['accessRole'],
-    backgroundColor: item.backgroundColor,
-    foregroundColor: item.foregroundColor,
-    selected: item.selected,
-    timeZone: item.timeZone,
+    backgroundColor: item.backgroundColor ?? undefined,
+    foregroundColor: item.foregroundColor ?? undefined,
+    selected: item.selected ?? undefined,
+    timeZone: item.timeZone ?? undefined,
   }));
 }
 
@@ -327,8 +327,8 @@ export async function getEvents(
       updated: data.updated || new Date().toISOString(),
       timeZone: data.timeZone || 'UTC',
       accessRole: data.accessRole || 'reader',
-      nextSyncToken: data.nextSyncToken,
-      nextPageToken: data.nextPageToken,
+      nextSyncToken: data.nextSyncToken ?? undefined,
+      nextPageToken: data.nextPageToken ?? undefined,
       items: (data.items || []).map(mapGoogleEvent),
     };
   } catch (error: unknown) {

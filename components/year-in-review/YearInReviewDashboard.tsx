@@ -159,8 +159,10 @@ export function YearInReviewDashboard({ year, className }: YearInReviewDashboard
               spaces={spaces}
               currentSpace={currentSpace}
               onSpaceChange={switchSpace}
+              onCreateSpace={() => {}}
+              onInvitePartner={() => {}}
               userColorTheme={user.color_theme}
-              variant="compact"
+              variant="default"
             />
           </div>
         )}

@@ -102,7 +102,7 @@ export async function GET(request: Request) {
           .eq('id', connection.id);
 
         // Perform sync
-        const syncResult = await calendarSyncService.syncCalendar(
+        const syncResult = await calendarSyncService.performSync(
           connection.id,
           forceFullSync ? 'full' : 'incremental'
         );
@@ -119,7 +119,7 @@ export async function GET(request: Request) {
             sync_status: syncResult.success ? 'active' : 'error',
             last_sync_at: new Date().toISOString(),
             next_sync_at: nextSync.toISOString(),
-            last_error: syncResult.success ? null : syncResult.error?.message,
+            last_error: syncResult.success ? null : syncResult.errors?.[0]?.error_message,
           })
           .eq('id', connection.id);
 
@@ -128,7 +128,7 @@ export async function GET(request: Request) {
           connection_id: connection.id,
           success: syncResult.success,
           events_synced: syncResult.eventsProcessed,
-          error: syncResult.success ? undefined : syncResult.error?.message,
+          error: syncResult.success ? undefined : syncResult.errors?.[0]?.error_message,
         });
 
         console.log(

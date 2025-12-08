@@ -214,7 +214,7 @@ export async function exportCategoryBreakdown(
   if (error) throw error;
 
   // Group by category
-  const grouped = (expenses || []).reduce((acc, expense) => {
+  const grouped = (expenses || []).reduce((acc: Record<string, Expense[]>, expense: Expense) => {
     const category = expense.category || 'Uncategorized';
     if (!acc[category]) {
       acc[category] = [];

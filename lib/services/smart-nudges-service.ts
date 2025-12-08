@@ -353,18 +353,19 @@ class SmartNudgesService {
 
     if (error) throw error;
 
-    const nudges = data || [];
+    interface NudgeStats { read_at: string | null; clicked_at: string | null; was_effective: boolean; dismissed_at: string | null; category: string }
+    const nudges = (data || []) as NudgeStats[];
 
     return {
       total_nudges: nudges.length,
-      read_nudges: nudges.filter(n => n.read_at).length,
-      clicked_nudges: nudges.filter(n => n.clicked_at).length,
-      effective_nudges: nudges.filter(n => n.was_effective).length,
-      dismissed_nudges: nudges.filter(n => n.dismissed_at).length,
-      read_rate: nudges.length > 0 ? (nudges.filter(n => n.read_at).length / nudges.length) * 100 : 0,
-      click_rate: nudges.length > 0 ? (nudges.filter(n => n.clicked_at).length / nudges.length) * 100 : 0,
-      effectiveness_rate: nudges.length > 0 ? (nudges.filter(n => n.was_effective).length / nudges.length) * 100 : 0,
-      category_breakdown: nudges.reduce((acc, nudge) => {
+      read_nudges: nudges.filter((n: NudgeStats) => n.read_at).length,
+      clicked_nudges: nudges.filter((n: NudgeStats) => n.clicked_at).length,
+      effective_nudges: nudges.filter((n: NudgeStats) => n.was_effective).length,
+      dismissed_nudges: nudges.filter((n: NudgeStats) => n.dismissed_at).length,
+      read_rate: nudges.length > 0 ? (nudges.filter((n: NudgeStats) => n.read_at).length / nudges.length) * 100 : 0,
+      click_rate: nudges.length > 0 ? (nudges.filter((n: NudgeStats) => n.clicked_at).length / nudges.length) * 100 : 0,
+      effectiveness_rate: nudges.length > 0 ? (nudges.filter((n: NudgeStats) => n.was_effective).length / nudges.length) * 100 : 0,
+      category_breakdown: nudges.reduce((acc: Record<string, number>, nudge: NudgeStats) => {
         acc[nudge.category] = (acc[nudge.category] || 0) + 1;
         return acc;
       }, {} as Record<string, number>)

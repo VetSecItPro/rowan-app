@@ -96,9 +96,9 @@ export const eventCommentsService = {
     if (repliesError) throw repliesError;
 
     // Nest replies under their parent comments
-    const commentsWithReplies = topLevelComments.map(comment => ({
+    const commentsWithReplies = topLevelComments.map((comment: { id: string; [key: string]: unknown }) => ({
       ...comment,
-      replies: replies.filter(reply => reply.parent_comment_id === comment.id)
+      replies: replies.filter((reply: { parent_comment_id: string }) => reply.parent_comment_id === comment.id)
     }));
 
     return commentsWithReplies;

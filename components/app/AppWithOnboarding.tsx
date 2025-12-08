@@ -18,6 +18,8 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
     currentSpace,
     refreshSpaces,
     isReady,
+    user,
+    createSpace,
   } = useAuthWithSpaces();
   const [retrying, setRetrying] = useState(false);
 

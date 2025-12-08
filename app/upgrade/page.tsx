@@ -8,7 +8,7 @@ import { supabase } from '@/lib/supabase';
 
 export default function UpgradePage() {
   const searchParams = useSearchParams();
-  const emailParam = searchParams.get('email');
+  const emailParam = searchParams?.get('email');
   const [hasTracked, setHasTracked] = useState(false);
 
   useEffect(() => {

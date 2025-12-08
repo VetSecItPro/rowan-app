@@ -109,7 +109,7 @@ export const eventProposalsService = {
 
     // Get votes for each proposal
     const proposalsWithVotes = await Promise.all(
-      (data || []).map(async (proposal) => ({
+      (data || []).map(async (proposal: { id: string; [key: string]: unknown }) => ({
         ...proposal,
         votes: await this.getVotes(proposal.id)
       }))

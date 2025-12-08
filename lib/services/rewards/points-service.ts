@@ -94,7 +94,7 @@ export const pointsService = {
       .gt('points', 0) // Only credits
       .gte('created_at', weekStart.toISOString());
 
-    const pointsThisWeek = (weekTransactions || []).reduce((sum, t) => sum + t.points, 0);
+    const pointsThisWeek = (weekTransactions || []).reduce((sum: number, t: { points: number }) => sum + t.points, 0);
 
     // Get points earned this month
     const monthStart = new Date();
@@ -109,7 +109,7 @@ export const pointsService = {
       .gt('points', 0)
       .gte('created_at', monthStart.toISOString());
 
-    const pointsThisMonth = (monthTransactions || []).reduce((sum, t) => sum + t.points, 0);
+    const pointsThisMonth = (monthTransactions || []).reduce((sum: number, t: { points: number }) => sum + t.points, 0);
 
     // Get chores completed today/this week
     const today = new Date();
@@ -450,8 +450,8 @@ export const pointsService = {
         .gt('points', 0)
         .gte('created_at', periodStart.toISOString());
 
-      const pointsThisPeriod = (periodTx || []).reduce((sum, t) => sum + t.points, 0);
-      const choresThisPeriod = (periodTx || []).filter(t => t.source_type === 'chore').length;
+      const pointsThisPeriod = (periodTx || []).reduce((sum: number, t: { points: number }) => sum + t.points, 0);
+      const choresThisPeriod = (periodTx || []).filter((t: { source_type: string }) => t.source_type === 'chore').length;
 
       // Get month transactions for monthly view
       const monthStart = new Date();
@@ -466,7 +466,7 @@ export const pointsService = {
         .gt('points', 0)
         .gte('created_at', monthStart.toISOString());
 
-      const pointsThisMonth = (monthTx || []).reduce((sum, t) => sum + t.points, 0);
+      const pointsThisMonth = (monthTx || []).reduce((sum: number, t: { points: number }) => sum + t.points, 0);
 
       entries.push({
         user_id: user.id,
@@ -519,6 +519,6 @@ export const pointsService = {
    * Check if a streak milestone was reached
    */
   isStreakMilestone(streak: number): boolean {
-    return CONFIG.STREAK_MILESTONES.includes(streak);
+    return (CONFIG.STREAK_MILESTONES as readonly number[]).includes(streak);
   },
 };
