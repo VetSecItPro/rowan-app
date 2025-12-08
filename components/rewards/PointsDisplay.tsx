@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { pointsService } from '@/lib/services/rewards';
 import { LEVEL_DEFINITIONS } from '@/lib/types/rewards';
 import type { UserRewardsStats, LevelDefinition } from '@/lib/types/rewards';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 interface PointsDisplayProps {
   userId: string;
@@ -64,22 +65,26 @@ export function PointsDisplay({
     return (
       <div className={`flex items-center gap-3 ${className}`}>
         {/* Points Badge */}
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 dark:bg-amber-900/30 rounded-full">
-          <span className="text-lg">{currentLevel.badge_emoji}</span>
-          <span className="font-semibold text-amber-700 dark:text-amber-300">
-            {stats.total_points.toLocaleString()}
-          </span>
-          <span className="text-amber-600 dark:text-amber-400 text-sm">pts</span>
-        </div>
+        <Tooltip content="Earn points by completing tasks and chores. Spend them in the Rewards Shop!" position="bottom">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 dark:bg-amber-900/30 rounded-full cursor-help">
+            <span className="text-lg">{currentLevel.badge_emoji}</span>
+            <span className="font-semibold text-amber-700 dark:text-amber-300">
+              {stats.total_points.toLocaleString()}
+            </span>
+            <span className="text-amber-600 dark:text-amber-400 text-sm">pts</span>
+          </div>
+        </Tooltip>
 
         {/* Streak Badge */}
         {showStreak && stats.current_streak > 0 && (
-          <div className="flex items-center gap-1 px-2 py-1 bg-orange-100 dark:bg-orange-900/30 rounded-full">
-            <span className="text-sm">🔥</span>
-            <span className="font-medium text-orange-700 dark:text-orange-300 text-sm">
-              {stats.current_streak}
-            </span>
-          </div>
+          <Tooltip content={`${stats.current_streak} day streak! Complete chores daily for bonus points.`} position="bottom">
+            <div className="flex items-center gap-1 px-2 py-1 bg-orange-100 dark:bg-orange-900/30 rounded-full cursor-help">
+              <span className="text-sm">🔥</span>
+              <span className="font-medium text-orange-700 dark:text-orange-300 text-sm">
+                {stats.current_streak}
+              </span>
+            </div>
+          </Tooltip>
         )}
       </div>
     );
@@ -90,23 +95,27 @@ export function PointsDisplay({
     <div className={`bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 ${className}`}>
       {/* Header with Level */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">{currentLevel.badge_emoji}</span>
-          <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white">
-              {currentLevel.name}
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Level {stats.level}
-            </p>
+        <Tooltip content={`Level up by earning more points! Each level unlocks new badges.`} position="right">
+          <div className="flex items-center gap-2 cursor-help">
+            <span className="text-2xl">{currentLevel.badge_emoji}</span>
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white">
+                {currentLevel.name}
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Level {stats.level}
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="text-right">
-          <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">
-            {stats.total_points.toLocaleString()}
-          </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">points</p>
-        </div>
+        </Tooltip>
+        <Tooltip content="Complete tasks and chores to earn points!" position="left">
+          <div className="text-right cursor-help">
+            <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+              {stats.total_points.toLocaleString()}
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">points</p>
+          </div>
+        </Tooltip>
       </div>
 
       {/* Progress Bar */}
@@ -132,57 +141,65 @@ export function PointsDisplay({
       <div className="grid grid-cols-2 gap-3">
         {/* Streak */}
         {showStreak && (
-          <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <span>🔥</span>
-              <span className="text-lg font-semibold text-orange-600 dark:text-orange-400">
-                {stats.current_streak}
-              </span>
+          <Tooltip content="Complete at least 1 chore each day to build your streak. Streaks earn bonus points!" position="top">
+            <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-3 cursor-help">
+              <div className="flex items-center gap-2">
+                <span>🔥</span>
+                <span className="text-lg font-semibold text-orange-600 dark:text-orange-400">
+                  {stats.current_streak}
+                </span>
+              </div>
+              <p className="text-xs text-orange-600/70 dark:text-orange-400/70 mt-0.5">
+                day streak
+              </p>
             </div>
-            <p className="text-xs text-orange-600/70 dark:text-orange-400/70 mt-0.5">
-              day streak
-            </p>
-          </div>
+          </Tooltip>
         )}
 
         {/* This Week */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
-          <div className="flex items-center gap-2">
-            <span>📈</span>
-            <span className="text-lg font-semibold text-blue-600 dark:text-blue-400">
-              {stats.points_this_week}
-            </span>
+        <Tooltip content="Points earned since Sunday. Keep completing tasks to grow this number!" position="top">
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 cursor-help">
+            <div className="flex items-center gap-2">
+              <span>📈</span>
+              <span className="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                {stats.points_this_week}
+              </span>
+            </div>
+            <p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-0.5">
+              pts this week
+            </p>
           </div>
-          <p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-0.5">
-            pts this week
-          </p>
-        </div>
+        </Tooltip>
 
         {/* Chores Today */}
-        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
-          <div className="flex items-center gap-2">
-            <span>✅</span>
-            <span className="text-lg font-semibold text-green-600 dark:text-green-400">
-              {stats.chores_completed_today}
-            </span>
+        <Tooltip content="Number of chores you've completed today. Each chore earns points!" position="top">
+          <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 cursor-help">
+            <div className="flex items-center gap-2">
+              <span>✅</span>
+              <span className="text-lg font-semibold text-green-600 dark:text-green-400">
+                {stats.chores_completed_today}
+              </span>
+            </div>
+            <p className="text-xs text-green-600/70 dark:text-green-400/70 mt-0.5">
+              chores today
+            </p>
           </div>
-          <p className="text-xs text-green-600/70 dark:text-green-400/70 mt-0.5">
-            chores today
-          </p>
-        </div>
+        </Tooltip>
 
         {/* Longest Streak */}
-        <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3">
-          <div className="flex items-center gap-2">
-            <span>🏆</span>
-            <span className="text-lg font-semibold text-purple-600 dark:text-purple-400">
-              {stats.longest_streak}
-            </span>
+        <Tooltip content="Your personal best! Try to beat your longest streak record." position="top">
+          <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 cursor-help">
+            <div className="flex items-center gap-2">
+              <span>🏆</span>
+              <span className="text-lg font-semibold text-purple-600 dark:text-purple-400">
+                {stats.longest_streak}
+              </span>
+            </div>
+            <p className="text-xs text-purple-600/70 dark:text-purple-400/70 mt-0.5">
+              best streak
+            </p>
           </div>
-          <p className="text-xs text-purple-600/70 dark:text-purple-400/70 mt-0.5">
-            best streak
-          </p>
-        </div>
+        </Tooltip>
       </div>
 
       {/* Pending Redemptions */}

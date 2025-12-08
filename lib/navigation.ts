@@ -9,6 +9,7 @@ import {
   Target,
   Heart,
   Sparkles,
+  Gift,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -76,6 +77,13 @@ export const NAVIGATION_ITEMS: NavItem[] = [
     icon: Target,
     gradient: 'bg-gradient-goals',
     description: 'Track progress',
+  },
+  {
+    name: 'Rewards Shop',
+    href: '/rewards',
+    icon: Gift,
+    gradient: 'bg-gradient-to-r from-amber-500 to-orange-500',
+    description: 'Redeem points',
   },
   {
     name: 'Daily Check-In',
