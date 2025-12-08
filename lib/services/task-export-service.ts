@@ -13,7 +13,7 @@ export const taskExportService = {
     if (error) throw error;
 
     const headers = ['Title', 'Description', 'Status', 'Priority', 'Category', 'Due Date', 'Assigned To', 'Created At'];
-    const rows = data?.map(task => [
+    const rows = data?.map((task: { title: string; description?: string | null; status: string; priority: string; category?: string | null; due_date?: string | null; assigned_to?: string | null; created_at: string }) => [
       task.title,
       task.description || '',
       task.status,
@@ -25,8 +25,8 @@ export const taskExportService = {
     ]);
 
     let csv = headers.join(',') + '\n';
-    rows?.forEach(row => {
-      csv += row.map(cell => `"${cell}"`).join(',') + '\n';
+    rows?.forEach((row: string[]) => {
+      csv += row.map((cell: string) => `"${cell}"`).join(',') + '\n';
     });
 
     return csv;

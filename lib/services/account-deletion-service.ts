@@ -78,7 +78,7 @@ async function deleteUserAccount(userId: string): Promise<DeletionResult> {
 
     if (partnershipsError) throw partnershipsError;
 
-    const partnershipIds = (partnerships || []).map(p => p.partnership_id);
+    const partnershipIds = (partnerships || []).map((p: { partnership_id: string }) => p.partnership_id);
 
     // Set deletion timestamp (30 days from now)
     const deletionDate = new Date();
@@ -132,7 +132,7 @@ async function deleteUserAccount(userId: string): Promise<DeletionResult> {
         .in('partnership_id', partnershipIds);
 
       if (shoppingLists && shoppingLists.length > 0) {
-        const listIds = shoppingLists.map(l => l.id);
+        const listIds = shoppingLists.map((l: { id: string }) => l.id);
         await supabase.from('shopping_items').delete().in('list_id', listIds);
         await supabase.from('shopping_lists').delete().in('partnership_id', partnershipIds);
       }

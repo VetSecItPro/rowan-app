@@ -781,7 +781,7 @@ export const goalsService = {
 
     // Group by category and count
     const categoryMap = new Map<string, { count: number; icon: string }>();
-    data?.forEach(template => {
+    data?.forEach((template: { category: string; icon?: string | null }) => {
       const current = categoryMap.get(template.category) || { count: 0, icon: template.icon || '📋' };
       categoryMap.set(template.category, {
         count: current.count + 1,
@@ -1392,7 +1392,7 @@ export const goalsService = {
       .eq('comment_id', commentId);
 
     // Create new mentions
-    const mentionInserts = mentionedUsers.map(mentionedUser => ({
+    const mentionInserts = mentionedUsers.map((mentionedUser: { id: string }) => ({
       comment_id: commentId,
       mentioned_user_id: mentionedUser.id,
       mentioning_user_id: user.id,

@@ -562,7 +562,7 @@ export async function getSplitExpenseStats(
 
   if (expensesError) throw expensesError;
 
-  const totalSplit = (expenses || []).reduce((sum, e) => sum + parseFloat(e.amount.toString()), 0);
+  const totalSplit = (expenses || []).reduce((sum: number, e: { amount: number }) => sum + parseFloat(e.amount.toString()), 0);
 
   // Get unsettled splits
   const { data: splits, error: splitsError } = await supabase
@@ -574,7 +574,7 @@ export async function getSplitExpenseStats(
   if (splitsError) throw splitsError;
 
   const unsettledAmount = (splits || []).reduce(
-    (sum, s) => sum + (s.amount_owed - s.amount_paid),
+    (sum: number, s: { amount_owed: number; amount_paid: number }) => sum + (s.amount_owed - s.amount_paid),
     0
   );
 

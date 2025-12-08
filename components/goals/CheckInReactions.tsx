@@ -102,7 +102,7 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
       const counts: Record<string, number> = {};
       const userReactionSet = new Set<string>();
 
-      (reactionsData || []).forEach(reaction => {
+      (reactionsData || []).forEach((reaction: { emoji: string; user_id: string }) => {
         counts[reaction.emoji] = (counts[reaction.emoji] || 0) + 1;
         if (user && reaction.user_id === user.id) {
           userReactionSet.add(reaction.emoji);

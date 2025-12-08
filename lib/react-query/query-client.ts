@@ -26,9 +26,8 @@ export const queryClient = new QueryClient({
       // GARBAGE COLLECTION: Remove unused data after 10 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes (was cacheTime in v4)
 
-      // TIMEOUT: Prevent infinite loading from hanging requests (CRITICAL FIX)
-      // This ensures queries fail gracefully instead of hanging forever in production
-      timeout: 30000, // 30 second timeout for all queries
+      // NOTE: timeout was removed - not supported in React Query v5
+      // Consider using AbortController in individual queries for timeout behavior
 
       // BACKGROUND REFETCHING: Keep data fresh while showing cached data
       refetchOnWindowFocus: true,   // Refetch when user returns to tab
@@ -64,8 +63,7 @@ export const queryClient = new QueryClient({
     },
 
     mutations: {
-      // TIMEOUT: Prevent infinite loading from hanging mutation requests
-      timeout: 30000, // 30 second timeout for mutations
+      // NOTE: timeout was removed - not supported in React Query v5
 
       // MUTATION RETRIES: Limited retries for mutations to prevent duplicate operations
       retry: 1,
@@ -215,10 +213,10 @@ export const intelligentInvalidation = {
    */
   userData: async (userId: string) => {
     await Promise.all([
-      this.auth(userId),
-      this.spaces(userId),
+      intelligentInvalidation.auth(userId),
+      intelligentInvalidation.spaces(userId),
       // Invalidate all user's analytics data
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.goals.analytics }),
+      queryClient.invalidateQueries({ queryKey: ['goals', 'analytics'] }),
     ]);
   },
 

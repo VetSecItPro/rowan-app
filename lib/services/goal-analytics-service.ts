@@ -365,17 +365,17 @@ export async function getGoalQuickStats(spaceId: string): Promise<{
     if (error) throw error;
 
     const totalGoals = goals?.length || 0;
-    const completedGoals = goals?.filter(g => g.status === 'completed').length || 0;
-    const activeGoals = goals?.filter(g => g.status === 'active').length || 0;
+    const completedGoals = goals?.filter((g: { status: string }) => g.status === 'completed').length || 0;
+    const activeGoals = goals?.filter((g: { status: string }) => g.status === 'active').length || 0;
     const completionRate = totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
 
     let totalMilestones = 0;
     let completedMilestones = 0;
 
-    goals?.forEach(goal => {
+    goals?.forEach((goal: { goal_milestones?: Array<{ completed: boolean }> }) => {
       if (goal.goal_milestones) {
         totalMilestones += goal.goal_milestones.length;
-        completedMilestones += goal.goal_milestones.filter((m: any) => m.completed).length;
+        completedMilestones += goal.goal_milestones.filter((m: { completed: boolean }) => m.completed).length;
       }
     });
 

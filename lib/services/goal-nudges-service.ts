@@ -673,15 +673,15 @@ export const goalNudgesService = {
     }
 
     const totalGenerated = nudges.length;
-    const totalDismissed = nudges.filter(n => n.is_dismissed).length;
+    const totalDismissed = nudges.filter((n: { is_dismissed: boolean }) => n.is_dismissed).length;
     const now = new Date();
-    const totalExpired = nudges.filter(n => n.expires_at && isAfter(now, parseISO(n.expires_at))).length;
-    const actionTakenCount = nudges.filter(n => n.goal_nudge_actions && n.goal_nudge_actions.length > 0).length;
+    const totalExpired = nudges.filter((n: { expires_at?: string | null }) => n.expires_at && isAfter(now, parseISO(n.expires_at))).length;
+    const actionTakenCount = nudges.filter((n: { goal_nudge_actions?: unknown[] }) => n.goal_nudge_actions && n.goal_nudge_actions.length > 0).length;
     const effectivenessRate = totalGenerated > 0 ? (actionTakenCount / totalGenerated) * 100 : 0;
 
     // Analyze nudge types
     const typeMap = new Map<NudgeType, { count: number; actions: number }>();
-    nudges.forEach(nudge => {
+    nudges.forEach((nudge: { nudge_type: NudgeType; goal_nudge_actions?: unknown[] }) => {
       const existing = typeMap.get(nudge.nudge_type) || { count: 0, actions: 0 };
       existing.count++;
       if (nudge.goal_nudge_actions && nudge.goal_nudge_actions.length > 0) {
@@ -701,7 +701,7 @@ export const goalNudgesService = {
     for (let i = 0; i < Math.min(4, Math.ceil(days / 7)); i++) {
       const weekStart = subDays(new Date(), (i + 1) * 7);
       const weekEnd = subDays(new Date(), i * 7);
-      const weekNudges = nudges.filter(n => {
+      const weekNudges = nudges.filter((n: { created_at: string }) => {
         const created = parseISO(n.created_at);
         return isAfter(created, weekStart) && isBefore(created, weekEnd);
       });
@@ -709,7 +709,7 @@ export const goalNudgesService = {
       weeklyTrend.unshift({
         week: format(weekStart, 'MMM d'),
         generated: weekNudges.length,
-        acted_upon: weekNudges.filter(n => n.goal_nudge_actions && n.goal_nudge_actions.length > 0).length
+        acted_upon: weekNudges.filter((n: { goal_nudge_actions?: unknown[] }) => n.goal_nudge_actions && n.goal_nudge_actions.length > 0).length
       });
     }
 

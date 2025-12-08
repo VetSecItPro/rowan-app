@@ -22,6 +22,8 @@ export interface UserProfile {
   created_at: string;
   updated_at: string;
   timezone?: string;
+  color_theme?: string;
+  pronouns?: string;
   preferences?: Record<string, any>;
   is_beta_tester?: boolean;
   beta_status?: 'pending' | 'approved' | 'rejected' | 'completed';

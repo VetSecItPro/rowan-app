@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { RealtimeChannel } from '@supabase/supabase-js';
+import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import type { Reminder } from '@/lib/services/reminders-service';
 import { toast } from 'sonner';
 
@@ -150,38 +150,21 @@ export function useRemindersRealtime({
     let channel: RealtimeChannel;
     let accessCheckInterval: NodeJS.Timeout;
 
-    // Timeout wrapper to prevent hanging operations
-    function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
-      return Promise.race([
-        promise,
-        new Promise<T>((_, reject) =>
-          setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
-        )
-      ]);
-    }
-
     // Verify user still has access to this space
     async function verifyAccess(): Promise<boolean> {
       try {
-        // Add 8-second timeout to individual operations
-        const { data: { user }, error: authError } = await withTimeout(
-          supabase.auth.getUser(),
-          8000
-        );
+        const { data: authData, error: authError } = await supabase.auth.getUser();
 
-        if (authError || !user) {
+        if (authError || !authData?.user) {
           return false;
         }
 
-        const { data: membership, error: memberError } = await withTimeout(
-          supabase
-            .from('space_members')
-            .select('user_id')
-            .eq('space_id', spaceId)
-            .eq('user_id', user.id)
-            .single(),
-          8000
-        );
+        const { data: membership, error: memberError } = await supabase
+          .from('space_members')
+          .select('user_id')
+          .eq('space_id', spaceId)
+          .eq('user_id', authData.user.id)
+          .single();
 
         return !memberError && !!membership;
       } catch (err) {
@@ -242,12 +225,12 @@ export function useRemindersRealtime({
           query = query.eq('assigned_to', filters.assignedTo);
         }
 
-        const { data, error: fetchError } = await withTimeout(query, 10000); // 10 second timeout for data fetch
+        const { data, error: fetchError } = await query;
 
         if (fetchError) throw fetchError;
 
         // Map the data to handle null assignee/snoozer
-        const mappedData = (data || []).map((reminder: any) => ({
+        const mappedData = ((data as Reminder[]) || []).map((reminder: Reminder) => ({
           ...reminder,
           assignee: reminder.assignee || undefined,
           snoozer: reminder.snoozer || undefined,
@@ -272,7 +255,7 @@ export function useRemindersRealtime({
             table: 'reminders',
             filter: `space_id=eq.${spaceId}`,
           },
-          (payload) => {
+          (payload: RealtimePostgresChangesPayload<Reminder>) => {
             const newReminder = payload.new as Reminder;
 
             if (reminderFilter(newReminder)) {
@@ -296,7 +279,7 @@ export function useRemindersRealtime({
             table: 'reminders',
             filter: `space_id=eq.${spaceId}`,
           },
-          (payload) => {
+          (payload: RealtimePostgresChangesPayload<Reminder>) => {
             const updatedReminder = payload.new as Reminder;
 
             if (reminderFilter(updatedReminder)) {
@@ -332,7 +315,7 @@ export function useRemindersRealtime({
             table: 'reminders',
             filter: `space_id=eq.${spaceId}`,
           },
-          (payload) => {
+          (payload: RealtimePostgresChangesPayload<Reminder>) => {
             const deletedReminderId = (payload.old as Reminder).id;
             // Add to batch queue for deletes
             updateQueueRef.current.deletes.push(deletedReminderId);

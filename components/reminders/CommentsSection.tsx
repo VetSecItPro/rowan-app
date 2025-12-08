@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/contexts/auth-context';
 import { createClient } from '@/lib/supabase/client';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { MentionInput } from './MentionInput';
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 interface CommentsSectionProps {
   reminderId: string;
@@ -55,13 +56,13 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
           table: 'reminder_comments',
           filter: `reminder_id=eq.${reminderId}`,
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<{[key: string]: unknown}>) => {
           console.log('Real-time comment update:', payload);
           // Refresh comments when changes occur, but debounce to avoid excessive calls
           setTimeout(() => fetchComments(), 100);
         }
       )
-      .subscribe((status) => {
+      .subscribe((status: string) => {
         console.log('Comment subscription status:', status);
       });
 
@@ -84,9 +85,9 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
       updated_at: new Date().toISOString(),
       user: {
         id: user.id,
-        name: user.name,
+        name: user.name || 'Unknown',
         email: user.email,
-        avatar_url: user.avatar_url,
+        avatar_url: user.avatar_url || undefined,
       },
     };
 
@@ -224,12 +225,12 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
           {user.avatar_url ? (
             <img
               src={user.avatar_url}
-              alt={user.name}
+              alt={user.name || 'User'}
               className="w-8 h-8 rounded-full object-cover flex-shrink-0"
             />
           ) : (
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-              {user.name
+              {(user.name || 'U')
                 .split(' ')
                 .map((n) => n[0])
                 .join('')

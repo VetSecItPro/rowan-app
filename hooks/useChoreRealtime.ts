@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { RealtimeChannel } from '@supabase/supabase-js';
+import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import type { Chore } from '@/lib/types';
 
 interface UseChoreRealtimeOptions {
@@ -62,38 +62,21 @@ export function useChoreRealtime({
     let channel: RealtimeChannel;
     let accessCheckInterval: NodeJS.Timeout;
 
-    // Timeout wrapper to prevent hanging operations
-    function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
-      return Promise.race([
-        promise,
-        new Promise<T>((_, reject) =>
-          setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
-        )
-      ]);
-    }
-
     // Verify user still has access to this space
     async function verifyAccess(): Promise<boolean> {
       try {
-        // Add 8-second timeout to individual operations
-        const { data: { user }, error: authError } = await withTimeout(
-          supabase.auth.getUser(),
-          8000
-        );
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
 
         if (authError || !user) {
           return false;
         }
 
-        const { data: membership, error: memberError } = await withTimeout(
-          supabase
-            .from('space_members')
-            .select('user_id, role')
-            .eq('space_id', spaceId)
-            .eq('user_id', user.id)
-            .single(),
-          8000
-        );
+        const { data: membership, error: memberError } = await supabase
+          .from('space_members')
+          .select('user_id, role')
+          .eq('space_id', spaceId)
+          .eq('user_id', user.id)
+          .single();
 
         return !memberError && !!membership;
       } catch (err) {
@@ -145,7 +128,7 @@ export function useChoreRealtime({
           query = query.eq('assigned_to', filters.assignedTo);
         }
 
-        const { data, error: fetchError } = await withTimeout(query, 10000); // 10 second timeout for data fetch
+        const { data, error: fetchError } = await query;
 
         if (fetchError) throw fetchError;
 
@@ -168,7 +151,7 @@ export function useChoreRealtime({
             table: 'chores',
             filter: `space_id=eq.${spaceId}`,
           },
-          (payload) => {
+          (payload: RealtimePostgresChangesPayload<Chore>) => {
             const newChore = payload.new as Chore;
 
             // Apply filters
@@ -205,7 +188,7 @@ export function useChoreRealtime({
             table: 'chores',
             filter: `space_id=eq.${spaceId}`,
           },
-          (payload) => {
+          (payload: RealtimePostgresChangesPayload<Chore>) => {
             const updatedChore = payload.new as Chore;
 
             // Apply filters
@@ -251,7 +234,7 @@ export function useChoreRealtime({
             table: 'chores',
             filter: `space_id=eq.${spaceId}`,
           },
-          (payload) => {
+          (payload: RealtimePostgresChangesPayload<Chore>) => {
             const deletedChoreId = (payload.old as Chore).id;
             setChores((prev) => prev.filter((c) => c.id !== deletedChoreId));
             onChoreDeleted?.(deletedChoreId);

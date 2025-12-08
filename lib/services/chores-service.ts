@@ -376,11 +376,11 @@ export const choresService = {
           table: 'chores',
           filter: `space_id=eq.${spaceId}`,
         },
-        (payload) => {
+        (payload: { eventType: string; new: Record<string, unknown>; old: Record<string, unknown> }) => {
           callback({
             eventType: payload.eventType as 'INSERT' | 'UPDATE' | 'DELETE',
-            new: payload.new as Chore | null,
-            old: payload.old as Chore | null,
+            new: payload.new as unknown as Chore | null,
+            old: payload.old as unknown as Chore | null,
           });
         }
       )

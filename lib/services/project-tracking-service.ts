@@ -643,18 +643,21 @@ export async function getProjectStats(spaceId: string): Promise<{
 
   if (error) throw error;
 
+  type ProjectBudgetData = Pick<Project, 'status' | 'estimated_budget' | 'actual_cost' | 'budget_variance'>;
+  const typedProjects = projects as ProjectBudgetData[] | null;
+
   const stats = {
-    total_projects: projects?.length || 0,
-    active_projects: projects?.filter((p) => p.status === 'in-progress').length || 0,
-    completed_projects: projects?.filter((p) => p.status === 'completed').length || 0,
-    total_estimated_budget: projects?.reduce((sum, p) => sum + (p.estimated_budget || 0), 0) || 0,
-    total_actual_cost: projects?.reduce((sum, p) => sum + p.actual_cost, 0) || 0,
-    total_variance: projects?.reduce((sum, p) => sum + p.budget_variance, 0) || 0,
-    projects_over_budget: projects?.filter((p) => p.budget_variance < 0).length || 0,
-    projects_under_budget: projects?.filter((p) => p.budget_variance > 0).length || 0,
-    avg_variance_percentage: projects?.length > 0 ?
-      (projects.reduce((sum, p) => sum + Math.abs(p.budget_variance || 0), 0) / projects.length) /
-      (projects.reduce((sum, p) => sum + (p.estimated_budget || 1), 0) / projects.length) * 100 : 0,
+    total_projects: typedProjects?.length || 0,
+    active_projects: typedProjects?.filter((p: ProjectBudgetData) => p.status === 'in-progress').length || 0,
+    completed_projects: typedProjects?.filter((p: ProjectBudgetData) => p.status === 'completed').length || 0,
+    total_estimated_budget: typedProjects?.reduce((sum: number, p: ProjectBudgetData) => sum + (p.estimated_budget || 0), 0) || 0,
+    total_actual_cost: typedProjects?.reduce((sum: number, p: ProjectBudgetData) => sum + p.actual_cost, 0) || 0,
+    total_variance: typedProjects?.reduce((sum: number, p: ProjectBudgetData) => sum + p.budget_variance, 0) || 0,
+    projects_over_budget: typedProjects?.filter((p: ProjectBudgetData) => p.budget_variance < 0).length || 0,
+    projects_under_budget: typedProjects?.filter((p: ProjectBudgetData) => p.budget_variance > 0).length || 0,
+    avg_variance_percentage: typedProjects?.length && typedProjects.length > 0 ?
+      (typedProjects.reduce((sum: number, p: ProjectBudgetData) => sum + Math.abs(p.budget_variance || 0), 0) / typedProjects.length) /
+      (typedProjects.reduce((sum: number, p: ProjectBudgetData) => sum + (p.estimated_budget || 1), 0) / typedProjects.length) * 100 : 0,
   };
 
   return stats;

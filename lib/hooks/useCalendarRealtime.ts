@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { CalendarEvent } from '@/lib/services/calendar-service';
-import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import type { RealtimeChannel, RealtimePostgresChangesPayload, REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js';
 
 export interface PresenceUser {
   user_id: string;
@@ -119,7 +119,7 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
         // Handle editing notifications
         console.log('User editing:', payload.payload);
       })
-      .subscribe(async (status) => {
+      .subscribe(async (status: `${REALTIME_SUBSCRIBE_STATES}`) => {
         if (status === 'SUBSCRIBED') {
           setIsConnected(true);
 

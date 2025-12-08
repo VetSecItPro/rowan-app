@@ -69,7 +69,7 @@ export async function analyzeSpendingPatterns(
 
     // Group by category
     const categoryTotals: Record<string, number> = {};
-    expenses?.forEach((exp) => {
+    expenses?.forEach((exp: { category?: string | null; amount: number }) => {
       const cat = exp.category || 'Uncategorized';
       categoryTotals[cat] = (categoryTotals[cat] || 0) + parseFloat(exp.amount.toString());
     });
@@ -269,7 +269,7 @@ export async function analyzeDayOfWeekPatterns(
     6: { total: 0, count: 0 }, // Saturday
   };
 
-  expenses?.forEach((exp) => {
+  expenses?.forEach((exp: { date: string; amount: number }) => {
     const date = parseISO(exp.date);
     const dayOfWeek = date.getDay();
     dayTotals[dayOfWeek].total += parseFloat(exp.amount.toString());
@@ -315,7 +315,7 @@ export async function getMonthlyTrends(
     let total = 0;
     const categories: Record<string, number> = {};
 
-    expenses?.forEach((exp) => {
+    expenses?.forEach((exp: { amount: number; category?: string | null }) => {
       const amount = parseFloat(exp.amount.toString());
       total += amount;
       const cat = exp.category || 'Uncategorized';
@@ -359,7 +359,7 @@ export async function detectSpendingAnomalies(
 
   // Calculate current month totals by category
   const currentTotals: Record<string, number> = {};
-  currentExpenses?.forEach((exp) => {
+  currentExpenses?.forEach((exp: { category?: string | null; amount: number }) => {
     const cat = exp.category || 'Uncategorized';
     currentTotals[cat] = (currentTotals[cat] || 0) + parseFloat(exp.amount.toString());
   });

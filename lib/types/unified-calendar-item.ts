@@ -5,6 +5,7 @@ import type { Task } from '@/lib/types';
 import type { Meal } from '@/lib/services/meals-service';
 import type { Reminder } from '@/lib/services/reminders-service';
 import type { CalendarEvent } from '@/lib/services/calendar-service';
+import type { Goal } from '@/lib/services/goals-service';
 
 // =============================================================================
 // UNIFIED CALENDAR ITEM TYPE
@@ -136,7 +137,7 @@ export interface UnifiedCalendarItem {
   metadata?: Record<string, unknown>;
 
   /** Reference to the original item for actions */
-  originalItem: Task | Meal | Reminder | CalendarEvent | Record<string, unknown>;
+  originalItem: Task | Meal | Reminder | CalendarEvent | Goal | Record<string, unknown>;
 }
 
 // =============================================================================

@@ -308,8 +308,8 @@ export function subscribeToNotifications(
         table: 'notifications',
         filter: `user_id=eq.${userId}`,
       },
-      (payload) => {
-        callback(payload.new as Notification);
+      (payload: { new: Record<string, unknown> }) => {
+        callback(payload.new as unknown as Notification);
       }
     )
     .subscribe();
@@ -336,8 +336,8 @@ export function subscribeToMilestoneCompletions(
         table: 'goal_milestones',
         filter: `goal_id=eq.${goalId}`,
       },
-      (payload) => {
-        const milestone = payload.new as GoalMilestone;
+      (payload: { new: Record<string, unknown> }) => {
+        const milestone = payload.new as unknown as GoalMilestone;
         if (milestone.completed) {
           callback(milestone);
         }

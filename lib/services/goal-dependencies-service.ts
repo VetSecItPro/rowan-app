@@ -252,8 +252,8 @@ export async function validateDependency(input: CreateDependencyInput): Promise<
     return { valid: false, error: 'One or both goals not found' };
   }
 
-  const goal = goals.find(g => g.id === input.goal_id);
-  const dependsOnGoal = goals.find(g => g.id === input.depends_on_goal_id);
+  const goal = goals.find((g: { id: string }) => g.id === input.goal_id);
+  const dependsOnGoal = goals.find((g: { id: string }) => g.id === input.depends_on_goal_id);
 
   if (!goal || !dependsOnGoal) {
     return { valid: false, error: 'Goals not found' };
@@ -321,7 +321,7 @@ export async function getAvailableGoalsForDependency(
   const existingDeps = await getGoalDependencies(goalId);
   const existingDepGoalIds = new Set(existingDeps.map(d => d.depends_on_goal_id));
 
-  return (data || []).filter(goal => !existingDepGoalIds.has(goal.id));
+  return (data || []).filter((goal: { id: string }) => !existingDepGoalIds.has(goal.id));
 }
 
 /**
@@ -383,9 +383,9 @@ export async function getBlockedGoals(spaceId: string): Promise<GoalWithDependen
 
   if (error) throw error;
 
-  return (data || []).filter(goal => {
-    const deps = (goal as any).goal_dependencies || [];
-    return deps.some((dep: any) =>
+  return (data || []).filter((goal: { goal_dependencies?: Array<{ dependency_type: string; status: string }> }) => {
+    const deps = goal.goal_dependencies || [];
+    return deps.some((dep: { dependency_type: string; status: string }) =>
       dep.dependency_type === 'prerequisite' && dep.status === 'pending'
     );
   });

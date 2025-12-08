@@ -428,6 +428,8 @@ export interface OutlookDeltaResponse {
   '@odata.context': string;
   '@odata.deltaLink'?: string;
   '@odata.nextLink'?: string;
+  deltaLink?: string;
+  nextLink?: string;
   value: OutlookCalendarEvent[];
 }
 
@@ -514,6 +516,7 @@ export interface SyncResult {
   events_created: number;
   events_updated: number;
   events_deleted: number;
+  eventsProcessed?: number;
   conflicts_detected: number;
   errors: SyncError[];
   duration_ms: number;
