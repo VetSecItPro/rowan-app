@@ -6,6 +6,7 @@ export const dynamic = 'force-dynamic';
 import { useState } from 'react';
 // Using native HTML elements and existing components
 import { EnhancedButton } from '@/components/ui/EnhancedButton';
+import { FeatureGateWrapper } from '@/components/subscription/FeatureGateWrapper';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -84,6 +85,11 @@ export default function ExpensesPage() {
   };
 
   return (
+    <FeatureGateWrapper
+      feature="household"
+      title="Expense Tracking"
+      description="Track your household expenses, scan receipts with AI, and manage your family budget. Upgrade to Pro to unlock this feature."
+    >
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -292,5 +298,6 @@ export default function ExpensesPage() {
         </CardContent>
       </Card>
     </div>
+    </FeatureGateWrapper>
   );
 }

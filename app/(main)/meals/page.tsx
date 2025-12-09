@@ -29,6 +29,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMont
 import { showSuccess, showError, showPromise } from '@/lib/utils/toast';
 import { toast } from 'sonner';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
+import { FeatureGateWrapper } from '@/components/subscription/FeatureGateWrapper';
 
 type ViewMode = 'calendar' | 'list' | 'recipes';
 type CalendarViewMode = 'week' | '2weeks' | 'month';
@@ -853,6 +854,11 @@ export default function MealsPage() {
   }, [pendingMealData, selectedRecipeForReview, spaceId, loadMeals]);
 
   return (
+    <FeatureGateWrapper
+      feature="mealPlanning"
+      title="Meal Planning"
+      description="Plan your family meals, save recipes, and automatically generate shopping lists. Upgrade to Pro to unlock this feature."
+    >
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Meal Planning' }]}>
       <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
@@ -1378,5 +1384,6 @@ export default function MealsPage() {
         onSuccess={() => loadMeals()}
       />
     </FeatureLayout>
+    </FeatureGateWrapper>
   );
 }

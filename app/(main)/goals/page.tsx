@@ -8,6 +8,7 @@ import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List
 import { format } from 'date-fns';
 import Link from 'next/link';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
+import { FeatureGateWrapper } from '@/components/subscription/FeatureGateWrapper';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { GoalCard } from '@/components/goals/GoalCard';
 import { SortableGoalsList } from '@/components/goals/SortableGoalsList';
@@ -660,6 +661,11 @@ export default function GoalsPage() {
   }
 
   return (
+    <FeatureGateWrapper
+      feature="goals"
+      title="Goals & Milestones"
+      description="Track your family goals, set milestones, and celebrate achievements together. Upgrade to Pro to unlock this feature."
+    >
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
       <PageErrorBoundary>
         <PullToRefresh onRefresh={loadData} disabled={loading}>
@@ -1159,5 +1165,6 @@ export default function GoalsPage() {
         variant="danger"
       />
     </FeatureLayout>
+    </FeatureGateWrapper>
   );
 }
