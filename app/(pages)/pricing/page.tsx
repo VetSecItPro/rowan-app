@@ -3,7 +3,7 @@
 /**
  * Pricing Page
  * Displays subscription tiers and pricing options
- * Updated for 14-day trial model
+ * Updated for 14-day trial model with Stripe checkout integration
  */
 
 import { useState } from 'react';
@@ -11,24 +11,78 @@ import { useRouter } from 'next/navigation';
 import { PricingCard } from '@/components/pricing/PricingCard';
 import { PricingToggle } from '@/components/pricing/PricingToggle';
 import Image from 'next/image';
-import { Sparkles, Clock, Shield } from 'lucide-react';
+import { Sparkles, Clock, Shield, Loader2 } from 'lucide-react';
+import { loadStripe } from '@stripe/stripe-js';
+
+// Initialize Stripe.js
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null;
 
 export default function PricingPage() {
   const router = useRouter();
   const [period, setPeriod] = useState<'monthly' | 'annual'>('monthly');
+  const [loading, setLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handlePeriodChange = (newPeriod: 'monthly' | 'annual') => {
-    console.log('[PricingPage] Period changing from', period, 'to', newPeriod);
     setPeriod(newPeriod);
   };
 
-  const handleSelectPlan = (tier: 'free' | 'pro' | 'family') => {
+  const handleSelectPlan = async (tier: 'free' | 'pro' | 'family') => {
+    setError(null);
+
     if (tier === 'free') {
       router.push('/signup');
-    } else {
-      // TODO: Implement Stripe checkout
-      console.log(`Selected ${tier} - ${period}`);
-      router.push('/dashboard');
+      return;
+    }
+
+    // Check if Stripe is configured
+    if (!stripePromise) {
+      setError('Payments are not configured yet. Please try again later.');
+      return;
+    }
+
+    setLoading(tier);
+
+    try {
+      // Create checkout session
+      const response = await fetch('/api/stripe/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tier, period }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle specific error cases
+        if (response.status === 401) {
+          // User not logged in - redirect to signup
+          router.push('/signup?redirect=/pricing');
+          return;
+        }
+        throw new Error(data.message || data.error || 'Failed to create checkout session');
+      }
+
+      // Redirect to Stripe Checkout
+      const stripe = await stripePromise;
+      if (!stripe) {
+        throw new Error('Failed to load Stripe');
+      }
+
+      const { error: stripeError } = await stripe.redirectToCheckout({
+        sessionId: data.sessionId,
+      });
+
+      if (stripeError) {
+        throw new Error(stripeError.message);
+      }
+    } catch (err) {
+      console.error('Checkout error:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(null);
     }
   };
 
@@ -71,6 +125,13 @@ export default function PricingPage() {
             <PricingToggle value={period} onChange={handlePeriodChange} />
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="mt-8 mx-auto max-w-md rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 text-center">
+              <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+            </div>
+          )}
+
           {/* Pricing Cards */}
           <div className="mt-16 grid gap-8 lg:grid-cols-3">
             {/* Free Trial Tier */}
@@ -92,6 +153,8 @@ export default function PricingPage() {
                 'Falls back to free tier after trial',
               ]}
               cta="Start 14-Day Trial"
+              loading={loading === 'free'}
+              disabled={loading !== null}
               onSelect={() => handleSelectPlan('free')}
             />
 
@@ -117,6 +180,8 @@ export default function PricingPage() {
               ]}
               cta="Upgrade to Pro"
               popular={true}
+              loading={loading === 'pro'}
+              disabled={loading !== null}
               onSelect={() => handleSelectPlan('pro')}
             />
 
@@ -139,6 +204,8 @@ export default function PricingPage() {
                 'Advanced analytics',
               ]}
               cta="Upgrade to Family"
+              loading={loading === 'family'}
+              disabled={loading !== null}
               onSelect={() => handleSelectPlan('family')}
             />
           </div>
