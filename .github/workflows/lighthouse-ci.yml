@@ -38,6 +38,7 @@ jobs:
           # Use placeholder values for build (auth pages are static)
           NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder_key_for_build
+          SUPABASE_SERVICE_ROLE_KEY: placeholder_service_role_key_for_build
 
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli@0.13.x
@@ -182,3 +183,4 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder_key_for_build
+          SUPABASE_SERVICE_ROLE_KEY: placeholder_service_role_key_for_build
