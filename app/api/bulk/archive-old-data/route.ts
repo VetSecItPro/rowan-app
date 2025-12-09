@@ -1,10 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import {
   archiveOldExpenses,
   archiveOldTasks,
   archiveOldCalendarEvents,
 } from '@/lib/services/bulk-operations-service';
+import { checkExpensiveOperationRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 /**
  * Archive Old Data API Endpoint
@@ -15,8 +17,18 @@ import {
  * - Archived data remains accessible but not in default views
  */
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    // Rate limit check - expensive operation (5 per hour)
+    const ip = extractIP(request.headers);
+    const { success: rateLimitPassed } = await checkExpensiveOperationRateLimit(ip);
+    if (!rateLimitPassed) {
+      return NextResponse.json(
+        { error: 'Rate limit exceeded. Bulk operations are limited to 5 per hour.' },
+        { status: 429 }
+      );
+    }
+
     const supabase = await createClient();
 
     // Get authenticated user

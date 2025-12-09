@@ -32,6 +32,30 @@ export const authRateLimit = redis ? new Ratelimit({
   prefix: 'rowan:auth',
 }) : null;
 
+// Rate limit for MFA operations: 10 requests per 15 minutes (moderate, prevents brute force)
+export const mfaRateLimit = redis ? new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(10, '15 m'),
+  analytics: true,
+  prefix: 'rowan:mfa',
+}) : null;
+
+// Rate limit for expensive operations (bulk, exports): 5 requests per hour
+export const expensiveOperationRateLimit = redis ? new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(5, '1 h'),
+  analytics: true,
+  prefix: 'rowan:expensive',
+}) : null;
+
+// Rate limit for sensitive operations (account deletion, data export): 3 requests per day
+export const sensitiveOperationRateLimit = redis ? new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(3, '24 h'),
+  analytics: true,
+  prefix: 'rowan:sensitive',
+}) : null;
+
 /**
  * Helper function to check rate limits with automatic fallback
  * Uses Redis if available, otherwise falls back to in-memory rate limiting
@@ -76,4 +100,25 @@ export async function checkApiRateLimit(ip: string): Promise<{ success: boolean 
  */
 export async function checkAuthRateLimit(ip: string): Promise<{ success: boolean }> {
   return checkRateLimit(ip, authRateLimit, 5, 3600000); // 1 hour = 3600000ms
+}
+
+/**
+ * MFA rate limit: 10 requests per 15 minutes
+ */
+export async function checkMfaRateLimit(ip: string): Promise<{ success: boolean }> {
+  return checkRateLimit(ip, mfaRateLimit, 10, 900000); // 15 minutes = 900000ms
+}
+
+/**
+ * Expensive operation rate limit: 5 requests per hour
+ */
+export async function checkExpensiveOperationRateLimit(ip: string): Promise<{ success: boolean }> {
+  return checkRateLimit(ip, expensiveOperationRateLimit, 5, 3600000); // 1 hour
+}
+
+/**
+ * Sensitive operation rate limit: 3 requests per day
+ */
+export async function checkSensitiveOperationRateLimit(ip: string): Promise<{ success: boolean }> {
+  return checkRateLimit(ip, sensitiveOperationRateLimit, 3, 86400000); // 24 hours
 }

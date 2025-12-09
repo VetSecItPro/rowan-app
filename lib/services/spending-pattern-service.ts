@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
-import { startOfMonth, endOfMonth, subMonths, format, differenceInDays, parseISO } from 'date-fns';
+import { startOfMonth, endOfMonth, subMonths, format, differenceInMonths, parseISO } from 'date-fns';
+import { cacheAside, cacheKeys, CACHE_TTL } from '@/lib/cache';
 
 // ==================== TYPES ====================
 
@@ -42,46 +43,49 @@ export interface DayOfWeekPattern {
 // ==================== PATTERN ANALYSIS ====================
 
 /**
- * Analyzes spending patterns over the last N months
+ * Internal function to analyze spending patterns
+ * Optimized: Single query fetches all data, then groups in memory
  */
-export async function analyzeSpendingPatterns(
+async function _analyzeSpendingPatterns(
   spaceId: string,
-  monthsToAnalyze = 6
+  monthsToAnalyze: number
 ): Promise<SpendingPattern[]> {
   const supabase = createClient();
+
+  // Calculate date range for entire period
+  const endDate = endOfMonth(new Date());
+  const startDate = startOfMonth(subMonths(new Date(), monthsToAnalyze - 1));
+
+  // Single query to fetch all expenses in the date range
+  const { data: expenses, error } = await supabase
+    .from('expenses')
+    .select('category, amount, date')
+    .eq('space_id', spaceId)
+    .gte('date', format(startDate, 'yyyy-MM-dd'))
+    .lte('date', format(endDate, 'yyyy-MM-dd'));
+
+  if (error) throw error;
 
   // Get monthly spending data for each category
   const categoryPatterns: Map<string, number[]> = new Map();
 
-  for (let i = 0; i < monthsToAnalyze; i++) {
-    const date = subMonths(new Date(), i);
-    const monthStart = startOfMonth(date);
-    const monthEnd = endOfMonth(date);
+  // Group expenses by month and category in memory
+  expenses?.forEach((exp: { category?: string | null; amount: number; date: string }) => {
+    const expDate = parseISO(exp.date);
+    const cat = exp.category || 'Uncategorized';
+    const amount = parseFloat(exp.amount.toString());
 
-    const { data: expenses, error } = await supabase
-      .from('expenses')
-      .select('category, amount')
-      .eq('space_id', spaceId)
-      .gte('date', format(monthStart, 'yyyy-MM-dd'))
-      .lte('date', format(monthEnd, 'yyyy-MM-dd'));
+    // Calculate month index (0 = current month, 1 = last month, etc.)
+    const monthIndex = differenceInMonths(new Date(), expDate);
 
-    if (error) throw error;
-
-    // Group by category
-    const categoryTotals: Record<string, number> = {};
-    expenses?.forEach((exp: { category?: string | null; amount: number }) => {
-      const cat = exp.category || 'Uncategorized';
-      categoryTotals[cat] = (categoryTotals[cat] || 0) + parseFloat(exp.amount.toString());
-    });
-
-    // Store monthly totals
-    Object.entries(categoryTotals).forEach(([category, total]) => {
-      if (!categoryPatterns.has(category)) {
-        categoryPatterns.set(category, new Array(monthsToAnalyze).fill(0));
+    // Only include if within our analysis window
+    if (monthIndex >= 0 && monthIndex < monthsToAnalyze) {
+      if (!categoryPatterns.has(cat)) {
+        categoryPatterns.set(cat, new Array(monthsToAnalyze).fill(0));
       }
-      categoryPatterns.get(category)![i] = total;
-    });
-  }
+      categoryPatterns.get(cat)![monthIndex] += amount;
+    }
+  });
 
   // Analyze patterns for each category
   const patterns: SpendingPattern[] = [];
@@ -135,6 +139,21 @@ export async function analyzeSpendingPatterns(
 
   // Sort by average spending (highest first)
   return patterns.sort((a, b) => b.average_monthly - a.average_monthly);
+}
+
+/**
+ * Analyzes spending patterns over the last N months
+ * Cached for 5 minutes to reduce database load
+ */
+export async function analyzeSpendingPatterns(
+  spaceId: string,
+  monthsToAnalyze = 6
+): Promise<SpendingPattern[]> {
+  return cacheAside(
+    cacheKeys.spendingPatterns(spaceId, monthsToAnalyze),
+    () => _analyzeSpendingPatterns(spaceId, monthsToAnalyze),
+    CACHE_TTL.MEDIUM // 5 minutes
+  );
 }
 
 // ==================== FORECASTING ====================
@@ -288,48 +307,81 @@ export async function analyzeDayOfWeekPatterns(
 // ==================== MONTHLY TRENDS ====================
 
 /**
+ * Internal function to get monthly spending trends
+ * Optimized: Single query fetches all data, then groups in memory
+ */
+async function _getMonthlyTrends(
+  spaceId: string,
+  monthsBack: number
+): Promise<MonthlyTrend[]> {
+  const supabase = createClient();
+
+  // Calculate date range for entire period
+  const endDate = endOfMonth(new Date());
+  const startDate = startOfMonth(subMonths(new Date(), monthsBack - 1));
+
+  // Single query to fetch all expenses in the date range
+  const { data: expenses, error } = await supabase
+    .from('expenses')
+    .select('category, amount, date')
+    .eq('space_id', spaceId)
+    .gte('date', format(startDate, 'yyyy-MM-dd'))
+    .lte('date', format(endDate, 'yyyy-MM-dd'));
+
+  if (error) throw error;
+
+  // Initialize month buckets
+  const monthBuckets: Map<string, { total: number; categories: Record<string, number> }> = new Map();
+
+  for (let i = 0; i < monthsBack; i++) {
+    const date = subMonths(new Date(), i);
+    const monthKey = format(date, 'MMM yyyy');
+    monthBuckets.set(monthKey, { total: 0, categories: {} });
+  }
+
+  // Group expenses by month in memory
+  expenses?.forEach((exp: { amount: number; category?: string | null; date: string }) => {
+    const expDate = parseISO(exp.date);
+    const monthKey = format(expDate, 'MMM yyyy');
+    const amount = parseFloat(exp.amount.toString());
+    const cat = exp.category || 'Uncategorized';
+
+    const bucket = monthBuckets.get(monthKey);
+    if (bucket) {
+      bucket.total += amount;
+      bucket.categories[cat] = (bucket.categories[cat] || 0) + amount;
+    }
+  });
+
+  // Convert to array in chronological order (oldest first)
+  const trends: MonthlyTrend[] = [];
+  for (let i = monthsBack - 1; i >= 0; i--) {
+    const date = subMonths(new Date(), i);
+    const monthKey = format(date, 'MMM yyyy');
+    const bucket = monthBuckets.get(monthKey)!;
+    trends.push({
+      month: monthKey,
+      total: bucket.total,
+      categories: bucket.categories,
+    });
+  }
+
+  return trends;
+}
+
+/**
  * Gets monthly spending trends
+ * Cached for 5 minutes to reduce database load
  */
 export async function getMonthlyTrends(
   spaceId: string,
   monthsBack = 12
 ): Promise<MonthlyTrend[]> {
-  const supabase = createClient();
-  const trends: MonthlyTrend[] = [];
-
-  for (let i = 0; i < monthsBack; i++) {
-    const date = subMonths(new Date(), i);
-    const monthStart = startOfMonth(date);
-    const monthEnd = endOfMonth(date);
-
-    const { data: expenses, error } = await supabase
-      .from('expenses')
-      .select('category, amount')
-      .eq('space_id', spaceId)
-      .gte('date', format(monthStart, 'yyyy-MM-dd'))
-      .lte('date', format(monthEnd, 'yyyy-MM-dd'));
-
-    if (error) throw error;
-
-    // Calculate totals
-    let total = 0;
-    const categories: Record<string, number> = {};
-
-    expenses?.forEach((exp: { amount: number; category?: string | null }) => {
-      const amount = parseFloat(exp.amount.toString());
-      total += amount;
-      const cat = exp.category || 'Uncategorized';
-      categories[cat] = (categories[cat] || 0) + amount;
-    });
-
-    trends.unshift({
-      month: format(date, 'MMM yyyy'),
-      total,
-      categories,
-    });
-  }
-
-  return trends;
+  return cacheAside(
+    cacheKeys.spendingTrends(spaceId, monthsBack),
+    () => _getMonthlyTrends(spaceId, monthsBack),
+    CACHE_TTL.MEDIUM // 5 minutes
+  );
 }
 
 // ==================== ANOMALY DETECTION ====================

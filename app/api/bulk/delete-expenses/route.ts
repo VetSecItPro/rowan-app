@@ -1,6 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { bulkDeleteExpenses, getExpensesBulkDeleteCount } from '@/lib/services/bulk-operations-service';
+import { checkExpensiveOperationRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 /**
  * Bulk Delete Expenses API Endpoint
@@ -10,8 +12,18 @@ import { bulkDeleteExpenses, getExpensesBulkDeleteCount } from '@/lib/services/b
  * - Allows users to delete multiple expenses at once
  */
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    // Rate limit check - expensive/destructive operation (5 per hour)
+    const ip = extractIP(request.headers);
+    const { success: rateLimitPassed } = await checkExpensiveOperationRateLimit(ip);
+    if (!rateLimitPassed) {
+      return NextResponse.json(
+        { error: 'Rate limit exceeded. Bulk operations are limited to 5 per hour.' },
+        { status: 429 }
+      );
+    }
+
     const supabase = await createClient();
 
     // Get authenticated user
@@ -65,8 +77,18 @@ export async function POST(request: Request) {
 }
 
 // Get count of expenses that would be deleted
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
+    // Rate limit check
+    const ip = extractIP(request.headers);
+    const { success: rateLimitPassed } = await checkExpensiveOperationRateLimit(ip);
+    if (!rateLimitPassed) {
+      return NextResponse.json(
+        { error: 'Rate limit exceeded. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const supabase = await createClient();
 
     const {
