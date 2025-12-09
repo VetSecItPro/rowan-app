@@ -8,7 +8,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Clock, Sparkles, AlertTriangle, X, Crown, Zap } from 'lucide-react';
-import { useSubscription } from '@/lib/contexts/subscription-context';
+import { useSubscription, useSubscriptionSafe } from '@/lib/contexts/subscription-context';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface TrialStatusBannerProps {
@@ -189,9 +189,17 @@ export function TrialStatusBanner({
 
 /**
  * Compact trial badge for navigation/sidebar
+ * Uses safe hook to handle rendering outside of SubscriptionProvider
  */
 export function TrialBadge() {
-  const { isInTrial, trialDaysRemaining, hasTrialExpired, tier, isLoading } = useSubscription();
+  const subscription = useSubscriptionSafe();
+
+  // Return null if not in a provider context (e.g., during auth loading)
+  if (!subscription) {
+    return null;
+  }
+
+  const { isInTrial, trialDaysRemaining, hasTrialExpired, tier, isLoading } = subscription;
 
   if (isLoading || tier === 'pro' || tier === 'family') {
     return null;
