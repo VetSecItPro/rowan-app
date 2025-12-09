@@ -60,6 +60,7 @@ import { TodayAtAGlance } from '@/components/dashboard/TodayAtAGlance';
 import { CountdownWidget } from '@/components/calendar/CountdownWidget';
 import { PointsDisplay, LeaderboardWidget } from '@/components/rewards';
 import { CTAButton } from '@/components/ui/EnhancedButton';
+import { TrialStatusBanner } from '@/components/subscription';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { format, isToday, isThisWeek, isPast, parseISO, startOfWeek, subWeeks } from 'date-fns';
@@ -1040,6 +1041,9 @@ export default function DashboardPage() {
             userName={user?.name}
             currentDate={currentDate}
           />
+
+          {/* Trial Status Banner - Shows trial countdown or upgrade prompt */}
+          <TrialStatusBanner />
 
           {/* Today at a Glance - Shows today's events, tasks, meals, reminders */}
           {spaceId && (
