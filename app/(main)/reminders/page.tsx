@@ -33,6 +33,14 @@ export default function RemindersPage(): JSX.Element {
 
   const ITEMS_PER_PAGE = 20;
 
+  // Memoize filter object to prevent unnecessary re-subscriptions
+  const memoizedFilters = useMemo(() => ({
+    status: statusFilter !== 'all' ? [statusFilter] : undefined,
+    assignedTo: assignmentFilter === 'mine' ? user?.id : assignmentFilter === 'unassigned' ? 'none' : undefined,
+    category: categoryFilter !== 'all' ? [categoryFilter] : undefined,
+    priority: priorityFilter !== 'all' ? [priorityFilter] : undefined,
+  }), [statusFilter, assignmentFilter, categoryFilter, priorityFilter, user?.id]);
+
   // Real-time hook - replaces manual loadReminders
   const {
     reminders: realtimeReminders,
@@ -41,12 +49,7 @@ export default function RemindersPage(): JSX.Element {
     setReminders,
   } = useRemindersRealtime({
     spaceId: currentSpace?.id || '',
-    filters: {
-      status: statusFilter !== 'all' ? [statusFilter] : undefined,
-      assignedTo: assignmentFilter === 'mine' ? user?.id : assignmentFilter === 'unassigned' ? 'none' : undefined,
-      category: categoryFilter !== 'all' ? [categoryFilter] : undefined,
-      priority: priorityFilter !== 'all' ? [priorityFilter] : undefined,
-    },
+    filters: memoizedFilters,
     onReminderAdded: (reminder) => console.log('[RemindersPage] Reminder added via real-time:', reminder.title),
     onReminderUpdated: (reminder) => console.log('[RemindersPage] Reminder updated via real-time:', reminder.title),
     onReminderDeleted: (reminderId) => console.log('[RemindersPage] Reminder deleted via real-time:', reminderId),

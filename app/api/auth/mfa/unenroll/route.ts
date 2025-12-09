@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
+import { checkMfaRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 /**
  * MFA Unenrollment API
@@ -14,6 +16,16 @@ const UnenrollSchema = z.object({
 
 export async function DELETE(request: NextRequest) {
   try {
+    // Rate limit check
+    const ip = extractIP(request.headers);
+    const { success: rateLimitPassed } = await checkMfaRateLimit(ip);
+    if (!rateLimitPassed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 

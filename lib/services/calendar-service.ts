@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { sanitizeSearchInput } from '@/lib/utils';
+import { cacheAside, cacheKeys, CACHE_TTL } from '@/lib/cache';
 
 export interface CalendarEvent {
   id: string;
@@ -300,28 +301,50 @@ export const calendarService = {
   },
 
   async getEventStats(spaceId: string): Promise<EventStats> {
-    const events = await this.getEvents(spaceId);
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - today.getDay());
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    return cacheAside(
+      cacheKeys.calendarStats(spaceId),
+      async () => {
+        const supabase = createClient();
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const tomorrow = new Date(today.getTime() + 86400000);
+        const weekStart = new Date(today);
+        weekStart.setDate(today.getDate() - today.getDay());
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    return {
-      total: events.length,
-      today: events.filter(e => {
-        const eventDate = new Date(e.start_time);
-        return eventDate >= today && eventDate < new Date(today.getTime() + 86400000);
-      }).length,
-      thisWeek: events.filter(e => {
-        const eventDate = new Date(e.start_time);
-        return eventDate >= weekStart;
-      }).length,
-      thisMonth: events.filter(e => {
-        const eventDate = new Date(e.start_time);
-        return eventDate >= monthStart;
-      }).length,
-    };
+        // Run all COUNT queries in parallel for efficiency
+        const [totalResult, todayResult, weekResult, monthResult] = await Promise.all([
+          supabase
+            .from('events')
+            .select('*', { count: 'exact', head: true })
+            .eq('space_id', spaceId),
+          supabase
+            .from('events')
+            .select('*', { count: 'exact', head: true })
+            .eq('space_id', spaceId)
+            .gte('start_time', today.toISOString())
+            .lt('start_time', tomorrow.toISOString()),
+          supabase
+            .from('events')
+            .select('*', { count: 'exact', head: true })
+            .eq('space_id', spaceId)
+            .gte('start_time', weekStart.toISOString()),
+          supabase
+            .from('events')
+            .select('*', { count: 'exact', head: true })
+            .eq('space_id', spaceId)
+            .gte('start_time', monthStart.toISOString()),
+        ]);
+
+        return {
+          total: totalResult.count ?? 0,
+          today: todayResult.count ?? 0,
+          thisWeek: weekResult.count ?? 0,
+          thisMonth: monthResult.count ?? 0,
+        };
+      },
+      CACHE_TTL.SHORT // 1 minute - stats change frequently
+    );
   },
 
   async duplicateEvent(id: string, newStartTime?: string): Promise<CalendarEvent> {
