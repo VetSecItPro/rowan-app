@@ -227,6 +227,14 @@ export function useSubscription(): SubscriptionContextValue {
   return context;
 }
 
+/**
+ * Safe version of useSubscription that returns null if outside provider
+ * Use this for components that may render before auth is ready
+ */
+export function useSubscriptionSafe(): SubscriptionContextValue | null {
+  return useContext(SubscriptionContext) ?? null;
+}
+
 // Convenience hook for checking feature access
 export function useFeatureAccess(feature: keyof FeatureLimits) {
   const { canAccess, effectiveTier, isInTrial, showUpgradeModal } = useSubscription();
