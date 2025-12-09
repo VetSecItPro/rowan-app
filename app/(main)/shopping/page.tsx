@@ -89,8 +89,8 @@ export default function ShoppingPage() {
   // Memoized stats calculations
   const memoizedStats = useMemo(() => stats, [stats]);
 
-  // Load lists function (stable reference not needed as it's called in useEffect)
-  async function loadLists() {
+  // Load lists function with stable reference for real-time subscription
+  const loadLists = useCallback(async () => {
     // Don't load data if user doesn't have a space yet
     if (!currentSpace || !user) {
       setLoading(false);
@@ -111,12 +111,11 @@ export default function ShoppingPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [currentSpace, user]);
 
   useEffect(() => {
     loadLists();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSpace, user]);
+  }, [loadLists]);
 
   // Real-time subscription for shopping lists
   useEffect(() => {

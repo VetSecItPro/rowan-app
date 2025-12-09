@@ -1,6 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { bulkExportByDateRange } from '@/lib/services/bulk-operations-service';
+import { checkExpensiveOperationRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,8 +15,18 @@ export const dynamic = 'force-dynamic';
  * - Allows users to export data for specific date ranges
  */
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
+    // Rate limit check - expensive operation (5 per hour)
+    const ip = extractIP(request.headers);
+    const { success: rateLimitPassed } = await checkExpensiveOperationRateLimit(ip);
+    if (!rateLimitPassed) {
+      return NextResponse.json(
+        { error: 'Rate limit exceeded. Export operations are limited to 5 per hour.' },
+        { status: 429 }
+      );
+    }
+
     const supabase = await createClient();
 
     // Get authenticated user

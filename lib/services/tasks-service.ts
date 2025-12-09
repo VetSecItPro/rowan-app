@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 import { enhancedNotificationService } from './enhanced-notification-service';
 import { sanitizeSearchInput } from '@/lib/utils';
+import { cacheAside, cacheKeys, CACHE_TTL } from '@/lib/cache';
 import type { CreateTaskInput, UpdateTaskInput } from '@/lib/validations/task-schemas';
 import type {
   Task,
@@ -527,44 +528,50 @@ export const tasksService = {
    * ```
    */
   async getTaskStats(spaceId: string): Promise<TaskStats> {
-    const supabase = createClient();
-    try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('status, priority')
-        .eq('space_id', spaceId);
+    return cacheAside(
+      cacheKeys.taskStats(spaceId),
+      async () => {
+        const supabase = createClient();
+        try {
+          const { data, error } = await supabase
+            .from('tasks')
+            .select('status, priority')
+            .eq('space_id', spaceId);
 
-      if (error) {
-        throw new Error(`Failed to get task stats: ${error.message}`);
-      }
+          if (error) {
+            throw new Error(`Failed to get task stats: ${error.message}`);
+          }
 
-      const total = data.length;
-      const completed = data.filter((t: Task) => t.status === 'completed').length;
-      const inProgress = data.filter((t: Task) => t.status === 'in-progress').length;
-      const pending = data.filter((t: Task) => t.status === 'pending').length;
-      const blocked = data.filter((t: Task) => t.status === 'blocked').length;
-      const onHold = data.filter((t: Task) => t.status === 'on-hold').length;
+          const total = data.length;
+          const completed = data.filter((t: Task) => t.status === 'completed').length;
+          const inProgress = data.filter((t: Task) => t.status === 'in-progress').length;
+          const pending = data.filter((t: Task) => t.status === 'pending').length;
+          const blocked = data.filter((t: Task) => t.status === 'blocked').length;
+          const onHold = data.filter((t: Task) => t.status === 'on-hold').length;
 
-      const byPriority = {
-        low: data.filter((t: Task) => t.priority === 'low').length,
-        medium: data.filter((t: Task) => t.priority === 'medium').length,
-        high: data.filter((t: Task) => t.priority === 'high').length,
-        urgent: data.filter((t: Task) => t.priority === 'urgent').length,
-      };
+          const byPriority = {
+            low: data.filter((t: Task) => t.priority === 'low').length,
+            medium: data.filter((t: Task) => t.priority === 'medium').length,
+            high: data.filter((t: Task) => t.priority === 'high').length,
+            urgent: data.filter((t: Task) => t.priority === 'urgent').length,
+          };
 
-      return {
-        total,
-        completed,
-        inProgress,
-        pending,
-        blocked,
-        onHold,
-        byPriority,
-      };
-    } catch (error) {
-      logger.error('Error in getTaskStats', error, { component: 'tasksService', action: 'getTaskStats' });
-      throw error;
-    }
+          return {
+            total,
+            completed,
+            inProgress,
+            pending,
+            blocked,
+            onHold,
+            byPriority,
+          };
+        } catch (error) {
+          logger.error('Error in getTaskStats', error, { component: 'tasksService', action: 'getTaskStats' });
+          throw error;
+        }
+      },
+      CACHE_TTL.SHORT // 1 minute - stats change frequently
+    );
   },
 
   /**
