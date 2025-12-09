@@ -9,6 +9,7 @@ import { createTaskSchema } from '@/lib/validations/task-schemas';
 import { ZodError } from 'zod';
 import { extractIP, fallbackRateLimit } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { checkUsageLimit, trackUsage } from '@/lib/middleware/usage-check';
 
 // Types for query options
 interface TaskQueryOptions {
@@ -162,6 +163,23 @@ export async function POST(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(session.user);
 
+    // Check daily task creation limit
+    const usageCheck = await checkUsageLimit(session.user.id, 'tasks_created');
+    if (!usageCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: 'Daily task creation limit reached',
+          message: usageCheck.message,
+          currentUsage: usageCheck.currentUsage,
+          limit: usageCheck.limit,
+          remaining: usageCheck.remaining,
+          upgradeRequired: true,
+          upgradeUrl: '/pricing',
+        },
+        { status: 429 }
+      );
+    }
+
     // Parse and validate request body with Zod
     const body = await req.json();
 
@@ -209,6 +227,9 @@ export async function POST(req: NextRequest) {
       estimated_hours: validatedData.estimated_hours ?? undefined,
       calendar_sync: validatedData.calendar_sync ?? false,
     });
+
+    // Track task creation usage
+    await trackUsage(session.user.id, 'tasks_created');
 
     return NextResponse.json({
       success: true,

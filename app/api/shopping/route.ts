@@ -8,6 +8,7 @@ import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { createShoppingListSchema } from '@/lib/validations/shopping-schemas';
 import { ZodError } from 'zod';
+import { checkUsageLimit, trackUsage } from '@/lib/middleware/usage-check';
 
 /**
  * GET /api/shopping
@@ -121,6 +122,23 @@ export async function POST(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(session.user);
 
+    // Check daily shopping list update limit
+    const usageCheck = await checkUsageLimit(session.user.id, 'shopping_list_updates');
+    if (!usageCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: 'Daily shopping update limit reached',
+          message: usageCheck.message,
+          currentUsage: usageCheck.currentUsage,
+          limit: usageCheck.limit,
+          remaining: usageCheck.remaining,
+          upgradeRequired: true,
+          upgradeUrl: '/pricing',
+        },
+        { status: 429 }
+      );
+    }
+
     // Parse and validate request body
     const body = await req.json();
 
@@ -170,6 +188,9 @@ export async function POST(req: NextRequest) {
       ...body,
       created_by: session.user.id,
     });
+
+    // Track shopping update usage
+    await trackUsage(session.user.id, 'shopping_list_updates');
 
     return NextResponse.json({
       success: true,
