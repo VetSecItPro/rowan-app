@@ -6,6 +6,7 @@ import { verifySpaceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { checkUsageLimit, trackUsage } from '@/lib/middleware/usage-check';
 
 /**
  * GET /api/messages
@@ -109,6 +110,23 @@ export async function POST(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(session.user);
 
+    // Check daily message limit
+    const usageCheck = await checkUsageLimit(session.user.id, 'messages_sent');
+    if (!usageCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: 'Daily message limit reached',
+          message: usageCheck.message,
+          currentUsage: usageCheck.currentUsage,
+          limit: usageCheck.limit,
+          remaining: usageCheck.remaining,
+          upgradeRequired: true,
+          upgradeUrl: '/pricing',
+        },
+        { status: 429 }
+      );
+    }
+
     // Parse request body
     const body = await req.json();
     const { space_id, content } = body;
@@ -146,6 +164,9 @@ export async function POST(req: NextRequest) {
       ...body,
       sender_id: session.user.id,
     });
+
+    // Track message usage
+    await trackUsage(session.user.id, 'messages_sent');
 
     return NextResponse.json({
       success: true,
