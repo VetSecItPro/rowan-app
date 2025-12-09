@@ -100,13 +100,13 @@ export async function deleteCachePattern(pattern: string): Promise<boolean> {
   try {
     // Scan for keys matching the pattern
     const keys: string[] = [];
-    let cursor = 0;
+    let cursor = '0';
 
     do {
-      const result = await redis.scan(cursor, { match: pattern, count: 100 });
+      const result: [string, string[]] = await redis.scan(cursor, { match: pattern, count: 100 }) as [string, string[]];
       cursor = result[0];
       keys.push(...result[1]);
-    } while (cursor !== 0);
+    } while (cursor !== '0');
 
     // Delete all matching keys
     if (keys.length > 0) {

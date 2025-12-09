@@ -165,6 +165,8 @@ function AttachmentItem({
             <img
               src={reminderAttachmentsService.getFileUrl(attachment.file_path)}
               alt={attachment.display_name}
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover"
             />
           </div>

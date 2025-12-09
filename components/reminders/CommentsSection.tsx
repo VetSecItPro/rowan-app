@@ -226,6 +226,8 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
             <img
               src={user.avatar_url}
               alt={user.name || 'User'}
+              loading="lazy"
+              decoding="async"
               className="w-8 h-8 rounded-full object-cover flex-shrink-0"
             />
           ) : (
@@ -328,6 +330,8 @@ function CommentItem({
         <img
           src={comment.user.avatar_url}
           alt={comment.user.name}
+          loading="lazy"
+          decoding="async"
           className="w-8 h-8 rounded-full object-cover flex-shrink-0"
         />
       ) : (

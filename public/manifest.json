@@ -1,28 +1,72 @@
 {
   "name": "Rowan - Your Life, Organized",
   "short_name": "Rowan",
-  "description": "Collaborative life management for couples and families",
+  "description": "Collaborative life management for couples and families. Track tasks, expenses, meals, reminders, and more - all in one beautiful app.",
   "start_url": "/",
+  "id": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#000000",
   "theme_color": "#000000",
-  "orientation": "portrait-primary",
-  "categories": ["productivity", "lifestyle"],
+  "orientation": "any",
+  "categories": ["productivity", "lifestyle", "utilities", "family"],
   "lang": "en-US",
   "dir": "ltr",
   "scope": "/",
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
   "icons": [
     {
       "src": "/rowan-logo.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/rowan-logo.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/rowan-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/rowan-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/mobile-dashboard.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Dashboard - Your day at a glance"
+    },
+    {
+      "src": "/screenshots/mobile-tasks.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Task management made simple"
+    },
+    {
+      "src": "/screenshots/desktop-dashboard.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Full dashboard experience on desktop"
     }
   ],
   "shortcuts": [

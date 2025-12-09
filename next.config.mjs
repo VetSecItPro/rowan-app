@@ -33,7 +33,7 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
 
-  // Image optimization settings
+  // Image optimization settings (optimized for high-DPI mobile displays)
   images: {
     remotePatterns: [
       {
@@ -58,6 +58,13 @@ const nextConfig = {
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Device sizes for high-DPI displays (1x, 2x, 3x pixel densities)
+    // These are the srcset breakpoints for responsive images
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    // Image sizes for specific component sizes (thumbnails, avatars, etc.)
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Generate blur placeholders for better perceived performance
+    // Note: Requires explicit placeholder="blur" on Image components
   },
 
   // Security headers and CSP

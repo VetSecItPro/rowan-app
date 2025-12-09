@@ -209,6 +209,8 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
                     <img
                       src={url}
                       alt={attachment.file_name}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover cursor-pointer"
                       onClick={() => setSelectedImage(url)}
                     />
@@ -319,6 +321,8 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
           <img
             src={selectedImage}
             alt="Preview"
+            loading="eager"
+            decoding="async"
             className="max-w-full max-h-full rounded-lg shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           />
