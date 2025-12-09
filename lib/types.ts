@@ -15,6 +15,7 @@ export type {
   SubscriptionStatus,
   SubscriptionPeriod,
   Subscription,
+  TrialStatus,
   SubscriptionEventType,
   TriggerSource,
   SubscriptionEvent,
