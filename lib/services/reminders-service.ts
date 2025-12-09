@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { cacheAside, cacheKeys, CACHE_TTL } from '@/lib/cache';
 
 export interface Reminder {
   id: string;
@@ -170,20 +171,45 @@ export const remindersService = {
   },
 
   async getReminderStats(spaceId: string): Promise<ReminderStats> {
-    const supabase = createClient();
-    const reminders = await this.getReminders(spaceId);
-    const now = new Date();
+    return cacheAside(
+      cacheKeys.reminderStats(spaceId),
+      async () => {
+        const supabase = createClient();
+        const now = new Date().toISOString();
 
-    return {
-      total: reminders.length,
-      active: reminders.filter(r => r.status === 'active').length,
-      completed: reminders.filter(r => r.status === 'completed').length,
-      overdue: reminders.filter(r =>
-        r.status === 'active' &&
-        r.reminder_time &&
-        new Date(r.reminder_time) < now
-      ).length,
-    };
+        // Run all COUNT queries in parallel for efficiency
+        const [totalResult, activeResult, completedResult, overdueResult] = await Promise.all([
+          supabase
+            .from('reminders')
+            .select('*', { count: 'exact', head: true })
+            .eq('space_id', spaceId),
+          supabase
+            .from('reminders')
+            .select('*', { count: 'exact', head: true })
+            .eq('space_id', spaceId)
+            .eq('status', 'active'),
+          supabase
+            .from('reminders')
+            .select('*', { count: 'exact', head: true })
+            .eq('space_id', spaceId)
+            .eq('status', 'completed'),
+          supabase
+            .from('reminders')
+            .select('*', { count: 'exact', head: true })
+            .eq('space_id', spaceId)
+            .eq('status', 'active')
+            .lt('reminder_time', now),
+        ]);
+
+        return {
+          total: totalResult.count ?? 0,
+          active: activeResult.count ?? 0,
+          completed: completedResult.count ?? 0,
+          overdue: overdueResult.count ?? 0,
+        };
+      },
+      CACHE_TTL.SHORT // 1 minute - stats change frequently
+    );
   },
 
   async snoozeReminder(id: string, minutes: number, userId: string): Promise<Reminder> {

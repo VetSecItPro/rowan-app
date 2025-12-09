@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
+import { checkMfaRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 /**
  * MFA Verification API
@@ -16,6 +18,16 @@ const VerifyCodeSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit check - stricter for MFA verification to prevent brute force
+    const ip = extractIP(request.headers);
+    const { success: rateLimitPassed } = await checkMfaRateLimit(ip);
+    if (!rateLimitPassed) {
+      return NextResponse.json(
+        { error: 'Too many verification attempts. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
