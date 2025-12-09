@@ -3,6 +3,7 @@
 /**
  * Pricing Page
  * Displays subscription tiers and pricing options
+ * Updated for 14-day trial model
  */
 
 import { useState } from 'react';
@@ -10,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { PricingCard } from '@/components/pricing/PricingCard';
 import { PricingToggle } from '@/components/pricing/PricingToggle';
 import Image from 'next/image';
+import { Sparkles, Clock, Shield } from 'lucide-react';
 
 export default function PricingPage() {
   const router = useRouter();
@@ -46,12 +48,21 @@ export default function PricingPage() {
                 className="rounded-2xl"
               />
             </div>
+
+            {/* Trial Badge */}
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 px-4 py-2">
+              <Sparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                Start with a 14-day free trial - no credit card required
+              </span>
+            </div>
+
             <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
               The family command center that works
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600 dark:text-gray-400">
-              Choose the plan that fits your family. Start free and upgrade anytime to unlock
-              unlimited features and bring everyone together.
+              Try Rowan Pro free for 14 days. Experience unlimited tasks, calendar, meal planning,
+              and more. No commitment - upgrade only if you love it.
             </p>
           </div>
 
@@ -62,25 +73,25 @@ export default function PricingPage() {
 
           {/* Pricing Cards */}
           <div className="mt-16 grid gap-8 lg:grid-cols-3">
-            {/* Free Tier */}
+            {/* Free Trial Tier */}
             <PricingCard
               tier="free"
-              title="Free"
-              description="Perfect for trying out Rowan"
+              title="Free Trial"
+              description="14 days of Pro features, no credit card"
               monthlyPrice={0}
               annualPrice={0}
               period={period}
               features={[
-                '50 active tasks',
-                '5 tasks per day',
-                '3 shopping lists',
-                '20 messages per day',
-                '2 users',
-                '1 space',
-                'Basic reminders',
-                '30-day message history',
+                '14-day Pro trial included',
+                'Unlimited tasks & calendar',
+                'Unlimited messages',
+                'Photo uploads (trial)',
+                'Meal planning (trial)',
+                'Goals & milestones (trial)',
+                '2 users, 1 space',
+                'Falls back to free tier after trial',
               ]}
-              cta="Get Started"
+              cta="Start 14-Day Trial"
               onSelect={() => handleSelectPlan('free')}
             />
 
@@ -133,9 +144,23 @@ export default function PricingPage() {
           </div>
 
           {/* Trust Signals */}
-          <div className="mt-16 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Cancel anytime • 30-day money-back guarantee • Secure payment via Stripe
+          <div className="mt-16">
+            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <span>14-day free trial</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <span>No credit card required</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <span>Cancel anytime</span>
+              </div>
+            </div>
+            <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-500">
+              30-day money-back guarantee on paid plans • Secure payment via Stripe
             </p>
           </div>
 
