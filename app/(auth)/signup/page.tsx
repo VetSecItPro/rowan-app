@@ -280,6 +280,8 @@ export default function SignUpPage() {
                   placeholder="Alex Johnson"
                   disabled={isLoading}
                   autoFocus
+                  autoComplete="name"
+                  autoCapitalize="words"
                 />
               </div>
             </div>
@@ -294,6 +296,7 @@ export default function SignUpPage() {
                 <input
                   id="email"
                   type="email"
+                  inputMode="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -301,6 +304,7 @@ export default function SignUpPage() {
                   placeholder="alex@example.com"
                   disabled={isLoading}
                   autoComplete="email"
+                  autoCapitalize="none"
                 />
               </div>
             </div>

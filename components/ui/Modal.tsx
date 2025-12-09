@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { X } from 'lucide-react';
 
 interface ModalProps {
@@ -10,7 +10,26 @@ interface ModalProps {
   children: React.ReactNode;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   fullScreenOnMobile?: boolean;
+  /** Whether to trap focus within the modal (default: true) */
+  trapFocus?: boolean;
+  /** Whether to auto-focus the first focusable element (default: true) */
+  autoFocus?: boolean;
 }
+
+// Focus trap constants
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'area[href]',
+  'input:not([disabled]):not([type="hidden"])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  'button:not([disabled])',
+  'iframe',
+  'object',
+  'embed',
+  '[contenteditable]',
+  '[tabindex]:not([tabindex="-1"])',
+].join(', ');
 
 export function Modal({
   isOpen,
@@ -19,7 +38,13 @@ export function Modal({
   children,
   maxWidth = 'md',
   fullScreenOnMobile = true,
+  trapFocus = true,
+  autoFocus = true,
 }: ModalProps) {
+  // Refs
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -43,8 +68,75 @@ export function Modal({
     return () => window.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
+  // Get all focusable elements within the modal
+  const getFocusableElements = useCallback(() => {
+    if (!modalRef.current) return [];
+    const elements = modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
+    return Array.from(elements).filter((el) => {
+      const style = window.getComputedStyle(el);
+      return style.display !== 'none' && style.visibility !== 'hidden';
+    });
+  }, []);
+
+  // Focus trap handler
+  const handleTabKey = useCallback((event: KeyboardEvent) => {
+    if (!trapFocus || event.key !== 'Tab') return;
+
+    const elements = getFocusableElements();
+    if (elements.length === 0) return;
+
+    const firstElement = elements[0];
+    const lastElement = elements[elements.length - 1];
+    const activeElement = document.activeElement as HTMLElement;
+
+    // Handle Shift+Tab (backwards)
+    if (event.shiftKey) {
+      if (activeElement === firstElement || !modalRef.current?.contains(activeElement)) {
+        event.preventDefault();
+        lastElement.focus();
+      }
+    } else {
+      // Handle Tab (forwards)
+      if (activeElement === lastElement || !modalRef.current?.contains(activeElement)) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    }
+  }, [trapFocus, getFocusableElements]);
+
+  // Focus trap and auto-focus effect
+  useEffect(() => {
+    if (!isOpen || !trapFocus) return;
+
+    // Store the currently focused element
+    previouslyFocusedRef.current = document.activeElement as HTMLElement;
+
+    // Auto-focus first focusable element
+    if (autoFocus) {
+      requestAnimationFrame(() => {
+        const elements = getFocusableElements();
+        if (elements.length > 0) {
+          elements[0].focus();
+        }
+      });
+    }
+
+    // Add tab key handler
+    document.addEventListener('keydown', handleTabKey);
+
+    return () => {
+      document.removeEventListener('keydown', handleTabKey);
+
+      // Return focus to previously focused element
+      if (previouslyFocusedRef.current) {
+        requestAnimationFrame(() => {
+          previouslyFocusedRef.current?.focus();
+        });
+      }
+    };
+  }, [isOpen, trapFocus, autoFocus, getFocusableElements, handleTabKey]);
+
   // Swipe to dismiss functionality
-  const modalRef = useRef<HTMLDivElement>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchCurrent, setTouchCurrent] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -197,7 +289,7 @@ export function Modal({
         </div>
 
         {/* Content */}
-        <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 relative" style={{ overflowX: 'visible', overflowY: 'visible' }}>
+        <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 pb-safe-4 sm:pb-6 relative" style={{ overflowX: 'visible', overflowY: 'visible' }}>
           {children}
         </div>
       </div>

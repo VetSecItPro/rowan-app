@@ -595,6 +595,8 @@ export default function AdminBetaPage() {
                                     className="w-10 h-10 rounded-full"
                                     src={user.avatar_url}
                                     alt=""
+                                    loading="lazy"
+                                    decoding="async"
                                   />
                                 ) : (
                                   <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center">

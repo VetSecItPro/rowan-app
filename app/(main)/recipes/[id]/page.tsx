@@ -205,6 +205,8 @@ export default function RecipeDetailPage() {
             <img
               src={recipe.image_url}
               alt={recipe.name}
+              loading="lazy"
+              decoding="async"
               className="w-full h-96 object-cover"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';

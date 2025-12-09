@@ -192,12 +192,14 @@ export default function LoginPage() {
                 <input
                   id="email"
                   type="email"
+                  inputMode="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-base md:text-sm mobile-text-input"
                   placeholder="john@fake.com"
                   required
                   autoComplete="email"
+                  autoCapitalize="none"
                 />
               </div>
             </div>

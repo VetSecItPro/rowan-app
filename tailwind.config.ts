@@ -43,6 +43,11 @@ const config: Config & { safelist?: any[] } = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        // Use Playfair Display for headings, system fonts for body
+        sans: ['var(--font-playfair)', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        playfair: ['var(--font-playfair)', 'serif'],
+      },
       colors: {
         // Custom off-white for light mode backgrounds
         'off-white': '#fafafa', // gray-50 equivalent for softer light mode
@@ -65,6 +70,7 @@ const config: Config & { safelist?: any[] } = {
         'fadeIn': 'fadeIn 0.5s ease-in-out forwards',
         'slide-up': 'slide-up 0.3s ease-out',
         'slide-down': 'slide-down 0.3s ease-out',
+        'bottom-sheet': 'bottom-sheet 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       },
       keyframes: {
         'bounce-subtle': {
@@ -86,6 +92,10 @@ const config: Config & { safelist?: any[] } = {
         'slide-down': {
           '0%': { transform: 'translateY(-10px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        'bottom-sheet': {
+          '0%': { transform: 'translateY(100%)' },
+          '100%': { transform: 'translateY(0)' },
         },
       },
     },

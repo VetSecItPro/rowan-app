@@ -145,6 +145,8 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                     <img
                       src={reminder.assignee.avatar_url}
                       alt={reminder.assignee.name}
+                      loading="lazy"
+                      decoding="async"
                       className="w-6 h-6 rounded-full object-cover border-2 border-white dark:border-gray-800"
                     />
                   ) : (

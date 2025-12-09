@@ -194,6 +194,8 @@ export function MentionInput({
                   <img
                     src={member.user.avatar_url}
                     alt={member.user.name}
+                    loading="lazy"
+                    decoding="async"
                     className="w-8 h-8 rounded-full object-cover"
                   />
                 ) : (
