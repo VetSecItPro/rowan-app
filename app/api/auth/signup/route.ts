@@ -304,6 +304,25 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Initialize subscription with 14-day trial
+    // This calls the database function which sets up trial dates
+    try {
+      const { error: subscriptionError } = await supabaseServerClient
+        .rpc('initialize_subscription', { p_user_id: userId });
+
+      if (subscriptionError) {
+        console.warn('Subscription initialization failed (non-critical):', subscriptionError);
+        // Non-critical - subscription will be created on first access if needed
+      } else {
+        console.log('Trial subscription initialized for user:', userId);
+        // Record trial started event
+        await supabaseServerClient
+          .rpc('record_trial_started', { p_user_id: userId });
+      }
+    } catch (subError) {
+      console.warn('Subscription initialization error (non-critical):', subError);
+    }
+
     // CRITICAL: Link user to beta_access_requests for tracking
     // Find the most recent successful beta access request (with no user_id yet)
     // and link it to this new user
