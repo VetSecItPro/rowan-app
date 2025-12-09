@@ -309,6 +309,8 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
                     <img
                       src={qrCode}
                       alt="2FA QR Code"
+                      loading="eager"
+                      decoding="async"
                       className="mx-auto w-48 h-48"
                     />
                   </div>
@@ -361,10 +363,13 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
                 </div>
                 <input
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   placeholder="000000"
                   maxLength={6}
+                  autoComplete="one-time-code"
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 dark:text-white text-center text-lg tracking-widest"
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">

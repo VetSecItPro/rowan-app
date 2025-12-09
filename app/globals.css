@@ -1,5 +1,7 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+/* Font is now loaded via next/font in layout.tsx for better performance */
+/* Playfair Display is available via --font-playfair CSS variable */
 
 /* Enable class-based dark mode for Tailwind CSS v4 */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -12,6 +14,169 @@
 /* Apply off-white to common background classes in light mode */
 html:not(.dark) .bg-white {
   background-color: #fafafa !important;
+}
+
+/* ==================== TOUCH SCROLL OPTIMIZATION ==================== */
+/* Better touch scrolling on mobile devices */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+}
+
+/* Apply to all scrollable containers */
+[class*="overflow-y-auto"],
+[class*="overflow-x-auto"],
+[class*="overflow-auto"] {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ==================== iOS KEYBOARD AVOIDANCE ==================== */
+/* Helps prevent keyboard from covering inputs on iOS Safari */
+
+/* Use interactive-widget to handle viewport resize on virtual keyboard */
+@supports (height: 100dvh) {
+  .keyboard-avoiding-container {
+    min-height: 100dvh; /* Dynamic viewport height adjusts with keyboard */
+  }
+}
+
+/* Input focus scroll behavior */
+input:focus,
+textarea:focus,
+select:focus,
+[contenteditable="true"]:focus {
+  scroll-margin-bottom: 100px; /* Extra space below focused element */
+  scroll-padding-bottom: 100px;
+}
+
+/* For iOS Safari PWA/standalone mode */
+@media screen and (display-mode: standalone) {
+  input:focus,
+  textarea:focus {
+    scroll-margin-bottom: 150px;
+  }
+}
+
+/* ==================== REDUCED MOTION SUPPORT ==================== */
+/* Respect user's motion preferences for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable specific animations */
+  .animate-bounce,
+  .animate-bounce-subtle,
+  .animate-pulse,
+  .animate-spin,
+  .shimmer,
+  .shimmer-bg {
+    animation: none !important;
+  }
+}
+
+/* ==================== LANDSCAPE ORIENTATION SUPPORT ==================== */
+/* Fixes for mobile landscape mode (limited vertical space) */
+
+/* Landscape mode detection */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  /* Reduce vertical padding/margins in landscape */
+  .landscape-compact {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+
+  /* Make headers smaller in landscape */
+  .landscape-header-compact h1 {
+    font-size: 1.25rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  /* Reduce hero/banner heights */
+  .landscape-hero-compact {
+    min-height: 40vh !important;
+    max-height: 50vh !important;
+  }
+
+  /* Hide non-essential content in landscape */
+  .landscape-hide {
+    display: none !important;
+  }
+
+  /* Make modals/sheets scrollable */
+  .landscape-scroll {
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+  }
+
+  /* Reduce safe area impact on landscape */
+  .pb-safe {
+    padding-bottom: 12px !important;
+  }
+}
+
+/* iOS Safari landscape with notch (iPhone X+) */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  /* Account for iPhone notch in landscape */
+  .landscape-safe-left {
+    padding-left: max(1rem, env(safe-area-inset-left)) !important;
+  }
+  .landscape-safe-right {
+    padding-right: max(1rem, env(safe-area-inset-right)) !important;
+  }
+}
+
+/* Tablet landscape (more vertical space available) */
+@media screen and (orientation: landscape) and (min-height: 500px) and (max-height: 800px) {
+  /* Slightly reduce spacing for tablets in landscape */
+  .tablet-landscape-compact {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
+}
+
+/* Use landscape-specific grid layouts */
+@media screen and (orientation: landscape) and (max-width: 900px) and (max-height: 500px) {
+  /* Side-by-side layout for forms in landscape */
+  .landscape-grid-2 {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1rem !important;
+  }
+
+  /* Horizontal scrolling for cards in landscape */
+  .landscape-scroll-x {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 1rem !important;
+    padding-bottom: 0.5rem !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .landscape-scroll-x > * {
+    flex-shrink: 0 !important;
+    width: 280px !important;
+  }
+}
+
+/* Full-screen modals in landscape should be scrollable */
+@media screen and (orientation: landscape) and (max-height: 600px) {
+  [role="dialog"] {
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+
+  /* Bottom sheets need adjustment in landscape */
+  [data-bottom-sheet] {
+    max-height: 85vh !important;
+  }
 }
 
 @theme {
@@ -91,6 +256,81 @@ html:not(.dark) .bg-white {
 }
 
 @layer utilities {
+  /* ==================== SAFE AREA UTILITIES ==================== */
+  /* For iPhone notch, home bar, and other device safe areas */
+
+  /* Padding utilities for safe areas */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pl-safe {
+    padding-left: env(safe-area-inset-left, 0px);
+  }
+  .pr-safe {
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+  .px-safe {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+  .py-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .p-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
+  /* Height/spacing utilities for safe areas */
+  .h-safe {
+    height: env(safe-area-inset-bottom, 0px);
+  }
+  .h-safe-top {
+    height: env(safe-area-inset-top, 0px);
+  }
+  .min-h-safe {
+    min-height: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Margin utilities for safe areas */
+  .mt-safe {
+    margin-top: env(safe-area-inset-top, 0px);
+  }
+  .mb-safe {
+    margin-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .ml-safe {
+    margin-left: env(safe-area-inset-left, 0px);
+  }
+  .mr-safe {
+    margin-right: env(safe-area-inset-right, 0px);
+  }
+
+  /* Bottom positioning with safe area */
+  .bottom-safe {
+    bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .top-safe {
+    top: env(safe-area-inset-top, 0px);
+  }
+
+  /* Combined padding with base value + safe area */
+  .pb-safe-4 {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  }
+  .pb-safe-6 {
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  }
+  .pt-safe-4 {
+    padding-top: calc(1rem + env(safe-area-inset-top, 0px));
+  }
+
   .gradient-primary {
     @apply bg-gradient-to-r from-slate-600 to-gray-700;
   }

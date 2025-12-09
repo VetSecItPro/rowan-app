@@ -110,6 +110,8 @@ export function EventCommentThread({ eventId, spaceId, onClose }: EventCommentTh
                   <img
                     src={comment.user.avatar_url}
                     alt={comment.user.name}
+                    loading="lazy"
+                    decoding="async"
                     className="w-8 h-8 rounded-full"
                   />
                 ) : (

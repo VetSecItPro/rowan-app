@@ -1,12 +1,24 @@
 import type { Metadata, Viewport } from "next";
+import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthProvider } from "@/lib/contexts/auth-context";
 import { SpacesProvider } from "@/lib/contexts/spaces-context";
 import { CookieConsent } from "@/components/gdpr/CookieConsent";
 import ClientErrorBoundary from "@/components/shared/ClientErrorBoundary";
+import { NetworkStatus } from "@/components/ui/NetworkStatus";
 // import { CommandPaletteProvider } from "@/components/ui/command-palette"; // Temporarily disabled UI
 import { Toaster } from 'sonner';
+
+// Optimized font loading with Next.js font module
+// Automatically self-hosted, preloaded, and optimized
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  display: 'swap', // Ensures text is visible while font loads
+  variable: '--font-playfair',
+  weight: ['400', '500', '600', '700', '800', '900'],
+  style: ['normal', 'italic'],
+});
 
 // Force dynamic rendering for all pages since we use AuthProvider with React Context
 export const dynamic = 'force-dynamic';
@@ -36,6 +48,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
+  viewportFit: 'cover', // Enable safe area support for notched devices
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#fafafa' },
     { media: '(prefers-color-scheme: dark)', color: '#111827' }
@@ -50,6 +63,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Resource hints for faster connections - preconnect to critical third-party services */}
+        <link rel="preconnect" href="https://SUPABASE_PROJECT_REF.supabase.co" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+
+        {/* DNS prefetch for non-critical services */}
+        <link rel="dns-prefetch" href="https://vercel.live" />
+        <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
         {/* Inline script to prevent theme flash - runs before React hydrates */}
         <script
           dangerouslySetInnerHTML={{
@@ -68,7 +90,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased bg-gradient-to-br from-gray-50 via-slate-50 to-stone-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 text-gray-900 dark:text-white" style={{ scrollbarGutter: 'stable' }}>
+      <body className={`${playfair.variable} font-sans antialiased bg-gradient-to-br from-gray-50 via-slate-50 to-stone-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 text-gray-900 dark:text-white`} style={{ scrollbarGutter: 'stable' }}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -79,6 +101,7 @@ export default function RootLayout({
           <AuthProvider>
             <SpacesProvider>
               <ClientErrorBoundary>
+                <NetworkStatus />
                 {/* <CommandPaletteProvider> // Temporarily disabled UI */}
                   {children}
                 {/* </CommandPaletteProvider> */}

@@ -3,19 +3,23 @@
 // Force dynamic rendering to prevent useContext errors during static generation
 export const dynamic = 'force-dynamic';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { getGoalAnalytics, GoalAnalytics, DateRange } from '@/lib/services/goal-analytics-service';
 import StatCards from '@/components/goals/analytics/StatCards';
-import CompletionRateChart from '@/components/goals/analytics/CompletionRateChart';
-import MilestonesBarChart from '@/components/goals/analytics/MilestonesBarChart';
-import CategorySuccessChart from '@/components/goals/analytics/CategorySuccessChart';
-import TrendLineChart from '@/components/goals/analytics/TrendLineChart';
-import ProgressHeatmap from '@/components/goals/analytics/ProgressHeatmap';
+// Use dynamic imports for chart components to reduce initial bundle size
+import {
+  DynamicCompletionRateChart,
+  DynamicMilestonesBarChart,
+  DynamicCategorySuccessChart,
+  DynamicTrendLineChart,
+  DynamicProgressHeatmap,
+} from '@/components/goals/analytics/DynamicGoalsCharts';
 import { ArrowLeft, Calendar, Download } from 'lucide-react';
 import Link from 'next/link';
 import { subMonths, subYears } from 'date-fns';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
+import { ErrorRetryFullPage } from '@/components/ui/ErrorRetry';
 
 type DateRangeOption = '1m' | '3m' | '6m' | '1y';
 
@@ -27,48 +31,49 @@ export default function GoalsAnalyticsPage() {
   const [error, setError] = useState<string | null>(null);
   const [dateRangeOption, setDateRangeOption] = useState<DateRangeOption>('6m');
 
-  useEffect(() => {
+  // Memoize fetch function for reuse in retry
+  const fetchAnalytics = useCallback(async () => {
     if (!spaceId) return;
 
-    const fetchAnalytics = async () => {
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
 
-      try {
-        // Calculate date range based on selected option
-        const endDate = new Date();
-        let startDate: Date;
+    try {
+      // Calculate date range based on selected option
+      const endDate = new Date();
+      let startDate: Date;
 
-        switch (dateRangeOption) {
-          case '1m':
-            startDate = subMonths(endDate, 1);
-            break;
-          case '3m':
-            startDate = subMonths(endDate, 3);
-            break;
-          case '6m':
-            startDate = subMonths(endDate, 6);
-            break;
-          case '1y':
-            startDate = subYears(endDate, 1);
-            break;
-          default:
-            startDate = subMonths(endDate, 6);
-        }
-
-        const dateRange: DateRange = { start: startDate, end: endDate };
-        const data = await getGoalAnalytics(spaceId, dateRange);
-        setAnalytics(data);
-      } catch (err) {
-        console.error('Failed to fetch analytics:', err);
-        setError('Failed to load analytics data');
-      } finally {
-        setLoading(false);
+      switch (dateRangeOption) {
+        case '1m':
+          startDate = subMonths(endDate, 1);
+          break;
+        case '3m':
+          startDate = subMonths(endDate, 3);
+          break;
+        case '6m':
+          startDate = subMonths(endDate, 6);
+          break;
+        case '1y':
+          startDate = subYears(endDate, 1);
+          break;
+        default:
+          startDate = subMonths(endDate, 6);
       }
-    };
 
-    fetchAnalytics();
+      const dateRange: DateRange = { start: startDate, end: endDate };
+      const data = await getGoalAnalytics(spaceId, dateRange);
+      setAnalytics(data);
+    } catch (err) {
+      console.error('Failed to fetch analytics:', err);
+      setError('Failed to load analytics data');
+    } finally {
+      setLoading(false);
+    }
   }, [spaceId, dateRangeOption]);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics]);
 
   const handleExport = () => {
     // TODO: Implement export functionality (PNG/PDF)
@@ -95,9 +100,12 @@ export default function GoalsAnalyticsPage() {
   if (error) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
-          <p className="text-red-600 dark:text-red-400">{error}</p>
-        </div>
+        <ErrorRetryFullPage
+          title="Unable to Load Analytics"
+          message={error}
+          onRetry={fetchAnalytics}
+          errorType="network"
+        />
       </div>
     );
   }
@@ -200,7 +208,7 @@ export default function GoalsAnalyticsPage() {
       <div className="space-y-8">
         {/* Row 1: Completion Rate and Category Success */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <CompletionRateChart
+          <DynamicCompletionRateChart
             completed={Math.round(
               (analytics.completionRate *
                 analytics.categoryBreakdown.reduce((sum, c) => sum + c.value, 0)) /
@@ -217,18 +225,18 @@ export default function GoalsAnalyticsPage() {
             paused={0}
             cancelled={0}
           />
-          <CategorySuccessChart data={analytics.successByCategory} />
+          <DynamicCategorySuccessChart data={analytics.successByCategory} />
         </div>
 
         {/* Row 2: Milestones Bar Chart and Trend Line */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <MilestonesBarChart data={analytics.milestonesByWeek} />
-          <TrendLineChart data={analytics.progressTrend} />
+          <DynamicMilestonesBarChart data={analytics.milestonesByWeek} />
+          <DynamicTrendLineChart data={analytics.progressTrend} />
         </div>
 
         {/* Row 3: Activity Heatmap (Full Width) */}
         <div>
-          <ProgressHeatmap data={analytics.activityHeatmap} />
+          <DynamicProgressHeatmap data={analytics.activityHeatmap} />
         </div>
       </div>
     </div>

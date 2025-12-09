@@ -48,6 +48,8 @@ export function TimeAwareWelcomeBox({
         <img
           src={imageUrl}
           alt={`${timePeriod} background`}
+          loading="lazy"
+          decoding="async"
           className={`w-full h-full object-contain transition-all duration-1000 ${
             imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
           }`}
@@ -140,6 +142,8 @@ export function CompactTimeAwareWelcome({
         <img
           src={imageUrl}
           alt={`${timePeriod} background`}
+          loading="lazy"
+          decoding="async"
           className={`w-full h-full object-cover transition-all duration-1000 ${
             imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
           }`}

@@ -310,6 +310,8 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                 <img
                   src={previewUrl!}
                   alt="Screenshot preview"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-auto rounded-lg"
                 />
                 <button
