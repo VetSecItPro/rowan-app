@@ -34,6 +34,18 @@ export async function GET(request: NextRequest) {
 
     // Combine into comprehensive response
     const response = {
+      // Top-level tier for easy access
+      tier: subscriptionStatus.tier,
+
+      // Trial status (for client-side trial banner/modal)
+      trial: {
+        isInTrial: subscriptionStatus.trial.isInTrial,
+        daysRemaining: subscriptionStatus.trial.daysRemaining,
+        trialEndsAt: subscriptionStatus.trial.trialEndsAt,
+        trialStartedAt: subscriptionStatus.trial.trialStartedAt,
+      },
+
+      // Full subscription details
       subscription: {
         tier: subscriptionStatus.tier,
         status: subscriptionStatus.status,
