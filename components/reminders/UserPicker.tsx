@@ -131,6 +131,8 @@ export function UserPicker({
               <img
                 src={selectedMember.users.avatar_url}
                 alt={selectedMember.users.name}
+                loading="lazy"
+                decoding="async"
                 className="w-8 h-8 rounded-full object-cover"
               />
             ) : (
@@ -229,6 +231,8 @@ export function UserPicker({
                         <img
                           src={member.users.avatar_url}
                           alt={member.users.name}
+                          loading="lazy"
+                          decoding="async"
                           className="w-8 h-8 rounded-full object-cover"
                         />
                       ) : (

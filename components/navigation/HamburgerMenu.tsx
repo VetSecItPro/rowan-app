@@ -215,8 +215,8 @@ export function HamburgerMenu() {
                 </Link>
               </div>
 
-              {/* Mobile: Safe Area Padding */}
-              <div className="h-safe sm:hidden" />
+              {/* Mobile: Safe Area Padding for home bar */}
+              <div className="pb-safe sm:hidden" />
             </div>
           </div>
         </>

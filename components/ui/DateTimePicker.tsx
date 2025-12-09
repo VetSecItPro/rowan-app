@@ -1,8 +1,15 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Calendar, Clock, X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+
+// Check if we're on a mobile device (touch-first)
+const isMobileDevice = () => {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(max-width: 640px)').matches ||
+         window.matchMedia('(pointer: coarse)').matches;
+};
 
 interface DateTimePickerProps {
   value: string;
@@ -26,13 +33,20 @@ export function DateTimePicker({
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [manualInput, setManualInput] = useState<string>('');
+  const [isMobile, setIsMobile] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
 
-  // Ensure component is mounted on client side
+  // Ensure component is mounted on client side and detect mobile
   useEffect(() => {
     setMounted(true);
+    setIsMobile(isMobileDevice());
+
+    // Listen for resize to update mobile state
+    const handleResize = () => setIsMobile(isMobileDevice());
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Parse existing value into date and time components
@@ -268,141 +282,187 @@ export function DateTimePicker({
         </div>
       </div>
 
-      {/* Portal Calendar */}
+      {/* Portal Calendar - Mobile: Full screen bottom sheet, Desktop: Positioned dropdown */}
       {isOpen && mounted && createPortal(
-        <div
-          ref={calendarRef}
-          className="absolute bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-2xl z-50 p-4"
-          style={{
-            top: position.top,
-            left: position.left,
-            width: 400,
-            maxWidth: 'calc(100vw - 32px)',
-            zIndex: 10000
-          }}
-        >
-          <div className="flex flex-col gap-4">
-            {/* Calendar */}
-            <div>
-              {/* Month Navigation Header */}
-              <div className="flex items-center justify-between mb-3">
-                <button
-                  type="button"
-                  onClick={goToPreviousMonth}
-                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                  title="Previous month"
-                >
-                  <ChevronLeft className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                </button>
+        <>
+          {/* Mobile backdrop overlay */}
+          {isMobile && (
+            <div
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999]"
+              onClick={() => setIsOpen(false)}
+            />
+          )}
 
-                <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {new Date(currentYear, currentMonth).toLocaleDateString('en-US', {
-                    month: 'long',
-                    year: 'numeric'
-                  })}
+          <div
+            ref={calendarRef}
+            className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-2xl ${
+              isMobile
+                ? 'fixed inset-x-0 bottom-0 rounded-t-2xl p-4 pb-safe max-h-[85vh] overflow-y-auto animate-bottom-sheet'
+                : 'absolute rounded-lg p-4'
+            }`}
+            style={isMobile ? {
+              zIndex: 10000
+            } : {
+              top: position.top,
+              left: position.left,
+              width: 400,
+              maxWidth: 'calc(100vw - 32px)',
+              zIndex: 10000
+            }}
+          >
+            {/* Mobile drag handle */}
+            {isMobile && (
+              <div className="flex justify-center mb-3">
+                <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
+              </div>
+            )}
+
+            <div className="flex flex-col gap-4">
+              {/* Calendar */}
+              <div>
+                {/* Month Navigation Header */}
+                <div className="flex items-center justify-between mb-3">
+                  <button
+                    type="button"
+                    onClick={goToPreviousMonth}
+                    className={`hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95 ${
+                      isMobile ? 'p-3 min-w-[44px] min-h-[44px]' : 'p-1'
+                    }`}
+                    title="Previous month"
+                  >
+                    <ChevronLeft className={`text-gray-600 dark:text-gray-400 ${isMobile ? 'w-6 h-6' : 'w-4 h-4'}`} />
+                  </button>
+
+                  <div className={`font-medium text-gray-700 dark:text-gray-300 ${isMobile ? 'text-base' : 'text-sm'}`}>
+                    {new Date(currentYear, currentMonth).toLocaleDateString('en-US', {
+                      month: 'long',
+                      year: 'numeric'
+                    })}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={goToNextMonth}
+                    className={`hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95 ${
+                      isMobile ? 'p-3 min-w-[44px] min-h-[44px]' : 'p-1'
+                    }`}
+                    title="Next month"
+                  >
+                    <ChevronRight className={`text-gray-600 dark:text-gray-400 ${isMobile ? 'w-6 h-6' : 'w-4 h-4'}`} />
+                  </button>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={goToNextMonth}
-                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                  title="Next month"
-                >
-                  <ChevronRight className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-7 gap-1 text-xs">
-                {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
-                  <div key={day} className="p-2 text-center font-medium text-gray-500 dark:text-gray-400">
-                    {day}
-                  </div>
-                ))}
-
-                {calendarDays.map((day, idx) => {
-                  const isCurrentMonth = day.getMonth() === currentMonth;
-                  const isToday = day.toDateString() === today.toDateString();
-                  const isSelected = selectedDate === day.toISOString().split('T')[0];
-
-                  return (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => handleDateChange(day.toISOString().split('T')[0])}
-                      className={`p-2 text-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors ${
-                        !isCurrentMonth ? 'text-gray-300 dark:text-gray-600' : 'text-gray-900 dark:text-white'
-                      } ${isToday ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400' : ''} ${
-                        isSelected ? 'bg-blue-500 text-white' : ''
+                <div className={`grid grid-cols-7 gap-1 ${isMobile ? 'text-sm' : 'text-xs'}`}>
+                  {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
+                    <div
+                      key={day}
+                      className={`text-center font-medium text-gray-500 dark:text-gray-400 ${
+                        isMobile ? 'p-3' : 'p-2'
                       }`}
                     >
-                      {day.getDate()}
+                      {day}
+                    </div>
+                  ))}
+
+                  {calendarDays.map((day, idx) => {
+                    const isCurrentMonth = day.getMonth() === currentMonth;
+                    const isToday = day.toDateString() === today.toDateString();
+                    const isSelected = selectedDate === day.toISOString().split('T')[0];
+
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleDateChange(day.toISOString().split('T')[0])}
+                        className={`text-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95 ${
+                          isMobile ? 'p-3 min-w-[44px] min-h-[44px] text-base' : 'p-2'
+                        } ${
+                          !isCurrentMonth ? 'text-gray-300 dark:text-gray-600' : 'text-gray-900 dark:text-white'
+                        } ${isToday ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400' : ''} ${
+                          isSelected ? 'bg-blue-500 text-white hover:bg-blue-600' : ''
+                        }`}
+                      >
+                        {day.getDate()}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Time Picker */}
+              <div>
+                <div className={`font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2 ${
+                  isMobile ? 'text-base' : 'text-sm'
+                }`}>
+                  <Clock className={isMobile ? 'w-5 h-5' : 'w-4 h-4'} />
+                  Time
+                </div>
+
+                <div className={`overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg overscroll-contain ${
+                  isMobile ? 'max-h-40' : 'max-h-32'
+                }`}>
+                  {timeOptions.map((time) => (
+                    <button
+                      key={time}
+                      type="button"
+                      onClick={() => handleTimeChange(time)}
+                      className={`w-full text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors active:scale-[0.99] ${
+                        isMobile ? 'px-4 py-3 text-base min-h-[44px]' : 'px-3 py-2 text-sm'
+                      } ${
+                        selectedTime === time ? 'bg-blue-500 text-white hover:bg-blue-600' : 'text-gray-900 dark:text-white'
+                      }`}
+                    >
+                      {time}
                     </button>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Time Picker */}
-            <div>
-              <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                Time
-              </div>
-
-              <div className="max-h-32 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded">
-                {timeOptions.map((time) => (
-                  <button
-                    key={time}
-                    type="button"
-                    onClick={() => handleTimeChange(time)}
-                    className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
-                      selectedTime === time ? 'bg-blue-500 text-white' : 'text-gray-900 dark:text-white'
-                    }`}
-                  >
-                    {time}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 flex items-center justify-between gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                const now = new Date();
-                const nowDate = now.toISOString().split('T')[0];
-                const nowTime = now.toTimeString().split(' ')[0].substring(0, 5);
-                handleDateChange(nowDate);
-                handleTimeChange(nowTime);
-              }}
-              className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-            >
-              Now
-            </button>
-
-            <div className="flex gap-2">
+            <div className={`flex items-center justify-between gap-2 ${isMobile ? 'mt-6' : 'mt-4'}`}>
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
-                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                onClick={() => {
+                  const now = new Date();
+                  const nowDate = now.toISOString().split('T')[0];
+                  const nowTime = now.toTimeString().split(' ')[0].substring(0, 5);
+                  handleDateChange(nowDate);
+                  handleTimeChange(nowTime);
+                }}
+                className={`bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors active:scale-95 ${
+                  isMobile ? 'px-4 py-3 text-base min-h-[44px]' : 'px-3 py-2 text-sm'
+                }`}
               >
-                Cancel
+                Now
               </button>
 
-              {(selectedDate || selectedTime) && (
+              <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-1.5"
+                  className={`text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors ${
+                    isMobile ? 'px-4 py-3 text-base min-h-[44px]' : 'px-4 py-2 text-sm'
+                  }`}
                 >
-                  <Check className="w-3 h-3" />
-                  Done
+                  Cancel
                 </button>
-              )}
+
+                {(selectedDate || selectedTime) && (
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(false)}
+                    className={`bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1.5 active:scale-95 ${
+                      isMobile ? 'px-6 py-3 text-base min-h-[44px]' : 'px-4 py-2 text-sm'
+                    }`}
+                  >
+                    <Check className={isMobile ? 'w-4 h-4' : 'w-3 h-3'} />
+                    Done
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>,
+        </>,
         document.body
       )}
     </div>
