@@ -105,7 +105,7 @@ const QuickAction = memo(function QuickAction({
   return (
     <button
       onClick={onClick}
-      className="w-full p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md transition-all duration-200 text-left group"
+      className="w-full p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md transition-all duration-200 text-left group cursor-pointer"
     >
       <div className="flex items-start gap-4">
         <div className="flex-shrink-0 mt-0.5">
@@ -159,10 +159,11 @@ export default function AdminDashboardPage() {
   }, []);
 
   // Use React Query with stale-while-revalidate for instant loading
-  const { data: stats, isLoading, refetch } = useQuery({
+  const { data: stats, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['admin-dashboard-stats'],
     queryFn: async () => {
-      const response = await fetch('/api/admin/dashboard/stats');
+      // Add cache-busting param to force fresh data from server
+      const response = await fetch(`/api/admin/dashboard/stats?t=${Date.now()}`);
       if (!response.ok) throw new Error('Failed to fetch stats');
       const data = await response.json();
       return data.stats as DashboardStats;
@@ -216,11 +217,11 @@ export default function AdminDashboardPage() {
               )}
               <button
                 onClick={() => refetch()}
-                disabled={isLoading}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                disabled={isFetching}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-                Refresh
+                <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+                {isFetching ? 'Refreshing...' : 'Refresh'}
               </button>
             </div>
           </div>

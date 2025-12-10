@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/client';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 /**
  * Account Deletion Service
@@ -40,9 +40,13 @@ async function logDeletionAction(
   userId: string,
   action: 'initiated' | 'cancelled' | 'permanent' | 'email_sent',
   actionDetails?: Record<string, any>,
-  supabase?: ReturnType<typeof createClient>
+  supabase?: SupabaseClient
 ) {
-  const client = supabase || createClient();
+  if (!supabase) {
+    console.error('No supabase client provided to logDeletionAction');
+    return;
+  }
+  const client = supabase;
 
   try {
     await client.from('account_deletion_audit_log').insert({
@@ -60,8 +64,7 @@ async function logDeletionAction(
 /**
  * Soft delete user account and cascade delete all personal data
  */
-async function deleteUserAccount(userId: string): Promise<DeletionResult> {
-  const supabase = createClient();
+async function deleteUserAccount(userId: string, supabase: SupabaseClient): Promise<DeletionResult> {
 
   try {
     // Log deletion initiation
@@ -163,9 +166,7 @@ async function deleteUserAccount(userId: string): Promise<DeletionResult> {
 /**
  * Check if user account is marked for deletion
  */
-async function isAccountMarkedForDeletion(userId: string): Promise<boolean> {
-  const supabase = createClient();
-
+async function isAccountMarkedForDeletion(userId: string, supabase: SupabaseClient): Promise<boolean> {
   const { data, error } = await supabase
     .from('deleted_accounts')
     .select('user_id')
@@ -178,8 +179,7 @@ async function isAccountMarkedForDeletion(userId: string): Promise<boolean> {
 /**
  * Cancel account deletion (within 30-day grace period)
  */
-async function cancelAccountDeletion(userId: string): Promise<DeletionResult> {
-  const supabase = createClient();
+async function cancelAccountDeletion(userId: string, supabase: SupabaseClient): Promise<DeletionResult> {
 
   try {
     // Log cancellation
