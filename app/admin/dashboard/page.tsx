@@ -19,6 +19,7 @@ import {
   Moon,
   ArrowLeft,
   MessageSquare,
+  CreditCard,
   type LucideIcon
 } from 'lucide-react';
 
@@ -319,6 +320,13 @@ export default function AdminDashboardPage() {
                 icon={BarChart3}
                 iconColor="text-cyan-600 dark:text-cyan-400"
                 onClick={() => router.push('/admin/analytics')}
+              />
+              <QuickAction
+                title="Subscription Analytics"
+                description="Revenue metrics, MRR, and subscriber data"
+                icon={CreditCard}
+                iconColor="text-emerald-600 dark:text-emerald-400"
+                onClick={() => router.push('/admin/subscriptions')}
               />
               <QuickAction
                 title="Beta Feedback"

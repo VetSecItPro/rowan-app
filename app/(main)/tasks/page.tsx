@@ -34,6 +34,7 @@ import { ChoreRotationConfig } from '@/components/tasks/ChoreRotationConfig';
 import { TaskCardSkeleton } from '@/components/ui/Skeleton';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 import { PointsDisplay } from '@/components/rewards';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { pointsService } from '@/lib/services/rewards';
 
 type TaskType = 'task' | 'chore';
@@ -827,23 +828,25 @@ export default function TasksPage() {
                   {/* Status Filter - Mobile Dropdown + Desktop Buttons */}
                   <div>
                     {/* Custom Dropdown with Filter Icon */}
-                    <div className="relative mb-3 max-w-xs">
-                      <div className="relative">
-                        <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400 pointer-events-none z-10" />
-                        <Dropdown
-                          value={statusFilter}
-                          onChange={(value) => setStatusFilter(value || 'all')}
-                          options={[
-                            { value: 'all', label: 'All Tasks & Chores' },
-                            { value: 'pending', label: 'Pending' },
-                            { value: 'in_progress', label: 'In Progress' },
-                            { value: 'completed', label: 'Completed' }
-                          ]}
-                          placeholder="Filter by status..."
-                          className="pl-10"
-                        />
+                    <Tooltip content="Filter tasks by completion status" position="bottom">
+                      <div className="relative mb-3 max-w-xs">
+                        <div className="relative">
+                          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400 pointer-events-none z-10" />
+                          <Dropdown
+                            value={statusFilter}
+                            onChange={(value) => setStatusFilter(value || 'all')}
+                            options={[
+                              { value: 'all', label: 'All Tasks & Chores' },
+                              { value: 'pending', label: 'Pending' },
+                              { value: 'in_progress', label: 'In Progress' },
+                              { value: 'completed', label: 'Completed' }
+                            ]}
+                            placeholder="Filter by status..."
+                            className="pl-10"
+                          />
+                        </div>
                       </div>
-                    </div>
+                    </Tooltip>
 
                   </div>
                 </div>

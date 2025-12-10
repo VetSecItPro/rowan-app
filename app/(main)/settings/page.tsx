@@ -71,7 +71,10 @@ import {
   Edit,
   Receipt,
   FolderOpen,
-  Link2
+  Link2,
+  CreditCard,
+  Gift,
+  Search
 } from 'lucide-react';
 
 type SettingsTab = 'profile' | 'subscription' | 'security' | 'notifications' | 'privacy-data' | 'data-management' | 'integrations' | 'documentation' | 'analytics';
@@ -124,8 +127,27 @@ const mockPendingInvitations = [
   { email: 'newuser@example.com', role: 'Member', sentAt: '2 days ago' },
 ];
 
-// Documentation features array
+// Documentation features array - organized by category
+// Search keywords map for natural language search
+const documentationSearchKeywords: Record<string, string[]> = {
+  tasks: ['task', 'chore', 'todo', 'to-do', 'assignment', 'duty', 'cleaning', 'housework'],
+  calendar: ['calendar', 'event', 'schedule', 'appointment', 'meeting', 'date', 'time'],
+  reminders: ['reminder', 'alert', 'notification', 'remind', 'notify', 'alarm'],
+  messages: ['message', 'chat', 'communication', 'talk', 'conversation', 'partner'],
+  shopping: ['shopping', 'grocery', 'groceries', 'list', 'buy', 'purchase', 'store'],
+  meals: ['meal', 'planning', 'dinner', 'lunch', 'breakfast', 'food', 'cook', 'recipe'],
+  recipes: ['recipe', 'cookbook', 'ingredient', 'cooking', 'dish', 'import', 'url'],
+  goals: ['goal', 'milestone', 'target', 'objective', 'achievement', 'planning'],
+  household: ['household', 'budget', 'bill', 'expense', 'home', 'utility', 'finance'],
+  expenses: ['expense', 'receipt', 'scan', 'spending', 'money', 'track', 'cost', 'ai'],
+  projects: ['project', 'budget', 'vendor', 'contractor', 'renovation', 'actual'],
+  spaces: ['space', 'collaboration', 'team', 'invite', 'partner', 'share', 'family'],
+  checkin: ['check-in', 'checkin', 'wellness', 'mood', 'emotion', 'feeling', 'daily'],
+  subscriptions: ['subscription', 'billing', 'payment', 'plan', 'pricing', 'trial', 'pro', 'family', 'upgrade', 'cancel'],
+};
+
 const documentationFeatures = [
+  // Core Daily Features
   {
     id: 'tasks',
     name: 'Tasks & Chores',
@@ -181,6 +203,7 @@ const documentationFeatures = [
     href: '/settings/documentation/shopping',
     available: true,
   },
+  // Meal & Recipe Features
   {
     id: 'meals',
     name: 'Meal Planning',
@@ -193,6 +216,18 @@ const documentationFeatures = [
     available: true,
   },
   {
+    id: 'recipes',
+    name: 'Recipe Library & Discovery',
+    description: 'Browse, save, and discover new recipes with AI-powered import',
+    icon: UtensilsCrossed,
+    color: 'from-yellow-500 to-yellow-600',
+    hoverBorder: 'hover:border-yellow-500',
+    hoverShadow: 'hover:shadow-yellow-500/50',
+    href: '/settings/documentation/recipes',
+    available: true,
+  },
+  // Planning & Goals
+  {
     id: 'goals',
     name: 'Goals & Planning',
     description: 'Set and track your shared goals and milestones',
@@ -203,17 +238,7 @@ const documentationFeatures = [
     href: '/settings/documentation/goals',
     available: true,
   },
-  {
-    id: 'checkin',
-    name: 'Daily Check-In',
-    description: 'Track emotional wellness and connect with your partner',
-    icon: Heart,
-    color: 'from-pink-500 to-purple-500',
-    hoverBorder: 'hover:border-pink-500',
-    hoverShadow: 'hover:shadow-pink-500/50',
-    href: '/settings/documentation/checkin',
-    available: true,
-  },
+  // Financial Features
   {
     id: 'household',
     name: 'Household & Budget',
@@ -223,17 +248,6 @@ const documentationFeatures = [
     hoverBorder: 'hover:border-amber-500',
     hoverShadow: 'hover:shadow-amber-500/50',
     href: '/settings/documentation/household',
-    available: true,
-  },
-  {
-    id: 'spaces',
-    name: 'Space & Collaboration',
-    description: 'Master space management, invitations, and team collaboration',
-    icon: Users,
-    color: 'from-teal-500 to-teal-600',
-    hoverBorder: 'hover:border-teal-500',
-    hoverShadow: 'hover:shadow-teal-500/50',
-    href: '/settings/documentation/spaces',
     available: true,
   },
   {
@@ -258,15 +272,50 @@ const documentationFeatures = [
     href: '/settings/documentation/projects',
     available: true,
   },
+  // Collaboration Features
   {
-    id: 'recipes',
-    name: 'Recipe Library & Discovery',
-    description: 'Browse, save, and discover new recipes with AI-powered import',
-    icon: UtensilsCrossed,
-    color: 'from-yellow-500 to-yellow-600',
-    hoverBorder: 'hover:border-yellow-500',
-    hoverShadow: 'hover:shadow-yellow-500/50',
-    href: '/settings/documentation/recipes',
+    id: 'spaces',
+    name: 'Space & Collaboration',
+    description: 'Master space management, invitations, and team collaboration',
+    icon: Users,
+    color: 'from-teal-500 to-teal-600',
+    hoverBorder: 'hover:border-teal-500',
+    hoverShadow: 'hover:shadow-teal-500/50',
+    href: '/settings/documentation/spaces',
+    available: true,
+  },
+  {
+    id: 'checkin',
+    name: 'Daily Check-In',
+    description: 'Track emotional wellness and connect with your partner',
+    icon: Heart,
+    color: 'from-pink-500 to-purple-500',
+    hoverBorder: 'hover:border-pink-500',
+    hoverShadow: 'hover:shadow-pink-500/50',
+    href: '/settings/documentation/checkin',
+    available: true,
+  },
+  // Account & Billing
+  {
+    id: 'subscriptions',
+    name: 'Subscriptions & Billing',
+    description: 'Plans, pricing, free trials, billing, and managing your subscription',
+    icon: CreditCard,
+    color: 'from-emerald-500 to-teal-500',
+    hoverBorder: 'hover:border-emerald-500',
+    hoverShadow: 'hover:shadow-emerald-500/50',
+    href: '/settings/documentation/subscriptions',
+    available: true,
+  },
+  {
+    id: 'rewards',
+    name: 'Rewards Shop',
+    description: 'Motivate with points, browse rewards catalog, and redeem prizes',
+    icon: Gift,
+    color: 'from-amber-500 to-orange-500',
+    hoverBorder: 'hover:border-amber-500',
+    hoverShadow: 'hover:shadow-amber-500/50',
+    href: '/settings/documentation/rewards',
     available: true,
   },
 ];
@@ -328,6 +377,9 @@ export default function SettingsPage() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<UserRole>('Member');
   const [isSendingInvite, setIsSendingInvite] = useState(false);
+
+  // Documentation search state
+  const [docSearchQuery, setDocSearchQuery] = useState('');
 
 
   // Space members state
@@ -1500,9 +1552,40 @@ export default function SettingsPage() {
                       <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Choose a feature to learn about. Comprehensive guides for all Rowan features.</p>
                     </div>
 
-                    {/* Features Grid - Optimized for 13 cards */}
+                    {/* Search Bar */}
+                    <div className="relative max-w-xl">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+                      <input
+                        type="text"
+                        placeholder="Search documentation... (e.g., 'expenses', 'billing', 'meal planning')"
+                        value={docSearchQuery}
+                        onChange={(e) => setDocSearchQuery(e.target.value)}
+                        className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-2 focus:ring-purple-500/20 transition-colors"
+                      />
+                      {docSearchQuery && (
+                        <button
+                          onClick={() => setDocSearchQuery('')}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Features Grid - Optimized for 14 cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
-                      {documentationFeatures.map((feature) => {
+                      {documentationFeatures
+                        .filter((feature) => {
+                          if (!docSearchQuery.trim()) return true;
+                          const query = docSearchQuery.toLowerCase().trim();
+                          // Check name and description
+                          if (feature.name.toLowerCase().includes(query)) return true;
+                          if (feature.description.toLowerCase().includes(query)) return true;
+                          // Check keywords
+                          const keywords = documentationSearchKeywords[feature.id] || [];
+                          return keywords.some(keyword => keyword.toLowerCase().includes(query) || query.includes(keyword.toLowerCase()));
+                        })
+                        .map((feature) => {
                         const Icon = feature.icon;
                         const isAvailable = feature.available;
 
