@@ -1478,15 +1478,23 @@ SUPABASE_SERVICE_ROLE_KEY=...
 - [ ] Add is_outdoor event flag
 - [ ] Test with various locations
 
-### Phase 13: AI Event Parser ✓
-- [ ] Create event-parser-service.ts with Claude
-- [ ] Build QuickAddEvent component
-- [ ] Create parse-event API endpoint
-- [ ] Add rate limiting
-- [ ] Build preview/edit flow
-- [ ] Test with various input formats
-- [ ] Add usage analytics
-- [ ] Handle edge cases gracefully
+### Phase 13: AI Event Parser ✓ (COMPLETED Dec 9, 2025)
+- [x] Create event-parser-service.ts with Google Gemini (lib/services/ai/event-parser-service.ts)
+- [x] Build QuickAddEvent component (components/calendar/QuickAddEvent.tsx)
+- [x] Create parse-event API endpoint (app/api/calendar/parse-event/route.ts)
+- [x] Add rate limiting (20 requests/hour per user)
+- [x] Build preview/edit flow with editable form
+- [x] Test with various input formats (emails, texts, natural language)
+- [x] Add usage analytics via trigger_source tracking
+- [x] Handle edge cases gracefully (error boundaries, validation)
+
+**Implementation Details:**
+- Used Google Gemini (gemini-1.5-flash) instead of Claude for cost efficiency
+- Structured JSON output with Zod validation
+- Handles natural language dates ("next Tuesday", "this weekend")
+- Extracts: title, date, time, location, description, duration
+- Confidence scoring for parsed results
+- Pre-filled form allows user corrections before saving
 
 ### Phase 14: Chore Rewards ✓
 - [ ] Create rewards system tables
