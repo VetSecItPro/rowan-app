@@ -9,7 +9,30 @@
  * - Payment failures
  *
  * SECURITY: Server-side only - never expose to client
+ *
+ * Phase 9.2: Now persists logs to database for querying
  */
+
+import { createClient } from '@supabase/supabase-js';
+
+// ============================================================================
+// DATABASE CLIENT (for log persistence)
+// ============================================================================
+
+// Use service role client for inserting logs (bypasses RLS)
+function getSupabaseAdmin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.warn('[MONETIZATION_LOGGER] Supabase credentials not configured - logs will only go to console');
+    return null;
+  }
+
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    auth: { persistSession: false },
+  });
+}
 
 // ============================================================================
 // TYPES
@@ -75,13 +98,14 @@ function createLogEntry(
 }
 
 /**
- * Output log entry to console in structured format
- * In production, this could be sent to a logging service (Vercel, Datadog, etc.)
+ * Output log entry to console and persist to database
+ * Phase 9.2: Now persists to monetization_logs table for querying
  */
-function outputLog(entry: MonetizationLogEntry): void {
+async function outputLog(entry: MonetizationLogEntry): Promise<void> {
   const prefix = `[MONETIZATION]`;
   const logLine = JSON.stringify(entry);
 
+  // Always log to console
   switch (entry.level) {
     case 'error':
       console.error(prefix, logLine);
@@ -91,6 +115,45 @@ function outputLog(entry: MonetizationLogEntry): void {
       break;
     default:
       console.log(prefix, logLine);
+  }
+
+  // Persist to database (non-blocking)
+  persistLogToDatabase(entry).catch((err) => {
+    console.error('[MONETIZATION_LOGGER] Failed to persist log:', err);
+  });
+}
+
+/**
+ * Persist log entry to database
+ */
+async function persistLogToDatabase(entry: MonetizationLogEntry): Promise<void> {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) return;
+
+  try {
+    const { error } = await supabase.from('monetization_logs').insert({
+      timestamp: entry.timestamp,
+      level: entry.level,
+      event: entry.event,
+      user_id: entry.userId || null,
+      tier: entry.tier || null,
+      period: entry.period || null,
+      amount: entry.amount || null,
+      currency: entry.currency || 'usd',
+      stripe_customer_id: entry.stripeCustomerId || null,
+      stripe_subscription_id: entry.stripeSubscriptionId || null,
+      stripe_session_id: entry.stripeSessionId || null,
+      stripe_event_id: entry.stripeEventId || null,
+      trigger_source: entry.triggerSource || null,
+      error_message: entry.error || null,
+      metadata: entry.metadata || {},
+    });
+
+    if (error) {
+      console.error('[MONETIZATION_LOGGER] Database insert error:', error);
+    }
+  } catch (err) {
+    console.error('[MONETIZATION_LOGGER] Database persistence error:', err);
   }
 }
 
