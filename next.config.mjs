@@ -24,7 +24,8 @@ const nextConfig = {
   },
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
-    webpackBuildWorker: true,
+    // Disabled due to race condition causing 500 errors in dev
+    // webpackBuildWorker: true,
     instrumentationHook: false,
   },
 

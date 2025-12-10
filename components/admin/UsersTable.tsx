@@ -140,7 +140,11 @@ export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableP
         </thead>
         <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
           {filteredUsers.map((user) => (
-            <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+            <tr
+              key={user.id}
+              onClick={() => setSelectedUser(user)}
+              className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
+            >
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
                   <div className="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
@@ -167,7 +171,10 @@ export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableP
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button
-                  onClick={() => setSelectedUser(user)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedUser(user);
+                  }}
                   className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
                   title="Manage user"
                 >
@@ -187,8 +194,14 @@ export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableP
 
       {/* User Actions Modal */}
       {selectedUser && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedUser(null)}
+        >
+          <div
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">

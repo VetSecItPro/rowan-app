@@ -5,6 +5,7 @@ import { X, AlertTriangle, Trash2, Download, Calendar, Check } from 'lucide-reac
 import { accountDeletionService } from '@/lib/services/account-deletion-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 interface AccountDeletionModalProps {
   isOpen: boolean;
@@ -44,8 +45,9 @@ export function AccountDeletionModal({ isOpen, onClose }: AccountDeletionModalPr
     setIsDeleting(true);
 
     try {
-      // Call the account deletion service
-      const result = await accountDeletionService.deleteUserAccount(user.id);
+      // Call the account deletion service with browser client
+      const supabase = createClient();
+      const result = await accountDeletionService.deleteUserAccount(user.id, supabase);
 
       if (!result.success) {
         alert(result.error || 'Failed to delete account. Please try again.');
