@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     }
 
     // Check if account is actually marked for deletion
-    const isMarked = await accountDeletionService.isAccountMarkedForDeletion(user.id);
+    const isMarked = await accountDeletionService.isAccountMarkedForDeletion(user.id, supabase);
 
     if (!isMarked) {
       return NextResponse.json(
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     }
 
     // Cancel the deletion
-    const result = await accountDeletionService.cancelAccountDeletion(user.id);
+    const result = await accountDeletionService.cancelAccountDeletion(user.id, supabase);
 
     if (!result.success) {
       return NextResponse.json(
