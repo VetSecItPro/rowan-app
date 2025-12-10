@@ -799,6 +799,153 @@ export async function verifyEmailService(): Promise<EmailResult> {
   }
 }
 
+// ============================================================================
+// SUBSCRIPTION EMAIL FUNCTIONS
+// ============================================================================
+
+// Import subscription email templates
+import SubscriptionWelcomeEmail from '@/lib/emails/templates/SubscriptionWelcomeEmail';
+import PaymentFailedEmail from '@/lib/emails/templates/PaymentFailedEmail';
+import SubscriptionCancelledEmail from '@/lib/emails/templates/SubscriptionCancelledEmail';
+
+// Subscription email interfaces
+export interface SubscriptionWelcomeData {
+  recipientEmail: string;
+  recipientName: string;
+  tier: 'pro' | 'family';
+  period: 'monthly' | 'annual';
+  dashboardUrl: string;
+}
+
+export interface PaymentFailedData {
+  recipientEmail: string;
+  recipientName: string;
+  tier: 'pro' | 'family';
+  attemptCount: number;
+  updatePaymentUrl: string;
+  gracePeriodDays: number;
+}
+
+export interface SubscriptionCancelledData {
+  recipientEmail: string;
+  recipientName: string;
+  tier: 'pro' | 'family';
+  accessUntil: string;
+  resubscribeUrl: string;
+}
+
+/**
+ * Send a subscription welcome email after successful payment
+ */
+export async function sendSubscriptionWelcomeEmail(data: SubscriptionWelcomeData): Promise<EmailResult> {
+  try {
+    if (!resend) {
+      console.error('Resend not initialized - missing RESEND_API_KEY');
+      return { success: false, error: 'Email service not configured' };
+    }
+
+    const tierName = data.tier === 'family' ? 'Family' : 'Pro';
+    const emailHtml = await render(SubscriptionWelcomeEmail(data));
+
+    const { data: result, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [data.recipientEmail],
+      subject: `Welcome to Rowan ${tierName}! Your subscription is active`,
+      html: emailHtml,
+      replyTo: REPLY_TO_EMAIL,
+      tags: [
+        { name: 'category', value: 'subscription-welcome' },
+        { name: 'tier', value: data.tier },
+        { name: 'period', value: data.period }
+      ]
+    });
+
+    if (error) {
+      console.error('Failed to send subscription welcome email:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, messageId: result?.id };
+  } catch (error) {
+    console.error('Error sending subscription welcome email:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+/**
+ * Send a payment failed email when subscription payment fails
+ */
+export async function sendPaymentFailedEmail(data: PaymentFailedData): Promise<EmailResult> {
+  try {
+    if (!resend) {
+      console.error('Resend not initialized - missing RESEND_API_KEY');
+      return { success: false, error: 'Email service not configured' };
+    }
+
+    const emailHtml = await render(PaymentFailedEmail(data));
+
+    const { data: result, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [data.recipientEmail],
+      subject: 'Action needed: Your Rowan payment couldn\'t be processed',
+      html: emailHtml,
+      replyTo: REPLY_TO_EMAIL,
+      tags: [
+        { name: 'category', value: 'payment-failed' },
+        { name: 'tier', value: data.tier },
+        { name: 'attempt_count', value: String(data.attemptCount) }
+      ]
+    });
+
+    if (error) {
+      console.error('Failed to send payment failed email:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, messageId: result?.id };
+  } catch (error) {
+    console.error('Error sending payment failed email:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+/**
+ * Send a subscription cancelled confirmation email
+ */
+export async function sendSubscriptionCancelledEmail(data: SubscriptionCancelledData): Promise<EmailResult> {
+  try {
+    if (!resend) {
+      console.error('Resend not initialized - missing RESEND_API_KEY');
+      return { success: false, error: 'Email service not configured' };
+    }
+
+    const tierName = data.tier === 'family' ? 'Family' : 'Pro';
+    const emailHtml = await render(SubscriptionCancelledEmail(data));
+
+    const { data: result, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [data.recipientEmail],
+      subject: `Your Rowan ${tierName} subscription has been cancelled`,
+      html: emailHtml,
+      replyTo: REPLY_TO_EMAIL,
+      tags: [
+        { name: 'category', value: 'subscription-cancelled' },
+        { name: 'tier', value: data.tier }
+      ]
+    });
+
+    if (error) {
+      console.error('Failed to send subscription cancelled email:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, messageId: result?.id };
+  } catch (error) {
+    console.error('Error sending subscription cancelled email:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
 // Export emailService object for compatibility
 export const emailService = {
   sendTaskAssignmentEmail,
@@ -815,4 +962,8 @@ export const emailService = {
   sendEmailVerificationEmail,
   sendBatchEmails,
   verifyEmailService,
+  // Subscription emails
+  sendSubscriptionWelcomeEmail,
+  sendPaymentFailedEmail,
+  sendSubscriptionCancelledEmail,
 };
