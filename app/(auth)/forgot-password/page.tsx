@@ -47,11 +47,11 @@ export default function ForgotPasswordPage() {
 
   if (emailSent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800 p-4">
-        <div className="w-full max-w-md bg-gray-50 dark:bg-gray-900 rounded-2xl shadow-2xl p-8">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+        <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-center mb-6">
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-              <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
+            <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center">
+              <Check className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
             </div>
           </div>
           <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-2">
@@ -66,7 +66,7 @@ export default function ForgotPasswordPage() {
           <div className="flex justify-center">
             <Link
               href="/login"
-              className="btn-touch text-purple-600 dark:text-purple-400 hover:underline text-sm font-medium rounded-md py-2 px-3 active:scale-95"
+              className="btn-touch text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium rounded-md py-2 px-3 active:scale-95 transition-colors"
             >
               ← Back to Login
             </Link>
@@ -77,12 +77,12 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800 p-4">
-      <div className="w-full max-w-md bg-gray-50 dark:bg-gray-900 rounded-2xl shadow-2xl p-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-700">
         {/* Header */}
         <div className="flex items-center justify-center mb-6">
-          <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
-            <Mail className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+          <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center">
+            <Mail className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
           </div>
         </div>
 
@@ -119,7 +119,7 @@ export default function ForgotPasswordPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400 transition-colors text-base md:text-sm mobile-text-input"
+                className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent focus:outline-none text-gray-900 dark:text-white placeholder-gray-400 transition-colors text-base md:text-sm mobile-text-input"
                 placeholder="Enter your email address"
                 required
                 autoComplete="email"
@@ -130,7 +130,7 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="btn-touch w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 active:scale-[0.98]"
+            className="btn-touch w-full px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 active:scale-[0.98]"
           >
             {isLoading ? (
               <>
@@ -150,7 +150,7 @@ export default function ForgotPasswordPage() {
         <div className="mt-6 text-center">
           <Link
             href="/login"
-            className="btn-touch inline-flex items-center gap-2 py-2 px-3 text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium rounded-md transition-colors active:scale-95"
+            className="btn-touch inline-flex items-center gap-2 py-2 px-3 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium rounded-md transition-colors active:scale-95"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Login
