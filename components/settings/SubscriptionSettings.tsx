@@ -6,7 +6,7 @@
  * Updated to use correct type properties from subscription-context
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import {
   Crown,
@@ -22,7 +22,8 @@ import {
   MessageSquare,
   ShoppingCart,
   Camera,
-  Star
+  Star,
+  Loader2
 } from 'lucide-react';
 import { useSubscription } from '@/lib/contexts/subscription-context';
 import { motion } from 'framer-motion';
@@ -81,6 +82,38 @@ export function SubscriptionSettings() {
     trial,
     limits,
   } = useSubscription();
+
+  const [isBillingLoading, setIsBillingLoading] = useState(false);
+  const [billingError, setBillingError] = useState<string | null>(null);
+
+  /**
+   * Opens Stripe Customer Portal for billing management
+   */
+  const handleManageBilling = async () => {
+    setIsBillingLoading(true);
+    setBillingError(null);
+
+    try {
+      const response = await fetch('/api/stripe/customer-portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to open billing portal');
+      }
+
+      const { url } = await response.json();
+
+      // Redirect to Stripe Customer Portal
+      window.location.href = url;
+    } catch (error) {
+      console.error('Error opening billing portal:', error);
+      setBillingError(error instanceof Error ? error.message : 'Failed to open billing portal');
+      setIsBillingLoading(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -335,24 +368,36 @@ export function SubscriptionSettings() {
           </Link>
 
           {(tier === 'pro' || tier === 'family') && (
-            <button
-              className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-blue-200 dark:hover:border-blue-800 transition-all group"
-              onClick={() => {
-                // TODO: Implement Stripe customer portal
-                console.log('Open billing portal');
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                  <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <div className="space-y-2">
+              <button
+                className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-blue-200 dark:hover:border-blue-800 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={handleManageBilling}
+                disabled={isBillingLoading}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    {isBillingLoading ? (
+                      <Loader2 className="h-5 w-5 text-blue-600 dark:text-blue-400 animate-spin" />
+                    ) : (
+                      <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    )}
+                  </div>
+                  <div className="text-left">
+                    <span className="font-semibold text-gray-900 dark:text-white block">
+                      {isBillingLoading ? 'Opening Billing Portal...' : 'Manage Billing'}
+                    </span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">Update payment method, view invoices</span>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <span className="font-semibold text-gray-900 dark:text-white block">Manage Billing</span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Update payment method, view invoices</span>
-                </div>
-              </div>
-              <span className="text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all">→</span>
-            </button>
+                <span className="text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all">→</span>
+              </button>
+              {billingError && (
+                <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2 px-4">
+                  <AlertTriangle className="h-4 w-4" />
+                  {billingError}
+                </p>
+              )}
+            </div>
           )}
         </div>
 

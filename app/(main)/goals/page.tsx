@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle, GitBranch, X, BarChart3, Calendar, MoreHorizontal, ChevronDown } from 'lucide-react';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -696,50 +697,58 @@ export default function GoalsPage() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {/* Simplified Navigation - Core tabs only */}
               <div className="flex items-center gap-1 p-1.5 bg-gradient-to-r from-indigo-100 to-indigo-200 dark:from-indigo-900/30 dark:to-indigo-800/30 rounded-xl border border-indigo-200 dark:border-indigo-700 sm:min-w-[380px]">
-                <button
-                  onClick={() => handleViewModeChange('goals')}
-                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
-                    viewMode === 'goals'
-                      ? 'bg-gradient-goals text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                  }`}
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                  <span className="text-sm">Goals</span>
-                </button>
-                <button
-                  onClick={() => handleViewModeChange('milestones')}
-                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
-                    viewMode === 'milestones'
-                      ? 'bg-gradient-goals text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                  <span className="text-sm">Milestones</span>
-                </button>
-                <button
-                  onClick={() => handleViewModeChange('habits')}
-                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
-                    viewMode === 'habits'
-                      ? 'bg-gradient-goals text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                  }`}
-                >
-                  <Target className="w-4 h-4" />
-                  <span className="text-sm">Habits</span>
-                </button>
-                <button
-                  onClick={() => handleViewModeChange('activity')}
-                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
-                    viewMode === 'activity'
-                      ? 'bg-gradient-goals text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
-                  }`}
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  <span className="text-sm">Activity</span>
-                </button>
+                <Tooltip content="View and manage your goals" position="bottom">
+                  <button
+                    onClick={() => handleViewModeChange('goals')}
+                    className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                      viewMode === 'goals'
+                        ? 'bg-gradient-goals text-white'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                    }`}
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                    <span className="text-sm">Goals</span>
+                  </button>
+                </Tooltip>
+                <Tooltip content="Celebrate completed achievements" position="bottom">
+                  <button
+                    onClick={() => handleViewModeChange('milestones')}
+                    className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                      viewMode === 'milestones'
+                        ? 'bg-gradient-goals text-white'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                    }`}
+                  >
+                    <List className="w-4 h-4" />
+                    <span className="text-sm">Milestones</span>
+                  </button>
+                </Tooltip>
+                <Tooltip content="Track daily habits and streaks" position="bottom">
+                  <button
+                    onClick={() => handleViewModeChange('habits')}
+                    className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                      viewMode === 'habits'
+                        ? 'bg-gradient-goals text-white'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                    }`}
+                  >
+                    <Target className="w-4 h-4" />
+                    <span className="text-sm">Habits</span>
+                  </button>
+                </Tooltip>
+                <Tooltip content="View recent goal updates and changes" position="bottom">
+                  <button
+                    onClick={() => handleViewModeChange('activity')}
+                    className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                      viewMode === 'activity'
+                        ? 'bg-gradient-goals text-white'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                    }`}
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span className="text-sm">Activity</span>
+                  </button>
+                </Tooltip>
               </div>
               <button
                 onClick={handleNewButtonClick}

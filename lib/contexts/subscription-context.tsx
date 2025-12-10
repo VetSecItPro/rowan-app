@@ -121,7 +121,18 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   // Fetch subscription status
   const fetchSubscription = useCallback(async () => {
     try {
-      const response = await fetch('/api/subscriptions');
+      // DEV ONLY: Check for mockTier in URL for testing feature gating
+      let url = '/api/subscriptions';
+      if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const mockTier = urlParams.get('mockTier');
+        if (mockTier) {
+          url = `/api/subscriptions?mockTier=${mockTier}`;
+          console.log(`[DEV] Testing with mock tier: ${mockTier}`);
+        }
+      }
+
+      const response = await fetch(url);
       if (!response.ok) {
         // Not logged in or error - default to free
         setTier('free');

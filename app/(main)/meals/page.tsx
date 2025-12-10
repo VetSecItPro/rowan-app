@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback, memo, useRef } from 'react';
 import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, TrendingUp, ShoppingBag, ChevronLeft, ChevronRight, LayoutGrid, List, ChefHat, ExternalLink, X, CheckSquare } from 'lucide-react';
+import { Tooltip } from '@/components/ui/Tooltip';
 import Link from 'next/link';
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -873,39 +874,45 @@ export default function MealsPage() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {/* View Toggle */}
               <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700 w-full sm:w-auto">
-                <button
-                  onClick={handleSetCalendarView}
-                  className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
-                    viewMode === 'calendar'
-                      ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
-                  }`}
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                  <span className="text-sm">Calendar</span>
-                </button>
-                <button
-                  onClick={handleSetListView}
-                  className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
-                    viewMode === 'list'
-                      ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                  <span className="text-sm">List</span>
-                </button>
-                <button
-                  onClick={handleSetRecipesView}
-                  className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
-                    viewMode === 'recipes'
-                      ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
-                  }`}
-                >
-                  <BookOpen className="w-4 h-4" />
-                  <span className="text-sm">Recipes</span>
-                </button>
+                <Tooltip content="View meals in weekly calendar format" position="bottom">
+                  <button
+                    onClick={handleSetCalendarView}
+                    className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
+                      viewMode === 'calendar'
+                        ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
+                    }`}
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                    <span className="text-sm">Calendar</span>
+                  </button>
+                </Tooltip>
+                <Tooltip content="View all planned meals as a list" position="bottom">
+                  <button
+                    onClick={handleSetListView}
+                    className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
+                      viewMode === 'list'
+                        ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
+                    }`}
+                  >
+                    <List className="w-4 h-4" />
+                    <span className="text-sm">List</span>
+                  </button>
+                </Tooltip>
+                <Tooltip content="Browse your saved recipe collection" position="bottom">
+                  <button
+                    onClick={handleSetRecipesView}
+                    className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
+                      viewMode === 'recipes'
+                        ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
+                    }`}
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    <span className="text-sm">Recipes</span>
+                  </button>
+                </Tooltip>
               </div>
 
               {/* Shopping Actions Toggle */}

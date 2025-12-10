@@ -20,6 +20,7 @@ import {
   PlusCircle,
   Scan
 } from 'lucide-react';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { ReceiptScanner } from '@/components/expenses/ReceiptScanner';
 import { ReceiptLibrary } from '@/components/expenses/ReceiptLibrary';
 import { ExtractedReceiptData, ExpenseSuggestion } from '@/lib/services/receipt-scanning-service';
@@ -199,14 +200,18 @@ export default function ExpensesPage() {
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="scanner" className="flex items-center gap-2">
-            <Scan className="h-4 w-4" />
-            Receipt Scanner
-          </TabsTrigger>
-          <TabsTrigger value="library" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            Receipt Library
-          </TabsTrigger>
+          <Tooltip content="Upload and scan receipts with AI" position="bottom">
+            <TabsTrigger value="scanner" className="flex items-center gap-2">
+              <Scan className="h-4 w-4" />
+              Receipt Scanner
+            </TabsTrigger>
+          </Tooltip>
+          <Tooltip content="Browse and search saved receipts" position="bottom">
+            <TabsTrigger value="library" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Receipt Library
+            </TabsTrigger>
+          </Tooltip>
         </TabsList>
 
         <TabsContent value="scanner" className="space-y-6">
