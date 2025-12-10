@@ -11,6 +11,9 @@ const weatherCache = new Map<string, {
   timestamp: number;
 }>();
 
+// In-flight request tracker to prevent duplicate concurrent fetches
+const inFlightRequests = new Map<string, Promise<WeatherForecast | null>>();
+
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 
 interface WeatherBadgeProps {
@@ -36,9 +39,6 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
   }, [eventTime, location]);
 
   const loadWeather = async () => {
-    console.log('[WeatherBadge] loadWeather called with:', { location, eventTime });
-    // Note: No early return - let weather service handle user location detection when location is undefined
-
     // Create cache key - handle undefined location for user location detection
     const effectiveLocation = location || 'user-location';
     const cacheKey = `${effectiveLocation}-${eventTime.split('T')[0]}`;
@@ -68,9 +68,25 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
       }
       abortControllerRef.current = new AbortController();
 
-      console.log('[WeatherBadge] About to call weatherService.getWeatherForEvent with:', { location, eventTime });
-      const forecast = await weatherService.getWeatherForEvent(location, eventTime);
-      console.log('[WeatherBadge] weatherService.getWeatherForEvent returned:', forecast);
+      // Check if there's already an in-flight request for this cache key
+      let forecast: WeatherForecast | null;
+      const existingRequest = inFlightRequests.get(cacheKey);
+
+      if (existingRequest) {
+        // Wait for the existing request instead of making a duplicate
+        forecast = await existingRequest;
+      } else {
+        // Create the request and track it
+        const requestPromise = weatherService.getWeatherForEvent(location, eventTime);
+        inFlightRequests.set(cacheKey, requestPromise);
+
+        try {
+          forecast = await requestPromise;
+        } finally {
+          // Clean up the in-flight tracker
+          inFlightRequests.delete(cacheKey);
+        }
+      }
 
       if (forecast) {
         const weatherAlert = weatherService.shouldWarnAboutWeather(forecast, location);
@@ -97,11 +113,6 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
       if (error instanceof Error && error.name === 'AbortError') {
         // Request was cancelled - this is normal
         return;
-      }
-
-      // Only log weather errors in development
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('[WeatherBadge] Weather unavailable for', location, ':', error instanceof Error ? error.message : 'Unknown error');
       }
 
       // If we had no cached data and fetch failed, gracefully degrade

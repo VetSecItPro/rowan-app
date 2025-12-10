@@ -233,7 +233,7 @@ async function permanentlyDeleteExpiredAccounts() {
         await accountDeletionService.logDeletionAction(account.user_id, 'permanent', {
           timestamp: now.toISOString(),
           partnership_ids: account.partnership_ids || [],
-        });
+        }, supabase);
 
         // Delete from auth (this cascades to profiles via foreign key)
         const { error: authDeleteError } = await supabase.auth.admin.deleteUser(account.user_id);

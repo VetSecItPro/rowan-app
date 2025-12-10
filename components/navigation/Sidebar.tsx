@@ -3,9 +3,9 @@
 import { useState, useEffect, useMemo, memo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronLeft, ChevronRight, MessageSquare } from 'lucide-react';
+import { ChevronLeft, ChevronRight, LayoutDashboard } from 'lucide-react';
 import { NAVIGATION_ITEMS, type NavItem } from '@/lib/navigation';
-import { useAuth } from '@/hooks/useAuth';
+import { useAdmin } from '@/hooks/useAdmin';
 import { TrialBadge } from '@/components/subscription';
 
 const SIDEBAR_STORAGE_KEY = 'sidebar-expanded';
@@ -92,10 +92,7 @@ export function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(true); // Start expanded by default for new users
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
-  const { user } = useAuth();
-
-  // Check if user is admin
-  const isAdmin = user?.email === 'vetsecitpro@gmail.com';
+  const { isAdmin } = useAdmin();
 
   // Load saved state from localStorage
   useEffect(() => {
@@ -177,31 +174,31 @@ export function Sidebar() {
             ))}
           </ul>
         </div>
-
-        {/* Admin Section - Only visible to admin */}
-        {isAdmin && (
-          <div className="mt-4 mx-2 rounded-xl bg-gradient-to-b from-orange-50/30 to-transparent dark:from-orange-900/10 dark:to-transparent p-2">
-            {isExpanded && (
-              <span className="text-xs font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 px-2 mb-3 block">
-                Admin
-              </span>
-            )}
-            <ul className="space-y-1.5">
-              <NavItemComponent
-                item={{
-                  name: 'Beta Feedback',
-                  href: '/admin/beta-feedback',
-                  icon: MessageSquare,
-                  gradient: 'bg-gradient-to-r from-orange-500 to-red-500',
-                  description: 'Manage feedback',
-                }}
-                isActive={pathname === '/admin/beta-feedback' || (pathname?.startsWith('/admin/beta-feedback') ?? false)}
-                isExpanded={isExpanded}
-              />
-            </ul>
-          </div>
-        )}
       </nav>
+
+      {/* Admin Section - separate from features */}
+      {isAdmin && (
+        <div className="mx-2 mb-2 px-2 pt-2 pb-3 border-t border-gray-200/50 dark:border-gray-700/30">
+          {isExpanded && (
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2.5 mb-2 block">
+              Admin
+            </span>
+          )}
+          <ul className="space-y-1.5">
+            <NavItemComponent
+              item={{
+                name: 'Admin Dashboard',
+                href: '/admin/dashboard',
+                icon: LayoutDashboard,
+                gradient: 'bg-gradient-to-r from-orange-500 to-amber-500',
+                description: 'Analytics & metrics',
+              }}
+              isActive={pathname === '/admin/dashboard' || (pathname?.startsWith('/admin/dashboard') ?? false)}
+              isExpanded={isExpanded}
+            />
+          </ul>
+        </div>
+      )}
 
       {/* Footer gradient fade */}
       <div className="h-8 bg-gradient-to-t from-white/80 dark:from-gray-900/80 to-transparent pointer-events-none" />
