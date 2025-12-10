@@ -5,7 +5,7 @@
  * Displays a single pricing tier with features and CTA
  */
 
-import { Check } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 
 export interface PricingCardProps {
   tier: 'free' | 'pro' | 'family';
@@ -17,6 +17,8 @@ export interface PricingCardProps {
   features: string[];
   cta: string;
   popular?: boolean;
+  loading?: boolean;
+  disabled?: boolean;
   onSelect: () => void;
 }
 
@@ -30,6 +32,8 @@ export function PricingCard({
   features,
   cta,
   popular = false,
+  loading = false,
+  disabled = false,
   onSelect,
 }: PricingCardProps) {
   const price = period === 'monthly' ? monthlyPrice : annualPrice;
@@ -88,16 +92,18 @@ export function PricingCard({
       {/* CTA Button */}
       <button
         onClick={onSelect}
-        className={`mb-6 w-full rounded-lg px-6 py-3 text-base font-semibold transition-all ${
+        disabled={loading || disabled}
+        className={`mb-6 w-full rounded-lg px-6 py-3 text-base font-semibold transition-all flex items-center justify-center gap-2 ${
           popular
             ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-700 hover:to-teal-700 dark:from-emerald-500 dark:to-teal-500 dark:hover:from-emerald-600 dark:hover:to-teal-600 shadow-md hover:shadow-lg'
             : isFree
               ? 'bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600'
               : 'bg-gray-900 text-white hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600'
-        }`}
+        } ${(loading || disabled) ? 'opacity-60 cursor-not-allowed' : ''}`}
         aria-label={`${cta} for ${title} plan`}
       >
-        {cta}
+        {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+        {loading ? 'Processing...' : cta}
       </button>
 
       {/* Features List */}
