@@ -85,30 +85,24 @@ export const weatherService = {
     location: string | undefined,
     eventTime: string
   ): Promise<WeatherForecast | null> {
-    console.log('[Weather Service] getWeatherForEvent called with:', { location, eventTime });
     let effectiveLocation = location;
 
     // If no location provided, try to detect user location
     if (!effectiveLocation) {
-      console.log('[Weather] No event location provided, attempting to detect user location...');
       effectiveLocation = (await this.detectUserLocation()) || undefined;
     }
 
     if (!effectiveLocation) {
-      console.log('[Weather] No location available (event or user), skipping weather fetch');
       return null;
     }
 
     // Smart fetching: Only fetch for upcoming events within 5 days
     const shouldFetch = this.shouldFetchWeather(eventTime);
-    console.log('[Weather Service] shouldFetchWeather result:', { eventTime, shouldFetch });
     if (!shouldFetch) {
-      console.log('[Weather Service] Skipping weather fetch - outside 5-day window');
       return null;
     }
 
     try {
-      console.log(`[Weather] Fetching weather for ${effectiveLocation} at ${eventTime}`);
 
       // Use cache with 3-hour TTL
       return await weatherCacheService.getOrFetchWeather(
