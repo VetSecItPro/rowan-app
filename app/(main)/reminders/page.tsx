@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown, TrendingUp, X } from 'lucide-react';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
@@ -541,66 +542,78 @@ export default function RemindersPage(): JSX.Element {
                       Category
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      <button
-                        onClick={() => setCategoryFilter('all')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                          categoryFilter === 'all'
-                            ? 'bg-pink-500 text-white'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/20'
-                        }`}
-                      >
-                        All
-                      </button>
-                      <button
-                        onClick={() => setCategoryFilter('bills')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
-                          categoryFilter === 'bills'
-                            ? 'bg-green-500 text-white'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-green-900/20'
-                        }`}
-                      >
-                        <span>💰</span> Bills
-                      </button>
-                      <button
-                        onClick={() => setCategoryFilter('health')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
-                          categoryFilter === 'health'
-                            ? 'bg-red-500 text-white'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/20'
-                        }`}
-                      >
-                        <span>❤️</span> Health
-                      </button>
-                      <button
-                        onClick={() => setCategoryFilter('work')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
-                          categoryFilter === 'work'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/20'
-                        }`}
-                      >
-                        <span>💼</span> Work
-                      </button>
-                      <button
-                        onClick={() => setCategoryFilter('personal')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
-                          categoryFilter === 'personal'
-                            ? 'bg-purple-500 text-white'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-purple-900/20'
-                        }`}
-                      >
-                        <span>✨</span> Personal
-                      </button>
-                      <button
-                        onClick={() => setCategoryFilter('household')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
-                          categoryFilter === 'household'
-                            ? 'bg-amber-500 text-white'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-amber-100 dark:hover:bg-amber-900/20'
-                        }`}
-                      >
-                        <span>🏠</span> Household
-                      </button>
+                      <Tooltip content="Show all reminders" position="bottom">
+                        <button
+                          onClick={() => setCategoryFilter('all')}
+                          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                            categoryFilter === 'all'
+                              ? 'bg-pink-500 text-white'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/20'
+                          }`}
+                        >
+                          All
+                        </button>
+                      </Tooltip>
+                      <Tooltip content="Bill payments and due dates" position="bottom">
+                        <button
+                          onClick={() => setCategoryFilter('bills')}
+                          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
+                            categoryFilter === 'bills'
+                              ? 'bg-green-500 text-white'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-green-900/20'
+                          }`}
+                        >
+                          <span>💰</span> Bills
+                        </button>
+                      </Tooltip>
+                      <Tooltip content="Medical appointments and medications" position="bottom">
+                        <button
+                          onClick={() => setCategoryFilter('health')}
+                          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
+                            categoryFilter === 'health'
+                              ? 'bg-red-500 text-white'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/20'
+                          }`}
+                        >
+                          <span>❤️</span> Health
+                        </button>
+                      </Tooltip>
+                      <Tooltip content="Work deadlines and meetings" position="bottom">
+                        <button
+                          onClick={() => setCategoryFilter('work')}
+                          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
+                            categoryFilter === 'work'
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/20'
+                          }`}
+                        >
+                          <span>💼</span> Work
+                        </button>
+                      </Tooltip>
+                      <Tooltip content="Personal errands and self-care" position="bottom">
+                        <button
+                          onClick={() => setCategoryFilter('personal')}
+                          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
+                            categoryFilter === 'personal'
+                              ? 'bg-purple-500 text-white'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-purple-900/20'
+                          }`}
+                        >
+                          <span>✨</span> Personal
+                        </button>
+                      </Tooltip>
+                      <Tooltip content="Home maintenance and chores" position="bottom">
+                        <button
+                          onClick={() => setCategoryFilter('household')}
+                          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
+                            categoryFilter === 'household'
+                              ? 'bg-amber-500 text-white'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-amber-100 dark:hover:bg-amber-900/20'
+                          }`}
+                        >
+                          <span>🏠</span> Household
+                        </button>
+                      </Tooltip>
                     </div>
                   </div>
 

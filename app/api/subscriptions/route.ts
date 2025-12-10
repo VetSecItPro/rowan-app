@@ -3,18 +3,57 @@
  * GET /api/subscriptions - Get current user's subscription details
  *
  * IMPORTANT: Server-side only - requires authentication
+ *
+ * DEV-ONLY: Add ?mockTier=free|pro|family|trial to test feature gating
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getUserFeatureAccess } from '@/lib/services/feature-access-service';
 import { getSubscriptionStatus } from '@/lib/services/subscription-service';
+import type { SubscriptionTier } from '@/lib/types';
 
 /**
  * GET handler - Get user's subscription details including features and usage
  */
 export async function GET(request: NextRequest) {
   try {
+    // DEV ONLY: Allow mocking subscription tier for testing (before auth check)
+    const mockTier = request.nextUrl.searchParams.get('mockTier') as SubscriptionTier | 'trial' | null;
+    const isDev = process.env.NODE_ENV === 'development';
+
+    if (isDev && mockTier) {
+      console.log(`[DEV] Mocking subscription tier: ${mockTier}`);
+
+      // Return mock data for testing (bypasses auth for dev testing)
+      const isTrialMock = mockTier === 'trial';
+      const actualTier = isTrialMock ? 'free' : mockTier as SubscriptionTier;
+
+      return NextResponse.json({
+        tier: actualTier,
+        trial: {
+          isInTrial: isTrialMock,
+          daysRemaining: isTrialMock ? 10 : 0,
+          trialEndsAt: isTrialMock ? new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString() : null,
+          trialStartedAt: isTrialMock ? new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString() : null,
+        },
+        subscription: {
+          tier: actualTier,
+          status: mockTier === 'free' ? 'none' : 'active',
+          isActive: mockTier !== 'free',
+          isPastDue: false,
+          isCanceled: false,
+          expiresAt: null,
+          daysUntilExpiration: null,
+        },
+        features: {},
+        limits: {},
+        dailyUsage: {},
+        _mock: true,
+        _mockTier: mockTier,
+      }, { status: 200 });
+    }
+
     // Get authenticated user
     const supabase = createClient();
     const {

@@ -25,6 +25,7 @@ const CACHE_TTL = {
   analytics: 900,          // 15 minutes for analytics (expensive queries, historical data)
   betaStats: 300,          // 5 minutes for beta stats
   notificationStats: 300,  // 5 minutes for notification stats
+  subscriptionAnalytics: 600, // 10 minutes for subscription metrics (revenue data)
 } as const;
 
 interface CacheOptions {
@@ -129,4 +130,8 @@ export const ADMIN_CACHE_KEYS = {
   analytics: (range: string) => `analytics:${range}`,
   betaStats: 'beta:stats',
   notificationStats: 'notifications:stats',
+  subscriptionMetrics: 'subscriptions:metrics',
+  subscriptionEvents: (eventType: string | null, limit: number, offset: number) =>
+    `subscriptions:events:${eventType || 'all'}:${limit}:${offset}`,
+  dailyRevenue: (days: number) => `subscriptions:revenue:${days}d`,
 } as const;
