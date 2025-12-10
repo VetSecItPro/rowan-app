@@ -180,12 +180,12 @@ export default function AdminDashboardPage() {
           <div className="flex items-center justify-between py-6">
             <div className="flex items-center gap-4">
               <a
-                href="/"
+                href="/dashboard"
                 className="flex items-center gap-2 px-3 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                 title="Back to Rowan App"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span className="text-sm font-medium">Back to Website</span>
+                <span className="text-sm font-medium">Back to App</span>
               </a>
               <div className="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
