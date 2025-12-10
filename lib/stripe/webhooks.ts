@@ -7,7 +7,14 @@
 
 import { getStripeClient } from './client';
 import { createClient } from '../supabase/server';
+import {
+  sendSubscriptionWelcomeEmail,
+  sendPaymentFailedEmail,
+  sendSubscriptionCancelledEmail,
+} from '../services/email-service';
 import type Stripe from 'stripe';
+
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://rowanapp.com';
 
 /**
  * Verify Stripe webhook signature
@@ -84,8 +91,8 @@ async function handleCheckoutSessionCompleted(
 ): Promise<void> {
   const supabase = createClient();
   const userId = session.metadata?.userId;
-  const tier = session.metadata?.tier;
-  const period = session.metadata?.period;
+  const tier = session.metadata?.tier as 'pro' | 'family' | undefined;
+  const period = session.metadata?.period as 'monthly' | 'annual' | undefined;
 
   if (!userId || !tier || !period) {
     console.error('Missing metadata in checkout session:', session.id);
@@ -124,6 +131,30 @@ async function handleCheckoutSessionCompleted(
       subscription_id: session.subscription,
     },
   });
+
+  // Get user email and name for welcome email
+  const { data: user } = await supabase
+    .from('users')
+    .select('email, name')
+    .eq('id', userId)
+    .single();
+
+  if (user?.email) {
+    // Send welcome email
+    const emailResult = await sendSubscriptionWelcomeEmail({
+      recipientEmail: user.email,
+      recipientName: user.name || 'there',
+      tier,
+      period,
+      dashboardUrl: `${BASE_URL}/dashboard`,
+    });
+
+    if (emailResult.success) {
+      console.log(`Welcome email sent to ${user.email}`);
+    } else {
+      console.error('Failed to send welcome email:', emailResult.error);
+    }
+  }
 
   console.log(`Subscription created for user ${userId}: ${tier} ${period}`);
 }
@@ -232,6 +263,7 @@ async function handleSubscriptionDeleted(
 
   // Update to canceled status (keep record for history)
   const periodEnd = (subscription as any).current_period_end;
+  const accessUntilDate = periodEnd ? new Date(periodEnd * 1000) : new Date();
 
   const { error } = await supabase
     .from('subscriptions')
@@ -260,6 +292,37 @@ async function handleSubscriptionDeleted(
       ended_at: subscription.ended_at,
     },
   });
+
+  // Get user email and name for cancellation email
+  const { data: user } = await supabase
+    .from('users')
+    .select('email, name')
+    .eq('id', userId)
+    .single();
+
+  if (user?.email && currentSub?.tier) {
+    const tier = currentSub.tier as 'pro' | 'family';
+    // Format the access until date nicely
+    const accessUntil = accessUntilDate.toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    });
+
+    const emailResult = await sendSubscriptionCancelledEmail({
+      recipientEmail: user.email,
+      recipientName: user.name || 'there',
+      tier,
+      accessUntil,
+      resubscribeUrl: `${BASE_URL}/pricing`,
+    });
+
+    if (emailResult.success) {
+      console.log(`Cancellation email sent to ${user.email}`);
+    } else {
+      console.error('Failed to send cancellation email:', emailResult.error);
+    }
+  }
 
   console.log(`Subscription canceled for user ${userId}`);
 }
@@ -343,6 +406,33 @@ async function handleInvoicePaymentFailed(
       attempt_count: invoice.attempt_count,
     },
   });
+
+  // Get user email and name for payment failed email
+  const { data: user } = await supabase
+    .from('users')
+    .select('email, name')
+    .eq('id', subscription.user_id)
+    .single();
+
+  if (user?.email && subscription.tier) {
+    const tier = subscription.tier as 'pro' | 'family';
+    const attemptCount = invoice.attempt_count || 1;
+
+    const emailResult = await sendPaymentFailedEmail({
+      recipientEmail: user.email,
+      recipientName: user.name || 'there',
+      tier,
+      attemptCount,
+      updatePaymentUrl: `${BASE_URL}/settings/billing`,
+      gracePeriodDays: 7, // Standard 7-day grace period
+    });
+
+    if (emailResult.success) {
+      console.log(`Payment failed email sent to ${user.email}`);
+    } else {
+      console.error('Failed to send payment failed email:', emailResult.error);
+    }
+  }
 
   console.log(`Payment failed for subscription ${subscriptionId}`);
 }
