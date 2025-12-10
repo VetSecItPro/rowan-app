@@ -12,6 +12,17 @@ import {
   sendPaymentFailedEmail,
   sendSubscriptionCancelledEmail,
 } from '../services/email-service';
+import {
+  logWebhookReceived,
+  logWebhookProcessed,
+  logWebhookError,
+  logSubscriptionCreated,
+  logSubscriptionUpdated,
+  logSubscriptionCancelled,
+  logPaymentSucceeded,
+  logPaymentFailed,
+  logCheckoutSuccess,
+} from '../utils/monetization-logger';
 import type Stripe from 'stripe';
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://rowanapp.com';
@@ -51,35 +62,59 @@ export function constructWebhookEvent(
  * @param event - Verified Stripe event
  */
 export async function handleWebhookEvent(event: Stripe.Event): Promise<void> {
-  console.log(`Processing webhook event: ${event.type}`);
+  const startTime = Date.now();
 
-  switch (event.type) {
-    case 'checkout.session.completed':
-      await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
-      break;
+  // Log webhook received
+  logWebhookReceived({
+    stripeEventId: event.id,
+    eventType: event.type,
+  });
 
-    case 'customer.subscription.created':
-      await handleSubscriptionCreated(event.data.object as Stripe.Subscription);
-      break;
+  try {
+    switch (event.type) {
+      case 'checkout.session.completed':
+        await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
+        break;
 
-    case 'customer.subscription.updated':
-      await handleSubscriptionUpdated(event.data.object as Stripe.Subscription);
-      break;
+      case 'customer.subscription.created':
+        await handleSubscriptionCreated(event.data.object as Stripe.Subscription);
+        break;
 
-    case 'customer.subscription.deleted':
-      await handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
-      break;
+      case 'customer.subscription.updated':
+        await handleSubscriptionUpdated(event.data.object as Stripe.Subscription);
+        break;
 
-    case 'invoice.payment_succeeded':
-      await handleInvoicePaymentSucceeded(event.data.object as Stripe.Invoice);
-      break;
+      case 'customer.subscription.deleted':
+        await handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
+        break;
 
-    case 'invoice.payment_failed':
-      await handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
-      break;
+      case 'invoice.payment_succeeded':
+        await handleInvoicePaymentSucceeded(event.data.object as Stripe.Invoice);
+        break;
 
-    default:
-      console.log(`Unhandled event type: ${event.type}`);
+      case 'invoice.payment_failed':
+        await handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
+        break;
+
+      default:
+        console.log(`Unhandled event type: ${event.type}`);
+    }
+
+    // Log successful processing
+    const processingTimeMs = Date.now() - startTime;
+    logWebhookProcessed({
+      stripeEventId: event.id,
+      eventType: event.type,
+      processingTimeMs,
+    });
+  } catch (error) {
+    // Log error
+    logWebhookError({
+      stripeEventId: event.id,
+      eventType: event.type,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+    throw error; // Re-throw to allow caller to handle
   }
 }
 
@@ -130,6 +165,25 @@ async function handleCheckoutSessionCompleted(
       customer_id: session.customer,
       subscription_id: session.subscription,
     },
+  });
+
+  // Log checkout success with structured logger
+  logCheckoutSuccess({
+    userId,
+    tier,
+    period,
+    stripeSessionId: session.id,
+    stripeCustomerId: session.customer as string,
+    stripeSubscriptionId: session.subscription as string,
+  });
+
+  // Log subscription created
+  logSubscriptionCreated({
+    userId,
+    tier,
+    period,
+    stripeCustomerId: session.customer as string,
+    stripeSubscriptionId: session.subscription as string,
   });
 
   // Get user email and name for welcome email
@@ -237,6 +291,18 @@ async function handleSubscriptionUpdated(
     },
   });
 
+  // Log with structured logger
+  logSubscriptionUpdated({
+    userId,
+    tier: subscription.metadata?.tier || 'unknown',
+    period: subscription.metadata?.period || 'monthly',
+    stripeSubscriptionId: subscription.id,
+    metadata: {
+      new_status: status,
+      stripe_status: subscription.status,
+    },
+  });
+
   console.log(`Subscription updated for user ${userId}: ${status}`);
 }
 
@@ -291,6 +357,14 @@ async function handleSubscriptionDeleted(
       canceled_at: subscription.canceled_at,
       ended_at: subscription.ended_at,
     },
+  });
+
+  // Log with structured logger
+  logSubscriptionCancelled({
+    userId,
+    tier: currentSub?.tier || 'unknown',
+    stripeSubscriptionId: subscription.id,
+    periodEndDate: accessUntilDate.toISOString(),
   });
 
   // Get user email and name for cancellation email
@@ -353,6 +427,15 @@ async function handleInvoicePaymentSucceeded(
     console.error('Error updating subscription on payment success:', error);
   }
 
+  // Log payment success
+  logPaymentSucceeded({
+    userId: '', // We don't have userId here, but it's tracked via subscription_id
+    amount: invoice.amount_due / 100,
+    currency: invoice.currency.toUpperCase(),
+    stripeSubscriptionId: subscriptionId,
+    invoiceId: invoice.id,
+  });
+
   console.log(`Payment succeeded for subscription ${subscriptionId}`);
 }
 
@@ -405,6 +488,17 @@ async function handleInvoicePaymentFailed(
       amount_due: invoice.amount_due,
       attempt_count: invoice.attempt_count,
     },
+  });
+
+  // Log with structured logger
+  logPaymentFailed({
+    userId: subscription.user_id,
+    amount: invoice.amount_due / 100,
+    currency: invoice.currency?.toUpperCase() || 'USD',
+    stripeSubscriptionId: subscriptionId,
+    error: 'Invoice payment failed',
+    attemptCount: invoice.attempt_count || 1,
+    invoiceId: invoice.id,
   });
 
   // Get user email and name for payment failed email
