@@ -105,7 +105,7 @@ const QuickAction = memo(function QuickAction({
   return (
     <button
       onClick={onClick}
-      className="w-full p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md transition-all duration-200 text-left group"
+      className="w-full p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md transition-all duration-200 text-left group cursor-pointer"
     >
       <div className="flex items-start gap-4">
         <div className="flex-shrink-0 mt-0.5">
