@@ -233,7 +233,6 @@ export const weatherService = {
         return null;
       }
 
-      console.log(`[Weather] Successfully geocoded "${location}" to ${data.lat}, ${data.lon}`);
       return {
         lat: data.lat,
         lon: data.lon,
