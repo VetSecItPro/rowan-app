@@ -9,13 +9,12 @@ try {
   // Check if Upstash credentials are available
   if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
     redisConnectionError = 'Upstash credentials not configured';
-    console.warn('[Weather Cache] Upstash Redis not configured - running without cache');
+    // Silently continue without cache - this is expected in development
   } else {
     redis = new Redis({
       url: process.env.UPSTASH_REDIS_REST_URL,
       token: process.env.UPSTASH_REDIS_REST_TOKEN,
     });
-    console.log('[Weather Cache] Upstash Redis initialized successfully');
   }
 } catch (error) {
   redisConnectionError = error instanceof Error ? error.message : 'Unknown Redis initialization error';
