@@ -6,7 +6,7 @@
  * Updated to use correct type properties from subscription-context
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Crown,
@@ -23,10 +23,29 @@ import {
   ShoppingCart,
   Camera,
   Star,
-  Loader2
+  Loader2,
+  CreditCard,
+  Receipt,
+  CalendarClock,
+  ExternalLink
 } from 'lucide-react';
 import { useSubscription } from '@/lib/contexts/subscription-context';
 import { motion } from 'framer-motion';
+
+interface BillingInfo {
+  hasBillingInfo: boolean;
+  nextBillingDate?: string;
+  nextAmount?: number;
+  currency?: string;
+  paymentMethod?: {
+    brand: string;
+    last4: string;
+    expMonth: number;
+    expYear: number;
+  };
+  status?: string;
+  cancelAtPeriodEnd?: boolean;
+}
 
 const TIER_DETAILS = {
   free: {
@@ -85,6 +104,26 @@ export function SubscriptionSettings() {
 
   const [isBillingLoading, setIsBillingLoading] = useState(false);
   const [billingError, setBillingError] = useState<string | null>(null);
+  const [billingInfo, setBillingInfo] = useState<BillingInfo | null>(null);
+  const [isBillingInfoLoading, setIsBillingInfoLoading] = useState(false);
+
+  // Fetch billing info for paid users
+  useEffect(() => {
+    if (tier === 'pro' || tier === 'family') {
+      setIsBillingInfoLoading(true);
+      fetch('/api/stripe/billing-info')
+        .then(res => res.json())
+        .then(data => {
+          setBillingInfo(data);
+        })
+        .catch(err => {
+          console.error('Failed to fetch billing info:', err);
+        })
+        .finally(() => {
+          setIsBillingInfoLoading(false);
+        });
+    }
+  }, [tier]);
 
   /**
    * Opens Stripe Customer Portal for billing management
@@ -262,11 +301,124 @@ export function SubscriptionSettings() {
         </div>
       </motion.div>
 
+      {/* Billing Summary Card - Only for paid subscribers */}
+      {(tier === 'pro' || tier === 'family') && billingInfo?.hasBillingInfo && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm"
+        >
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <Receipt className="h-5 w-5 text-emerald-500" />
+              Billing Summary
+            </h3>
+            <button
+              onClick={handleManageBilling}
+              disabled={isBillingLoading}
+              className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-1 transition-colors"
+            >
+              {isBillingLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  Manage in Stripe
+                  <ExternalLink className="h-3 w-3" />
+                </>
+              )}
+            </button>
+          </div>
+
+          {isBillingInfoLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="animate-pulse p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50">
+                  <div className="h-4 w-20 bg-gray-200 dark:bg-gray-600 rounded mb-2" />
+                  <div className="h-6 w-32 bg-gray-200 dark:bg-gray-600 rounded" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                {/* Next Billing Date */}
+                <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-100 dark:border-blue-800">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CalendarClock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <span className="text-xs font-medium text-blue-600 dark:text-blue-400">Next Billing</span>
+                  </div>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">
+                    {billingInfo.nextBillingDate
+                      ? new Date(billingInfo.nextBillingDate).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })
+                      : '—'
+                    }
+                  </p>
+                  {billingInfo.cancelAtPeriodEnd && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3" />
+                      Cancels after this period
+                    </p>
+                  )}
+                </div>
+
+                {/* Amount Due */}
+                <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border border-emerald-100 dark:border-emerald-800">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Receipt className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Amount</span>
+                  </div>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">
+                    {billingInfo.nextAmount !== undefined && billingInfo.nextAmount !== null
+                      ? `$${billingInfo.nextAmount.toFixed(2)}`
+                      : '—'
+                    }
+                    {billingInfo.currency && (
+                      <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">{billingInfo.currency}</span>
+                    )}
+                  </p>
+                </div>
+
+                {/* Payment Method */}
+                <div className="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-100 dark:border-purple-800">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CreditCard className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                    <span className="text-xs font-medium text-purple-600 dark:text-purple-400">Payment Method</span>
+                  </div>
+                  {billingInfo.paymentMethod ? (
+                    <>
+                      <p className="text-lg font-bold text-gray-900 dark:text-white capitalize">
+                        {billingInfo.paymentMethod.brand} •••• {billingInfo.paymentMethod.last4}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Expires {billingInfo.paymentMethod.expMonth}/{billingInfo.paymentMethod.expYear}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-lg font-bold text-gray-900 dark:text-white">—</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Quick note */}
+              <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                <Shield className="h-3 w-3 text-green-500" />
+                View full billing history and invoices in Stripe
+              </p>
+            </>
+          )}
+        </motion.div>
+      )}
+
       {/* Usage Limits */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
+        transition={{ delay: 0.15 }}
         className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm"
       >
         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
