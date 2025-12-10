@@ -29,7 +29,7 @@ export const activityFeedService = {
         supabase.from('goals').select('id, title, status, created_by, created_at, updated_at, users!goals_created_by_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('messages').select('id, content, sender_id, created_at, users!messages_sender_id_fkey(id, name, email, avatar_url)').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('calendar_events').select('id, title, created_by, created_at, updated_at').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
-        supabase.from('daily_check_ins').select('id, mood, created_at, user_id').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
+        supabase.from('daily_checkins').select('id, mood, created_at, user_id').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('shopping_lists').select('id, title, created_by, created_at, updated_at').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('meals').select('id, name, meal_type, created_by, created_at, updated_at').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
         supabase.from('expenses').select('id, title, amount, category, created_by, created_at, updated_at').eq('space_id', spaceId).order('created_at', { ascending: false }).limit(5),
@@ -252,7 +252,7 @@ export const activityFeedService = {
     const channels: RealtimeChannel[] = [];
 
     // Tables to monitor for activity
-    const tables = ['tasks', 'goals', 'messages', 'calendar_events', 'daily_check_ins', 'shopping_lists', 'meals', 'expenses', 'projects', 'reminders', 'chores'];
+    const tables = ['tasks', 'goals', 'messages', 'calendar_events', 'daily_checkins', 'shopping_lists', 'meals', 'expenses', 'projects', 'reminders', 'chores'];
 
     tables.forEach(table => {
       const channel = supabase
