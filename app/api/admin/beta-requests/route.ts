@@ -93,10 +93,11 @@ export async function GET(req: NextRequest) {
         }
 
         // Transform the data to include additional information
+        // SECURITY: password_attempt intentionally excluded to prevent credential exposure
         const requests = (betaRequests || []).map((request: any) => ({
           id: request.id,
           email: request.email,
-          password_attempt: request.password_attempt,
+          // password_attempt removed for security - credentials should never be exposed
           ip_address: request.ip_address,
           user_agent: request.user_agent,
           access_granted: request.access_granted,
@@ -134,7 +135,6 @@ export async function GET(req: NextRequest) {
     );
 
     // Log admin access
-    console.log(`Admin beta requests accessed by: ${sessionData.email} from IP: ${ip}`);
 
     return NextResponse.json({
       success: true,

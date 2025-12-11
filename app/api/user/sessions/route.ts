@@ -64,7 +64,7 @@ export async function GET(request: Request) {
       ipAddress: session.ip_address,
     }));
 
-    console.log('Formatted sessions for frontend:', formattedSessions);
+    // PII removed from logs for privacy compliance
 
     return NextResponse.json({
       success: true,

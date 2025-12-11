@@ -96,7 +96,6 @@ export async function PATCH(req: NextRequest) {
     }
 
     // Log admin action
-    console.log(`Admin ${sessionData.email} updated feedback ${validatedData.feedbackId} to status: ${validatedData.status}`);
 
     // Track admin activity
     await supabase
@@ -225,7 +224,6 @@ export async function POST(req: NextRequest) {
     }
 
     // Log admin action
-    console.log(`Admin ${sessionData.email} bulk updated ${validatedData.feedbackIds.length} feedback items to status: ${validatedData.status}`);
 
     return NextResponse.json({
       success: true,

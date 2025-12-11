@@ -93,56 +93,76 @@ export function fallbackRateLimit(
 
 /**
  * Extract IP address from request headers
- * Handles proxy chains and returns first valid IP
+ *
+ * SECURITY: IP extraction priority for rate limiting:
+ * 1. Vercel-specific headers (trusted, sanitized by Vercel)
+ * 2. Cloudflare-specific header (trusted, set by Cloudflare)
+ * 3. x-real-ip (typically set by reverse proxy)
+ * 4. x-forwarded-for LAST IP (rightmost is most trusted - set by our proxy)
+ *
+ * NOTE: We do NOT trust the FIRST IP in x-forwarded-for because attackers
+ * can prepend fake IPs. The rightmost IP is set by our trusted proxy.
+ *
+ * @param headers Request headers
+ * @returns IP address for rate limiting (NOT for geolocation or logging)
  */
 export function extractIP(headers: Headers): string {
-  console.log('extractIP: checking headers for IP address...');
+  // SECURITY: In production, trust platform-specific headers first
+  // These are sanitized by the platform and cannot be spoofed
 
-  // Try x-forwarded-for first (proxy chain)
-  const forwardedFor = headers.get('x-forwarded-for');
-  console.log('extractIP: x-forwarded-for =', forwardedFor);
-  if (forwardedFor) {
-    // Take first IP in chain (client IP)
-    const firstIP = forwardedFor.split(',')[0]?.trim();
-    if (firstIP) {
-      // Check if this is a localhost/development IP
-      if (firstIP === '::1' || firstIP === '127.0.0.1' || firstIP === 'localhost') {
-        console.log('extractIP: detected localhost IP, using development mode');
-        if (process.env.NODE_ENV === 'development') {
-          console.log('extractIP: development mode - using test IP for geolocation');
-          return '8.8.8.8'; // Use test IP for geolocation in development
-        }
-      }
-      console.log('extractIP: using x-forwarded-for IP =', firstIP);
-      return firstIP;
+  // 1. Vercel sets this header with the true client IP (cannot be spoofed)
+  const vercelForwardedFor = headers.get('x-vercel-forwarded-for');
+  if (vercelForwardedFor) {
+    const ip = vercelForwardedFor.split(',')[0]?.trim();
+    if (ip && isValidIP(ip)) {
+      return ip;
     }
   }
 
-  // Try x-real-ip (single proxy)
-  const realIP = headers.get('x-real-ip');
-  console.log('extractIP: x-real-ip =', realIP);
-  if (realIP) {
-    console.log('extractIP: using x-real-ip =', realIP);
-    return realIP.trim();
-  }
-
-  // Try cf-connecting-ip (Cloudflare)
+  // 2. Cloudflare sets this header (cannot be spoofed when behind CF)
   const cfIP = headers.get('cf-connecting-ip');
-  console.log('extractIP: cf-connecting-ip =', cfIP);
-  if (cfIP) {
-    console.log('extractIP: using cf-connecting-ip =', cfIP);
+  if (cfIP && isValidIP(cfIP.trim())) {
     return cfIP.trim();
   }
 
-  // In development, try to get a public IP for testing
-  // This helps with geolocation testing in localhost
-  if (process.env.NODE_ENV === 'development') {
-    console.log('extractIP: development mode - using test IP for geolocation');
-    // Use a test IP that will return location data for development
-    return '8.8.8.8'; // Google DNS - will return Mountain View, CA
+  // 3. x-real-ip is typically set by nginx/reverse proxy
+  const realIP = headers.get('x-real-ip');
+  if (realIP && isValidIP(realIP.trim())) {
+    return realIP.trim();
   }
 
-  // Fallback to anonymous
-  console.log('extractIP: no IP headers found, using anonymous');
+  // 4. x-forwarded-for - SECURITY: Use LAST IP, not first
+  // The last IP is set by our trusted proxy; first can be spoofed
+  const forwardedFor = headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    const ips = forwardedFor.split(',').map(ip => ip.trim());
+    // Use the last IP in the chain (most trusted - set by our infra)
+    const lastIP = ips[ips.length - 1];
+    if (lastIP && isValidIP(lastIP)) {
+      return lastIP;
+    }
+  }
+
+  // 5. In development, use a stable identifier per session
+  // SECURITY: Do NOT use a constant IP that all dev instances share
+  if (process.env.NODE_ENV === 'development') {
+    // Use 'dev-localhost' as identifier - unique per environment
+    return 'dev-localhost';
+  }
+
+  // Fallback to anonymous (will share rate limit bucket)
   return 'anonymous';
+}
+
+/**
+ * Validate IP address format (basic check)
+ * Prevents injection attacks via malformed IPs
+ */
+function isValidIP(ip: string): boolean {
+  if (!ip || ip.length > 45) return false; // IPv6 max length
+  // Basic IPv4 pattern
+  const ipv4Pattern = /^(\d{1,3}\.){3}\d{1,3}$/;
+  // Basic IPv6 pattern (simplified)
+  const ipv6Pattern = /^[a-fA-F0-9:]+$/;
+  return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
 }

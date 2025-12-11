@@ -29,6 +29,12 @@ export async function GET(request: Request) {
   const forceFullSync = searchParams.get('force_full') === '1';
   const authHeader = request.headers.get('authorization');
 
+  // SECURITY: Fail-closed if CRON_SECRET is not configured
+  if (!process.env.CRON_SECRET) {
+    console.error('[CRON] CRON_SECRET environment variable not configured');
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+  }
+
   // Auth check for cron job
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

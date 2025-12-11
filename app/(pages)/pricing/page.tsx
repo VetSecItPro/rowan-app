@@ -71,7 +71,8 @@ export default function PricingPage() {
         throw new Error('Failed to load Stripe');
       }
 
-      const { error: stripeError } = await stripe.redirectToCheckout({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: stripeError } = await (stripe as any).redirectToCheckout({
         sessionId: data.sessionId,
       });
 
