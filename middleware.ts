@@ -124,9 +124,19 @@ export async function middleware(req: NextRequest) {
   // Check beta access expiration for logged-in users
   if (isProtectedPath && session?.user?.email) {
     try {
-      const { data: isValid } = await supabase.rpc('is_beta_access_valid', {
+      const { data: isValid, error: rpcError } = await supabase.rpc('is_beta_access_valid', {
         user_email: session.user.email
       });
+
+      // SECURITY: Fail-closed - if we can't verify, deny access
+      // But allow a grace period for transient errors
+      if (rpcError) {
+        console.error('Beta validation RPC error:', rpcError);
+        // For database errors, redirect to an error page instead of allowing access
+        // This prevents expired beta users from gaining access during DB issues
+        const errorUrl = new URL('/error?code=beta_check_failed', req.url);
+        return NextResponse.redirect(errorUrl);
+      }
 
       if (isValid === false) {
         // Beta access expired - redirect to beta-expired page
@@ -138,8 +148,10 @@ export async function middleware(req: NextRequest) {
         return res;
       }
     } catch (error) {
-      console.error('Beta validation error:', error);
-      // Allow access if validation fails to prevent lockout
+      console.error('Beta validation exception:', error);
+      // SECURITY: Fail-closed on unexpected errors
+      const errorUrl = new URL('/error?code=beta_check_error', req.url);
+      return NextResponse.redirect(errorUrl);
     }
   }
 
@@ -152,10 +164,17 @@ export async function middleware(req: NextRequest) {
   }
 
   // CSRF Protection: Validate Origin header for state-changing requests
+  // SECURITY: Now covers BOTH protected page paths AND API routes
   const method = req.method;
   const isStateChanging = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
+  const isApiRoute = req.nextUrl.pathname.startsWith('/api/');
 
-  if (isStateChanging && isProtectedPath) {
+  // Skip CSRF check for cron routes (authenticated by CRON_SECRET header)
+  const isCronRoute = req.nextUrl.pathname.startsWith('/api/cron/');
+  // Skip CSRF check for webhook routes (authenticated by webhook signatures)
+  const isWebhookRoute = req.nextUrl.pathname.includes('/webhook');
+
+  if (isStateChanging && (isProtectedPath || isApiRoute) && !isCronRoute && !isWebhookRoute) {
     const origin = req.headers.get('origin');
     const host = req.headers.get('host');
 
@@ -163,9 +182,17 @@ export async function middleware(req: NextRequest) {
     if (origin && host) {
       const originUrl = new URL(origin);
       const expectedHost = host.split(':')[0]; // Remove port if present
+      const originHost = originUrl.host.split(':')[0]; // Remove port from origin too
 
-      // Check if origin matches host (same-origin)
-      if (!originUrl.host.includes(expectedHost)) {
+      // SECURITY FIX: Use strict equality instead of includes() to prevent subdomain bypass
+      // e.g., rowan.app.attacker.com would pass includes() check but fail strict equality
+      const isValidOrigin = originHost === expectedHost ||
+        // Allow Vercel preview deployments
+        originHost.endsWith('.vercel.app') ||
+        // Allow localhost in development
+        (process.env.NODE_ENV === 'development' && originHost === 'localhost');
+
+      if (!isValidOrigin) {
         return NextResponse.json(
           { error: 'Invalid origin' },
           { status: 403 }
@@ -233,5 +260,7 @@ export const config = {
     '/admin/:path*', // Admin routes now protected
     '/login',
     '/signup',
+    // SECURITY: Include API routes for CSRF protection
+    '/api/:path*',
   ],
 };

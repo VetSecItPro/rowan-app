@@ -5,6 +5,22 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
+import DOMPurify from 'isomorphic-dompurify';
+
+// SECURITY: Strip all HTML tags from text input - only allow plain text for names
+function stripHtml(input: string): string {
+  // First use DOMPurify to sanitize, then strip any remaining tags
+  const sanitized = DOMPurify.sanitize(input, { ALLOWED_TAGS: [] });
+  // Also remove any script/style blocks and decode HTML entities
+  return sanitized
+    .replace(/<[^>]*>/g, '') // Remove any remaining tags
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .trim();
+}
 
 /**
  * PUT /api/user/profile
@@ -83,9 +99,17 @@ export async function PUT(request: Request) {
       );
     }
 
-    // Trim and sanitize name
-    const sanitizedName = name.trim();
+    // SECURITY: Strip HTML from name to prevent XSS when displayed
+    const sanitizedName = stripHtml(name);
     const sanitizedEmail = email.trim().toLowerCase();
+
+    // Validate sanitized name isn't empty after stripping
+    if (sanitizedName.length === 0) {
+      return NextResponse.json(
+        { error: 'Name cannot be empty or contain only HTML' },
+        { status: 400 }
+      );
+    }
 
     // Prepare update data
     const updateData: any = {
@@ -94,9 +118,27 @@ export async function PUT(request: Request) {
       updated_at: new Date().toISOString(),
     };
 
-    // Include avatar_url if provided
-    if (avatar_url !== undefined) {
-      updateData.avatar_url = avatar_url;
+    // Include avatar_url if provided (with URL validation)
+    if (avatar_url !== undefined && avatar_url !== null && avatar_url !== '') {
+      // SECURITY: Validate avatar_url is a proper URL and uses HTTPS
+      try {
+        const avatarUrlObj = new URL(avatar_url);
+        if (avatarUrlObj.protocol !== 'https:') {
+          return NextResponse.json(
+            { error: 'Avatar URL must use HTTPS' },
+            { status: 400 }
+          );
+        }
+        updateData.avatar_url = avatar_url;
+      } catch {
+        return NextResponse.json(
+          { error: 'Invalid avatar URL format' },
+          { status: 400 }
+        );
+      }
+    } else if (avatar_url === null || avatar_url === '') {
+      // Allow clearing avatar
+      updateData.avatar_url = null;
     }
 
     // Update user profile in database

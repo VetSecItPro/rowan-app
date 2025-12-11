@@ -10,6 +10,15 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 // This should be called by a cron job (Vercel Cron or external)
 export async function POST(request: NextRequest) {
   try {
+    // SECURITY: Fail-closed if CRON_SECRET is not configured
+    if (!process.env.CRON_SECRET) {
+      console.error('[CRON] CRON_SECRET environment variable not configured');
+      return NextResponse.json(
+        { success: false, error: 'Server configuration error' },
+        { status: 500 }
+      );
+    }
+
     // Verify this is a legitimate cron request
     const authHeader = request.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
