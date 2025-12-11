@@ -14,8 +14,8 @@ import { motion } from 'framer-motion';
 export default function PaymentSuccessPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const tier = searchParams.get('tier') || 'pro';
-  const period = searchParams.get('period') || 'monthly';
+  const tier = searchParams?.get('tier') || 'pro';
+  const period = searchParams?.get('period') || 'monthly';
   const [countdown, setCountdown] = useState(5);
 
   // Auto-redirect to dashboard after 5 seconds

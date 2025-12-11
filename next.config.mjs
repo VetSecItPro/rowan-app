@@ -35,20 +35,34 @@ const nextConfig = {
   },
 
   // Image optimization settings (optimized for high-DPI mobile displays)
+  // SECURITY: Restricted to trusted image hosts to prevent SSRF attacks
   images: {
     remotePatterns: [
+      // Supabase Storage (avatars, attachments)
       {
         protocol: 'https',
-        hostname: 'picsum.photos',
+        hostname: '*.supabase.co',
+      },
+      // Gravatar for default avatars
+      {
+        protocol: 'https',
+        hostname: 'gravatar.com',
       },
       {
         protocol: 'https',
-        hostname: 'source.unsplash.com',
+        hostname: '*.gravatar.com',
       },
+      // Google profile pictures (OAuth)
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: 'lh3.googleusercontent.com',
       },
+      // Apple profile pictures (OAuth)
+      {
+        protocol: 'https',
+        hostname: '*.apple.com',
+      },
+      // Development only
       {
         protocol: 'http',
         hostname: 'localhost',
@@ -57,7 +71,8 @@ const nextConfig = {
     ],
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60,
-    dangerouslyAllowSVG: true,
+    // SECURITY: SVG disabled - SVGs can contain executable scripts
+    dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     // Device sizes for high-DPI displays (1x, 2x, 3x pixel densities)
     // These are the srcset breakpoints for responsive images

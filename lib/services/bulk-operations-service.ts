@@ -159,6 +159,7 @@ export async function bulkDeleteTasks(
 
 /**
  * Bulk export data by date range
+ * SECURITY: Only exports data from spaces the user is a member of
  */
 export async function bulkExportByDateRange(
   userId: string,
@@ -168,6 +169,24 @@ export async function bulkExportByDateRange(
 ): Promise<BulkExportResult> {
   try {
     const supabase = createClient();
+
+    // SECURITY: First get all spaces the user is a member of
+    const { data: userSpaces, error: spacesError } = await supabase
+      .from('space_members')
+      .select('space_id')
+      .eq('user_id', userId);
+
+    if (spacesError) {
+      console.error('Error fetching user spaces:', spacesError);
+      return { success: false, error: 'Failed to verify user permissions' };
+    }
+
+    if (!userSpaces || userSpaces.length === 0) {
+      // User has no spaces - return empty result
+      return { success: true, data: [], count: 0 };
+    }
+
+    const spaceIds = userSpaces.map((s: { space_id: string }) => s.space_id);
 
     // Map data types to their respective tables and date columns
     const tableConfig: Record<string, { table: string; dateColumn: string }> = {
@@ -183,10 +202,11 @@ export async function bulkExportByDateRange(
       return { success: false, error: 'Invalid data type' };
     }
 
-    // Query data within date range
+    // SECURITY: Query data within date range AND filtered by user's spaces
     const { data, error, count } = await supabase
       .from(config.table)
       .select('*')
+      .in('space_id', spaceIds)
       .gte(config.dateColumn, startDate)
       .lte(config.dateColumn, endDate)
       .order(config.dateColumn, { ascending: false });

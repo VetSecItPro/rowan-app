@@ -85,7 +85,6 @@ export async function POST(
           throw new Error(`Failed to suspend user: ${banError.message}`);
         }
 
-        console.log(`Admin ${sessionData.email} suspended user ${userId} from IP: ${ip}`);
         break;
       }
 
@@ -103,7 +102,6 @@ export async function POST(
           .delete()
           .eq('user_id', userId);
 
-        console.log(`Admin ${sessionData.email} deleted user ${userId} from IP: ${ip}`);
         break;
       }
 
@@ -118,7 +116,6 @@ export async function POST(
           throw new Error(`Failed to revoke beta access: ${revokeError.message}`);
         }
 
-        console.log(`Admin ${sessionData.email} revoked beta access for user ${userId} from IP: ${ip}`);
         break;
       }
     }

@@ -34,7 +34,7 @@ import { useTheme } from 'next-themes';
 interface BetaRequest {
   id: string;
   email: string;
-  password_attempt: string;
+  // password_attempt column removed for security - never store plaintext passwords
   ip_address: string | null;
   user_agent: string | null;
   access_granted: boolean;
@@ -499,7 +499,7 @@ export default function AdminBetaPage() {
                                   {request.email}
                                 </div>
                                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                                  Password: {request.password_attempt ? '••••••••' : 'None'}
+                                  IP: {request.ip_address || 'Unknown'}
                                 </div>
                               </div>
                             </div>

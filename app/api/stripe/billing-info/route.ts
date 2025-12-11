@@ -54,13 +54,15 @@ export async function GET() {
     }
 
     // Calculate next billing info
-    const currentPeriodEnd = stripeSubscription.current_period_end;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const currentPeriodEnd = (stripeSubscription as any).current_period_end;
     const nextBillingDate = new Date(currentPeriodEnd * 1000);
 
     // Get upcoming invoice for amount
     let nextAmount = null;
     try {
-      const upcomingInvoice = await stripe.invoices.retrieveUpcoming({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const upcomingInvoice = await (stripe.invoices as any).retrieveUpcoming({
         customer: subscription.stripe_customer_id,
         subscription: subscription.stripe_subscription_id,
       });
