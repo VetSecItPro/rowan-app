@@ -109,7 +109,6 @@ export async function GET(req: NextRequest) {
     }));
 
     // Log admin access
-    console.log(`Admin notifications accessed by: ${sessionData.email} from IP: ${ip}`);
 
     return NextResponse.json({
       success: true,

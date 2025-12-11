@@ -24,7 +24,8 @@ interface ExpiringUser {
 }
 
 // Email template for 7-day warning
-function get7DayEmailHtml(email: string, expiryDate: string): string {
+// SECURITY: No PII in URLs to avoid referer leakage - user is already logged in
+function get7DayEmailHtml(expiryDate: string): string {
   return `
 <!DOCTYPE html>
 <html>
@@ -49,7 +50,7 @@ function get7DayEmailHtml(email: string, expiryDate: string): string {
     </p>
 
     <div style="text-align: center; margin: 40px 0;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL}/upgrade?email=${encodeURIComponent(email)}"
+      <a href="${process.env.NEXT_PUBLIC_APP_URL}/pricing"
          style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
         Upgrade Your Account
       </a>
@@ -69,7 +70,8 @@ function get7DayEmailHtml(email: string, expiryDate: string): string {
 }
 
 // Email template for 3-day warning
-function get3DayEmailHtml(email: string, expiryDate: string): string {
+// SECURITY: No PII in URLs to avoid referer leakage - user is already logged in
+function get3DayEmailHtml(expiryDate: string): string {
   return `
 <!DOCTYPE html>
 <html>
@@ -103,7 +105,7 @@ function get3DayEmailHtml(email: string, expiryDate: string): string {
     </div>
 
     <div style="text-align: center; margin: 40px 0;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL}/upgrade?email=${encodeURIComponent(email)}"
+      <a href="${process.env.NEXT_PUBLIC_APP_URL}/pricing"
          style="display: inline-block; background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
         Upgrade Now
       </a>
@@ -124,6 +126,12 @@ function get3DayEmailHtml(email: string, expiryDate: string): string {
 
 export async function GET(request: Request) {
   try {
+    // SECURITY: Fail-closed if CRON_SECRET is not configured
+    if (!process.env.CRON_SECRET) {
+      console.error('[CRON] CRON_SECRET environment variable not configured');
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
     // Verify cron secret to prevent unauthorized access
     const authHeader = request.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -173,7 +181,7 @@ export async function GET(request: Request) {
               from: 'Rowan <noreply@rowan.app>',
               to: user.email,
               subject: 'Your Rowan Beta Access Expires in 7 Days',
-              html: get7DayEmailHtml(user.email, expiryDate)
+              html: get7DayEmailHtml(expiryDate)
             });
 
             // Record notification sent
@@ -220,7 +228,7 @@ export async function GET(request: Request) {
               from: 'Rowan <noreply@rowan.app>',
               to: user.email,
               subject: '⏰ Final Reminder: Rowan Beta Access Expires in 3 Days',
-              html: get3DayEmailHtml(user.email, expiryDate)
+              html: get3DayEmailHtml(expiryDate)
             });
 
             // Record notification sent

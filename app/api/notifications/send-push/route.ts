@@ -79,6 +79,7 @@ export async function POST(req: NextRequest) {
     }
 
     setSentryUser(session.user);
+    const callerId = session.user.id;
 
     // Check if VAPID is configured
     if (!vapidPublicKey || !vapidPrivateKey) {
@@ -94,6 +95,32 @@ export async function POST(req: NextRequest) {
     // Check if bulk or single send
     const isBulk = 'userIds' in body;
 
+    // SECURITY: Helper to verify caller can notify target user
+    // Users can only send notifications to members of their shared spaces
+    async function canNotifyUser(targetUserId: string): Promise<boolean> {
+      // Users can always notify themselves
+      if (targetUserId === callerId) return true;
+
+      // Check if caller and target share at least one space
+      const { data: sharedSpaces, error } = await supabase
+        .from('space_members')
+        .select('space_id')
+        .eq('user_id', callerId)
+        .in('space_id',
+          supabase
+            .from('space_members')
+            .select('space_id')
+            .eq('user_id', targetUserId)
+        );
+
+      if (error) {
+        console.error('Error checking space membership:', error);
+        return false;
+      }
+
+      return sharedSpaces && sharedSpaces.length > 0;
+    }
+
     if (isBulk) {
       // Bulk send
       const parseResult = sendBulkPushSchema.safeParse(body);
@@ -105,9 +132,17 @@ export async function POST(req: NextRequest) {
       }
 
       const { userIds, payload } = parseResult.data;
-      const results = { success: 0, failed: 0, errors: [] as string[] };
+      const results = { success: 0, failed: 0, errors: [] as string[], unauthorized: 0 };
 
       for (const userId of userIds) {
+        // SECURITY: Verify authorization for each target user
+        const authorized = await canNotifyUser(userId);
+        if (!authorized) {
+          results.unauthorized++;
+          results.errors.push(`${userId}: Not authorized to notify this user`);
+          continue;
+        }
+
         const sendResult = await sendPushToUser(supabase, userId, payload);
         if (sendResult.success) {
           results.success += sendResult.sent;
@@ -135,6 +170,16 @@ export async function POST(req: NextRequest) {
       }
 
       const { userId, payload } = parseResult.data;
+
+      // SECURITY: Verify caller can notify target user
+      const authorized = await canNotifyUser(userId);
+      if (!authorized) {
+        return NextResponse.json(
+          { error: 'Not authorized to send notifications to this user' },
+          { status: 403 }
+        );
+      }
+
       const result = await sendPushToUser(supabase, userId, payload);
 
       if (!result.success) {
