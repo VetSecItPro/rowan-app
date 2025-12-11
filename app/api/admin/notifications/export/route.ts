@@ -110,7 +110,6 @@ export async function POST(req: NextRequest) {
       const csvContent = [headers.join(','), ...rows.map((row: string[]) => row.join(','))].join('\n');
 
       // Log export activity
-      console.log(`Admin notification export by: ${sessionData.email} from IP: ${ip}, Records: ${rows.length}`);
 
       // Return CSV file
       return new NextResponse(csvContent, {
@@ -123,7 +122,6 @@ export async function POST(req: NextRequest) {
     }
 
     // JSON format (fallback)
-    console.log(`Admin notification export (JSON) by: ${sessionData.email} from IP: ${ip}, Records: ${notifications?.length || 0}`);
 
     return NextResponse.json({
       success: true,

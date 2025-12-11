@@ -144,7 +144,6 @@ export async function GET(req: NextRequest) {
     );
 
     // Log admin dashboard access
-    console.log(`Admin dashboard stats accessed by: ${sessionData.email} from IP: ${ip}`);
 
     return NextResponse.json({
       success: true,

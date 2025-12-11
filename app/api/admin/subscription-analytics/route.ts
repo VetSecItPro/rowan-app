@@ -122,9 +122,6 @@ export async function GET(req: NextRequest) {
     response.lastUpdated = new Date().toISOString();
     response.view = view;
 
-    // Log admin access
-    console.log(`Subscription analytics accessed by: ${sessionData.email} from IP: ${ip}, View: ${view}`);
-
     return NextResponse.json({
       success: true,
       ...response,
