@@ -1,0 +1,23 @@
+# Rowan Family Organization App - Security Policy
+# RFC 9116 compliant security.txt
+
+# Contact for security vulnerability reports
+Contact: mailto:security@rowan.app
+Contact: https://github.com/VetSecItPro/rowan-app/security/advisories/new
+
+# This file expires in 1 year - please update annually
+Expires: 2026-12-10T00:00:00.000Z
+
+# Preferred language for communication
+Preferred-Languages: en
+
+# Canonical location of this file
+Canonical: https://rowan.app/.well-known/security.txt
+
+# Security policy
+Policy: https://github.com/VetSecItPro/rowan-app/security/policy
+
+# We appreciate responsible disclosure
+Acknowledgments: https://rowan.app/security/thanks
+
+# Encryption not required but PGP available on request
