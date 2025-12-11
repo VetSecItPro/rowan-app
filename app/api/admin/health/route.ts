@@ -331,7 +331,6 @@ export async function GET(req: NextRequest) {
     };
 
     // Log admin access
-    console.log(`Admin health check by: ${sessionData.email} from IP: ${ip}, Status: ${overallStatus}`);
 
     return NextResponse.json({
       success: true,
