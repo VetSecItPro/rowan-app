@@ -72,13 +72,21 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
 
-        {/* Inline script to prevent theme flash - runs before React hydrates */}
+        {/*
+          Inline script to prevent theme flash - runs before React hydrates.
+          SECURITY: This dangerouslySetInnerHTML usage is SAFE because:
+          1. Content is a hardcoded string literal (no user input interpolation)
+          2. Theme value from localStorage is validated against allowlist
+          3. Standard Next.js pattern for FOUC prevention
+        */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
                 try {
-                  var theme = localStorage.getItem('rowan-theme') || 'dark';
+                  var stored = localStorage.getItem('rowan-theme');
+                  // SECURITY: Only allow 'light' or 'dark' - prevents injection
+                  var theme = (stored === 'light' || stored === 'dark') ? stored : 'dark';
                   document.documentElement.classList.add(theme);
                   document.documentElement.style.colorScheme = theme;
                 } catch (e) {
