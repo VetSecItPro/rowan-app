@@ -96,7 +96,6 @@ export async function POST(req: NextRequest) {
     const processedCount = updatedRecords?.length || 0;
 
     // Log the bulk unsubscribe action
-    console.log(`Admin bulk unsubscribe by: ${sessionData.email} from IP: ${ip}, Count: ${processedCount}, IDs: ${ids.slice(0, 10).join(', ')}${ids.length > 10 ? '...' : ''}`);
 
     // Optional: Send confirmation emails to unsubscribed users
     // This would typically be handled by a background job or queue

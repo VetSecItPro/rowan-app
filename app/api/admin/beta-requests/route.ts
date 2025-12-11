@@ -135,7 +135,6 @@ export async function GET(req: NextRequest) {
     );
 
     // Log admin access
-    console.log(`Admin beta requests accessed by: ${sessionData.email} from IP: ${ip}`);
 
     return NextResponse.json({
       success: true,

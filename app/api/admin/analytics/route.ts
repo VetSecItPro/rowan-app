@@ -260,7 +260,6 @@ export async function GET(req: NextRequest) {
     );
 
     // Log admin access
-    console.log(`Admin analytics accessed by: ${sessionData.email} from IP: ${ip}, Range: ${timeRange}`);
 
     return NextResponse.json({
       success: true,
