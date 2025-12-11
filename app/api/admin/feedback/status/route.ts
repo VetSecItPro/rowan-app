@@ -3,7 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import { cookies } from 'next/headers';
+import { safeCookies } from '@/lib/utils/safe-cookies';
+import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { z } from 'zod';
 
 // Force dynamic rendering for admin authentication
@@ -33,8 +34,8 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    // Check admin authentication
-    const cookieStore = cookies();
+    // Check admin authentication using secure AES-256-GCM encryption
+    const cookieStore = safeCookies();
     const adminSession = cookieStore.get('admin-session');
 
     if (!adminSession) {
@@ -44,15 +45,15 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    // Decode admin session
-    let sessionData;
+    // Decrypt and validate admin session
+    let sessionData: { email?: string; adminId?: string; role?: string };
     try {
-      sessionData = JSON.parse(Buffer.from(adminSession.value, 'base64').toString());
+      sessionData = await decryptSessionData(adminSession.value);
 
-      // Check if session is expired
-      if (sessionData.expiresAt < Date.now()) {
+      // Validate session data structure and expiration
+      if (!validateSessionData(sessionData)) {
         return NextResponse.json(
-          { error: 'Session expired' },
+          { error: 'Invalid or expired session' },
           { status: 401 }
         );
       }
@@ -171,8 +172,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check admin authentication
-    const cookieStore = cookies();
+    // Check admin authentication using secure AES-256-GCM encryption
+    const cookieStore = safeCookies();
     const adminSession = cookieStore.get('admin-session');
 
     if (!adminSession) {
@@ -182,14 +183,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Decode admin session
-    let sessionData;
+    // Decrypt and validate admin session
+    let sessionData: { email?: string; adminId?: string; role?: string };
     try {
-      sessionData = JSON.parse(Buffer.from(adminSession.value, 'base64').toString());
+      sessionData = await decryptSessionData(adminSession.value);
 
-      if (sessionData.expiresAt < Date.now()) {
+      // Validate session data structure and expiration
+      if (!validateSessionData(sessionData)) {
         return NextResponse.json(
-          { error: 'Session expired' },
+          { error: 'Invalid or expired session' },
           { status: 401 }
         );
       }
