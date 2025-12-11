@@ -45,12 +45,12 @@ export async function POST(req: NextRequest) {
     // Create Supabase client with service role for public access
     const supabase = createClient();
 
-    // Log the beta access attempt
+    // Log the beta access attempt (password NOT stored for security)
     const { error: logError } = await supabase
       .from('beta_access_requests')
       .insert({
         email: null, // Will be filled when user actually signs up
-        password_attempt: password,
+        // password_attempt intentionally omitted - never store plaintext passwords
         ip_address: ip,
         user_agent: req.headers.get('user-agent') || null,
         access_granted: password === BETA_PASSWORD,
