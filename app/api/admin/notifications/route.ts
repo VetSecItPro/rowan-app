@@ -10,6 +10,19 @@ import { decryptSessionData, validateSessionData } from '@/lib/utils/session-cry
 export const dynamic = 'force-dynamic';
 
 /**
+ * SECURITY: Sanitize search input for PostgreSQL ILIKE patterns
+ * Escapes special characters: %, _, and \ which have special meaning in LIKE/ILIKE
+ */
+function sanitizeSearchInput(input: string): string {
+  // Escape backslash first (order matters!), then % and _
+  return input
+    .replace(/\\/g, '\\\\')  // Escape backslashes
+    .replace(/%/g, '\\%')    // Escape wildcard %
+    .replace(/_/g, '\\_')    // Escape single char wildcard _
+    .slice(0, 100);          // Limit length to prevent DoS
+}
+
+/**
  * GET /api/admin/notifications
  * Get all launch notifications for admin management
  */
@@ -79,9 +92,10 @@ export async function GET(req: NextRequest) {
       query = query.eq('subscribed', false);
     }
 
-    // Apply search filter
+    // Apply search filter with sanitization
     if (search) {
-      query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%`);
+      const sanitizedSearch = sanitizeSearchInput(search);
+      query = query.or(`name.ilike.%${sanitizedSearch}%,email.ilike.%${sanitizedSearch}%`);
     }
 
     // Apply pagination

@@ -116,8 +116,6 @@ async function tryGeocodingWithFallbacks(location: string): Promise<any> {
     if (!searchTerm) continue;
 
     try {
-      console.log(`[Weather Geocode API] Trying strategy ${index + 1}: "${searchTerm}"`);
-
       const geocodeUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(searchTerm)}&count=5&language=en&format=json`;
 
       const response = await fetch(geocodeUrl, {
@@ -129,7 +127,6 @@ async function tryGeocodingWithFallbacks(location: string): Promise<any> {
       });
 
       if (!response.ok) {
-        console.log(`[Weather Geocode API] Strategy ${index + 1} failed with status ${response.status}`);
         continue;
       }
 
@@ -170,13 +167,10 @@ async function tryGeocodingWithFallbacks(location: string): Promise<any> {
           }
         }
 
-        console.log(`[Weather Geocode API] Strategy ${index + 1} successful:`, bestResult.name, bestResult.country);
         return bestResult;
       }
 
-      console.log(`[Weather Geocode API] Strategy ${index + 1} returned no results`);
-    } catch (error) {
-      console.log(`[Weather Geocode API] Strategy ${index + 1} error:`, error instanceof Error ? error.message : 'Unknown error');
+    } catch {
       continue;
     }
   }
@@ -195,8 +189,6 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    console.log('[Weather Geocode API] Geocoding location:', location);
 
     // Get geocoding result (cache the basic coordinates, but get full details)
     let fullResult: any = null;
@@ -220,7 +212,6 @@ export async function GET(request: NextRequest) {
     }
 
     if (!cachedCoords || !fullResult) {
-      console.log('[Weather Geocode API] All geocoding strategies failed for:', location);
       return NextResponse.json(
         { error: 'Location not found after trying multiple search strategies' },
         { status: 404 }
@@ -235,11 +226,8 @@ export async function GET(request: NextRequest) {
       admin1: fullResult.admin1 || 'Unknown', // state/region
     };
 
-    console.log('[Weather Geocode API] Geocoding successful:', coordinates);
-
     return NextResponse.json(coordinates);
-  } catch (error) {
-    console.error('[Weather Geocode API] Error:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to geocode location' },
       { status: 500 }
