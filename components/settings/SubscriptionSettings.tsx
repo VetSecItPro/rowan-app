@@ -27,7 +27,12 @@ import {
   CreditCard,
   Receipt,
   CalendarClock,
-  ExternalLink
+  ExternalLink,
+  Download,
+  FileText,
+  CheckCircle,
+  XCircle,
+  HelpCircle
 } from 'lucide-react';
 import { useSubscription } from '@/lib/contexts/subscription-context';
 import { motion } from 'framer-motion';
@@ -45,6 +50,17 @@ interface BillingInfo {
   };
   status?: string;
   cancelAtPeriodEnd?: boolean;
+}
+
+interface Invoice {
+  id: string;
+  number: string | null;
+  date: string;
+  amount: number;
+  currency: string;
+  status: string;
+  pdfUrl: string | null;
+  hostedUrl: string | null;
 }
 
 const TIER_DETAILS = {
@@ -106,6 +122,8 @@ export function SubscriptionSettings() {
   const [billingError, setBillingError] = useState<string | null>(null);
   const [billingInfo, setBillingInfo] = useState<BillingInfo | null>(null);
   const [isBillingInfoLoading, setIsBillingInfoLoading] = useState(false);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [isInvoicesLoading, setIsInvoicesLoading] = useState(false);
 
   // Fetch billing info for paid users
   useEffect(() => {
@@ -121,6 +139,26 @@ export function SubscriptionSettings() {
         })
         .finally(() => {
           setIsBillingInfoLoading(false);
+        });
+    }
+  }, [tier]);
+
+  // Fetch recent invoices for paid users
+  useEffect(() => {
+    if (tier === 'pro' || tier === 'family') {
+      setIsInvoicesLoading(true);
+      fetch('/api/stripe/invoices')
+        .then(res => res.json())
+        .then(data => {
+          if (data.invoices) {
+            setInvoices(data.invoices);
+          }
+        })
+        .catch(err => {
+          console.error('Failed to fetch invoices:', err);
+        })
+        .finally(() => {
+          setIsInvoicesLoading(false);
         });
     }
   }, [tier]);
@@ -414,6 +452,98 @@ export function SubscriptionSettings() {
         </motion.div>
       )}
 
+      {/* Recent Invoices - Only for paid subscribers */}
+      {(tier === 'pro' || tier === 'family') && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.12 }}
+          className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm"
+        >
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <FileText className="h-5 w-5 text-blue-500" />
+              Recent Invoices
+            </h3>
+            <button
+              onClick={handleManageBilling}
+              disabled={isBillingLoading}
+              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 transition-colors"
+            >
+              View All in Stripe
+              <ExternalLink className="h-3 w-3" />
+            </button>
+          </div>
+
+          {isInvoicesLoading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="animate-pulse flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                  <div className="flex items-center gap-3">
+                    <div className="h-4 w-24 bg-gray-200 dark:bg-gray-600 rounded" />
+                    <div className="h-4 w-16 bg-gray-200 dark:bg-gray-600 rounded" />
+                  </div>
+                  <div className="h-4 w-12 bg-gray-200 dark:bg-gray-600 rounded" />
+                </div>
+              ))}
+            </div>
+          ) : invoices.length > 0 ? (
+            <div className="space-y-2">
+              {invoices.slice(0, 5).map((invoice) => (
+                <div
+                  key={invoice.id}
+                  className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      {invoice.status === 'paid' ? (
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                      ) : invoice.status === 'open' ? (
+                        <Clock className="h-4 w-4 text-amber-500" />
+                      ) : (
+                        <XCircle className="h-4 w-4 text-red-500" />
+                      )}
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {new Date(invoice.date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {invoice.number || 'Invoice'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                      ${invoice.amount.toFixed(2)} {invoice.currency}
+                    </span>
+                    {invoice.pdfUrl && (
+                      <a
+                        href={invoice.pdfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                        title="Download PDF"
+                      >
+                        <Download className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-6 text-gray-500 dark:text-gray-400">
+              <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">No invoices yet</p>
+              <p className="text-xs mt-1">Your invoices will appear here after your first payment</p>
+            </div>
+          )}
+        </motion.div>
+      )}
+
       {/* Usage Limits */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -552,6 +682,42 @@ export function SubscriptionSettings() {
             </div>
           )}
         </div>
+
+        {/* What you can do in Stripe Portal */}
+        {(tier === 'pro' || tier === 'family') && (
+          <div className="mt-5 p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-100 dark:border-blue-800">
+            <div className="flex items-center gap-2 mb-3">
+              <HelpCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <span className="text-sm font-semibold text-blue-800 dark:text-blue-200">What you can do in Stripe Portal</span>
+            </div>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-blue-700 dark:text-blue-300">
+              <li className="flex items-center gap-2">
+                <Check className="h-3 w-3 text-blue-500" />
+                Update payment method
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-3 w-3 text-blue-500" />
+                Download invoice PDFs
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-3 w-3 text-blue-500" />
+                View full billing history
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-3 w-3 text-blue-500" />
+                Cancel or pause subscription
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-3 w-3 text-blue-500" />
+                Update billing address
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-3 w-3 text-blue-500" />
+                View tax information
+              </li>
+            </ul>
+          </div>
+        )}
 
         <div className="mt-5 p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50">
           <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
