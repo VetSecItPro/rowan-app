@@ -229,8 +229,13 @@ export async function uploadAvatar(
     if (user?.avatar_url) {
       // Extract path from URL
       const oldPath = user.avatar_url.split('/avatars/')[1];
-      if (oldPath) {
+      // SECURITY: Only delete if the path belongs to this user
+      // This prevents IDOR attacks where a user sets their avatar_url to another user's file
+      // then uploads a new avatar to trigger deletion of the other user's file
+      if (oldPath && oldPath.startsWith(`${userId}/`)) {
         await deleteFile('avatars', oldPath);
+      } else if (oldPath) {
+        console.warn(`[storage-service] Skipping deletion of avatar not owned by user ${userId}: ${oldPath}`);
       }
     }
 

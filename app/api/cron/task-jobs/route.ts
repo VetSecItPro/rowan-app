@@ -23,7 +23,13 @@ export async function GET(request: Request) {
   const job = searchParams.get('job');
   const authHeader = request.headers.get('authorization');
 
-  // Simple auth check (use environment variable in production)
+  // SECURITY: Fail-closed if CRON_SECRET is not configured
+  if (!process.env.CRON_SECRET) {
+    console.error('[CRON] CRON_SECRET environment variable not configured');
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+  }
+
+  // Verify cron secret to prevent unauthorized access
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
