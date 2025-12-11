@@ -20,16 +20,11 @@ if (typeof window !== 'undefined') {
   );
 }
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!supabaseUrl) {
-  throw new Error('Missing environment variable: NEXT_PUBLIC_SUPABASE_URL');
-}
-
-if (!supabaseServiceKey) {
-  throw new Error('Missing environment variable: SUPABASE_SERVICE_ROLE_KEY');
-}
+// Use dummy values during build time if env vars aren't available
+// The client will fail at runtime if used without proper env vars,
+// but this allows the build to succeed in CI environments
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-key';
 
 export const supabaseServer = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
