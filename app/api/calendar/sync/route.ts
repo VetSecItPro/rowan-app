@@ -7,6 +7,12 @@ import { calendarSyncService } from '@/lib/services/calendar';
 import { ManualSyncRequestSchema } from '@/lib/validations/calendar-integration-schemas';
 import { z } from 'zod';
 
+// Query parameter validation schema for GET endpoint
+const GetQueryParamsSchema = z.object({
+  connection_id: z.string().uuid(),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+});
+
 export async function POST(request: NextRequest) {
   console.log('[Calendar Sync] POST request received');
 
@@ -155,16 +161,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Parse and validate query parameters
     const { searchParams } = new URL(request.url);
-    const connectionId = searchParams.get('connection_id');
-    const limit = parseInt(searchParams.get('limit') || '10', 10);
-
-    if (!connectionId) {
-      return NextResponse.json(
-        { error: 'connection_id is required' },
-        { status: 400 }
-      );
-    }
+    const validatedParams = GetQueryParamsSchema.parse({
+      connection_id: searchParams.get('connection_id'),
+      limit: searchParams.get('limit') || '10',
+    });
+    const { connection_id: connectionId, limit } = validatedParams;
 
     // Verify user has access to this connection
     const { data: connection } = await supabase
@@ -222,6 +225,14 @@ export async function GET(request: NextRequest) {
       pending_conflicts: conflictsCount || 0,
     });
   } catch (error) {
+    // Handle Zod validation errors
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid query parameters', details: error.issues },
+        { status: 400 }
+      );
+    }
+
     console.error('Failed to get sync status:', error);
     return NextResponse.json(
       { error: 'Failed to fetch sync status' },

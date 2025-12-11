@@ -5,6 +5,15 @@ import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookies } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
+import { z } from 'zod';
+
+// Query parameter validation schema
+const QueryParamsSchema = z.object({
+  page: z.coerce.number().int().min(1).max(10000).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(50),
+  status: z.enum(['subscribed', 'unsubscribed']).optional(),
+  search: z.string().max(100).optional(),
+});
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
@@ -72,12 +81,15 @@ export async function GET(req: NextRequest) {
     // Create Supabase client
     const supabase = createClient();
 
-    // Get query parameters
+    // Parse and validate query parameters
     const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const status = searchParams.get('status'); // 'subscribed', 'unsubscribed', or null for all
-    const search = searchParams.get('search') || '';
+    const validatedParams = QueryParamsSchema.parse({
+      page: searchParams.get('page') || '1',
+      limit: searchParams.get('limit') || '50',
+      status: searchParams.get('status') || undefined,
+      search: searchParams.get('search') || undefined,
+    });
+    const { page, limit, status, search } = validatedParams;
 
     // Build query
     let query = supabase
@@ -137,6 +149,14 @@ export async function GET(req: NextRequest) {
     });
 
   } catch (error) {
+    // Handle Zod validation errors
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid query parameters', details: error.issues },
+        { status: 400 }
+      );
+    }
+
     Sentry.captureException(error, {
       tags: {
         endpoint: '/api/admin/notifications',
@@ -146,7 +166,6 @@ export async function GET(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/admin/notifications GET error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch notifications' },
       { status: 500 }
