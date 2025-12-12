@@ -109,10 +109,10 @@ export function BillCard({ bill, onEdit, onDelete, onMarkPaid }: BillCardProps) 
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="btn-touch w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             aria-label="Bill options"
           >
-            <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <MoreVertical className="w-5 h-5" />
           </button>
 
           {showMenu && (

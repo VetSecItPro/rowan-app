@@ -87,9 +87,9 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
             <button
               onClick={() => setShowMenu(!showMenu)}
               aria-label="Project options menu"
-              className="btn-touch w-12 h-12 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95"
+              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             >
-              <MoreVertical className="w-5 h-5 md:w-4 md:h-4 text-gray-500 dark:text-gray-400" />
+              <MoreVertical className="w-5 h-5" />
             </button>
             {showMenu && (
               <>

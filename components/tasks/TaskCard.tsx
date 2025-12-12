@@ -158,9 +158,9 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
             onClick={() => setShowMenu(!showMenu)}
             title="Edit or Delete"
             aria-label="Task options menu"
-            className="btn-icon-mobile flex items-center justify-center"
+            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
-            <MoreVertical className="w-5 h-5 md:w-4 md:h-4 text-gray-600 dark:text-gray-400" />
+            <MoreVertical className="w-5 h-5" />
           </button>
 
           {showMenu && (
