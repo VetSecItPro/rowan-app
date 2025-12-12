@@ -22,6 +22,17 @@ import {
   getSubscriptionEvents,
   getDailyRevenueData,
 } from '@/lib/services/subscription-analytics-service';
+import { z } from 'zod';
+
+// Query parameter validation schema
+const QueryParamsSchema = z.object({
+  view: z.enum(['metrics', 'events', 'revenue', 'all']).default('all'),
+  eventType: z.string().max(100).optional(),
+  limit: z.coerce.number().int().min(1).max(500).default(50),
+  offset: z.coerce.number().int().min(0).max(100000).default(0),
+  days: z.coerce.number().int().min(1).max(365).default(30),
+  refresh: z.enum(['true', 'false']).optional(),
+});
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
@@ -81,14 +92,18 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Parse query parameters
+    // Parse and validate query parameters
     const { searchParams } = new URL(req.url);
-    const view = searchParams.get('view') || 'all';
-    const eventType = searchParams.get('eventType') || undefined;
-    const limit = parseInt(searchParams.get('limit') || '50', 10);
-    const offset = parseInt(searchParams.get('offset') || '0', 10);
-    const days = parseInt(searchParams.get('days') || '30', 10);
-    const forceRefresh = searchParams.get('refresh') === 'true';
+    const validatedParams = QueryParamsSchema.parse({
+      view: searchParams.get('view') || 'all',
+      eventType: searchParams.get('eventType') || undefined,
+      limit: searchParams.get('limit') || '50',
+      offset: searchParams.get('offset') || '0',
+      days: searchParams.get('days') || '30',
+      refresh: searchParams.get('refresh') || undefined,
+    });
+    const { view, eventType, limit, offset, days } = validatedParams;
+    const forceRefresh = validatedParams.refresh === 'true';
 
     // Build response based on view parameter
     const response: Record<string, unknown> = {};
@@ -128,6 +143,14 @@ export async function GET(req: NextRequest) {
     });
 
   } catch (error) {
+    // Handle Zod validation errors
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid query parameters', details: error.issues },
+        { status: 400 }
+      );
+    }
+
     Sentry.captureException(error, {
       tags: {
         endpoint: '/api/admin/subscription-analytics',
@@ -137,7 +160,6 @@ export async function GET(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/admin/subscription-analytics GET error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch subscription analytics' },
       { status: 500 }

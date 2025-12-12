@@ -63,7 +63,6 @@ export async function POST(req: NextRequest) {
       .eq('role', 'owner');
 
     if (countError) {
-      console.error('[API] Error counting user spaces:', countError);
       return NextResponse.json(
         { error: 'Failed to check space limit' },
         { status: 500 }
@@ -89,9 +88,6 @@ export async function POST(req: NextRequest) {
     const result = await createSpace(name.trim(), session.user.id, supabase);
 
     if (!result.success) {
-      console.error('[API] Space creation failed:', result.error);
-      console.error('[API] User ID:', session.user.id);
-      console.error('[API] Space name:', name.trim());
       return NextResponse.json(
         { error: result.error },
         { status: 400 }
@@ -112,7 +108,6 @@ export async function POST(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/spaces/create error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

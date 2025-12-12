@@ -1,8 +1,28 @@
 import { withSentryConfig } from '@sentry/nextjs';
 import bundleAnalyzer from '@next/bundle-analyzer';
+import path from 'path';
+import os from 'os';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // FIX: Webpack cache race condition with spaces in path
+  // Move cache to /tmp/rowan-app-cache (no spaces) to prevent ENOENT errors
+  webpack: (config, { dev }) => {
+    if (dev) {
+      // Use temp directory for webpack cache (no spaces in path)
+      const cacheDir = path.join(os.tmpdir(), 'rowan-app-cache');
+      config.cache = {
+        type: 'filesystem',
+        cacheDirectory: cacheDir,
+        // Prevent stale cache issues
+        compression: false,
+        // Use content hash for better cache invalidation
+        hashAlgorithm: 'xxhash64',
+      };
+    }
+    return config;
+  },
+
   eslint: {
     // Warning: This allows production builds to successfully complete even if
     // your project has ESLint errors.

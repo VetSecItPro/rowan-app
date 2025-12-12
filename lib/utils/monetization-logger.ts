@@ -15,6 +15,14 @@
 
 import { createClient } from '@supabase/supabase-js';
 
+// SECURITY: Runtime check to prevent accidental client-side import
+if (typeof window !== 'undefined') {
+  throw new Error(
+    'SECURITY ERROR: monetization-logger.ts cannot be used on the client side. ' +
+    'This module uses the service role key and must only run on the server.'
+  );
+}
+
 // ============================================================================
 // DATABASE CLIENT (for log persistence)
 // ============================================================================

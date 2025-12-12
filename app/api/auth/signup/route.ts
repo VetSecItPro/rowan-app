@@ -111,8 +111,7 @@ export async function POST(request: NextRequest) {
     let supabase;
     try {
       supabase = createClient();
-    } catch (error) {
-      console.error('Supabase client creation failed:', error);
+    } catch {
       return NextResponse.json(
         { error: 'Service temporarily unavailable' },
         { status: 503 }
@@ -134,8 +133,6 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      console.error('Supabase auth signup error:', error.message, error);
-
       // Handle specific signup errors with clear messages
       if (error.message.includes('User already registered') ||
           error.message.includes('already been registered') ||
@@ -188,8 +185,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Log the actual error for debugging but return user-friendly message
-      console.error('Unhandled signup error:', error);
+      // Return user-friendly message
       return NextResponse.json(
         { error: `Account creation failed: ${error.message || 'Unknown error'}. Please try again.` },
         { status: 500 }
@@ -227,12 +223,11 @@ export async function POST(request: NextRequest) {
       }, { onConflict: 'id' });
 
     if (publicUserError) {
-      console.error('Public user creation failed:', publicUserError);
       // Clean up the auth user
       try {
         await supabaseServerClient.auth.admin.deleteUser(userId);
-      } catch (error) {
-        console.error('Failed to cleanup auth user after public user creation failure:', error);
+      } catch {
+        // Cleanup failed - orphaned auth user may exist
       }
 
       return NextResponse.json(
@@ -251,7 +246,6 @@ export async function POST(request: NextRequest) {
 
     if (existingMembership) {
       // Workspace already created by trigger - we're done
-      console.log('Workspace already provisioned by trigger for user:', userId);
     } else {
       // Fallback: Create the initial space manually (trigger may not have fired)
       const { data: newSpace, error: spaceError } = await supabaseServerClient
@@ -266,12 +260,11 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (spaceError || !newSpace) {
-        console.error('Space creation failed:', spaceError);
         // Clean up the auth user to avoid orphaned accounts
         try {
           await supabaseServerClient.auth.admin.deleteUser(userId);
-        } catch (error) {
-          console.error('Failed to cleanup auth user after signup failure:', error);
+        } catch {
+          // Cleanup failed - orphaned auth user may exist
         }
 
         return NextResponse.json(
@@ -289,12 +282,11 @@ export async function POST(request: NextRequest) {
         });
 
       if (memberError) {
-        console.error('Failed to add user to initial space:', memberError);
         try {
           await supabaseServerClient.from('spaces').delete().eq('id', newSpace.id);
           await supabaseServerClient.auth.admin.deleteUser(userId);
-        } catch (error) {
-          console.error('Cleanup after membership failure failed:', error);
+        } catch {
+          // Cleanup failed
         }
 
         return NextResponse.json(
@@ -310,24 +302,21 @@ export async function POST(request: NextRequest) {
       const { error: subscriptionError } = await supabaseServerClient
         .rpc('initialize_subscription', { p_user_id: userId });
 
-      if (subscriptionError) {
-        console.warn('Subscription initialization failed (non-critical):', subscriptionError);
-        // Non-critical - subscription will be created on first access if needed
-      } else {
-        console.log('Trial subscription initialized for user:', userId);
+      if (!subscriptionError) {
         // Record trial started event
         await supabaseServerClient
           .rpc('record_trial_started', { p_user_id: userId });
       }
-    } catch (subError) {
-      console.warn('Subscription initialization error (non-critical):', subError);
+      // Non-critical - subscription will be created on first access if needed
+    } catch {
+      // Non-critical - subscription will be created on first access if needed
     }
 
     // CRITICAL: Link user to beta_access_requests for tracking
     // Find the most recent successful beta access request (with no user_id yet)
     // and link it to this new user
     try {
-      const { error: betaLinkError } = await supabaseServerClient
+      await supabaseServerClient
         .from('beta_access_requests')
         .update({
           user_id: userId,
@@ -338,16 +327,9 @@ export async function POST(request: NextRequest) {
         .is('user_id', null)
         .order('created_at', { ascending: false })
         .limit(1);
-
-      if (betaLinkError) {
-        // Non-critical - just log it, don't fail signup
-        console.warn('Failed to link beta access request:', betaLinkError);
-      } else {
-        console.log('Successfully linked beta access request for user:', userId);
-      }
-    } catch (betaError) {
-      // Non-critical - just log it
-      console.warn('Beta access linking error:', betaError);
+      // Non-critical - don't fail signup if linking fails
+    } catch {
+      // Non-critical - beta access linking is optional
     }
 
     // Success response
@@ -391,7 +373,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Generic error handler
-    console.error('Signup API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

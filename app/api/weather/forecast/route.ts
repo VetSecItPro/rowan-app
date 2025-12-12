@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { weatherCacheService } from '@/lib/services/weather-cache-service';
+import { z } from 'zod';
+
+// Query parameter validation schema with geographic bounds
+const QueryParamsSchema = z.object({
+  lat: z.coerce.number().min(-90).max(90),
+  lon: z.coerce.number().min(-180).max(180),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+});
 
 // Force dynamic rendering for this route since it uses request.url
 export const dynamic = 'force-dynamic';
@@ -7,27 +15,24 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const lat = searchParams.get('lat');
-    const lon = searchParams.get('lon');
-    const date = searchParams.get('date');
 
-    if (!lat || !lon || lat === 'undefined' || lon === 'undefined' || lat === 'null' || lon === 'null') {
+    // Pre-validate required parameters exist
+    const latParam = searchParams.get('lat');
+    const lonParam = searchParams.get('lon');
+    if (!latParam || !lonParam || latParam === 'undefined' || lonParam === 'undefined' || latParam === 'null' || lonParam === 'null') {
       return NextResponse.json(
         { error: 'Latitude and longitude parameters are required' },
         { status: 400 }
       );
     }
 
-    // Validate that coordinates are valid numbers
-    const latNum = parseFloat(lat);
-    const lonNum = parseFloat(lon);
-
-    if (isNaN(latNum) || isNaN(lonNum)) {
-      return NextResponse.json(
-        { error: 'Latitude and longitude must be valid numbers' },
-        { status: 400 }
-      );
-    }
+    // Parse and validate query parameters with Zod
+    const validatedParams = QueryParamsSchema.parse({
+      lat: latParam,
+      lon: lonParam,
+      date: searchParams.get('date') || undefined,
+    });
+    const { lat: latNum, lon: lonNum, date } = validatedParams;
 
     console.log('[Weather Forecast API] Fetching weather for:', { lat: latNum, lon: lonNum, date });
 
@@ -70,6 +75,14 @@ export async function GET(request: NextRequest) {
     console.log('[Weather Forecast API] Returning weather:', forecast);
     return NextResponse.json(forecast);
   } catch (error) {
+    // Handle Zod validation errors
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid query parameters', details: error.issues },
+        { status: 400 }
+      );
+    }
+
     console.error('[Weather Forecast API] Error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch weather forecast' },
