@@ -82,7 +82,7 @@ export async function logout(page: Page): Promise<void> {
  */
 export async function goToPricingPage(page: Page): Promise<void> {
   await page.goto('/pricing');
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   // Verify pricing page loaded - look for h1 heading with "family" in the text
   // The page h1 is "The family command center that works"
