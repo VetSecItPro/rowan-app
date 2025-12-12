@@ -13,6 +13,7 @@ interface FeatureFlags {
   PERSONAL_WORKSPACES: boolean;
   SMART_ONBOARDING: boolean;
   WORKSPACE_MIGRATION: boolean;
+  MONETIZATION: boolean;
 }
 
 /**
@@ -43,6 +44,15 @@ export const FEATURE_FLAGS: FeatureFlags = {
    * Enable with: NEXT_PUBLIC_ENABLE_WORKSPACE_MIGRATION=true
    */
   WORKSPACE_MIGRATION: process.env.NEXT_PUBLIC_ENABLE_WORKSPACE_MIGRATION === 'true',
+
+  /**
+   * Monetization Feature
+   * Enables pricing page, upgrade prompts, and subscription management
+   * Controls visibility of all paid features for gradual rollout
+   *
+   * Enable with: NEXT_PUBLIC_ENABLE_MONETIZATION=true
+   */
+  MONETIZATION: process.env.NEXT_PUBLIC_ENABLE_MONETIZATION === 'true',
 };
 
 /**
@@ -68,6 +78,14 @@ export const featureFlags = {
    */
   isWorkspaceMigrationEnabled(): boolean {
     return FEATURE_FLAGS.WORKSPACE_MIGRATION;
+  },
+
+  /**
+   * Check if monetization features are enabled
+   * Controls pricing page, upgrade prompts, and subscription management
+   */
+  isMonetizationEnabled(): boolean {
+    return FEATURE_FLAGS.MONETIZATION;
   },
 
   /**
@@ -111,6 +129,7 @@ export const featureFlagHelpers = {
       NEXT_PUBLIC_ENABLE_PERSONAL_WORKSPACES: process.env.NEXT_PUBLIC_ENABLE_PERSONAL_WORKSPACES,
       NEXT_PUBLIC_ENABLE_SMART_ONBOARDING: process.env.NEXT_PUBLIC_ENABLE_SMART_ONBOARDING,
       NEXT_PUBLIC_ENABLE_WORKSPACE_MIGRATION: process.env.NEXT_PUBLIC_ENABLE_WORKSPACE_MIGRATION,
+      NEXT_PUBLIC_ENABLE_MONETIZATION: process.env.NEXT_PUBLIC_ENABLE_MONETIZATION,
     };
   }
 };
