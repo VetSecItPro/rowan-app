@@ -271,6 +271,22 @@ export default function RemindersPage(): JSX.Element {
     setIsModalOpen(true);
   }, []);
 
+  // Memoized callback for marking bill as paid from reminder
+  const handleMarkBillPaid = useCallback(async (reminderId: string) => {
+    try {
+      await remindersService.markBillPaidFromReminder(reminderId);
+      // Optimistic update - mark as completed immediately
+      setReminders(prevReminders =>
+        prevReminders.map(reminder =>
+          reminder.id === reminderId ? { ...reminder, status: 'completed' as const } : reminder
+        )
+      );
+    } catch (error) {
+      console.error('Failed to mark bill as paid:', error);
+      alert('Failed to mark bill as paid. Please try again.');
+    }
+  }, [setReminders]);
+
   // Memoized callback for closing modal
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
@@ -833,6 +849,7 @@ export default function RemindersPage(): JSX.Element {
                       onEdit={handleEditReminder}
                       onDelete={handleDeleteReminder}
                       onSnooze={handleSnoozeReminder}
+                      onMarkBillPaid={handleMarkBillPaid}
                       selectionMode={selectionMode}
                       selected={selectedReminderIds.has(reminder.id)}
                       onSelectionChange={handleSelectionChange}
