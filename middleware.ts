@@ -186,9 +186,16 @@ export async function middleware(req: NextRequest) {
 
       // SECURITY FIX: Use strict equality instead of includes() to prevent subdomain bypass
       // e.g., rowan.app.attacker.com would pass includes() check but fail strict equality
+      //
+      // SECURITY: Vercel preview pattern restricted to this project only
+      // Prevents CSRF from arbitrary *.vercel.app domains
+      // Valid patterns: rowan-app-{hash}.vercel.app, rowan-app-git-{branch}-*.vercel.app
+      const isVercelPreview = originHost.endsWith('.vercel.app') &&
+        (originHost.startsWith('rowan-app-') || originHost === 'rowan-app.vercel.app');
+
       const isValidOrigin = originHost === expectedHost ||
-        // Allow Vercel preview deployments
-        originHost.endsWith('.vercel.app') ||
+        // Allow only THIS project's Vercel preview deployments
+        isVercelPreview ||
         // Allow localhost in development
         (process.env.NODE_ENV === 'development' && originHost === 'localhost');
 

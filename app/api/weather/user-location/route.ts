@@ -33,14 +33,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('[Weather User Location API] Detecting location for IP:', clientIP);
-
     // Detect geographic location
     const detection = await geographicDetectionService.detectLocation(clientIP);
 
     if (!detection.success || !detection.data) {
-      console.warn('[Weather User Location API] Location detection failed:', detection.error);
-
       return NextResponse.json(
         {
           error: detection.error || 'Failed to detect location',
@@ -81,17 +77,8 @@ export async function GET(request: NextRequest) {
       ip: clientIP
     };
 
-    console.log('[Weather User Location API] Location detected successfully:', {
-      city: locationData.city,
-      region: locationData.region,
-      country: locationData.country,
-      confidence: detection.confidence
-    });
-
     return NextResponse.json(weatherLocation);
-  } catch (error) {
-    console.error('[Weather User Location API] Unexpected error:', error);
-
+  } catch {
     return NextResponse.json(
       {
         error: 'Internal server error during location detection',
@@ -162,16 +149,8 @@ export async function POST(request: NextRequest) {
       source: 'manual_override'
     };
 
-    console.log('[Weather User Location API] Manual location set:', {
-      city,
-      region,
-      country
-    });
-
     return NextResponse.json(manualLocation);
-  } catch (error) {
-    console.error('[Weather User Location API] Error processing manual location:', error);
-
+  } catch {
     return NextResponse.json(
       { error: 'Failed to process manual location' },
       { status: 500 }

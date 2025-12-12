@@ -48,7 +48,6 @@ export async function GET(request: NextRequest) {
 
     // If column doesn't exist yet, return default settings
     if (profileError && profileError.message?.includes('column "privacy_settings" does not exist')) {
-      console.log('Privacy settings column does not exist yet, returning defaults');
       return NextResponse.json({
         success: true,
         data: defaultSettings,
@@ -56,7 +55,6 @@ export async function GET(request: NextRequest) {
     }
 
     if (profileError) {
-      console.error('Error fetching privacy settings:', profileError);
       return NextResponse.json(
         { error: 'Failed to fetch privacy settings' },
         { status: 500 }
@@ -69,8 +67,7 @@ export async function GET(request: NextRequest) {
       success: true,
       data: privacySettings,
     });
-  } catch (error) {
-    console.error('Error in privacy settings GET:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -110,7 +107,6 @@ export async function PATCH(request: NextRequest) {
 
     // If column doesn't exist yet, return error for now (updates not supported without column)
     if (fetchError && fetchError.message?.includes('column "privacy_settings" does not exist')) {
-      console.log('Privacy settings column does not exist yet, cannot update');
       return NextResponse.json(
         { error: 'Privacy settings feature not yet available' },
         { status: 503 }
@@ -118,7 +114,6 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (fetchError) {
-      console.error('Error fetching current privacy settings:', fetchError);
       return NextResponse.json(
         { error: 'Failed to fetch current settings' },
         { status: 500 }
@@ -145,7 +140,6 @@ export async function PATCH(request: NextRequest) {
       .single();
 
     if (updateError) {
-      console.error('Error updating privacy settings:', updateError);
       return NextResponse.json(
         { error: 'Failed to update privacy settings' },
         { status: 500 }
@@ -165,7 +159,6 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    console.error('Error in privacy settings PATCH:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

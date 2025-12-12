@@ -12,7 +12,6 @@ export async function POST(request: NextRequest) {
   try {
     // SECURITY: Fail-closed if CRON_SECRET is not configured
     if (!process.env.CRON_SECRET) {
-      console.error('[CRON] CRON_SECRET environment variable not configured');
       return NextResponse.json(
         { success: false, error: 'Server configuration error' },
         { status: 500 }
@@ -37,8 +36,6 @@ export async function POST(request: NextRequest) {
       errors: 0,
     };
 
-    console.log('🔄 Starting account deletion processing job...', today.toISOString());
-
     // Step 1: Send 7-day reminders
     const sevenDaysFromNow = new Date(today);
     sevenDaysFromNow.setDate(today.getDate() + 7);
@@ -56,11 +53,8 @@ export async function POST(request: NextRequest) {
       .gte('scheduled_deletion_date', today.toISOString());
 
     if (sevenDayError) {
-      console.error('Error fetching 7-day reminder accounts:', sevenDayError);
       results.errors++;
     } else if (sevenDayAccounts && sevenDayAccounts.length > 0) {
-      console.log(`📧 Processing ${sevenDayAccounts.length} seven-day reminders...`);
-
       for (const account of sevenDayAccounts) {
         try {
           await send7DayDeletionReminder(
@@ -86,9 +80,7 @@ export async function POST(request: NextRequest) {
             });
 
           results.sevenDayReminders++;
-          console.log(`✅ Sent 7-day reminder to ${account.profiles.email}`);
-        } catch (error) {
-          console.error(`❌ Failed to send 7-day reminder to ${account.profiles.email}:`, error);
+        } catch {
           results.errors++;
         }
       }
@@ -111,11 +103,8 @@ export async function POST(request: NextRequest) {
       .gte('scheduled_deletion_date', today.toISOString());
 
     if (oneDayError) {
-      console.error('Error fetching 1-day reminder accounts:', oneDayError);
       results.errors++;
     } else if (oneDayAccounts && oneDayAccounts.length > 0) {
-      console.log(`📧 Processing ${oneDayAccounts.length} one-day reminders...`);
-
       for (const account of oneDayAccounts) {
         try {
           await send1DayDeletionReminder(
@@ -141,9 +130,7 @@ export async function POST(request: NextRequest) {
             });
 
           results.oneDayReminders++;
-          console.log(`✅ Sent 1-day reminder to ${account.profiles.email}`);
-        } catch (error) {
-          console.error(`❌ Failed to send 1-day reminder to ${account.profiles.email}:`, error);
+        } catch {
           results.errors++;
         }
       }
@@ -161,11 +148,8 @@ export async function POST(request: NextRequest) {
       .lte('scheduled_deletion_date', today.toISOString());
 
     if (deleteError) {
-      console.error('Error fetching accounts to delete:', deleteError);
       results.errors++;
     } else if (accountsToDelete && accountsToDelete.length > 0) {
-      console.log(`🗑️ Processing ${accountsToDelete.length} account deletions...`);
-
       for (const account of accountsToDelete) {
         try {
           await executeAccountDeletion(account.user_id, account.profiles.email, account.profiles.full_name || 'User');
@@ -177,23 +161,18 @@ export async function POST(request: NextRequest) {
             .eq('id', account.id);
 
           results.deletionsProcessed++;
-          console.log(`✅ Deleted account for ${account.profiles.email}`);
-        } catch (error) {
-          console.error(`❌ Failed to delete account for ${account.profiles.email}:`, error);
+        } catch {
           results.errors++;
         }
       }
     }
-
-    console.log('✅ Account deletion processing job completed:', results);
 
     return NextResponse.json({
       success: true,
       message: 'Account deletion processing completed',
       results,
     });
-  } catch (error) {
-    console.error('❌ Account deletion processing job failed:', error);
+  } catch {
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -211,7 +190,6 @@ async function send7DayDeletionReminder(
   const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/settings/privacy-data?cancel-deletion=${requestId}`;
 
   if (!resend) {
-    console.warn('Resend API key not configured, skipping email');
     return;
   }
 
@@ -277,7 +255,6 @@ async function send1DayDeletionReminder(
   const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/settings/privacy-data?cancel-deletion=${requestId}`;
 
   if (!resend) {
-    console.warn('Resend API key not configured, skipping email');
     return;
   }
 
@@ -370,10 +347,7 @@ async function executeAccountDeletion(userId: string, email: string, userName: s
 
     // 3. Send deletion confirmation email
     await sendDeletionCompletedEmail(email, userName);
-
-    console.log(`✅ Account deletion completed for user ${userId} (${email})`);
   } catch (error) {
-    console.error(`❌ Account deletion failed for user ${userId}:`, error);
     throw error;
   }
 }
@@ -381,9 +355,8 @@ async function executeAccountDeletion(userId: string, email: string, userName: s
 async function sendDeletionCompletedEmail(email: string, userName: string) {
   try {
     if (!resend) {
-    console.warn('Resend API key not configured, skipping email');
-    return;
-  }
+      return;
+    }
 
   await resend.emails.send({
       from: 'Rowan <noreply@rowan.app>',
@@ -431,8 +404,7 @@ async function sendDeletionCompletedEmail(email: string, userName: string) {
         notification_type: 'deletion_completed',
         email_address: email,
       });
-  } catch (error) {
-    console.error('Error sending deletion completed email:', error);
+  } catch {
     // Don't throw error here - deletion is already complete
   }
 }

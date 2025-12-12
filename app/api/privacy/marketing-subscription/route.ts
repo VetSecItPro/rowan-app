@@ -76,7 +76,6 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (createError) {
-        console.error('Error creating default privacy preferences:', createError);
         return NextResponse.json(
           { success: false, error: 'Failed to initialize preferences' },
           { status: 500 }
@@ -84,7 +83,6 @@ export async function POST(request: NextRequest) {
       }
       currentPrefs = newPrefs;
     } else if (prefsError) {
-      console.error('Error fetching privacy preferences:', prefsError);
       return NextResponse.json(
         { success: false, error: 'Failed to fetch current preferences' },
         { status: 500 }
@@ -107,7 +105,6 @@ export async function POST(request: NextRequest) {
       .eq('user_id', userId);
 
     if (updateError) {
-      console.error('Error updating marketing preferences:', updateError);
       return NextResponse.json(
         { success: false, error: 'Failed to update preferences' },
         { status: 500 }
@@ -133,7 +130,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error('Marketing subscription API error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -186,7 +182,6 @@ export async function GET(request: NextRequest) {
         .single();
 
       if (createError) {
-        console.error('Error creating default privacy preferences:', createError);
         return NextResponse.json(
           { success: false, error: 'Failed to initialize preferences' },
           { status: 500 }
@@ -194,7 +189,6 @@ export async function GET(request: NextRequest) {
       }
       preferences = newPrefs;
     } else if (prefsError) {
-      console.error('Error fetching marketing preferences:', prefsError);
       return NextResponse.json(
         { success: false, error: 'Failed to fetch preferences' },
         { status: 500 }
@@ -209,7 +203,6 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (profileError) {
-      console.error('Error fetching profile:', profileError);
       return NextResponse.json(
         { success: false, error: 'Failed to fetch profile' },
         { status: 500 }
@@ -242,8 +235,7 @@ export async function GET(request: NextRequest) {
         },
       },
     });
-  } catch (error) {
-    console.error('Marketing subscription GET error:', error);
+  } catch {
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -265,10 +257,7 @@ async function applyMarketingPreferences(userId: string, preferences: any, curre
     if (typeof preferences.emailMarketing !== 'undefined') {
       await updateEmailServiceProvider(userId, preferences.emailMarketing);
     }
-
-    console.log(`✅ Marketing preferences applied for user ${userId}`);
-  } catch (error) {
-    console.error('❌ Error applying marketing preferences:', error);
+  } catch {
     // Don't throw error here to avoid breaking the preference update
   }
 }
@@ -277,7 +266,6 @@ async function applyMarketingPreferences(userId: string, preferences: any, curre
 async function updateResendAudience(userId: string, enableMarketing: boolean) {
   try {
     if (!process.env.RESEND_API_KEY) {
-      console.log('📧 Resend API key not configured, skipping audience update');
       return;
     }
 
@@ -291,82 +279,46 @@ async function updateResendAudience(userId: string, enableMarketing: boolean) {
       .single();
 
     if (!profile?.email) {
-      console.log('📧 No email found for user, skipping audience update');
       return;
     }
 
-    if (enableMarketing) {
-      // Add to marketing audience
-      console.log(`📧 Adding ${profile.email} to marketing audience`);
-      // In a real implementation, you would:
-      // await resend.audiences.add({
-      //   audienceId: 'marketing-audience-id',
-      //   email: profile.email,
-      //   firstName: profile.name?.split(' ')[0],
-      // });
-    } else {
-      // Remove from marketing audience
-      console.log(`📧 Removing ${profile.email} from marketing audience`);
-      // In a real implementation, you would:
-      // await resend.audiences.remove({
-      //   audienceId: 'marketing-audience-id',
-      //   email: profile.email,
-      // });
-    }
-  } catch (error) {
-    console.error('Error updating Resend audience:', error);
+    // In a real implementation, you would:
+    // if (enableMarketing) {
+    //   await resend.audiences.add({
+    //     audienceId: 'marketing-audience-id',
+    //     email: profile.email,
+    //     firstName: profile.name?.split(' ')[0],
+    //   });
+    // } else {
+    //   await resend.audiences.remove({
+    //     audienceId: 'marketing-audience-id',
+    //     email: profile.email,
+    //   });
+    // }
+    void enableMarketing; // Placeholder for future implementation
+  } catch {
+    // Silently handle audience update errors
   }
 }
 
 // Update SMS subscription (Twilio or similar)
+// Note: Phone column doesn't exist in users table yet - placeholder for future SMS functionality
 async function updateSMSSubscription(userId: string, enableSMS: boolean) {
-  try {
-    // Note: Phone column doesn't exist in users table yet
-    // This is a placeholder for future SMS functionality
-    console.log(`📱 SMS marketing ${enableSMS ? 'enabled' : 'disabled'} for user ${userId}`);
-    console.log('📱 Phone number feature not yet implemented - users table needs phone column');
-
-    // TODO: Add phone column to users table or create separate phone_numbers table
-    // Then implement actual SMS subscription logic here
-
-    // Example future implementation:
-    // const supabase = createClient();
-    // const { data: profile } = await supabase
-    //   .from('users')
-    //   .select('phone')
-    //   .eq('id', userId)
-    //   .single();
-    //
-    // if (!profile?.phone) {
-    //   console.log('📱 No phone number found for user, skipping SMS update');
-    //   return;
-    // }
-    //
-    // if (enableSMS) {
-    //   console.log(`📱 Enabling SMS marketing for ${profile.phone}`);
-    //   // await twilioClient.messages.create({...});
-    // } else {
-    //   console.log(`📱 Disabling SMS marketing for ${profile.phone}`);
-    //   // Add phone to unsubscribe list
-    // }
-  } catch (error) {
-    console.error('Error updating SMS subscription:', error);
-  }
+  // TODO: Add phone column to users table or create separate phone_numbers table
+  // Then implement actual SMS subscription logic here
+  void userId;
+  void enableSMS;
 }
 
 // Update email service provider (if using multiple)
+// This would integrate with other email providers like Mailchimp, Sendgrid, etc.
 async function updateEmailServiceProvider(userId: string, enableEmail: boolean) {
-  try {
-    // This would integrate with other email providers like Mailchimp, Sendgrid, etc.
-    console.log(`📮 ${enableEmail ? 'Enabling' : 'Disabling'} email marketing for user ${userId}`);
-
-    // Example implementation points:
-    // - Mailchimp: Add/remove from lists
-    // - SendGrid: Update contact lists
-    // - ConvertKit: Manage subscribers
-  } catch (error) {
-    console.error('Error updating email service provider:', error);
-  }
+  // Example implementation points:
+  // - Mailchimp: Add/remove from lists
+  // - SendGrid: Update contact lists
+  // - ConvertKit: Manage subscribers
+  void userId;
+  void enableEmail;
 }
 
 // Log marketing preference changes for audit trail
@@ -390,10 +342,8 @@ async function logMarketingPreferenceChange(userId: string, preferences: any) {
     if (notifications.length > 0) {
       await supabase.from('privacy_email_notifications').insert(notifications);
     }
-
-    console.log(`📝 Marketing preference changes logged for user ${userId}`);
-  } catch (error) {
-    console.error('Error logging marketing preference change:', error);
+  } catch {
+    // Silently handle logging errors to not disrupt the main flow
   }
 }
 
@@ -419,8 +369,7 @@ async function generateUnsubscribeToken(userId: string, type: string): Promise<s
       });
 
     return token;
-  } catch (error) {
-    console.error('Error generating unsubscribe token:', error);
+  } catch {
     return 'invalid-token';
   }
 }
@@ -498,8 +447,7 @@ async function handleTokenUnsubscribe(token: string, type: string) {
       message: `Successfully unsubscribed from ${type} marketing`,
       data: { type, unsubscribed: true },
     });
-  } catch (error) {
-    console.error('Token unsubscribe error:', error);
+  } catch {
     return NextResponse.json(
       { success: false, error: 'Failed to process unsubscribe request' },
       { status: 500 }
