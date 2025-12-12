@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Bell, Check, Trash2, X, Filter, CheckCircle2, Circle } from 'lucide-react';
+import { Bell, Check, Trash2, X, Filter, CheckCircle2, Circle, DollarSign } from 'lucide-react';
 import {
   inAppNotificationsService,
   type InAppNotification,
@@ -10,6 +10,7 @@ import {
 } from '@/lib/services/in-app-notifications-service';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { billsService } from '@/lib/services/bills-service';
 
 interface ComprehensiveNotificationCenterProps {
   userId: string;
@@ -115,6 +116,29 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
       }
     } catch (error) {
       console.error('Error deleting notification:', error);
+    }
+  };
+
+  // Mark bill as paid from notification
+  const handleMarkBillPaid = async (notification: InAppNotification) => {
+    // Get bill ID from related_item_id or metadata
+    const billId = notification.related_item_id || notification.metadata?.billId;
+    if (!billId) {
+      console.error('No bill ID found in notification');
+      return;
+    }
+
+    try {
+      await billsService.markBillAsPaid(billId);
+      // Mark the notification as read after action
+      if (!notification.is_read) {
+        await handleMarkAsRead(notification.id);
+      }
+      // Refresh notifications
+      await fetchNotifications();
+    } catch (error) {
+      console.error('Error marking bill as paid:', error);
+      alert('Failed to mark bill as paid. Please try again.');
     }
   };
 
@@ -313,6 +337,12 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
                       onClick={() => handleNotificationClick(notification)}
                       onMarkAsRead={() => handleMarkAsRead(notification.id)}
                       onDelete={() => handleDeleteNotification(notification.id)}
+                      onMarkBillPaid={
+                        notification.type === 'bill_due' &&
+                        (notification.related_item_id || notification.metadata?.billId)
+                          ? () => handleMarkBillPaid(notification)
+                          : undefined
+                      }
                     />
                   ))}
                 </div>
@@ -349,9 +379,10 @@ interface NotificationItemProps {
   onClick: () => void;
   onMarkAsRead: () => void;
   onDelete: () => void;
+  onMarkBillPaid?: () => void;
 }
 
-function NotificationItem({ notification, onClick, onMarkAsRead, onDelete }: NotificationItemProps) {
+function NotificationItem({ notification, onClick, onMarkAsRead, onDelete, onMarkBillPaid }: NotificationItemProps) {
   const icon = inAppNotificationsService.getNotificationIcon(notification.type);
   const color = inAppNotificationsService.getNotificationColor(notification.type);
   const priorityColor = inAppNotificationsService.getPriorityColor(notification.priority);
@@ -432,6 +463,20 @@ function NotificationItem({ notification, onClick, onMarkAsRead, onDelete }: Not
 
         {/* Actions */}
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {/* Quick Pay for Bill Notifications */}
+          {onMarkBillPaid && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onMarkBillPaid();
+              }}
+              className="p-1.5 hover:bg-green-100 dark:hover:bg-green-900/20 rounded-full transition-colors"
+              aria-label="Mark bill as paid"
+              title="Mark bill as paid"
+            >
+              <DollarSign className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
+            </button>
+          )}
           {!notification.is_read && (
             <button
               onClick={(e) => {
