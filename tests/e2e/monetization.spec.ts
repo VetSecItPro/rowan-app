@@ -302,11 +302,9 @@ test.describe('Security Checks', () => {
     });
     expect([401, 403]).toContain(checkoutResponse.status());
 
-    // Test cancel subscription without auth
-    const cancelResponse = await request.post('/api/subscription/cancel', {
-      data: { reason: 'test' },
-    });
-    expect([401, 403]).toContain(cancelResponse.status());
+    // Test customer portal access without auth (used for subscription management)
+    const portalResponse = await request.post('/api/stripe/customer-portal');
+    expect([401, 403]).toContain(portalResponse.status());
   });
 
   test('invalid input is rejected with proper errors', async ({ request }) => {
