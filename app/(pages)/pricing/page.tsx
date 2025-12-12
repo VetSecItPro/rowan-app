@@ -6,13 +6,14 @@
  * Updated for 14-day trial model with Stripe checkout integration
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { PricingCard } from '@/components/pricing/PricingCard';
 import { PricingToggle } from '@/components/pricing/PricingToggle';
 import Image from 'next/image';
 import { Sparkles, Clock, Shield, Loader2 } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
+import { featureFlags } from '@/lib/constants/feature-flags';
 
 // Initialize Stripe.js
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -24,6 +25,18 @@ export default function PricingPage() {
   const [period, setPeriod] = useState<'monthly' | 'annual'>('monthly');
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Redirect if monetization is disabled
+  useEffect(() => {
+    if (!featureFlags.isMonetizationEnabled()) {
+      router.replace('/dashboard');
+    }
+  }, [router]);
+
+  // Don't render anything if monetization is disabled (will redirect)
+  if (!featureFlags.isMonetizationEnabled()) {
+    return null;
+  }
 
   const handlePeriodChange = (newPeriod: 'monthly' | 'annual') => {
     setPeriod(newPeriod);
