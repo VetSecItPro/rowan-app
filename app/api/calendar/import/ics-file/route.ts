@@ -55,11 +55,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify user has access to the space
-    console.log('[ICS File Import] Checking space access:', {
-      space_id: validatedData.space_id,
-      user_id: user.id,
-    });
-
     const { data: spaceMember, error: spaceError } = await supabase
       .from('space_members')
       .select('space_id, role')
@@ -68,19 +63,11 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (spaceError || !spaceMember) {
-      console.error('[ICS File Import] Space access denied:', {
-        spaceError,
-        spaceMember,
-        space_id: validatedData.space_id,
-        user_id: user.id,
-      });
       return NextResponse.json(
         { error: 'Space not found or access denied' },
         { status: 403 }
       );
     }
-
-    console.log('[ICS File Import] Space access confirmed:', spaceMember);
 
     // Validate ICS content before importing
     const validation = icsImportService.validateICSContent(validatedData.ics_content);
@@ -93,11 +80,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    console.log('[ICS File Import] ICS validation passed:', {
-      eventCount: validation.eventCount,
-      calendarName: validation.calendarName,
-    });
 
     // Import events from ICS content
     const importResult = await icsImportService.importICSFile(
@@ -117,11 +99,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('[ICS File Import] Import completed:', {
-      eventsImported: importResult.eventsImported,
-      fileName: validatedData.file_name,
-    });
-
     return NextResponse.json({
       success: true,
       events_imported: importResult.eventsImported,
@@ -130,8 +107,6 @@ export async function POST(request: NextRequest) {
       message: `Successfully imported ${importResult.eventsImported} events`,
     });
   } catch (error) {
-    console.error('[ICS File Import] Error:', error);
-
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation error', details: error.issues },

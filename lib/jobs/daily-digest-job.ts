@@ -1,19 +1,16 @@
-import { createClient } from '@supabase/supabase-js';
 import { sendAIDailyDigestEmail, AIDailyDigestData, DailyDigestData } from '@/lib/services/email-service';
 import { digestGeneratorService, DigestInput } from '@/lib/services/ai/digest-generator-service';
 import { logger } from '@/lib/logger';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
-// Create admin Supabase client for server-side operations
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  }
-);
+// SECURITY: Runtime check to prevent accidental client-side import
+// This job uses the service role key and must only run on the server
+if (typeof window !== 'undefined') {
+  throw new Error(
+    'SECURITY ERROR: daily-digest-job.ts cannot be used on the client side. ' +
+    'This module uses the service role key and must only run on the server.'
+  );
+}
 
 interface DigestResult {
   success: boolean;

@@ -52,7 +52,6 @@ export async function GET(request: Request) {
     const cronSecret = process.env.CRON_SECRET;
 
     if (!cronSecret) {
-      console.error('CRON_SECRET not configured');
       return NextResponse.json(
         { error: 'Cron secret not configured' },
         { status: 500 }
@@ -65,8 +64,6 @@ export async function GET(request: Request) {
         { status: 401 }
       );
     }
-
-    console.log('[CRON] Starting cleanup job:', new Date().toISOString());
 
     const supabase = await createClient();
     const now = new Date();
@@ -84,19 +81,12 @@ export async function GET(request: Request) {
       .gte('permanent_deletion_at', warningDateStart.toISOString())
       .lte('permanent_deletion_at', warningDateEnd.toISOString());
 
-    if (warningError) {
-      console.error('[CRON] Error fetching accounts for warning:', warningError);
-    }
-
     let warningsSent = 0;
     let warningsFailed = 0;
 
-    if (accountsNeedingWarning && accountsNeedingWarning.length > 0) {
-      console.log(`[CRON] Found ${accountsNeedingWarning.length} accounts needing warning emails`);
-
+    if (!warningError && accountsNeedingWarning && accountsNeedingWarning.length > 0) {
       for (const account of accountsNeedingWarning) {
         try {
-          // Get user email from auth
           const { data: userData } = await supabase.auth.admin.getUserById(account.user_id);
 
           if (userData?.user?.email) {
@@ -107,10 +97,8 @@ export async function GET(request: Request) {
               new Date(account.permanent_deletion_at)
             );
             warningsSent++;
-            console.log(`[CRON] Warning email sent to user ${account.user_id}`);
           }
-        } catch (error) {
-          console.error(`[CRON] Failed to send warning email for user ${account.user_id}:`, error);
+        } catch {
           warningsFailed++;
         }
       }
@@ -122,19 +110,12 @@ export async function GET(request: Request) {
       .select('user_id, permanent_deletion_at')
       .lt('permanent_deletion_at', now.toISOString());
 
-    if (deleteCheckError) {
-      console.error('[CRON] Error fetching accounts for deletion:', deleteCheckError);
-    }
-
     // Step 3: Get user emails before deletion
     let confirmationsSent = 0;
     let confirmationsFailed = 0;
     const userEmails: Array<{userId: string, email?: string, name?: string}> = [];
 
-    if (accountsToDelete && accountsToDelete.length > 0) {
-      console.log(`[CRON] Found ${accountsToDelete.length} accounts ready for permanent deletion`);
-
-      // Get user emails before deletion
+    if (!deleteCheckError && accountsToDelete && accountsToDelete.length > 0) {
       for (const account of accountsToDelete) {
         try {
           const { data: userData } = await supabase.auth.admin.getUserById(account.user_id);
@@ -143,8 +124,7 @@ export async function GET(request: Request) {
             email: userData?.user?.email,
             name: userData?.user?.user_metadata?.name || userData?.user?.email,
           });
-        } catch (error) {
-          console.error(`[CRON] Failed to get user data for ${account.user_id}:`, error);
+        } catch {
           userEmails.push({ userId: account.user_id });
         }
       }
@@ -152,7 +132,6 @@ export async function GET(request: Request) {
 
     // Step 4: Permanently delete expired accounts
     const deletionResult = await permanentlyDeleteExpiredAccounts();
-    console.log(`[CRON] Deletion complete: ${deletionResult.deleted} deleted, ${deletionResult.errors} errors`);
 
     // Step 5: Send confirmation emails for deleted accounts
     for (const user of userEmails) {
@@ -160,9 +139,7 @@ export async function GET(request: Request) {
         try {
           await sendPermanentDeletionConfirmationEmail(user.email, user.userId, user.name);
           confirmationsSent++;
-          console.log(`[CRON] Confirmation email sent to user ${user.userId}`);
-        } catch (error) {
-          console.error(`[CRON] Failed to send confirmation email for user ${user.userId}:`, error);
+        } catch {
           confirmationsFailed++;
         }
       }
@@ -178,19 +155,13 @@ export async function GET(request: Request) {
       confirmations_failed: confirmationsFailed,
     };
 
-    console.log('[CRON] Cleanup job complete:', summary);
-
     return NextResponse.json({
       success: true,
       ...summary,
     });
-  } catch (error) {
-    console.error('[CRON] Fatal error in cleanup job:', error);
+  } catch {
     return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -213,22 +184,12 @@ async function permanentlyDeleteExpiredAccounts() {
       .select('user_id, partnership_ids')
       .lt('permanent_deletion_at', now.toISOString());
 
-    if (fetchError) {
-      console.error('[DELETION] Error fetching expired accounts:', fetchError);
-      return { deleted: 0, errors: 1 };
+    if (fetchError || !expiredAccounts || expiredAccounts.length === 0) {
+      return { deleted: 0, errors: fetchError ? 1 : 0 };
     }
-
-    if (!expiredAccounts || expiredAccounts.length === 0) {
-      console.log('[DELETION] No expired accounts found');
-      return { deleted: 0, errors: 0 };
-    }
-
-    console.log(`[DELETION] Processing ${expiredAccounts.length} expired accounts`);
 
     for (const account of expiredAccounts) {
       try {
-        console.log(`[DELETION] Permanently deleting user ${account.user_id}`);
-
         // Log permanent deletion
         await accountDeletionService.logDeletionAction(account.user_id, 'permanent', {
           timestamp: now.toISOString(),
@@ -236,10 +197,7 @@ async function permanentlyDeleteExpiredAccounts() {
         }, supabase);
 
         // Delete from auth (this cascades to profiles via foreign key)
-        const { error: authDeleteError } = await supabase.auth.admin.deleteUser(account.user_id);
-        if (authDeleteError) {
-          console.error(`[DELETION] Error deleting auth user ${account.user_id}:`, authDeleteError);
-        }
+        await supabase.auth.admin.deleteUser(account.user_id);
 
         // Remove from deleted_accounts table
         const { error: deleteRecordError } = await supabase
@@ -248,21 +206,17 @@ async function permanentlyDeleteExpiredAccounts() {
           .eq('user_id', account.user_id);
 
         if (deleteRecordError) {
-          console.error(`[DELETION] Error removing deletion record for ${account.user_id}:`, deleteRecordError);
           errors++;
         } else {
           deleted++;
-          console.log(`[DELETION] Successfully deleted user ${account.user_id}`);
         }
-      } catch (error) {
-        console.error(`[DELETION] Error processing account ${account.user_id}:`, error);
+      } catch {
         errors++;
       }
     }
 
     return { deleted, errors };
-  } catch (error) {
-    console.error('[DELETION] Fatal error in permanent deletion:', error);
+  } catch {
     return { deleted: 0, errors: 1 };
   }
 }

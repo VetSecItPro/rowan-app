@@ -3,10 +3,33 @@ import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import { cookies } from 'next/headers';
+import { safeCookies } from '@/lib/utils/safe-cookies';
+import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
+import { z } from 'zod';
+
+// Query parameter validation schema
+const QueryParamsSchema = z.object({
+  page: z.coerce.number().int().min(1).max(10000).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(50),
+  status: z.enum(['subscribed', 'unsubscribed']).optional(),
+  search: z.string().max(100).optional(),
+});
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
+
+/**
+ * SECURITY: Sanitize search input for PostgreSQL ILIKE patterns
+ * Escapes special characters: %, _, and \ which have special meaning in LIKE/ILIKE
+ */
+function sanitizeSearchInput(input: string): string {
+  // Escape backslash first (order matters!), then % and _
+  return input
+    .replace(/\\/g, '\\\\')  // Escape backslashes
+    .replace(/%/g, '\\%')    // Escape wildcard %
+    .replace(/_/g, '\\_')    // Escape single char wildcard _
+    .slice(0, 100);          // Limit length to prevent DoS
+}
 
 /**
  * GET /api/admin/notifications
@@ -25,8 +48,8 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Check admin authentication
-    const cookieStore = cookies();
+    // Check admin authentication using secure AES-256-GCM encryption
+    const cookieStore = safeCookies();
     const adminSession = cookieStore.get('admin-session');
 
     if (!adminSession) {
@@ -36,15 +59,15 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Decode admin session
-    let sessionData;
+    // Decrypt and validate admin session
+    let sessionData: { email?: string; adminId?: string; role?: string };
     try {
-      sessionData = JSON.parse(Buffer.from(adminSession.value, 'base64').toString());
+      sessionData = await decryptSessionData(adminSession.value);
 
-      // Check if session is expired
-      if (sessionData.expiresAt < Date.now()) {
+      // Validate session data structure and expiration
+      if (!validateSessionData(sessionData)) {
         return NextResponse.json(
-          { error: 'Session expired' },
+          { error: 'Invalid or expired session' },
           { status: 401 }
         );
       }
@@ -58,12 +81,15 @@ export async function GET(req: NextRequest) {
     // Create Supabase client
     const supabase = createClient();
 
-    // Get query parameters
+    // Parse and validate query parameters
     const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const status = searchParams.get('status'); // 'subscribed', 'unsubscribed', or null for all
-    const search = searchParams.get('search') || '';
+    const validatedParams = QueryParamsSchema.parse({
+      page: searchParams.get('page') || '1',
+      limit: searchParams.get('limit') || '50',
+      status: searchParams.get('status') || undefined,
+      search: searchParams.get('search') || undefined,
+    });
+    const { page, limit, status, search } = validatedParams;
 
     // Build query
     let query = supabase
@@ -78,9 +104,10 @@ export async function GET(req: NextRequest) {
       query = query.eq('subscribed', false);
     }
 
-    // Apply search filter
+    // Apply search filter with sanitization
     if (search) {
-      query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%`);
+      const sanitizedSearch = sanitizeSearchInput(search);
+      query = query.or(`name.ilike.%${sanitizedSearch}%,email.ilike.%${sanitizedSearch}%`);
     }
 
     // Apply pagination
@@ -122,6 +149,14 @@ export async function GET(req: NextRequest) {
     });
 
   } catch (error) {
+    // Handle Zod validation errors
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid query parameters', details: error.issues },
+        { status: 400 }
+      );
+    }
+
     Sentry.captureException(error, {
       tags: {
         endpoint: '/api/admin/notifications',
@@ -131,7 +166,6 @@ export async function GET(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/admin/notifications GET error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch notifications' },
       { status: 500 }
