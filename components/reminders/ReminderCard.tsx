@@ -1,6 +1,6 @@
 'use client';
 
-import { Clock, Flag, MoreVertical, Timer, Check, Edit, Trash2, ChevronDown, ChevronUp, MessageCircle, Activity, Paperclip } from 'lucide-react';
+import { Clock, Flag, MoreVertical, Timer, Check, Edit, Trash2, ChevronDown, ChevronUp, MessageCircle, Activity, Paperclip, DollarSign } from 'lucide-react';
 import { Reminder } from '@/lib/services/reminders-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
@@ -14,6 +14,7 @@ interface ReminderCardProps {
   onEdit: (reminder: Reminder) => void;
   onDelete: (reminderId: string) => void;
   onSnooze: (reminderId: string, minutes: number) => void;
+  onMarkBillPaid?: (reminderId: string) => void;
   selectionMode?: boolean;
   selected?: boolean;
   onSelectionChange?: (reminderId: string, selected: boolean) => void;
@@ -40,7 +41,7 @@ const categoryConfig = {
   household: { label: 'Household', icon: '🏠', color: 'bg-amber-500', textColor: 'text-amber-700 dark:text-amber-300', bgColor: 'bg-amber-100 dark:bg-amber-900/30' },
 };
 
-export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSnooze, selectionMode, selected, onSelectionChange }: ReminderCardProps) {
+export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSnooze, onMarkBillPaid, selectionMode, selected, onSelectionChange }: ReminderCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showSnoozeMenu, setShowSnoozeMenu] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
@@ -179,9 +180,9 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
           <button
             onClick={() => setShowMenu(!showMenu)}
             aria-label="Reminder options menu"
-            className="p-2 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
-            <MoreVertical className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            <MoreVertical className="w-5 h-5" />
           </button>
 
           {showMenu && (
@@ -191,12 +192,27 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                 onClick={() => setShowMenu(false)}
               />
               <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
+                {/* Mark Bill as Paid - Only show for bill-linked reminders */}
+                {reminder.linked_bill_id && onMarkBillPaid && reminder.status !== 'completed' && (
+                  <button
+                    onClick={() => {
+                      onMarkBillPaid(reminder.id);
+                      setShowMenu(false);
+                    }}
+                    className="w-full px-4 py-3 text-left text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 flex items-center gap-2 rounded-t-lg transition-colors font-medium"
+                  >
+                    <DollarSign className="w-4 h-4" />
+                    Mark Bill as Paid
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     onEdit(reminder);
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 rounded-t-lg transition-colors"
+                  className={`w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors ${
+                    !reminder.linked_bill_id || !onMarkBillPaid || reminder.status === 'completed' ? 'rounded-t-lg' : ''
+                  }`}
                 >
                   <Edit className="w-4 h-4" />
                   Edit Reminder
