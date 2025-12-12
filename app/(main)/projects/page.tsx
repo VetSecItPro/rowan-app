@@ -487,10 +487,10 @@ export default function ProjectsPage() {
             </div>
           </div>
 
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700/50 rounded-xl p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-xl font-bold text-amber-900 dark:text-amber-100">
                   {activeTab === 'projects' && `All Projects (${filteredProjects.length})`}
                   {activeTab === 'budgets' && 'Budget Overview'}
                   {activeTab === 'bills' && `All Bills (${filteredBills.length})`}
