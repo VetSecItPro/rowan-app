@@ -84,11 +84,10 @@ export async function goToPricingPage(page: Page): Promise<void> {
   await page.goto('/pricing');
   await page.waitForLoadState('networkidle');
 
-  // Verify pricing page loaded - look for h1 heading or pricing-related content
-  // The page h1 is "The family command center that works" so we check for that or pricing tiers
+  // Verify pricing page loaded - look for h1 heading with "family" in the text
+  // The page h1 is "The family command center that works"
   await expect(
-    page.locator('h1').filter({ hasText: /family|pricing|plans|upgrade/i })
-      .or(page.locator('text=/free trial/i').first())
+    page.locator('h1').filter({ hasText: /family|pricing|plans|upgrade/i }).first()
   ).toBeVisible();
 }
 
