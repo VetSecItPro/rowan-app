@@ -98,13 +98,12 @@ export async function togglePricingPeriod(
   page: Page,
   period: 'monthly' | 'annual'
 ): Promise<void> {
-  const toggle = page.locator('[data-testid="pricing-toggle"], button:has-text("Annual"), button:has-text("Monthly")');
-
-  // Check current state and toggle if needed
-  const isAnnual = await page.locator('text=/save|annual/i').isVisible();
-
-  if ((period === 'annual' && !isAnnual) || (period === 'monthly' && isAnnual)) {
-    await toggle.click();
+  // The pricing page has separate Monthly/Annual buttons, not a single toggle
+  // Click the specific button for the desired period
+  if (period === 'annual') {
+    await page.getByRole('button', { name: 'Annual' }).click();
+  } else {
+    await page.getByRole('button', { name: 'Monthly' }).click();
   }
 }
 
