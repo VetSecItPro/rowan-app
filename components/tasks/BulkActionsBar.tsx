@@ -118,7 +118,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
               </span>
               <button
                 onClick={onClearSelection}
-                className="btn-touch p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all active:scale-95 hover-lift shimmer-blue active-press hover:shadow-sm rounded"
+                className="btn-touch p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors active:scale-95 rounded"
                 title="Clear selection"
               >
                 <X className="w-4 h-4" />
@@ -132,7 +132,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
               <button
                 onClick={bulkComplete}
                 disabled={loading}
-                className="btn-touch flex items-center gap-1.5 px-3 py-1.5 text-sm bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 transition-all active:scale-95 hover-lift shimmer-green active-press hover:shadow-md"
+                className="btn-touch flex items-center gap-1.5 px-3 py-1.5 text-sm bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 transition-colors active:scale-95"
                 title="Mark as completed"
               >
                 <CheckCircle className="w-4 h-4" />
@@ -142,7 +142,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
               <button
                 onClick={() => setShowDeleteConfirm(true)}
                 disabled={loading}
-                className="btn-touch flex items-center gap-1.5 px-3 py-1.5 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 transition-all active:scale-95 hover-lift shimmer-red active-press hover:shadow-md"
+                className="btn-touch flex items-center gap-1.5 px-3 py-1.5 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 transition-colors active:scale-95"
                 title="Delete selected"
               >
                 <Trash2 className="w-4 h-4" />
@@ -152,7 +152,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
               <div className="relative">
                 <button
                   onClick={() => setShowMoreActions(!showMoreActions)}
-                  className="btn-touch flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all active:scale-95 hover-lift shimmer-blue active-press hover:shadow-md"
+                  className="btn-touch flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors active:scale-95"
                 >
                   <MoreHorizontal className="w-4 h-4" />
                   More
@@ -175,7 +175,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
                             bulkUpdateStatus('in-progress');
                             setShowMoreActions(false);
                           }}
-                          className="btn-touch w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-all active:scale-[0.98] hover-lift shimmer-blue active-press"
+                          className="btn-touch w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                         >
                           In Progress
                         </button>
@@ -184,7 +184,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
                             bulkUpdateStatus('blocked');
                             setShowMoreActions(false);
                           }}
-                          className="btn-touch w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-all active:scale-[0.98] hover-lift shimmer-red active-press"
+                          className="btn-touch w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                         >
                           Blocked
                         </button>
@@ -193,7 +193,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
                             bulkUpdateStatus('on-hold');
                             setShowMoreActions(false);
                           }}
-                          className="btn-touch w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-all active:scale-[0.98] hover-lift shimmer-amber active-press"
+                          className="btn-touch w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                         >
                           On Hold
                         </button>
@@ -209,7 +209,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
                             bulkUpdatePriority('urgent');
                             setShowMoreActions(false);
                           }}
-                          className="btn-touch w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-all active:scale-[0.98] hover-lift shimmer-red active-press"
+                          className="btn-touch w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                         >
                           <AlertCircle className="w-3 h-3 inline mr-2" />
                           Urgent
@@ -219,7 +219,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
                             bulkUpdatePriority('high');
                             setShowMoreActions(false);
                           }}
-                          className="btn-touch w-full text-left px-3 py-2 text-sm text-orange-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-all active:scale-[0.98] hover-lift shimmer-orange active-press"
+                          className="btn-touch w-full text-left px-3 py-2 text-sm text-orange-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                         >
                           <AlertCircle className="w-3 h-3 inline mr-2" />
                           High
@@ -229,7 +229,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
                             bulkUpdatePriority('medium');
                             setShowMoreActions(false);
                           }}
-                          className="btn-touch w-full text-left px-3 py-2 text-sm text-yellow-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-all active:scale-[0.98] hover-lift shimmer-yellow active-press"
+                          className="btn-touch w-full text-left px-3 py-2 text-sm text-yellow-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                         >
                           <AlertCircle className="w-3 h-3 inline mr-2" />
                           Medium
@@ -239,7 +239,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
                             bulkUpdatePriority('low');
                             setShowMoreActions(false);
                           }}
-                          className="btn-touch w-full text-left px-3 py-2 text-sm text-green-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-all active:scale-[0.98] hover-lift shimmer-green active-press"
+                          className="btn-touch w-full text-left px-3 py-2 text-sm text-green-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                         >
                           <AlertCircle className="w-3 h-3 inline mr-2" />
                           Low

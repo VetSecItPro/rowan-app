@@ -144,7 +144,7 @@ export default function CommentItem({
             <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
               <button
                 onClick={() => setIsEditing(!isEditing)}
-                className="btn-touch rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300 transition-all active:scale-95 hover-lift shimmer-blue active-press hover:shadow-md"
+                className="btn-touch rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300 transition-all active:scale-95 hover:shadow-md"
                 title="Edit"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,7 +158,7 @@ export default function CommentItem({
               </button>
               <button
                 onClick={() => onPin(comment.id)}
-                className="btn-touch rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300 transition-all active:scale-95 hover-lift shimmer-blue active-press hover:shadow-md"
+                className="btn-touch rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300 transition-all active:scale-95 hover:shadow-md"
                 title={comment.is_pinned ? 'Unpin' : 'Pin'}
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
@@ -167,7 +167,7 @@ export default function CommentItem({
               </button>
               <button
                 onClick={() => onDelete(comment.id)}
-                className="btn-touch rounded p-1 text-gray-400 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-all active:scale-95 hover-lift shimmer-red active-press hover:shadow-md"
+                className="btn-touch rounded p-1 text-gray-400 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-all active:scale-95 hover:shadow-md"
                 title="Delete"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,7 +209,7 @@ export default function CommentItem({
                 <button
                   key={reaction.emoji}
                   onClick={() => handleReaction(reaction.emoji)}
-                  className={`btn-touch rounded-full border px-2 py-1 text-xs transition-all active:scale-95 hover-lift shimmer-blue active-press hover:shadow-md ${
+                  className={`btn-touch rounded-full border px-2 py-1 text-xs transition-all active:scale-95 hover:shadow-md ${
                     hasReacted
                       ? 'border-blue-500 bg-blue-50 text-blue-600 dark:border-blue-400 dark:bg-blue-900/20 dark:text-blue-400'
                       : 'border-gray-300 bg-gray-50 text-gray-600 hover:border-gray-400 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300'
@@ -227,14 +227,14 @@ export default function CommentItem({
           {canReply && (
             <button
               onClick={() => setIsReplying(!isReplying)}
-              className="btn-touch text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-all active:scale-95 hover-lift shimmer-blue active-press hover:shadow-sm px-2 py-1 rounded"
+              className="btn-touch text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-all active:scale-95 hover:shadow-sm px-2 py-1 rounded"
             >
               Reply
             </button>
           )}
           <button
             onClick={() => setShowReactionPicker(!showReactionPicker)}
-            className="btn-touch text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-all active:scale-95 hover-lift shimmer-blue active-press hover:shadow-sm px-2 py-1 rounded"
+            className="btn-touch text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-all active:scale-95 hover:shadow-sm px-2 py-1 rounded"
           >
             React
           </button>

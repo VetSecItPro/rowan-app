@@ -122,7 +122,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="btn-touch w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all active:scale-[0.98] hover-lift shimmer-blue active-press"
+        className="btn-touch w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
       >
         <div className="flex items-center gap-2">
           <Filter className="w-5 h-5 text-gray-500" />
@@ -140,7 +140,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 e.stopPropagation();
                 clearFilters();
               }}
-              className="btn-touch px-3 py-1 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all active:scale-95 hover-lift shimmer-blue active-press"
+              className="btn-touch px-3 py-1 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
             >
               Clear all
             </button>
@@ -163,7 +163,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
               value={filters.search || ''}
               onChange={(e) => updateFilter('search', e.target.value || undefined)}
               placeholder="Search tasks..."
-              className="w-full px-3 py-2 border border-gray-200/50 dark:border-gray-700/50 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm transition-all hover:border-blue-400 dark:hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 hover:shadow-md focus:shadow-lg hover-lift shimmer-blue"
+              className="w-full px-3 py-2 border border-gray-200/50 dark:border-gray-700/50 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm transition-colors hover:border-blue-400 dark:hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800"
             />
           </div>
 
@@ -177,7 +177,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 <button
                   key={status.value}
                   onClick={() => toggleArrayFilter('status', status.value)}
-                  className={`btn-touch px-3 py-1.5 text-xs rounded-lg transition-all active:scale-95 hover-lift shimmer-blue active-press ${
+                  className={`btn-touch px-3 py-1.5 text-xs rounded-lg transition-colors ${
                     filters.status?.includes(status.value)
                       ? `${status.color} hover:shadow-md`
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -200,7 +200,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 <button
                   key={priority.value}
                   onClick={() => toggleArrayFilter('priority', priority.value)}
-                  className={`btn-touch px-3 py-1.5 text-xs rounded-lg transition-all active:scale-95 hover-lift shimmer-blue active-press ${
+                  className={`btn-touch px-3 py-1.5 text-xs rounded-lg transition-colors ${
                     filters.priority?.includes(priority.value)
                       ? `${priority.color} bg-gray-100 dark:bg-gray-700 hover:shadow-md`
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -223,7 +223,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 {members.map((member) => (
                   <label
                     key={member.user_id}
-                    htmlFor="field-5" className="btn-touch flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded transition-all active:scale-[0.98] hover-lift shimmer-blue active-press"
+                    htmlFor="field-5" className="btn-touch flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded transition-colors"
                   >
                     <input
                       type="checkbox"
@@ -253,7 +253,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                   <button
                     key={category.id}
                     onClick={() => toggleArrayFilter('categories', category.id)}
-                    className={`btn-touch px-3 py-1.5 text-xs rounded-lg transition-all active:scale-95 hover-lift shimmer-blue active-press ${
+                    className={`btn-touch px-3 py-1.5 text-xs rounded-lg transition-colors ${
                       filters.categories?.includes(category.id)
                         ? `bg-${category.color}-100 text-${category.color}-700 hover:shadow-md`
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -277,13 +277,13 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 type="date"
                 value={filters.dueDateFrom || ''}
                 onChange={(e) => updateFilter('dueDateFrom', e.target.value || undefined)}
-                className="px-3 py-2 text-sm border border-gray-200/50 dark:border-gray-700/50 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm transition-all hover:border-blue-400 dark:hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 hover:shadow-md focus:shadow-lg hover-lift shimmer-blue"
+                className="px-3 py-2 text-sm border border-gray-200/50 dark:border-gray-700/50 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm transition-colors hover:border-blue-400 dark:hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800"
               />
               <input
                 type="date"
                 value={filters.dueDateTo || ''}
                 onChange={(e) => updateFilter('dueDateTo', e.target.value || undefined)}
-                className="px-3 py-2 text-sm border border-gray-200/50 dark:border-gray-700/50 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm transition-all hover:border-blue-400 dark:hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 hover:shadow-md focus:shadow-lg hover-lift shimmer-blue"
+                className="px-3 py-2 text-sm border border-gray-200/50 dark:border-gray-700/50 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm transition-colors hover:border-blue-400 dark:hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800"
               />
             </div>
           </div>
@@ -294,7 +294,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
               Special Filters
             </label>
             <div className="space-y-2">
-              <label htmlFor="field-9" className="btn-touch flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded transition-all active:scale-[0.98] hover-lift shimmer-blue active-press">
+              <label htmlFor="field-9" className="btn-touch flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded transition-colors">
                 <input
                   type="checkbox"
                   checked={filters.isPastDue || false}
@@ -303,7 +303,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">Past Due</span>
               </label>
-              <label htmlFor="field-10" className="btn-touch flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded transition-all active:scale-[0.98] hover-lift shimmer-blue active-press">
+              <label htmlFor="field-10" className="btn-touch flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded transition-colors">
                 <input
                   type="checkbox"
                   checked={filters.hasAttachments || false}
@@ -312,7 +312,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">Has Attachments</span>
               </label>
-              <label htmlFor="field-11" className="btn-touch flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded transition-all active:scale-[0.98] hover-lift shimmer-blue active-press">
+              <label htmlFor="field-11" className="btn-touch flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded transition-colors">
                 <input
                   type="checkbox"
                   checked={filters.hasDependencies || false}

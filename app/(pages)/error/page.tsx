@@ -22,7 +22,7 @@ const ERROR_MESSAGES: Record<string, { title: string; description: string }> = {
 
 function ErrorContent() {
   const searchParams = useSearchParams();
-  const code = searchParams.get('code') || 'default';
+  const code = searchParams?.get('code') || 'default';
   const errorInfo = ERROR_MESSAGES[code] || ERROR_MESSAGES.default;
 
   const handleRefresh = () => {

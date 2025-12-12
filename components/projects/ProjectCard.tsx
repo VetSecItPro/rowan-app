@@ -87,7 +87,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
             <button
               onClick={() => setShowMenu(!showMenu)}
               aria-label="Project options menu"
-              className="btn-touch w-12 h-12 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95 hover-lift shimmer-amber active-press"
+              className="btn-touch w-12 h-12 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95"
             >
               <MoreVertical className="w-5 h-5 md:w-4 md:h-4 text-gray-500 dark:text-gray-400" />
             </button>
@@ -98,7 +98,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
                   {onEdit && (
                     <button
                       onClick={() => { onEdit(project); setShowMenu(false); }}
-                      className="btn-touch w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg text-gray-900 dark:text-white active:scale-[0.98] hover-lift shimmer-amber active-press"
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg text-gray-900 dark:text-white transition-colors"
                     >
                       Edit
                     </button>
@@ -106,7 +106,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
                   <button
                     onClick={handleExportPDF}
                     disabled={isExporting}
-                    className="btn-touch w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white active:scale-[0.98] flex items-center gap-2 disabled:opacity-50 hover-lift shimmer-amber active-press"
+                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white transition-colors flex items-center gap-2 disabled:opacity-50"
                   >
                     <FileText className="w-4 h-4" />
                     {isExporting ? 'Exporting...' : 'Export PDF'}
@@ -114,7 +114,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
                   {onDelete && (
                     <button
                       onClick={() => { onDelete(project.id); setShowMenu(false); }}
-                      className="btn-touch w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg active:scale-[0.98] hover-lift shimmer-red active-press"
+                      className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-b-lg transition-colors"
                     >
                       Delete
                     </button>
