@@ -139,7 +139,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
               {/* JSON Option */}
               <button
                 onClick={() => setSelectedFormat('json')}
-                className={`btn-touch p-4 rounded-xl border-2 transition-all text-left hover-lift active-press shimmer-blue ${
+                className={`btn-touch p-4 rounded-xl border-2 transition-all text-left transition-colors ${
                   selectedFormat === 'json'
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
@@ -170,7 +170,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
               {/* CSV Option */}
               <button
                 onClick={() => setSelectedFormat('csv')}
-                className={`btn-touch p-4 rounded-xl border-2 transition-all text-left hover-lift active-press shimmer-green ${
+                className={`btn-touch p-4 rounded-xl border-2 transition-all text-left transition-colors ${
                   selectedFormat === 'csv'
                     ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
@@ -201,7 +201,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
               {/* PDF Option */}
               <button
                 onClick={() => setSelectedFormat('pdf')}
-                className={`btn-touch p-4 rounded-xl border-2 transition-all text-left hover-lift active-press shimmer-purple ${
+                className={`btn-touch p-4 rounded-xl border-2 transition-all text-left transition-colors ${
                   selectedFormat === 'pdf'
                     ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
@@ -240,7 +240,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
                   <button
                     key={type.value}
                     onClick={() => setSelectedDataType(type.value)}
-                    className={`btn-touch w-full p-3 rounded-lg border transition-all text-left hover-lift active-press shimmer-green ${
+                    className={`btn-touch w-full p-3 rounded-lg border transition-all text-left transition-colors ${
                       selectedDataType === type.value
                         ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
                         : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'

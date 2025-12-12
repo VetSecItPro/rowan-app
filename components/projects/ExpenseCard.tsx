@@ -41,7 +41,7 @@ export function ExpenseCard({ expense, onEdit, onDelete, onStatusChange }: Expen
           {expense.status === 'pending' && (
             <button
               onClick={handleMarkAsPaid}
-              className="btn-touch p-1.5 hover:bg-green-50 dark:hover:bg-green-900/20 rounded transition-colors active:scale-95 hover-lift shimmer-green active-press"
+              className="btn-touch p-1.5 hover:bg-green-50 dark:hover:bg-green-900/20 rounded transition-colors active:scale-95"
               title="Mark as paid"
               aria-label="Mark expense as paid"
             >
@@ -49,13 +49,13 @@ export function ExpenseCard({ expense, onEdit, onDelete, onStatusChange }: Expen
             </button>
           )}
           <div className="relative">
-            <button onClick={() => setShowMenu(!showMenu)} aria-label="Expense options menu" className="btn-touch p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 hover-lift shimmer-amber active-press"><MoreVertical className="w-4 h-4" /></button>
+            <button onClick={() => setShowMenu(!showMenu)} aria-label="Expense options menu" className="btn-touch p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-colors"><MoreVertical className="w-4 h-4" /></button>
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
               <div className="absolute right-0 mt-1 w-32 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
-                <button onClick={() => { onEdit(expense); setShowMenu(false); }} className="btn-touch w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg active:scale-[0.98] hover-lift shimmer-amber active-press">Edit</button>
-                <button onClick={() => { onDelete(expense.id); setShowMenu(false); }} className="btn-touch w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg active:scale-[0.98] hover-lift shimmer-red active-press">Delete</button>
+                <button onClick={() => { onEdit(expense); setShowMenu(false); }} className="btn-touch w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg transition-colors">Edit</button>
+                <button onClick={() => { onDelete(expense.id); setShowMenu(false); }} className="btn-touch w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-b-lg transition-colors">Delete</button>
               </div>
             </>
           )}
