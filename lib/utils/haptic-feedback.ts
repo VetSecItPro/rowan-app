@@ -15,30 +15,44 @@ interface HapticConfig {
 }
 
 class HapticFeedbackManager {
-  private config: HapticConfig;
+  private config: HapticConfig | null = null;
 
-  constructor() {
-    this.config = {
-      enabled: true, // Could be tied to user preferences
-      isIOS: /iPad|iPhone|iPod/.test(navigator.userAgent),
-      hasVibration: 'vibrate' in navigator,
-    };
+  private getConfig(): HapticConfig {
+    // Lazy initialization to avoid SSR issues (navigator doesn't exist on server)
+    if (!this.config) {
+      if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+        this.config = {
+          enabled: true, // Could be tied to user preferences
+          isIOS: /iPad|iPhone|iPod/.test(navigator.userAgent),
+          hasVibration: 'vibrate' in navigator,
+        };
+      } else {
+        // Server-side fallback - haptics disabled
+        this.config = {
+          enabled: false,
+          isIOS: false,
+          hasVibration: false,
+        };
+      }
+    }
+    return this.config;
   }
 
   /**
    * Triggers haptic feedback based on type
    */
   public trigger(type: HapticType): void {
-    if (!this.config.enabled) return;
+    const config = this.getConfig();
+    if (!config.enabled) return;
 
     // iOS Haptic Engine (preferred when available)
-    if (this.config.isIOS && 'DeviceMotionEvent' in window) {
+    if (config.isIOS && typeof window !== 'undefined' && 'DeviceMotionEvent' in window) {
       this.triggerIOSHaptic(type);
       return;
     }
 
     // Fallback to vibration API
-    if (this.config.hasVibration) {
+    if (config.hasVibration) {
       this.triggerVibration(type);
     }
   }
@@ -47,6 +61,9 @@ class HapticFeedbackManager {
    * iOS Haptic Feedback using requestPermission (iOS 13+)
    */
   private triggerIOSHaptic(type: HapticType): void {
+    // SSR guard - navigator only available in browser
+    if (typeof navigator === 'undefined') return;
+
     try {
       // iOS devices support the Haptic Feedback API through DeviceMotionEvent
       // This is a simulation since Web Haptic API is not widely supported
@@ -74,7 +91,8 @@ class HapticFeedbackManager {
    * Vibration API fallback for Android and other devices
    */
   private triggerVibration(type: HapticType): void {
-    if (!navigator.vibrate) return;
+    // SSR guard - navigator only available in browser
+    if (typeof navigator === 'undefined' || !navigator.vibrate) return;
 
     const patterns = {
       light: [5],
@@ -94,14 +112,16 @@ class HapticFeedbackManager {
    * Enable/disable haptic feedback
    */
   public setEnabled(enabled: boolean): void {
-    this.config.enabled = enabled;
+    const config = this.getConfig();
+    config.enabled = enabled;
   }
 
   /**
    * Check if haptic feedback is supported
    */
   public isSupported(): boolean {
-    return this.config.hasVibration || this.config.isIOS;
+    const config = this.getConfig();
+    return config.hasVibration || config.isIOS;
   }
 }
 
