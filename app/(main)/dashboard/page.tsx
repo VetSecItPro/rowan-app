@@ -49,7 +49,8 @@ import {
   Users,
   DollarSign,
   List,
-  ChevronLeft
+  ChevronLeft,
+  Trophy
 } from 'lucide-react';
 import { SpaceSelector } from '@/components/spaces/SpaceSelector';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
@@ -1614,20 +1615,46 @@ export default function DashboardPage() {
                   </Tooltip>
                 </div>
 
-                {/* Streak Badge */}
+                {/* Streak Badges */}
                 {checkInStats && (
-                  <Tooltip content={checkInStats.currentStreak > 0
-                    ? `You've checked in ${checkInStats.currentStreak} days in a row! Keep it up!`
-                    : 'Start your check-in streak today!'
-                  }>
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-100 to-yellow-100 dark:from-orange-900/30 dark:to-yellow-900/30 rounded-full cursor-help">
-                      <Zap className="w-3.5 h-3.5 text-orange-500" />
-                      <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{checkInStats.currentStreak}</span>
-                      <span className="text-xs text-gray-600 dark:text-gray-400 hidden sm:inline">
-                        {checkInStats.currentStreak === 0 ? 'start streak' : 'day streak'}
-                      </span>
-                    </div>
-                  </Tooltip>
+                  <div className="flex items-center gap-2">
+                    {/* Current Streak or Days Since Last Check-in */}
+                    {checkInStats.currentStreak > 0 ? (
+                      <Tooltip content={`You've checked in ${checkInStats.currentStreak} days in a row!${checkInStats.longestStreak > checkInStats.currentStreak ? ` Best: ${checkInStats.longestStreak} days` : ' This is your best streak!'}`}>
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-100 to-yellow-100 dark:from-orange-900/30 dark:to-yellow-900/30 rounded-full cursor-help">
+                          <Zap className="w-3.5 h-3.5 text-orange-500" />
+                          <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{checkInStats.currentStreak}</span>
+                          <span className="text-xs text-gray-600 dark:text-gray-400 hidden sm:inline">day streak</span>
+                        </div>
+                      </Tooltip>
+                    ) : checkInStats.daysSinceLastCheckIn !== null && checkInStats.daysSinceLastCheckIn > 0 ? (
+                      <Tooltip content={`Last check-in was ${checkInStats.daysSinceLastCheckIn} day${checkInStats.daysSinceLastCheckIn === 1 ? '' : 's'} ago. Check in today to restart your streak!${checkInStats.longestStreak > 0 ? ` Your best: ${checkInStats.longestStreak} days` : ''}`}>
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-gray-100 to-slate-100 dark:from-gray-800/50 dark:to-slate-800/50 rounded-full cursor-help border border-gray-200 dark:border-gray-700">
+                          <Clock className="w-3.5 h-3.5 text-gray-500" />
+                          <span className="text-sm font-bold text-gray-600 dark:text-gray-400">{checkInStats.daysSinceLastCheckIn}</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-500 hidden sm:inline">day{checkInStats.daysSinceLastCheckIn === 1 ? '' : 's'} ago</span>
+                        </div>
+                      </Tooltip>
+                    ) : (
+                      <Tooltip content="Start your check-in streak today!">
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-100 to-yellow-100 dark:from-orange-900/30 dark:to-yellow-900/30 rounded-full cursor-help">
+                          <Zap className="w-3.5 h-3.5 text-orange-500" />
+                          <span className="text-xs text-gray-600 dark:text-gray-400">start streak</span>
+                        </div>
+                      </Tooltip>
+                    )}
+
+                    {/* Longest Streak Badge (show when there's a record) */}
+                    {checkInStats.longestStreak > 0 && checkInStats.currentStreak === 0 && (
+                      <Tooltip content={`Your best streak: ${checkInStats.longestStreak} consecutive days!`}>
+                        <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-full cursor-help">
+                          <Trophy className="w-3.5 h-3.5 text-purple-500" />
+                          <span className="text-sm font-bold text-purple-600 dark:text-purple-400">{checkInStats.longestStreak}</span>
+                          <span className="text-xs text-gray-600 dark:text-gray-400 hidden sm:inline">best</span>
+                        </div>
+                      </Tooltip>
+                    )}
+                  </div>
                 )}
               </div>
             </div>

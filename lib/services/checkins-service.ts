@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import { format, subDays, startOfDay, endOfDay, parseISO } from 'date-fns';
+import { format, subDays, startOfDay, endOfDay, parseISO, differenceInDays } from 'date-fns';
 import { getCurrentDateString } from '@/lib/utils/date-utils';
 
 export interface DailyCheckIn {
@@ -28,6 +28,8 @@ export interface CreateCheckInInput {
 
 export interface CheckInStats {
   currentStreak: number;
+  longestStreak: number;
+  daysSinceLastCheckIn: number | null; // null if never checked in
   totalCheckIns: number;
   thisWeek: number;
   thisMonth: number;
@@ -198,19 +200,26 @@ export const checkInsService = {
     const weekAgo = subDays(now, 7);
     const monthAgo = subDays(now, 30);
 
-    // Calculate current streak
+    // Calculate current streak and longest streak
     // Use string comparison directly to avoid timezone issues
     // Dates are stored as 'yyyy-MM-dd' strings
     let currentStreak = 0;
+    let longestStreak = 0;
+    let daysSinceLastCheckIn: number | null = null;
     const today = getCurrentDateString(); // e.g. '2025-12-08'
 
     // Get unique sorted date strings (most recent first)
-    const sortedDates = checkIns
-      .map((c: { date: string }) => c.date)
+    const sortedDates = [...new Set(checkIns.map((c: { date: string }) => c.date))]
       .sort((a: string, b: string) => b.localeCompare(a));
 
     if (sortedDates.length > 0) {
-      // Start from today and work backwards
+      // Calculate days since last check-in
+      const lastCheckInDate = sortedDates[0];
+      const todayDate = parseISO(today);
+      const lastDate = parseISO(lastCheckInDate);
+      daysSinceLastCheckIn = differenceInDays(todayDate, lastDate);
+
+      // Calculate current streak (starting from today)
       let expectedDate = today;
 
       for (const checkInDate of sortedDates) {
@@ -224,6 +233,27 @@ export const checkInsService = {
           break;
         }
         // If checkInDate > expectedDate, skip (duplicate or future date)
+      }
+
+      // Calculate longest streak (iterate through all dates)
+      // Sort dates in ascending order for this calculation
+      const ascendingDates = [...sortedDates].sort((a, b) => a.localeCompare(b));
+      let tempStreak = 1;
+      longestStreak = 1;
+
+      for (let i = 1; i < ascendingDates.length; i++) {
+        const prevDate = parseISO(ascendingDates[i - 1]);
+        const currDate = parseISO(ascendingDates[i]);
+        const dayDiff = differenceInDays(currDate, prevDate);
+
+        if (dayDiff === 1) {
+          // Consecutive day
+          tempStreak++;
+          longestStreak = Math.max(longestStreak, tempStreak);
+        } else {
+          // Gap in days, reset temp streak
+          tempStreak = 1;
+        }
       }
     }
 
@@ -252,6 +282,8 @@ export const checkInsService = {
 
     return {
       currentStreak,
+      longestStreak,
+      daysSinceLastCheckIn,
       totalCheckIns: checkIns.length,
       thisWeek,
       thisMonth,
