@@ -1570,7 +1570,9 @@ export default function DashboardPage() {
             className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:min-h-[600px]"
           >
             {/* Left: Daily Check-In */}
-            <div className="group bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-blue-50/50 dark:from-pink-900/10 dark:via-purple-900/10 dark:to-blue-900/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.3)] border border-pink-200/20 dark:border-pink-500/20 hover:border-pink-400/50 dark:hover:border-pink-400/50 transition-all duration-300 flex flex-col">
+            <div
+              id="daily-checkin"
+              className="group bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-blue-50/50 dark:from-pink-900/10 dark:via-purple-900/10 dark:to-blue-900/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.3)] border border-pink-200/20 dark:border-pink-500/20 hover:border-pink-400/50 dark:hover:border-pink-400/50 transition-all duration-300 flex flex-col scroll-mt-24">
             {/* Compact Header with Date, Toggle, and Streak Badge */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
               <div className="flex flex-col gap-1">
