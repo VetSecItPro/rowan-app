@@ -87,7 +87,7 @@ export const NAVIGATION_ITEMS: NavItem[] = [
   },
   {
     name: 'Daily Check-In',
-    href: '/dashboard',
+    href: '/dashboard#daily-checkin',
     icon: Heart,
     gradient: 'bg-gradient-to-r from-pink-500 to-purple-500',
     description: 'Track your mood',
