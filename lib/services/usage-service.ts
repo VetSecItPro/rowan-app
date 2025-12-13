@@ -12,6 +12,9 @@ import type { UsageType } from '../types';
 
 /**
  * Get today's usage for a user and usage type
+ *
+ * Note: The database schema has individual columns for each usage type
+ * (tasks_created, messages_sent, etc.) rather than a generic usage_type column.
  */
 export async function getTodayUsage(
   userId: string,
@@ -20,11 +23,20 @@ export async function getTodayUsage(
   const supabase = createClient();
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
+  // Map UsageType to the actual database column name
+  const columnMap: Record<UsageType, string> = {
+    tasks_created: 'tasks_created',
+    messages_sent: 'messages_sent',
+    shopping_list_updates: 'shopping_list_updates',
+    quick_actions_used: 'quick_actions_used',
+  };
+
+  const columnName = columnMap[usageType];
+
   const { data, error } = await supabase
     .from('daily_usage')
-    .select('count')
+    .select(columnName)
     .eq('user_id', userId)
-    .eq('usage_type', usageType)
     .eq('date', today)
     .single();
 
@@ -33,11 +45,14 @@ export async function getTodayUsage(
     return 0;
   }
 
-  return data?.count || 0;
+  return (data as Record<string, number>)?.[columnName] || 0;
 }
 
 /**
  * Increment usage counter for a specific type
+ *
+ * Uses upsert to atomically increment the counter for today.
+ * The database schema has individual columns for each usage type.
  */
 export async function incrementUsage(
   userId: string,
@@ -47,16 +62,53 @@ export async function incrementUsage(
   const supabase = createClient();
   const today = new Date().toISOString().split('T')[0];
 
-  // Use the database function to increment atomically
-  const { error } = await supabase.rpc('increment_daily_usage', {
-    p_user_id: userId,
-    p_usage_type: usageType,
-    p_increment: amount,
-  });
+  // Map UsageType to the actual database column name
+  const columnMap: Record<UsageType, string> = {
+    tasks_created: 'tasks_created',
+    messages_sent: 'messages_sent',
+    shopping_list_updates: 'shopping_list_updates',
+    quick_actions_used: 'quick_actions_used',
+  };
 
-  if (error) {
-    console.error('Error incrementing usage:', error);
-    return { success: false, error: error.message };
+  const columnName = columnMap[usageType];
+
+  // First, try to get existing record
+  const { data: existing } = await supabase
+    .from('daily_usage')
+    .select('id, ' + columnName)
+    .eq('user_id', userId)
+    .eq('date', today)
+    .single();
+
+  if (existing) {
+    // Update existing record
+    const currentValue = (existing as Record<string, number>)[columnName] || 0;
+    const { error } = await supabase
+      .from('daily_usage')
+      .update({ [columnName]: currentValue + amount })
+      .eq('id', existing.id);
+
+    if (error) {
+      console.error('Error incrementing usage:', error);
+      return { success: false, error: error.message };
+    }
+  } else {
+    // Insert new record with default values
+    const { error } = await supabase
+      .from('daily_usage')
+      .insert({
+        user_id: userId,
+        date: today,
+        tasks_created: usageType === 'tasks_created' ? amount : 0,
+        messages_sent: usageType === 'messages_sent' ? amount : 0,
+        shopping_list_updates: usageType === 'shopping_list_updates' ? amount : 0,
+        quick_actions_used: usageType === 'quick_actions_used' ? amount : 0,
+      });
+
+    if (error) {
+      console.error('Error creating usage record:', error);
+      return { success: false, error: error.message };
+    }
   }
 
   return { success: true };
