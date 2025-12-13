@@ -9,14 +9,17 @@ import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
-import { NewShoppingListModal } from '@/components/shopping/NewShoppingListModal';
-import { SaveTemplateModal } from '@/components/shopping/SaveTemplateModal';
-import { TemplatePickerModal } from '@/components/shopping/TemplatePickerModal';
-import { ScheduleTripModal } from '@/components/shopping/ScheduleTripModal';
-import { ShareListModal } from '@/components/shopping/ShareListModal';
-import { FrequentItemsPanel } from '@/components/shopping/FrequentItemsPanel';
-import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+// Lazy-loaded components for better initial page load
+import {
+  LazyNewShoppingListModal,
+  LazySaveTemplateModal,
+  LazyShoppingTemplatePickerModal,
+  LazyScheduleTripModal,
+  LazyShareListModal,
+  LazyFrequentItemsPanel,
+  LazyConfirmDialog,
+} from '@/lib/utils/lazy-components';
 import { shoppingService, ShoppingList, CreateListInput } from '@/lib/services/shopping-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { calendarService } from '@/lib/services/calendar-service';
@@ -794,7 +797,7 @@ export default function ShoppingPage() {
 
           {/* Frequent Items Panel */}
           {currentSpace && lists.length > 0 && (
-            <FrequentItemsPanel
+            <LazyFrequentItemsPanel
               spaceId={currentSpace.id}
               onAddItem={handleAddFrequentItem}
             />
@@ -945,16 +948,16 @@ export default function ShoppingPage() {
       </PageErrorBoundary>
       {currentSpace && (
         <>
-          <TemplatePickerModal
+          <LazyShoppingTemplatePickerModal
             isOpen={showTemplatePicker}
             onClose={() => setShowTemplatePicker(false)}
             onSelectTemplate={handleSelectTemplate}
             onStartFresh={handleStartFresh}
             spaceId={currentSpace.id}
           />
-          <NewShoppingListModal isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleCreateList} editList={editingList} spaceId={currentSpace.id} />
+          <LazyNewShoppingListModal isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleCreateList} editList={editingList} spaceId={currentSpace.id} />
           {listForTemplate && (
-            <SaveTemplateModal
+            <LazySaveTemplateModal
               isOpen={showTemplateModal}
               onClose={() => {
                 setShowTemplateModal(false);
@@ -965,7 +968,7 @@ export default function ShoppingPage() {
             />
           )}
           {listToSchedule && (
-            <ScheduleTripModal
+            <LazyScheduleTripModal
               isOpen={showScheduleTripModal}
               onClose={() => {
                 setShowScheduleTripModal(false);
@@ -975,7 +978,7 @@ export default function ShoppingPage() {
               list={listToSchedule}
             />
           )}
-          <ShareListModal
+          <LazyShareListModal
             isOpen={showShareModal}
             onClose={handleCloseShareModal}
             list={listToShare}
@@ -984,7 +987,7 @@ export default function ShoppingPage() {
         </>
       )}
 
-      <ConfirmDialog
+      <LazyConfirmDialog
         isOpen={confirmDialog.isOpen}
         onClose={() => setConfirmDialog({ isOpen: false, listId: '' })}
         onConfirm={handleConfirmDelete}
