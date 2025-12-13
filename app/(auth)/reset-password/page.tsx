@@ -1,14 +1,15 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Lock, Eye, EyeOff, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { useValidatedSearchParams, AuthCallbackParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
 
 function ResetPasswordForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const { params, error: validationError } = useValidatedSearchParams(AuthCallbackParamsSchema);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -23,15 +24,22 @@ function ResetPasswordForm() {
 
   useEffect(() => {
     const checkSession = async () => {
+      // Check for validation errors first
+      if (validationError) {
+        setError('Invalid reset link format');
+        setIsCheckingSession(false);
+        return;
+      }
+
       const supabase = createClient();
       const { data: { session }, error } = await supabase.auth.getSession();
 
       // Check if user came here from a password reset link (Supabase native)
-      const accessToken = searchParams?.get('access_token');
-      const refreshToken = searchParams?.get('refresh_token');
+      const accessToken = params?.access_token;
+      const refreshToken = params?.refresh_token;
 
       // Check if user came here from our custom reset link
-      const customToken = searchParams?.get('token');
+      const customToken = params?.token;
 
       if (accessToken && refreshToken) {
         // User clicked Supabase native password reset link
@@ -74,7 +82,7 @@ function ResetPasswordForm() {
     };
 
     checkSession();
-  }, [searchParams]);
+  }, [params, validationError]);
 
   const validatePassword = (pwd: string): string[] => {
     const errors: string[] = [];
@@ -115,7 +123,7 @@ function ResetPasswordForm() {
     setIsLoading(true);
 
     try {
-      const customToken = searchParams?.get('token');
+      const customToken = params?.token;
 
       if (customToken) {
         // Use our custom password reset API

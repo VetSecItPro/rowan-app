@@ -4,6 +4,8 @@ import type { OCRResult } from '@/lib/services/receipts-service';
 import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { validateImageMagicBytes, isFormatAllowed, ALLOWED_RECEIPT_FORMATS } from '@/lib/utils/file-validation';
+import { logger } from '@/lib/logger';
 
 // =====================================================
 // GEMINI VISION OCR API ROUTE
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file type
+    // Validate MIME type first (quick check)
     if (!file.type.startsWith('image/')) {
       return NextResponse.json(
         { error: 'File must be an image' },
@@ -62,6 +64,28 @@ export async function POST(request: NextRequest) {
     if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json(
         { error: 'Image size must be less than 10MB' },
+        { status: 400 }
+      );
+    }
+
+    // SECURITY: Validate magic bytes to prevent disguised malicious files
+    const validation = await validateImageMagicBytes(file);
+    if (!validation.valid) {
+      logger.warn('Receipt scan rejected: invalid magic bytes', {
+        component: 'api/ocr/scan-receipt',
+        action: 'magic_bytes_validation_failed',
+        declaredMime: file.type,
+      });
+      return NextResponse.json(
+        { error: 'File does not appear to be a valid image' },
+        { status: 400 }
+      );
+    }
+
+    // Validate format is allowed for receipts
+    if (!isFormatAllowed(validation.format!, ALLOWED_RECEIPT_FORMATS)) {
+      return NextResponse.json(
+        { error: `Image format ${validation.format} is not allowed. Please use JPEG, PNG, WebP, TIFF, or BMP.` },
         { status: 400 }
       );
     }
@@ -130,7 +154,7 @@ Extract the data now:`;
     try {
       parsedData = JSON.parse(jsonText);
     } catch (parseError) {
-      console.error('Failed to parse Gemini response:', text);
+      logger.warn('Failed to parse Gemini OCR response', { component: 'api/ocr/scan-receipt', action: 'parse_failed' });
       // Fallback to regex-based extraction if JSON parsing fails
       return NextResponse.json(
         {
@@ -159,7 +183,7 @@ Extract the data now:`;
 
     return NextResponse.json(ocrResult);
   } catch (error: any) {
-    console.error('OCR API error:', error);
+    logger.error('OCR API error', error, { component: 'api/ocr/scan-receipt', action: 'ocr' });
 
     // Check if it's a Gemini API error
     if (error?.message?.includes('API key')) {

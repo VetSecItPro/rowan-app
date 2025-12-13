@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { weatherCacheService } from '@/lib/services/weather-cache-service';
 import { z } from 'zod';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 // Query parameter validation schema with geographic bounds
 const QueryParamsSchema = z.object({
@@ -14,6 +16,13 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const { searchParams } = new URL(request.url);
 
     // Pre-validate required parameters exist

@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const { conversationId } = await request.json();
 
     if (!conversationId) {
@@ -29,6 +38,35 @@ export async function POST(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
+
+    // SECURITY: Verify user has access to this conversation's space
+    const { data: conversation, error: convError } = await supabaseAdmin
+      .from('conversations')
+      .select('space_id')
+      .eq('id', conversationId)
+      .single();
+
+    if (convError || !conversation) {
+      return NextResponse.json(
+        { error: 'Conversation not found' },
+        { status: 404 }
+      );
+    }
+
+    // Verify user is a member of this space
+    const { data: membership, error: memberError } = await supabaseAdmin
+      .from('space_members')
+      .select('id')
+      .eq('space_id', conversation.space_id)
+      .eq('user_id', user.id)
+      .single();
+
+    if (memberError || !membership) {
+      return NextResponse.json(
+        { error: 'Access denied' },
+        { status: 403 }
+      );
+    }
 
     // Mark all unread messages in this conversation as read (except user's own messages)
     const { data, error: updateError } = await supabaseAdmin

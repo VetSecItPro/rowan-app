@@ -73,9 +73,8 @@ async function getAuthenticatedClient(connectionId: string) {
     throw new Error('Failed to retrieve refresh token');
   }
 
-  // Check if tokens were actually retrieved
-  console.log('[OAuth] Access token retrieved:', accessToken ? `${accessToken.substring(0, 20)}...` : 'NULL');
-  console.log('[OAuth] Refresh token retrieved:', refreshToken ? `${refreshToken.substring(0, 10)}...` : 'NULL');
+  // Check if tokens were actually retrieved (never log token values, only success/failure)
+  console.log('[OAuth] Token retrieval status - access:', !!accessToken, 'refresh:', !!refreshToken);
 
   if (!accessToken || !refreshToken) {
     console.error('[OAuth] Tokens are null despite no error. Access:', !!accessToken, 'Refresh:', !!refreshToken);

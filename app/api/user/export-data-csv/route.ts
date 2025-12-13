@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import {
   exportAllDataToCsv,
@@ -8,6 +8,8 @@ import {
   exportShoppingListsToCsv,
   exportMessagesToCsv,
 } from '@/lib/services/data-export-service';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,8 +24,15 @@ export const dynamic = 'force-dynamic';
  * CSV format is compatible with Excel, Google Sheets, and other spreadsheet software
  */
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const supabase = await createClient();
 
     // Get authenticated user
