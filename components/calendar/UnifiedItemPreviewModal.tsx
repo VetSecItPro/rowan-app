@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { X, ExternalLink, Clock, MapPin, User, Calendar, CheckCircle2, Circle, AlertCircle, UtensilsCrossed, Bell, Target } from 'lucide-react';
+import { X, ExternalLink, Clock, MapPin, User, Calendar, CheckCircle2, Circle, AlertCircle, UtensilsCrossed, Bell, Target, Loader2 } from 'lucide-react';
 import type { UnifiedCalendarItem } from '@/lib/types/unified-calendar-item';
 import { UNIFIED_ITEM_COLORS, UNIFIED_ITEM_LABELS } from '@/lib/types/unified-calendar-item';
 import type { Task } from '@/lib/types';
@@ -215,6 +216,7 @@ function GoalDetails({ item }: { item: UnifiedCalendarItem }) {
 
 export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPreviewModalProps) {
   const router = useRouter();
+  const [isNavigating, setIsNavigating] = useState(false);
   const colors = UNIFIED_ITEM_COLORS[item.itemType];
   const label = UNIFIED_ITEM_LABELS[item.itemType];
   const Icon = getItemIcon(item.itemType);
@@ -223,9 +225,10 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
   if (!isOpen) return null;
 
   const handleEditClick = () => {
+    setIsNavigating(true);
     const route = getEditRoute(item);
     router.push(route);
-    onClose();
+    // Don't call onClose() - let navigation complete first
   };
 
   return (
@@ -327,13 +330,15 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
           <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              disabled={isNavigating}
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-50"
             >
               Close
             </button>
             <button
               onClick={handleEditClick}
-              className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors flex items-center gap-2 ${
+              disabled={isNavigating}
+              className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors flex items-center gap-2 disabled:opacity-70 ${
                 item.itemType === 'task' ? 'bg-blue-600 hover:bg-blue-700' :
                 item.itemType === 'meal' ? 'bg-orange-600 hover:bg-orange-700' :
                 item.itemType === 'reminder' ? 'bg-pink-600 hover:bg-pink-700' :
@@ -341,8 +346,17 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
                 'bg-purple-600 hover:bg-purple-700'
               }`}
             >
-              <ExternalLink className="w-4 h-4" />
-              Edit in {label}s
+              {isNavigating ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <ExternalLink className="w-4 h-4" />
+                  Edit in {label}s
+                </>
+              )}
             </button>
           </div>
         </div>

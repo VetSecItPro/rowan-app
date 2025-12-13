@@ -143,12 +143,6 @@ export default function CalendarPage() {
     }
   }, []);
 
-  // Get unified items for a specific date
-  const getUnifiedItemsForDate = useCallback((date: Date): UnifiedCalendarItem[] => {
-    const dateKey = format(date, 'yyyy-MM-dd');
-    return unifiedItemsByDate.get(dateKey) || [];
-  }, [unifiedItemsByDate]);
-
   // Memoize filtered events (consistent across all views)
   const filteredEvents = useMemo(() => {
     let filtered = events;
@@ -169,6 +163,62 @@ export default function CalendarPage() {
 
     return filtered;
   }, [events, searchQuery, statusFilter]);
+
+  // Memoize filtered unified items (tasks, meals, reminders, goals)
+  const filteredUnifiedItems = useMemo(() => {
+    if (statusFilter === 'all') {
+      return unifiedItems;
+    }
+
+    // Map filter values to unified item status values
+    // Status filter: 'not-started' | 'in-progress' | 'completed'
+    // Unified item statuses vary by type:
+    // - Tasks: 'pending', 'in-progress', 'completed', 'blocked', 'on-hold'
+    // - Reminders: 'pending', 'completed', 'snoozed'
+    // - Goals: 'not_started', 'in_progress', 'completed', 'cancelled'
+    // - Meals: typically no status (always shown)
+
+    return unifiedItems.filter(item => {
+      const itemStatus = item.status?.toLowerCase();
+
+      // Meals don't have status - show them in 'all' only, or treat as pending
+      if (item.itemType === 'meal') {
+        return statusFilter === 'not-started'; // Show meals as "pending" items
+      }
+
+      if (statusFilter === 'not-started') {
+        return itemStatus === 'pending' || itemStatus === 'not_started' || itemStatus === 'not-started' || !itemStatus;
+      }
+
+      if (statusFilter === 'in-progress') {
+        return itemStatus === 'in-progress' || itemStatus === 'in_progress' || itemStatus === 'active';
+      }
+
+      if (statusFilter === 'completed') {
+        return itemStatus === 'completed' || itemStatus === 'done';
+      }
+
+      return true;
+    });
+  }, [unifiedItems, statusFilter]);
+
+  // Create filtered unified items grouped by date
+  const filteredUnifiedItemsByDate = useMemo(() => {
+    const grouped = new Map<string, UnifiedCalendarItem[]>();
+    for (const item of filteredUnifiedItems) {
+      const dateKey = format(parseISO(item.startTime), 'yyyy-MM-dd');
+      const existing = grouped.get(dateKey) || [];
+      grouped.set(dateKey, [...existing, item]);
+    }
+    return grouped;
+  }, [filteredUnifiedItems]);
+
+  // Get unified items for a specific date (respects status filter)
+  const getUnifiedItemsForDate = useCallback((date: Date): UnifiedCalendarItem[] => {
+    const dateKey = format(date, 'yyyy-MM-dd');
+    // Use filtered items when status filter is active
+    return filteredUnifiedItemsByDate.get(dateKey) || [];
+  }, [filteredUnifiedItemsByDate]);
 
   // Memoize stats calculations - use filteredEvents to match current view
   const stats = useMemo(() => {
