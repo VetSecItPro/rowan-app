@@ -21,6 +21,23 @@ export interface ProjectStats {
 }
 
 /**
+ * Helper to clean input - convert empty strings to null for date fields
+ */
+function cleanProjectInput(input: Partial<CreateProjectInput>): Record<string, unknown> {
+  const cleaned: Record<string, unknown> = { ...input };
+
+  // Convert empty strings to null for date fields
+  if ('start_date' in cleaned && cleaned.start_date === '') {
+    cleaned.start_date = null;
+  }
+  if ('target_date' in cleaned && cleaned.target_date === '') {
+    cleaned.target_date = null;
+  }
+
+  return cleaned;
+}
+
+/**
  * Projects Service
  * Handles all project CRUD operations and stats
  */
@@ -60,10 +77,12 @@ export const projectsOnlyService = {
    */
   async createProject(input: CreateProjectInput): Promise<Project> {
     const supabase = createClient();
+    const cleaned = cleanProjectInput(input);
+
     const { data, error } = await supabase
       .from('projects')
       .insert([{
-        ...input,
+        ...cleaned,
         status: input.status || 'planning',
       }])
       .select()
@@ -78,10 +97,12 @@ export const projectsOnlyService = {
    */
   async updateProject(id: string, updates: Partial<CreateProjectInput>): Promise<Project> {
     const supabase = createClient();
+    const cleaned = cleanProjectInput(updates);
+
     const { data, error } = await supabase
       .from('projects')
       .update({
-        ...updates,
+        ...cleaned,
         updated_at: new Date().toISOString(),
       })
       .eq('id', id)
