@@ -143,16 +143,16 @@ export function NewBillModal({
 
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto animate-scale-in">
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <div className="flex items-center justify-between p-6 sticky top-0 bg-gradient-to-r from-amber-500 to-amber-600 rounded-t-2xl z-10">
+            <h2 className="text-xl font-semibold text-white">
               {editBill ? 'Edit Bill' : 'New Bill'}
             </h2>
             <button
               onClick={onClose}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all"
               aria-label="Close modal"
             >
-              <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              <X className="w-5 h-5 text-white" />
             </button>
           </div>
 

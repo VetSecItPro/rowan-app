@@ -146,15 +146,15 @@ export function GoalCheckInModal({
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg sm:text-xl font-bold">Goal Check-In</h2>
-              <p className="text-sm text-blue-100 mt-1 truncate">{goalTitle}</p>
+              <p className="text-sm text-indigo-100 mt-1 truncate">{goalTitle}</p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 flex items-center justify-center hover:opacity-75 transition-opacity"
+              className="p-2 flex items-center justify-center hover:bg-white/20 rounded-full transition-all"
               aria-label="Close modal"
             >
               <X className="w-5 h-5 sm:w-4 sm:h-4" />

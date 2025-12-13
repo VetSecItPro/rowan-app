@@ -192,10 +192,10 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
           </div>
           <button
             onClick={onClose}
-            className="text-white hover:text-blue-100 transition-colors"
+            className="p-2 flex items-center justify-center hover:bg-white/20 rounded-full transition-all"
             aria-label="Close"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
@@ -346,7 +346,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
             <button
               type="submit"
               disabled={isSubmitting || description.trim().length < 10}
-              className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium transition-all shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {isSubmitting ? (
                 <>
