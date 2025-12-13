@@ -32,6 +32,7 @@ export interface Reminder {
     email: string;
     avatar_url?: string;
   };
+  linked_bill_id?: string; // Link to bill if this reminder is for a bill payment
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -59,6 +60,7 @@ export interface CreateReminderInput {
   repeat_pattern?: string;
   repeat_days?: number[];
   assigned_to?: string; // User ID to assign this reminder to
+  linked_bill_id?: string; // Link to bill if this reminder is for a bill payment
 }
 
 export interface UpdateReminderInput extends Partial<CreateReminderInput> {
@@ -277,6 +279,57 @@ export const remindersService = {
       `)
       .eq('space_id', spaceId)
       .is('assigned_to', null)
+      .order('reminder_time', { ascending: true });
+
+    if (error) throw error;
+    return (data || []).map((reminder: any) => ({
+      ...reminder,
+      assignee: reminder.assignee || undefined,
+    }));
+  },
+
+  /**
+   * Mark the linked bill as paid from a reminder
+   * This allows users to mark bills paid directly from the Reminders page
+   */
+  async markBillPaidFromReminder(reminderId: string): Promise<{ success: boolean; billId?: string }> {
+    // Get the reminder to find the linked bill
+    const reminder = await this.getReminderById(reminderId);
+    if (!reminder) {
+      throw new Error('Reminder not found');
+    }
+
+    if (!reminder.linked_bill_id) {
+      throw new Error('This reminder is not linked to a bill');
+    }
+
+    // Import bills service dynamically to avoid circular dependencies
+    const { billsService } = await import('./bills-service');
+
+    // Mark the bill as paid (this will also complete this reminder via markBillAsPaid)
+    await billsService.markBillAsPaid(reminder.linked_bill_id);
+
+    return { success: true, billId: reminder.linked_bill_id };
+  },
+
+  /**
+   * Get reminders that are linked to bills (for unified bill reminder dashboard)
+   */
+  async getBillReminders(spaceId: string): Promise<Reminder[]> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('reminders')
+      .select(`
+        *,
+        assignee:assigned_to (
+          id,
+          name,
+          email,
+          avatar_url
+        )
+      `)
+      .eq('space_id', spaceId)
+      .not('linked_bill_id', 'is', null)
       .order('reminder_time', { ascending: true });
 
     if (error) throw error;

@@ -168,13 +168,13 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
     <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-3xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
-        <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-between px-4 sm:px-6 py-4 rounded-t-xl">
           <div className="flex items-center gap-2">
-            <UserCheck className="w-5 h-5 text-indigo-500" />
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Approval Workflow</h2>
+            <UserCheck className="w-5 h-5 text-white" />
+            <h2 className="text-lg sm:text-xl font-bold text-white">Approval Workflow</h2>
           </div>
-          <button onClick={onClose} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95">
-            <X className="w-5 h-5 sm:w-4 sm:h-4" />
+          <button onClick={onClose} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95">
+            <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
           </button>
         </div>
 
@@ -204,7 +204,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
                   <button
                     onClick={requestApproval}
                     disabled={!selectedApprover || requesting}
-                    className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {requesting ? 'Requesting...' : 'Request'}
                   </button>

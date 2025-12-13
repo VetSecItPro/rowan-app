@@ -23,6 +23,7 @@ export interface CalendarEvent {
   deleted_by?: string; // Who deleted it
   show_countdown?: boolean; // Display as countdown widget on dashboard
   countdown_label?: string; // Custom countdown label (e.g., "Birthday!", "Vacation!")
+  linked_bill_id?: string; // Link to bill if this event is for a bill due date
   created_at: string;
   updated_at: string;
 }
@@ -43,6 +44,7 @@ export interface CreateEventInput {
   timezone?: string; // Event timezone
   show_countdown?: boolean; // Display as countdown widget
   countdown_label?: string; // Custom countdown label
+  linked_bill_id?: string; // Link to bill if this event is for a bill due date
 }
 
 export interface EventStats {

@@ -94,9 +94,9 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
             <button
               onClick={() => setShowMenu(!showMenu)}
               aria-label="Goal options menu"
-              className="p-2 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             >
-              <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <MoreVertical className="w-5 h-5" />
             </button>
             <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
               Options

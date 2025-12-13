@@ -119,10 +119,13 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
                 <p className="text-purple-100 text-sm mt-1">{spaceName}</p>
               </div>
             </div>
-            <X
-              className="w-5 h-5 text-white cursor-pointer hover:opacity-80 transition-opacity"
+            <button
               onClick={handleClose}
-            />
+              aria-label="Close modal"
+              className="p-2 flex items-center justify-center hover:bg-white/20 rounded-full transition-all"
+            >
+              <X className="w-5 h-5 sm:w-4 sm:h-4" />
+            </button>
           </div>
         </div>
 
@@ -194,7 +197,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:opacity-90 transition-all shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl transition-all shadow-lg shadow-purple-500/25 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Sending...' : 'Send Invitation'}
               </button>
@@ -249,7 +252,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
             <button
               type="button"
               onClick={handleClose}
-              className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:opacity-90 transition-all shadow-lg font-medium"
+              className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl transition-all shadow-lg shadow-purple-500/25 font-medium"
             >
               Done
             </button>

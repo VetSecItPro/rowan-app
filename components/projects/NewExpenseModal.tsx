@@ -73,7 +73,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
         <div className="sticky top-0 z-10 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
             <h2 className="text-lg sm:text-xl font-bold">{editExpense ? 'Edit Expense' : 'Create New Expense'}</h2>
-            <button onClick={onClose} aria-label="Close modal" className="p-2 flex items-center justify-center hover:opacity-75 transition-opacity">
+            <button onClick={onClose} aria-label="Close modal" className="p-2 flex items-center justify-center hover:bg-white/20 rounded-full transition-all">
               <X className="w-5 h-5 sm:w-4 sm:h-4" />
             </button>
           </div>
@@ -221,8 +221,8 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
             <button
               type="submit"
               disabled={!!dateError}
-              className={`flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl transition-all shadow-lg font-medium ${
-                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
+              className={`flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl transition-all shadow-lg shadow-amber-500/25 font-medium ${
+                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:from-amber-600 hover:to-amber-700'
               }`}
             >
               {editExpense ? 'Save Expense' : 'Create Expense'}

@@ -1,10 +1,11 @@
 'use client';
 
-import { memo, useState } from 'react';
-import { Folder, Calendar, DollarSign, MoreVertical, AlertTriangle, CheckCircle, FileText } from 'lucide-react';
+import { memo, useState, useEffect } from 'react';
+import { Folder, Calendar, DollarSign, MoreVertical, AlertTriangle, CheckCircle, FileText, Target } from 'lucide-react';
 import Link from 'next/link';
 import type { Project } from '@/lib/services/project-tracking-service';
 import { pdfExportService } from '@/lib/services/pdf-export-service';
+import { projectMilestonesService } from '@/lib/services/project-milestones-service';
 
 interface ProjectCardProps {
   project: Project;
@@ -31,6 +32,22 @@ const priorityConfig = {
 export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }: ProjectCardProps) => {
   const [showMenu, setShowMenu] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [milestoneProgress, setMilestoneProgress] = useState<{ total: number; completed: number; percentage: number } | null>(null);
+
+  // Load milestone progress
+  useEffect(() => {
+    async function loadProgress() {
+      try {
+        const progress = await projectMilestonesService.getMilestoneProgress(project.id);
+        if (progress.total > 0) {
+          setMilestoneProgress(progress);
+        }
+      } catch (error) {
+        // Silently fail - milestones are optional
+      }
+    }
+    loadProgress();
+  }, [project.id]);
 
   // Calculate budget progress percentage
   const budgetProgress = project.estimated_budget
@@ -50,6 +67,16 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
     }
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't trigger edit if clicking on menu button or menu items
+    const target = e.target as HTMLElement;
+    if (target.closest('[data-menu-area]')) return;
+
+    if (onEdit) {
+      onEdit(project);
+    }
+  };
+
   const isOverBudget = project.budget_variance < 0;
   const isUnderBudget = project.budget_variance > 0 && project.estimated_budget;
 
@@ -57,7 +84,10 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
   const priorityInfo = priorityConfig[project.priority] || priorityConfig.medium;
 
   const CardContent = () => (
-    <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
+    <div
+      className={`bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow ${onEdit ? 'cursor-pointer hover:border-amber-300 dark:hover:border-amber-600' : ''}`}
+      onClick={handleCardClick}
+    >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -83,18 +113,18 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
           </div>
         </div>
         {(onEdit || onDelete) && (
-          <div className="relative">
+          <div className="relative" data-menu-area>
             <button
-              onClick={() => setShowMenu(!showMenu)}
+              onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
               aria-label="Project options menu"
-              className="btn-touch w-12 h-12 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95"
+              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             >
-              <MoreVertical className="w-5 h-5 md:w-4 md:h-4 text-gray-500 dark:text-gray-400" />
+              <MoreVertical className="w-5 h-5" />
             </button>
             {showMenu && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-                <div className="absolute right-0 mt-1 w-40 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+                <div className="absolute right-0 mt-1 w-40 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20" onClick={(e) => e.stopPropagation()}>
                   {onEdit && (
                     <button
                       onClick={() => { onEdit(project); setShowMenu(false); }}
@@ -184,6 +214,33 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
           </div>
         )}
       </div>
+
+      {/* Steps Progress */}
+      {milestoneProgress && (
+        <div className="mb-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Target className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <span className="text-xs font-medium text-amber-700 dark:text-amber-300">
+                Steps
+              </span>
+            </div>
+            <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+              {milestoneProgress.completed}/{milestoneProgress.total}
+            </span>
+          </div>
+          <div className="w-full bg-amber-200 dark:bg-amber-900/50 rounded-full h-1.5">
+            <div
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                milestoneProgress.percentage === 100
+                  ? 'bg-green-500'
+                  : 'bg-gradient-to-r from-amber-500 to-amber-600'
+              }`}
+              style={{ width: `${milestoneProgress.percentage}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Tags */}
       {project.tags && project.tags.length > 0 && (

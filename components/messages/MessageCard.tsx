@@ -129,21 +129,21 @@ export function MessageCard({
           </p>
         </div>
 
-        {/* Message Bubble with Glassmorphism - Pill Shape with Dynamic Sizing */}
+        {/* Message Bubble with Enhanced Glassmorphism */}
         <div className="relative group/message z-10 w-fit">
           <div
-            className={`relative rounded-3xl cursor-pointer backdrop-blur-xl ${
+            className={`relative rounded-2xl cursor-pointer backdrop-blur-lg backdrop-saturate-150 ${
               // Dynamic padding based on content length
               message.content && message.content.length < 20
-                ? 'px-4 py-2' // Small padding for short messages
+                ? 'px-4 py-2.5' // Small padding for short messages
                 : message.content && message.content.length < 80
-                ? 'px-4 py-2.5' // Medium padding
-                : 'px-5 py-3' // Full padding for longer messages
+                ? 'px-4 py-3' // Medium padding
+                : 'px-5 py-3.5' // Full padding for longer messages
             } ${
               isOwn
-                ? 'bg-blue-500/10 dark:bg-blue-400/10 hover:bg-blue-500/15 dark:hover:bg-blue-400/15 border border-blue-200/40 dark:border-blue-400/20 hover:border-blue-300/60 dark:hover:border-blue-400/30 shadow-sm hover:shadow-md'
-                : 'bg-white/40 dark:bg-gray-700/40 hover:bg-white/60 dark:hover:bg-gray-700/50 border border-gray-200/40 dark:border-gray-600/30 hover:border-gray-300/60 dark:hover:border-gray-500/40 shadow-sm hover:shadow-md'
-            } transition-all duration-200`}
+                ? 'bg-gradient-to-br from-blue-500/20 via-blue-400/15 to-indigo-500/10 dark:from-blue-500/25 dark:via-blue-400/20 dark:to-indigo-500/15 border border-blue-300/30 dark:border-blue-400/25 shadow-lg shadow-blue-500/10 dark:shadow-blue-500/5 hover:shadow-xl hover:shadow-blue-500/15 dark:hover:shadow-blue-500/10 hover:border-blue-300/50 dark:hover:border-blue-400/40 ring-1 ring-white/20 dark:ring-white/5'
+                : 'bg-gradient-to-br from-white/60 via-white/50 to-gray-100/40 dark:from-gray-700/50 dark:via-gray-600/40 dark:to-gray-700/30 border border-white/40 dark:border-gray-500/30 shadow-lg shadow-gray-500/10 dark:shadow-black/20 hover:shadow-xl hover:shadow-gray-500/15 dark:hover:shadow-black/30 hover:border-white/60 dark:hover:border-gray-500/40 ring-1 ring-white/30 dark:ring-white/5'
+            } transition-all duration-300 ease-out`}
           >
             {/* Message Content with Markdown Support and Expand/Collapse */}
             {message.content && (
@@ -219,22 +219,22 @@ export function MessageCard({
               </div>
             )}
 
-            {/* Reactions Display - Only show existing reactions */}
+            {/* Reactions Display - Glassmorphism Pills */}
             {reactions.length > 0 && (
-              <div className="relative z-10 flex flex-wrap gap-1 mt-2">
+              <div className="relative z-10 flex flex-wrap gap-1.5 mt-2.5 pt-2 border-t border-white/10 dark:border-gray-600/20">
                 {reactions.map((reaction) => (
                   <button
                     key={reaction.emoji}
                     onClick={() => handleAddReaction(reaction.emoji)}
                     disabled={loadingReaction}
-                    className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium backdrop-blur-sm transition-all duration-200 ${
                       reaction.reacted_by_current_user
-                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
-                        : 'bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        ? 'bg-blue-500/20 dark:bg-blue-400/25 text-blue-700 dark:text-blue-300 border border-blue-300/40 dark:border-blue-400/30 shadow-sm shadow-blue-500/10'
+                        : 'bg-white/30 dark:bg-gray-600/30 text-gray-700 dark:text-gray-300 border border-white/30 dark:border-gray-500/30 hover:bg-white/50 dark:hover:bg-gray-600/50 hover:border-white/50 dark:hover:border-gray-500/50'
                     }`}
                     title={`${reaction.count} ${reaction.count === 1 ? 'reaction' : 'reactions'}`}
                   >
-                    <span>{reaction.emoji}</span>
+                    <span className="text-sm">{reaction.emoji}</span>
                     <span>{reaction.count}</span>
                   </button>
                 ))}
@@ -243,11 +243,11 @@ export function MessageCard({
 
           </div>
 
-          {/* Message Actions - Enhanced Hover Experience with Persistent Toolbar */}
-          <div className={`absolute -top-12 z-[100] opacity-0 invisible group-hover/message:opacity-100 group-hover/message:visible hover:opacity-100 hover:visible transition-all duration-300 pointer-events-none ${
+          {/* Message Actions - Glassmorphism Floating Toolbar */}
+          <div className={`absolute -top-12 z-[100] opacity-0 invisible group-hover/message:opacity-100 group-hover/message:visible hover:opacity-100 hover:visible transition-all duration-300 ease-out pointer-events-none ${
             isOwn ? 'left-0' : 'right-0'
           }`}>
-              <div className="flex items-center gap-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-full shadow-lg border border-gray-200 dark:border-gray-700 p-1.5 pointer-events-auto">
+              <div className="flex items-center gap-0.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl backdrop-saturate-150 rounded-full shadow-xl shadow-black/10 dark:shadow-black/30 border border-white/50 dark:border-gray-600/50 p-1 pointer-events-auto ring-1 ring-black/5 dark:ring-white/5">
                 {/* Edit Button - Always show for own messages, or if user has edit permissions */}
                 {isOwn && (
                   <button

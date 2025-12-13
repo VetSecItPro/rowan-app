@@ -44,20 +44,31 @@ export function MessageNotificationBell({
     fetchUnreadCount();
   }, [userId, spaceId]);
 
-  // Real-time subscription
+  // Real-time subscription - listen for any message changes and refetch
   useEffect(() => {
     const channel = supabase
-      .channel('messages_unread_count')
+      .channel(`messages_unread_count_${spaceId}`)
       .on(
         'postgres_changes',
         {
-          event: '*',
+          event: 'UPDATE',
           schema: 'public',
           table: 'messages',
-          filter: `space_id=eq.${spaceId}`,
+        },
+        (payload) => {
+          // Refresh unread count when any message is updated (e.g., marked as read)
+          fetchUnreadCount();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
         },
         () => {
-          // Refresh unread count when messages change
+          // Refresh when new messages arrive
           fetchUnreadCount();
         }
       )

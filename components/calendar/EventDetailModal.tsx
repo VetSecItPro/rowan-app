@@ -67,7 +67,7 @@ export function EventDetailModal({ isOpen, onClose, event, onEdit, onDelete }: E
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-2xl sm:max-w-4xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header - Fixed */}
-        <div className="sticky top-0 z-10 bg-purple-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl flex-shrink-0">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl flex-shrink-0">
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
