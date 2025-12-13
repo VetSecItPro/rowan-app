@@ -38,7 +38,25 @@ function buildCalendarEventTitle(date: ImportantDate | CreateImportantDateInput,
 }
 
 /**
+ * Map important date type to valid event category
+ */
+function getEventCategory(dateType: string): string {
+  switch (dateType) {
+    case 'birthday':
+    case 'anniversary':
+    case 'memorial':
+      return 'family';
+    case 'renewal':
+    case 'appointment':
+      return 'personal';
+    default:
+      return 'personal';
+  }
+}
+
+/**
  * Create or update a calendar event for an important date
+ * Uses the 'events' table which is the main calendar table
  */
 async function syncToCalendar(
   importantDate: ImportantDate,
@@ -70,6 +88,7 @@ async function syncToCalendar(
 
   const title = buildCalendarEventTitle(importantDate, years);
 
+  // Use the 'events' table (main calendar table) with valid category
   const eventData = {
     space_id: importantDate.space_id,
     title,
@@ -77,17 +96,16 @@ async function syncToCalendar(
     start_time: startTime.toISOString(),
     end_time: endTime.toISOString(),
     all_day: importantDate.calendar_all_day !== false,
-    show_countdown: importantDate.show_on_countdown !== false,
-    countdown_label: importantDate.countdown_label || importantDate.person_name || importantDate.title,
+    category: getEventCategory(importantDate.date_type),
     important_date_id: importantDate.id,
     created_by: importantDate.created_by,
   };
 
   // Check if linked event already exists
   if (importantDate.linked_calendar_event_id) {
-    // Update existing event
+    // Update existing event in 'events' table
     const { error } = await supabase
-      .from('calendar_events')
+      .from('events')
       .update(eventData)
       .eq('id', importantDate.linked_calendar_event_id);
 
@@ -99,7 +117,7 @@ async function syncToCalendar(
 
   // Check if there's already an event linked via important_date_id
   const { data: existingEvent } = await supabase
-    .from('calendar_events')
+    .from('events')
     .select('id')
     .eq('important_date_id', importantDate.id)
     .single();
@@ -107,7 +125,7 @@ async function syncToCalendar(
   if (existingEvent) {
     // Update existing event
     const { error } = await supabase
-      .from('calendar_events')
+      .from('events')
       .update(eventData)
       .eq('id', existingEvent.id);
 
@@ -124,9 +142,9 @@ async function syncToCalendar(
     return existingEvent.id;
   }
 
-  // Create new event
+  // Create new event in 'events' table
   const { data: newEvent, error } = await supabase
-    .from('calendar_events')
+    .from('events')
     .insert(eventData)
     .select('id')
     .single();
@@ -147,13 +165,14 @@ async function syncToCalendar(
 
 /**
  * Delete the linked calendar event for an important date
+ * Uses the 'events' table which is the main calendar table
  */
 async function deleteLinkedCalendarEvent(importantDateId: string): Promise<void> {
   const supabase = createClient();
 
-  // Delete by important_date_id link
+  // Delete by important_date_id link from 'events' table
   const { error } = await supabase
-    .from('calendar_events')
+    .from('events')
     .delete()
     .eq('important_date_id', importantDateId);
 
