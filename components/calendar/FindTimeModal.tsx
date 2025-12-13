@@ -79,7 +79,7 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-2xl sm:max-w-3xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gradient-calendar text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl flex items-center justify-between">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Sparkles className="w-6 h-6" />
             <div>
@@ -89,7 +89,7 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
           </div>
           <button
             onClick={onClose}
-            className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-all active:scale-95"
+            className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95"
             title="Close (Esc)"
           >
             <X className="w-5 h-5 sm:w-4 sm:h-4" />
@@ -260,7 +260,7 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
             disabled={!selectedSlot}
             className={`px-6 py-3 rounded-lg font-medium transition-all ${
               selectedSlot
-                ? 'bg-gradient-calendar text-white hover:opacity-90 shadow-lg'
+                ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-lg'
                 : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-500 cursor-not-allowed'
             }`}
           >

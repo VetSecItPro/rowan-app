@@ -227,14 +227,14 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
           </div>
         )}
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-blue-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
             <h2 className="text-lg sm:text-xl font-bold">
               {editTask ? 'Edit Task' : 'Create New Task'}
             </h2>
             <button
               onClick={onClose}
-              className="p-1 -mr-1"
+              className="p-1 -mr-1 hover:bg-white/20 rounded-full transition-colors"
               aria-label="Close modal"
             >
               <X className="w-5 h-5" />
@@ -537,8 +537,8 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
             <button
               type="submit"
               disabled={!!dateError}
-              className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white rounded-lg transition-colors font-medium ${
-                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
+              className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg transition-colors font-medium ${
+                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:from-blue-600 hover:to-blue-700'
               }`}
             >
               {editTask ? 'Update Task' : 'Create Task'}

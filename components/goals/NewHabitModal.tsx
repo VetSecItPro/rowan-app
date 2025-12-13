@@ -142,7 +142,7 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
       <div className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-2xl shadow-2xl flex flex-col overflow-hidden" style={{ zIndex: 10000, maxHeight: '90vh' }}>
         <div className="flex-1 overflow-y-auto overscroll-contain relative">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-indigo-600/90 backdrop-blur-md border-b border-indigo-200/50 dark:border-indigo-700/50 px-4 sm:px-6 py-4 flex items-center justify-between">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-indigo-500 to-indigo-600 backdrop-blur-md border-b border-indigo-200/50 dark:border-indigo-700/50 px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
               <Target className="w-5 h-5 text-white" />
@@ -256,7 +256,7 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
             </button>
             <button
               type="submit"
-              className="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-lg font-medium flex items-center gap-2"
+              className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-xl transition-all shadow-lg shadow-indigo-500/25 font-medium flex items-center gap-2"
             >
               {editHabit ? (
                 <>
