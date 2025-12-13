@@ -211,6 +211,17 @@ export async function middleware(req: NextRequest) {
   // Skip security headers in development to match next.config.mjs behavior
   if (process.env.NODE_ENV !== 'development') {
     // Add security headers with strengthened CSP for production only
+    //
+    // SECURITY NOTE: 'unsafe-inline' and 'unsafe-eval' are required due to Next.js framework limitations:
+    // - 'unsafe-inline': Required for Next.js hydration scripts and inline styles (CSS-in-JS)
+    // - 'unsafe-eval': Required for some bundled libraries and webpack runtime
+    //
+    // FUTURE IMPROVEMENT: Next.js 13.4+ supports experimental nonce-based CSP via:
+    // - experimental.appDocumentPreloading in next.config.js
+    // - Using generateNonce() in middleware and passing to Script components
+    // See: https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy
+    //
+    // Priority: Medium - Implement when Next.js nonce support stabilizes
     response.headers.set(
       'Content-Security-Policy',
       "default-src 'self'; " +

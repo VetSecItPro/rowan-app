@@ -8,7 +8,7 @@ import { safeCookies } from '@/lib/utils/safe-cookies';
 import { encryptSessionData } from '@/lib/utils/session-crypto-edge';
 import { createClient as createStandaloneClient } from '@supabase/supabase-js';
 
-const ADMIN_SESSION_DURATION = 24 * 60 * 60; // 24 hours in seconds
+const ADMIN_SESSION_DURATION = 2 * 60 * 60; // 2 hours in seconds (security: shorter session for elevated privileges)
 
 /**
  * POST /api/admin/auth/login

@@ -8,6 +8,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { recalculateStorageUsage } from '@/lib/services/storage-service';
 import { z } from 'zod';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
+import { logger } from '@/lib/logger';
 
 const DeleteRequestSchema = z.object({
   spaceId: z.string().uuid(),
@@ -16,6 +20,17 @@ const DeleteRequestSchema = z.object({
 
 export async function DELETE(request: NextRequest) {
   try {
+    // CSRF validation for defense-in-depth
+    const csrfError = validateCsrfRequest(request);
+    if (csrfError) return csrfError;
+
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     // Get authenticated user
     const supabase = createClient();
     const {
@@ -62,7 +77,10 @@ export async function DELETE(request: NextRequest) {
       .in('id', fileIds);
 
     if (fetchError) {
-      console.error('Error fetching files for deletion:', fetchError);
+      logger.error('Error fetching files for deletion:', fetchError, {
+        component: 'StorageDeleteAPI',
+        action: 'FETCH_FILES',
+      });
       return NextResponse.json(
         { error: 'Failed to fetch files' },
         { status: 500 }
@@ -104,9 +122,12 @@ export async function DELETE(request: NextRequest) {
     const failureCount = deleteResults.length - successCount;
 
     if (failureCount > 0) {
-      console.error(
-        `Failed to delete ${failureCount} out of ${deleteResults.length} files`
-      );
+      logger.warn(`Failed to delete ${failureCount} out of ${deleteResults.length} files`, {
+        component: 'StorageDeleteAPI',
+        action: 'DELETE_FILES',
+        failureCount,
+        totalCount: deleteResults.length,
+      });
     }
 
     // Recalculate storage usage
@@ -121,7 +142,10 @@ export async function DELETE(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error in storage delete API:', error);
+    logger.error('Error in storage delete API:', error, {
+      component: 'StorageDeleteAPI',
+      action: 'DELETE',
+    });
     return NextResponse.json(
       { error: 'Failed to delete files' },
       { status: 500 }

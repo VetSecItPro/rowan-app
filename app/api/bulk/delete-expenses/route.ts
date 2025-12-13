@@ -3,6 +3,30 @@ import { createClient } from '@/lib/supabase/server';
 import { bulkDeleteExpenses, getExpensesBulkDeleteCount } from '@/lib/services/bulk-operations-service';
 import { checkExpensiveOperationRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { z } from 'zod';
+import { logger } from '@/lib/logger';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
+
+// Zod schemas for validation
+const BulkDeleteOptionsSchema = z.object({
+  startDate: z.string().datetime().optional(),
+  endDate: z.string().datetime().optional(),
+  categoryId: z.string().uuid('Invalid category ID format').optional(),
+  budgetId: z.string().uuid('Invalid budget ID format').optional(),
+}).optional();
+
+const BulkDeleteRequestSchema = z.object({
+  partnership_id: z.string().uuid('Invalid partnership ID format'),
+  options: BulkDeleteOptionsSchema,
+});
+
+const GetCountQuerySchema = z.object({
+  partnership_id: z.string().uuid('Invalid partnership ID format'),
+  start_date: z.string().datetime().optional(),
+  end_date: z.string().datetime().optional(),
+  category_id: z.string().uuid('Invalid category ID format').optional(),
+  budget_id: z.string().uuid('Invalid budget ID format').optional(),
+});
 
 /**
  * Bulk Delete Expenses API Endpoint
@@ -14,6 +38,10 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 
 export async function POST(request: NextRequest) {
   try {
+    // CSRF validation for defense-in-depth
+    const csrfError = validateCsrfRequest(request);
+    if (csrfError) return csrfError;
+
     // Rate limit check - expensive/destructive operation (5 per hour)
     const ip = extractIP(request.headers);
     const { success: rateLimitPassed } = await checkExpensiveOperationRateLimit(ip);
@@ -36,13 +64,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get request body
+    // Parse and validate request body
     const body = await request.json();
-    const { partnership_id, options } = body;
+    const validationResult = BulkDeleteRequestSchema.safeParse(body);
 
-    if (!partnership_id) {
-      return NextResponse.json({ error: 'Partnership ID required' }, { status: 400 });
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: 'Validation error', details: validationResult.error.issues },
+        { status: 400 }
+      );
     }
+
+    const { partnership_id, options } = validationResult.data;
 
     // Verify user has access to this partnership
     const { data: membership } = await supabase
@@ -68,7 +101,7 @@ export async function POST(request: NextRequest) {
       deleted_count: result.deleted_count,
     });
   } catch (error) {
-    console.error('Bulk delete expenses error:', error);
+    logger.error('Bulk delete expenses error', error, { component: 'api/bulk/delete-expenses', action: 'post' });
     return NextResponse.json(
       { error: 'Failed to delete expenses' },
       { status: 500 }
@@ -101,15 +134,29 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const partnershipId = searchParams.get('partnership_id');
-    const startDate = searchParams.get('start_date');
-    const endDate = searchParams.get('end_date');
-    const categoryId = searchParams.get('category_id');
-    const budgetId = searchParams.get('budget_id');
+    const queryParams = {
+      partnership_id: searchParams.get('partnership_id') || '',
+      start_date: searchParams.get('start_date') || undefined,
+      end_date: searchParams.get('end_date') || undefined,
+      category_id: searchParams.get('category_id') || undefined,
+      budget_id: searchParams.get('budget_id') || undefined,
+    };
 
-    if (!partnershipId) {
-      return NextResponse.json({ error: 'Partnership ID required' }, { status: 400 });
+    // Remove undefined values for cleaner validation
+    const cleanParams = Object.fromEntries(
+      Object.entries(queryParams).filter(([, v]) => v !== undefined)
+    );
+
+    const validationResult = GetCountQuerySchema.safeParse(cleanParams);
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: 'Validation error', details: validationResult.error.issues },
+        { status: 400 }
+      );
     }
+
+    const { partnership_id: partnershipId, start_date: startDate, end_date: endDate, category_id: categoryId, budget_id: budgetId } = validationResult.data;
 
     // Verify user has access
     const { data: membership } = await supabase
@@ -132,7 +179,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ count });
   } catch (error) {
-    console.error('Get bulk delete count error:', error);
+    logger.error('Get bulk delete count error', error, { component: 'api/bulk/delete-expenses', action: 'get' });
     return NextResponse.json(
       { error: 'Failed to get count' },
       { status: 500 }

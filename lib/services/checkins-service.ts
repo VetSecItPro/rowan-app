@@ -209,8 +209,8 @@ export const checkInsService = {
     const today = getCurrentDateString(); // e.g. '2025-12-08'
 
     // Get unique sorted date strings (most recent first)
-    const sortedDates = [...new Set(checkIns.map((c: { date: string }) => c.date))]
-      .sort((a: string, b: string) => b.localeCompare(a));
+    const sortedDates = [...new Set(checkIns.map((c: { date: string }) => c.date))] as string[];
+    sortedDates.sort((a, b) => b.localeCompare(a));
 
     if (sortedDates.length > 0) {
       // Calculate days since last check-in

@@ -10,6 +10,10 @@ import { createClient } from '../../../../lib/supabase/server';
 import { createCheckoutSession } from '../../../../lib/stripe/checkout';
 import type { SubscriptionTier, SubscriptionPeriod } from '../../../../lib/types';
 import { z } from 'zod';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
+import { logger } from '@/lib/logger';
 
 // Request body validation schema
 const CreateCheckoutSessionSchema = z.object({
@@ -19,6 +23,20 @@ const CreateCheckoutSessionSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // CSRF validation for defense-in-depth
+    const csrfError = validateCsrfRequest(request);
+    if (csrfError) return csrfError;
+
+    // Rate limiting to prevent checkout abuse
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     // Get authenticated user
     const supabase = createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -72,7 +90,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ sessionId });
 
   } catch (error) {
-    console.error('Error creating checkout session:', error);
+    logger.error('Error creating checkout session:', error, {
+      component: 'StripeCheckoutAPI',
+      action: 'POST',
+    });
 
     return NextResponse.json(
       {
