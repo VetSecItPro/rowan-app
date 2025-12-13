@@ -183,16 +183,16 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
       {/* Modal */}
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-lg sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-green-500 to-emerald-600 flex items-center justify-between px-4 sm:px-6 py-4 sm:rounded-t-xl">
+          <h2 className="text-lg sm:text-xl font-bold text-white">
             {editMessage ? 'Edit Message' : 'New Message'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 flex items-center justify-center hover:opacity-75 transition-opacity"
+            className="p-2 flex items-center justify-center hover:bg-white/20 rounded-full transition-all"
             aria-label="Close modal"
           >
-            <X className="w-5 h-5 sm:w-4 sm:h-4 text-gray-600 dark:text-gray-400" />
+            <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
           </button>
         </div>
 

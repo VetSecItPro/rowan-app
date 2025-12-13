@@ -191,7 +191,7 @@ export function TemplateSelectionModal({
     <div className="fixed inset-0 flex items-center justify-center p-4 bg-black/50 z-50">
       <div className="w-full max-w-6xl max-h-screen sm:max-h-[90vh] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 bg-indigo-600">
+        <div className="flex items-center justify-between p-6 bg-gradient-to-r from-indigo-500 to-indigo-600">
           <div>
             <h2 className="text-2xl font-bold text-white">Choose a Goal Template</h2>
             <p className="text-sm text-indigo-100 mt-1">
@@ -200,7 +200,7 @@ export function TemplateSelectionModal({
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            className="p-2 hover:bg-white/20 rounded-full transition-colors"
             aria-label="Close modal"
           >
             <X className="w-5 h-5 text-white" />
@@ -333,7 +333,7 @@ export function TemplateSelectionModal({
               <button
                 onClick={onCreateFromScratch}
                 title="Start with a blank goal instead of using a template"
-                className="flex-1 sm:flex-none px-6 py-3 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-600 transition-colors"
+                className="flex-1 sm:flex-none px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-xl font-medium transition-all shadow-lg shadow-indigo-500/25"
               >
                 Create from Scratch
               </button>

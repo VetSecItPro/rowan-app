@@ -174,7 +174,7 @@ export function EventProposalModal({
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-2xl sm:max-w-3xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-purple-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Calendar className="w-6 h-6" />
@@ -184,10 +184,10 @@ export function EventProposalModal({
             </div>
             <button
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-purple-700 transition-colors"
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all"
               aria-label="Close modal"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
           </div>
           {mode === 'vote' && proposal && (
@@ -331,7 +331,7 @@ export function EventProposalModal({
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl transition-all shadow-lg shadow-purple-500/25 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <Send className="w-4 h-4" />
                 {loading ? 'Creating...' : 'Send Proposal'}

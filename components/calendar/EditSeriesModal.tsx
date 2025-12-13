@@ -288,7 +288,7 @@ export function EditSeriesModal({
             className={`px-6 py-2 rounded-xl font-medium transition-colors disabled:opacity-50 ${
               isDeleteAction
                 ? 'bg-red-600 hover:bg-red-700 text-white'
-                : 'bg-purple-600 hover:bg-purple-700 text-white'
+                : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white'
             }`}
           >
             {isProcessing ? 'Processing...' : (isDeleteAction ? 'Delete' : 'Continue')}

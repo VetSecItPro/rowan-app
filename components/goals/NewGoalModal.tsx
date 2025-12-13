@@ -175,14 +175,14 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-[600px] sm:h-auto sm:min-h-[600px] sm:rounded-2xl shadow-2xl flex flex-col" style={{ maxHeight: '90vh' }}>
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-indigo-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
             <h2 className="text-lg sm:text-xl font-bold">
               {editGoal ? 'Edit Goal' : selectedTemplate ? `Create Goal from Template` : 'Create New Goal'}
             </h2>
             <button
               onClick={onClose}
-              className="p-2 flex items-center justify-center hover:opacity-75 transition-opacity"
+              className="p-2 flex items-center justify-center hover:bg-white/20 rounded-full transition-all"
               aria-label="Close modal"
             >
               <X className="w-5 h-5 sm:w-4 sm:h-4" />
@@ -368,7 +368,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
             </button>
             <button
               type="submit"
-              className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-lg font-medium"
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-xl transition-all shadow-lg shadow-indigo-500/25 font-medium"
             >
               {editGoal ? 'Update Goal' : 'Create Goal'}
             </button>

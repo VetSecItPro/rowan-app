@@ -91,16 +91,16 @@ export function NewConversationModal({
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg animate-scale-in">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <div className="flex items-center justify-between p-6 bg-gradient-to-r from-green-500 to-emerald-600 rounded-t-2xl">
+            <h2 className="text-xl font-semibold text-white">
               New Conversation
             </h2>
             <button
               onClick={onClose}
-              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95"
+              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95"
               aria-label="Close modal"
             >
-              <X className="w-5 h-5 sm:w-4 sm:h-4 text-gray-500 dark:text-gray-400" />
+              <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
             </button>
           </div>
 
@@ -187,7 +187,7 @@ export function NewConversationModal({
               <button
                 type="submit"
                 disabled={!title.trim() || isCreating}
-                className="px-6 py-2.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white rounded-lg transition-colors font-medium disabled:cursor-not-allowed"
+                className="px-6 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-300 disabled:to-gray-400 dark:disabled:from-gray-700 dark:disabled:to-gray-600 text-white rounded-lg transition-all font-medium disabled:cursor-not-allowed shadow-lg shadow-green-500/25"
               >
                 {isCreating ? 'Creating...' : 'Create Conversation'}
               </button>
