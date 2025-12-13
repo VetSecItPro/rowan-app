@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
 import DOMPurify from 'isomorphic-dompurify';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
 
 // SECURITY: Strip all HTML tags from text input - only allow plain text for names
 function stripHtml(input: string): string {
@@ -26,8 +27,12 @@ function stripHtml(input: string): string {
  * PUT /api/user/profile
  * Update user profile information (name, email)
  */
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
   try {
+    // CSRF validation for defense-in-depth
+    const csrfError = validateCsrfRequest(request);
+    if (csrfError) return csrfError;
+
     // Rate limiting with automatic fallback
     const ip = extractIP(request.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
@@ -233,7 +238,7 @@ export async function PUT(request: Request) {
  * GET /api/user/profile
  * Get current user profile information
  */
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     // Rate limiting with automatic fallback
     const ip = extractIP(request.headers);

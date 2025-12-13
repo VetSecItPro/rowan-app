@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { checkMfaRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
+import { logger } from '@/lib/logger';
 
 /**
  * MFA Unenrollment API
@@ -16,6 +18,10 @@ const UnenrollSchema = z.object({
 
 export async function DELETE(request: NextRequest) {
   try {
+    // CSRF validation for defense-in-depth
+    const csrfError = validateCsrfRequest(request);
+    if (csrfError) return csrfError;
+
     // Rate limit check
     const ip = extractIP(request.headers);
     const { success: rateLimitPassed } = await checkMfaRateLimit(ip);
@@ -45,7 +51,10 @@ export async function DELETE(request: NextRequest) {
     });
 
     if (error) {
-      console.error('MFA unenrollment error:', error);
+      logger.error('MFA unenrollment error:', error, {
+        component: 'MFAUnenrollAPI',
+        action: 'UNENROLL',
+      });
       return NextResponse.json(
         { error: 'Failed to disable MFA: ' + error.message },
         { status: 500 }
@@ -64,7 +73,10 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    console.error('Error in MFA unenrollment:', error);
+    logger.error('Error in MFA unenrollment:', error, {
+      component: 'MFAUnenrollAPI',
+      action: 'DELETE',
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

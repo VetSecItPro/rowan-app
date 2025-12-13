@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { checkMfaRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
+import { logger } from '@/lib/logger';
 
 /**
  * MFA Enrollment API
@@ -12,6 +14,10 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 
 export async function POST(request: NextRequest) {
   try {
+    // CSRF validation for defense-in-depth
+    const csrfError = validateCsrfRequest(request);
+    if (csrfError) return csrfError;
+
     // Rate limit check
     const ip = extractIP(request.headers);
     const { success: rateLimitPassed } = await checkMfaRateLimit(ip);
@@ -39,7 +45,10 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      console.error('MFA enrollment error:', error);
+      logger.error('MFA enrollment error:', error, {
+        component: 'MFAEnrollAPI',
+        action: 'ENROLL',
+      });
       return NextResponse.json(
         { error: 'Failed to enroll in MFA: ' + error.message },
         { status: 500 }
@@ -57,7 +66,10 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error in MFA enrollment:', error);
+    logger.error('Error in MFA enrollment:', error, {
+      component: 'MFAEnrollAPI',
+      action: 'POST',
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -91,7 +103,10 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.mfa.listFactors();
 
     if (error) {
-      console.error('MFA list factors error:', error);
+      logger.error('MFA list factors error:', error, {
+        component: 'MFAEnrollAPI',
+        action: 'LIST_FACTORS',
+      });
       return NextResponse.json(
         { error: 'Failed to list MFA factors: ' + error.message },
         { status: 500 }
@@ -106,7 +121,10 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error listing MFA factors:', error);
+    logger.error('Error listing MFA factors:', error, {
+      component: 'MFAEnrollAPI',
+      action: 'GET',
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

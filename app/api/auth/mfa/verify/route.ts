@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { checkMfaRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
+import { logger } from '@/lib/logger';
 
 /**
  * MFA Verification API
@@ -18,6 +20,10 @@ const VerifyCodeSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // CSRF validation for defense-in-depth
+    const csrfError = validateCsrfRequest(request);
+    if (csrfError) return csrfError;
+
     // Rate limit check - stricter for MFA verification to prevent brute force
     const ip = extractIP(request.headers);
     const { success: rateLimitPassed } = await checkMfaRateLimit(ip);
@@ -52,7 +58,10 @@ export async function POST(request: NextRequest) {
       });
 
       if (error) {
-        console.error('MFA challenge verification error:', error);
+        logger.error('MFA challenge verification error:', error, {
+          component: 'MFAVerifyAPI',
+          action: 'VERIFY_CHALLENGE',
+        });
         return NextResponse.json(
           { error: 'Invalid verification code' },
           { status: 400 }
@@ -69,7 +78,10 @@ export async function POST(request: NextRequest) {
       });
 
       if (error) {
-        console.error('MFA enrollment verification error:', error);
+        logger.error('MFA enrollment verification error:', error, {
+          component: 'MFAVerifyAPI',
+          action: 'VERIFY_ENROLLMENT',
+        });
         return NextResponse.json(
           { error: 'Invalid verification code' },
           { status: 400 }
@@ -92,7 +104,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error('Error in MFA verification:', error);
+    logger.error('Error in MFA verification:', error, {
+      component: 'MFAVerifyAPI',
+      action: 'POST',
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

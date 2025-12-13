@@ -1,6 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { accountDeletionService } from '@/lib/services/account-deletion-service';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
+import { logger } from '@/lib/logger';
 
 /**
  * Cancel Account Deletion API
@@ -17,8 +21,19 @@ import { accountDeletionService } from '@/lib/services/account-deletion-service'
  * - Only users can cancel their own deletion
  * - Validates user is marked for deletion
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    // CSRF validation for defense-in-depth
+    const csrfError = validateCsrfRequest(request);
+    if (csrfError) return csrfError;
+
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const supabase = await createClient();
 
     // Get authenticated user
@@ -56,7 +71,10 @@ export async function POST(request: Request) {
       message: 'Account deletion cancelled successfully',
     });
   } catch (error) {
-    console.error('[API] Error canceling account deletion:', error);
+    logger.error('[API] Error canceling account deletion:', error, {
+      component: 'CancelDeletionAPI',
+      action: 'POST',
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -70,8 +88,15 @@ export async function POST(request: Request) {
  * Returns whether the user's account is marked for deletion
  * and the permanent deletion date if applicable.
  */
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const supabase = await createClient();
 
     // Get authenticated user
@@ -92,7 +117,10 @@ export async function GET(request: Request) {
       .single();
 
     if (checkError && checkError.code !== 'PGRST116') {
-      console.error('[API] Error checking deletion status:', checkError);
+      logger.error('[API] Error checking deletion status:', checkError, {
+        component: 'CancelDeletionAPI',
+        action: 'GET_STATUS',
+      });
       return NextResponse.json(
         { error: 'Failed to check deletion status' },
         { status: 500 }
@@ -111,7 +139,10 @@ export async function GET(request: Request) {
       permanentDeletionAt: deletionRecord.permanent_deletion_at,
     });
   } catch (error) {
-    console.error('[API] Error getting deletion status:', error);
+    logger.error('[API] Error getting deletion status:', error, {
+      component: 'CancelDeletionAPI',
+      action: 'GET',
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

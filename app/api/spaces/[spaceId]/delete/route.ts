@@ -5,6 +5,8 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
+import { logger } from '@/lib/logger';
 
 /**
  * DELETE /api/spaces/[spaceId]/delete
@@ -15,6 +17,10 @@ export async function DELETE(
   { params }: { params: { spaceId: string } }
 ) {
   try {
+    // CSRF validation for defense-in-depth
+    const csrfError = validateCsrfRequest(req);
+    if (csrfError) return csrfError;
+
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
@@ -154,7 +160,11 @@ export async function DELETE(
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/spaces/[spaceId]/delete error:', error);
+    logger.error('[API] /api/spaces/[spaceId]/delete error:', error, {
+      component: 'SpaceDeleteAPI',
+      action: 'DELETE',
+      spaceId: params.spaceId,
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

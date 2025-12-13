@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, List, X, RefreshCw, Archive } from 'lucide-react';
+import { z } from 'zod';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { EventCard } from '@/components/calendar/EventCard';
@@ -42,6 +43,76 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMont
 
 type ViewMode = 'day' | 'week' | 'month' | 'agenda' | 'timeline' | 'proposal' | 'list';
 
+// Schema for validating localStorage calendar connection data
+const CalendarConnectionSchema = z.object({
+  id: z.string(),
+  provider: z.string(),
+  last_sync_at: z.string().nullable(),
+});
+
+const CalendarConnectionsArraySchema = z.array(CalendarConnectionSchema);
+
+// ISO date string validation (basic format check)
+const ISODateStringSchema = z.string().refine(
+  (val) => !isNaN(Date.parse(val)),
+  { message: 'Invalid date string' }
+);
+
+/**
+ * Safely parse and validate localStorage data
+ * Returns default value if parsing or validation fails
+ */
+function safeParseLocalStorage<T>(
+  key: string,
+  schema: z.ZodType<T>,
+  defaultValue: T
+): T {
+  try {
+    const cached = localStorage.getItem(key);
+    if (!cached) return defaultValue;
+
+    const parsed = JSON.parse(cached);
+    const result = schema.safeParse(parsed);
+
+    if (result.success) {
+      return result.data;
+    }
+
+    // Validation failed - clear corrupted data and return default
+    console.warn(`Invalid localStorage data for key "${key}", clearing cache`);
+    localStorage.removeItem(key);
+    return defaultValue;
+  } catch {
+    // JSON parse error - clear corrupted data and return default
+    console.warn(`Failed to parse localStorage key "${key}", clearing cache`);
+    localStorage.removeItem(key);
+    return defaultValue;
+  }
+}
+
+/**
+ * Safely get a simple string value from localStorage with optional validation
+ */
+function safeGetLocalStorageString(
+  key: string,
+  validator?: (val: string) => boolean
+): string | null {
+  try {
+    const value = localStorage.getItem(key);
+    if (!value) return null;
+
+    if (validator && !validator(value)) {
+      console.warn(`Invalid localStorage value for key "${key}", clearing cache`);
+      localStorage.removeItem(key);
+      return null;
+    }
+
+    return value;
+  } catch {
+    return null;
+  }
+}
+
 export default function CalendarPage() {
   const { currentSpace, user } = useAuthWithSpaces();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -71,6 +142,7 @@ export default function CalendarPage() {
   const [locationLoading, setLocationLoading] = useState(true);
 
   // Calendar sync state - initialize from localStorage for instant display
+  // Uses validated parsing to prevent corrupted/tampered data from causing issues
   const [isSyncing, setIsSyncing] = useState(false);
   const [hasCalendarConnection, setHasCalendarConnection] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -79,16 +151,24 @@ export default function CalendarPage() {
     return false;
   });
   // Store all active calendar connections (supports multiple providers)
+  // Validated with Zod schema to ensure data structure integrity
   const [calendarConnections, setCalendarConnections] = useState<Array<{ id: string; provider: string; last_sync_at: string | null }>>(() => {
     if (typeof window !== 'undefined') {
-      const cached = localStorage.getItem('rowan_calendar_connections');
-      return cached ? JSON.parse(cached) : [];
+      return safeParseLocalStorage(
+        'rowan_calendar_connections',
+        CalendarConnectionsArraySchema,
+        []
+      );
     }
     return [];
   });
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('rowan_calendar_last_sync');
+      // Validate that the stored value is a valid date string
+      return safeGetLocalStorageString(
+        'rowan_calendar_last_sync',
+        (val) => !isNaN(Date.parse(val))
+      );
     }
     return null;
   });

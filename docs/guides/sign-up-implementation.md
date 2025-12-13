@@ -103,7 +103,7 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret_here
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id_here
 
 # Existing variables
-NEXT_PUBLIC_SUPABASE_URL=https://mhqpjprmpvigmwcghpzx.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
