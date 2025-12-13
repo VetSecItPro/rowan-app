@@ -63,7 +63,7 @@ import { PointsDisplay, LeaderboardWidget } from '@/components/rewards';
 import { CTAButton } from '@/components/ui/EnhancedButton';
 import { TrialStatusBanner } from '@/components/subscription';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { format, isToday, isThisWeek, isPast, parseISO, startOfWeek, subWeeks } from 'date-fns';
 import { formatDate, formatTimestamp, getCurrentDateString } from '@/lib/utils/date-utils';
 
@@ -237,11 +237,21 @@ const TrendIndicator = memo(function TrendIndicator({ value, label }: { value: n
 
 export default function DashboardPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, spaces, currentSpace, loading: authLoading, switchSpace, refreshSpaces } = useAuthWithSpaces();
   const spaceId = currentSpace?.id;
   const [loading, setLoading] = useState(true);
   const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
+
+  // Handle ?invite=true query parameter from header dropdown
+  useEffect(() => {
+    if (searchParams.get('invite') === 'true' && spaceId) {
+      setShowInviteModal(true);
+      // Remove the query param from URL without navigation
+      router.replace('/dashboard', { scroll: false });
+    }
+  }, [searchParams, spaceId, router]);
   const [stats, setStats] = useState<EnhancedDashboardStats>({
     tasks: {
       total: 0,
