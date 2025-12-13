@@ -74,6 +74,8 @@ export interface ImportantDate {
   show_on_countdown: boolean;
   countdown_days_before: number;
   countdown_label: string | null;
+  // Calendar integration
+  linked_calendar_event_id: string | null;
   is_active: boolean;
   created_by: string | null;
   created_at: string;

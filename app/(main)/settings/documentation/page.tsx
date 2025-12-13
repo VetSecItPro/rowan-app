@@ -18,7 +18,7 @@ const documentationSearchKeywords: Record<string, string[]> = {
   household: ['household', 'budget', 'bill', 'expense', 'home', 'utility', 'finance'],
   expenses: ['expense', 'receipt', 'scan', 'spending', 'money', 'track', 'cost', 'ai'],
   projects: ['project', 'budget', 'vendor', 'contractor', 'renovation', 'actual'],
-  spaces: ['space', 'collaboration', 'team', 'invite', 'partner', 'share', 'family'],
+  // spaces: ['space', 'collaboration', 'team', 'invite', 'partner', 'share', 'family'], // Hidden - simplified to single space
   checkin: ['check-in', 'checkin', 'wellness', 'mood', 'emotion', 'feeling', 'daily'],
   subscriptions: ['subscription', 'billing', 'payment', 'plan', 'pricing', 'trial', 'pro', 'family', 'upgrade', 'cancel'],
   rewards: ['reward', 'points', 'redeem', 'earn', 'chore', 'incentive', 'prize', 'catalog', 'shop', 'kids', 'children'],
@@ -150,18 +150,18 @@ const features = [
     href: '/settings/documentation/projects',
     available: true,
   },
-  // Collaboration Features
-  {
-    id: 'spaces',
-    name: 'Space & Collaboration',
-    description: 'Master space management, invitations, and team collaboration',
-    icon: Users,
-    color: 'from-teal-500 to-teal-600',
-    hoverBorder: 'hover:border-teal-500',
-    hoverShadow: 'hover:shadow-teal-500/50',
-    href: '/settings/documentation/spaces',
-    available: true,
-  },
+  // Collaboration Features - Hidden (simplified to single space)
+  // {
+  //   id: 'spaces',
+  //   name: 'Space & Collaboration',
+  //   description: 'Master space management, invitations, and team collaboration',
+  //   icon: Users,
+  //   color: 'from-teal-500 to-teal-600',
+  //   hoverBorder: 'hover:border-teal-500',
+  //   hoverShadow: 'hover:shadow-teal-500/50',
+  //   href: '/settings/documentation/spaces',
+  //   available: false,
+  // },
   {
     id: 'checkin',
     name: 'Daily Check-In',
