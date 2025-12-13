@@ -131,7 +131,7 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
 
     // Users and spaces
     maxUsers: 6,
-    maxSpaces: 3,
+    maxSpaces: 1,
 
     // Storage
     storageGB: 15,
