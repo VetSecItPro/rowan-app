@@ -521,7 +521,7 @@ export default function ProjectsPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700/50 rounded-xl p-6">
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700/50 rounded-xl p-6 overflow-visible min-h-[calc(100vh-380px)]">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
                 <h2 className="text-xl font-bold text-amber-900 dark:text-amber-100">
@@ -601,12 +601,10 @@ export default function ProjectsPage() {
                   </CTAButton>
                 </div>
               ) : (
-                <div className="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                    {filteredProjects.map((project) => (
-                      <ProjectCard key={project.id} project={project} onEdit={(p) => { setEditingProject(p); setIsProjectModalOpen(true); }} onDelete={handleDeleteProject} />
-                    ))}
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {filteredProjects.map((project) => (
+                    <ProjectCard key={project.id} project={project} onEdit={(p) => { setEditingProject(p); setIsProjectModalOpen(true); }} onDelete={handleDeleteProject} />
+                  ))}
                 </div>
               )
             ) : activeTab === 'budgets' ? (
@@ -807,12 +805,10 @@ export default function ProjectsPage() {
                   </CTAButton>
                 </div>
               ) : (
-                <div className="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                    {filteredExpenses.map((expense) => (
-                      <ExpenseCard key={expense.id} expense={expense} onEdit={(e) => { setEditingExpense(e); setIsExpenseModalOpen(true); }} onDelete={handleDeleteExpense} onStatusChange={handleStatusChange} />
-                    ))}
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {filteredExpenses.map((expense) => (
+                    <ExpenseCard key={expense.id} expense={expense} onEdit={(e) => { setEditingExpense(e); setIsExpenseModalOpen(true); }} onDelete={handleDeleteExpense} onStatusChange={handleStatusChange} />
+                  ))}
                 </div>
               )
             ) : activeTab === 'receipts' ? (
