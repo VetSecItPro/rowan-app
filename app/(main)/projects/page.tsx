@@ -10,19 +10,21 @@ import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { CTAButton } from '@/components/ui/EnhancedButton';
 import { ProjectCard } from '@/components/projects/ProjectCard';
-import { NewProjectModal } from '@/components/projects/NewProjectModal';
 import { ExpenseCard } from '@/components/projects/ExpenseCard';
-import { NewExpenseModal } from '@/components/projects/NewExpenseModal';
-import { NewBudgetModal } from '@/components/projects/NewBudgetModal';
-import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { SafeToSpendIndicator } from '@/components/projects/SafeToSpendIndicator';
-import { BillCard } from '@/components/projects/BillCard';
-import { NewBillModal } from '@/components/projects/NewBillModal';
 import { BillsList } from '@/components/budget/BillsList';
-import { BudgetTemplateModal } from '@/components/projects/BudgetTemplateModal';
-import { SpendingInsightsCard } from '@/components/projects/SpendingInsightsCard';
-import { ReceiptUploadModal } from '@/components/projects/ReceiptUploadModal';
-import { ReceiptsListCard } from '@/components/projects/ReceiptsListCard';
+// Lazy-loaded modals for better initial page load
+import {
+  LazyNewProjectModal,
+  LazyNewExpenseModal,
+  LazyNewBudgetModal,
+  LazyNewBillModal,
+  LazyBudgetTemplateModal,
+  LazyReceiptUploadModal,
+  LazySpendingInsightsCard,
+  LazyReceiptsListCard,
+  LazyConfirmDialog,
+} from '@/lib/utils/lazy-components';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { projectsOnlyService, type CreateProjectInput } from '@/lib/services/projects-service';
 import { projectsService, type Expense, type CreateExpenseInput } from '@/lib/services/budgets-service';
@@ -779,7 +781,7 @@ export default function ProjectsPage() {
                   {/* Spending Insights */}
                   {currentSpace && (
                     <div className="mt-6">
-                      <SpendingInsightsCard spaceId={currentSpace.id} />
+                      <LazySpendingInsightsCard spaceId={currentSpace.id} />
                     </div>
                   )}
                 </div>
@@ -815,23 +817,23 @@ export default function ProjectsPage() {
                 </div>
               )
             ) : activeTab === 'receipts' ? (
-              currentSpace && <ReceiptsListCard spaceId={currentSpace.id} onDelete={() => loadData()} />
+              currentSpace && <LazyReceiptsListCard spaceId={currentSpace.id} onDelete={() => loadData()} />
             ) : null}
           </div>
         </div>
       </div>
       {currentSpace && (
         <>
-          <NewProjectModal isOpen={isProjectModalOpen} onClose={() => { setIsProjectModalOpen(false); setEditingProject(null); }} onSave={handleCreateProject} editProject={editingProject} spaceId={currentSpace.id} />
-          <NewExpenseModal isOpen={isExpenseModalOpen} onClose={() => { setIsExpenseModalOpen(false); setEditingExpense(null); }} onSave={handleCreateExpense} editExpense={editingExpense} spaceId={currentSpace.id} />
-          <NewBudgetModal isOpen={isBudgetModalOpen} onClose={() => setIsBudgetModalOpen(false)} onSave={handleSetBudget} currentBudget={currentBudget} spaceId={currentSpace.id} />
-          <NewBillModal isOpen={isBillModalOpen} onClose={() => { setIsBillModalOpen(false); setEditingBill(null); }} onSave={handleCreateBill} editBill={editingBill} spaceId={currentSpace.id} />
-          <BudgetTemplateModal isOpen={isTemplateModalOpen} onClose={() => setIsTemplateModalOpen(false)} onApply={handleApplyTemplate} templates={budgetTemplates} templateCategories={templateCategories} />
-          <ReceiptUploadModal isOpen={isReceiptModalOpen} onClose={() => setIsReceiptModalOpen(false)} spaceId={currentSpace.id} onSuccess={() => loadData()} />
+          <LazyNewProjectModal isOpen={isProjectModalOpen} onClose={() => { setIsProjectModalOpen(false); setEditingProject(null); }} onSave={handleCreateProject} editProject={editingProject} spaceId={currentSpace.id} />
+          <LazyNewExpenseModal isOpen={isExpenseModalOpen} onClose={() => { setIsExpenseModalOpen(false); setEditingExpense(null); }} onSave={handleCreateExpense} editExpense={editingExpense} spaceId={currentSpace.id} />
+          <LazyNewBudgetModal isOpen={isBudgetModalOpen} onClose={() => setIsBudgetModalOpen(false)} onSave={handleSetBudget} currentBudget={currentBudget} spaceId={currentSpace.id} />
+          <LazyNewBillModal isOpen={isBillModalOpen} onClose={() => { setIsBillModalOpen(false); setEditingBill(null); }} onSave={handleCreateBill} editBill={editingBill} spaceId={currentSpace.id} />
+          <LazyBudgetTemplateModal isOpen={isTemplateModalOpen} onClose={() => setIsTemplateModalOpen(false)} onApply={handleApplyTemplate} templates={budgetTemplates} templateCategories={templateCategories} />
+          <LazyReceiptUploadModal isOpen={isReceiptModalOpen} onClose={() => setIsReceiptModalOpen(false)} spaceId={currentSpace.id} onSuccess={() => loadData()} />
         </>
       )}
 
-      <ConfirmDialog
+      <LazyConfirmDialog
         isOpen={confirmDialog.isOpen}
         onClose={() => setConfirmDialog({ isOpen: false, action: 'delete-project', id: '' })}
         onConfirm={handleConfirmDelete}
