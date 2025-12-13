@@ -51,9 +51,70 @@ export const LazyUnifiedItemModal = dynamic(
   { loading: ModalLoading, ssr: false }
 );
 
+export const LazyUnifiedDetailsModal = dynamic(
+  () => import('@/components/shared/UnifiedDetailsModal').then(mod => ({ default: mod.UnifiedDetailsModal })),
+  { loading: ModalLoading, ssr: false }
+);
+
 export const LazyConfirmDialog = dynamic(
   () => import('@/components/shared/ConfirmDialog').then(mod => ({ default: mod.ConfirmDialog })),
   { loading: ModalLoading, ssr: false }
+);
+
+// ============================================
+// TASK COMPONENTS
+// ============================================
+export const LazyTaskFilterPanel = dynamic(
+  () => import('@/components/tasks/TaskFilterPanel').then(mod => ({ default: mod.TaskFilterPanel })),
+  { ssr: false }
+);
+
+export const LazyBulkActionsBar = dynamic(
+  () => import('@/components/tasks/BulkActionsBar').then(mod => ({ default: mod.BulkActionsBar })),
+  { ssr: false }
+);
+
+export const LazyTaskTemplatePickerModal = dynamic(
+  () => import('@/components/tasks/TemplatePickerModal').then(mod => ({ default: mod.TemplatePickerModal })),
+  { loading: ModalLoading, ssr: false }
+);
+
+export const LazyDraggableItemList = dynamic(
+  () => import('@/components/tasks/DraggableItemList').then(mod => ({ default: mod.DraggableItemList })),
+  { ssr: false }
+);
+
+// ============================================
+// SHOPPING COMPONENTS
+// ============================================
+export const LazyNewShoppingListModal = dynamic(
+  () => import('@/components/shopping/NewShoppingListModal').then(mod => ({ default: mod.NewShoppingListModal })),
+  { loading: ModalLoading, ssr: false }
+);
+
+export const LazySaveTemplateModal = dynamic(
+  () => import('@/components/shopping/SaveTemplateModal').then(mod => ({ default: mod.SaveTemplateModal })),
+  { loading: ModalLoading, ssr: false }
+);
+
+export const LazyShoppingTemplatePickerModal = dynamic(
+  () => import('@/components/shopping/TemplatePickerModal').then(mod => ({ default: mod.TemplatePickerModal })),
+  { loading: ModalLoading, ssr: false }
+);
+
+export const LazyScheduleTripModal = dynamic(
+  () => import('@/components/shopping/ScheduleTripModal').then(mod => ({ default: mod.ScheduleTripModal })),
+  { loading: ModalLoading, ssr: false }
+);
+
+export const LazyShareListModal = dynamic(
+  () => import('@/components/shopping/ShareListModal').then(mod => ({ default: mod.ShareListModal })),
+  { loading: ModalLoading, ssr: false }
+);
+
+export const LazyFrequentItemsPanel = dynamic(
+  () => import('@/components/shopping/FrequentItemsPanel').then(mod => ({ default: mod.FrequentItemsPanel })),
+  { ssr: false }
 );
 
 // ============================================
