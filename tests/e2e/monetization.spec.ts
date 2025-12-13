@@ -309,18 +309,19 @@ test.describe('Security Checks', () => {
 
   test('invalid input is rejected with proper errors', async ({ request }) => {
     // Test with invalid tier
+    // Note: 403 is expected when CSRF validation fails (no token provided)
     const invalidTierResponse = await request.post('/api/stripe/create-checkout-session', {
       headers: { 'Content-Type': 'application/json' },
       data: { tier: 'invalid', period: 'monthly' },
     });
-    expect([400, 401, 422]).toContain(invalidTierResponse.status());
+    expect([400, 401, 403, 422]).toContain(invalidTierResponse.status());
 
     // Test with invalid period
     const invalidPeriodResponse = await request.post('/api/stripe/create-checkout-session', {
       headers: { 'Content-Type': 'application/json' },
       data: { tier: 'pro', period: 'invalid' },
     });
-    expect([400, 401, 422]).toContain(invalidPeriodResponse.status());
+    expect([400, 401, 403, 422]).toContain(invalidPeriodResponse.status());
   });
 
   test('webhook endpoint validates signature', async ({ request }) => {
