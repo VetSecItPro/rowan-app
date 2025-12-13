@@ -80,7 +80,8 @@ export function CreateSpaceModal({ isOpen, onClose, onSpaceCreated }: CreateSpac
             </div>
             <button
               onClick={onClose}
-              className="p-2 flex items-center justify-center hover:opacity-75 transition-opacity"
+              aria-label="Close modal"
+              className="p-2 flex items-center justify-center hover:bg-white/20 rounded-full transition-all"
             >
               <X className="w-5 h-5 sm:w-4 sm:h-4" />
             </button>
@@ -123,7 +124,7 @@ export function CreateSpaceModal({ isOpen, onClose, onSpaceCreated }: CreateSpac
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-xl hover:opacity-90 transition-all shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white rounded-xl transition-all shadow-lg shadow-teal-500/25 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Creating...' : 'Create Space'}
             </button>

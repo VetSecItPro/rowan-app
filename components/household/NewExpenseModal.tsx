@@ -38,9 +38,9 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4">
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-2xl font-bold">{editExpense ? 'Edit Expense' : 'New Expense'}</h2>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"><X className="w-5 h-5" /></button>
+        <div className="flex items-center justify-between p-6 bg-gradient-to-r from-amber-500 to-amber-600 rounded-t-xl">
+          <h2 className="text-2xl font-bold text-white">{editExpense ? 'Edit Expense' : 'New Expense'}</h2>
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-white/20 transition-all"><X className="w-5 h-5 text-white" /></button>
         </div>
         <form onSubmit={(e) => { e.preventDefault(); onSave(formData); onClose(); }} className="p-6 space-y-4">
           <div>

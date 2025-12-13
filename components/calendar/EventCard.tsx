@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, Clock, MapPin, MoreVertical, Edit, Trash2, Check, ShoppingCart, Eye } from 'lucide-react';
+import { Calendar, Clock, MapPin, MoreVertical, Edit, Trash2, Check, ShoppingCart, Eye, DollarSign } from 'lucide-react';
 import { CalendarEvent } from '@/lib/services/calendar-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
@@ -13,16 +13,18 @@ interface LinkedShoppingList {
 }
 
 interface EventCardProps {
-  event: CalendarEvent;
+  event: CalendarEvent & { linked_bill_id?: string };
   onEdit: (event: CalendarEvent) => void;
   onDelete: (id: string) => void;
   onStatusChange: (id: string, status: 'not-started' | 'in-progress' | 'completed') => void;
   onViewDetails?: (event: CalendarEvent) => void;
+  onMarkBillPaid?: (eventId: string, billId: string) => void;
   linkedShoppingList?: LinkedShoppingList;
 }
 
-export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetails, linkedShoppingList }: EventCardProps) {
+export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetails, onMarkBillPaid, linkedShoppingList }: EventCardProps) {
   const [showMenu, setShowMenu] = useState(false);
+  const isBillEvent = Boolean(event.linked_bill_id);
 
   const formatEventTime = () => {
     return formatTimestamp(event.start_time, 'h:mm a');
@@ -169,9 +171,9 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
           <button
             onClick={() => setShowMenu(!showMenu)}
             aria-label="Event options menu"
-            className="w-12 h-12 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
-            <MoreVertical className="w-5 h-5 md:w-4 md:h-4 text-gray-600 dark:text-gray-400" />
+            <MoreVertical className="w-5 h-5" />
           </button>
 
           {showMenu && (
@@ -181,13 +183,28 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                 onClick={() => setShowMenu(false)}
               />
               <div className="absolute right-0 mt-2 w-48 dropdown-mobile bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-xl z-20">
+                {/* Mark Bill as Paid - Only show for bill-linked events that aren't completed */}
+                {isBillEvent && onMarkBillPaid && event.linked_bill_id && event.status !== 'completed' && (
+                  <button
+                    onClick={() => {
+                      onMarkBillPaid(event.id, event.linked_bill_id!);
+                      setShowMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 flex items-center gap-2 rounded-t-lg transition-colors font-medium"
+                  >
+                    <DollarSign className="w-4 h-4" />
+                    Mark Bill as Paid
+                  </button>
+                )}
                 {onViewDetails && (
                   <button
                     onClick={() => {
                       onViewDetails(event);
                       setShowMenu(false);
                     }}
-                    className="w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 rounded-t-lg transition-colors"
+                    className={`w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors ${
+                      (!isBillEvent || !onMarkBillPaid || event.status === 'completed') ? 'rounded-t-lg' : ''
+                    }`}
                   >
                     <Eye className="w-4 h-4" />
                     View Details
@@ -199,7 +216,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                     setShowMenu(false);
                   }}
                   className={`w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors ${
-                    !onViewDetails ? 'rounded-t-lg' : ''
+                    !onViewDetails && (!isBillEvent || !onMarkBillPaid || event.status === 'completed') ? 'rounded-t-lg' : ''
                   }`}
                 >
                   <Edit className="w-4 h-4" />

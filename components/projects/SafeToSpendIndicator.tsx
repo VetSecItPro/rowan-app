@@ -139,25 +139,6 @@ export function SafeToSpendIndicator({ spaceId }: SafeToSpendIndicatorProps) {
         </div>
       )}
 
-      {/* Budget Usage Progress */}
-      <div className="space-y-1">
-        <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
-          <span>Budget Used</span>
-          <span className="font-medium">{Math.min(100, percentageUsed).toFixed(1)}%</span>
-        </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-300 ${
-              status === 'over' || status === 'danger'
-                ? 'bg-gradient-to-r from-red-500 to-red-600'
-                : status === 'warning'
-                ? 'bg-gradient-to-r from-yellow-500 to-orange-500'
-                : 'bg-gradient-to-r from-green-500 to-emerald-500'
-            }`}
-            style={{ width: `${Math.min(100, percentageUsed)}%` }}
-          />
-        </div>
-      </div>
     </div>
   );
 }

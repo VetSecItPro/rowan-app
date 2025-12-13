@@ -40,13 +40,13 @@ export function ReactionPicker({ onSelectEmoji, className = '' }: ReactionPicker
             onClick={() => setIsOpen(false)}
           />
 
-          {/* Picker Popup */}
-          <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-2xl p-2 z-20 flex gap-1 flex-wrap max-w-[200px]">
+          {/* Picker Popup - Glassmorphism */}
+          <div className="absolute bottom-full left-0 mb-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl backdrop-saturate-150 border border-white/50 dark:border-gray-600/50 rounded-2xl shadow-2xl shadow-black/20 dark:shadow-black/40 p-2.5 z-20 flex gap-1 flex-wrap max-w-[220px] ring-1 ring-black/5 dark:ring-white/5">
             {REACTION_EMOJIS.map((emoji) => (
               <button
                 key={emoji}
                 onClick={() => handleEmojiClick(emoji)}
-                className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-xl transition-all hover:scale-110 active:scale-95"
+                className="w-9 h-9 flex items-center justify-center hover:bg-white/60 dark:hover:bg-gray-600/60 rounded-xl text-xl transition-all duration-200 hover:scale-110 active:scale-95 hover:shadow-md"
                 title={`React with ${emoji}`}
               >
                 {emoji}

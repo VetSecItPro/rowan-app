@@ -109,10 +109,10 @@ export function BillCard({ bill, onEdit, onDelete, onMarkPaid }: BillCardProps) 
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="btn-touch w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             aria-label="Bill options"
           >
-            <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <MoreVertical className="w-5 h-5" />
           </button>
 
           {showMenu && (
@@ -205,19 +205,27 @@ export function BillCard({ bill, onEdit, onDelete, onMarkPaid }: BillCardProps) 
         )}
       </div>
 
-      {/* Status Badge */}
+      {/* Status Badge & Pay Button */}
       <div className="flex items-center justify-between pt-4 border-t border-gray-300 dark:border-gray-600">
         <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${config.statusBadge}`}>
           <StatusIcon className="w-3.5 h-3.5" />
           {config.label}
         </div>
 
-        {/* Last Paid */}
-        {bill.last_paid_date && (
+        {/* Pay Now Button or Last Paid */}
+        {!isPaid ? (
+          <button
+            onClick={() => onMarkPaid(bill.id)}
+            className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-sm font-medium rounded-lg transition-all shadow-lg shadow-green-500/25 flex items-center gap-1.5"
+          >
+            <Check className="w-4 h-4" />
+            Pay Now
+          </button>
+        ) : bill.last_paid_date ? (
           <span className="text-xs text-gray-500 dark:text-gray-400">
             Last paid: {format(parseISO(bill.last_paid_date), 'MMM d')}
           </span>
-        )}
+        ) : null}
       </div>
 
       {/* Notes (if any) */}

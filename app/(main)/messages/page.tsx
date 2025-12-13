@@ -4,7 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as ImageIcon, Paperclip, TrendingUp, X } from 'lucide-react';
+import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as ImageIcon, Paperclip, TrendingUp, X, CalendarClock } from 'lucide-react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { MessageCard } from '@/components/messages/MessageCard';
@@ -79,6 +79,8 @@ export default function MessagesPage() {
   const [forwardingMessage, setForwardingMessage] = useState<Message | null>(null);
   const [editingConversationTitle, setEditingConversationTitle] = useState(false);
   const [conversationTitleInput, setConversationTitleInput] = useState('');
+  const [showSchedulePicker, setShowSchedulePicker] = useState(false);
+  const [scheduledTime, setScheduledTime] = useState<Date | null>(null);
 
   const [stats, setStats] = useState({
     thisWeek: 0,
@@ -316,16 +318,6 @@ export default function MessagesPage() {
       loadMessages();
     }
   }, [confirmDialog, loadMessages]);
-
-  // Memoize handleMarkRead callback
-  const handleMarkRead = useCallback(async (messageId: string) => {
-    try {
-      await messagesService.markAsRead(messageId);
-      // Real-time subscription will handle the read status update
-    } catch (error) {
-      console.error('Failed to mark message as read:', error);
-    }
-  }, []);
 
   // Handle pin/unpin toggle
   const handleTogglePin = useCallback(async (messageId: string) => {
@@ -658,6 +650,20 @@ export default function MessagesPage() {
       setMessages(messagesData);
       setPinnedMessages(pinnedData);
       setShowConversationSidebar(false); // Close mobile sidebar
+
+      // Mark all unread messages in this conversation as read
+      const markedCount = await messagesService.markConversationAsRead(selectedConversationId);
+      if (markedCount > 0) {
+        // Update local message state to reflect read status
+        setMessages(prev => prev.map(m => ({
+          ...m,
+          read: true,
+          read_at: m.read_at || new Date().toISOString()
+        })));
+        // Refresh stats to update unread counter
+        const newStats = await messagesService.getMessageStats(currentSpace.id);
+        setStats(newStats);
+      }
     } catch (error) {
       console.error('Failed to load conversation:', error);
       toast.error('Failed to load conversation');
@@ -950,10 +956,10 @@ export default function MessagesPage() {
 
 
           {/* Conversations and Chat Interface */}
-          <div className="flex gap-4">
+          <div className="flex gap-4 h-[calc(100vh-380px)] sm:h-[calc(100vh-400px)] min-h-[500px]">
             {/* Conversation Sidebar - Desktop */}
             <div className="hidden md:block w-80 flex-shrink-0">
-              <div className="sticky top-4 h-[600px]">
+              <div className="sticky top-4 h-full">
                 <ConversationSidebar
                   conversations={conversations}
                   activeConversationId={conversationId || undefined}
@@ -966,25 +972,25 @@ export default function MessagesPage() {
             </div>
 
             {/* Chat Interface */}
-            <div className="flex-1 bg-gradient-to-br from-white/80 via-emerald-50/40 to-green-50/60 dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-800/90 backdrop-blur-2xl border border-emerald-200/30 dark:border-gray-700/50 rounded-3xl overflow-visible flex flex-col h-[400px] sm:h-[500px] md:h-[600px] shadow-2xl shadow-emerald-500/10 dark:shadow-gray-900/50">
+            <div className="flex-1 bg-gradient-to-br from-white/80 via-emerald-50/40 to-green-50/60 dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-800/90 backdrop-blur-2xl border border-emerald-200/30 dark:border-gray-700/50 rounded-3xl overflow-visible flex flex-col h-full shadow-2xl shadow-emerald-500/10 dark:shadow-gray-900/50">
             {/* Chat Header */}
-            <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-emerald-200/30 dark:border-gray-700 bg-gradient-to-r from-emerald-400/10 via-green-400/10 to-teal-400/10 dark:from-gray-800 dark:to-gray-900 backdrop-blur-sm">
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-emerald-200/30 dark:border-gray-700 bg-gradient-to-r from-emerald-400/10 via-green-400/10 to-teal-400/10 dark:from-gray-800 dark:to-gray-900 backdrop-blur-sm">
               <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
                   {/* Mobile Menu Button */}
                   <button
                     onClick={() => setShowConversationSidebar(true)}
-                    className="md:hidden p-2 hover:bg-emerald-100/50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200"
+                    className="md:hidden p-2 hover:bg-emerald-100/50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 flex-shrink-0"
                     aria-label="Open conversations"
                   >
                     <MessageCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   </button>
 
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 bg-gradient-to-br from-emerald-400 via-green-500 to-teal-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white/50 dark:ring-gray-700">
-                      <MessageCircle className="w-5 h-5 text-white" />
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-emerald-400 via-green-500 to-teal-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white/50 dark:ring-gray-700 flex-shrink-0">
+                      <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       {editingConversationTitle ? (
                         <input
                           type="text"
@@ -993,11 +999,11 @@ export default function MessagesPage() {
                           onKeyDown={handleTitleKeyDown}
                           onBlur={handleSaveConversationTitle}
                           autoFocus
-                          className="text-base sm:text-lg font-bold text-gray-900 dark:text-white tracking-tight bg-transparent border-b-2 border-emerald-500 outline-none max-w-[200px]"
+                          className="text-sm sm:text-base font-bold text-gray-900 dark:text-white tracking-tight bg-transparent border-b-2 border-emerald-500 outline-none max-w-[150px] sm:max-w-[200px]"
                         />
                       ) : (
                         <h2
-                          className="text-base sm:text-lg font-bold text-gray-900 dark:text-white tracking-tight cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                          className="text-sm sm:text-base font-bold text-gray-900 dark:text-white tracking-tight cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors truncate"
                           onClick={handleEditConversationTitle}
                           title="Click to rename conversation"
                         >
@@ -1005,17 +1011,19 @@ export default function MessagesPage() {
                         </h2>
                       )}
                       <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                        <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <p className="text-xs sm:text-sm text-emerald-600 dark:text-emerald-400 font-medium">
                           Active now
                         </p>
                       </div>
                     </div>
                   </div>
-                  <span className="px-3 py-1.5 bg-gradient-to-r from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 border border-emerald-300/50 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-300 text-xs font-semibold rounded-full shadow-sm">
-                    {format(new Date(), 'MMM yyyy')}
-                  </span>
                 </div>
+
+                {/* Date Badge */}
+                <span className="hidden sm:inline-flex px-3 py-1.5 bg-gradient-to-r from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 border border-emerald-300/50 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-300 text-xs font-semibold rounded-full shadow-sm flex-shrink-0">
+                  {format(new Date(), 'MMM yyyy')}
+                </span>
               </div>
             </div>
 
@@ -1089,7 +1097,7 @@ export default function MessagesPage() {
                             message={message}
                             onEdit={handleEditMessage}
                             onDelete={handleDeleteMessage}
-                            onMarkRead={handleMarkRead}
+                            onMarkRead={() => {}}
                             onTogglePin={handleTogglePin}
                             onForward={handleForwardMessage}
                             isOwn={message.sender_id === user?.id}
@@ -1150,20 +1158,20 @@ export default function MessagesPage() {
                       Add emoji
                     </div>
 
-                    {/* Emoji Picker Popup */}
+                    {/* Emoji Picker Popup - Glassmorphism */}
                     {showEmojiPicker && (
                       <>
                         <div
                           className="fixed inset-0 z-10"
                           onClick={closeEmojiPicker}
                         />
-                        <div className="absolute bottom-full mb-2 right-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-3 sm:p-4 grid grid-cols-4 sm:grid-cols-5 gap-1.5 sm:gap-2 z-20 min-w-[200px] sm:min-w-[240px]">
+                        <div className="absolute bottom-full mb-2 right-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl backdrop-saturate-150 border border-white/50 dark:border-gray-600/50 rounded-2xl shadow-2xl shadow-black/20 dark:shadow-black/40 p-3 sm:p-4 grid grid-cols-5 sm:grid-cols-6 gap-1 sm:gap-1.5 z-20 min-w-[220px] sm:min-w-[280px] ring-1 ring-black/5 dark:ring-white/5">
                           {EMOJIS.map((emoji, idx) => (
                             <button
                               key={idx}
                               type="button"
                               onClick={() => handleEmojiClick(emoji)}
-                              className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-xl sm:text-2xl transition-all hover:scale-110 cursor-pointer"
+                              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center hover:bg-white/60 dark:hover:bg-gray-600/60 rounded-xl text-xl sm:text-2xl transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer hover:shadow-md"
                             >
                               {emoji}
                             </button>
@@ -1201,6 +1209,112 @@ export default function MessagesPage() {
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                       Attach file
                     </div>
+                  </div>
+
+                  {/* Schedule Message Button */}
+                  <div className="relative group hidden sm:block">
+                    <button
+                      type="button"
+                      onClick={() => setShowSchedulePicker(!showSchedulePicker)}
+                      className={`p-1.5 sm:p-2 rounded-lg transition-all duration-200 cursor-pointer ${
+                        scheduledTime
+                          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                          : 'hover:bg-gray-200 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      <CalendarClock className={`w-4 h-4 sm:w-5 sm:h-5 ${scheduledTime ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`} />
+                    </button>
+                    {/* Tooltip */}
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                      {scheduledTime ? `Scheduled: ${format(scheduledTime, 'MMM d, h:mm a')}` : 'Schedule message'}
+                    </div>
+
+                    {/* Schedule Picker Popup - Glassmorphism */}
+                    {showSchedulePicker && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-10"
+                          onClick={() => setShowSchedulePicker(false)}
+                        />
+                        <div className="absolute bottom-full mb-2 right-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl backdrop-saturate-150 border border-white/50 dark:border-gray-600/50 rounded-2xl shadow-2xl shadow-black/20 dark:shadow-black/40 p-4 z-20 min-w-[280px] ring-1 ring-black/5 dark:ring-white/5">
+                          <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                            <CalendarClock className="w-4 h-4 text-blue-500" />
+                            Schedule Message
+                          </h4>
+
+                          {/* Quick Schedule Options */}
+                          <div className="grid grid-cols-2 gap-2 mb-3">
+                            {[
+                              { label: 'In 1 hour', hours: 1 },
+                              { label: 'In 3 hours', hours: 3 },
+                              { label: 'Tomorrow 9am', preset: 'tomorrow9' },
+                              { label: 'Tomorrow 6pm', preset: 'tomorrow18' },
+                            ].map((option) => (
+                              <button
+                                key={option.label}
+                                type="button"
+                                onClick={() => {
+                                  const now = new Date();
+                                  let newTime: Date;
+                                  if (option.hours) {
+                                    newTime = new Date(now.getTime() + option.hours * 60 * 60 * 1000);
+                                  } else if (option.preset === 'tomorrow9') {
+                                    newTime = new Date(now);
+                                    newTime.setDate(newTime.getDate() + 1);
+                                    newTime.setHours(9, 0, 0, 0);
+                                  } else {
+                                    newTime = new Date(now);
+                                    newTime.setDate(newTime.getDate() + 1);
+                                    newTime.setHours(18, 0, 0, 0);
+                                  }
+                                  setScheduledTime(newTime);
+                                  setShowSchedulePicker(false);
+                                  toast.success(`Message scheduled for ${format(newTime, 'MMM d, h:mm a')}`);
+                                }}
+                                className="px-3 py-2 text-xs font-medium bg-white/60 dark:bg-gray-700/60 hover:bg-blue-50 dark:hover:bg-blue-900/30 border border-gray-200/50 dark:border-gray-600/50 rounded-lg transition-all duration-200 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-300 hover:border-blue-300 dark:hover:border-blue-600"
+                              >
+                                {option.label}
+                              </button>
+                            ))}
+                          </div>
+
+                          {/* Custom Date/Time */}
+                          <div className="space-y-2">
+                            <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                              Custom date & time
+                            </label>
+                            <input
+                              type="datetime-local"
+                              min={format(new Date(), "yyyy-MM-dd'T'HH:mm")}
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  const newTime = new Date(e.target.value);
+                                  setScheduledTime(newTime);
+                                  setShowSchedulePicker(false);
+                                  toast.success(`Message scheduled for ${format(newTime, 'MMM d, h:mm a')}`);
+                                }
+                              }}
+                              className="w-full px-3 py-2 text-sm bg-white/60 dark:bg-gray-700/60 border border-gray-200/50 dark:border-gray-600/50 rounded-lg focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
+                            />
+                          </div>
+
+                          {/* Clear Schedule */}
+                          {scheduledTime && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setScheduledTime(null);
+                                setShowSchedulePicker(false);
+                                toast.info('Schedule cleared');
+                              }}
+                              className="w-full mt-3 px-3 py-2 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            >
+                              Clear schedule
+                            </button>
+                          )}
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Voice Message Button */}
@@ -1260,11 +1374,34 @@ export default function MessagesPage() {
 
               {/* Voice Recorder */}
               {showVoiceRecorder && (
-                <div className="mt-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="mt-3 p-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-lg rounded-xl border border-white/40 dark:border-gray-600/40 shadow-lg">
                   <VoiceRecorder
                     onSendVoice={handleSendVoice}
                     onCancel={() => setShowVoiceRecorder(false)}
                   />
+                </div>
+              )}
+
+              {/* Scheduled Message Indicator */}
+              {scheduledTime && (
+                <div className="mt-3 flex items-center justify-between px-4 py-2.5 bg-blue-50/80 dark:bg-blue-900/20 backdrop-blur-sm rounded-xl border border-blue-200/50 dark:border-blue-700/30">
+                  <div className="flex items-center gap-2">
+                    <CalendarClock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                      Message will be sent: {format(scheduledTime, 'MMM d, h:mm a')}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setScheduledTime(null);
+                      toast.info('Schedule cleared');
+                    }}
+                    className="p-1 hover:bg-blue-100 dark:hover:bg-blue-800/30 rounded-lg transition-colors"
+                    aria-label="Clear schedule"
+                  >
+                    <X className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  </button>
                 </div>
               )}
 
