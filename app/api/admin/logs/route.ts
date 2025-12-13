@@ -20,6 +20,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import { getErrorStats } from '@/lib/utils/error-alerting';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 // ============================================================================
 // VALIDATION SCHEMAS
@@ -95,6 +97,13 @@ async function verifyAdminAccess(request: NextRequest): Promise<{
 
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     // Verify admin access
     const authResult = await verifyAdminAccess(request);
     if (!authResult.isAdmin) {
@@ -207,6 +216,13 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     // Verify admin access
     const authResult = await verifyAdminAccess(request);
     if (!authResult.isAdmin) {

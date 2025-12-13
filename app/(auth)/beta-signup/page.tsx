@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, TestTube, ArrowRight, Shield, Users, Lightbulb } from 'lucide-react';
 
-const BETA_PASSWORD = 'rowan-beta-2024';
+// Security: Beta password is validated server-side only (never expose in client bundle)
 
 export default function BetaSignupPage() {
   const [step, setStep] = useState<'password' | 'signup'>('password');
@@ -13,6 +13,7 @@ export default function BetaSignupPage() {
   const [passwordError, setPasswordError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
 
   // Signup form state
   const [signupData, setSignupData] = useState({
@@ -25,14 +26,30 @@ export default function BetaSignupPage() {
 
   const router = useRouter();
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordError('');
+    setIsValidating(true);
 
-    if (password === BETA_PASSWORD) {
-      setStep('signup');
-    } else {
-      setPasswordError('Incorrect beta testing password. Please check the documentation or contact support.');
+    try {
+      // Validate password via API (password never exposed in client bundle)
+      const response = await fetch('/api/beta/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setStep('signup');
+      } else {
+        setPasswordError(result.error || 'Incorrect beta testing password. Please check the documentation or contact support.');
+      }
+    } catch {
+      setPasswordError('Unable to validate password. Please try again.');
+    } finally {
+      setIsValidating(false);
     }
   };
 
@@ -158,10 +175,11 @@ export default function BetaSignupPage() {
 
                 <button
                   type="submit"
-                  className="w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800 transition-colors"
+                  disabled={isValidating}
+                  className="w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  Continue
-                  <ArrowRight className="w-4 h-4" />
+                  {isValidating ? 'Validating...' : 'Continue'}
+                  {!isValidating && <ArrowRight className="w-4 h-4" />}
                 </button>
               </form>
             </>

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { geographicDetectionService } from '@/lib/services/geographic-detection-service';
 import { createClient } from '@/lib/supabase/server';
 import { ccpaService } from '@/lib/services/ccpa-service';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 /**
  * Geographic Detection API Endpoint
@@ -12,6 +14,13 @@ import { ccpaService } from '@/lib/services/ccpa-service';
 
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     // Get client IP address
     const clientIP = geographicDetectionService.getClientIP(request);
 
@@ -101,6 +110,13 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 

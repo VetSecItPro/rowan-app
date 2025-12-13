@@ -3,9 +3,18 @@ import { createClient } from '@/lib/supabase/server';
 import { feedbackService } from '@/lib/services/feedback-service';
 import { isAdmin } from '@/lib/utils/admin-check';
 import { FeedbackStatus, FeedbackType } from '@/lib/types';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const supabase = await createClient();
 
     // Check authentication

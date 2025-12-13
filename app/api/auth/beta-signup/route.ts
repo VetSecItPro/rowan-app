@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
+import { authRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
-const BETA_PASSWORD = 'rowan-beta-2024';
+// Security: Beta password loaded from environment variable (never hardcode)
+// Set BETA_PASSWORD in Vercel environment variables
 
 // Validation schema
 const betaSignupSchema = z.object({
@@ -20,6 +23,29 @@ const betaSignupSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting for beta signup (prevent brute force/spam)
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = authRateLimit
+      ? await authRateLimit.limit(ip)
+      : { success: true };
+
+    if (!rateLimitSuccess) {
+      return NextResponse.json(
+        { error: 'Too many signup attempts. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
+    // Validate that BETA_PASSWORD is configured (runtime check)
+    const BETA_PASSWORD = process.env.BETA_PASSWORD;
+    if (!BETA_PASSWORD) {
+      console.error('BETA_PASSWORD environment variable is not configured');
+      return NextResponse.json(
+        { error: 'Beta signup is temporarily unavailable' },
+        { status: 503 }
+      );
+    }
+
     const body = await request.json();
 
     // Validate input

@@ -5,6 +5,8 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { uploadRecipeImage } from '@/lib/services/storage-service';
+import { validateImageMagicBytes, isFormatAllowed, ALLOWED_RECIPE_FORMATS } from '@/lib/utils/file-validation';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/upload/recipe
@@ -48,10 +50,32 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate file is an image
+    // Validate MIME type first (quick check)
     if (!file.type.startsWith('image/')) {
       return NextResponse.json(
         { error: 'File must be an image' },
+        { status: 400 }
+      );
+    }
+
+    // SECURITY: Validate magic bytes to prevent disguised malicious files
+    const validation = await validateImageMagicBytes(file);
+    if (!validation.valid) {
+      logger.warn('Recipe image upload rejected: invalid magic bytes', {
+        component: 'api/upload/recipe',
+        action: 'magic_bytes_validation_failed',
+        declaredMime: file.type,
+      });
+      return NextResponse.json(
+        { error: 'File does not appear to be a valid image' },
+        { status: 400 }
+      );
+    }
+
+    // Validate format is allowed for recipes
+    if (!isFormatAllowed(validation.format!, ALLOWED_RECIPE_FORMATS)) {
+      return NextResponse.json(
+        { error: `Image format ${validation.format} is not allowed. Please use JPEG, PNG, WebP, GIF, AVIF, or HEIC.` },
         { status: 400 }
       );
     }
@@ -82,7 +106,7 @@ export async function POST(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/upload/recipe POST error:', error);
+    logger.error('Recipe image upload error', error, { component: 'api/upload/recipe', action: 'upload' });
     return NextResponse.json(
       { error: 'Failed to upload recipe image' },
       { status: 500 }

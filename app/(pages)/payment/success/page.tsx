@@ -6,16 +6,17 @@
  */
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useValidatedSearchParams, PaymentSuccessParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
 
 export default function PaymentSuccessPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const tier = searchParams?.get('tier') || 'pro';
-  const period = searchParams?.get('period') || 'monthly';
+  const { params } = useValidatedSearchParams(PaymentSuccessParamsSchema);
+  const tier = params?.tier || 'pro';
+  const period = params?.period || 'monthly';
   const [countdown, setCountdown] = useState(5);
 
   // Auto-redirect to dashboard after 5 seconds
