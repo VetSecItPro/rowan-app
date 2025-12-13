@@ -16,6 +16,7 @@ import { QuickAddEvent } from '@/components/calendar/QuickAddEvent';
 import { UnifiedCalendarFilters } from '@/components/calendar/UnifiedCalendarFilters';
 import { UnifiedCalendarLegendCompact } from '@/components/calendar/UnifiedCalendarLegend';
 import { UnifiedCalendarItemCard } from '@/components/calendar/UnifiedCalendarItemCard';
+import { UnifiedItemPreviewModal } from '@/components/calendar/UnifiedItemPreviewModal';
 import { useUnifiedCalendar } from '@/lib/hooks/useUnifiedCalendar';
 import type { UnifiedCalendarItem, UnifiedCalendarFilters as FilterState } from '@/lib/types/unified-calendar-item';
 
@@ -63,6 +64,7 @@ export default function CalendarPage() {
 
   // Phase 9: Unified calendar items state (tasks, meals, reminders alongside events)
   const [selectedUnifiedItem, setSelectedUnifiedItem] = useState<UnifiedCalendarItem | null>(null);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
   // Location state for weather display
   const [userLocation, setUserLocation] = useState<string | null>(null);
@@ -131,12 +133,14 @@ export default function CalendarPage() {
   // Handler for clicking unified calendar items
   const handleUnifiedItemClick = useCallback((item: UnifiedCalendarItem) => {
     setSelectedUnifiedItem(item);
-    // For events, open the edit modal (events are also included for color consistency)
+    // For events, open the edit modal
     if (item.itemType === 'event' && item.originalItem) {
       setEditingEvent(item.originalItem as CalendarEvent);
       setIsModalOpen(true);
+    } else {
+      // For tasks, meals, reminders, goals - open the preview modal
+      setIsPreviewModalOpen(true);
     }
-    // For other item types, we could navigate to their respective pages or show a detail modal
   }, []);
 
   // Get unified items for a specific date
@@ -1883,6 +1887,18 @@ export default function CalendarPage() {
           event={detailEvent}
           onEdit={handleEditEvent}
           onDelete={handleDeleteEvent}
+        />
+      )}
+
+      {/* Unified Item Preview Modal (for tasks, meals, reminders, goals) */}
+      {selectedUnifiedItem && selectedUnifiedItem.itemType !== 'event' && (
+        <UnifiedItemPreviewModal
+          item={selectedUnifiedItem}
+          isOpen={isPreviewModalOpen}
+          onClose={() => {
+            setIsPreviewModalOpen(false);
+            setSelectedUnifiedItem(null);
+          }}
         />
       )}
 
