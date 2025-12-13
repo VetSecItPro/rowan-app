@@ -16,6 +16,7 @@ import { QuickAddEvent } from '@/components/calendar/QuickAddEvent';
 import { UnifiedCalendarFilters } from '@/components/calendar/UnifiedCalendarFilters';
 import { UnifiedCalendarLegendCompact } from '@/components/calendar/UnifiedCalendarLegend';
 import { UnifiedCalendarItemCard } from '@/components/calendar/UnifiedCalendarItemCard';
+import { UnifiedItemPreviewModal } from '@/components/calendar/UnifiedItemPreviewModal';
 import { useUnifiedCalendar } from '@/lib/hooks/useUnifiedCalendar';
 import type { UnifiedCalendarItem, UnifiedCalendarFilters as FilterState } from '@/lib/types/unified-calendar-item';
 
@@ -63,6 +64,7 @@ export default function CalendarPage() {
 
   // Phase 9: Unified calendar items state (tasks, meals, reminders alongside events)
   const [selectedUnifiedItem, setSelectedUnifiedItem] = useState<UnifiedCalendarItem | null>(null);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
   // Location state for weather display
   const [userLocation, setUserLocation] = useState<string | null>(null);
@@ -131,19 +133,15 @@ export default function CalendarPage() {
   // Handler for clicking unified calendar items
   const handleUnifiedItemClick = useCallback((item: UnifiedCalendarItem) => {
     setSelectedUnifiedItem(item);
-    // For events, open the edit modal (events are also included for color consistency)
+    // For events, open the edit modal
     if (item.itemType === 'event' && item.originalItem) {
       setEditingEvent(item.originalItem as CalendarEvent);
       setIsModalOpen(true);
+    } else {
+      // For tasks, meals, reminders, goals - open the preview modal
+      setIsPreviewModalOpen(true);
     }
-    // For other item types, we could navigate to their respective pages or show a detail modal
   }, []);
-
-  // Get unified items for a specific date
-  const getUnifiedItemsForDate = useCallback((date: Date): UnifiedCalendarItem[] => {
-    const dateKey = format(date, 'yyyy-MM-dd');
-    return unifiedItemsByDate.get(dateKey) || [];
-  }, [unifiedItemsByDate]);
 
   // Memoize filtered events (consistent across all views)
   const filteredEvents = useMemo(() => {
@@ -165,6 +163,62 @@ export default function CalendarPage() {
 
     return filtered;
   }, [events, searchQuery, statusFilter]);
+
+  // Memoize filtered unified items (tasks, meals, reminders, goals)
+  const filteredUnifiedItems = useMemo(() => {
+    if (statusFilter === 'all') {
+      return unifiedItems;
+    }
+
+    // Map filter values to unified item status values
+    // Status filter: 'not-started' | 'in-progress' | 'completed'
+    // Unified item statuses vary by type:
+    // - Tasks: 'pending', 'in-progress', 'completed', 'blocked', 'on-hold'
+    // - Reminders: 'pending', 'completed', 'snoozed'
+    // - Goals: 'not_started', 'in_progress', 'completed', 'cancelled'
+    // - Meals: typically no status (always shown)
+
+    return unifiedItems.filter(item => {
+      const itemStatus = item.status?.toLowerCase();
+
+      // Meals don't have status - show them in 'all' only, or treat as pending
+      if (item.itemType === 'meal') {
+        return statusFilter === 'not-started'; // Show meals as "pending" items
+      }
+
+      if (statusFilter === 'not-started') {
+        return itemStatus === 'pending' || itemStatus === 'not_started' || itemStatus === 'not-started' || !itemStatus;
+      }
+
+      if (statusFilter === 'in-progress') {
+        return itemStatus === 'in-progress' || itemStatus === 'in_progress' || itemStatus === 'active';
+      }
+
+      if (statusFilter === 'completed') {
+        return itemStatus === 'completed' || itemStatus === 'done';
+      }
+
+      return true;
+    });
+  }, [unifiedItems, statusFilter]);
+
+  // Create filtered unified items grouped by date
+  const filteredUnifiedItemsByDate = useMemo(() => {
+    const grouped = new Map<string, UnifiedCalendarItem[]>();
+    for (const item of filteredUnifiedItems) {
+      const dateKey = format(parseISO(item.startTime), 'yyyy-MM-dd');
+      const existing = grouped.get(dateKey) || [];
+      grouped.set(dateKey, [...existing, item]);
+    }
+    return grouped;
+  }, [filteredUnifiedItems]);
+
+  // Get unified items for a specific date (respects status filter)
+  const getUnifiedItemsForDate = useCallback((date: Date): UnifiedCalendarItem[] => {
+    const dateKey = format(date, 'yyyy-MM-dd');
+    // Use filtered items when status filter is active
+    return filteredUnifiedItemsByDate.get(dateKey) || [];
+  }, [filteredUnifiedItemsByDate]);
 
   // Memoize stats calculations - use filteredEvents to match current view
   const stats = useMemo(() => {
@@ -1883,6 +1937,18 @@ export default function CalendarPage() {
           event={detailEvent}
           onEdit={handleEditEvent}
           onDelete={handleDeleteEvent}
+        />
+      )}
+
+      {/* Unified Item Preview Modal (for tasks, meals, reminders, goals) */}
+      {selectedUnifiedItem && selectedUnifiedItem.itemType !== 'event' && (
+        <UnifiedItemPreviewModal
+          item={selectedUnifiedItem}
+          isOpen={isPreviewModalOpen}
+          onClose={() => {
+            setIsPreviewModalOpen(false);
+            setSelectedUnifiedItem(null);
+          }}
         />
       )}
 

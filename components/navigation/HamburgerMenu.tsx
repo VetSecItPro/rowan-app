@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { NAVIGATION_ITEMS } from '@/lib/navigation';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { SpaceSelector } from '@/components/spaces/SpaceSelector';
 // import { useCommandPaletteTrigger } from '@/hooks/useCommandPalette'; // Temporarily disabled
 
 export function HamburgerMenu() {
@@ -14,7 +13,7 @@ export function HamburgerMenu() {
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
-  const { user, currentSpace, spaces, switchSpace } = useAuth();
+  const { user } = useAuth();
   // const { trigger } = useCommandPaletteTrigger(); // Temporarily disabled
 
   // Close menu when route changes
@@ -104,31 +103,6 @@ export function HamburgerMenu() {
 
             {/* Menu Content */}
             <div className="py-2">
-              {/* Space Selector - Mobile Only */}
-              {user && currentSpace && spaces.length > 0 && (
-                <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-800 sm:hidden">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Current Space</p>
-                  <SpaceSelector
-                    spaces={spaces}
-                    currentSpace={currentSpace}
-                    onSpaceChange={(space) => {
-                      switchSpace(space);
-                      setIsOpen(false);
-                    }}
-                    onCreateSpace={() => {
-                      router.push('/dashboard');
-                      setIsOpen(false);
-                    }}
-                    onInvitePartner={() => {
-                      router.push('/dashboard');
-                      setIsOpen(false);
-                    }}
-                    userColorTheme={user.color_theme}
-                    variant="default"
-                  />
-                </div>
-              )}
-
               {/* Command Palette Trigger - Temporarily disabled */}
               {/*
               <div className="px-4 py-3 sm:py-2 border-b border-gray-200 dark:border-gray-800">

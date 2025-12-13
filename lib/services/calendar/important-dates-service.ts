@@ -1,5 +1,6 @@
 // Phase 15: Important Dates Service
 // Service for managing birthdays, anniversaries, and recurring important dates
+// Phase 16: Added calendar integration - auto-creates calendar events for important dates
 
 import { createClient } from '@/lib/supabase/client';
 import type {
@@ -10,6 +11,175 @@ import type {
   ImportantDateQueryOptions,
   ImportantDatesResult,
 } from '@/lib/types/important-dates';
+
+/**
+ * Build a title for the calendar event based on important date type
+ */
+function buildCalendarEventTitle(date: ImportantDate | CreateImportantDateInput, years?: number | null): string {
+  const name = date.person_name || date.title;
+  const emoji = date.emoji || '🎂';
+
+  switch (date.date_type) {
+    case 'birthday':
+      if (years !== null && years !== undefined) {
+        return `${emoji} ${name} turns ${years}!`;
+      }
+      return `${emoji} ${name}'s Birthday`;
+    case 'anniversary':
+      if (years !== null && years !== undefined) {
+        return `${emoji} ${name} - ${years} years`;
+      }
+      return `${emoji} ${name}`;
+    case 'memorial':
+      return `${emoji} ${name}`;
+    default:
+      return `${emoji} ${name}`;
+  }
+}
+
+/**
+ * Map important date type to valid event category
+ */
+function getEventCategory(dateType: string): string {
+  switch (dateType) {
+    case 'birthday':
+    case 'anniversary':
+    case 'memorial':
+      return 'family';
+    case 'renewal':
+    case 'appointment':
+      return 'personal';
+    default:
+      return 'personal';
+  }
+}
+
+/**
+ * Create or update a calendar event for an important date
+ * Uses the 'events' table which is the main calendar table
+ */
+async function syncToCalendar(
+  importantDate: ImportantDate,
+  years: number | null
+): Promise<string | null> {
+  if (!importantDate.show_on_calendar) {
+    return null;
+  }
+
+  const supabase = createClient();
+
+  // Calculate the next occurrence date for calendar event
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  let eventYear = currentYear;
+
+  // Check if this year's date has passed
+  const thisYearDate = new Date(currentYear, importantDate.month - 1, importantDate.day_of_month);
+  if (thisYearDate < now) {
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (thisYearDate.getTime() !== today.getTime()) {
+      eventYear = currentYear + 1;
+    }
+  }
+
+  // Create start time at midnight for all-day events
+  const startTime = new Date(eventYear, importantDate.month - 1, importantDate.day_of_month, 0, 0, 0);
+  const endTime = new Date(eventYear, importantDate.month - 1, importantDate.day_of_month, 23, 59, 59);
+
+  const title = buildCalendarEventTitle(importantDate, years);
+
+  // Use the 'events' table (main calendar table) with valid category
+  const eventData = {
+    space_id: importantDate.space_id,
+    title,
+    description: importantDate.notes || `Auto-created from Important Dates: ${importantDate.title}`,
+    start_time: startTime.toISOString(),
+    end_time: endTime.toISOString(),
+    all_day: importantDate.calendar_all_day !== false,
+    category: getEventCategory(importantDate.date_type),
+    important_date_id: importantDate.id,
+    created_by: importantDate.created_by,
+  };
+
+  // Check if linked event already exists
+  if (importantDate.linked_calendar_event_id) {
+    // Update existing event in 'events' table
+    const { error } = await supabase
+      .from('events')
+      .update(eventData)
+      .eq('id', importantDate.linked_calendar_event_id);
+
+    if (error) {
+      console.error('Error updating linked calendar event:', error);
+    }
+    return importantDate.linked_calendar_event_id;
+  }
+
+  // Check if there's already an event linked via important_date_id
+  const { data: existingEvent } = await supabase
+    .from('events')
+    .select('id')
+    .eq('important_date_id', importantDate.id)
+    .single();
+
+  if (existingEvent) {
+    // Update existing event
+    const { error } = await supabase
+      .from('events')
+      .update(eventData)
+      .eq('id', existingEvent.id);
+
+    if (error) {
+      console.error('Error updating calendar event:', error);
+    }
+
+    // Update the link in important_dates
+    await supabase
+      .from('important_dates')
+      .update({ linked_calendar_event_id: existingEvent.id })
+      .eq('id', importantDate.id);
+
+    return existingEvent.id;
+  }
+
+  // Create new event in 'events' table
+  const { data: newEvent, error } = await supabase
+    .from('events')
+    .insert(eventData)
+    .select('id')
+    .single();
+
+  if (error) {
+    console.error('Error creating calendar event:', error);
+    return null;
+  }
+
+  // Update the link in important_dates
+  await supabase
+    .from('important_dates')
+    .update({ linked_calendar_event_id: newEvent.id })
+    .eq('id', importantDate.id);
+
+  return newEvent.id;
+}
+
+/**
+ * Delete the linked calendar event for an important date
+ * Uses the 'events' table which is the main calendar table
+ */
+async function deleteLinkedCalendarEvent(importantDateId: string): Promise<void> {
+  const supabase = createClient();
+
+  // Delete by important_date_id link from 'events' table
+  const { error } = await supabase
+    .from('events')
+    .delete()
+    .eq('important_date_id', importantDateId);
+
+  if (error) {
+    console.error('Error deleting linked calendar event:', error);
+  }
+}
 
 /**
  * Calculate the next occurrence of a recurring date
@@ -199,6 +369,7 @@ export const importantDatesService = {
 
   /**
    * Create a new important date
+   * Automatically syncs to calendar if show_on_calendar is true
    */
   async createImportantDate(input: CreateImportantDateInput): Promise<ImportantDateWithMeta | null> {
     const supabase = createClient();
@@ -248,7 +419,14 @@ export const importantDatesService = {
         return null;
       }
 
-      return enrichWithMeta(data);
+      const enriched = enrichWithMeta(data);
+
+      // Sync to calendar if enabled
+      if (data.show_on_calendar) {
+        await syncToCalendar(data, enriched.years);
+      }
+
+      return enriched;
     } catch (err) {
       console.error('Error in createImportantDate:', err);
       return null;
@@ -257,6 +435,7 @@ export const importantDatesService = {
 
   /**
    * Update an important date
+   * Automatically syncs changes to linked calendar event
    */
   async updateImportantDate(
     id: string,
@@ -277,7 +456,17 @@ export const importantDatesService = {
         return null;
       }
 
-      return enrichWithMeta(data);
+      const enriched = enrichWithMeta(data);
+
+      // Sync to calendar
+      if (data.show_on_calendar) {
+        await syncToCalendar(data, enriched.years);
+      } else {
+        // If show_on_calendar was turned off, delete linked event
+        await deleteLinkedCalendarEvent(id);
+      }
+
+      return enriched;
     } catch (err) {
       console.error('Error in updateImportantDate:', err);
       return null;
@@ -286,11 +475,15 @@ export const importantDatesService = {
 
   /**
    * Delete an important date
+   * Also deletes any linked calendar event
    */
   async deleteImportantDate(id: string): Promise<boolean> {
     const supabase = createClient();
 
     try {
+      // First delete linked calendar event (CASCADE should handle this, but be explicit)
+      await deleteLinkedCalendarEvent(id);
+
       const { error } = await supabase
         .from('important_dates')
         .delete()
@@ -347,6 +540,41 @@ export const importantDatesService = {
     }
 
     return result.dates.filter((date) => date.is_today);
+  },
+
+  /**
+   * Sync all existing important dates to calendar
+   * Use this to migrate existing data or refresh all calendar events
+   */
+  async syncAllToCalendar(spaceId: string): Promise<{ synced: number; errors: number }> {
+    const result = await this.getImportantDates(spaceId, { is_active: true });
+
+    if (result.error) {
+      console.error('Error fetching important dates for sync:', result.error);
+      return { synced: 0, errors: 1 };
+    }
+
+    let synced = 0;
+    let errors = 0;
+
+    for (const date of result.dates) {
+      if (date.show_on_calendar) {
+        try {
+          const eventId = await syncToCalendar(date, date.years);
+          if (eventId) {
+            synced++;
+          } else {
+            errors++;
+          }
+        } catch (err) {
+          console.error(`Error syncing important date ${date.id}:`, err);
+          errors++;
+        }
+      }
+    }
+
+    console.log(`[ImportantDatesService] Synced ${synced} dates to calendar, ${errors} errors`);
+    return { synced, errors };
   },
 };
 

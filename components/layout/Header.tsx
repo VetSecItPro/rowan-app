@@ -10,8 +10,7 @@ import { ComprehensiveNotificationCenter } from '@/components/notifications/Comp
 import { FeedbackButton } from '@/components/feedback/FeedbackButton';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useSpaces } from '@/lib/contexts/spaces-context';
-import { LogOut, User as UserIcon, ChevronDown, Trophy, Shield } from 'lucide-react';
-import { SpaceSelector } from '@/components/spaces/SpaceSelector';
+import { LogOut, User as UserIcon, ChevronDown, Trophy, Shield, UserPlus } from 'lucide-react';
 import { hasAdminAccess } from '@/lib/utils/admin-utils';
 
 const COLOR_THEMES = {
@@ -128,21 +127,6 @@ export function Header() {
               </Link>
             )}
 
-            {/* Space Selector for logged-in users */}
-            {user && currentSpace && spaces.length > 0 && (
-              <div className="hidden sm:block">
-                <SpaceSelector
-                  spaces={spaces}
-                  currentSpace={currentSpace}
-                  onSpaceChange={switchSpace}
-                  onCreateSpace={() => router.push('/dashboard')} // Navigate to dashboard for modal
-                  onInvitePartner={() => router.push('/dashboard')} // Navigate to dashboard for modal
-                  userColorTheme={user.color_theme}
-                  variant="header"
-                />
-              </div>
-            )}
-
             {/* Conditional: Show user dropdown if logged in, otherwise show Login button */}
             {user ? (
               <div className="relative" ref={dropdownRef}>
@@ -222,6 +206,18 @@ export function Header() {
                       <Trophy className="w-4 h-4" />
                       Achievements
                     </Link>
+
+                    {/* Invite Partner - Navigate to dashboard to trigger invite modal */}
+                    {currentSpace && (
+                      <Link
+                        href="/dashboard?invite=true"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors active:scale-[0.98]"
+                      >
+                        <UserPlus className="w-4 h-4" />
+                        Invite Partner
+                      </Link>
+                    )}
 
                     {/* Admin Dashboard - Only show for admin users */}
                     {hasAdminAccess(user) && (
