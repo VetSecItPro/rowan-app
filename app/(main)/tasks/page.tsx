@@ -9,9 +9,6 @@ import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { TaskCard } from '@/components/tasks/TaskCard';
-import { DraggableItemList } from '@/components/tasks/DraggableItemList';
-import { UnifiedItemModal } from '@/components/shared/UnifiedItemModal';
-import { UnifiedDetailsModal } from '@/components/shared/UnifiedDetailsModal';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { tasksService } from '@/lib/services/tasks-service';
 import { choresService, CreateChoreInput } from '@/lib/services/chores-service';
@@ -20,18 +17,18 @@ import { Task, Chore } from '@/lib/types';
 import type { CreateTaskInput, UpdateTaskInput } from '@/lib/validations/task-schemas';
 import { useTaskRealtime } from '@/hooks/useTaskRealtime';
 import { useChoreRealtime } from '@/hooks/useChoreRealtime';
-import { TaskFilterPanel, TaskFilters } from '@/components/tasks/TaskFilterPanel';
+import { TaskFilters } from '@/components/tasks/TaskFilterPanel';
 import { Dropdown } from '@/components/ui/Dropdown';
-import { BulkActionsBar } from '@/components/tasks/BulkActionsBar';
-import { TemplatePickerModal } from '@/components/tasks/TemplatePickerModal';
-import { SnoozeModal } from '@/components/tasks/SnoozeModal';
-import { SubtasksList } from '@/components/tasks/SubtasksList';
-import { TimeTracker } from '@/components/tasks/TimeTracker';
-import { TaskComments } from '@/components/tasks/TaskComments';
-import { TaskQuickActions } from '@/components/tasks/TaskQuickActions';
-import { CalendarSyncToggle } from '@/components/tasks/CalendarSyncToggle';
-import { ChoreRotationConfig } from '@/components/tasks/ChoreRotationConfig';
 import { TaskCardSkeleton } from '@/components/ui/Skeleton';
+// Lazy-loaded components for better initial page load
+import {
+  LazyUnifiedItemModal,
+  LazyUnifiedDetailsModal,
+  LazyTaskFilterPanel,
+  LazyBulkActionsBar,
+  LazyTaskTemplatePickerModal,
+  LazyDraggableItemList,
+} from '@/lib/utils/lazy-components';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 import { PointsDisplay } from '@/components/rewards';
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -807,7 +804,7 @@ export default function TasksPage() {
             {/* Filters Sidebar - Only show when filters are enabled */}
             {showFilters && currentSpace && (
               <div className="lg:col-span-1">
-                <TaskFilterPanel spaceId={currentSpace.id} onFilterChange={setFilters} />
+                <LazyTaskFilterPanel spaceId={currentSpace.id} onFilterChange={setFilters} />
               </div>
             )}
 
@@ -882,7 +879,7 @@ export default function TasksPage() {
                   /* Unified drag-and-drop for all items with scrollbar */
                   <div className="space-y-4">
                     <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-                      <DraggableItemList
+                      <LazyDraggableItemList
                         spaceId={currentSpace.id}
                         initialItems={paginatedItems as any}
                         onStatusChange={handleStatusChange}
@@ -970,7 +967,7 @@ export default function TasksPage() {
       {/* Unified Modals */}
       {user && (
         <>
-          <UnifiedItemModal
+          <LazyUnifiedItemModal
             isOpen={isUnifiedModalOpen}
             onClose={handleCloseModal}
             onSave={handleSaveItem}
@@ -983,7 +980,7 @@ export default function TasksPage() {
 
           {currentSpace && (
             <>
-              <UnifiedDetailsModal
+              <LazyUnifiedDetailsModal
                 isOpen={isDetailsModalOpen}
                 onClose={handleCloseDetailsModal}
                 item={selectedItem}
@@ -996,7 +993,7 @@ export default function TasksPage() {
 
               {/* Advanced Feature Modals */}
 
-              <TemplatePickerModal
+              <LazyTaskTemplatePickerModal
                 isOpen={isTemplatePickerOpen}
                 onClose={() => setIsTemplatePickerOpen(false)}
                 onSelect={(templateId) => {
@@ -1015,7 +1012,7 @@ export default function TasksPage() {
 
       {/* Bulk Actions Bar */}
       {currentSpace && (
-        <BulkActionsBar
+        <LazyBulkActionsBar
           selectedTaskIds={selectedTaskIds}
           onClearSelection={() => setSelectedTaskIds([])}
           onActionComplete={handleBulkActionComplete}
