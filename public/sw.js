@@ -299,11 +299,71 @@ self.addEventListener('notificationclose', (event) => {
   }
 });
 
-// Message event - for communication with main thread
-self.addEventListener('message', (event) => {
-  console.log('[Service Worker] Message received:', event.data);
+// Allowlist of valid message types the service worker accepts
+const ALLOWED_MESSAGE_TYPES = [
+  'SKIP_WAITING',
+  'CLEAR_CACHE',
+  'GET_VERSION',
+];
 
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
+// Message event - for communication with main thread
+// SECURITY: Validates origin and message type to prevent malicious messages
+self.addEventListener('message', (event) => {
+  // SECURITY: Validate message origin - only accept messages from same origin
+  // event.origin is the origin of the client that sent the message
+  // For service workers, we check that the source is a valid WindowClient
+  if (!event.source || event.source.type !== 'window') {
+    console.warn('[Service Worker] Rejected message from non-window source');
+    return;
+  }
+
+  // SECURITY: Validate message structure
+  if (!event.data || typeof event.data !== 'object' || typeof event.data.type !== 'string') {
+    console.warn('[Service Worker] Rejected malformed message');
+    return;
+  }
+
+  const { type } = event.data;
+
+  // SECURITY: Check against allowlist of valid message types
+  if (!ALLOWED_MESSAGE_TYPES.includes(type)) {
+    console.warn('[Service Worker] Rejected unknown message type:', type);
+    return;
+  }
+
+  console.log('[Service Worker] Processing message:', type);
+
+  // Handle allowed message types
+  switch (type) {
+    case 'SKIP_WAITING':
+      self.skipWaiting();
+      break;
+
+    case 'CLEAR_CACHE':
+      // Clear all caches
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames
+            .filter((name) => name.startsWith('rowan-'))
+            .map((name) => caches.delete(name))
+        );
+      }).then(() => {
+        // Notify the client that cache was cleared
+        if (event.source) {
+          event.source.postMessage({ type: 'CACHE_CLEARED', success: true });
+        }
+      });
+      break;
+
+    case 'GET_VERSION':
+      // Return the current cache version
+      if (event.source) {
+        event.source.postMessage({ type: 'VERSION', version: CACHE_VERSION });
+      }
+      break;
+
+    default:
+      // This shouldn't happen due to allowlist check, but just in case
+      console.warn('[Service Worker] Unhandled message type:', type);
   }
 });

@@ -3,10 +3,31 @@ import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import crypto from 'crypto';
 
 // Security: Beta password moved to environment variable (CRITICAL-3 fix)
 // Set BETA_PASSWORD in Vercel environment variables
 const MAX_BETA_USERS = 30;
+
+/**
+ * Constant-time string comparison to prevent timing attacks
+ * Returns true if strings are equal, false otherwise
+ */
+function timingSafeCompare(a: string, b: string): boolean {
+  // Convert to buffers for comparison
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+
+  // If lengths differ, still do a comparison to maintain constant time
+  // but compare against a dummy buffer of the correct length
+  if (bufA.length !== bufB.length) {
+    // Compare bufA against itself to maintain constant timing
+    crypto.timingSafeEqual(bufA, bufA);
+    return false;
+  }
+
+  return crypto.timingSafeEqual(bufA, bufB);
+}
 
 /**
  * POST /api/beta/validate
@@ -45,6 +66,9 @@ export async function POST(req: NextRequest) {
     // Create Supabase client with service role for public access
     const supabase = createClient();
 
+    // Use timing-safe comparison to prevent timing attacks
+    const isValidPassword = timingSafeCompare(password, BETA_PASSWORD);
+
     // Log the beta access attempt (password NOT stored for security)
     const { error: logError } = await supabase
       .from('beta_access_requests')
@@ -53,14 +77,14 @@ export async function POST(req: NextRequest) {
         // password_attempt intentionally omitted - never store plaintext passwords
         ip_address: ip,
         user_agent: req.headers.get('user-agent') || null,
-        access_granted: password === BETA_PASSWORD,
+        access_granted: isValidPassword,
         created_at: new Date().toISOString(),
       });
 
     // Beta access attempts logged to database for audit trail
 
-    // Check password
-    if (password !== BETA_PASSWORD) {
+    // Check password (using pre-computed timing-safe result)
+    if (!isValidPassword) {
       return NextResponse.json(
         {
           success: false,

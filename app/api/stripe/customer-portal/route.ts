@@ -9,9 +9,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getStripeClient } from '@/lib/stripe/client';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
+    // CSRF validation for defense-in-depth
+    const csrfError = validateCsrfRequest(request);
+    if (csrfError) return csrfError;
+
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     // Get authenticated user
     const supabase = createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -49,7 +64,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ url: portalSession.url });
 
   } catch (error) {
-    console.error('Error creating customer portal session:', error);
+    logger.error('Error creating customer portal session:', error, {
+      component: 'StripeCustomerPortalAPI',
+      action: 'POST',
+    });
     return NextResponse.json(
       { error: 'Failed to create customer portal session' },
       { status: 500 }

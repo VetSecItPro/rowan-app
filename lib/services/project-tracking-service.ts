@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { sanitizeSearchInput } from '@/lib/utils/input-sanitization';
 
 // ==================== TYPES ====================
 
@@ -406,7 +407,7 @@ export async function getVendorsByTrade(spaceId: string, trade: string): Promise
     .from('vendors')
     .select('*')
     .eq('space_id', spaceId)
-    .ilike('trade', `%${trade}%`)
+    .ilike('trade', `%${sanitizeSearchInput(trade)}%`)
     .eq('is_active', true)
     .order('rating', { ascending: false, nullsFirst: false });
 

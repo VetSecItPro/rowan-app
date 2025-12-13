@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/client';
 import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { FileUploadResult } from './file-upload-service';
 import { enhancedNotificationService } from './enhanced-notification-service';
+import { sanitizeSearchInput } from '@/lib/utils/input-sanitization';
 
 export interface Message {
   id: string;
@@ -357,7 +358,7 @@ export const messagesService = {
       .from('messages')
       .select('*, conversation:conversations!conversation_id!inner(space_id)')
       .eq('conversation.space_id', spaceId)
-      .ilike('content', `%${query}%`)
+      .ilike('content', `%${sanitizeSearchInput(query)}%`)
       .order('created_at', { ascending: false })
       .limit(50);
 

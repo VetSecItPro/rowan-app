@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { sanitizeSearchInput } from '@/lib/utils/input-sanitization';
 
 // =====================================================
 // TYPES
@@ -304,7 +305,7 @@ export async function searchReceipts(
     .eq('space_id', spaceId);
 
   if (params.merchant_name) {
-    query = query.ilike('merchant_name', `%${params.merchant_name}%`);
+    query = query.ilike('merchant_name', `%${sanitizeSearchInput(params.merchant_name)}%`);
   }
 
   if (params.date_from) {

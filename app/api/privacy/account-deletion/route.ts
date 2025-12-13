@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
 import { Resend } from 'resend';
+import { validateCsrfRequest } from '@/lib/security/csrf-validation';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -22,6 +23,10 @@ const CancelDeletionSchema = z.object({
 // POST - Request account deletion
 export async function POST(request: NextRequest) {
   try {
+    // CSRF validation for defense-in-depth
+    const csrfError = validateCsrfRequest(request);
+    if (csrfError) return csrfError;
+
     const supabase = createClient();
 
     // Check authentication
@@ -137,6 +142,10 @@ export async function POST(request: NextRequest) {
 // DELETE - Cancel account deletion
 export async function DELETE(request: NextRequest) {
   try {
+    // CSRF validation for defense-in-depth
+    const csrfError = validateCsrfRequest(request);
+    if (csrfError) return csrfError;
+
     const supabase = createClient();
 
     // Check authentication

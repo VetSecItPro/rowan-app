@@ -6,6 +6,8 @@ import { createClient } from '@/lib/supabase/server';
 import { calendarSyncService } from '@/lib/services/calendar';
 import { ManualSyncRequestSchema } from '@/lib/validations/calendar-integration-schemas';
 import { z } from 'zod';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 // Query parameter validation schema for GET endpoint
 const GetQueryParamsSchema = z.object({
@@ -17,6 +19,13 @@ export async function POST(request: NextRequest) {
   console.log('[Calendar Sync] POST request received');
 
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const supabase = await createClient();
 
     // Verify authentication
@@ -39,10 +48,10 @@ export async function POST(request: NextRequest) {
     console.log('[Calendar Sync] Request body:', body);
     const validatedData = ManualSyncRequestSchema.parse(body);
 
-    // Verify connection exists
+    // Verify connection exists and get ownership info
     const { data: connection, error: connectionError } = await supabase
       .from('calendar_connections')
-      .select('*')
+      .select('*, user_id')
       .eq('id', validatedData.connection_id)
       .single();
 
@@ -66,6 +75,19 @@ export async function POST(request: NextRequest) {
       console.error('[Calendar Sync] Access denied for user:', user.id);
       return NextResponse.json(
         { error: 'Access denied to this calendar connection' },
+        { status: 403 }
+      );
+    }
+
+    // SECURITY: Verify user owns the connection OR is a space admin
+    // Calendar connections contain OAuth tokens tied to a specific user's account
+    const isOwner = connection.user_id === user.id;
+    const isAdmin = spaceMember.role === 'admin' || spaceMember.role === 'owner';
+
+    if (!isOwner && !isAdmin) {
+      console.error('[Calendar Sync] User does not own connection:', user.id);
+      return NextResponse.json(
+        { error: 'You can only sync your own calendar connections' },
         { status: 403 }
       );
     }
@@ -147,6 +169,13 @@ export async function POST(request: NextRequest) {
 // GET endpoint to check sync status and history
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const supabase = await createClient();
 
     const {
@@ -172,7 +201,7 @@ export async function GET(request: NextRequest) {
     // Verify user has access to this connection
     const { data: connection } = await supabase
       .from('calendar_connections')
-      .select('space_id')
+      .select('space_id, user_id')
       .eq('id', connectionId)
       .single();
 
@@ -185,7 +214,7 @@ export async function GET(request: NextRequest) {
 
     const { data: spaceMember } = await supabase
       .from('space_members')
-      .select('id')
+      .select('id, role')
       .eq('space_id', connection.space_id)
       .eq('user_id', user.id)
       .single();
@@ -193,6 +222,17 @@ export async function GET(request: NextRequest) {
     if (!spaceMember) {
       return NextResponse.json(
         { error: 'Access denied' },
+        { status: 403 }
+      );
+    }
+
+    // SECURITY: Verify user owns the connection OR is a space admin
+    const isOwner = connection.user_id === user.id;
+    const isAdmin = spaceMember.role === 'admin' || spaceMember.role === 'owner';
+
+    if (!isOwner && !isAdmin) {
+      return NextResponse.json(
+        { error: 'You can only view your own calendar sync status' },
         { status: 403 }
       );
     }

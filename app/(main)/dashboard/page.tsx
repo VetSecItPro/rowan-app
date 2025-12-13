@@ -246,7 +246,7 @@ export default function DashboardPage() {
 
   // Handle ?invite=true query parameter from header dropdown
   useEffect(() => {
-    if (searchParams.get('invite') === 'true' && spaceId) {
+    if (searchParams?.get('invite') === 'true' && spaceId) {
       setShowInviteModal(true);
       // Remove the query param from URL without navigation
       router.replace('/dashboard', { scroll: false });

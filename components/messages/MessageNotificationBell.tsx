@@ -55,7 +55,7 @@ export function MessageNotificationBell({
           schema: 'public',
           table: 'messages',
         },
-        (payload) => {
+        (_payload: unknown) => {
           // Refresh unread count when any message is updated (e.g., marked as read)
           fetchUnreadCount();
         }
