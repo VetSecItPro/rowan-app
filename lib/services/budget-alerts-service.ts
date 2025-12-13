@@ -186,7 +186,8 @@ export async function getSafeToSpendInfo(spaceId: string): Promise<{
   }
 
   return {
-    safeToSpend: Math.max(0, stats.remaining),
+    // When over budget, return the absolute value of how much over
+    safeToSpend: status === 'over' ? Math.abs(stats.remaining) : stats.remaining,
     status,
     percentageUsed,
     daysLeftInMonth,
