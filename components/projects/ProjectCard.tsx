@@ -215,14 +215,14 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
         )}
       </div>
 
-      {/* Milestone Progress */}
+      {/* Steps Progress */}
       {milestoneProgress && (
         <div className="mb-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <Target className="w-4 h-4 text-amber-600 dark:text-amber-400" />
               <span className="text-xs font-medium text-amber-700 dark:text-amber-300">
-                Milestones
+                Steps
               </span>
             </div>
             <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">

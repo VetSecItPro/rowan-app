@@ -223,17 +223,20 @@ export default function ProjectsPage() {
     };
   }, [currentSpace, loadData]);
 
-  const handleCreateProject = useCallback(async (data: CreateProjectInput) => {
+  const handleCreateProject = useCallback(async (data: CreateProjectInput): Promise<Project | null> => {
     try {
+      let project: Project;
       if (editingProject) {
-        await projectsOnlyService.updateProject(editingProject.id, data);
+        project = await projectsOnlyService.updateProject(editingProject.id, data);
       } else {
-        await projectsOnlyService.createProject(data);
+        project = await projectsOnlyService.createProject(data);
       }
       loadData();
       setEditingProject(null);
+      return project;
     } catch (error) {
       console.error('Failed to save project:', error);
+      throw error;
     }
   }, [editingProject, loadData]);
 

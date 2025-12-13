@@ -17,7 +17,7 @@ interface MilestoneItem {
 interface NewProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: CreateProjectInput) => Promise<void>;
+  onSave: (data: CreateProjectInput) => Promise<Project | null>;
   editProject?: Project | null;
   spaceId: string;
 }
@@ -139,11 +139,13 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
     e.preventDefault();
     setLoading(true);
     try {
-      await onSave(formData);
+      const savedProject = await onSave(formData);
 
-      // Handle milestones after project is saved
-      if (editProject) {
-        // Delete marked milestones
+      // Get the project ID (either from edit or newly created)
+      const projectId = editProject?.id || savedProject?.id;
+
+      if (projectId) {
+        // Delete marked milestones (only for existing milestones)
         const toDelete = milestones.filter(m => m.isDeleted && m.id);
         for (const m of toDelete) {
           await projectMilestonesService.deleteMilestone(m.id!);
@@ -151,12 +153,15 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
 
         // Create new milestones
         const toCreate = milestones.filter(m => m.isNew && !m.isDeleted);
-        for (const m of toCreate) {
-          await projectMilestonesService.createMilestone({
-            project_id: editProject.id,
-            space_id: spaceId,
-            title: m.title,
-          });
+        if (toCreate.length > 0) {
+          await projectMilestonesService.createManyMilestones(
+            toCreate.map((m, index) => ({
+              project_id: projectId,
+              space_id: spaceId,
+              title: m.title,
+              sort_order: index,
+            }))
+          );
         }
       }
 
@@ -274,13 +279,13 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
             />
           </div>
 
-          {/* Milestones Section */}
+          {/* Steps Section */}
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Target className="w-5 h-5 text-amber-500" />
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                  Milestones / Steps
+                  Steps
                 </h3>
               </div>
               {activeMilestones.length > 0 && (
@@ -365,7 +370,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
                     handleAddMilestone();
                   }
                 }}
-                placeholder="Add a milestone or step..."
+                placeholder="Add a step..."
                 className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white placeholder:text-gray-400"
               />
               <button
@@ -380,7 +385,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
 
             {activeMilestones.length === 0 && (
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                Break your project into smaller steps to track progress
+                Break your project into steps to track progress
               </p>
             )}
           </div>
