@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Mail, MessageSquare, Shield, Check, AlertCircle, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { useValidatedSearchParams, UnsubscribeParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
 
 interface UnsubscribeResult {
   success: boolean;
@@ -14,15 +14,22 @@ interface UnsubscribeResult {
 }
 
 function UnsubscribeContent() {
-  const searchParams = useSearchParams();
+  const { params, error: validationError } = useValidatedSearchParams(UnsubscribeParamsSchema);
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<UnsubscribeResult | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [type, setType] = useState<string | null>(null);
 
   useEffect(() => {
-    const tokenParam = searchParams?.get('token');
-    const typeParam = searchParams?.get('type') || 'email';
+    // Check for validation errors
+    if (validationError) {
+      setLoading(false);
+      setResult({ success: false, error: 'Invalid unsubscribe link format' });
+      return;
+    }
+
+    const tokenParam = params?.token;
+    const typeParam = params?.type || 'email';
 
     setToken(tokenParam || null);
     setType(typeParam || null);
@@ -33,7 +40,7 @@ function UnsubscribeContent() {
       setLoading(false);
       setResult({ success: false, error: 'No unsubscribe token provided' });
     }
-  }, [searchParams]);
+  }, [params, validationError]);
 
   const processUnsubscribe = async (token: string, type: string) => {
     try {

@@ -4,15 +4,16 @@
 export const dynamic = 'force-dynamic';
 
 import { useEffect, useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Check, X, Loader2, Home } from 'lucide-react';
 import Link from 'next/link';
+import { useValidatedSearchParams, TokenParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
 
 function AcceptInvitationContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams?.get('token');
+  const { params, error: validationError } = useValidatedSearchParams(TokenParamsSchema);
+  const token = params?.token;
 
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
@@ -21,6 +22,13 @@ function AcceptInvitationContent() {
 
   useEffect(() => {
     async function handleAcceptInvitation() {
+      // Check for validation errors first
+      if (validationError) {
+        setError('Invalid invitation link format');
+        setLoading(false);
+        return;
+      }
+
       if (!token) {
         setError('Invalid invitation link');
         setLoading(false);
@@ -72,7 +80,7 @@ function AcceptInvitationContent() {
     }
 
     handleAcceptInvitation();
-  }, [token, router]);
+  }, [token, router, validationError]);
 
   if (loading) {
     return (

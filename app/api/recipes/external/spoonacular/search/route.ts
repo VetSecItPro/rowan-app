@@ -51,11 +51,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json([]);
     }
 
-    // Search for recipes
-    const url = `https://api.spoonacular.com/recipes/complexSearch?query=${encodeURIComponent(query)}&number=10&addRecipeInformation=true&fillIngredients=true&apiKey=${apiKey}`;
-    console.log('[Spoonacular] Calling API:', url.replace(apiKey, 'API_KEY_HIDDEN'));
+    // Search for recipes - build URL without API key for safe logging
+    const baseUrl = `https://api.spoonacular.com/recipes/complexSearch?query=${encodeURIComponent(query)}&number=10&addRecipeInformation=true&fillIngredients=true`;
+    console.log('[Spoonacular] Calling API:', baseUrl);
 
-    const searchResponse = await fetch(url);
+    // Add API key only when making the request (never in logged URL)
+    const searchResponse = await fetch(`${baseUrl}&apiKey=${apiKey}`);
 
     if (!searchResponse.ok) {
       const errorText = await searchResponse.text();

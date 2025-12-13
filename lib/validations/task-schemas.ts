@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { sanitizePlainText } from '@/lib/sanitize';
 
 // Base task schema
 export const taskBaseSchema = z.object({
@@ -235,27 +236,18 @@ export const bulkDeleteSchema = z.object({
   space_id: z.string().uuid(), // For security verification
 });
 
-// Helper function to sanitize HTML input
-export function sanitizeString(input: string): string {
-  return input
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;');
-}
-
 // Helper to validate and sanitize task input
+// Uses DOMPurify via sanitizePlainText for robust HTML sanitization
 export function validateAndSanitizeTask(data: unknown): z.infer<typeof createTaskSchema> {
   const parsed = createTaskSchema.parse(data);
 
   return {
     ...parsed,
-    title: sanitizeString(parsed.title),
-    description: parsed.description ? sanitizeString(parsed.description) : null,
-    category: parsed.category ? sanitizeString(parsed.category) : null,
-    quick_note: parsed.quick_note ? sanitizeString(parsed.quick_note) : null,
-    tags: parsed.tags ? sanitizeString(parsed.tags) : null,
+    title: sanitizePlainText(parsed.title),
+    description: parsed.description ? sanitizePlainText(parsed.description) : null,
+    category: parsed.category ? sanitizePlainText(parsed.category) : null,
+    quick_note: parsed.quick_note ? sanitizePlainText(parsed.quick_note) : null,
+    tags: parsed.tags ? sanitizePlainText(parsed.tags) : null,
     estimated_hours: parsed.estimated_hours,
     calendar_sync: parsed.calendar_sync,
   };

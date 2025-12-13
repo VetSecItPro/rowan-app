@@ -5,6 +5,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { icsImportService } from '@/lib/services/calendar';
 import { z } from 'zod';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 // Validation schema for ICS file import
 const ICSFileImportSchema = z.object({
@@ -18,6 +20,13 @@ const MAX_FILE_SIZE = 1024 * 1024;
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const supabase = await createClient();
 
     // Verify authentication

@@ -6,9 +6,18 @@ import { createClient } from '@/lib/supabase/server';
 import { appleCalDAVService } from '@/lib/services/calendar';
 import { AppleCalDAVCredentialsSchema } from '@/lib/validations/calendar-integration-schemas';
 import { z } from 'zod';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const supabase = await createClient();
 
     // Verify authentication
@@ -212,6 +221,13 @@ export async function POST(request: NextRequest) {
 // GET endpoint to check connection status
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const supabase = await createClient();
 
     const {

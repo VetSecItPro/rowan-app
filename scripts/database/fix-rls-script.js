@@ -60,5 +60,5 @@ CREATE POLICY "Users can read own record" ON admin_users
 `);
 
 console.log('\n🔄 After fixing, try accessing the admin again');
-console.log('📧 Admin email: ops@steelmotionllc.com');
-console.log('🔐 Admin password: RowanOps2025!');
+console.log('📧 Admin email: vetsecitpro@gmail.com');
+console.log('🔐 Use your configured admin password');

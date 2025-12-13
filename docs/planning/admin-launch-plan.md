@@ -25,7 +25,7 @@ Transform Rowan App from development mode to beta launch readiness with comprehe
 1. **Database Schema Ready**
    - ✅ `beta_access_requests` table with security tracking
    - ✅ `launch_notifications` table with GDPR compliance
-   - ✅ `admin_users` table with ops@steelmotionllc.com super_admin
+   - ✅ `admin_users` table with vetsecitpro@gmail.com super_admin
    - ✅ `daily_analytics` table with comprehensive tracking functions
    - ✅ All tables have RLS policies, indexes, and utility functions
    - ✅ Combined SQL file created: `combined_beta_migrations.sql`
@@ -90,8 +90,8 @@ This creates the foundation for all beta launch functionality.
 
 1. **Database Migrations** - Must run `combined_beta_migrations.sql` first
 2. **Homepage Analysis** - Located login button (line 37-42) and hamburger (line 35)
-3. **Password Security** - Beta password: `RowanApp2025&$&$&$` (max 30 users)
-4. **Admin Email** - ops@steelmotionllc.com configured as super_admin
+3. **Password Security** - Beta password stored in BETA_PASSWORD env var (max 30 users)
+4. **Admin Email** - vetsecitpro@gmail.com configured as super_admin
 
 ### **📝 NOTES FOR NEXT SESSION**
 
@@ -106,7 +106,7 @@ This creates the foundation for all beta launch functionality.
 ## 🔐 **BETA PROGRAM SPECIFICATIONS**
 
 ### **Access Control**
-- **Beta Password:** `RowanApp2025&$&$&$`
+- **Beta Password:** Stored in `BETA_PASSWORD` environment variable (never hardcoded)
 - **User Limit:** 30 beta testers maximum
 - **Overflow Handling:** Waitlist for additional requests
 - **Validation:** Real-time password checking with rate limiting
@@ -147,7 +147,7 @@ This creates the foundation for all beta launch functionality.
 
 ### **Access & Security**
 - **URL:** `ops.rowanapp.com` (stealth naming)
-- **Admin Email:** `ops@steelmotionllc.com`
+- **Admin Email:** `vetsecitpro@gmail.com`
 - **Authentication:** Separate admin login system
 - **Security:** No public references, hidden from sitemaps
 - **IP Restrictions:** Consider limiting to specific IPs
@@ -203,11 +203,11 @@ This creates the foundation for all beta launch functionality.
 ### **Resend Configuration**
 - **Service:** Resend.com (free tier: 100 emails/day)
 - **From Address:** `noreply@rowanapp.com`
-- **Reply-To:** `ops@steelmotionllc.com`
+- **Reply-To:** `vetsecitpro@gmail.com`
 - **Templates:** Professional HTML + plain text
 
 ### **Daily Digest Email**
-**Sent to:** `ops@steelmotionllc.com`
+**Sent to:** `vetsecitpro@gmail.com`
 **Schedule:** Every day at 9:00 AM EST
 **Content:**
 ```

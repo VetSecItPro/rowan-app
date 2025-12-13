@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookies } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
+import { sanitizeSearchInput } from '@/lib/utils';
 import { z } from 'zod';
 
 // Query parameter validation schema
@@ -17,19 +18,6 @@ const QueryParamsSchema = z.object({
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
-
-/**
- * SECURITY: Sanitize search input for PostgreSQL ILIKE patterns
- * Escapes special characters: %, _, and \ which have special meaning in LIKE/ILIKE
- */
-function sanitizeSearchInput(input: string): string {
-  // Escape backslash first (order matters!), then % and _
-  return input
-    .replace(/\\/g, '\\\\')  // Escape backslashes
-    .replace(/%/g, '\\%')    // Escape wildcard %
-    .replace(/_/g, '\\_')    // Escape single char wildcard _
-    .slice(0, 100);          // Limit length to prevent DoS
-}
 
 /**
  * GET /api/admin/notifications

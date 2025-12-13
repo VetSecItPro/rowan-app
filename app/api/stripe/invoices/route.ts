@@ -4,9 +4,11 @@
  * Users can see their billing history without leaving the app
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getStripeClient } from '@/lib/stripe/client';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 interface InvoiceData {
   id: string;
@@ -19,8 +21,15 @@ interface InvoiceData {
   hostedUrl: string | null;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const supabase = createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 

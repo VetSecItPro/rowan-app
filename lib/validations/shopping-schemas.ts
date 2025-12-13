@@ -1,8 +1,10 @@
 import { z } from 'zod';
+import { sanitizePlainText } from '@/lib/sanitize';
 
 /**
  * Shopping List Validation Schemas
  * Security: Prevents XSS, injection, and data integrity issues
+ * Uses DOMPurify via sanitizePlainText for robust HTML sanitization
  */
 
 // Create shopping list schema
@@ -12,7 +14,7 @@ export const createShoppingListSchema = z.object({
     .min(1, 'Title is required')
     .max(255, 'Title must be less than 255 characters')
     .trim()
-    .transform(val => val.replace(/<[^>]*>/g, '')), // Strip HTML tags
+    .transform(sanitizePlainText),
 });
 
 // Update shopping list schema
@@ -21,7 +23,7 @@ export const updateShoppingListSchema = z.object({
     .min(1, 'Title is required')
     .max(255, 'Title must be less than 255 characters')
     .trim()
-    .transform(val => val.replace(/<[^>]*>/g, ''))
+    .transform(sanitizePlainText)
     .optional(),
   is_public: z.boolean().optional(),
   share_read_only: z.boolean().optional(),
@@ -34,7 +36,7 @@ export const createShoppingItemSchema = z.object({
     .min(1, 'Item name is required')
     .max(255, 'Item name must be less than 255 characters')
     .trim()
-    .transform(val => val.replace(/<[^>]*>/g, '')),
+    .transform(sanitizePlainText),
   quantity: z.string()
     .max(50, 'Quantity must be less than 50 characters')
     .trim()
@@ -59,7 +61,7 @@ export const updateShoppingItemSchema = z.object({
     .min(1, 'Item name is required')
     .max(255, 'Item name must be less than 255 characters')
     .trim()
-    .transform(val => val.replace(/<[^>]*>/g, ''))
+    .transform(sanitizePlainText)
     .optional(),
   quantity: z.string()
     .max(50, 'Quantity must be less than 50 characters')

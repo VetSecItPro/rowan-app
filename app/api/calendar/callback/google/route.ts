@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { googleCalendarService } from '@/lib/services/calendar';
 import { GoogleOAuthCallbackSchema } from '@/lib/validations/calendar-integration-schemas';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 interface OAuthState {
   connection_id: string;
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     // Handle OAuth errors from Google
     if (params.error) {
-      console.error('Google OAuth error:', params.error, params.error_description);
+      logger.warn('Google OAuth error', { component: 'calendar/callback/google', action: 'oauth_error', errorType: params.error });
 
       // Redirect to calendar settings with error
       const errorUrl = new URL('/settings', baseUrl);
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
       const stateJson = Buffer.from(validated.state, 'base64url').toString('utf-8');
       oauthState = JSON.parse(stateJson) as OAuthState;
     } catch {
-      console.error('Invalid OAuth state');
+      logger.warn('Invalid OAuth state', { component: 'calendar/callback/google', action: 'invalid_state' });
       const errorUrl = new URL('/settings', baseUrl);
       errorUrl.searchParams.set('tab', 'integrations');
       errorUrl.searchParams.set('error', 'invalid_state');
@@ -72,7 +73,7 @@ export async function GET(request: NextRequest) {
 
     // Verify the state matches the current user
     if (oauthState.user_id !== user.id) {
-      console.error('OAuth state user mismatch');
+      logger.warn('OAuth state user mismatch', { component: 'calendar/callback/google', action: 'user_mismatch' });
       const errorUrl = new URL('/settings', baseUrl);
       errorUrl.searchParams.set('tab', 'integrations');
       errorUrl.searchParams.set('error', 'user_mismatch');
@@ -88,7 +89,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (connectionError || !connection) {
-      console.error('Connection not found:', connectionError);
+      logger.warn('Connection not found', { component: 'calendar/callback/google', action: 'connection_not_found' });
       const errorUrl = new URL('/settings', baseUrl);
       errorUrl.searchParams.set('tab', 'integrations');
       errorUrl.searchParams.set('error', 'connection_not_found');
@@ -102,7 +103,7 @@ export async function GET(request: NextRequest) {
     );
 
     if (!tokenResult.success) {
-      console.error('Token exchange failed:', tokenResult.error);
+      logger.warn('Token exchange failed', { component: 'calendar/callback/google', action: 'token_exchange_failed' });
 
       // Update connection status to error
       await supabase
@@ -142,10 +143,10 @@ export async function GET(request: NextRequest) {
     );
 
     if (queueError) {
-      console.error('Failed to queue existing events:', queueError);
+      logger.warn('Failed to queue existing events', { component: 'calendar/callback/google', action: 'queue_events_failed' });
       // Don't fail the whole flow - just log it
     } else {
-      console.log(`Queued ${queuedCount} existing events for sync to Google Calendar`);
+      logger.debug('Queued existing events for sync', { component: 'calendar/callback/google', action: 'events_queued', count: queuedCount });
     }
 
     // Redirect to calendar settings with success message
@@ -156,7 +157,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.redirect(successUrl);
   } catch (error) {
-    console.error('Google OAuth callback error:', error);
+    logger.error('Google OAuth callback error', error, { component: 'calendar/callback/google', action: 'callback_failed' });
 
     if (error instanceof z.ZodError) {
       const errorUrl = new URL('/settings', baseUrl);

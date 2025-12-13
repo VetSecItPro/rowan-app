@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { outlookCalendarService } from '@/lib/services/calendar';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // Validation schema for Outlook OAuth callback
 const OutlookOAuthCallbackSchema = z.object({
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
 
     // Handle OAuth errors from Microsoft
     if (params.error) {
-      console.error('Microsoft OAuth error:', params.error, params.error_description);
+      logger.warn('Microsoft OAuth error', { component: 'calendar/callback/outlook', action: 'oauth_error', errorType: params.error });
 
       // Redirect to calendar settings with error
       const errorUrl = new URL('/settings', baseUrl);
@@ -53,7 +54,7 @@ export async function GET(request: NextRequest) {
       const stateJson = Buffer.from(validated.state, 'base64url').toString('utf-8');
       oauthState = JSON.parse(stateJson) as OAuthState;
     } catch {
-      console.error('Invalid OAuth state');
+      logger.warn('Invalid OAuth state', { component: 'calendar/callback/outlook', action: 'invalid_state' });
       const errorUrl = new URL('/settings', baseUrl);
       errorUrl.searchParams.set('tab', 'integrations');
       errorUrl.searchParams.set('error', 'invalid_state');
@@ -77,7 +78,7 @@ export async function GET(request: NextRequest) {
 
     // Verify the state matches the current user
     if (oauthState.user_id !== user.id) {
-      console.error('OAuth state user mismatch');
+      logger.warn('OAuth state user mismatch', { component: 'calendar/callback/outlook', action: 'user_mismatch' });
       const errorUrl = new URL('/settings', baseUrl);
       errorUrl.searchParams.set('tab', 'integrations');
       errorUrl.searchParams.set('error', 'user_mismatch');
@@ -93,7 +94,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (connectionError || !connection) {
-      console.error('Connection not found:', connectionError);
+      logger.warn('Connection not found', { component: 'calendar/callback/outlook', action: 'connection_not_found' });
       const errorUrl = new URL('/settings', baseUrl);
       errorUrl.searchParams.set('tab', 'integrations');
       errorUrl.searchParams.set('error', 'connection_not_found');
@@ -105,7 +106,7 @@ export async function GET(request: NextRequest) {
     try {
       tokenData = await outlookCalendarService.exchangeCodeForTokens(validated.code);
     } catch (tokenError) {
-      console.error('Token exchange failed:', tokenError);
+      logger.warn('Token exchange failed', { component: 'calendar/callback/outlook', action: 'token_exchange_failed' });
 
       // Update connection status to error
       await supabase
@@ -136,7 +137,7 @@ export async function GET(request: NextRequest) {
     try {
       userProfile = await outlookCalendarService.getUserProfile(oauthState.connection_id);
     } catch (profileError) {
-      console.error('Failed to get user profile:', profileError);
+      logger.warn('Failed to get user profile', { component: 'calendar/callback/outlook', action: 'profile_fetch_failed' });
       // Continue without profile - not critical
     }
 
@@ -174,10 +175,10 @@ export async function GET(request: NextRequest) {
     );
 
     if (queueError) {
-      console.error('Failed to queue existing events:', queueError);
+      logger.warn('Failed to queue existing events', { component: 'calendar/callback/outlook', action: 'queue_events_failed' });
       // Don't fail the whole flow - just log it
     } else {
-      console.log(`Queued ${queuedCount} existing events for sync to Outlook Calendar`);
+      logger.debug('Queued existing events for sync', { component: 'calendar/callback/outlook', action: 'events_queued', count: queuedCount });
     }
 
     // Redirect to calendar settings with success message
@@ -188,7 +189,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.redirect(successUrl);
   } catch (error) {
-    console.error('Microsoft OAuth callback error:', error);
+    logger.error('Microsoft OAuth callback error', error, { component: 'calendar/callback/outlook', action: 'callback_failed' });
 
     if (error instanceof z.ZodError) {
       const errorUrl = new URL('/settings', baseUrl);
