@@ -83,7 +83,7 @@ export default function AdminLoginPage() {
                 id="admin-email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="ops@steelmotionllc.com"
+                placeholder="admin@example.com"
                 className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white transition-colors"
                 required
                 disabled={isLoading}

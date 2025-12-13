@@ -7,6 +7,21 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { checkUsageLimit, trackUsage } from '@/lib/middleware/usage-check';
+import { z } from 'zod';
+import { logger } from '@/lib/logger';
+
+// Zod schemas for validation
+const GetMessagesQuerySchema = z.object({
+  conversation_id: z.string().uuid('Invalid conversation ID format'),
+});
+
+const CreateMessageSchema = z.object({
+  space_id: z.string().uuid('Invalid space ID format'),
+  content: z.string().min(1, 'Message content is required').max(10000, 'Message content too long'),
+  conversation_id: z.string().uuid('Invalid conversation ID format').nullable().optional().transform(v => v ?? null),
+  parent_message_id: z.string().uuid('Invalid parent message ID format').optional(),
+  attachments: z.array(z.string().url('Invalid attachment URL')).optional(),
+});
 
 /**
  * GET /api/messages
@@ -40,17 +55,21 @@ export async function GET(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(session.user);
 
-    // Get conversation_id from query params
+    // Get and validate conversation_id from query params
     const { searchParams } = new URL(req.url);
-    const conversationId = searchParams.get('conversation_id');
+    const queryParams = {
+      conversation_id: searchParams.get('conversation_id') || '',
+    };
 
-    if (!conversationId) {
+    const validationResult = GetMessagesQuerySchema.safeParse(queryParams);
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'conversation_id is required' },
+        { error: 'Validation error', details: validationResult.error.issues },
         { status: 400 }
       );
     }
 
+    const { conversation_id: conversationId } = validationResult.data;
 
     // Get messages from service
     const messages = await messagesService.getMessages(conversationId);
@@ -70,7 +89,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    console.error('[API] /api/messages GET error:', error);
+    logger.error('Messages GET error', error, { component: 'api/messages', action: 'get' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -127,17 +146,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Parse request body
+    // Parse and validate request body
     const body = await req.json();
-    const { space_id, content } = body;
+    const validationResult = CreateMessageSchema.safeParse(body);
 
-    // Validate required fields
-    if (!space_id || !content) {
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'space_id and content are required' },
+        { error: 'Validation error', details: validationResult.error.issues },
         { status: 400 }
       );
     }
+
+    const { space_id } = validationResult.data;
 
     // Verify user has access to this space
     try {
@@ -159,9 +179,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create message using service
+    // Create message using service with validated data
     const message = await messagesService.createMessage({
-      ...body,
+      ...validationResult.data,
       sender_id: session.user.id,
     });
 
@@ -173,7 +193,7 @@ export async function POST(req: NextRequest) {
       data: message,
     });
   } catch (error) {
-    console.error('[API] /api/messages POST error:', error);
+    logger.error('Messages POST error', error, { component: 'api/messages', action: 'post' });
     return NextResponse.json(
       { error: 'Failed to create message' },
       { status: 500 }

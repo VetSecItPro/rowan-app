@@ -1,10 +1,23 @@
 #!/usr/bin/env node
 
 const { createClient } = require('@supabase/supabase-js');
+const path = require('path');
 
-// Configuration
-const supabaseUrl = 'https://mhqpjprmpvigmwcghpzx.supabase.co';
-const serviceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ocXBqcHJtcHZpZ213Y2docHp4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTY5NDEzOCwiZXhwIjoyMDc1MjcwMTM4fQ.AMEB5wEaRlSX92TgLzv-HbDbAa26ozeNLYY2cOjKE1U';
+// Load environment variables from .env.local
+require('dotenv').config({ path: path.join(__dirname, '../../.env.local') });
+
+// Configuration - loaded from environment variables (NEVER hardcode secrets)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Validate required environment variables
+if (!supabaseUrl || !serviceRoleKey) {
+  console.error('❌ Missing required environment variables');
+  console.error('   Please ensure these are set in .env.local:');
+  console.error('   - NEXT_PUBLIC_SUPABASE_URL');
+  console.error('   - SUPABASE_SERVICE_ROLE_KEY');
+  process.exit(1);
+}
 
 // Create supabase client with service role key
 const supabase = createClient(supabaseUrl, serviceRoleKey, {

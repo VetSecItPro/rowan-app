@@ -4,12 +4,13 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, FormEvent } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { RestoreAccountModal } from '@/components/settings/RestoreAccountModal';
+import { useValidatedSearchParams, LoginParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -26,7 +27,7 @@ export default function LoginPage() {
   } | null>(null);
   const { signIn } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const { params } = useValidatedSearchParams(LoginParamsSchema);
 
   // Smooth fade-in animation on mount
   useEffect(() => {
@@ -36,10 +37,10 @@ export default function LoginPage() {
 
   // Check if user was just registered
   useEffect(() => {
-    if (searchParams?.get('registered') === 'true') {
+    if (params?.registered === 'true') {
       setSuccessMessage('Account created successfully! Please log in with your credentials.');
     }
-  }, [searchParams]);
+  }, [params]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

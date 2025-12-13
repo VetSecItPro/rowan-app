@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { exportAllUserData } from '@/lib/services/data-export-service';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,8 +12,15 @@ export const dynamic = 'force-dynamic';
  * GDPR Compliance: Right to Data Portability (Article 20)
  * Allows authenticated users to export all their data in JSON format
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     // Get authenticated user
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();

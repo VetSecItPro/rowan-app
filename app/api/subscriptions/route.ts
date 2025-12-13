@@ -12,12 +12,21 @@ import { createClient } from '@/lib/supabase/server';
 import { getUserFeatureAccess } from '@/lib/services/feature-access-service';
 import { getSubscriptionStatus } from '@/lib/services/subscription-service';
 import type { SubscriptionTier } from '@/lib/types';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 /**
  * GET handler - Get user's subscription details including features and usage
  */
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     // DEV ONLY: Allow mocking subscription tier for testing (before auth check)
     const mockTier = request.nextUrl.searchParams.get('mockTier') as SubscriptionTier | 'trial' | null;
     const isDev = process.env.NODE_ENV === 'development';

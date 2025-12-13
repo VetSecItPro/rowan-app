@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { geographicDetectionService } from '@/lib/services/geographic-detection-service';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 // Force dynamic rendering for this route since it uses request data
 export const dynamic = 'force-dynamic';
@@ -13,6 +15,13 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     // Get client IP address
     const clientIP = geographicDetectionService.getClientIP(request);
 
@@ -102,6 +111,13 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const body = await request.json();
     const { city, region, country, latitude, longitude } = body;
 

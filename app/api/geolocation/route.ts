@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 // Force dynamic rendering for this route since it uses request headers
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     // Get client IP address
     const forwarded = request.headers.get('x-forwarded-for');
     const realIP = request.headers.get('x-real-ip');
@@ -12,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     // Handle localhost and development - try to get real IP first
     if (!clientIP || clientIP === '::1' || clientIP === '127.0.0.1' || clientIP.includes('localhost')) {
-      console.log('[Geolocation API] Local development detected, attempting to get real IP...');
+      logger.debug('Local development detected, attempting to get real IP', { component: 'geolocation' });
 
       try {
         // Try to get the external IP address even in development
@@ -26,17 +36,17 @@ export async function GET(request: NextRequest) {
         if (externalIPResponse.ok) {
           const externalIP = await externalIPResponse.text();
           if (externalIP && externalIP.trim() !== clientIP) {
-            console.log('[Geolocation API] Got external IP:', externalIP);
+            logger.debug('Got external IP', { component: 'geolocation' });
             clientIP = externalIP.trim();
           }
         }
-      } catch (error) {
-        console.log('[Geolocation API] Could not fetch external IP:', error);
+      } catch {
+        logger.debug('Could not fetch external IP', { component: 'geolocation' });
       }
 
       // If we still don't have a valid IP, return Dallas as fallback
       if (!clientIP || clientIP === '::1' || clientIP === '127.0.0.1' || clientIP.includes('localhost')) {
-        console.log('[Geolocation API] Using Dallas fallback for local development');
+        logger.debug('Using fallback location for local development', { component: 'geolocation' });
         return NextResponse.json({
           city: 'Dallas',
           region: 'Texas',
@@ -53,7 +63,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    console.log('[Geolocation API] Getting location for IP:', clientIP);
+    logger.debug('Getting location', { component: 'geolocation' });
 
     // Call ipapi.co for geolocation
     const response = await fetch(`https://ipapi.co/${clientIP}/json/`, {
@@ -71,7 +81,7 @@ export async function GET(request: NextRequest) {
 
     // Validate response
     if (data.error || !data.latitude || !data.longitude) {
-      console.log('[Geolocation API] API error or invalid data:', data);
+      logger.warn('Geolocation API returned invalid data', { component: 'geolocation', action: 'api_error' });
 
       // Return Dallas, Texas as fallback since user mentioned they're there
       return NextResponse.json({
@@ -101,11 +111,11 @@ export async function GET(request: NextRequest) {
       fallback: false,
     };
 
-    console.log('[Geolocation API] Location detected:', `${location.city}, ${location.region}, ${location.country}`);
+    logger.debug('Location detected', { component: 'geolocation', city: location.city, region: location.region });
 
     return NextResponse.json(location);
   } catch (error) {
-    console.error('[Geolocation API] Error:', error);
+    logger.error('Geolocation API error', error, { component: 'geolocation' });
 
     // Return Dallas, Texas as fallback
     return NextResponse.json({

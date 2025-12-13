@@ -3,6 +3,18 @@ import { createClient } from '@/lib/supabase/server';
 import { checkShoppingTokenRateLimit } from '@/lib/ratelimit-shopping';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
+import { z } from 'zod';
+import { logger } from '@/lib/logger';
+
+// Zod schemas for validation
+const ShareTokenSchema = z.string()
+  .min(32, 'Share token must be at least 32 characters')
+  .regex(/^[a-zA-Z0-9_-]+$/, 'Share token contains invalid characters');
+
+const PatchItemSchema = z.object({
+  itemId: z.string().uuid('Invalid item ID format'),
+  isPurchased: z.boolean({ message: 'isPurchased must be a boolean' }),
+});
 
 /**
  * GET /api/shopping/share/[token]
@@ -27,21 +39,16 @@ export async function GET(
 
     const { token } = params;
 
-    if (!token) {
+    // Validate token format with Zod
+    const tokenValidation = ShareTokenSchema.safeParse(token);
+    if (!tokenValidation.success) {
       return NextResponse.json(
-        { error: 'Share token is required' },
+        { error: 'Invalid share token format', details: tokenValidation.error.issues },
         { status: 400 }
       );
     }
 
-    // Basic token format validation (reject obviously invalid tokens early)
-    if (token.length < 32 || !/^[a-zA-Z0-9_-]+$/.test(token)) {
-      return NextResponse.json(
-        { error: 'Invalid share token format' },
-        { status: 400 }
-      );
-    }
-
+    const validatedToken = tokenValidation.data;
     const supabase = createClient();
 
     // Find shopping list by share token
@@ -49,7 +56,7 @@ export async function GET(
     const { data: shoppingList, error: listError } = await supabase
       .from('shopping_lists')
       .select('*')
-      .eq('share_token', token)
+      .eq('share_token', validatedToken)
       .eq('is_public', true)
       .single();
 
@@ -122,7 +129,7 @@ export async function GET(
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/shopping/share/[token] GET error:', error);
+    logger.error('Shopping share GET error', error, { component: 'api/shopping/share', action: 'get' });
     return NextResponse.json(
       { error: 'Failed to load shopping list' },
       { status: 500 }
@@ -155,24 +162,29 @@ export async function PATCH(
 
     const { token } = params;
 
-    // Basic token format validation (reject obviously invalid tokens early)
-    if (token.length < 32 || !/^[a-zA-Z0-9_-]+$/.test(token)) {
+    // Validate token format with Zod
+    const tokenValidation = ShareTokenSchema.safeParse(token);
+    if (!tokenValidation.success) {
       return NextResponse.json(
-        { error: 'Invalid share token format' },
+        { error: 'Invalid share token format', details: tokenValidation.error.issues },
         { status: 400 }
       );
     }
 
+    const validatedToken = tokenValidation.data;
+
+    // Parse and validate request body with Zod
     const body = await req.json();
-    const { itemId, isPurchased } = body;
+    const bodyValidation = PatchItemSchema.safeParse(body);
 
-    // Validate input - only allow boolean updates to is_purchased
-    if (!itemId || typeof isPurchased !== 'boolean') {
+    if (!bodyValidation.success) {
       return NextResponse.json(
-        { error: 'itemId and isPurchased are required' },
+        { error: 'Validation error', details: bodyValidation.error.issues },
         { status: 400 }
       );
     }
+
+    const { itemId, isPurchased } = bodyValidation.data;
 
     const supabase = createClient();
 
@@ -180,7 +192,7 @@ export async function PATCH(
     const { data: shoppingList, error: listError } = await supabase
       .from('shopping_lists')
       .select('id, share_read_only')
-      .eq('share_token', token)
+      .eq('share_token', validatedToken)
       .eq('is_public', true)
       .single();
 
@@ -228,7 +240,7 @@ export async function PATCH(
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/shopping/share/[token] PATCH error:', error);
+    logger.error('Shopping share PATCH error', error, { component: 'api/shopping/share', action: 'patch' });
     return NextResponse.json(
       { error: 'Failed to update item' },
       { status: 500 }
