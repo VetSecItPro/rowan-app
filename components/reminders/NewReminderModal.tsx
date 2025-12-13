@@ -471,8 +471,8 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
             <button
               type="submit"
               disabled={!!dateError}
-              className={`px-4 py-2 bg-pink-600 text-white rounded-lg transition-all shadow-lg ${
-                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:bg-pink-700'
+              className={`px-4 py-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-lg transition-all shadow-lg shadow-pink-500/25 ${
+                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:from-pink-600 hover:to-pink-700'
               }`}
             >
               {editReminder ? 'Save Changes' : 'Create Reminder'}

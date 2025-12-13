@@ -243,7 +243,7 @@ export function DependenciesModal({
             <div className="mb-6">
               <button
                 onClick={() => setShowAddForm(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-lg transition-all shadow-lg shadow-indigo-500/25 font-medium"
               >
                 <Plus className="w-4 h-4" />
                 Add Dependency
@@ -384,7 +384,7 @@ export function DependenciesModal({
                   <button
                     onClick={handleAddDependency}
                     disabled={!selectedGoalId || saving}
-                    className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-lg transition-all shadow-lg shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   >
                     {saving && (
                       <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />

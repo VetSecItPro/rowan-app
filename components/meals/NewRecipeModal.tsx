@@ -328,7 +328,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
             <h2 className="text-lg sm:text-xl font-bold text-white">
               {editRecipe ? 'Edit Recipe' : 'Create New Recipe'}
             </h2>
-            <button onClick={onClose} aria-label="Close modal" className="p-2 flex items-center justify-center hover:opacity-75 transition-opacity">
+            <button onClick={onClose} aria-label="Close modal" className="p-2 flex items-center justify-center hover:bg-white/20 rounded-full transition-all">
               <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
             </button>
           </div>

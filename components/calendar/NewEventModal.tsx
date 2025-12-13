@@ -350,7 +350,7 @@ export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, sp
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-3xl sm:h-[90vh] sm:rounded-2xl overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-purple-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Calendar className="w-6 h-6" />
@@ -360,7 +360,7 @@ export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, sp
             </div>
             <button
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-purple-700 transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-white/20 transition-colors"
               aria-label="Close modal"
             >
               <X className="w-4 h-4" />
@@ -824,8 +824,8 @@ export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, sp
             <button
               type="submit"
               disabled={!!dateError || uploading}
-              className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-purple-600 text-white rounded-lg transition-colors font-medium ${
-                dateError || uploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-purple-700'
+              className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg transition-colors font-medium ${
+                dateError || uploading ? 'opacity-50 cursor-not-allowed' : 'hover:from-purple-600 hover:to-purple-700'
               }`}
             >
               {uploading ? 'Saving...' : editEvent ? 'Update Event' : 'Create Event'}

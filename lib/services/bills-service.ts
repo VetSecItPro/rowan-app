@@ -1,5 +1,8 @@
 import { createClient } from '@/lib/supabase/client';
 import { projectsService } from './budgets-service';
+import { remindersService } from './reminders-service';
+import { calendarService } from './calendar-service';
+import { subDays } from 'date-fns';
 
 // =====================================================
 // TYPES
@@ -32,6 +35,7 @@ export interface Bill {
   next_due_date?: string;
   linked_expense_id?: string;
   linked_calendar_event_id?: string;
+  linked_reminder_id?: string;
   reminder_enabled: boolean;
   reminder_days_before: number;
   last_reminder_sent_at?: string;
@@ -154,14 +158,16 @@ export async function getUpcomingBills(spaceId: string): Promise<Bill[]> {
 }
 
 /**
- * Create a new bill
+ * Create a new bill with automatic reminder and calendar event creation
  */
 export async function createBill(
   input: CreateBillInput,
   userId: string
 ): Promise<Bill> {
   const supabase = createClient();
-  const { data, error } = await supabase
+
+  // Step 1: Create the bill record
+  const { data: bill, error } = await supabase
     .from('bills')
     .insert([
       {
@@ -178,7 +184,69 @@ export async function createBill(
     .single();
 
   if (error) throw error;
-  return data;
+
+  const updates: { linked_reminder_id?: string; linked_calendar_event_id?: string } = {};
+
+  // Step 2: Create linked reminder if enabled
+  const reminderEnabled = input.reminder_enabled !== false;
+  const reminderDaysBefore = input.reminder_days_before || 3;
+
+  if (reminderEnabled) {
+    try {
+      const reminderDate = subDays(new Date(input.due_date), reminderDaysBefore);
+      const reminder = await remindersService.createReminder({
+        space_id: input.space_id,
+        title: `Pay ${input.name}`,
+        description: `Bill due: $${input.amount.toFixed(2)}${input.payee ? ` to ${input.payee}` : ''}`,
+        emoji: '💰',
+        category: 'bills',
+        reminder_time: reminderDate.toISOString(),
+        priority: 'high',
+        // @ts-ignore - linked_bill_id will be added to the type
+        linked_bill_id: bill.id,
+      });
+      updates.linked_reminder_id = reminder.id;
+    } catch (reminderError) {
+      console.error('Failed to create linked reminder:', reminderError);
+      // Continue without reminder - don't fail the bill creation
+    }
+  }
+
+  // Step 3: Create calendar event for the due date
+  try {
+    const event = await calendarService.createEvent({
+      space_id: input.space_id,
+      title: `${input.name} Due`,
+      description: `$${input.amount.toFixed(2)}${input.payee ? ` - Pay to ${input.payee}` : ''}`,
+      start_time: new Date(input.due_date).toISOString(),
+      category: 'personal',
+      event_type: 'bill_due',
+      // @ts-ignore - linked_bill_id will be added to the type
+      linked_bill_id: bill.id,
+    });
+    updates.linked_calendar_event_id = event.id;
+  } catch (calendarError) {
+    console.error('Failed to create linked calendar event:', calendarError);
+    // Continue without calendar event - don't fail the bill creation
+  }
+
+  // Step 4: Update bill with linked IDs
+  if (updates.linked_reminder_id || updates.linked_calendar_event_id) {
+    const { data: updatedBill, error: updateError } = await supabase
+      .from('bills')
+      .update(updates)
+      .eq('id', bill.id)
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error('Failed to update bill with linked IDs:', updateError);
+      return bill; // Return original bill if update fails
+    }
+    return updatedBill;
+  }
+
+  return bill;
 }
 
 /**
@@ -212,6 +280,7 @@ export async function deleteBill(billId: string): Promise<void> {
 
 /**
  * Mark bill as paid and optionally create expense record
+ * Also completes linked reminders and calendar events
  */
 export async function markBillAsPaid(
   billId: string,
@@ -257,7 +326,32 @@ export async function markBillAsPaid(
       .eq('id', billId);
   }
 
-  // If recurring, create next bill instance
+  // Complete linked reminder if exists
+  if (bill.linked_reminder_id) {
+    try {
+      await remindersService.updateReminder(bill.linked_reminder_id, {
+        status: 'completed',
+      });
+    } catch (reminderError) {
+      console.error('Failed to complete linked reminder:', reminderError);
+      // Continue - don't fail the bill payment
+    }
+  }
+
+  // Complete linked calendar event if exists
+  if (bill.linked_calendar_event_id) {
+    try {
+      await calendarService.updateEventStatus(
+        bill.linked_calendar_event_id,
+        'completed'
+      );
+    } catch (eventError) {
+      console.error('Failed to complete linked calendar event:', eventError);
+      // Continue - don't fail the bill payment
+    }
+  }
+
+  // If recurring, create next bill instance (with new linked reminder and event)
   if (bill.frequency !== 'one-time' && bill.next_due_date) {
     await createBill(
       {

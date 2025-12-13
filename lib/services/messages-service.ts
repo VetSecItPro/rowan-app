@@ -249,26 +249,71 @@ export const messagesService = {
     if (error) throw error;
   },
 
-  async markAsRead(id: string): Promise<Message> {
+  async markAsRead(id: string): Promise<Message | null> {
+    // Mark a single message as read (for individual message marking if needed)
+    // This delegates to markConversationAsRead for consistency
     const supabase = createClient();
-    return this.updateMessage(id, {
-      read: true,
-    } as any);
-  },
 
-  async markConversationAsRead(conversationId: string): Promise<void> {
-    const supabase = createClient();
-    const { error } = await supabase
+    // Get the message to find its conversation
+    const { data: message, error: fetchError } = await supabase
       .from('messages')
-      .update({ read: true, read_at: new Date().toISOString() })
-      .eq('conversation_id', conversationId)
-      .eq('read', false);
+      .select('conversation_id')
+      .eq('id', id)
+      .single();
 
-    if (error) throw error;
+    if (fetchError || !message) {
+      console.error('Failed to fetch message:', fetchError);
+      return null;
+    }
+
+    // Use conversation-based marking
+    await this.markConversationAsRead(message.conversation_id);
+
+    // Return the updated message
+    const { data: updatedMessage, error: refetchError } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (refetchError) {
+      console.error('Failed to refetch message:', refetchError);
+      return null;
+    }
+
+    return updatedMessage;
   },
 
-  async getMessageStats(spaceId: string): Promise<MessageStats> {
+  async markConversationAsRead(conversationId: string): Promise<number> {
+    // Use API route to bypass RLS
+    const response = await fetch('/api/messages/mark-conversation-read', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ conversationId }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Failed to mark conversation as read:', errorData);
+      throw new Error(errorData.error || 'Failed to mark conversation as read');
+    }
+
+    const result = await response.json();
+    return result.markedCount || 0;
+  },
+
+  async getMessageStats(spaceId: string, userId?: string): Promise<MessageStats> {
     const supabase = createClient();
+
+    // Get current user if not provided
+    let currentUserId = userId;
+    if (!currentUserId) {
+      const { data: { user } } = await supabase.auth.getUser();
+      currentUserId = user?.id;
+    }
+
     const [messagesResult, conversationsResult] = await Promise.all([
       supabase
         .from('messages')
@@ -298,7 +343,8 @@ export const messagesService = {
 
     return {
       thisWeek: messages.filter((m: Message) => new Date(m.created_at) >= weekStart).length,
-      unread: messages.filter((m: Message) => !m.read).length,
+      // Only count unread messages from OTHER users (not your own)
+      unread: messages.filter((m: Message) => !m.read && m.sender_id !== currentUserId).length,
       today: messages.filter((m: Message) => new Date(m.created_at) >= today).length,
       total: messages.length,
       conversations: conversations.length,
