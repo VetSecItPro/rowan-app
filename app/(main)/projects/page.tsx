@@ -4,6 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Folder, Plus, Search, Wallet, Receipt, DollarSign, CheckCircle, Clock, FileText, FileCheck, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -35,7 +36,31 @@ type TabType = 'projects' | 'budgets' | 'expenses' | 'bills' | 'receipts';
 
 export default function ProjectsPage() {
   const { currentSpace, user } = useAuthWithSpaces();
-  const [activeTab, setActiveTab] = useState<TabType>('projects');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Get tab from URL or default to first tab in array
+  const validTabs: TabType[] = ['projects', 'budgets', 'bills', 'expenses', 'receipts'];
+  const tabFromUrl = searchParams?.get('tab') as TabType | null;
+  const initialTab = tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : validTabs[0];
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
+
+  // Update URL when tab changes (without full page reload)
+  const handleTabChange = useCallback((tab: TabType) => {
+    setActiveTab(tab);
+    const params = new URLSearchParams(searchParams?.toString() ?? '');
+    params.set('tab', tab);
+    router.replace(`/projects?${params.toString()}`, { scroll: false });
+  }, [searchParams, router]);
+
+  // Sync tab state when URL changes (e.g., back/forward navigation)
+  useEffect(() => {
+    const tabParam = searchParams?.get('tab') as TabType | null;
+    if (tabParam && validTabs.includes(tabParam) && tabParam !== activeTab) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams, activeTab, validTabs]);
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [bills, setBills] = useState<Bill[]>([]);
@@ -51,6 +76,7 @@ export default function ProjectsPage() {
   const [editingBill, setEditingBill] = useState<Bill | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchTyping, setIsSearchTyping] = useState(false);
+  const [projectFilter, setProjectFilter] = useState<'all' | 'active' | 'completed'>('all');
   const [currentBudget, setCurrentBudget] = useState<number>(0);
   const [budgetStats, setBudgetStats] = useState({ monthlyBudget: 0, spentThisMonth: 0, remaining: 0, pendingBills: 0 });
   const [budgetTemplates, setBudgetTemplates] = useState<BudgetTemplate[]>([]);
@@ -320,7 +346,15 @@ export default function ProjectsPage() {
     }
   }, [currentSpace, loadData]);
 
-  const filteredProjects = projects.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredProjects = projects.filter(p => {
+    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+    if (!matchesSearch) return false;
+
+    if (projectFilter === 'all') return true;
+    if (projectFilter === 'active') return p.status !== 'completed';
+    if (projectFilter === 'completed') return p.status === 'completed';
+    return true;
+  });
   const filteredExpenses = expenses.filter(e => e.title.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredBills = bills.filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -354,7 +388,7 @@ export default function ProjectsPage() {
                 {(['projects', 'budgets', 'bills', 'expenses', 'receipts'] as TabType[]).map((tab) => (
                   <button
                     key={tab}
-                    onClick={() => setActiveTab(tab)}
+                    onClick={() => handleTabChange(tab)}
                     className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] ${
                       activeTab === tab
                         ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white'
@@ -502,20 +536,35 @@ export default function ProjectsPage() {
               </div>
 
               {/* Category Filter for Projects - Segmented Buttons */}
-              {activeTab === 'projects' && filteredProjects.length > 0 && (
+              {activeTab === 'projects' && projects.length > 0 && (
                 <div className="bg-gray-50 dark:bg-gray-900 border-2 border-amber-200 dark:border-amber-700 rounded-lg p-1 flex gap-1 w-fit">
                   <button
-                    className="px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[60px] bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md"
+                    onClick={() => setProjectFilter('all')}
+                    className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[60px] ${
+                      projectFilter === 'all'
+                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20'
+                    }`}
                   >
                     All
                   </button>
                   <button
-                    className="px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[60px] text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                    onClick={() => setProjectFilter('active')}
+                    className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[60px] ${
+                      projectFilter === 'active'
+                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20'
+                    }`}
                   >
                     Active
                   </button>
                   <button
-                    className="px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[80px] text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                    onClick={() => setProjectFilter('completed')}
+                    className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[80px] ${
+                      projectFilter === 'completed'
+                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20'
+                    }`}
                   >
                     Completed
                   </button>
@@ -610,30 +659,82 @@ export default function ProjectsPage() {
 
                   {/* Budget Progress Bar */}
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">Spent this month</span>
-                      <span className="font-medium text-gray-900 dark:text-white">
-                        {budgetStats.monthlyBudget > 0
-                          ? `${Math.min(100, Math.round((budgetStats.spentThisMonth / budgetStats.monthlyBudget) * 100))}%`
-                          : '0%'}
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-300 ${
-                          budgetStats.monthlyBudget > 0 && (budgetStats.spentThisMonth / budgetStats.monthlyBudget) >= 0.9
-                            ? 'bg-gradient-to-r from-red-500 to-red-600'
-                            : budgetStats.monthlyBudget > 0 && (budgetStats.spentThisMonth / budgetStats.monthlyBudget) >= 0.7
-                            ? 'bg-gradient-to-r from-yellow-500 to-yellow-600'
-                            : 'bg-gradient-to-r from-green-500 to-green-600'
-                        }`}
-                        style={{
-                          width: budgetStats.monthlyBudget > 0
-                            ? `${Math.min(100, (budgetStats.spentThisMonth / budgetStats.monthlyBudget) * 100)}%`
-                            : '0%'
-                        }}
-                      />
-                    </div>
+                    {(() => {
+                      const percentUsed = budgetStats.monthlyBudget > 0
+                        ? (budgetStats.spentThisMonth / budgetStats.monthlyBudget) * 100
+                        : 0;
+                      const isOver = percentUsed > 100;
+                      const overagePercent = isOver ? percentUsed - 100 : 0;
+                      // When over, calculate the relative widths: budget portion + overage portion = 100% of bar
+                      const budgetPortionWidth = isOver ? (100 / percentUsed) * 100 : percentUsed;
+                      const overagePortionWidth = isOver ? (overagePercent / percentUsed) * 100 : 0;
+
+                      return (
+                        <>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-600 dark:text-gray-400">Spent this month</span>
+                            <span className={`font-medium ${isOver ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`}>
+                              {percentUsed.toFixed(1)}%
+                              {isOver && ` (+${overagePercent.toFixed(1)}% over)`}
+                            </span>
+                          </div>
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden relative flex">
+                            {/* Budget portion (up to 100%) */}
+                            <div
+                              className={`h-full transition-all duration-300 ${
+                                isOver
+                                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 rounded-l-full'
+                                  : percentUsed >= 90
+                                  ? 'bg-gradient-to-r from-red-500 to-red-600 rounded-full'
+                                  : percentUsed >= 70
+                                  ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-full'
+                                  : 'bg-gradient-to-r from-green-500 to-green-600 rounded-full'
+                              }`}
+                              style={{ width: `${budgetPortionWidth}%` }}
+                            />
+                            {/* Overage portion (above 100%) - different color */}
+                            {isOver && (
+                              <div
+                                className="h-full rounded-r-full animate-pulse relative overflow-hidden"
+                                style={{ width: `${overagePortionWidth}%` }}
+                              >
+                                {/* Red background */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600" />
+                                {/* Striped overlay */}
+                                <div
+                                  className="absolute inset-0"
+                                  style={{
+                                    backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255,255,255,0.25) 4px, rgba(255,255,255,0.25) 8px)',
+                                  }}
+                                />
+                              </div>
+                            )}
+                            {/* 100% marker line when over budget */}
+                            {isOver && (
+                              <div
+                                className="absolute top-0 bottom-0 w-0.5 bg-white dark:bg-gray-900 z-10"
+                                style={{ left: `${budgetPortionWidth}%` }}
+                              />
+                            )}
+                          </div>
+                          {/* Legend when over budget */}
+                          {isOver && (
+                            <div className="flex items-center justify-between text-xs">
+                              <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-1.5">
+                                  <div className="w-3 h-3 rounded bg-gradient-to-r from-orange-500 to-orange-600" />
+                                  <span className="text-gray-600 dark:text-gray-400">Budget (100%)</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                  <div className="w-3 h-3 rounded bg-gradient-to-r from-red-500 to-red-600" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.2) 2px, rgba(255,255,255,0.2) 4px)' }} />
+                                  <span className="text-red-600 dark:text-red-400">Over (+{overagePercent.toFixed(1)}%)</span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
 
                   {/* Budget Stats Grid */}
