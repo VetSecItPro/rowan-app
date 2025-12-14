@@ -1,11 +1,12 @@
 'use client';
 
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useMemo, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { Header } from './Header';
 import { Breadcrumb } from './Breadcrumb';
 import { Footer } from '@/components/navigation/Footer';
 import { SmartBackgroundCanvas } from '@/components/ui/SmartBackgroundCanvas';
+import { useFeatureTracking, type FeatureName } from '@/lib/hooks/useFeatureTracking';
 
 interface FeatureLayoutProps {
   children: ReactNode;
@@ -61,6 +62,30 @@ export function FeatureLayout({
         return 'dashboard';
     }
   }, [pathname, breadcrumbItems]);
+
+  // Track page views for analytics
+  const { trackPageView } = useFeatureTracking();
+
+  useEffect(() => {
+    // Map feature names to valid tracking names
+    const trackableFeatures: Record<string, FeatureName> = {
+      tasks: 'tasks',
+      calendar: 'calendar',
+      messages: 'messages',
+      shopping: 'shopping',
+      meals: 'meals',
+      reminders: 'reminders',
+      goals: 'goals',
+      budget: 'expenses', // Map budget to expenses
+      projects: 'projects',
+      dashboard: 'dashboard',
+    };
+
+    const featureName = trackableFeatures[currentFeature];
+    if (featureName) {
+      trackPageView(featureName);
+    }
+  }, [currentFeature, trackPageView]);
 
   return (
     <SmartBackgroundCanvas

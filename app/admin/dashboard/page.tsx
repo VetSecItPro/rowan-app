@@ -20,6 +20,7 @@ import {
   ArrowLeft,
   MessageSquare,
   CreditCard,
+  Layers,
   type LucideIcon
 } from 'lucide-react';
 
@@ -328,6 +329,13 @@ export default function AdminDashboardPage() {
                 icon={CreditCard}
                 iconColor="text-emerald-600 dark:text-emerald-400"
                 onClick={() => router.push('/admin/subscriptions')}
+              />
+              <QuickAction
+                title="Feature Usage"
+                description="Track which features users interact with"
+                icon={Layers}
+                iconColor="text-amber-600 dark:text-amber-400"
+                onClick={() => router.push('/admin/feature-usage')}
               />
               <QuickAction
                 title="Beta Feedback"
