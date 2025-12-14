@@ -1,7 +1,9 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
+import { decryptSessionData, validateSessionData, encryptSessionData } from '@/lib/utils/session-crypto-edge';
+
+const ADMIN_SESSION_DURATION = 2 * 60 * 60; // 2 hours in seconds
 
 export async function middleware(req: NextRequest) {
   let response = NextResponse.next({
@@ -58,38 +60,84 @@ export async function middleware(req: NextRequest) {
 
   const { data: { session } } = await supabase.auth.getSession();
 
-  // Admin routes - require admin authentication
+  // Admin routes - Single Sign-On (no separate admin login)
   const isAdminPath = req.nextUrl.pathname.startsWith('/admin');
   const isAdminLoginPath = req.nextUrl.pathname === '/admin/login';
 
-  if (isAdminPath && !isAdminLoginPath) {
-    // Verify admin session
+  // Redirect old admin login page to regular login
+  if (isAdminLoginPath) {
+    const redirectUrl = new URL('/login', req.url);
+    redirectUrl.searchParams.set('redirectTo', '/admin/dashboard');
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  if (isAdminPath) {
+    // First check if there's a valid admin-session cookie
     const adminSessionCookie = req.cookies.get('admin-session')?.value;
 
-    if (!adminSessionCookie) {
-      // No admin session - redirect to admin login
-      return NextResponse.redirect(new URL('/admin/login', req.url));
+    if (adminSessionCookie) {
+      try {
+        const sessionData = await decryptSessionData(adminSessionCookie);
+        if (validateSessionData(sessionData)) {
+          // Valid admin session - allow access
+          return response;
+        }
+      } catch {
+        // Invalid cookie, will try SSO below
+      }
     }
 
-    try {
-      // Decrypt and validate admin session (async with Web Crypto API)
-      const sessionData = await decryptSessionData(adminSessionCookie);
+    // No valid admin session - try SSO with regular auth
+    if (!session) {
+      // Not logged in at all - redirect to login
+      const redirectUrl = new URL('/login', req.url);
+      redirectUrl.searchParams.set('redirectTo', req.nextUrl.pathname);
+      return NextResponse.redirect(redirectUrl);
+    }
 
-      if (!validateSessionData(sessionData)) {
-        // Invalid or expired session - redirect to admin login
-        const response = NextResponse.redirect(new URL('/admin/login', req.url));
-        // Clear invalid cookie
-        response.cookies.delete('admin-session');
-        return response;
+    // User is logged in - check if they're an admin
+    try {
+      const { data: adminData, error: adminError } = await supabase.rpc('get_admin_details');
+
+      if (adminError || !adminData || adminData.length === 0) {
+        // Not an admin - redirect to dashboard with error
+        const redirectUrl = new URL('/dashboard', req.url);
+        redirectUrl.searchParams.set('error', 'admin_required');
+        const res = NextResponse.redirect(redirectUrl);
+        res.cookies.delete('admin-session');
+        return res;
       }
 
-      // Admin session valid - continue
+      // User is an admin - create admin session cookie automatically
+      const admin = adminData[0];
+      const sessionData = {
+        adminId: admin.admin_id,
+        email: admin.email,
+        role: admin.role,
+        permissions: admin.permissions,
+        authUserId: session.user.id,
+        loginTime: Date.now(),
+        expiresAt: Date.now() + (ADMIN_SESSION_DURATION * 1000),
+      };
+
+      const sessionPayload = await encryptSessionData(sessionData);
+
+      // Set admin session cookie and redirect to same page (to pick up the cookie)
+      const res = NextResponse.redirect(new URL(req.nextUrl.pathname, req.url));
+      res.cookies.set('admin-session', sessionPayload, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: ADMIN_SESSION_DURATION,
+        path: '/',
+      });
+      return res;
+
     } catch (error) {
-      // Decryption failed - invalid session
-      console.error('Admin session validation failed:', error);
-      const response = NextResponse.redirect(new URL('/admin/login', req.url));
-      response.cookies.delete('admin-session');
-      return response;
+      console.error('Admin SSO check failed:', error);
+      const redirectUrl = new URL('/dashboard', req.url);
+      redirectUrl.searchParams.set('error', 'admin_check_failed');
+      return NextResponse.redirect(redirectUrl);
     }
   }
 
