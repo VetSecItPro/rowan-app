@@ -2,24 +2,31 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { TestTube, MessageSquare, ExternalLink } from 'lucide-react';
+import { TestTube, MessageSquare, Shield } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { useAdmin } from '@/hooks/useAdmin';
 
 export function BetaFeedbackButton() {
   const { user } = useAuth();
+  const { isAdmin, loading: adminLoading } = useAdmin();
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Show for beta testers or admin
-  const isAdmin = user?.email === 'vetsecitpro@gmail.com';
   const isBetaTester = user?.is_beta_tester && user.beta_status === 'approved';
 
+  // Don't render anything while checking admin status
+  if (adminLoading) {
+    return null;
+  }
+
+  // Only show for beta testers or admins
   if (!isBetaTester && !isAdmin) {
     return null;
   }
 
   return (
     <>
-      {/* Floating feedback button */}
+      {/* Floating feedback button - show for both beta testers and admins */}
       <div className="fixed bottom-6 right-6 z-50">
         <div
           className="group relative"
@@ -50,12 +57,21 @@ export function BetaFeedbackButton() {
         </div>
       </div>
 
-      {/* Beta status indicator */}
+      {/* Status indicator badge - different for admin vs beta tester */}
       <div className="fixed top-20 right-4 z-40">
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-300 rounded-full text-xs font-medium backdrop-blur-sm">
-          <TestTube className="w-3 h-3" />
-          <span>Beta Tester</span>
-        </div>
+        {isAdmin ? (
+          // Admin badge - purple/indigo theme
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-300 dark:border-indigo-700 text-indigo-800 dark:text-indigo-300 rounded-full text-xs font-medium backdrop-blur-sm">
+            <Shield className="w-3 h-3" />
+            <span>Admin</span>
+          </div>
+        ) : isBetaTester ? (
+          // Beta tester badge - blue theme
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-300 rounded-full text-xs font-medium backdrop-blur-sm">
+            <TestTube className="w-3 h-3" />
+            <span>Beta Tester</span>
+          </div>
+        ) : null}
       </div>
     </>
   );
