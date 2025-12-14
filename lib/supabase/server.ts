@@ -1,5 +1,5 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { cookies, type UnsafeUnwrappedCookies } from 'next/headers';
 
 export const createClient = () => {
   // Runtime check to prevent execution during build time
@@ -34,7 +34,7 @@ export const createClient = () => {
   // Safely get cookies with error handling
   let cookieStore;
   try {
-    cookieStore = cookies();
+    cookieStore = (cookies() as unknown as UnsafeUnwrappedCookies);
   } catch (error) {
     // During build time, provide a mock cookie store
     console.warn('Cookies not available during build time, using mock store');

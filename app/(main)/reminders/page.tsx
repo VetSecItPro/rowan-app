@@ -17,7 +17,7 @@ import { remindersService, Reminder, CreateReminderInput } from '@/lib/services/
 import { CTAButton } from '@/components/ui/EnhancedButton';
 import { useRemindersRealtime } from '@/hooks/useRemindersRealtime';
 
-export default function RemindersPage(): JSX.Element {
+export default function RemindersPage(): React.JSX.Element {
   const { currentSpace, user, loading: authLoading } = useAuthWithSpaces();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);

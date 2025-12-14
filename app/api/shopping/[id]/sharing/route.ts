@@ -10,10 +10,8 @@ import { extractIP } from '@/lib/ratelimit-fallback';
  * PATCH /api/shopping/[id]/sharing
  * Update sharing settings for a shopping list (make public/private)
  */
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting
     const ip = extractIP(req.headers);
@@ -163,10 +161,8 @@ export async function PATCH(
  * GET /api/shopping/[id]/sharing
  * Get current sharing status and link for a shopping list
  */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting
     const ip = extractIP(req.headers);

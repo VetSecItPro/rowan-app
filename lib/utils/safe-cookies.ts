@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers';
+import { cookies, type UnsafeUnwrappedCookies } from 'next/headers';
 
 /**
  * Safe cookie accessor that works during both runtime and build time
@@ -9,7 +9,7 @@ import { cookies } from 'next/headers';
  */
 export function safeCookies() {
   try {
-    return cookies();
+    return (cookies() as unknown as UnsafeUnwrappedCookies);
   } catch (error) {
     // During build time, provide a mock cookie store
     console.warn('Cookies not available during build time, using mock store');
@@ -29,7 +29,7 @@ export function safeCookies() {
  */
 export function safeCookieGet(name: string) {
   try {
-    const cookieStore = cookies();
+    const cookieStore = (cookies() as unknown as UnsafeUnwrappedCookies);
     return cookieStore.get(name);
   } catch (error) {
     // During build time, return undefined
@@ -42,7 +42,7 @@ export function safeCookieGet(name: string) {
  */
 export function safeCookieSet(name: string, value: string, options?: any) {
   try {
-    const cookieStore = cookies();
+    const cookieStore = (cookies() as unknown as UnsafeUnwrappedCookies);
     cookieStore.set(name, value, options);
   } catch (error) {
     // During build time, do nothing

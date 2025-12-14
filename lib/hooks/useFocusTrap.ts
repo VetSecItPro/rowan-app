@@ -146,5 +146,5 @@ export function useFocusTrap<T extends HTMLElement = HTMLElement>(
 export interface FocusTrapProps extends UseFocusTrapOptions {
   children: React.ReactNode;
   className?: string;
-  as?: keyof JSX.IntrinsicElements;
+  as?: keyof React.JSX.IntrinsicElements;
 }

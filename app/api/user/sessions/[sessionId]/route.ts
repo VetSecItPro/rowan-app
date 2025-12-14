@@ -8,10 +8,8 @@ import { extractIP } from '@/lib/ratelimit-fallback';
  * DELETE /api/user/sessions/[sessionId]
  * Revoke a specific session
  */
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { sessionId: string } }
-) {
+export async function DELETE(request: NextRequest, props: { params: Promise<{ sessionId: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting
     const ip = extractIP(request.headers);

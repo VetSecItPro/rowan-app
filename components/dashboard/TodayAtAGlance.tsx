@@ -71,7 +71,7 @@ const PriorityBadge = memo(function PriorityBadge({ priority }: { priority?: str
 
 // Meal type icon
 const MealTypeIcon = memo(function MealTypeIcon({ type }: { type: string }) {
-  const icons: Record<string, { icon: JSX.Element; label: string }> = {
+  const icons: Record<string, { icon: React.JSX.Element; label: string }> = {
     breakfast: { icon: <Coffee className="w-3.5 h-3.5" />, label: 'Breakfast' },
     lunch: { icon: <Sun className="w-3.5 h-3.5" />, label: 'Lunch' },
     dinner: { icon: <Moon className="w-3.5 h-3.5" />, label: 'Dinner' },
@@ -97,7 +97,7 @@ const Section = memo(function Section({
   isEmpty
 }: {
   title: string;
-  icon: JSX.Element;
+  icon: React.JSX.Element;
   count: number;
   color: string;
   href: string;

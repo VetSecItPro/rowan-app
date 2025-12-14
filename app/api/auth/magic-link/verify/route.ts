@@ -12,7 +12,7 @@ const MagicLinkVerifySchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting: 5 attempts per hour per IP (uses fallback if Redis unavailable)
-    const ip = request.ip ?? request.headers.get('x-forwarded-for') ?? 'anonymous';
+    const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
     const { success: rateLimitPassed } = await checkAuthRateLimit(`magic-link-verify:${ip}`);
 
     if (!rateLimitPassed) {

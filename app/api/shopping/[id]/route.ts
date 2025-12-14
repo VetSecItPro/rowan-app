@@ -11,10 +11,8 @@ import { extractIP } from '@/lib/ratelimit-fallback';
  * GET /api/shopping/[id]
  * Get a single shopping list by ID
  */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
@@ -89,10 +87,8 @@ export async function GET(
  * PATCH /api/shopping/[id]
  * Update a shopping list
  */
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
@@ -173,10 +169,8 @@ export async function PATCH(
  * DELETE /api/shopping/[id]
  * Delete a shopping list
  */
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);

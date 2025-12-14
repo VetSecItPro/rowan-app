@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   try {
     // Test both methods of cookie access
-    const nextCookies = cookies();
+    const nextCookies = await cookies();
     const directCookies = req.headers.get('cookie');
 
     console.log('[TEST] Cookie comparison:', {

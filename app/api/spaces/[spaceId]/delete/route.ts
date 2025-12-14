@@ -12,10 +12,8 @@ import { logger } from '@/lib/logger';
  * DELETE /api/spaces/[spaceId]/delete
  * Delete a space (owner only)
  */
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { spaceId: string } }
-) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ spaceId: string }> }) {
+  const params = await props.params;
   try {
     // CSRF validation for defense-in-depth
     const csrfError = validateCsrfRequest(req);

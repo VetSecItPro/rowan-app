@@ -10,10 +10,8 @@ import { setSentryUser } from '@/lib/sentry-utils';
  * GET /api/spaces/[spaceId]/export
  * Get export summary for a space (preview before deletion)
  */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { spaceId: string } }
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ spaceId: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
@@ -89,10 +87,8 @@ export async function GET(
  * POST /api/spaces/[spaceId]/export
  * Export all data from a specific space (for space deletion)
  */
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { spaceId: string } }
-) {
+export async function POST(req: NextRequest, props: { params: Promise<{ spaceId: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);

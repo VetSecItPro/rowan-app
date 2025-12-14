@@ -52,7 +52,6 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
     // Disabled due to race condition causing 500 errors in dev
     // webpackBuildWorker: true,
-    instrumentationHook: false,
   },
 
   // Performance optimizations

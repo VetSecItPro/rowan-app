@@ -15,8 +15,9 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(
   req: NextRequest,
-  { params }: { params: { userId: string; action: string } }
+  props: { params: Promise<{ userId: string; action: string }> }
 ) {
+  const params = await props.params;
   try {
     // Rate limiting
     const ip = extractIP(req.headers);

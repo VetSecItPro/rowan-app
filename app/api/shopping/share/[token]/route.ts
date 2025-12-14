@@ -21,10 +21,8 @@ const PatchItemSchema = z.object({
  * Get a public shopping list by share token
  * No authentication required
  */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { token: string } }
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ token: string }> }) {
+  const params = await props.params;
   try {
     // Specific rate limiting for shopping token access (5 attempts per IP per minute)
     const ip = extractIP(req.headers);
@@ -144,10 +142,8 @@ export async function GET(
  *
  * Security: Only allows updating is_purchased field, not item details
  */
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { token: string } }
-) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ token: string }> }) {
+  const params = await props.params;
   try {
     // Specific rate limiting for shopping token access (5 attempts per IP per minute)
     const ip = extractIP(req.headers);

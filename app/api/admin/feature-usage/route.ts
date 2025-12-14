@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Check admin authentication
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const adminSession = cookieStore.get('admin-session');
 
     if (!adminSession) {
@@ -356,7 +356,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check admin authentication
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const adminSession = cookieStore.get('admin-session');
 
     if (!adminSession) {
