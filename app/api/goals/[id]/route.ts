@@ -7,6 +7,9 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+import { updateGoalSchema } from '@/lib/validations/goal-schemas';
+import { sanitizePlainText } from '@/lib/sanitize';
 
 /**
  * GET /api/goals/[id]
@@ -155,11 +158,28 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       );
     }
 
-    // Parse request body
-    const updates = await req.json();
+    // Parse and validate request body with Zod
+    const body = await req.json();
+    try {
+      updateGoalSchema.parse(body);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return NextResponse.json(
+          { error: 'Validation failed', details: error.issues },
+          { status: 400 }
+        );
+      }
+      throw error;
+    }
 
-    // Update goal using service
-    const updatedGoal = await goalsService.updateGoal(params.id, updates);
+    const { title, description } = body;
+
+    // Update goal using service with sanitized inputs
+    const updatedGoal = await goalsService.updateGoal(params.id, {
+      ...body,
+      title: title ? sanitizePlainText(title) : undefined,
+      description: description ? sanitizePlainText(description) : undefined,
+    });
 
     return NextResponse.json({
       success: true,

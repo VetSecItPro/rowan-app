@@ -4,6 +4,12 @@ import { createClient as createServerClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+// Validation schema for mark conversation read
+const markConversationReadSchema = z.object({
+  conversationId: z.string().uuid('Invalid conversation ID'),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,14 +20,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
 
-    const { conversationId } = await request.json();
+    // Parse and validate request body with Zod
+    const body = await request.json();
+    const validation = markConversationReadSchema.safeParse(body);
 
-    if (!conversationId) {
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Conversation ID is required' },
+        { error: 'Validation failed', details: validation.error.issues },
         { status: 400 }
       );
     }
+
+    const { conversationId } = validation.data;
 
     // Verify the user is authenticated
     const supabaseAuth = await createServerClient();

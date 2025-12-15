@@ -7,6 +7,9 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+import { createProjectSchema } from '@/lib/validations/project-schemas';
+import { sanitizePlainText } from '@/lib/sanitize';
 
 /**
  * GET /api/projects
@@ -120,17 +123,24 @@ export async function POST(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(session.user);
 
-    // Parse request body
+    // Parse and validate request body with Zod
     const body = await req.json();
-    const { space_id, name, description, status, start_date, target_date, budget_amount } = body;
-
-    // Validate required fields
-    if (!space_id || !name) {
-      return NextResponse.json(
-        { error: 'space_id and name are required' },
-        { status: 400 }
-      );
+    try {
+      createProjectSchema.parse({
+        ...body,
+        created_by: session.user.id,
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return NextResponse.json(
+          { error: 'Validation failed', details: error.issues },
+          { status: 400 }
+        );
+      }
+      throw error;
     }
+
+    const { space_id, name, description, status, start_date, target_date, budget_amount } = body;
 
     // Verify user has access to this space
     try {
@@ -152,27 +162,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate name length
-    if (name && name.trim().length > 200) {
-      return NextResponse.json(
-        { error: 'name must be 200 characters or less' },
-        { status: 400 }
-      );
-    }
-
-    // Validate description length
-    if (description && description.trim().length > 2000) {
-      return NextResponse.json(
-        { error: 'description must be 2000 characters or less' },
-        { status: 400 }
-      );
-    }
-
-    // Create project using service
+    // Create project using service with sanitized inputs
     const project = await projectsOnlyService.createProject({
       space_id,
-      name: name.trim(),
-      description: description?.trim(),
+      name: sanitizePlainText(name),
+      description: description ? sanitizePlainText(description) : undefined,
       status,
       start_date,
       target_date,

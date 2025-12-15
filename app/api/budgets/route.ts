@@ -7,6 +7,8 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+import { createBudgetSchema } from '@/lib/validations/budget-schemas';
 
 /**
  * GET /api/budgets
@@ -129,26 +131,21 @@ export async function POST(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(session.user);
 
-    // Parse request body
+    // Parse and validate request body with Zod
     const body = await req.json();
+    try {
+      createBudgetSchema.parse(body);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return NextResponse.json(
+          { error: 'Validation failed', details: error.issues },
+          { status: 400 }
+        );
+      }
+      throw error;
+    }
+
     const { space_id, monthly_budget } = body;
-
-    // Validate required fields
-    if (!space_id || monthly_budget === undefined || monthly_budget === null) {
-      return NextResponse.json(
-        { error: 'space_id and monthly_budget are required' },
-        { status: 400 }
-      );
-    }
-
-    // Validate monthly_budget is a number
-    const budgetAmount = Number(monthly_budget);
-    if (isNaN(budgetAmount) || budgetAmount < 0) {
-      return NextResponse.json(
-        { error: 'monthly_budget must be a positive number' },
-        { status: 400 }
-      );
-    }
 
     // Verify user has access to this space
     try {
@@ -172,7 +169,7 @@ export async function POST(req: NextRequest) {
 
     // Create/update budget using service
     const budget = await projectsService.setBudget(
-      { space_id, monthly_budget: budgetAmount },
+      { space_id, monthly_budget: Number(monthly_budget) },
       session.user.id
     );
 

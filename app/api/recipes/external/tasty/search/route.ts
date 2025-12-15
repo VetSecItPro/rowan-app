@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { sanitizePlainText, sanitizeUrl } from '@/lib/sanitize';
 
 export const dynamic = 'force-dynamic';
 
@@ -70,31 +71,31 @@ export async function GET(request: NextRequest) {
     }
 
     const recipes = data.results.map((recipe: any) => {
-      // Parse ingredients
+      // Parse and sanitize ingredients (external data could contain XSS payloads)
       const ingredients = recipe.sections?.[0]?.components?.map((comp: any) => ({
-        name: comp.ingredient?.name || comp.raw_text,
+        name: sanitizePlainText(comp.ingredient?.name || comp.raw_text),
         amount: comp.measurements?.[0]?.quantity || undefined,
-        unit: comp.measurements?.[0]?.unit?.name || undefined,
+        unit: sanitizePlainText(comp.measurements?.[0]?.unit?.name) || undefined,
       })) || [];
 
-      // Parse instructions
+      // Parse and sanitize instructions
       const instructions = recipe.instructions?.map((inst: any, idx: number) =>
-        `${idx + 1}. ${inst.display_text}`
+        `${idx + 1}. ${sanitizePlainText(inst.display_text)}`
       ).join('\n\n') || '';
 
       return {
         id: `tasty-${recipe.id}`,
         source: 'tasty',
-        name: recipe.name,
-        description: recipe.description,
-        image_url: recipe.thumbnail_url || recipe.original_video_url,
+        name: sanitizePlainText(recipe.name),
+        description: sanitizePlainText(recipe.description),
+        image_url: sanitizeUrl(recipe.thumbnail_url || recipe.original_video_url),
         prep_time: recipe.prep_time_minutes,
         cook_time: recipe.cook_time_minutes,
         servings: recipe.num_servings,
-        cuisine: recipe.tags?.find((t: any) => t.type === 'cuisine')?.display_name,
+        cuisine: sanitizePlainText(recipe.tags?.find((t: any) => t.type === 'cuisine')?.display_name),
         ingredients,
         instructions,
-        source_url: recipe.canonical_id ? `https://tasty.co/recipe/${recipe.slug}` : undefined,
+        source_url: recipe.canonical_id ? `https://tasty.co/recipe/${encodeURIComponent(recipe.slug || '')}` : undefined,
       };
     });
 

@@ -2,6 +2,12 @@ import { createClient } from '@/lib/supabase/client';
 import { sanitizeSearchInput } from '@/lib/utils';
 import { cacheAside, cacheKeys, CACHE_TTL } from '@/lib/cache';
 
+/**
+ * Security: Default maximum limit for list queries to prevent unbounded data retrieval
+ * This protects against DoS attacks and ensures predictable API response sizes
+ */
+const DEFAULT_MAX_LIMIT = 500;
+
 export interface CalendarEvent {
   id: string;
   space_id: string;
@@ -103,7 +109,10 @@ export const calendarService = {
       query = query.is('deleted_at', null);
     }
 
-    const { data, error } = await query.order('start_time', { ascending: true });
+    // SECURITY: Apply default limit to prevent unbounded queries
+    const { data, error } = await query
+      .order('start_time', { ascending: true })
+      .limit(DEFAULT_MAX_LIMIT);
 
     if (error) throw error;
     return data || [];

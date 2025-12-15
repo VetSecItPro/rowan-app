@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import crypto from 'crypto';
 
 export async function POST(request: NextRequest) {
   try {
@@ -150,13 +151,26 @@ export async function POST(request: NextRequest) {
     }
 
     // Create state parameter for OAuth (includes connection ID for callback)
+    // SECURITY: Include nonce and timestamp to prevent replay attacks
+    const nonce = crypto.randomBytes(16).toString('hex');
     const state = Buffer.from(
       JSON.stringify({
         connection_id: connection.id,
         space_id: validatedData.space_id,
         user_id: user.id,
+        nonce, // Unique per request
+        timestamp: Date.now(), // For expiration check in callback
       })
     ).toString('base64url');
+
+    // Store nonce in connection record for verification in callback
+    await supabase
+      .from('calendar_connections')
+      .update({
+        oauth_state_nonce: nonce,
+        oauth_state_created_at: new Date().toISOString(),
+      })
+      .eq('id', connection.id);
 
     // Generate Microsoft OAuth URL with optional login_hint for pre-selecting account
     const authUrl = outlookCalendarService.generateAuthUrl(state, validatedData.login_hint);

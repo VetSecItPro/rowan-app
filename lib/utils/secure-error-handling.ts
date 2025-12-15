@@ -126,11 +126,10 @@ export function logSecurityEvent(
   details: Record<string, any>,
   severity: 'low' | 'medium' | 'high' = 'medium'
 ) {
-  // In production, this should send to your security monitoring system
-  if (process.env.NODE_ENV === 'development') {
-    console.warn(`[SECURITY-${severity.toUpperCase()}] ${event}:`, details);
-  } else {
-    // In production, send to security monitoring service
-    // securityMonitoring.log({ event, details, severity, timestamp: new Date() });
-  }
+  // Use structured logger for all security events
+  logger.warn(`[SECURITY-${severity.toUpperCase()}] ${event}`, {
+    component: 'security-event',
+    action: event,
+    details: { severity, ...details }
+  });
 }
