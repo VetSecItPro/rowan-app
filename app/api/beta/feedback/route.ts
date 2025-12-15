@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 // GET - Load all feedback for beta testers
 export async function GET(request: NextRequest) {
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (feedbackError) {
-      console.error('Error loading feedback:', feedbackError);
+      logger.error('Error loading feedback:', feedbackError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: 'Failed to load feedback' },
         { status: 500 }
@@ -139,7 +140,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ feedback });
 
   } catch (error) {
-    console.error('Beta feedback API error:', error);
+    logger.error('Beta feedback API error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -221,7 +222,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (createError) {
-      console.error('Error creating feedback:', createError);
+      logger.error('Error creating feedback:', createError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: 'Failed to submit feedback' },
         { status: 500 }
@@ -249,7 +250,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Beta feedback creation error:', error);
+    logger.error('Beta feedback creation error:', error, { component: 'api-route', action: 'api_request' });
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(

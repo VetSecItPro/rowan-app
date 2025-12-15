@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { Calendar, RefreshCw, Unlink, AlertCircle, CheckCircle, Clock, Loader2, X, Mail, Key, ExternalLink, Link, Upload, FileText } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface CalendarConnection {
   id: string;
@@ -134,7 +135,7 @@ export function CalendarConnections() {
         .order('created_at', { ascending: false });
 
       if (fetchError) {
-        console.error('Failed to fetch connections:', fetchError);
+        logger.error('Failed to fetch connections:', fetchError, { component: 'CalendarConnections', action: 'component_action' });
         // Don't show error for empty table or permission issues on new spaces
         if (fetchError.code !== 'PGRST116') {
           setError('Failed to load calendar connections');
@@ -142,7 +143,7 @@ export function CalendarConnections() {
       }
       setConnections(data || []);
     } catch (err) {
-      console.error('Failed to fetch connections:', err);
+      logger.error('Failed to fetch connections:', err, { component: 'CalendarConnections', action: 'component_action' });
       // Don't show error to user for initial load issues
     } finally {
       setLoading(false);
@@ -235,7 +236,7 @@ export function CalendarConnections() {
         setIcsName(file.name.replace('.ics', ''));
       }
     } catch (err) {
-      console.error('Failed to read ICS file:', err);
+      logger.error('Failed to read ICS file:', err, { component: 'CalendarConnections', action: 'component_action' });
       setError('Failed to read the ICS file');
     }
   };
@@ -286,7 +287,7 @@ export function CalendarConnections() {
         setIcsFileContent('');
         setIcsMode('url');
       } catch (err) {
-        console.error('[CalendarConnections] ICS file import error:', err);
+        logger.error('[CalendarConnections] ICS file import error:', err, { component: 'CalendarConnections', action: 'component_action' });
         setError(err instanceof Error ? err.message : 'Failed to import ICS file');
       } finally {
         setConnecting(null);
@@ -333,7 +334,7 @@ export function CalendarConnections() {
       setSuccess(`ICS feed "${data.feed_name}" connected successfully! Imported ${data.initial_sync?.events_imported || 0} events.`);
       fetchConnections();
     } catch (err) {
-      console.error('[CalendarConnections] ICS connect error:', err);
+      logger.error('[CalendarConnections] ICS connect error:', err, { component: 'CalendarConnections', action: 'component_action' });
       setError(err instanceof Error ? err.message : 'Failed to connect ICS feed');
     } finally {
       setConnecting(null);
@@ -385,7 +386,7 @@ export function CalendarConnections() {
       setSuccess(`Cozi calendar "${data.calendar_name}" connected successfully! Imported ${data.initial_sync?.events_imported || 0} events.`);
       fetchConnections();
     } catch (err) {
-      console.error('[CalendarConnections] Cozi connect error:', err);
+      logger.error('[CalendarConnections] Cozi connect error:', err, { component: 'CalendarConnections', action: 'component_action' });
       setError(err instanceof Error ? err.message : 'Failed to connect Cozi calendar');
     } finally {
       setConnecting(null);
@@ -442,7 +443,7 @@ export function CalendarConnections() {
       setSuccess('Apple Calendar connected successfully! Initial sync will begin shortly.');
       fetchConnections();
     } catch (err) {
-      console.error('[CalendarConnections] Apple connect error:', err);
+      logger.error('[CalendarConnections] Apple connect error:', err, { component: 'CalendarConnections', action: 'component_action' });
       setError(err instanceof Error ? err.message : 'Failed to connect Apple Calendar');
     } finally {
       setConnecting(null);
@@ -479,7 +480,7 @@ export function CalendarConnections() {
       // Just show a note that it should be a Google account
     }
 
-    console.log('[CalendarConnections] Connecting:', { provider: selectedProvider, space_id: currentSpace.id, email: trimmedEmail });
+    logger.info('[CalendarConnections] Connecting:', { component: 'CalendarConnections', data: { provider: selectedProvider, space_id: currentSpace.id, email: trimmedEmail } });
     setConnecting(selectedProvider);
     setShowEmailModal(false);
 
@@ -495,7 +496,7 @@ export function CalendarConnections() {
       });
 
       const data = await response.json();
-      console.log('[CalendarConnections] API response:', { status: response.status, data });
+      logger.info('[CalendarConnections] API response:', { component: 'CalendarConnections', data: { status: response.status, data } });
 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to initiate connection');
@@ -503,11 +504,11 @@ export function CalendarConnections() {
 
       // Redirect to OAuth provider
       if (data.auth_url) {
-        console.log('[CalendarConnections] Redirecting to OAuth:', data.auth_url);
+        logger.info('[CalendarConnections] Redirecting to OAuth:', { component: 'CalendarConnections', data: data.auth_url });
         window.location.href = data.auth_url;
       }
     } catch (err) {
-      console.error('[CalendarConnections] Connection error:', err);
+      logger.error('[CalendarConnections] Connection error:', err, { component: 'CalendarConnections', action: 'component_action' });
       setError(err instanceof Error ? err.message : 'Failed to connect calendar');
       setConnecting(null);
     }
@@ -536,7 +537,7 @@ export function CalendarConnections() {
       setSuccess(`Sync complete: ${data.events_synced} events processed`);
       fetchConnections();
     } catch (err) {
-      console.error('Sync error:', err);
+      logger.error('Sync error:', err, { component: 'CalendarConnections', action: 'component_action' });
       setError(err instanceof Error ? err.message : 'Failed to sync calendar');
     } finally {
       setSyncing(null);
@@ -570,7 +571,7 @@ export function CalendarConnections() {
       setSuccess('Calendar disconnected successfully');
       fetchConnections();
     } catch (err) {
-      console.error('Disconnect error:', err);
+      logger.error('Disconnect error:', err, { component: 'CalendarConnections', action: 'component_action' });
       setError(err instanceof Error ? err.message : 'Failed to disconnect calendar');
     } finally {
       setDisconnecting(null);

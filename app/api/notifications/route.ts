@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 import {
   inAppNotificationsService,
   type NotificationFilters,
@@ -123,7 +124,7 @@ export async function GET(req: NextRequest) {
     Sentry.captureException(error, {
       tags: { endpoint: '/api/notifications', method: 'GET' },
     });
-    console.error('[API] /api/notifications GET error:', error);
+    logger.error('[API] /api/notifications GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -192,7 +193,7 @@ export async function POST(req: NextRequest) {
     Sentry.captureException(error, {
       tags: { endpoint: '/api/notifications', method: 'POST' },
     });
-    console.error('[API] /api/notifications POST error:', error);
+    logger.error('[API] /api/notifications POST error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -280,7 +281,7 @@ export async function PATCH(req: NextRequest) {
     Sentry.captureException(error, {
       tags: { endpoint: '/api/notifications', method: 'PATCH' },
     });
-    console.error('[API] /api/notifications PATCH error:', error);
+    logger.error('[API] /api/notifications PATCH error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -361,7 +362,7 @@ export async function DELETE(req: NextRequest) {
     Sentry.captureException(error, {
       tags: { endpoint: '/api/notifications', method: 'DELETE' },
     });
-    console.error('[API] /api/notifications DELETE error:', error);
+    logger.error('[API] /api/notifications DELETE error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

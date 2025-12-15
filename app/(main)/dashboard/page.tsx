@@ -24,6 +24,7 @@ import { Tooltip } from '@/components/shared/Tooltip';
 import { createClient } from '@/lib/supabase/client';
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
 import { motion } from 'framer-motion';
+import { logger } from '@/lib/logger';
 import {
   CheckSquare,
   Calendar,
@@ -700,7 +701,7 @@ export default function DashboardPage() {
         },
       });
     } catch (error) {
-      console.error('Failed to load dashboard stats:', error);
+      logger.error('Failed to load dashboard stats:', error, { component: 'page', action: 'execution' });
     } finally {
       setLoading(false);
     }
@@ -890,7 +891,7 @@ export default function DashboardPage() {
               const reactions = await reactionsService.getReactionsForCheckIn(checkIn.id);
               reactionsMap[checkIn.id] = reactions;
             } catch (error) {
-              console.error(`Failed to load reactions for check-in ${checkIn.id}:`, error);
+              logger.error('Failed to load reactions for check-in ${checkIn.id}:', error, { component: 'page', action: 'execution' });
               reactionsMap[checkIn.id] = [];
             }
           })
@@ -907,7 +908,7 @@ export default function DashboardPage() {
           setCheckInExpanded(true);
         }
       } catch (error) {
-        console.error('Failed to load check-ins:', error);
+        logger.error('Failed to load check-ins:', error, { component: 'page', action: 'execution' });
       }
     };
 
@@ -977,7 +978,7 @@ export default function DashboardPage() {
       // Show success modal
       setShowCheckInSuccess(true);
     } catch (error) {
-      console.error('Failed to create check-in:', error);
+      logger.error('Failed to create check-in:', error, { component: 'page', action: 'execution' });
     } finally {
       setCheckInSaving(false);
     }
@@ -1003,7 +1004,7 @@ export default function DashboardPage() {
         [checkinId]: [reaction],
       }));
     } catch (error) {
-      console.error('Failed to send reaction:', error);
+      logger.error('Failed to send reaction:', error, { component: 'page', action: 'execution' });
     } finally {
       setPartnerReactionLoading(false);
     }

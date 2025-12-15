@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 /**
  * Compliance Service
@@ -83,7 +84,7 @@ export async function getPrivacyPreferences(userId: string): Promise<{
 
     if (error && error.code !== 'PGRST116') {
       // PGRST116 is "not found" error
-      console.error('Error fetching privacy preferences:', error);
+      logger.error('Error fetching privacy preferences:', error, { component: 'lib-compliance-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
@@ -107,7 +108,7 @@ export async function getPrivacyPreferences(userId: string): Promise<{
 
     return { success: true, data: data as PrivacyPreferences };
   } catch (error) {
-    console.error('Error fetching privacy preferences:', error);
+    logger.error('Error fetching privacy preferences:', error, { component: 'lib-compliance-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to fetch preferences',
@@ -137,7 +138,7 @@ export async function updatePrivacyPreferences(
       );
 
     if (error) {
-      console.error('Error updating privacy preferences:', error);
+      logger.error('Error updating privacy preferences:', error, { component: 'lib-compliance-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
@@ -152,7 +153,7 @@ export async function updatePrivacyPreferences(
 
     return { success: true };
   } catch (error) {
-    console.error('Error updating privacy preferences:', error);
+    logger.error('Error updating privacy preferences:', error, { component: 'lib-compliance-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to update preferences',
@@ -178,7 +179,7 @@ export async function getCCPAPreference(userId: string): Promise<{
       .single();
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Error fetching CCPA preference:', error);
+      logger.error('Error fetching CCPA preference:', error, { component: 'lib-compliance-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
@@ -194,7 +195,7 @@ export async function getCCPAPreference(userId: string): Promise<{
 
     return { success: true, data: data as CCPAPreference };
   } catch (error) {
-    console.error('Error fetching CCPA preference:', error);
+    logger.error('Error fetching CCPA preference:', error, { component: 'lib-compliance-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to fetch CCPA preference',
@@ -230,13 +231,13 @@ export async function updateCCPAPreference(
       );
 
     if (error) {
-      console.error('Error updating CCPA preference:', error);
+      logger.error('Error updating CCPA preference:', error, { component: 'lib-compliance-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error updating CCPA preference:', error);
+    logger.error('Error updating CCPA preference:', error, { component: 'lib-compliance-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to update CCPA preference',
@@ -262,13 +263,13 @@ export async function getDataProcessingAgreements(userId: string): Promise<{
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching data processing agreements:', error);
+      logger.error('Error fetching data processing agreements:', error, { component: 'lib-compliance-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, data: data as DataProcessingAgreement[] };
   } catch (error) {
-    console.error('Error fetching data processing agreements:', error);
+    logger.error('Error fetching data processing agreements:', error, { component: 'lib-compliance-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to fetch agreements',
@@ -307,7 +308,7 @@ export async function recordConsent(
     });
 
     if (error) {
-      console.error('Error recording consent:', error);
+      logger.error('Error recording consent:', error, { component: 'lib-compliance-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
@@ -322,7 +323,7 @@ export async function recordConsent(
 
     return { success: true };
   } catch (error) {
-    console.error('Error recording consent:', error);
+    logger.error('Error recording consent:', error, { component: 'lib-compliance-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to record consent',
@@ -348,13 +349,13 @@ export async function logComplianceEvent(
     });
 
     if (error) {
-      console.error('Error logging compliance event:', error);
+      logger.error('Error logging compliance event:', error, { component: 'lib-compliance-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error logging compliance event:', error);
+    logger.error('Error logging compliance event:', error, { component: 'lib-compliance-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to log event',
@@ -396,13 +397,13 @@ export async function getComplianceEvents(
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error fetching compliance events:', error);
+      logger.error('Error fetching compliance events:', error, { component: 'lib-compliance-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, data: data as ComplianceEvent[] };
   } catch (error) {
-    console.error('Error fetching compliance events:', error);
+    logger.error('Error fetching compliance events:', error, { component: 'lib-compliance-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to fetch events',

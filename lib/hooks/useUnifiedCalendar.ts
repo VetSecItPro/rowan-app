@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { unifiedCalendarService } from '@/lib/services/calendar/unified-calendar-service';
 import { unifiedCalendarMapper } from '@/lib/services/calendar/unified-calendar-mapper';
+import { logger } from '@/lib/logger';
 import {
   DEFAULT_UNIFIED_FILTERS,
   type UnifiedCalendarItem,
@@ -42,7 +43,7 @@ function loadFiltersFromStorage(): UnifiedCalendarFilters | null {
       }
     }
   } catch (error) {
-    console.warn('[useUnifiedCalendar] Failed to load filters from localStorage:', error);
+    logger.warn('[useUnifiedCalendar] Failed to load filters from localStorage:', { component: 'lib-useUnifiedCalendar', error: error });
   }
   return null;
 }
@@ -56,7 +57,7 @@ function saveFiltersToStorage(filters: UnifiedCalendarFilters): void {
   try {
     localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filters));
   } catch (error) {
-    console.warn('[useUnifiedCalendar] Failed to save filters to localStorage:', error);
+    logger.warn('[useUnifiedCalendar] Failed to save filters to localStorage:', { component: 'lib-useUnifiedCalendar', error: error });
   }
 }
 
@@ -177,7 +178,7 @@ export function useUnifiedCalendar({
         setError(result.errors.join(', '));
       }
     } catch (err) {
-      console.error('[useUnifiedCalendar] Fetch error:', err);
+      logger.error('[useUnifiedCalendar] Fetch error:', err, { component: 'lib-useUnifiedCalendar', action: 'service_call' });
       setError(err instanceof Error ? err.message : 'Failed to fetch calendar items');
     } finally {
       setIsLoading(false);
@@ -235,7 +236,7 @@ export function useUnifiedCalendarDate(
         const result = await unifiedCalendarService.getItemsForDate(spaceId, date, filters);
         setItems(result);
       } catch (err) {
-        console.error('[useUnifiedCalendarDate] Error:', err);
+        logger.error('[useUnifiedCalendarDate] Error:', err, { component: 'lib-useUnifiedCalendar', action: 'service_call' });
       } finally {
         setIsLoading(false);
       }
@@ -267,7 +268,7 @@ export function useUpcomingItems(
         const result = await unifiedCalendarService.getUpcomingItems(spaceId, daysAhead, filters);
         setItems(result);
       } catch (err) {
-        console.error('[useUpcomingItems] Error:', err);
+        logger.error('[useUpcomingItems] Error:', err, { component: 'lib-useUnifiedCalendar', action: 'service_call' });
       } finally {
         setIsLoading(false);
       }

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { z } from 'zod';
 import { notificationQueueService } from './notification-queue-service';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // TYPES & VALIDATION
@@ -134,7 +135,7 @@ export const reminderNotificationsService = {
     });
 
     if (error) {
-      console.error('Error checking quiet hours:', error);
+      logger.error('Error checking quiet hours:', error, { component: 'lib-reminder-notifications-service', action: 'service_call' });
       return false;
     }
 
@@ -164,7 +165,7 @@ export const reminderNotificationsService = {
         .single();
 
       if (reminderError || !reminder) {
-        console.error('Reminder not found:', reminderError);
+        logger.error('Reminder not found:', reminderError, { component: 'lib-reminder-notifications-service', action: 'service_call' });
         return null;
       }
 
@@ -180,7 +181,7 @@ export const reminderNotificationsService = {
         .single();
 
       if (goalError || !goal) {
-        console.error('Goal not found:', goalError);
+        logger.error('Goal not found:', goalError, { component: 'lib-reminder-notifications-service', action: 'service_call' });
         return null;
       }
 
@@ -188,7 +189,7 @@ export const reminderNotificationsService = {
       entityTitle = goal.title;
       entityEmoji = '🎯'; // Default emoji for goals
     } else {
-      console.error('Neither reminder_id nor goal_id provided');
+      logger.error('Neither reminder_id nor goal_id provided', undefined, { component: 'lib-reminder-notifications-service', action: 'service_call' });
       return null;
     }
 
@@ -196,7 +197,7 @@ export const reminderNotificationsService = {
     const prefs = await this.getPreferences(validated.user_id, spaceId);
 
     if (!prefs) {
-      console.log('No preferences found for user, using defaults');
+      logger.info('No preferences found for user, using defaults', { component: 'lib-reminder-notifications-service' });
     }
 
     // Check if user should receive this notification
@@ -208,7 +209,7 @@ export const reminderNotificationsService = {
     });
 
     if (!shouldSend) {
-      console.log('Notification blocked by user preferences');
+      logger.info('Notification blocked by user preferences', { component: 'lib-reminder-notifications-service' });
       return null;
     }
 
@@ -228,7 +229,7 @@ export const reminderNotificationsService = {
       .single();
 
     if (error) {
-      console.error('Error creating notification:', error);
+      logger.error('Error creating notification:', error, { component: 'lib-reminder-notifications-service', action: 'service_call' });
       throw new Error('Failed to create notification');
     }
 
@@ -298,11 +299,11 @@ export const reminderNotificationsService = {
     reminder: { title: string; emoji?: string }
   ): Promise<void> {
     // TODO: Integrate with email service (Resend)
-    console.log('Sending email notification:', {
+    logger.info('Sending email notification:', { component: 'lib-reminder-notifications-service', data: {
       userId,
       type,
       reminder,
-    });
+    } });
   },
 
   /**
@@ -329,7 +330,7 @@ export const reminderNotificationsService = {
         }),
       });
     } catch (error) {
-      console.error('Error sending push notification:', error);
+      logger.error('Error sending push notification:', error, { component: 'lib-reminder-notifications-service', action: 'service_call' });
     }
   },
 
@@ -411,7 +412,7 @@ export const reminderNotificationsService = {
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error fetching notifications:', error);
+      logger.error('Error fetching notifications:', error, { component: 'lib-reminder-notifications-service', action: 'service_call' });
       throw new Error('Failed to fetch notifications');
     }
 
@@ -431,7 +432,7 @@ export const reminderNotificationsService = {
       .eq('is_read', false);
 
     if (error) {
-      console.error('Error fetching unread count:', error);
+      logger.error('Error fetching unread count:', error, { component: 'lib-reminder-notifications-service', action: 'service_call' });
       return 0;
     }
 
@@ -450,7 +451,7 @@ export const reminderNotificationsService = {
       .eq('id', notificationId);
 
     if (error) {
-      console.error('Error marking notification as read:', error);
+      logger.error('Error marking notification as read:', error, { component: 'lib-reminder-notifications-service', action: 'service_call' });
       throw new Error('Failed to mark notification as read');
     }
   },
@@ -468,7 +469,7 @@ export const reminderNotificationsService = {
       .eq('is_read', false);
 
     if (error) {
-      console.error('Error marking all notifications as read:', error);
+      logger.error('Error marking all notifications as read:', error, { component: 'lib-reminder-notifications-service', action: 'service_call' });
       throw new Error('Failed to mark all notifications as read');
     }
   },
@@ -491,7 +492,7 @@ export const reminderNotificationsService = {
       if (error.code === 'PGRST116') {
         return null;
       }
-      console.error('Error fetching preferences:', error);
+      logger.error('Error fetching preferences:', error, { component: 'lib-reminder-notifications-service', action: 'service_call' });
       throw new Error('Failed to fetch preferences');
     }
 
@@ -527,7 +528,7 @@ export const reminderNotificationsService = {
         .single();
 
       if (error) {
-        console.error('Error updating preferences:', error);
+        logger.error('Error updating preferences:', error, { component: 'lib-reminder-notifications-service', action: 'service_call' });
         throw new Error('Failed to update preferences');
       }
 
@@ -544,7 +545,7 @@ export const reminderNotificationsService = {
         .single();
 
       if (error) {
-        console.error('Error creating preferences:', error);
+        logger.error('Error creating preferences:', error, { component: 'lib-reminder-notifications-service', action: 'service_call' });
         throw new Error('Failed to create preferences');
       }
 

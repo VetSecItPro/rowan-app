@@ -9,6 +9,7 @@ import { createClient } from '../supabase/server';
 import { getUserTier } from './subscription-service';
 import { getFeatureLimits, isUnlimited, hasReachedLimit } from '../config/feature-limits';
 import type { UsageType } from '../types';
+import { logger } from '@/lib/logger';
 
 /**
  * Get today's usage for a user and usage type
@@ -89,7 +90,7 @@ export async function incrementUsage(
       .eq('id', existing.id);
 
     if (error) {
-      console.error('Error incrementing usage:', error);
+      logger.error('Error incrementing usage:', error, { component: 'lib-usage-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
   } else {
@@ -106,7 +107,7 @@ export async function incrementUsage(
       });
 
     if (error) {
-      console.error('Error creating usage record:', error);
+      logger.error('Error creating usage record:', error, { component: 'lib-usage-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
   }
@@ -275,7 +276,7 @@ export async function resetDailyUsage(): Promise<{ success: boolean; error?: str
     .lt('date', today);
 
   if (error) {
-    console.error('Error resetting daily usage:', error);
+    logger.error('Error resetting daily usage:', error, { component: 'lib-usage-service', action: 'service_call' });
     return { success: false, error: error.message };
   }
 

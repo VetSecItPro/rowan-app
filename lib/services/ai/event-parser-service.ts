@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // Zod schema for parsed event validation
 const ParsedEventSchema = z.object({
@@ -128,14 +129,14 @@ Parse this text and return the JSON object:`;
       try {
         parsedJson = JSON.parse(cleanedResponse);
       } catch {
-        console.error('[EventParser] Failed to parse JSON:', cleanedResponse);
+        logger.error('[EventParser] Failed to parse JSON:', cleanedResponse, { component: 'lib-event-parser-service', action: 'service_call' });
         return { success: false, error: 'AI response was not valid JSON' };
       }
 
       // Validate with Zod schema
       const validated = ParsedEventSchema.safeParse(parsedJson);
       if (!validated.success) {
-        console.error('[EventParser] Validation failed:', validated.error.issues);
+        logger.error('[EventParser] Validation failed:', undefined, { component: 'lib-event-parser-service', action: 'service_call', details: validated.error.issues });
         return {
           success: false,
           error: `Invalid event data: ${validated.error.issues.map((issue) => issue.message).join(', ')}`
@@ -144,7 +145,7 @@ Parse this text and return the JSON object:`;
 
       return { success: true, data: validated.data };
     } catch (error) {
-      console.error('[EventParser] Error parsing event:', error);
+      logger.error('[EventParser] Error parsing event:', error, { component: 'lib-event-parser-service', action: 'service_call' });
 
       if (error instanceof Error) {
         // Check for specific API errors

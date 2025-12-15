@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { logger } from '@/lib/logger';
 import {
   DndContext,
   DragEndEvent,
@@ -356,7 +357,7 @@ export function DraggableTaskList({
       );
       await Promise.all(updates);
     } catch (error) {
-      console.error('Error updating task order:', error);
+      logger.error('Error updating task order:', error, { component: 'DraggableTaskList', action: 'component_action' });
       // Revert on error
       setTasks(initialTasks);
     }

@@ -3,6 +3,7 @@ import { exportAllUserData } from '@/lib/services/data-export-service';
 import { NextRequest, NextResponse } from 'next/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('Error in data export API:', error);
+    logger.error('Error in data export API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import type { Chore } from '@/lib/types';
+import { logger } from '@/lib/logger';
 
 interface UseChoreRealtimeOptions {
   spaceId: string;
@@ -36,7 +37,7 @@ export function useChoreRealtime({
 
     const emergencyTimeout = setTimeout(() => {
       if (loading) {
-        console.warn('[useChoreRealtime] Emergency timeout reached - forcing loading completion');
+        logger.warn('[useChoreRealtime] Emergency timeout reached - forcing loading completion', { component: 'hook-useChoreRealtime' });
         setTimeoutReached(true);
         setLoading(false);
         setError(new Error('Loading timeout - please refresh to try again'));
@@ -80,7 +81,7 @@ export function useChoreRealtime({
 
         return !memberError && !!membership;
       } catch (err) {
-        console.warn('[useChoreRealtime] Access verification timeout or error:', err);
+        logger.warn('[useChoreRealtime] Access verification timeout or error:', { component: 'hook-useChoreRealtime', error: err });
         return false;
       }
     }
@@ -89,7 +90,7 @@ export function useChoreRealtime({
       try {
         // If timeout already reached, skip loading and use empty state
         if (timeoutReached) {
-          console.warn('[useChoreRealtime] Timeout reached - skipping data load');
+          logger.warn('[useChoreRealtime] Timeout reached - skipping data load', { component: 'hook-useChoreRealtime' });
           setChores([]);
           setLoading(false);
           return;
@@ -307,7 +308,7 @@ export function useChoreCompletionRealtime(choreId: string) {
         if (error) throw error;
         setCompletions(data || []);
       } catch (err) {
-        console.error('Error loading chore completions:', err);
+        logger.error('Error loading chore completions:', err, { component: 'hook-useChoreRealtime', action: 'hook_execution' });
       } finally {
         setLoading(false);
       }

@@ -6,6 +6,7 @@ import { reminderNotificationsService, ReminderNotification } from '@/lib/servic
 import { formatRelativeTime } from '@/lib/utils/date-utils';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface NotificationCenterProps {
   userId: string;
@@ -31,7 +32,7 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
       const count = await reminderNotificationsService.getUnreadCount(userId);
       setUnreadCount(count);
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      logger.error('Error fetching notifications:', error, { component: 'NotificationCenter', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -72,7 +73,7 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
       await reminderNotificationsService.markAsRead(notificationId);
       await fetchNotifications();
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      logger.error('Error marking notification as read:', error, { component: 'NotificationCenter', action: 'component_action' });
     }
   };
 
@@ -82,7 +83,7 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
       await reminderNotificationsService.markAllAsRead(userId);
       await fetchNotifications();
     } catch (error) {
-      console.error('Error marking all notifications as read:', error);
+      logger.error('Error marking all notifications as read:', error, { component: 'NotificationCenter', action: 'component_action' });
     }
   };
 

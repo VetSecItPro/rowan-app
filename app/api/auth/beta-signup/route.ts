@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { authRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 // Security: Beta password loaded from environment variable (never hardcode)
 // Set BETA_PASSWORD in Vercel environment variables
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
     // Validate that BETA_PASSWORD is configured (runtime check)
     const BETA_PASSWORD = process.env.BETA_PASSWORD;
     if (!BETA_PASSWORD) {
-      console.error('BETA_PASSWORD environment variable is not configured');
+      logger.error('BETA_PASSWORD environment variable is not configured', undefined, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: 'Beta signup is temporarily unavailable' },
         { status: 503 }
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (authError) {
-      console.error('Auth signup error:', authError);
+      logger.error('Auth signup error:', authError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: authError.message || 'Failed to create account' },
         { status: 400 }
@@ -103,7 +104,7 @@ export async function POST(request: NextRequest) {
       .eq('id', authData.user.id);
 
     if (updateError) {
-      console.error('Error updating user with beta status:', updateError);
+      logger.error('Error updating user with beta status:', updateError, { component: 'api-route', action: 'api_request' });
       // Don't fail the request, as the auth creation succeeded
       // The auth trigger should handle this, but we'll log the error
     }
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (activityError) {
-      console.error('Error logging beta activity:', activityError);
+      logger.error('Error logging beta activity:', activityError, { component: 'api-route', action: 'api_request' });
       // Don't fail the request for logging errors
     }
 
@@ -137,7 +138,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Beta signup error:', error);
+    logger.error('Beta signup error:', error, { component: 'api-route', action: 'api_request' });
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(

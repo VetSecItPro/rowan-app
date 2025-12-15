@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
+import { logger } from '@/lib/logger';
 
 // Validation schema for cookie preferences
 const CookiePreferencesSchema = z.object({
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (privacyError) {
-      console.error('Error fetching privacy preferences:', privacyError);
+      logger.error('Error fetching privacy preferences:', privacyError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { success: false, error: 'Failed to fetch preferences' },
         { status: 500 }
@@ -85,7 +86,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Cookie preferences GET error:', error);
+    logger.error('Cookie preferences GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -141,7 +142,7 @@ export async function POST(request: NextRequest) {
       .eq('user_id', userId);
 
     if (updateError) {
-      console.error('Error updating privacy preferences:', updateError);
+      logger.error('Error updating privacy preferences:', updateError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { success: false, error: 'Failed to update preferences' },
         { status: 500 }
@@ -178,7 +179,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error('Cookie preferences POST error:', error);
+    logger.error('Cookie preferences POST error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -191,30 +192,30 @@ async function applyCookiePreferences(userId: string, preferences: any) {
   try {
     // 1. Update Google Analytics consent
     if (process.env.GOOGLE_ANALYTICS_MEASUREMENT_ID) {
-      console.log(`📊 Google Analytics consent ${preferences.analytics ? 'granted' : 'denied'} for user ${userId}`);
+      logger.info(`📊 Google Analytics consent ${preferences.analytics ? 'granted' : 'denied'} for user ${userId}`, { component: 'api-route' });
       // In a real implementation:
       // await updateGoogleAnalyticsConsent(userId, preferences.analytics);
     }
 
     // 2. Update Facebook Pixel consent
     if (process.env.FACEBOOK_PIXEL_ID) {
-      console.log(`📢 Facebook Pixel consent ${preferences.marketing ? 'granted' : 'denied'} for user ${userId}`);
+      logger.info(`📢 Facebook Pixel consent ${preferences.marketing ? 'granted' : 'denied'} for user ${userId}`, { component: 'api-route' });
       // In a real implementation:
       // await updateFacebookPixelConsent(userId, preferences.marketing);
     }
 
     // 3. Update Vercel Analytics
-    console.log(`📈 Vercel Analytics consent ${preferences.analytics ? 'granted' : 'denied'} for user ${userId}`);
+    logger.info(`📈 Vercel Analytics consent ${preferences.analytics ? 'granted' : 'denied'} for user ${userId}`, { component: 'api-route' });
 
     // 4. Update other third-party services based on functional preferences
     if (!preferences.functional) {
-      console.log(`⚙️ Functional cookies disabled for user ${userId}`);
+      logger.info(`⚙️ Functional cookies disabled for user ${userId}`, { component: 'api-route' });
       // Disable non-essential functional features
     }
 
-    console.log(`✅ Cookie preferences applied for user ${userId}`);
+    logger.info(`✅ Cookie preferences applied for user ${userId}`, { component: 'api-route' });
   } catch (error) {
-    console.error('❌ Error applying cookie preferences:', error);
+    logger.error('❌ Error applying cookie preferences:', error, { component: 'api-route', action: 'api_request' });
     // Don't throw error here to avoid breaking the preference update
   }
 }
@@ -269,7 +270,7 @@ export async function DELETE(request: NextRequest) {
       .eq('user_id', userId);
 
     if (updateError) {
-      console.error('Error resetting privacy preferences:', updateError);
+      logger.error('Error resetting privacy preferences:', updateError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { success: false, error: 'Failed to reset preferences' },
         { status: 500 }
@@ -299,7 +300,7 @@ export async function DELETE(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Cookie preferences DELETE error:', error);
+    logger.error('Cookie preferences DELETE error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }

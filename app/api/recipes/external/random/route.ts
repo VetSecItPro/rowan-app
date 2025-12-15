@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // Query parameter validation schema
 const QueryParamsSchema = z.object({
@@ -104,7 +105,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.error('Random recipes API error:', error);
+    logger.error('Random recipes API error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to fetch random recipes' },
       { status: 500 }

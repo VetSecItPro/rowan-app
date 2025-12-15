@@ -3,6 +3,7 @@ import { weatherCacheService } from '@/lib/services/weather-cache-service';
 import { z } from 'zod';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 // Query parameter validation schema with geographic bounds
 const QueryParamsSchema = z.object({
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
     });
     const { lat: latNum, lon: lonNum, date } = validatedParams;
 
-    console.log('[Weather Forecast API] Fetching weather for:', { lat: latNum, lon: lonNum, date });
+    logger.info('[Weather Forecast API] Fetching weather for:', { component: 'api-route', data: { lat: latNum, lon: lonNum, date } });
 
     // Create location string and event time for cache key
     const location = `${latNum},${lonNum}`;
@@ -81,7 +82,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('[Weather Forecast API] Returning weather:', forecast);
+    logger.info('[Weather Forecast API] Returning weather:', { component: 'api-route', data: forecast });
     return NextResponse.json(forecast);
   } catch (error) {
     // Handle Zod validation errors
@@ -92,7 +93,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.error('[Weather Forecast API] Error:', error);
+    logger.error('[Weather Forecast API] Error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to fetch weather forecast' },
       { status: 500 }

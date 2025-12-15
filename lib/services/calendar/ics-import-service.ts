@@ -4,6 +4,7 @@
 import { createClient } from '@/lib/supabase/server';
 import type { ICSFeedConfig, SyncResult } from '@/lib/types/calendar-integration';
 import ICAL from 'ical.js';
+import { logger } from '@/lib/logger';
 
 /**
  * ICS Import Service
@@ -159,7 +160,7 @@ function parseICSData(icsData: string): ParsedICSEvent[] {
         const endDate = event.endDate;
 
         if (!startDate) {
-          console.warn('[ICS Parser] Skipping event without start date:', event.uid);
+          logger.warn('[ICS Parser] Skipping event without start date', { component: 'lib-ics-import-service', eventUid: event.uid });
           continue;
         }
 
@@ -196,12 +197,12 @@ function parseICSData(icsData: string): ParsedICSEvent[] {
           lastModified,
         });
       } catch (eventError) {
-        console.warn('[ICS Parser] Failed to parse event:', eventError);
+        logger.warn('[ICS Parser] Failed to parse event:', { component: 'lib-ics-import-service', error: eventError });
         // Continue with other events
       }
     }
   } catch (parseError) {
-    console.error('[ICS Parser] Failed to parse ICS data:', parseError);
+    logger.error('[ICS Parser] Failed to parse ICS data:', parseError, { component: 'lib-ics-import-service', action: 'service_call' });
     throw new Error('Failed to parse ICS calendar data');
   }
 
@@ -253,7 +254,7 @@ async function syncICSFeed(
 
     // If not modified, nothing to do
     if (fetchResult.notModified) {
-      console.log(`[ICS Sync] Feed not modified for connection ${connectionId}`);
+      logger.info(`[ICS Sync] Feed not modified for connection ${connectionId}`, { component: 'lib-ics-import-service' });
       return {
         success: true,
         connection_id: connectionId,
@@ -270,7 +271,7 @@ async function syncICSFeed(
 
     // Parse ICS data
     const icsEvents = parseICSData(fetchResult.data!);
-    console.log(`[ICS Sync] Parsed ${icsEvents.length} events from feed`);
+    logger.info(`[ICS Sync] Parsed ${icsEvents.length} events from feed`, { component: 'lib-ics-import-service' });
 
     // Get existing event mappings for this connection
     const { data: existingMappings } = await supabase
@@ -411,7 +412,7 @@ async function syncICSFeed(
       duration_ms: Date.now() - startTime,
     };
   } catch (error) {
-    console.error('[ICS Sync] Sync failed:', error);
+    logger.error('[ICS Sync] Sync failed:', error, { component: 'lib-ics-import-service', action: 'service_call' });
 
     const supabase = await createClient();
 
@@ -512,7 +513,7 @@ async function importICSFile(
       eventsImported,
     };
   } catch (error) {
-    console.error('[ICS File Import] Error:', error);
+    logger.error('[ICS File Import] Error:', error, { component: 'lib-ics-import-service', action: 'service_call' });
     return {
       success: false,
       eventsImported: 0,

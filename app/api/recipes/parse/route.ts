@@ -5,6 +5,7 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { logger } from '@/lib/logger';
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '');
 
@@ -177,7 +178,7 @@ ${text ? `Recipe content:\n${text}` : 'See the image for recipe content.'}`;
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('Recipe parsing error:', error);
+    logger.error('Recipe parsing error:', error, { component: 'api-route', action: 'api_request' });
 
     if (error instanceof SyntaxError) {
       return NextResponse.json(

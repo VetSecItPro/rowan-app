@@ -5,6 +5,7 @@ import { X, Clock, Plus, Trash2, Star } from 'lucide-react';
 import { calendarService, EventTemplate, CreateTemplateInput } from '@/lib/services/calendar-service';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { format, addHours } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 interface TemplateLibraryProps {
   isOpen: boolean;
@@ -36,7 +37,7 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
       const data = await calendarService.getTemplates(spaceId);
       setTemplates(data);
     } catch (error) {
-      console.error('Error loading templates:', error);
+      logger.error('Error loading templates:', error, { component: 'TemplateLibrary', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -60,7 +61,7 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
       await calendarService.deleteTemplate(templateToDelete);
       setTemplates(templates.filter(t => t.id !== templateToDelete));
     } catch (error) {
-      console.error('Error deleting template:', error);
+      logger.error('Error deleting template:', error, { component: 'TemplateLibrary', action: 'component_action' });
       alert('Failed to delete template');
     } finally {
       setShowDeleteConfirm(false);

@@ -7,6 +7,7 @@ import { format, formatDistanceToNow } from 'date-fns';
 import { useParams } from 'next/navigation';
 import { ReportsPage } from '@/components/reports/ReportsPage';
 import { getGeneratedReports, type GeneratedReport } from '@/lib/services/financial-reports-service';
+import { logger } from '@/lib/logger';
 
 type TimeRange = '1m' | '3m' | '6m' | '12m';
 type ViewMode = 'analytics' | 'reports';
@@ -34,7 +35,7 @@ export default function BudgetAnalyticsPage() {
       const reports = await getGeneratedReports(spaceId, 3); // Get 3 most recent reports
       setRecentReports(reports || []);
     } catch (error) {
-      console.error('Error loading recent reports:', error);
+      logger.error('Error loading recent reports:', error, { component: 'page', action: 'execution' });
     } finally {
       setLoadingReports(false);
     }

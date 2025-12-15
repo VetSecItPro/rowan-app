@@ -8,6 +8,7 @@ import { ManualSyncRequestSchema } from '@/lib/validations/calendar-integration-
 import { z } from 'zod';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 // Query parameter validation schema for GET endpoint
 const GetQueryParamsSchema = z.object({
@@ -16,7 +17,7 @@ const GetQueryParamsSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  console.log('[Calendar Sync] POST request received');
+  logger.info('[Calendar Sync] POST request received', { component: 'api-route' });
 
   try {
     // Rate limiting
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
 
-    console.log('[Calendar Sync] Auth check:', { userId: user?.id, authError: authError?.message });
+    logger.info('[Calendar Sync] Auth check:', { component: 'api-route', data: { userId: user?.id, authError: authError?.message } });
 
     if (authError || !user) {
       return NextResponse.json(
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     // Parse and validate request body
     const body = await request.json();
-    console.log('[Calendar Sync] Request body:', body);
+    logger.info('[Calendar Sync] Request body:', { component: 'api-route', data: body });
     const validatedData = ManualSyncRequestSchema.parse(body);
 
     // Verify connection exists and get ownership info
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (connectionError || !connection) {
-      console.error('[Calendar Sync] Connection not found:', connectionError);
+      logger.error('[Calendar Sync] Connection not found:', connectionError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: 'Calendar connection not found' },
         { status: 404 }
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (!spaceMember) {
-      console.error('[Calendar Sync] Access denied for user:', user.id);
+      logger.error('[Calendar Sync] Access denied for user:', undefined, { component: 'api-route', action: 'api_request', details: user.id });
       return NextResponse.json(
         { error: 'Access denied to this calendar connection' },
         { status: 403 }
@@ -85,7 +86,7 @@ export async function POST(request: NextRequest) {
     const isAdmin = spaceMember.role === 'admin' || spaceMember.role === 'owner';
 
     if (!isOwner && !isAdmin) {
-      console.error('[Calendar Sync] User does not own connection:', user.id);
+      logger.error('[Calendar Sync] User does not own connection:', undefined, { component: 'api-route', action: 'api_request', details: user.id });
       return NextResponse.json(
         { error: 'You can only sync your own calendar connections' },
         { status: 403 }
@@ -150,7 +151,7 @@ export async function POST(request: NextRequest) {
       message: `Sync completed successfully. ${totalEvents} events processed.`,
     });
   } catch (error) {
-    console.error('Calendar sync error:', error);
+    logger.error('Calendar sync error:', error, { component: 'api-route', action: 'api_request' });
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -273,7 +274,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.error('Failed to get sync status:', error);
+    logger.error('Failed to get sync status:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to fetch sync status' },
       { status: 500 }

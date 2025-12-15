@@ -5,6 +5,7 @@ import { Sparkles, X, Calendar, Clock, MapPin, Tag, Wand2, FileText, AlertCircle
 import { parseEventText, getEventSuggestions, isValidParsedEvent, ParsedEvent } from '@/lib/services/natural-language-parser';
 import { format } from 'date-fns';
 import type { AIParseResult } from '@/lib/services/ai/event-parser-service';
+import { logger } from '@/lib/logger';
 
 interface QuickAddEventProps {
   onCreateEvent: (eventData: any) => void;
@@ -127,7 +128,7 @@ export function QuickAddEvent({ onCreateEvent, isOpen, onClose, spaceId }: Quick
         confidence: event.confidence,
       });
     } catch (error) {
-      console.error('[QuickAddEvent] AI parsing error:', error);
+      logger.error('[QuickAddEvent] AI parsing error:', error, { component: 'QuickAddEvent', action: 'component_action' });
       setAiError('Failed to connect to AI service');
     } finally {
       setIsAILoading(false);

@@ -5,6 +5,7 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/spaces/[spaceId]/export
@@ -75,7 +76,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ spaceId: 
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/spaces/[spaceId]/export GET error:', error);
+    logger.error('[API] /api/spaces/[spaceId]/export GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -191,7 +192,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ spaceId:
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/spaces/[spaceId]/export POST error:', error);
+    logger.error('[API] /api/spaces/[spaceId]/export POST error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

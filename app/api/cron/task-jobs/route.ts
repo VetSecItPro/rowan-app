@@ -3,6 +3,7 @@ import { generateRecurringTasks } from '@/lib/jobs/task-recurrence-job';
 import { processTaskReminders } from '@/lib/jobs/task-reminders-job';
 import { runDailyCleanup, refreshMaterializedViews } from '@/lib/jobs/cleanup-jobs';
 import { processChoreRotations } from '@/lib/jobs/chore-rotation-job';
+import { logger } from '@/lib/logger';
 
 /**
  * Cron API Route for Task Background Jobs
@@ -25,7 +26,7 @@ export async function GET(request: Request) {
 
   // SECURITY: Fail-closed if CRON_SECRET is not configured
   if (!process.env.CRON_SECRET) {
-    console.error('[CRON] CRON_SECRET environment variable not configured');
+    logger.error('[CRON] CRON_SECRET environment variable not configured', undefined, { component: 'api-route', action: 'api_request' });
     return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
   }
 
@@ -72,7 +73,7 @@ export async function GET(request: Request) {
         );
     }
   } catch (error) {
-    console.error('Cron job error:', error);
+    logger.error('Cron job error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json({ error: 'Job failed', details: error }, { status: 500 });
   }
 }

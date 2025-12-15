@@ -5,6 +5,7 @@ import { verifyResourceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 /**
  * PATCH /api/shopping/[id]/sharing
@@ -123,7 +124,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     }
 
     // Log the sharing action for security monitoring
-    console.log(`Shopping list sharing updated: ${listId} -> ${isPublic ? 'public' : 'private'} by user ${session.user.id} from IP ${ip}`);
+    logger.info(`Shopping list sharing updated: ${listId} -> ${isPublic ? 'public' : 'private'} by user ${session.user.id} from IP ${ip}`, { component: 'api-route' });
 
     // Prepare response data
     const responseData = {
@@ -149,7 +150,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/shopping/[id]/sharing PATCH error:', error);
+    logger.error('[API] /api/shopping/[id]/sharing PATCH error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to update sharing settings' },
       { status: 500 }
@@ -240,7 +241,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/shopping/[id]/sharing GET error:', error);
+    logger.error('[API] /api/shopping/[id]/sharing GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to get sharing information' },
       { status: 500 }

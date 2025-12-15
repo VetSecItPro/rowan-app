@@ -10,6 +10,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { constructWebhookEvent, handleWebhookEvent } from '../../../../lib/stripe/webhooks';
+import { logger } from '@/lib/logger';
 
 // Disable body parsing - Stripe needs raw body for signature verification
 export const runtime = 'nodejs';
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
     const signature = request.headers.get('stripe-signature');
 
     if (!signature) {
-      console.error('Missing stripe-signature header');
+      logger.error('Missing stripe-signature header', undefined, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: 'Missing stripe-signature header' },
         { status: 400 }
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true });
 
   } catch (error) {
-    console.error('Webhook error:', error);
+    logger.error('Webhook error:', error, { component: 'api-route', action: 'api_request' });
 
     // Return error response
     return NextResponse.json(

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import {
   Tags,
   FolderOpen,
@@ -97,7 +98,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
       setCategories(categoriesData);
       setTags(tagsData);
     } catch (error) {
-      console.error('Error loading data:', error);
+      logger.error('Error loading data:', error, { component: 'CategoryTagManager', action: 'component_action' });
     } finally {
       setIsLoading(false);
     }
@@ -130,7 +131,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
       await loadData();
       resetCategoryForm();
     } catch (error) {
-      console.error('Error saving category:', error);
+      logger.error('Error saving category:', error, { component: 'CategoryTagManager', action: 'component_action' });
       alert('Failed to save category');
     }
   };
@@ -151,7 +152,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
       await deleteCustomCategory(categoryId);
       await loadData();
     } catch (error) {
-      console.error('Error deleting category:', error);
+      logger.error('Error deleting category:', error, { component: 'CategoryTagManager', action: 'component_action' });
       alert('Failed to delete category');
     }
   };
@@ -189,7 +190,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
       await loadData();
       resetTagForm();
     } catch (error) {
-      console.error('Error saving tag:', error);
+      logger.error('Error saving tag:', error, { component: 'CategoryTagManager', action: 'component_action' });
       alert('Failed to save tag');
     }
   };
@@ -208,7 +209,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
       await deleteTag(tagId);
       await loadData();
     } catch (error) {
-      console.error('Error deleting tag:', error);
+      logger.error('Error deleting tag:', error, { component: 'CategoryTagManager', action: 'component_action' });
       alert('Failed to delete tag');
     }
   };

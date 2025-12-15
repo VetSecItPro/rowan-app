@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { format, subDays, subMonths, subQuarters, subYears, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear } from 'date-fns';
+import { logger } from '@/lib/logger';
 import {
   CalendarIcon,
   ChartBarIcon,
@@ -113,7 +114,7 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
 
       onReportGenerated(result);
     } catch (error) {
-      console.error('Error generating report:', error);
+      logger.error('Error generating report:', error, { component: 'ReportGenerator', action: 'component_action' });
       setError('An unexpected error occurred while generating the report');
     } finally {
       setIsGenerating(false);

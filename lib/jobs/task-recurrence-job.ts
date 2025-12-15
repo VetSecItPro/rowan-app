@@ -7,6 +7,7 @@
 
 import { createClient } from '@/lib/supabase/client';
 import { taskRecurrenceService } from '@/lib/services/task-recurrence-service';
+import { logger } from '@/lib/logger';
 
 export async function generateRecurringTasks() {
   const supabase = createClient();
@@ -65,10 +66,10 @@ export async function generateRecurringTasks() {
       }
     }
 
-    console.log(`Generated ${generated} recurring task instances`);
+    logger.info(`Generated ${generated} recurring task instances`, { component: 'task-recurrence-job' });
     return { success: true, generated };
   } catch (error) {
-    console.error('Error generating recurring tasks:', error);
+    logger.error('Error generating recurring tasks:', error, { component: 'task-recurrence-job', action: 'service_call' });
     return { success: false, error };
   }
 }

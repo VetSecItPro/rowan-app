@@ -3,6 +3,7 @@
 import { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { X, Bell, Clock, Calendar, Volume2, VolumeX } from 'lucide-react';
+import { logger } from '@/lib/logger';
 import {
   smartNudgesService,
   NudgeSettings,
@@ -79,7 +80,7 @@ export function NudgeSettingsModal({
       onSettingsUpdate?.(updatedSettings);
       toast.success('Nudge settings updated!');
     } catch (error) {
-      console.error('Failed to update settings:', error);
+      logger.error('Failed to update settings:', error, { component: 'NudgeSettingsModal', action: 'component_action' });
       toast.error('Failed to update settings');
     } finally {
       setLoading(false);

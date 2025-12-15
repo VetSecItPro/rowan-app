@@ -6,6 +6,7 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { verifyResourceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/projects/[id]
@@ -78,7 +79,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
       data: project,
     });
   } catch (error) {
-    console.error('[API] /api/projects/[id] GET error:', error);
+    logger.error('[API] /api/projects/[id] GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -161,7 +162,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       data: project,
     });
   } catch (error) {
-    console.error('[API] /api/projects/[id] PATCH error:', error);
+    logger.error('[API] /api/projects/[id] PATCH error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to update project' },
       { status: 500 }
@@ -233,7 +234,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
       message: 'Project deleted successfully',
     });
   } catch (error) {
-    console.error('[API] /api/projects/[id] DELETE error:', error);
+    logger.error('[API] /api/projects/[id] DELETE error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to delete project' },
       { status: 500 }

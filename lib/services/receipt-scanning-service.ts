@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { fileUploadService, FileUploadResult } from './file-upload-service';
 import { mapReceiptCategory, getDefaultCategoriesForDomain } from '@/lib/constants/default-categories';
+import { logger } from '@/lib/logger';
 
 export interface ReceiptData {
   id: string;
@@ -196,7 +197,7 @@ export const receiptScanningService = {
           //   .eq('id', receiptRecord.id);
 
         } catch (error) {
-          console.error('Failed to auto-create expense:', error);
+          logger.error('Failed to auto-create expense:', error, { component: 'lib-receipt-scanning-service', action: 'service_call' });
         }
       }
 
@@ -209,7 +210,7 @@ export const receiptScanningService = {
       };
 
     } catch (error) {
-      console.error('Error processing receipt:', error);
+      logger.error('Error processing receipt:', error, { component: 'lib-receipt-scanning-service', action: 'service_call' });
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error occurred'
@@ -239,7 +240,7 @@ export const receiptScanningService = {
       };
 
     } catch (error) {
-      console.error('OCR extraction failed:', error);
+      logger.error('OCR extraction failed:', error, { component: 'lib-receipt-scanning-service', action: 'service_call' });
       return {
         text: '',
         confidence: 0
@@ -374,7 +375,7 @@ Thank you for shopping with us!`;
       extractedData.currency = 'USD';
 
     } catch (error) {
-      console.error('Error parsing receipt text:', error);
+      logger.error('Error parsing receipt text:', error, { component: 'lib-receipt-scanning-service', action: 'service_call' });
     }
 
     return extractedData;
@@ -509,7 +510,7 @@ Thank you for shopping with us!`;
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error getting receipt:', error);
+      logger.error('Error getting receipt:', error, { component: 'lib-receipt-scanning-service', action: 'service_call' });
       return null;
     }
   },
@@ -529,7 +530,7 @@ Thank you for shopping with us!`;
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error getting space receipts:', error);
+      logger.error('Error getting space receipts:', error, { component: 'lib-receipt-scanning-service', action: 'service_call' });
       return [];
     }
   },
@@ -555,7 +556,7 @@ Thank you for shopping with us!`;
       if (error) throw error;
       return true;
     } catch (error) {
-      console.error('Error deleting receipt:', error);
+      logger.error('Error deleting receipt:', error, { component: 'lib-receipt-scanning-service', action: 'service_call' });
       return false;
     }
   },
@@ -574,7 +575,7 @@ Thank you for shopping with us!`;
       if (error) throw error;
       return true;
     } catch (error) {
-      console.error('Error linking receipt to expense:', error);
+      logger.error('Error linking receipt to expense:', error, { component: 'lib-receipt-scanning-service', action: 'service_call' });
       return false;
     }
   }

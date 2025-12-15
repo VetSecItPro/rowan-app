@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Download, FileText, X, Calendar, FileSpreadsheet, File } from 'lucide-react';
 import { exportService } from '@/lib/services/export-service';
 import { pdfExportService } from '@/lib/services/pdf-export-service';
+import { logger } from '@/lib/logger';
 
 interface ExportButtonProps {
   spaceId: string;
@@ -49,7 +50,7 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
 
       setIsOpen(false);
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('Export failed:', error, { component: 'ExportButton', action: 'component_action' });
       alert('Failed to export expenses. Please try again.');
     } finally {
       setIsExporting(false);

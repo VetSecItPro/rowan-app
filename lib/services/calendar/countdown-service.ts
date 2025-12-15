@@ -4,6 +4,7 @@
 import { createClient } from '@/lib/supabase/client';
 import type { CalendarEvent } from '@/lib/services/calendar-service';
 import type { ImportantDate, ImportantDateType } from '@/lib/types/important-dates';
+import { logger } from '@/lib/logger';
 
 /**
  * Source type for countdown items
@@ -247,11 +248,11 @@ export const countdownService = {
       ]);
 
       if (eventsResult.error) {
-        console.error('[CountdownService] Error fetching events:', eventsResult.error);
+        logger.error('[CountdownService] Error fetching events:', undefined, { component: 'lib-countdown-service', action: 'service_call', details: eventsResult.error });
       }
 
       if (importantDatesResult.error) {
-        console.error('[CountdownService] Error fetching important dates:', importantDatesResult.error);
+        logger.error('[CountdownService] Error fetching important dates:', undefined, { component: 'lib-countdown-service', action: 'service_call', details: importantDatesResult.error });
       }
 
       // Transform events to countdown items
@@ -283,7 +284,7 @@ export const countdownService = {
 
       return { countdowns: allCountdowns };
     } catch (error) {
-      console.error('[CountdownService] Unexpected error:', error);
+      logger.error('[CountdownService] Unexpected error:', error, { component: 'lib-countdown-service', action: 'service_call' });
       return { countdowns: [], error: 'An unexpected error occurred' };
     }
   },
@@ -311,7 +312,7 @@ export const countdownService = {
         .order('start_time', { ascending: true });
 
       if (error) {
-        console.error('[CountdownService] Error fetching today countdowns:', error);
+        logger.error('[CountdownService] Error fetching today countdowns:', error, { component: 'lib-countdown-service', action: 'service_call' });
         return { countdowns: [], error: 'Failed to fetch today countdowns' };
       }
 
@@ -319,7 +320,7 @@ export const countdownService = {
 
       return { countdowns };
     } catch (error) {
-      console.error('[CountdownService] Unexpected error:', error);
+      logger.error('[CountdownService] Unexpected error:', error, { component: 'lib-countdown-service', action: 'service_call' });
       return { countdowns: [], error: 'An unexpected error occurred' };
     }
   },
@@ -349,13 +350,13 @@ export const countdownService = {
         .eq('id', eventId);
 
       if (error) {
-        console.error('[CountdownService] Error toggling countdown:', error);
+        logger.error('[CountdownService] Error toggling countdown:', error, { component: 'lib-countdown-service', action: 'service_call' });
         return { success: false, error: 'Failed to update countdown settings' };
       }
 
       return { success: true };
     } catch (error) {
-      console.error('[CountdownService] Unexpected error:', error);
+      logger.error('[CountdownService] Unexpected error:', error, { component: 'lib-countdown-service', action: 'service_call' });
       return { success: false, error: 'An unexpected error occurred' };
     }
   },
@@ -379,7 +380,7 @@ export const countdownService = {
 
       return eventToCountdown(event);
     } catch (error) {
-      console.error('[CountdownService] Error fetching event countdown:', error);
+      logger.error('[CountdownService] Error fetching event countdown:', error, { component: 'lib-countdown-service', action: 'service_call' });
       return null;
     }
   },

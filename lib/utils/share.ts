@@ -3,6 +3,8 @@
  * Provides native share functionality on supported devices
  */
 
+import { logger } from '@/lib/logger';
+
 export interface ShareData {
   title?: string;
   text?: string;
@@ -167,7 +169,7 @@ export async function copyToClipboard(text: string): Promise<boolean> {
     await navigator.clipboard.writeText(text);
     return true;
   } catch (error) {
-    console.error('Failed to copy to clipboard:', error);
+    logger.error('Failed to copy to clipboard:', error, { component: 'lib-share', action: 'service_call' });
     return false;
   }
 }

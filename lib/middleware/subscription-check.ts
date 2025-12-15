@@ -10,6 +10,7 @@ import { createClient } from '../supabase/server';
 import { canAccessFeature } from '../services/feature-access-service';
 import { hasTierAccess, getUserTier } from '../services/subscription-service';
 import type { SubscriptionTier } from '../types';
+import { logger } from '@/lib/logger';
 
 /**
  * API Route Handler type
@@ -132,7 +133,7 @@ export function withSubscriptionCheck(
       // Tier check passed, call original handler
       return handler(request, context);
     } catch (error) {
-      console.error('Error in subscription check middleware:', error);
+      logger.error('Error in subscription check middleware:', error, { component: 'lib-subscription-check', action: 'service_call' });
       return NextResponse.json(
         { error: 'Internal error', message: 'Failed to check subscription status' },
         { status: 500 }

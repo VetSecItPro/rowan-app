@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
 import { Resend } from 'resend';
 import { validateCsrfRequest } from '@/lib/security/csrf-validation';
+import { logger } from '@/lib/logger';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -85,7 +86,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (insertError) {
-      console.error('Error creating deletion request:', insertError);
+      logger.error('Error creating deletion request:', insertError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { success: false, error: 'Failed to create deletion request' },
         { status: 500 }
@@ -131,7 +132,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error('Account deletion POST error:', error);
+    logger.error('Account deletion POST error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -211,7 +212,7 @@ export async function DELETE(request: NextRequest) {
       .single();
 
     if (updateError) {
-      console.error('Error cancelling deletion request:', updateError);
+      logger.error('Error cancelling deletion request:', updateError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { success: false, error: 'Failed to cancel deletion request' },
         { status: 500 }
@@ -255,7 +256,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    console.error('Account deletion DELETE error:', error);
+    logger.error('Account deletion DELETE error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -303,7 +304,7 @@ export async function GET(request: NextRequest) {
         });
       }
 
-      console.error('Error fetching deletion status:', error);
+      logger.error('Error fetching deletion status:', error, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { success: false, error: 'Failed to fetch deletion status' },
         { status: 500 }
@@ -329,7 +330,7 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Account deletion GET error:', error);
+    logger.error('Account deletion GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -348,7 +349,7 @@ async function sendDeletionConfirmationEmail(
     const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/settings/privacy-data?cancel-deletion=${requestId}`;
 
     if (!resend) {
-      console.error('Resend API key not configured');
+      logger.error('Resend API key not configured', undefined, { component: 'api-route', action: 'api_request' });
       throw new Error('Email service not available');
     }
 
@@ -401,7 +402,7 @@ async function sendDeletionConfirmationEmail(
       `,
     });
   } catch (error) {
-    console.error('Error sending deletion confirmation email:', error);
+    logger.error('Error sending deletion confirmation email:', error, { component: 'api-route', action: 'api_request' });
     throw error;
   }
 }
@@ -409,7 +410,7 @@ async function sendDeletionConfirmationEmail(
 async function sendDeletionCancellationEmail(email: string, userName: string) {
   try {
     if (!resend) {
-      console.error('Resend API key not configured');
+      logger.error('Resend API key not configured', undefined, { component: 'api-route', action: 'api_request' });
       throw new Error('Email service not available');
     }
 
@@ -447,7 +448,7 @@ async function sendDeletionCancellationEmail(email: string, userName: string) {
       `,
     });
   } catch (error) {
-    console.error('Error sending deletion cancellation email:', error);
+    logger.error('Error sending deletion cancellation email:', error, { component: 'api-route', action: 'api_request' });
     throw error;
   }
 }

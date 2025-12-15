@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { RefreshCw, CheckCircle, Calendar, AlertTriangle, Loader2, Home } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { logger } from '@/lib/logger';
 
 export default function RestoreAccountPage() {
   const { user, loading: authLoading } = useAuth();
@@ -58,7 +59,7 @@ export default function RestoreAccountPage() {
       }
       setCheckingStatus(false);
     } catch (error) {
-      console.error('Error checking deletion status:', error);
+      logger.error('Error checking deletion status:', error, { component: 'page', action: 'execution' });
       setError('Failed to check account status. Please try again.');
       setCheckingStatus(false);
     }
@@ -90,7 +91,7 @@ export default function RestoreAccountPage() {
         window.location.href = '/dashboard';
       }, 2000);
     } catch (error) {
-      console.error('Account restoration error:', error);
+      logger.error('Account restoration error:', error, { component: 'page', action: 'execution' });
       setError('An unexpected error occurred. Please try again.');
       setIsRestoring(false);
     }

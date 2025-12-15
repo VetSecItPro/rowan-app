@@ -8,6 +8,7 @@
 import { getStripeClient } from './client';
 import { getPriceId } from './products';
 import type { SubscriptionTier, SubscriptionPeriod } from '../types';
+import { logger } from '@/lib/logger';
 
 /**
  * Create a Stripe checkout session for subscription
@@ -72,7 +73,7 @@ export async function createCheckoutSession(
 
     return session.id;
   } catch (error) {
-    console.error('Error creating checkout session:', error);
+    logger.error('Error creating checkout session:', error, { component: 'lib-checkout', action: 'service_call' });
     throw new Error('Failed to create checkout session');
   }
 }
@@ -112,7 +113,7 @@ async function getOrCreateCustomer(
 
     return customer;
   } catch (error) {
-    console.error('Error getting/creating customer:', error);
+    logger.error('Error getting/creating customer:', error, { component: 'lib-checkout', action: 'service_call' });
     throw new Error('Failed to get or create Stripe customer');
   }
 }
@@ -129,7 +130,7 @@ export async function getCheckoutSession(sessionId: string) {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     return session;
   } catch (error) {
-    console.error('Error retrieving checkout session:', error);
+    logger.error('Error retrieving checkout session:', error, { component: 'lib-checkout', action: 'service_call' });
     throw new Error('Failed to retrieve checkout session');
   }
 }

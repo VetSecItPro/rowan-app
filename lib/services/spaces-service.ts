@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 import { z } from 'zod';
 import type { Space, SpaceMember, CreateSpaceInput } from '@/lib/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // VALIDATION SCHEMAS
@@ -59,8 +60,7 @@ export async function createSpace(
       .single();
 
     if (spaceError) {
-      console.error('[spaces-service] createSpace INSERT error:', spaceError);
-      console.error('[spaces-service] Error details:', JSON.stringify(spaceError, null, 2));
+      logger.error('createSpace INSERT error', spaceError instanceof Error ? spaceError : new Error(JSON.stringify(spaceError)), { component: 'lib-spaces-service', action: 'service_call', details: JSON.stringify(spaceError) });
       throw spaceError;
     }
 
@@ -74,10 +74,7 @@ export async function createSpace(
       });
 
     if (memberError) {
-      console.error('[spaces-service] createSpace member INSERT error:', memberError);
-      console.error('[spaces-service] Member error details:', JSON.stringify(memberError, null, 2));
-      console.error('[spaces-service] Space ID:', space.id);
-      console.error('[spaces-service] User ID:', userId);
+      logger.error('createSpace member INSERT error', memberError instanceof Error ? memberError : new Error(JSON.stringify(memberError)), { component: 'lib-spaces-service', action: 'service_call', details: { memberError: JSON.stringify(memberError), spaceId: space.id, userId } });
       // Cleanup: delete the space if member creation failed
       await supabase.from('spaces').delete().eq('id', space.id);
       throw memberError;
@@ -85,7 +82,7 @@ export async function createSpace(
 
     return { success: true, data: space };
   } catch (error) {
-    console.error('[spaces-service] createSpace error:', error);
+    logger.error('[spaces-service] createSpace error:', error, { component: 'lib-spaces-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to create space'
@@ -119,7 +116,7 @@ export async function getUserSpaces(
       .order('joined_at', { ascending: false });
 
     if (error) {
-      console.error('[spaces-service] getUserSpaces error:', error);
+      logger.error('[spaces-service] getUserSpaces error:', error, { component: 'lib-spaces-service', action: 'service_call' });
       throw error;
     }
 
@@ -131,7 +128,7 @@ export async function getUserSpaces(
 
     return { success: true, data: spaces };
   } catch (error) {
-    console.error('[spaces-service] getUserSpaces error:', error);
+    logger.error('[spaces-service] getUserSpaces error:', error, { component: 'lib-spaces-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to fetch user spaces'
@@ -175,7 +172,7 @@ export async function getSpace(
       .single();
 
     if (spaceError) {
-      console.error('[spaces-service] getSpace error:', spaceError);
+      logger.error('[spaces-service] getSpace error:', spaceError, { component: 'lib-spaces-service', action: 'service_call' });
       throw spaceError;
     }
 
@@ -184,7 +181,7 @@ export async function getSpace(
       data: { ...space, role: membership.role }
     };
   } catch (error) {
-    console.error('[spaces-service] getSpace error:', error);
+    logger.error('[spaces-service] getSpace error:', error, { component: 'lib-spaces-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to fetch space'
@@ -239,13 +236,13 @@ export async function getSpaceMembers(
       .order('joined_at', { ascending: true });
 
     if (error) {
-      console.error('[spaces-service] getSpaceMembers error:', error);
+      logger.error('[spaces-service] getSpaceMembers error:', error, { component: 'lib-spaces-service', action: 'service_call' });
       throw error;
     }
 
     return { success: true, data };
   } catch (error) {
-    console.error('[spaces-service] getSpaceMembers error:', error);
+    logger.error('[spaces-service] getSpaceMembers error:', error, { component: 'lib-spaces-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to fetch space members'
@@ -295,13 +292,13 @@ export async function updateSpace(
       .single();
 
     if (updateError) {
-      console.error('[spaces-service] updateSpace error:', updateError);
+      logger.error('[spaces-service] updateSpace error:', updateError, { component: 'lib-spaces-service', action: 'service_call' });
       throw updateError;
     }
 
     return { success: true, data: space };
   } catch (error) {
-    console.error('[spaces-service] updateSpace error:', error);
+    logger.error('[spaces-service] updateSpace error:', error, { component: 'lib-spaces-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to update space'
@@ -344,13 +341,13 @@ export async function deleteSpace(
       .eq('id', spaceId);
 
     if (deleteError) {
-      console.error('[spaces-service] deleteSpace error:', deleteError);
+      logger.error('[spaces-service] deleteSpace error:', deleteError, { component: 'lib-spaces-service', action: 'service_call' });
       throw deleteError;
     }
 
     return { success: true };
   } catch (error) {
-    console.error('[spaces-service] deleteSpace error:', error);
+    logger.error('[spaces-service] deleteSpace error:', error, { component: 'lib-spaces-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to delete space'
@@ -411,13 +408,13 @@ export async function removeMember(
       .eq('user_id', targetUserId);
 
     if (removeError) {
-      console.error('[spaces-service] removeMember error:', removeError);
+      logger.error('[spaces-service] removeMember error:', removeError, { component: 'lib-spaces-service', action: 'service_call' });
       throw removeError;
     }
 
     return { success: true };
   } catch (error) {
-    console.error('[spaces-service] removeMember error:', error);
+    logger.error('[spaces-service] removeMember error:', error, { component: 'lib-spaces-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to remove member'
@@ -473,13 +470,13 @@ export async function updateMemberRole(
       .eq('user_id', targetUserId);
 
     if (updateError) {
-      console.error('[spaces-service] updateMemberRole error:', updateError);
+      logger.error('[spaces-service] updateMemberRole error:', updateError, { component: 'lib-spaces-service', action: 'service_call' });
       throw updateError;
     }
 
     return { success: true };
   } catch (error) {
-    console.error('[spaces-service] updateMemberRole error:', error);
+    logger.error('[spaces-service] updateMemberRole error:', error, { component: 'lib-spaces-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to update member role'
@@ -530,13 +527,13 @@ export async function leaveSpace(
       .eq('user_id', userId);
 
     if (removeError) {
-      console.error('[spaces-service] leaveSpace error:', removeError);
+      logger.error('[spaces-service] leaveSpace error:', removeError, { component: 'lib-spaces-service', action: 'service_call' });
       throw removeError;
     }
 
     return { success: true };
   } catch (error) {
-    console.error('[spaces-service] leaveSpace error:', error);
+    logger.error('[spaces-service] leaveSpace error:', error, { component: 'lib-spaces-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to leave space'

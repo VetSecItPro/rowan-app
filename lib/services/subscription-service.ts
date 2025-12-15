@@ -7,6 +7,7 @@
 
 import { createClient } from '../supabase/server';
 import type { SubscriptionTier, SubscriptionStatus, Subscription, TrialStatus } from '../types';
+import { logger } from '@/lib/logger';
 
 // Trial configuration
 export const TRIAL_DURATION_DAYS = 14;
@@ -24,7 +25,7 @@ export async function getUserSubscription(userId: string): Promise<Subscription 
     .single();
 
   if (error) {
-    console.error('Error fetching subscription:', error);
+    logger.error('Error fetching subscription:', error, { component: 'lib-subscription-service', action: 'service_call' });
     return null;
   }
 
@@ -153,7 +154,7 @@ export async function upsertSubscription(
     });
 
   if (error) {
-    console.error('Error upserting subscription:', error);
+    logger.error('Error upserting subscription:', error, { component: 'lib-subscription-service', action: 'service_call' });
     return { success: false, error: error.message };
   }
 
@@ -177,7 +178,7 @@ export async function cancelSubscription(
     .eq('user_id', userId);
 
   if (error) {
-    console.error('Error canceling subscription:', error);
+    logger.error('Error canceling subscription:', error, { component: 'lib-subscription-service', action: 'service_call' });
     return { success: false, error: error.message };
   }
 
@@ -208,7 +209,7 @@ export async function reactivateSubscription(
     .eq('user_id', userId);
 
   if (error) {
-    console.error('Error reactivating subscription:', error);
+    logger.error('Error reactivating subscription:', error, { component: 'lib-subscription-service', action: 'service_call' });
     return { success: false, error: error.message };
   }
 

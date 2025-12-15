@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import type { BadgeProgress } from '@/lib/types';
+import { logger } from '@/lib/logger';
 
 const supabase = createClient();
 
@@ -80,7 +81,7 @@ export async function getAllBadges(): Promise<AchievementBadge[]> {
     if (error) throw error;
     return data || [];
   } catch (error) {
-    console.error('Error fetching badges:', error);
+    logger.error('Error fetching badges:', error, { component: 'lib-achievement-service', action: 'service_call' });
     return [];
   }
 }
@@ -106,7 +107,7 @@ export async function getUserBadges(
     if (error) throw error;
     return data || [];
   } catch (error) {
-    console.error('Error fetching user badges:', error);
+    logger.error('Error fetching user badges:', error, { component: 'lib-achievement-service', action: 'service_call' });
     return [];
   }
 }
@@ -143,7 +144,7 @@ export async function getBadgeProgress(
     // Sort by completion percentage (descending)
     return results.sort((a, b) => b.progress.percentage - a.progress.percentage);
   } catch (error) {
-    console.error('Error fetching badge progress:', error);
+    logger.error('Error fetching badge progress:', error, { component: 'lib-achievement-service', action: 'service_call' });
     return [];
   }
 }
@@ -621,7 +622,7 @@ export async function checkAndAwardBadges(
 
     return newlyEarned;
   } catch (error) {
-    console.error('Error checking and awarding badges:', error);
+    logger.error('Error checking and awarding badges:', error, { component: 'lib-achievement-service', action: 'service_call' });
     return [];
   }
 }
@@ -659,7 +660,7 @@ export async function awardBadge(
 
     return data;
   } catch (error) {
-    console.error('Error awarding badge:', error);
+    logger.error('Error awarding badge:', error, { component: 'lib-achievement-service', action: 'service_call' });
     return null;
   }
 }
@@ -707,7 +708,7 @@ export async function getUserBadgeStats(
 
     return stats;
   } catch (error) {
-    console.error('Error fetching badge stats:', error);
+    logger.error('Error fetching badge stats:', error, { component: 'lib-achievement-service', action: 'service_call' });
     return {
       totalBadges: 0,
       totalPoints: 0,

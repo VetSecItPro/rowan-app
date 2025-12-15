@@ -3,6 +3,7 @@
 import { useState, useRef, DragEvent, ChangeEvent } from 'react';
 import Image from 'next/image';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface ImageUploadProps {
   /**
@@ -116,7 +117,7 @@ export default function ImageUpload({
         throw new Error('Upload succeeded but no URL returned');
       }
     } catch (err) {
-      console.error('Upload error:', err);
+      logger.error('Upload error:', err, { component: 'ImageUpload', action: 'component_action' });
       setError(err instanceof Error ? err.message : 'Failed to upload image');
       setPreview(null);
     } finally {

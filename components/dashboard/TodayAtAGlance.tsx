@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, memo } from 'react';
 import { motion } from 'framer-motion';
+import { logger } from '@/lib/logger';
 import {
   Calendar,
   CheckSquare,
@@ -365,7 +366,7 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
           overdueReminders
         });
       } catch (err) {
-        console.error('Error fetching today data:', err);
+        logger.error('Error fetching today data:', err, { component: 'TodayAtAGlance', action: 'component_action' });
         setError('Failed to load today\'s data');
       } finally {
         setLoading(false);

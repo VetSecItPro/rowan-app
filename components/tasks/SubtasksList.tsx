@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Check, Plus, X, GripVertical } from 'lucide-react';
 import { taskSubtasksService, Subtask } from '@/lib/services/task-subtasks-service';
 import { CTAButton } from '@/components/ui/EnhancedButton';
+import { logger } from '@/lib/logger';
 
 interface SubtasksListProps {
   taskId: string;
@@ -24,7 +25,7 @@ export function SubtasksList({ taskId, userId }: SubtasksListProps) {
       const data = await taskSubtasksService.getSubtasks(taskId);
       setSubtasks(data);
     } catch (error) {
-      console.error('Error loading subtasks:', error);
+      logger.error('Error loading subtasks:', error, { component: 'SubtasksList', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -44,7 +45,7 @@ export function SubtasksList({ taskId, userId }: SubtasksListProps) {
       setNewSubtaskTitle('');
       loadSubtasks();
     } catch (error) {
-      console.error('Error creating subtask:', error);
+      logger.error('Error creating subtask:', error, { component: 'SubtasksList', action: 'component_action' });
     }
   }
 
@@ -54,7 +55,7 @@ export function SubtasksList({ taskId, userId }: SubtasksListProps) {
       await taskSubtasksService.updateSubtask(subtaskId, { status: newStatus });
       loadSubtasks();
     } catch (error) {
-      console.error('Error updating subtask:', error);
+      logger.error('Error updating subtask:', error, { component: 'SubtasksList', action: 'component_action' });
     }
   }
 

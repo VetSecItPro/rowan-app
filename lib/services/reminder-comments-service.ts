@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // TYPES & VALIDATION
@@ -60,7 +61,7 @@ export const reminderCommentsService = {
       .order('created_at', { ascending: true });
 
     if (error) {
-      console.error('Error fetching comments:', error);
+      logger.error('Error fetching comments:', error, { component: 'lib-reminder-comments-service', action: 'service_call' });
       throw new Error('Failed to fetch comments');
     }
 
@@ -79,7 +80,7 @@ export const reminderCommentsService = {
       .eq('reminder_id', reminderId);
 
     if (error) {
-      console.error('Error fetching comment count:', error);
+      logger.error('Error fetching comment count:', error, { component: 'lib-reminder-comments-service', action: 'service_call' });
       return 0;
     }
 
@@ -103,7 +104,7 @@ export const reminderCommentsService = {
       .single();
 
     if (reminderError || !reminder) {
-      console.error('Reminder not found:', reminderError);
+      logger.error('Reminder not found:', reminderError, { component: 'lib-reminder-comments-service', action: 'service_call' });
       throw new Error('Reminder not found');
     }
 
@@ -119,12 +120,12 @@ export const reminderCommentsService = {
       .maybeSingle();
 
     if (membershipError) {
-      console.error('Error checking space membership:', membershipError);
+      logger.error('Error checking space membership:', membershipError, { component: 'lib-reminder-comments-service', action: 'service_call' });
       throw new Error('Failed to verify space access');
     }
 
     if (!membership) {
-      console.error('User is not a member of this space', { userId: validated.user_id, spaceId });
+      logger.error('User is not a member of this space', undefined, { component: 'lib-reminder-comments-service', action: 'service_call', details: { userId: validated.user_id, spaceId } });
       throw new Error('User is not a member of this space');
     }
 
@@ -148,7 +149,7 @@ export const reminderCommentsService = {
       .single();
 
     if (error) {
-      console.error('Error creating comment:', error);
+      logger.error('Error creating comment:', error, { component: 'lib-reminder-comments-service', action: 'service_call' });
       throw new Error('Failed to create comment');
     }
 
@@ -172,7 +173,7 @@ export const reminderCommentsService = {
       .single();
 
     if (existingError || !existing) {
-      console.error('Comment not found:', existingError);
+      logger.error('Comment not found:', existingError, { component: 'lib-reminder-comments-service', action: 'service_call' });
       throw new Error('Comment not found');
     }
 
@@ -200,7 +201,7 @@ export const reminderCommentsService = {
       .single();
 
     if (error) {
-      console.error('Error updating comment:', error);
+      logger.error('Error updating comment:', error, { component: 'lib-reminder-comments-service', action: 'service_call' });
       throw new Error('Failed to update comment');
     }
 
@@ -221,7 +222,7 @@ export const reminderCommentsService = {
       .single();
 
     if (existingError || !existing) {
-      console.error('Comment not found:', existingError);
+      logger.error('Comment not found:', existingError, { component: 'lib-reminder-comments-service', action: 'service_call' });
       throw new Error('Comment not found');
     }
 
@@ -236,7 +237,7 @@ export const reminderCommentsService = {
       .eq('id', commentId);
 
     if (error) {
-      console.error('Error deleting comment:', error);
+      logger.error('Error deleting comment:', error, { component: 'lib-reminder-comments-service', action: 'service_call' });
       throw new Error('Failed to delete comment');
     }
   },

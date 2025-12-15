@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -61,7 +62,7 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (filesError) {
-      console.error('Error fetching files:', filesError);
+      logger.error('Error fetching files:', filesError, { component: 'api-route', action: 'api_request' });
       // Don't fail if we can't fetch files - return empty array
       return NextResponse.json({ files: [] }, { status: 200 });
     }
@@ -82,7 +83,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ files: spaceFiles }, { status: 200 });
   } catch (error) {
-    console.error('Error in storage files API:', error);
+    logger.error('Error in storage files API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to get files list' },
       { status: 500 }

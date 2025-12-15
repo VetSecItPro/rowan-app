@@ -6,6 +6,7 @@ import { verifySpaceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/meals
@@ -79,7 +80,7 @@ export async function GET(req: NextRequest) {
       data: meals,
     });
   } catch (error) {
-    console.error('[API] /api/meals GET error:', error);
+    logger.error('[API] /api/meals GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -159,7 +160,7 @@ export async function POST(req: NextRequest) {
       data: meal,
     });
   } catch (error) {
-    console.error('[API] /api/meals POST error:', error);
+    logger.error('[API] /api/meals POST error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to create meal' },
       { status: 500 }

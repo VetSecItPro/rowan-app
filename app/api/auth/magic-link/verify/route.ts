@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkAuthRateLimit } from '@/lib/ratelimit';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
       .eq('token', token);
 
     if (markUsedError) {
-      console.error('Failed to mark token as used:', markUsedError);
+      logger.error('Failed to mark token as used:', markUsedError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: 'Failed to process authentication. Please try again.' },
         { status: 500 }
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (authError) {
-      console.error('Failed to generate session:', authError);
+      logger.error('Failed to generate session:', authError, { component: 'api-route', action: 'api_request' });
       
       // Alternative approach: Create a temporary access token
       const { data: userData, error: userError } = await supabase
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest) {
       .neq('token', token);
 
     if (cleanupError) {
-      console.error('Failed to cleanup other tokens:', cleanupError);
+      logger.error('Failed to cleanup other tokens:', cleanupError, { component: 'api-route', action: 'api_request' });
       // Don't fail the request
     }
 
@@ -132,7 +133,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Magic link verification error:', error);
+    logger.error('Magic link verification error:', error, { component: 'api-route', action: 'api_request' });
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -202,7 +203,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Magic link validation error:', error);
+    logger.error('Magic link validation error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to validate magic link' },
       { status: 500 }

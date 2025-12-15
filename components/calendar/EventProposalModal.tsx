@@ -6,6 +6,7 @@ import { eventProposalsService, EventProposal, ProposalVote, CreateProposalInput
 import { useAuth } from '@/lib/contexts/auth-context';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { formatDistance, format } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 interface EventProposalModalProps {
   isOpen: boolean;
@@ -62,7 +63,7 @@ export function EventProposalModal({
       const summary = await eventProposalsService.getVoteSummary(proposalId);
       setVoteSummary(summary);
     } catch (error) {
-      console.error('Failed to load vote summary:', error);
+      logger.error('Failed to load vote summary:', error, { component: 'EventProposalModal', action: 'component_action' });
     }
   };
 
@@ -77,7 +78,7 @@ export function EventProposalModal({
       });
       setVotes(voteMap);
     } catch (error) {
-      console.error('Failed to load user votes:', error);
+      logger.error('Failed to load user votes:', error, { component: 'EventProposalModal', action: 'component_action' });
     }
   };
 
@@ -115,7 +116,7 @@ export function EventProposalModal({
       onProposalCreated?.();
       onClose();
     } catch (error) {
-      console.error('Failed to create proposal:', error);
+      logger.error('Failed to create proposal:', error, { component: 'EventProposalModal', action: 'component_action' });
       alert('Failed to create proposal. Please try again.');
     } finally {
       setLoading(false);
@@ -138,7 +139,7 @@ export function EventProposalModal({
       setVotes({ ...votes, [slotIndex]: newVote });
       await loadVoteSummary(proposal.id);
     } catch (error) {
-      console.error('Failed to vote:', error);
+      logger.error('Failed to vote:', error, { component: 'EventProposalModal', action: 'component_action' });
     }
   };
 
@@ -158,7 +159,7 @@ export function EventProposalModal({
       onProposalCreated?.();
       onClose();
     } catch (error) {
-      console.error('Failed to approve proposal:', error);
+      logger.error('Failed to approve proposal:', error, { component: 'EventProposalModal', action: 'component_action' });
       alert('Failed to create event. Please try again.');
     } finally {
       setLoading(false);

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 import {
   archiveOldExpenses,
   archiveOldTasks,
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
       older_than_date,
     });
   } catch (error) {
-    console.error('Archive old data error:', error);
+    logger.error('Archive old data error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to archive data' },
       { status: 500 }

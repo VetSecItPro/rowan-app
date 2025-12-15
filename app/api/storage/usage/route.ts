@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getSpaceStorageUsage } from '@/lib/services/storage-service';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ usage: result.data }, { status: 200 });
   } catch (error) {
-    console.error('Error in storage usage API:', error);
+    logger.error('Error in storage usage API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to get storage usage' },
       { status: 500 }

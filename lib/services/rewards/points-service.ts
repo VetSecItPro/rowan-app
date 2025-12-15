@@ -2,6 +2,7 @@
 // Handles all point-related operations: awarding, spending, tracking, levels
 
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 import type {
   RewardPoints,
   PointTransaction,
@@ -210,7 +211,7 @@ export const pointsService = {
       .eq('id', record.id);
 
     if (updateError) {
-      console.error('Failed to update points balance:', updateError);
+      logger.error('Failed to update points balance:', updateError, { component: 'lib-points-service', action: 'service_call' });
     }
 
     return transaction;

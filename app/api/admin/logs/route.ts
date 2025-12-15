@@ -22,6 +22,7 @@ import { z } from 'zod';
 import { getErrorStats } from '@/lib/utils/error-alerting';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // VALIDATION SCHEMAS
@@ -162,7 +163,7 @@ export async function GET(request: NextRequest) {
     const { data: logs, error, count } = await query;
 
     if (error) {
-      console.error('[ADMIN_LOGS] Query error:', error);
+      logger.error('[ADMIN_LOGS] Query error:', error, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: 'Failed to fetch logs' },
         { status: 500 }
@@ -194,7 +195,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[ADMIN_LOGS] Error:', error);
+    logger.error('[ADMIN_LOGS] Error:', error, { component: 'api-route', action: 'api_request' });
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -321,7 +322,7 @@ export async function POST(request: NextRequest) {
       count: logs?.length || 0,
     });
   } catch (error) {
-    console.error('[ADMIN_LOGS] Export error:', error);
+    logger.error('[ADMIN_LOGS] Export error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to export logs' },
       { status: 500 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, BarChart3, Calendar, AlertCircle } from 'lucide-react';
 import { spendingInsightsService, type TimeRange, type SpendingInsights } from '@/lib/services/spending-insights-service';
+import { logger } from '@/lib/logger';
 
 interface SpendingInsightsCardProps {
   spaceId: string;
@@ -23,7 +24,7 @@ export function SpendingInsightsCard({ spaceId }: SpendingInsightsCardProps) {
       const data = await spendingInsightsService.getSpendingInsights(spaceId, timeRange);
       setInsights(data);
     } catch (error) {
-      console.error('Failed to load spending insights:', error);
+      logger.error('Failed to load spending insights:', error, { component: 'SpendingInsightsCard', action: 'component_action' });
     } finally {
       setIsLoading(false);
     }

@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/contexts/auth-context';
 import { useSpaces } from '@/lib/contexts/spaces-context';
 import { FeedbackType } from '@/lib/types';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface FeedbackModalProps {
   isOpen: boolean;
@@ -166,7 +167,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
 
       onClose();
     } catch (err: any) {
-      console.error('Error submitting feedback:', err);
+      logger.error('Error submitting feedback:', err, { component: 'FeedbackModal', action: 'component_action' });
       setError(err.message || 'Failed to submit feedback. Please try again.');
       toast.error('Failed to submit feedback', {
         description: 'Please try again later.',

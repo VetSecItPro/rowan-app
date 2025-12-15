@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Breadcrumbs } from '@/components/admin/Breadcrumbs';
+import { logger } from '@/lib/logger';
 import {
   Mail,
   Search,
@@ -86,7 +87,7 @@ export default function AdminNotificationsPage() {
         setStats(statsData.stats || stats);
       }
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      logger.error('Failed to fetch data:', error, { component: 'page', action: 'execution' });
     } finally {
       setIsLoading(false);
     }
@@ -165,7 +166,7 @@ export default function AdminNotificationsPage() {
         window.URL.revokeObjectURL(url);
       }
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('Export failed:', error, { component: 'page', action: 'execution' });
     }
   };
 
@@ -188,7 +189,7 @@ export default function AdminNotificationsPage() {
         setSelectedNotifications(new Set());
       }
     } catch (error) {
-      console.error('Bulk unsubscribe failed:', error);
+      logger.error('Bulk unsubscribe failed:', error, { component: 'page', action: 'execution' });
     }
   };
 

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, memo } from 'react';
+import { useState, memo, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
   CreditCard,
   DollarSign,
@@ -79,30 +80,27 @@ const EventBadge = memo(function EventBadge({ type }: { type: string }) {
 });
 
 export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
-  const [metrics, setMetrics] = useState<SubscriptionMetrics | null>(null);
-  const [events, setEvents] = useState<SubscriptionEvent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [activeView, setActiveView] = useState<'overview' | 'events'>('overview');
+  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
 
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch('/api/admin/subscription-analytics');
-      if (response.ok) {
-        const data = await response.json();
-        setMetrics(data.metrics);
-        setEvents(data.events?.events || []);
-      }
-    } catch (error) {
-      console.error('Failed to fetch subscription analytics:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // React Query for subscription analytics with caching
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['admin-subscription-analytics', timeRange],
+    queryFn: async () => {
+      const response = await fetch(`/api/admin/subscription-analytics?range=${timeRange}`);
+      if (!response.ok) throw new Error('Failed to fetch subscription analytics');
+      return response.json();
+    },
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const metrics: SubscriptionMetrics | null = data?.metrics || null;
+  const events: SubscriptionEvent[] = data?.events?.events || [];
+
+  const fetchData = useCallback(() => {
+    refetch();
+  }, [refetch]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -141,9 +139,9 @@ export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex-1 flex flex-col space-y-4 min-h-0">
       {/* View Toggle & Refresh */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveView('overview')}
@@ -166,13 +164,30 @@ export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
             Events ({events.length})
           </button>
         </div>
-        <button
-          onClick={fetchData}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Time Range Filter */}
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
+            {(['7d', '30d', '90d'] as const).map((range) => (
+              <button
+                key={range}
+                onClick={() => setTimeRange(range)}
+                className={`px-2 py-1 text-xs font-medium rounded-md transition-colors ${
+                  timeRange === range
+                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                {range === '7d' ? '7d' : range === '30d' ? '30d' : '90d'}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={fetchData}
+            className="flex items-center gap-1.5 px-2 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {activeView === 'overview' && (
@@ -304,8 +319,8 @@ export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
       )}
 
       {activeView === 'events' && (
-        <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-          <div className="max-h-[400px] overflow-y-auto divide-y divide-gray-200 dark:divide-gray-700">
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden flex-1 flex flex-col min-h-0">
+          <div className="flex-1 overflow-y-auto min-h-0 divide-y divide-gray-200 dark:divide-gray-700">
             {events.length > 0 ? (
               events.slice(0, 15).map((event) => (
                 <div key={event.id} className="p-3 hover:bg-gray-50 dark:hover:bg-gray-800/50">

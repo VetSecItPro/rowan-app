@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { History, ArrowRightLeft, Trash2, AlertCircle, CheckCircle2, Calendar } from 'lucide-react';
 import type { Settlement } from '@/lib/services/expense-splitting-service';
+import { logger } from '@/lib/logger';
 
 interface SettlementTrackerProps {
   settlements: Settlement[];
@@ -67,7 +68,7 @@ export function SettlementTracker({
     try {
       await onDelete(settlementId);
     } catch (err) {
-      console.error('Failed to delete settlement:', err);
+      logger.error('Failed to delete settlement:', err, { component: 'SettlementTracker', action: 'component_action' });
       setError('Failed to delete settlement. Please try again.');
     } finally {
       setDeletingId(null);

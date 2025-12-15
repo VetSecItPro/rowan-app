@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X, Save } from 'lucide-react';
 import { ShoppingList } from '@/lib/services/shopping-service';
+import { logger } from '@/lib/logger';
 
 interface SaveTemplateModalProps {
   isOpen: boolean;
@@ -28,7 +29,7 @@ export function SaveTemplateModal({ isOpen, onClose, onSave, list }: SaveTemplat
       setName(list.title);
       setDescription(list.description || '');
     } catch (error) {
-      console.error('Failed to save template:', error);
+      logger.error('Failed to save template:', error, { component: 'SaveTemplateModal', action: 'component_action' });
       alert('Failed to save template. Please try again.');
     } finally {
       setIsSaving(false);

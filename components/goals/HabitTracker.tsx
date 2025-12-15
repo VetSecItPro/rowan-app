@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import {
   Target,
   CheckCircle2,
@@ -79,7 +80,7 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
               completionRate,
             };
           } catch (error) {
-            console.error(`Error getting completion rate for habit ${habit.template.id}:`, error);
+            logger.error('Error getting completion rate for habit ${habit.template.id}:', error, { component: 'HabitTracker', action: 'component_action' });
             return habit;
           }
         })
@@ -87,7 +88,7 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
 
       setHabits(enrichedHabits);
     } catch (error) {
-      console.error('Error loading habits:', error);
+      logger.error('Error loading habits:', error, { component: 'HabitTracker', action: 'component_action' });
       toast.error('Failed to load habits');
     } finally {
       setLoading(false);
@@ -113,7 +114,7 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
       toast.success(completed ? 'Habit completed! 🎉' : 'Habit unmarked');
       await loadHabits(); // Reload to update streaks
     } catch (error) {
-      console.error('Error toggling habit:', error);
+      logger.error('Error toggling habit:', error, { component: 'HabitTracker', action: 'component_action' });
       toast.error('Failed to update habit');
     }
   };

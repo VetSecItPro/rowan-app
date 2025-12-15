@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface EventAttachment {
   id: string;
@@ -79,7 +80,7 @@ export const eventAttachmentsService = {
       });
 
     if (storageError) {
-      console.error('Storage upload error:', storageError);
+      logger.error('Storage upload error:', storageError, { component: 'lib-event-attachments-service', action: 'service_call' });
       throw new Error('Failed to upload file to storage');
     }
 
@@ -190,7 +191,7 @@ export const eventAttachmentsService = {
       .remove([attachment.storage_path]);
 
     if (storageError) {
-      console.error('Failed to delete file from storage:', storageError);
+      logger.error('Failed to delete file from storage:', storageError, { component: 'lib-event-attachments-service', action: 'service_call' });
       // Don't throw - database record is already deleted
     }
   },

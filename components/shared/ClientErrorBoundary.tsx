@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import { ErrorBoundary } from './ErrorBoundary';
+import { logger } from '@/lib/logger';
 
 interface ClientErrorBoundaryProps {
   children: ReactNode;
@@ -10,7 +11,7 @@ interface ClientErrorBoundaryProps {
 export default function ClientErrorBoundary({ children }: ClientErrorBoundaryProps) {
   const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
     // Log error for debugging
-    console.error('App-level error caught:', error, errorInfo);
+    logger.error('App-level error caught:', undefined, { component: 'ClientErrorBoundary', action: 'component_action', details: error, errorInfo });
 
     // In production, this could send to error reporting service
     if (process.env.NODE_ENV === 'production') {

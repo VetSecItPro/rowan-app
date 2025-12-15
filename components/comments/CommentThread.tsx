@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 import {
   getComments,
   createComment,
@@ -43,7 +44,7 @@ export default function CommentThread({
       setComments(data);
       setError(null);
     } catch (err) {
-      console.error('Failed to load comments:', err);
+      logger.error('Failed to load comments:', err, { component: 'CommentThread', action: 'component_action' });
       setError('Failed to load comments');
     } finally {
       setLoading(false);
@@ -94,7 +95,7 @@ export default function CommentThread({
       });
       await loadComments();
     } catch (err) {
-      console.error('Failed to create comment:', err);
+      logger.error('Failed to create comment:', err, { component: 'CommentThread', action: 'component_action' });
       setError('Failed to create comment');
     } finally {
       setIsSubmitting(false);
@@ -109,7 +110,7 @@ export default function CommentThread({
       await deleteComment(commentId, user.id);
       await loadComments();
     } catch (err) {
-      console.error('Failed to delete comment:', err);
+      logger.error('Failed to delete comment:', err, { component: 'CommentThread', action: 'component_action' });
       setError('Failed to delete comment');
     }
   };
@@ -123,7 +124,7 @@ export default function CommentThread({
       await togglePinComment(commentId, !comment.is_pinned);
       await loadComments();
     } catch (err) {
-      console.error('Failed to pin comment:', err);
+      logger.error('Failed to pin comment:', err, { component: 'CommentThread', action: 'component_action' });
       setError('Failed to pin comment');
     }
   };

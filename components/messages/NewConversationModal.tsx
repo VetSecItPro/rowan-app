@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X, MessageCircle, Users, Radio } from 'lucide-react';
 import { CreateConversationInput } from '@/lib/services/messages-service';
+import { logger } from '@/lib/logger';
 
 interface NewConversationModalProps {
   isOpen: boolean;
@@ -46,7 +47,7 @@ export function NewConversationModal({
       setConversationType('direct');
       onClose();
     } catch (error) {
-      console.error('Failed to create conversation:', error);
+      logger.error('Failed to create conversation:', error, { component: 'NewConversationModal', action: 'component_action' });
     } finally {
       setIsCreating(false);
     }

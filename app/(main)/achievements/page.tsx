@@ -8,6 +8,7 @@ import { BadgeCard } from '@/components/achievements/BadgeCard';
 import { AchievementNotification, useAchievementNotifications } from '@/components/achievements/AchievementNotification';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { OnlineUsersIndicator } from '@/components/shared/PresenceIndicator';
+import { logger } from '@/lib/logger';
 import {
   achievementBadgesService,
   AchievementBadge,
@@ -65,7 +66,7 @@ export default function AchievementsPage() {
       setProgress(userProgress);
       setStats(badgeStats);
     } catch (error) {
-      console.error('Failed to load achievement data:', error);
+      logger.error('Failed to load achievement data:', error, { component: 'page', action: 'execution' });
       toast.error('Failed to load achievements');
     } finally {
       setLoading(false);
@@ -98,7 +99,7 @@ export default function AchievementsPage() {
         toast.info('No new badges earned yet. Keep working on your goals!');
       }
     } catch (error) {
-      console.error('Failed to check for new badges:', error);
+      logger.error('Failed to check for new badges:', error, { component: 'page', action: 'execution' });
       toast.error('Failed to check for new badges');
     }
   };

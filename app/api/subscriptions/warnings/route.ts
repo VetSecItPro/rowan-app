@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getLimitWarnings } from '@/lib/services/feature-access-service';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 /**
  * GET handler - Get warnings for limits that user is approaching (>80% usage)
@@ -57,7 +58,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching limit warnings:', error);
+    logger.error('Error fetching limit warnings:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to fetch limit warnings' },
       { status: 500 }

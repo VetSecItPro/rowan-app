@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookies } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
+import { logger } from '@/lib/logger';
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
@@ -53,7 +54,7 @@ export async function POST(
         );
       }
     } catch (error) {
-      console.error('Admin session decryption failed:', error);
+      logger.error('Admin session decryption failed:', error, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: 'Invalid session' },
         { status: 401 }
@@ -138,7 +139,7 @@ export async function POST(
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/admin/users/[userId]/[action] POST error:', error);
+    logger.error('[API] /api/admin/users/[userId]/[action] POST error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to perform action' },
       { status: 500 }

@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,34 +39,34 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get('q');
     const apiKey = process.env.SPOONACULAR_API_KEY;
 
-    console.log('[Spoonacular] API called with query:', query);
-    console.log('[Spoonacular] API key configured:', !!apiKey);
+    logger.info('[Spoonacular] API called with query:', { component: 'api-route', data: query });
+    logger.info('[Spoonacular] API key configured:', { component: 'api-route', data: !!apiKey });
 
     if (!query || query.trim().length < 2) {
-      console.log('[Spoonacular] Query too short, returning empty');
+      logger.info('[Spoonacular] Query too short, returning empty', { component: 'api-route' });
       return NextResponse.json([]);
     }
 
     if (!apiKey) {
-      console.error('[Spoonacular] API key not configured - check SPOONACULAR_API_KEY environment variable');
+      logger.error('[Spoonacular] API key not configured - check SPOONACULAR_API_KEY environment variable', undefined, { component: 'api-route', action: 'api_request' });
       return NextResponse.json([]);
     }
 
     // Search for recipes - build URL without API key for safe logging
     const baseUrl = `https://api.spoonacular.com/recipes/complexSearch?query=${encodeURIComponent(query)}&number=10&addRecipeInformation=true&fillIngredients=true`;
-    console.log('[Spoonacular] Calling API:', baseUrl);
+    logger.info('[Spoonacular] Calling API:', { component: 'api-route', data: baseUrl });
 
     // Add API key only when making the request (never in logged URL)
     const searchResponse = await fetch(`${baseUrl}&apiKey=${apiKey}`);
 
     if (!searchResponse.ok) {
       const errorText = await searchResponse.text();
-      console.error('[Spoonacular] API failed:', searchResponse.status, searchResponse.statusText, errorText);
+      logger.error('[Spoonacular] API failed:', undefined, { component: 'api-route', action: 'api_request', details: { status: searchResponse.status, statusText: searchResponse.statusText, errorText } });
       return NextResponse.json([]);
     }
 
     const searchData = await searchResponse.json();
-    console.log('[Spoonacular] Got', searchData.results?.length || 0, 'recipes');
+    logger.info('[Spoonacular] Got recipes', { component: 'api-route', data: searchData.results?.length || 0 });
 
     if (!searchData.results || searchData.results.length === 0) {
       return NextResponse.json([]);
@@ -105,7 +106,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(recipes);
   } catch (error) {
-    console.error('Spoonacular search API error:', error);
+    logger.error('Spoonacular search API error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to search recipes' },
       { status: 500 }

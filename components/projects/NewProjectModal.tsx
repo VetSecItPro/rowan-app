@@ -5,6 +5,7 @@ import { X, Plus, Trash2, CheckCircle2, Circle, GripVertical, Target } from 'luc
 import type { Project } from '@/lib/services/project-tracking-service';
 import type { CreateProjectInput } from '@/lib/services/projects-service';
 import { projectMilestonesService, type ProjectMilestone } from '@/lib/services/project-milestones-service';
+import { logger } from '@/lib/logger';
 
 interface MilestoneItem {
   id?: string;
@@ -82,7 +83,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
         is_completed: m.is_completed,
       })));
     } catch (error) {
-      console.error('Failed to load milestones:', error);
+      logger.error('Failed to load milestones:', error, { component: 'NewProjectModal', action: 'component_action' });
     } finally {
       setLoadingMilestones(false);
     }
@@ -113,7 +114,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
       try {
         await projectMilestonesService.toggleMilestone(milestone.id);
       } catch (error) {
-        console.error('Failed to toggle milestone:', error);
+        logger.error('Failed to toggle milestone:', error, { component: 'NewProjectModal', action: 'component_action' });
         // Revert on error
         updated[index] = milestone;
         setMilestones(updated);
@@ -167,7 +168,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
 
       onClose();
     } catch (error) {
-      console.error('Failed to save project:', error);
+      logger.error('Failed to save project:', error, { component: 'NewProjectModal', action: 'component_action' });
     } finally {
       setLoading(false);
     }

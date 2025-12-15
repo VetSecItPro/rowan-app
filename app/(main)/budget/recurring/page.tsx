@@ -6,6 +6,7 @@ import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { RecurringPatternsList } from '@/components/expenses/RecurringPatternsList';
 import { DuplicateSubscriptions } from '@/components/expenses/DuplicateSubscriptions';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { logger } from '@/lib/logger';
 import {
   analyzeRecurringPatterns,
   getRecurringPatterns,
@@ -49,7 +50,7 @@ export default function RecurringExpensesPage() {
       const potentialDuplicates = detectDuplicates(data);
       setDuplicates(potentialDuplicates);
     } catch (err) {
-      console.error('Failed to load patterns:', err);
+      logger.error('Failed to load patterns:', err, { component: 'page', action: 'execution' });
       setError('Failed to load recurring patterns. Please try again.');
     } finally {
       setLoading(false);
@@ -71,7 +72,7 @@ export default function RecurringExpensesPage() {
       await analyzeRecurringPatterns(spaceId);
       await loadPatterns();
     } catch (err) {
-      console.error('Failed to analyze patterns:', err);
+      logger.error('Failed to analyze patterns:', err, { component: 'page', action: 'execution' });
       setError('Failed to analyze recurring patterns. Please try again.');
     } finally {
       setAnalyzing(false);
@@ -99,7 +100,7 @@ export default function RecurringExpensesPage() {
       // Reload patterns after action
       await loadPatterns();
     } catch (err) {
-      console.error('Failed to process pattern action:', err);
+      logger.error('Failed to process pattern action:', err, { component: 'page', action: 'execution' });
       throw err;
     }
   };
@@ -116,7 +117,7 @@ export default function RecurringExpensesPage() {
   // Handle duplicate review
   const handleReviewDuplicate = (group: DuplicateGroup) => {
     // Navigate to a comparison view or modal
-    console.log('Review duplicate group:', group);
+    logger.info('Review duplicate group:', { component: 'page', data: group });
     // TODO: Implement duplicate review modal
   };
 

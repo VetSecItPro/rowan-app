@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, memo } from 'react';
+import { useState, memo, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
   Shield,
   Users,
@@ -64,7 +65,36 @@ const StatCard = memo(function StatCard({
 });
 
 export const BetaProgramPanel = memo(function BetaProgramPanel() {
-  const [stats, setStats] = useState<BetaStats>({
+  const [searchTerm, setSearchTerm] = useState('');
+  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
+
+  // React Query for beta stats with caching
+  const { data: statsData, refetch: refetchStats } = useQuery({
+    queryKey: ['admin-beta-stats', timeRange],
+    queryFn: async () => {
+      const response = await fetch(`/api/admin/beta/stats?range=${timeRange}`);
+      if (!response.ok) throw new Error('Failed to fetch beta stats');
+      const data = await response.json();
+      return data.stats;
+    },
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+
+  // React Query for online users with caching
+  const { data: usersData, isLoading, refetch: refetchUsers } = useQuery({
+    queryKey: ['admin-online-users', timeRange],
+    queryFn: async () => {
+      const response = await fetch(`/api/admin/users/online?range=${timeRange}`);
+      if (!response.ok) throw new Error('Failed to fetch online users');
+      const data = await response.json();
+      return data.users || [];
+    },
+    staleTime: 30 * 1000, // 30 seconds for online status
+    gcTime: 5 * 60 * 1000,
+  });
+
+  const stats: BetaStats = statsData || {
     totalRequests: 0,
     approvedRequests: 0,
     pendingRequests: 0,
@@ -72,38 +102,13 @@ export const BetaProgramPanel = memo(function BetaProgramPanel() {
     capacity: 30,
     conversionRate: 0,
     averageActivityScore: 0,
-  });
-  const [betaUsers, setBetaUsers] = useState<BetaUser[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
-      const [statsResponse, usersResponse] = await Promise.all([
-        fetch('/api/admin/beta/stats'),
-        fetch('/api/admin/users/online')
-      ]);
-
-      if (statsResponse.ok) {
-        const statsData = await statsResponse.json();
-        setStats(prev => ({ ...prev, ...statsData.stats }));
-      }
-
-      if (usersResponse.ok) {
-        const usersData = await usersResponse.json();
-        setBetaUsers(usersData.users || []);
-      }
-    } catch (error) {
-      console.error('Failed to fetch beta data:', error);
-    } finally {
-      setIsLoading(false);
-    }
   };
+  const betaUsers: BetaUser[] = usersData || [];
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const fetchData = useCallback(() => {
+    refetchStats();
+    refetchUsers();
+  }, [refetchStats, refetchUsers]);
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'Never';
@@ -128,9 +133,9 @@ export const BetaProgramPanel = memo(function BetaProgramPanel() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex-1 flex flex-col space-y-4 min-h-0">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <div className="text-sm font-medium text-gray-900 dark:text-white">
             {stats.activeUsers}/{stats.capacity} Users
@@ -139,13 +144,30 @@ export const BetaProgramPanel = memo(function BetaProgramPanel() {
             ({stats.capacity - stats.activeUsers} slots remaining)
           </div>
         </div>
-        <button
-          onClick={fetchData}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Time Range Filter */}
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
+            {(['7d', '30d', '90d'] as const).map((range) => (
+              <button
+                key={range}
+                onClick={() => setTimeRange(range)}
+                className={`px-2 py-1 text-xs font-medium rounded-md transition-colors ${
+                  timeRange === range
+                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                {range === '7d' ? '7d' : range === '30d' ? '30d' : '90d'}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={fetchData}
+            className="flex items-center gap-1.5 px-2 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -195,8 +217,8 @@ export const BetaProgramPanel = memo(function BetaProgramPanel() {
       </div>
 
       {/* Users List */}
-      <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-        <div className="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+      <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden flex-1 flex flex-col min-h-0">
+        <div className="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Beta Users</span>
             <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
@@ -205,7 +227,7 @@ export const BetaProgramPanel = memo(function BetaProgramPanel() {
             </div>
           </div>
         </div>
-        <div className="max-h-[300px] overflow-y-auto">
+        <div className="flex-1 overflow-y-auto min-h-0">
           {filteredUsers.length > 0 ? (
             <div className="divide-y divide-gray-200 dark:divide-gray-700">
               {filteredUsers.slice(0, 10).map((user) => (

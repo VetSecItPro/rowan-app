@@ -8,6 +8,7 @@ import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { goalsService, Goal, Milestone } from '@/lib/services/goals-service';
 import { ArrowLeft, Calendar, ChevronLeft, ChevronRight, Target, Trophy, Clock, Filter } from 'lucide-react';
 import Link from 'next/link';
+import { logger } from '@/lib/logger';
 import {
   format,
   startOfMonth,
@@ -132,7 +133,7 @@ export default function GoalsCalendarPage() {
 
         setEvents(calendarEvents);
       } catch (err) {
-        console.error('Failed to fetch calendar data:', err);
+        logger.error('Failed to fetch calendar data:', err, { component: 'page', action: 'execution' });
         setError('Failed to load calendar data');
       } finally {
         setLoading(false);

@@ -5,6 +5,7 @@ import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import LRUCache from 'lru-cache';
 import { eventParserService } from '@/lib/services/ai/event-parser-service';
+import { logger } from '@/lib/logger';
 
 // Request validation schema
 const ParseEventRequestSchema = z.object({
@@ -37,7 +38,7 @@ async function checkRateLimit(userId: string): Promise<{ success: boolean; remai
       reset: result.reset ? new Date(result.reset) : undefined,
     };
   } catch (error) {
-    console.warn('[EventParser] Rate limit fallback - Redis unavailable:', error);
+    logger.warn('[EventParser] Rate limit fallback - Redis unavailable:', { component: 'api-route', error: error });
 
     // Fallback to in-memory cache
     const now = Date.now();
@@ -150,7 +151,7 @@ export async function POST(request: NextRequest) {
       }
     );
   } catch (error) {
-    console.error('[EventParser API] Unexpected error:', error);
+    logger.error('[EventParser API] Unexpected error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'An unexpected error occurred' },
       { status: 500 }

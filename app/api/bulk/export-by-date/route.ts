@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { bulkExportByDateRange } from '@/lib/services/bulk-operations-service';
 import { checkExpensiveOperationRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -106,7 +107,7 @@ export async function GET(request: NextRequest) {
       export_date: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Bulk export by date error:', error);
+    logger.error('Bulk export by date error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to export data' },
       { status: 500 }

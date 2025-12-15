@@ -4,6 +4,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { calendarSyncService } from '@/lib/services/calendar';
+import { logger } from '@/lib/logger';
 import type { CalendarProvider } from '@/lib/types/calendar-integration';
 
 /**
@@ -31,7 +32,7 @@ export async function GET(request: Request) {
 
   // SECURITY: Fail-closed if CRON_SECRET is not configured
   if (!process.env.CRON_SECRET) {
-    console.error('[CRON] CRON_SECRET environment variable not configured');
+    logger.error('CRON_SECRET environment variable not configured', new Error('Missing CRON_SECRET'), { component: 'cron-route', action: 'auth-check' });
     return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
   }
 
@@ -77,7 +78,7 @@ export async function GET(request: Request) {
     const { data: connections, error: queryError } = await query;
 
     if (queryError) {
-      console.error('[Calendar Sync Cron] Failed to fetch connections:', queryError);
+      logger.error('Failed to fetch connections', queryError instanceof Error ? queryError : new Error(String(queryError)), { component: 'cron-route', action: 'fetch-connections' });
       return NextResponse.json(
         { error: 'Failed to fetch connections', details: queryError.message },
         { status: 500 }
@@ -92,14 +93,14 @@ export async function GET(request: Request) {
       });
     }
 
-    console.log(`[Calendar Sync Cron] Processing ${connections.length} connections`);
+    logger.info(`Processing ${connections.length} connections`, { component: 'cron-route', action: 'process-connections', count: connections.length });
 
     // Process each connection
     for (const connection of connections) {
       const connectionStartTime = Date.now();
 
       try {
-        console.log(`[Calendar Sync Cron] Syncing ${connection.provider} connection ${connection.id}`);
+        logger.info(`Syncing ${connection.provider} connection ${connection.id}`, { component: 'cron-route', action: 'sync-connection', provider: connection.provider, connectionId: connection.id });
 
         // Update status to syncing
         await supabase
@@ -137,14 +138,10 @@ export async function GET(request: Request) {
           error: syncResult.success ? undefined : syncResult.errors?.[0]?.error_message,
         });
 
-        console.log(
-          `[Calendar Sync Cron] ${connection.provider} ${connection.id}: ` +
-          `${syncResult.success ? 'Success' : 'Failed'} - ` +
-          `${syncResult.eventsProcessed} events in ${Date.now() - connectionStartTime}ms`
-        );
+        logger.info(`${connection.provider} ${connection.id}: ${syncResult.success ? 'Success' : 'Failed'} - ${syncResult.eventsProcessed} events in ${Date.now() - connectionStartTime}ms`, { component: 'cron-route', action: 'sync-result', provider: connection.provider, connectionId: connection.id, success: syncResult.success, eventsProcessed: syncResult.eventsProcessed, durationMs: Date.now() - connectionStartTime });
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        console.error(`[Calendar Sync Cron] Error syncing ${connection.id}:`, error);
+        logger.error(`Error syncing ${connection.id}`, error instanceof Error ? error : new Error(String(error)), { component: 'cron-route', action: 'sync-connection', connectionId: connection.id });
 
         // Update connection with error status
         await supabase
@@ -178,7 +175,7 @@ export async function GET(request: Request) {
       results,
     });
   } catch (error) {
-    console.error('[Calendar Sync Cron] Fatal error:', error);
+    logger.error('Calendar sync cron fatal error', error instanceof Error ? error : new Error(String(error)), { component: 'cron-route', action: 'fatal-error' });
     return NextResponse.json(
       {
         error: 'Calendar sync cron failed',

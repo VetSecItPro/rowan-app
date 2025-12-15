@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkAuthRateLimit } from '@/lib/ratelimit';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
     );
 
     if (passwordError) {
-      console.error('Failed to update password:', passwordError);
+      logger.error('Failed to update password:', passwordError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: 'Failed to update password. Please try again.' },
         { status: 500 }
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
       .eq('token', token);
 
     if (markUsedError) {
-      console.error('Failed to mark token as used:', markUsedError);
+      logger.error('Failed to mark token as used:', markUsedError, { component: 'api-route', action: 'api_request' });
       // Don't fail the request, password was already updated
     }
 
@@ -103,7 +104,7 @@ export async function POST(request: NextRequest) {
       .neq('token', token);
 
     if (cleanupError) {
-      console.error('Failed to cleanup other tokens:', cleanupError);
+      logger.error('Failed to cleanup other tokens:', cleanupError, { component: 'api-route', action: 'api_request' });
       // Don't fail the request
     }
 
@@ -113,7 +114,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Password reset verification error:', error);
+    logger.error('Password reset verification error:', error, { component: 'api-route', action: 'api_request' });
 
     if (error instanceof z.ZodError) {
       const firstError = error.issues[0];
@@ -184,7 +185,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Token validation error:', error);
+    logger.error('Token validation error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to validate token' },
       { status: 500 }

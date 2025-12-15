@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { logger } from '@/lib/logger';
 
 interface UsePullToRefreshOptions {
   onRefresh: () => Promise<void>;
@@ -72,7 +73,7 @@ export function usePullToRefresh({
         try {
           await onRefresh();
         } catch (error) {
-          console.error('Refresh failed:', error);
+          logger.error('Refresh failed:', error, { component: 'lib-usePullToRefresh', action: 'service_call' });
         } finally {
           // Delay to show completion state
           setTimeout(() => {

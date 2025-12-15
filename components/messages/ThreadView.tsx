@@ -7,6 +7,7 @@ import { messagesService } from '@/lib/services/messages-service';
 import { MessageCard } from './MessageCard';
 import { toast } from 'sonner';
 import { RealtimeChannel } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 interface ThreadViewProps {
   parentMessage: MessageWithReplies;
@@ -52,7 +53,7 @@ export function ThreadView({
         }
       } catch (error) {
         if (isMounted) {
-          console.error('Failed to load replies:', error);
+          logger.error('Failed to load replies:', error, { component: 'ThreadView', action: 'component_action' });
           toast.error('Failed to load replies');
           setLoading(false);
         }
@@ -120,7 +121,7 @@ export function ThreadView({
         setReplyInput('');
         setTimeout(scrollToBottom, 100);
       } catch (error) {
-        console.error('Failed to send reply:', error);
+        logger.error('Failed to send reply:', error, { component: 'ThreadView', action: 'component_action' });
         toast.error('Failed to send reply');
       } finally {
         setSending(false);
@@ -143,7 +144,7 @@ export function ThreadView({
       await messagesService.deleteMessage(messageId);
       toast.success('Reply deleted');
     } catch (error) {
-      console.error('Failed to delete reply:', error);
+      logger.error('Failed to delete reply:', error, { component: 'ThreadView', action: 'component_action' });
       toast.error('Failed to delete reply');
     }
   }, []);

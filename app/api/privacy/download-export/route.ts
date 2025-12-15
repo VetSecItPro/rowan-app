@@ -2,6 +2,7 @@
 // Secure download endpoint for user data exports with authentication and access control
 
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 
 // Force dynamic rendering for this route
 export const dynamic = 'force-dynamic';
@@ -74,7 +75,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (exportError || !exportRequest) {
-      console.error('Export request not found:', exportError);
+      logger.error('Export request not found:', exportError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { success: false, error: 'Export file not found or access denied' },
         { status: 404 }
@@ -108,7 +109,7 @@ export async function GET(request: NextRequest) {
     // For this mock implementation, we'll return a redirect to a generated file
     return generateMockFileResponse(exportRequest, file);
   } catch (error) {
-    console.error('Download export API error:', error);
+    logger.error('Download export API error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -144,7 +145,7 @@ async function validateDownloadToken(token: string): Promise<string | null> {
 
     return tokenRecord.user_id;
   } catch (error) {
-    console.error('Error validating download token:', error);
+    logger.error('Error validating download token:', error, { component: 'api-route', action: 'api_request' });
     return null;
   }
 }
@@ -195,7 +196,7 @@ async function generateMockFileResponse(exportRequest: any, fileName: string) {
       },
     });
   } catch (error) {
-    console.error('Error generating file response:', error);
+    logger.error('Error generating file response:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { success: false, error: 'Failed to generate file' },
       { status: 500 }

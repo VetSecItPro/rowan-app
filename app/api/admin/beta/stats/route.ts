@@ -6,6 +6,7 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookies } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { withCache, ADMIN_CACHE_TTL } from '@/lib/services/admin-cache-service';
+import { logger } from '@/lib/logger';
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
@@ -54,7 +55,7 @@ export async function GET(req: NextRequest) {
         );
       }
     } catch (error) {
-      console.error('Admin session decryption failed:', error);
+      logger.error('Admin session decryption failed:', error, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: 'Invalid session' },
         { status: 401 }
@@ -178,7 +179,7 @@ export async function GET(req: NextRequest) {
         [totalRequestsResult, approvedRequestsResult, pendingRequestsResult, activeUsersFromRequestsResult, activeUsersFromUsersTableResult, recentActivityResult]
           .forEach((result, index) => {
             if (result.status === 'rejected') {
-              console.error(`Beta stat query ${index} failed:`, result.reason);
+              logger.error('Beta stat query ${index} failed:', undefined, { component: 'api-route', action: 'api_request', details: result.reason });
             }
           });
 
@@ -223,7 +224,7 @@ export async function GET(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/admin/beta/stats GET error:', error);
+    logger.error('[API] /api/admin/beta/stats GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to fetch beta statistics' },
       { status: 500 }

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { logger } from '@/lib/logger';
 import {
   BarChart,
   Bar,
@@ -122,9 +123,9 @@ export function YearInReviewDashboard({ year, className }: YearInReviewDashboard
 
       // Handle download (would implement actual file download)
       const result = await response.json();
-      console.log('Export prepared:', result);
+      logger.info('Export prepared:', { component: 'YearInReviewDashboard', data: result });
     } catch (err) {
-      console.error('Export error:', err);
+      logger.error('Export error:', err, { component: 'YearInReviewDashboard', action: 'component_action' });
     }
   };
 

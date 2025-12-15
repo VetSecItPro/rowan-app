@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, memo } from 'react';
+import { useState, memo, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
   Users,
   Search,
@@ -60,40 +61,45 @@ const StatusBadge = memo(function StatusBadge({ status, isBeta }: { status: stri
 });
 
 export const UsersPanel = memo(function UsersPanel() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [betaRequests, setBetaRequests] = useState<BetaRequest[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<'all' | 'beta' | 'active' | 'inactive'>('all');
   const [activeTab, setActiveTab] = useState<'users' | 'beta'>('users');
+  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
 
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
-      const [usersResponse, betaResponse] = await Promise.all([
-        fetch('/api/admin/users'),
-        fetch('/api/admin/beta-requests')
-      ]);
+  // React Query for users with caching
+  const { data: usersData, isLoading: usersLoading, refetch: refetchUsers } = useQuery({
+    queryKey: ['admin-users', timeRange],
+    queryFn: async () => {
+      const response = await fetch(`/api/admin/users?range=${timeRange}`);
+      if (!response.ok) throw new Error('Failed to fetch users');
+      const data = await response.json();
+      return data.users || [];
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
 
-      if (usersResponse.ok) {
-        const usersData = await usersResponse.json();
-        setUsers(usersData.users || []);
-      }
+  // React Query for beta requests with caching
+  const { data: betaData, isLoading: betaLoading, refetch: refetchBeta } = useQuery({
+    queryKey: ['admin-beta-requests', timeRange],
+    queryFn: async () => {
+      const response = await fetch(`/api/admin/beta-requests?range=${timeRange}`);
+      if (!response.ok) throw new Error('Failed to fetch beta requests');
+      const data = await response.json();
+      return data.requests || [];
+    },
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
 
-      if (betaResponse.ok) {
-        const betaData = await betaResponse.json();
-        setBetaRequests(betaData.requests || []);
-      }
-    } catch (error) {
-      console.error('Failed to fetch data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const users: User[] = usersData || [];
+  const betaRequests: BetaRequest[] = betaData || [];
+  const isLoading = usersLoading || betaLoading;
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const fetchData = useCallback(() => {
+    refetchUsers();
+    refetchBeta();
+  }, [refetchUsers, refetchBeta]);
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -128,10 +134,10 @@ export const UsersPanel = memo(function UsersPanel() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex-1 flex flex-col space-y-4 min-h-0">
       {/* Header with stats */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveTab('users')}
             className={`text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${
@@ -153,13 +159,30 @@ export const UsersPanel = memo(function UsersPanel() {
             Beta Requests ({betaRequests.length})
           </button>
         </div>
-        <button
-          onClick={fetchData}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Time Range Filter */}
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
+            {(['7d', '30d', '90d', 'all'] as const).map((range) => (
+              <button
+                key={range}
+                onClick={() => setTimeRange(range)}
+                className={`px-2 py-1 text-xs font-medium rounded-md transition-colors ${
+                  timeRange === range
+                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                {range === '7d' ? '7d' : range === '30d' ? '30d' : range === '90d' ? '90d' : 'All'}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={fetchData}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Search and Filter */}
@@ -193,8 +216,8 @@ export const UsersPanel = memo(function UsersPanel() {
 
       {/* Users Table */}
       {activeTab === 'users' && (
-        <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-          <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden flex-1 flex flex-col min-h-0">
+          <div className="overflow-x-auto flex-1 overflow-y-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
                 <tr>
@@ -247,8 +270,8 @@ export const UsersPanel = memo(function UsersPanel() {
 
       {/* Beta Requests Table */}
       {activeTab === 'beta' && (
-        <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-          <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden flex-1 flex flex-col min-h-0">
+          <div className="overflow-x-auto flex-1 overflow-y-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
                 <tr>

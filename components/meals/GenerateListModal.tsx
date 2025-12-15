@@ -5,6 +5,7 @@ import { X, ShoppingBag, Check, Loader2 } from 'lucide-react';
 import { Meal } from '@/lib/services/meals-service';
 import { formatDateString } from '@/lib/utils/date';
 import { showSuccess } from '@/lib/utils/toast';
+import { logger } from '@/lib/logger';
 
 interface GenerateListModalProps {
   isOpen: boolean;
@@ -94,7 +95,7 @@ export function GenerateListModal({
         );
       }
     } catch (err) {
-      console.error('Generate shopping list error:', err);
+      logger.error('Generate shopping list error:', err, { component: 'GenerateListModal', action: 'component_action' });
       setError(err instanceof Error ? err.message : 'Failed to generate shopping list');
     } finally {
       setIsGenerating(false);

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 // ==================== TYPES ====================
 
@@ -56,12 +57,12 @@ export async function getUserNotifications(userId: string, limit = 50): Promise<
       .limit(limit);
 
     if (error) {
-      console.warn('Error fetching notifications from notifications table:', error);
+      logger.warn('Error fetching notifications from notifications table:', { component: 'lib-milestone-notification-service', error: error });
       return [];
     }
     return data || [];
   } catch (error) {
-    console.warn('Failed to fetch notifications:', error);
+    logger.warn('Failed to fetch notifications:', { component: 'lib-milestone-notification-service', error: error });
     return [];
   }
 }
@@ -80,12 +81,12 @@ export async function getUnreadNotificationCount(userId: string): Promise<number
       .eq('read', false);
 
     if (error) {
-      console.warn('Error fetching unread notification count:', error);
+      logger.warn('Error fetching unread notification count:', { component: 'lib-milestone-notification-service', error: error });
       return 0;
     }
     return count || 0;
   } catch (error) {
-    console.warn('Failed to fetch unread notification count:', error);
+    logger.warn('Failed to fetch unread notification count:', { component: 'lib-milestone-notification-service', error: error });
     return 0;
   }
 }
@@ -103,10 +104,10 @@ export async function markNotificationAsRead(notificationId: string): Promise<vo
       .eq('id', notificationId);
 
     if (error) {
-      console.warn('Error marking notification as read:', error);
+      logger.warn('Error marking notification as read:', { component: 'lib-milestone-notification-service', error: error });
     }
   } catch (error) {
-    console.warn('Failed to mark notification as read:', error);
+    logger.warn('Failed to mark notification as read:', { component: 'lib-milestone-notification-service', error: error });
   }
 }
 
@@ -124,10 +125,10 @@ export async function markAllNotificationsAsRead(userId: string): Promise<void> 
       .eq('read', false);
 
     if (error) {
-      console.warn('Error marking all notifications as read:', error);
+      logger.warn('Error marking all notifications as read:', { component: 'lib-milestone-notification-service', error: error });
     }
   } catch (error) {
-    console.warn('Failed to mark all notifications as read:', error);
+    logger.warn('Failed to mark all notifications as read:', { component: 'lib-milestone-notification-service', error: error });
   }
 }
 
@@ -141,10 +142,10 @@ export async function deleteNotification(notificationId: string): Promise<void> 
     const { error } = await supabase.from('notifications').delete().eq('id', notificationId);
 
     if (error) {
-      console.warn('Error deleting notification:', error);
+      logger.warn('Error deleting notification:', { component: 'lib-milestone-notification-service', error: error });
     }
   } catch (error) {
-    console.warn('Failed to delete notification:', error);
+    logger.warn('Failed to delete notification:', { component: 'lib-milestone-notification-service', error: error });
   }
 }
 

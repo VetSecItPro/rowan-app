@@ -13,6 +13,7 @@ import { ProjectCard } from '@/components/projects/ProjectCard';
 import { ExpenseCard } from '@/components/projects/ExpenseCard';
 import { SafeToSpendIndicator } from '@/components/projects/SafeToSpendIndicator';
 import { BillsList } from '@/components/budget/BillsList';
+import { logger } from '@/lib/logger';
 // Lazy-loaded modals for better initial page load
 import {
   LazyNewProjectModal,
@@ -106,7 +107,7 @@ export default function ProjectsPage() {
       setCurrentBudget(budgetData?.monthly_budget || 0);
       setBudgetStats(stats);
     } catch (error) {
-      console.error('Failed to load data:', error);
+      logger.error('Failed to load data:', error, { component: 'page', action: 'execution' });
     } finally {
       setLoading(false);
     }
@@ -133,7 +134,7 @@ export default function ProjectsPage() {
         );
         setTemplateCategories(categoriesMap);
       } catch (error) {
-        console.error('Failed to load budget templates:', error);
+        logger.error('Failed to load budget templates:', error, { component: 'page', action: 'execution' });
       }
     }
 
@@ -237,7 +238,7 @@ export default function ProjectsPage() {
       setEditingProject(null);
       return project;
     } catch (error) {
-      console.error('Failed to save project:', error);
+      logger.error('Failed to save project:', error, { component: 'page', action: 'execution' });
       throw error;
     }
   }, [editingProject, loadData]);
@@ -262,7 +263,7 @@ export default function ProjectsPage() {
       loadData();
       setEditingExpense(null);
     } catch (error) {
-      console.error('Failed to save expense:', error);
+      logger.error('Failed to save expense:', error, { component: 'page', action: 'execution' });
     }
   }, [editingExpense, loadData, currentSpace]);
 
@@ -284,7 +285,7 @@ export default function ProjectsPage() {
       }
       loadData();
     } catch (error) {
-      console.error(`Failed to ${action}:`, error);
+      logger.error('Failed to ${action}:', error, { component: 'page', action: 'execution' });
     }
   }, [confirmDialog, loadData]);
 
@@ -293,7 +294,7 @@ export default function ProjectsPage() {
       await projectsService.updateExpense(expenseId, { status: newStatus });
       loadData();
     } catch (error) {
-      console.error('Failed to update expense status:', error);
+      logger.error('Failed to update expense status:', error, { component: 'page', action: 'execution' });
     }
   }, [loadData]);
 
@@ -303,7 +304,7 @@ export default function ProjectsPage() {
       await projectsService.setBudget({ space_id: currentSpace.id, monthly_budget: amount }, user.id);
       loadData();
     } catch (error) {
-      console.error('Failed to set budget:', error);
+      logger.error('Failed to set budget:', error, { component: 'page', action: 'execution' });
     }
   }, [currentSpace, user, loadData]);
 
@@ -319,7 +320,7 @@ export default function ProjectsPage() {
       loadData();
       setEditingBill(null);
     } catch (error) {
-      console.error('Failed to save bill:', error);
+      logger.error('Failed to save bill:', error, { component: 'page', action: 'execution' });
     }
   }, [editingBill, loadData, user]);
 
@@ -332,7 +333,7 @@ export default function ProjectsPage() {
       await billsService.markBillAsPaid(billId, true);
       loadData();
     } catch (error) {
-      console.error('Failed to mark bill as paid:', error);
+      logger.error('Failed to mark bill as paid:', error, { component: 'page', action: 'execution' });
     }
   }, [loadData]);
 
@@ -347,7 +348,7 @@ export default function ProjectsPage() {
       });
       loadData();
     } catch (error) {
-      console.error('Failed to apply budget template:', error);
+      logger.error('Failed to apply budget template:', error, { component: 'page', action: 'execution' });
     }
   }, [currentSpace, loadData]);
 

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Calendar, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react';
 import { taskCalendarService } from '@/lib/services/task-calendar-service';
 import { useRouter } from 'next/navigation';
+import { logger } from '@/lib/logger';
 
 interface CalendarSyncToggleProps {
   taskId: string;
@@ -34,7 +35,7 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
       // getTaskSyncStatus doesn't exist, so we'll just initialize with default
       setSyncStatus({ isSynced: false });
     } catch (error) {
-      console.error('Error loading sync status:', error);
+      logger.error('Error loading sync status:', error, { component: 'CalendarSyncToggle', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -45,7 +46,7 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
       const prefs = await taskCalendarService.getCalendarPreferences(userId);
       setPreferences(prefs);
     } catch (error) {
-      console.error('Error loading preferences:', error);
+      logger.error('Error loading preferences:', error, { component: 'CalendarSyncToggle', action: 'component_action' });
     }
   }
 
@@ -68,7 +69,7 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
         }
       }
     } catch (error: any) {
-      console.error('Error toggling sync:', error);
+      logger.error('Error toggling sync:', error, { component: 'CalendarSyncToggle', action: 'component_action' });
       setSyncStatus(prev => ({
         ...prev,
         error: error.message || 'Failed to sync',
@@ -83,7 +84,7 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
       await taskCalendarService.updateCalendarPreferences(userId, autoSync);
       loadPreferences();
     } catch (error) {
-      console.error('Error updating preferences:', error);
+      logger.error('Error updating preferences:', error, { component: 'CalendarSyncToggle', action: 'component_action' });
     }
   }
 

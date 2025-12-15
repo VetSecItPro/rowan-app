@@ -7,6 +7,7 @@ import { DisconnectCalendarRequestSchema } from '@/lib/validations/calendar-inte
 import { z } from 'zod';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,12 +59,12 @@ export async function POST(request: NextRequest) {
       .eq('user_id', user.id)
       .single();
 
-    console.log('[Disconnect] Space member check:', {
+    logger.info('[Disconnect] Space member check:', { component: 'api-route', data: {
       spaceId: connection.space_id,
       userId: user.id,
       spaceMember,
       memberError
-    });
+    } });
 
     if (!spaceMember) {
       return NextResponse.json(
@@ -153,7 +154,7 @@ export async function POST(request: NextRequest) {
       .eq('id', validatedData.connection_id);
 
     if (deleteError) {
-      console.error('Failed to delete connection:', deleteError);
+      logger.error('Failed to delete connection:', deleteError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: 'Failed to disconnect calendar' },
         { status: 500 }
@@ -167,7 +168,7 @@ export async function POST(request: NextRequest) {
       provider: connection.provider,
     });
   } catch (error) {
-    console.error('Calendar disconnect error:', error);
+    logger.error('Calendar disconnect error:', error, { component: 'api-route', action: 'api_request' });
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(

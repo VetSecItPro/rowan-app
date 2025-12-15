@@ -15,6 +15,7 @@ import { GoalCard } from '@/components/goals/GoalCard';
 import { SortableGoalsList } from '@/components/goals/SortableGoalsList';
 import { MilestoneCard } from '@/components/goals/MilestoneCard';
 import dynamicImport from 'next/dynamic';
+import { logger } from '@/lib/logger';
 
 // Dynamic imports for heavy modal components (load only when opened)
 const NewGoalModal = dynamicImport(() => import('@/components/goals/NewGoalModal').then(mod => ({ default: mod.NewGoalModal })), {
@@ -317,7 +318,7 @@ export default function GoalsPage() {
       }
 
     } catch (error) {
-      console.error('Failed to load data:', error);
+      logger.error('Failed to load data:', error, { component: 'page', action: 'execution' });
     } finally {
       setLoading(false);
     }
@@ -358,7 +359,7 @@ export default function GoalsPage() {
       }
       setEditingGoal(null);
     } catch (error) {
-      console.error('Failed to save goal:', error);
+      logger.error('Failed to save goal:', error, { component: 'page', action: 'execution' });
     }
   }, [editingGoal, setGoals, user]);
 
@@ -376,20 +377,20 @@ export default function GoalsPage() {
       loadData();
       setEditingMilestone(null);
     } catch (error) {
-      console.error('Failed to save milestone:', error);
+      logger.error('Failed to save milestone:', error, { component: 'page', action: 'execution' });
     }
   }, [editingMilestone, loadData]);
 
   const handleCreateHabit = useCallback(async (habitData: any) => {
     try {
       // TODO: Implement habit creation service when backend is ready
-      console.log('Creating habit:', habitData);
+      logger.info('Creating habit:', { component: 'page', data: habitData });
       toast.success('Habit created successfully!');
 
       // For now, just close the modal
       setEditingHabit(null);
     } catch (error) {
-      console.error('Failed to save habit:', error);
+      logger.error('Failed to save habit:', error, { component: 'page', action: 'execution' });
       toast.error('Failed to create habit. Please try again.');
     }
   }, [editingHabit]);
@@ -400,7 +401,7 @@ export default function GoalsPage() {
       toast.success('Check-in saved successfully!');
       loadData(); // Reload to update goal progress
     } catch (error) {
-      console.error('Failed to save check-in:', error);
+      logger.error('Failed to save check-in:', error, { component: 'page', action: 'execution' });
       toast.error('Failed to save check-in. Please try again.');
     }
   }, [loadData]);
@@ -427,7 +428,7 @@ export default function GoalsPage() {
         await goalsService.deleteMilestone(id);
       }
     } catch (error) {
-      console.error(`Failed to ${action}:`, error);
+      logger.error('Failed to ${action}:', error, { component: 'page', action: 'execution' });
       // Revert optimistic update on error
       loadData();
     }
@@ -449,7 +450,7 @@ export default function GoalsPage() {
       await goalsService.toggleMilestone(milestoneId, completed);
       // Real-time subscription will handle the update
     } catch (error) {
-      console.error('Failed to toggle milestone:', error);
+      logger.error('Failed to toggle milestone:', error, { component: 'page', action: 'execution' });
       // Revert on error
       setMilestones(previousMilestones);
       userActionsRef.current.delete(milestoneId);
@@ -486,7 +487,7 @@ export default function GoalsPage() {
       });
       // Real-time subscription will handle the update
     } catch (error) {
-      console.error('Failed to update goal status:', error);
+      logger.error('Failed to update goal status:', error, { component: 'page', action: 'execution' });
       // Revert on error
       setGoals(previousGoals);
       userActionsRef.current.delete(goalId);
@@ -610,7 +611,7 @@ export default function GoalsPage() {
       const reorderedGoals = goalIds.map(id => goals.find(g => g.id === id)!).filter(Boolean);
       setGoals(reorderedGoals);
     } catch (error) {
-      console.error('Failed to reorder goals:', error);
+      logger.error('Failed to reorder goals:', error, { component: 'page', action: 'execution' });
       loadData(); // Reload on error
     }
   }, [currentSpace, goals, loadData]);
@@ -629,7 +630,7 @@ export default function GoalsPage() {
       await goalsService.updateGoalPriority(goalId, priority);
       // Real-time subscription will handle the update
     } catch (error) {
-      console.error('Failed to update goal priority:', error);
+      logger.error('Failed to update goal priority:', error, { component: 'page', action: 'execution' });
       // Revert on error
       setGoals(previousGoals);
       userActionsRef.current.delete(goalId);
@@ -650,7 +651,7 @@ export default function GoalsPage() {
       await goalsService.toggleGoalPin(goalId, isPinned);
       // Real-time subscription will handle the update
     } catch (error) {
-      console.error('Failed to toggle goal pin:', error);
+      logger.error('Failed to toggle goal pin:', error, { component: 'page', action: 'execution' });
       // Revert on error
       setGoals(previousGoals);
       userActionsRef.current.delete(goalId);

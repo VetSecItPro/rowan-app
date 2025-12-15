@@ -8,6 +8,7 @@ import { setSentryUser } from '@/lib/sentry-utils';
 import { updateTaskSchema } from '@/lib/validations/task-schemas';
 import { ZodError } from 'zod';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/tasks/[id]
@@ -75,7 +76,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/tasks/[id] GET error:', error);
+    logger.error('[API] /api/tasks/[id] GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -180,7 +181,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/tasks/[id] PATCH error:', error);
+    logger.error('[API] /api/tasks/[id] PATCH error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to update task' },
       { status: 500 }
@@ -257,7 +258,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/tasks/[id] DELETE error:', error);
+    logger.error('[API] /api/tasks/[id] DELETE error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to delete task' },
       { status: 500 }

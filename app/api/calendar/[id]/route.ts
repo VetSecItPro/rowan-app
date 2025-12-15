@@ -6,6 +6,7 @@ import { verifyResourceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/calendar/[id]
@@ -73,7 +74,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/calendar/[id] GET error:', error);
+    logger.error('[API] /api/calendar/[id] GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -153,7 +154,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/calendar/[id] PATCH error:', error);
+    logger.error('[API] /api/calendar/[id] PATCH error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to update calendar event' },
       { status: 500 }
@@ -230,7 +231,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/calendar/[id] DELETE error:', error);
+    logger.error('[API] /api/calendar/[id] DELETE error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to delete calendar event' },
       { status: 500 }

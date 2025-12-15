@@ -4,6 +4,8 @@
  * Compatible with Next.js Edge Runtime (middleware)
  */
 
+import { logger } from '@/lib/logger';
+
 const CURRENT_KEY_VERSION = 1;
 
 /**
@@ -113,7 +115,7 @@ export async function encryptSessionData(data: object): Promise<string> {
     return btoa(String.fromCharCode(...combined));
 
   } catch (error) {
-    console.error('Session encryption failed:', error);
+    logger.error('Session encryption failed:', error, { component: 'lib-session-crypto-edge', action: 'service_call' });
     throw new Error('Failed to encrypt session data');
   }
 }
@@ -166,7 +168,7 @@ export async function decryptSessionData(encryptedData: string): Promise<object>
     return JSON.parse(jsonString);
 
   } catch (error) {
-    console.error('Session decryption failed:', error);
+    logger.error('Session decryption failed:', error, { component: 'lib-session-crypto-edge', action: 'service_call' });
     throw new Error('Failed to decrypt session data');
   }
 }

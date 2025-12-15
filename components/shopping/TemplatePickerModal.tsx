@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, FileText, ShoppingCart, Plus, Loader2 } from 'lucide-react';
 import { shoppingService, type TemplateItemInput } from '@/lib/services/shopping-service';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { logger } from '@/lib/logger';
 
 interface Template {
   id: string;
@@ -38,7 +39,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
       const data = await shoppingService.getTemplates(spaceId);
       setTemplates(data);
     } catch (error) {
-      console.error('Failed to load templates:', error);
+      logger.error('Failed to load templates:', error, { component: 'TemplatePickerModal', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -50,7 +51,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
       await onSelectTemplate(templateId);
       onClose();
     } catch (error) {
-      console.error('Failed to create list from template:', error);
+      logger.error('Failed to create list from template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
       alert('Failed to create list from template. Please try again.');
     } finally {
       setSelectedTemplateId(null);
@@ -198,7 +199,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                       );
                       loadTemplates();
                     } catch (error) {
-                      console.error('Failed to create template:', error);
+                      logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                     }
                   }}
                   className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
@@ -238,7 +239,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                       );
                       loadTemplates();
                     } catch (error) {
-                      console.error('Failed to create template:', error);
+                      logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                     }
                   }}
                   className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
@@ -277,7 +278,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                       );
                       loadTemplates();
                     } catch (error) {
-                      console.error('Failed to create template:', error);
+                      logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                     }
                   }}
                   className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
@@ -316,7 +317,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                       );
                       loadTemplates();
                     } catch (error) {
-                      console.error('Failed to create template:', error);
+                      logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                     }
                   }}
                   className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"

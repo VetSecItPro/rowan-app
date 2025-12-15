@@ -6,6 +6,7 @@ import { verifyResourceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/shopping/[id]
@@ -75,7 +76,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
       data: list,
     });
   } catch (error) {
-    console.error('[API] /api/shopping/[id] GET error:', error);
+    logger.error('[API] /api/shopping/[id] GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -157,7 +158,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       data: updatedList,
     });
   } catch (error) {
-    console.error('[API] /api/shopping/[id] PATCH error:', error);
+    logger.error('[API] /api/shopping/[id] PATCH error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to update shopping list' },
       { status: 500 }
@@ -236,7 +237,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
       message: 'Shopping list deleted successfully',
     });
   } catch (error) {
-    console.error('[API] /api/shopping/[id] DELETE error:', error);
+    logger.error('[API] /api/shopping/[id] DELETE error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to delete shopping list' },
       { status: 500 }

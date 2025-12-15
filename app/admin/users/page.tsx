@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Breadcrumbs } from '@/components/admin/Breadcrumbs';
+import { logger } from '@/lib/logger';
 import {
   Users,
   Search,
@@ -69,7 +70,7 @@ export default function AdminUsersPage() {
         setBetaRequests(betaData.requests || []);
       }
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      logger.error('Failed to fetch data:', error, { component: 'page', action: 'execution' });
     } finally {
       setIsLoading(false);
     }

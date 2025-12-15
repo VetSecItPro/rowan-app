@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 /**
  * Subtasks Service
@@ -54,7 +55,7 @@ export const taskSubtasksService = {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching subtasks:', error);
+      logger.error('Error fetching subtasks:', error, { component: 'lib-task-subtasks-service', action: 'service_call' });
       throw error;
     }
   },
@@ -74,7 +75,7 @@ export const taskSubtasksService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error creating subtask:', error);
+      logger.error('Error creating subtask:', error, { component: 'lib-task-subtasks-service', action: 'service_call' });
       throw error;
     }
   },
@@ -101,7 +102,7 @@ export const taskSubtasksService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error updating subtask:', error);
+      logger.error('Error updating subtask:', error, { component: 'lib-task-subtasks-service', action: 'service_call' });
       throw error;
     }
   },
@@ -119,7 +120,7 @@ export const taskSubtasksService = {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Error deleting subtask:', error);
+      logger.error('Error deleting subtask:', error, { component: 'lib-task-subtasks-service', action: 'service_call' });
       throw error;
     }
   },
@@ -143,7 +144,7 @@ export const taskSubtasksService = {
           .eq('id', update.id);
       }
     } catch (error) {
-      console.error('Error reordering subtasks:', error);
+      logger.error('Error reordering subtasks:', error, { component: 'lib-task-subtasks-service', action: 'service_call' });
       throw error;
     }
   },

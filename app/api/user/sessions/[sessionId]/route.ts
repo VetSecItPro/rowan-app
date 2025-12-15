@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { revokeSession } from '@/lib/services/session-tracking-service';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 /**
  * DELETE /api/user/sessions/[sessionId]
@@ -59,7 +60,7 @@ export async function DELETE(request: NextRequest, props: { params: Promise<{ se
       message: 'Session revoked successfully',
     });
   } catch (error) {
-    console.error('Error revoking session:', error);
+    logger.error('Error revoking session:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to revoke session' },
       { status: 500 }

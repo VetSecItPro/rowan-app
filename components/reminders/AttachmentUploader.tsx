@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { Upload, Link as LinkIcon, X, Loader2 } from 'lucide-react';
 import { reminderAttachmentsService } from '@/lib/services/reminder-attachments-service';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { logger } from '@/lib/logger';
 
 interface AttachmentUploaderProps {
   reminderId: string;
@@ -72,7 +73,7 @@ export function AttachmentUploader({ reminderId, onUploadComplete }: AttachmentU
         try {
           await reminderAttachmentsService.uploadFile(reminderId, file, user.id);
         } catch (error) {
-          console.error(`Error uploading ${file.name}:`, error);
+          logger.error('Error uploading ${file.name}:', error, { component: 'AttachmentUploader', action: 'component_action' });
           alert(`Failed to upload ${file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
       }
@@ -102,7 +103,7 @@ export function AttachmentUploader({ reminderId, onUploadComplete }: AttachmentU
       setShowUrlInput(false);
       onUploadComplete();
     } catch (error) {
-      console.error('Error creating URL attachment:', error);
+      logger.error('Error creating URL attachment:', error, { component: 'AttachmentUploader', action: 'component_action' });
       alert(`Failed to add URL: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsUploading(false);

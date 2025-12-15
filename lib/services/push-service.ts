@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface PushSubscription {
   endpoint: string;
@@ -142,7 +143,7 @@ class PushNotificationService {
 
       return subscriptionData;
     } catch (error) {
-      console.error('Push subscription error:', error);
+      logger.error('Push subscription error:', error, { component: 'lib-push-service', action: 'service_call' });
       throw error;
     }
   }
@@ -176,7 +177,7 @@ class PushNotificationService {
 
       return success;
     } catch (error) {
-      console.error('Push unsubscription error:', error);
+      logger.error('Push unsubscription error:', error, { component: 'lib-push-service', action: 'service_call' });
       return false;
     }
   }
@@ -208,7 +209,7 @@ class PushNotificationService {
         },
       };
     } catch (error) {
-      console.error('Error getting current subscription:', error);
+      logger.error('Error getting current subscription:', error, { component: 'lib-push-service', action: 'service_call' });
       return null;
     }
   }
@@ -239,7 +240,7 @@ class PushNotificationService {
 
       return { success: true };
     } catch (error) {
-      console.error('Error sending push notification:', error);
+      logger.error('Error sending push notification:', error, { component: 'lib-push-service', action: 'service_call' });
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -437,7 +438,7 @@ class PushNotificationService {
       .select('id');
 
     if (error) {
-      console.error('Error cleaning up subscriptions:', error);
+      logger.error('Error cleaning up subscriptions:', error, { component: 'lib-push-service', action: 'service_call' });
       return 0;
     }
 
@@ -483,7 +484,7 @@ class PushNotificationService {
    */
   async initialize(): Promise<void> {
     if (!this.isSupported()) {
-      console.log('Push notifications not supported');
+      logger.info('Push notifications not supported', { component: 'lib-push-service' });
       return;
     }
 
@@ -502,9 +503,9 @@ class PushNotificationService {
       // Clean up old subscriptions
       await this.cleanupInactiveSubscriptions();
 
-      console.log('Push notification service initialized');
+      logger.info('Push notification service initialized', { component: 'lib-push-service' });
     } catch (error) {
-      console.error('Push notification initialization error:', error);
+      logger.error('Push notification initialization error:', error, { component: 'lib-push-service', action: 'service_call' });
     }
   }
 }

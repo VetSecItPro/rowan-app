@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X, Calendar, Clock, Bell } from 'lucide-react';
 import { ShoppingList } from '@/lib/services/shopping-service';
+import { logger } from '@/lib/logger';
 
 interface ScheduleTripModalProps {
   isOpen: boolean;
@@ -46,7 +47,7 @@ export function ScheduleTripModal({ isOpen, onClose, onSchedule, list }: Schedul
       setDuration(60);
       setReminderMinutes(15);
     } catch (error) {
-      console.error('Failed to schedule trip:', error);
+      logger.error('Failed to schedule trip:', error, { component: 'ScheduleTripModal', action: 'component_action' });
       alert('Failed to schedule shopping trip. Please try again.');
     } finally {
       setIsScheduling(false);

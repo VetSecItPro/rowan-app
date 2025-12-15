@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/contexts/auth-context';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { logger } from '@/lib/logger';
 
 export default function RecipeDetailPage() {
   const router = useRouter();
@@ -28,7 +29,7 @@ export default function RecipeDetailPage() {
         const data = await mealsService.getRecipeById(recipeId);
         setRecipe(data);
       } catch (error) {
-        console.error('Failed to load recipe:', error);
+        logger.error('Failed to load recipe:', error, { component: 'page', action: 'execution' });
       } finally {
         setLoading(false);
       }
@@ -52,7 +53,7 @@ export default function RecipeDetailPage() {
       toast.success('Recipe deleted successfully');
       router.push('/recipes');
     } catch (error) {
-      console.error('Failed to delete recipe:', error);
+      logger.error('Failed to delete recipe:', error, { component: 'page', action: 'execution' });
       toast.error('Failed to delete recipe. Please try again.');
       setDeleting(false);
     }
@@ -95,7 +96,7 @@ export default function RecipeDetailPage() {
       toast.success(`Added ${ingredients.length} ingredients to shopping list!`);
       router.push('/shopping');
     } catch (error) {
-      console.error('Failed to add to shopping list:', error);
+      logger.error('Failed to add to shopping list:', error, { component: 'page', action: 'execution' });
       toast.error('Failed to add ingredients to shopping list');
     } finally {
       setAddingToShoppingList(false);

@@ -6,6 +6,7 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { verifyResourceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/meals/[id]
@@ -79,7 +80,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
       data: meal,
     });
   } catch (error) {
-    console.error('[API] /api/meals/[id] GET error:', error);
+    logger.error('[API] /api/meals/[id] GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -165,7 +166,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       data: updatedMeal,
     });
   } catch (error) {
-    console.error('[API] /api/meals/[id] PATCH error:', error);
+    logger.error('[API] /api/meals/[id] PATCH error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to update meal' },
       { status: 500 }
@@ -248,7 +249,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
       message: 'Meal deleted successfully',
     });
   } catch (error) {
-    console.error('[API] /api/meals/[id] DELETE error:', error);
+    logger.error('[API] /api/meals/[id] DELETE error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to delete meal' },
       { status: 500 }

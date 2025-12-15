@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface User {
   id: string;
@@ -44,7 +45,7 @@ export const notificationService = {
       .maybeSingle();
 
     if (error) {
-      console.error('[notificationService] Error fetching preferences:', error);
+      logger.error('[notificationService] Error fetching preferences:', error, { component: 'lib-notification-service', action: 'service_call' });
       return null;
     }
 
@@ -78,7 +79,7 @@ export const notificationService = {
 
       return currentTime >= startTime && currentTime <= endTime;
     } catch (error) {
-      console.error('[notificationService] Error checking quiet hours:', error);
+      logger.error('[notificationService] Error checking quiet hours:', error, { component: 'lib-notification-service', action: 'service_call' });
       return false;
     }
   },
@@ -188,7 +189,7 @@ export const notificationService = {
       const result = await response.json();
       return result;
     } catch (error) {
-      console.error('[notificationService] Email send exception:', error);
+      logger.error('[notificationService] Email send exception:', error, { component: 'lib-notification-service', action: 'service_call' });
       return { success: false, error: String(error) };
     }
   },

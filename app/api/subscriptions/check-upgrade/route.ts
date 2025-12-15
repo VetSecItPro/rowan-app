@@ -11,6 +11,7 @@ import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { shouldPromptUpgrade } from '@/lib/services/feature-access-service';
+import { logger } from '@/lib/logger';
 
 // Validation schema
 const UpgradeCheckSchema = z.object({
@@ -66,7 +67,7 @@ export async function POST(request: NextRequest) {
       reason: upgradeCheck.reason,
     });
   } catch (error) {
-    console.error('Error checking upgrade requirement:', error);
+    logger.error('Error checking upgrade requirement:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to check upgrade requirement' },
       { status: 500 }

@@ -4,6 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState } from 'react';
+import { logger } from '@/lib/logger';
 // Using native HTML elements and existing components
 import { EnhancedButton } from '@/components/ui/EnhancedButton';
 import { FeatureGateWrapper } from '@/components/subscription/FeatureGateWrapper';
@@ -50,18 +51,18 @@ export default function ExpensesPage() {
   });
 
   const handleExpenseCreated = (expenseData: ExpenseSuggestion) => {
-    console.log('Expense created:', expenseData);
+    logger.info('Expense created:', { component: 'page', data: expenseData });
     // TODO: Integrate with actual expense creation
     // This would typically call the expense service to create the expense
   };
 
   const handleReceiptProcessed = (receiptId: string, extractedData: ExtractedReceiptData) => {
-    console.log('Receipt processed:', receiptId, extractedData);
+    logger.info('Receipt processed:', { component: 'page', data: receiptId, extractedData });
     // Could show success message, refresh data, etc.
   };
 
   const handleCreateExpenseFromReceipt = (extractedData: ExtractedReceiptData) => {
-    console.log('Creating expense from receipt data:', extractedData);
+    logger.info('Creating expense from receipt data:', { component: 'page', data: extractedData });
     // Switch to scanner tab and pre-fill with data
     setActiveTab('scanner');
   };

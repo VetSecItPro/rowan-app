@@ -5,6 +5,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import * as Sentry from '@sentry/nextjs';
+import { logger } from '@/lib/logger';
 
 /**
  * Allowed MIME types for different buckets
@@ -125,7 +126,7 @@ export async function uploadFile(
       path: data.path,
     };
   } catch (error) {
-    console.error(`[storage-service] uploadFile error (${bucket}):`, error);
+    logger.error('[storage-service] uploadFile error (${bucket}):', error, { component: 'lib-storage-service', action: 'service_call' });
     Sentry.captureException(error, {
       tags: {
         service: 'storage-service',
@@ -161,7 +162,7 @@ export async function deleteFile(
 
     return { success: true };
   } catch (error) {
-    console.error(`[storage-service] deleteFile error (${bucket}):`, error);
+    logger.error('[storage-service] deleteFile error (${bucket}):', error, { component: 'lib-storage-service', action: 'service_call' });
     Sentry.captureException(error, {
       tags: {
         service: 'storage-service',
@@ -235,13 +236,13 @@ export async function uploadAvatar(
       if (oldPath && oldPath.startsWith(`${userId}/`)) {
         await deleteFile('avatars', oldPath);
       } else if (oldPath) {
-        console.warn(`[storage-service] Skipping deletion of avatar not owned by user ${userId}: ${oldPath}`);
+        logger.warn(`[storage-service] Skipping deletion of avatar not owned by user ${userId}: ${oldPath}`, { component: 'lib-storage-service' });
       }
     }
 
     return uploadResult;
   } catch (error) {
-    console.error('[storage-service] uploadAvatar error:', error);
+    logger.error('[storage-service] uploadAvatar error:', error, { component: 'lib-storage-service', action: 'service_call' });
     Sentry.captureException(error, {
       tags: {
         service: 'storage-service',
@@ -269,7 +270,7 @@ export async function uploadRecipeImage(
     const uploadResult = await uploadFile('recipes', file, userId);
     return uploadResult;
   } catch (error) {
-    console.error('[storage-service] uploadRecipeImage error:', error);
+    logger.error('[storage-service] uploadRecipeImage error:', error, { component: 'lib-storage-service', action: 'service_call' });
     Sentry.captureException(error, {
       tags: {
         service: 'storage-service',
@@ -368,7 +369,7 @@ export async function getSpaceStorageUsage(
       data: mapUsageToStorageUsage(usage, spaceId),
     };
   } catch (error) {
-    console.error('[storage-service] getSpaceStorageUsage error:', error);
+    logger.error('[storage-service] getSpaceStorageUsage error:', error, { component: 'lib-storage-service', action: 'service_call' });
     Sentry.captureException(error, {
       tags: {
         service: 'storage-service',
@@ -416,7 +417,7 @@ export async function checkStorageQuota(
       },
     };
   } catch (error) {
-    console.error('[storage-service] checkStorageQuota error:', error);
+    logger.error('[storage-service] checkStorageQuota error:', error, { component: 'lib-storage-service', action: 'service_call' });
     Sentry.captureException(error, {
       tags: {
         service: 'storage-service',
@@ -493,7 +494,7 @@ export async function shouldShowStorageWarning(
       message,
     };
   } catch (error) {
-    console.error('[storage-service] shouldShowStorageWarning error:', error);
+    logger.error('[storage-service] shouldShowStorageWarning error:', error, { component: 'lib-storage-service', action: 'service_call' });
     Sentry.captureException(error, {
       tags: {
         service: 'storage-service',
@@ -539,7 +540,7 @@ export async function dismissStorageWarning(
 
     return { success: true };
   } catch (error) {
-    console.error('[storage-service] dismissStorageWarning error:', error);
+    logger.error('[storage-service] dismissStorageWarning error:', error, { component: 'lib-storage-service', action: 'service_call' });
     Sentry.captureException(error, {
       tags: {
         service: 'storage-service',
@@ -572,7 +573,7 @@ export async function recalculateStorageUsage(
     // Fetch updated usage
     return getSpaceStorageUsage(spaceId);
   } catch (error) {
-    console.error('[storage-service] recalculateStorageUsage error:', error);
+    logger.error('[storage-service] recalculateStorageUsage error:', error, { component: 'lib-storage-service', action: 'service_call' });
     Sentry.captureException(error, {
       tags: {
         service: 'storage-service',

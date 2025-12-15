@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface SpaceMember {
   user_id: string;
@@ -61,7 +62,7 @@ export function MentionInput({
         .eq('space_id', spaceId);
 
       if (error) {
-        console.error('Error fetching space members:', error);
+        logger.error('Error fetching space members:', error, { component: 'MentionInput', action: 'component_action' });
         return;
       }
 

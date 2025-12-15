@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import { logger } from '@/lib/logger';
 
 // Initialize Resend only if API key is available (build-time safe)
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -128,7 +129,7 @@ export async function GET(request: Request) {
   try {
     // SECURITY: Fail-closed if CRON_SECRET is not configured
     if (!process.env.CRON_SECRET) {
-      console.error('[CRON] CRON_SECRET environment variable not configured');
+      logger.error('[CRON] CRON_SECRET environment variable not configured', undefined, { component: 'api-route', action: 'api_request' });
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
 
@@ -157,7 +158,7 @@ export async function GET(request: Request) {
       .rpc('get_expiring_beta_users', { days_threshold: 7 });
 
     if (sevenDayError) {
-      console.error('Error fetching 7-day expiring users:', sevenDayError);
+      logger.error('Error fetching 7-day expiring users:', sevenDayError, { component: 'api-route', action: 'api_request' });
       emailsSent.errors.push(`7-day fetch error: ${sevenDayError.message}`);
     } else if (sevenDayUsers) {
       for (const user of sevenDayUsers as ExpiringUser[]) {
@@ -192,7 +193,7 @@ export async function GET(request: Request) {
 
             emailsSent.sevenDay++;
           } catch (error) {
-            console.error(`Error sending 7-day email to ${user.email}:`, error);
+            logger.error('Error sending 7-day email to ${user.email}:', error, { component: 'api-route', action: 'api_request' });
             emailsSent.errors.push(`7-day email to ${user.email}: ${error}`);
           }
         }
@@ -204,7 +205,7 @@ export async function GET(request: Request) {
       .rpc('get_expiring_beta_users', { days_threshold: 3 });
 
     if (threeDayError) {
-      console.error('Error fetching 3-day expiring users:', threeDayError);
+      logger.error('Error fetching 3-day expiring users:', threeDayError, { component: 'api-route', action: 'api_request' });
       emailsSent.errors.push(`3-day fetch error: ${threeDayError.message}`);
     } else if (threeDayUsers) {
       for (const user of threeDayUsers as ExpiringUser[]) {
@@ -239,7 +240,7 @@ export async function GET(request: Request) {
 
             emailsSent.threeDay++;
           } catch (error) {
-            console.error(`Error sending 3-day email to ${user.email}:`, error);
+            logger.error('Error sending 3-day email to ${user.email}:', error, { component: 'api-route', action: 'api_request' });
             emailsSent.errors.push(`3-day email to ${user.email}: ${error}`);
           }
         }
@@ -253,7 +254,7 @@ export async function GET(request: Request) {
     });
 
   } catch (error) {
-    console.error('Cron job error:', error);
+    logger.error('Cron job error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error', details: String(error) },
       { status: 500 }

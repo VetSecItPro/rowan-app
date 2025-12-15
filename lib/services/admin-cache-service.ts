@@ -6,6 +6,7 @@
  */
 
 import { Redis } from '@upstash/redis';
+import { logger } from '@/lib/logger';
 
 // Check if Redis environment variables are available
 const hasRedisConfig = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -43,7 +44,7 @@ export async function getCached<T>(key: string): Promise<T | null> {
     const cached = await redis.get<T>(`${CACHE_PREFIX}${key}`);
     return cached;
   } catch (error) {
-    console.warn('Redis cache get failed:', error);
+    logger.warn('Redis cache get failed:', { component: 'lib-admin-cache-service', error: error });
     return null;
   }
 }
@@ -57,7 +58,7 @@ export async function setCache<T>(key: string, data: T, ttlSeconds: number): Pro
   try {
     await redis.setex(`${CACHE_PREFIX}${key}`, ttlSeconds, data);
   } catch (error) {
-    console.warn('Redis cache set failed:', error);
+    logger.warn('Redis cache set failed:', { component: 'lib-admin-cache-service', error: error });
   }
 }
 
@@ -70,7 +71,7 @@ export async function invalidateCache(key: string): Promise<void> {
   try {
     await redis.del(`${CACHE_PREFIX}${key}`);
   } catch (error) {
-    console.warn('Redis cache invalidation failed:', error);
+    logger.warn('Redis cache invalidation failed:', { component: 'lib-admin-cache-service', error: error });
   }
 }
 
@@ -87,7 +88,7 @@ export async function invalidateAdminCache(): Promise<void> {
       await redis.del(...keys);
     }
   } catch (error) {
-    console.warn('Redis admin cache invalidation failed:', error);
+    logger.warn('Redis admin cache invalidation failed:', { component: 'lib-admin-cache-service', error: error });
   }
 }
 

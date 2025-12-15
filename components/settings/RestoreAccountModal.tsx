@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X, AlertTriangle, RefreshCw, Calendar, CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { logger } from '@/lib/logger';
 
 interface RestoreAccountModalProps {
   isOpen: boolean;
@@ -46,7 +47,7 @@ export function RestoreAccountModal({
       // Reload the page to refresh the session and UI
       window.location.reload();
     } catch (error) {
-      console.error('Account restoration error:', error);
+      logger.error('Account restoration error:', error, { component: 'RestoreAccountModal', action: 'component_action' });
       setError('An unexpected error occurred. Please try again.');
       setIsRestoring(false);
     }

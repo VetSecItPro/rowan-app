@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 /**
  * Task Comments & Reactions Service
@@ -59,7 +60,7 @@ export const taskCommentsService = {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching comments:', error);
+      logger.error('Error fetching comments:', error, { component: 'lib-task-comments-service', action: 'service_call' });
       throw error;
     }
   },
@@ -79,7 +80,7 @@ export const taskCommentsService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error adding comment:', error);
+      logger.error('Error adding comment:', error, { component: 'lib-task-comments-service', action: 'service_call' });
       throw error;
     }
   },
@@ -100,7 +101,7 @@ export const taskCommentsService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error updating comment:', error);
+      logger.error('Error updating comment:', error, { component: 'lib-task-comments-service', action: 'service_call' });
       throw error;
     }
   },
@@ -118,7 +119,7 @@ export const taskCommentsService = {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Error deleting comment:', error);
+      logger.error('Error deleting comment:', error, { component: 'lib-task-comments-service', action: 'service_call' });
       throw error;
     }
   },
@@ -144,7 +145,7 @@ export const taskCommentsService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error adding comment reaction:', error);
+      logger.error('Error adding comment reaction:', error, { component: 'lib-task-comments-service', action: 'service_call' });
       throw error;
     }
   },
@@ -162,7 +163,7 @@ export const taskCommentsService = {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Error removing comment reaction:', error);
+      logger.error('Error removing comment reaction:', error, { component: 'lib-task-comments-service', action: 'service_call' });
       throw error;
     }
   },
@@ -181,7 +182,7 @@ export const taskCommentsService = {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching comment reactions:', error);
+      logger.error('Error fetching comment reactions:', error, { component: 'lib-task-comments-service', action: 'service_call' });
       throw error;
     }
   },
@@ -207,7 +208,7 @@ export const taskCommentsService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error adding task reaction:', error);
+      logger.error('Error adding task reaction:', error, { component: 'lib-task-comments-service', action: 'service_call' });
       throw error;
     }
   },
@@ -225,7 +226,7 @@ export const taskCommentsService = {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Error removing task reaction:', error);
+      logger.error('Error removing task reaction:', error, { component: 'lib-task-comments-service', action: 'service_call' });
       throw error;
     }
   },
@@ -244,7 +245,7 @@ export const taskCommentsService = {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching task reactions:', error);
+      logger.error('Error fetching task reactions:', error, { component: 'lib-task-comments-service', action: 'service_call' });
       throw error;
     }
   },

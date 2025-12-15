@@ -5,6 +5,7 @@ import { ThumbsUp, ThumbsDown, Star, CheckCircle2, XCircle, MessageSquare, Clock
 import { format, parseISO } from 'date-fns';
 import { EventProposal, ProposalVote, eventProposalsService } from '@/lib/services/event-proposals-service';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { logger } from '@/lib/logger';
 
 interface ProposalCardProps {
   proposal: EventProposal;
@@ -32,7 +33,7 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
       });
       onVote();
     } catch (error) {
-      console.error('Failed to vote:', error);
+      logger.error('Failed to vote:', error, { component: 'ProposalCard', action: 'component_action' });
     } finally {
       setVoting(false);
     }

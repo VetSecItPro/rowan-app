@@ -6,6 +6,7 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { verifyResourceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/reminders/[id]
@@ -79,7 +80,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
       data: reminder,
     });
   } catch (error) {
-    console.error('[API] /api/reminders/[id] GET error:', error);
+    logger.error('[API] /api/reminders/[id] GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -165,7 +166,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       data: updatedReminder,
     });
   } catch (error) {
-    console.error('[API] /api/reminders/[id] PATCH error:', error);
+    logger.error('[API] /api/reminders/[id] PATCH error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to update reminder' },
       { status: 500 }
@@ -248,7 +249,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
       message: 'Reminder deleted successfully',
     });
   } catch (error) {
-    console.error('[API] /api/reminders/[id] DELETE error:', error);
+    logger.error('[API] /api/reminders/[id] DELETE error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to delete reminder' },
       { status: 500 }

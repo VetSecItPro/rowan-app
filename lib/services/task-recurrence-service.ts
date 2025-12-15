@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import type { Task } from '@/lib/types';
+import { logger } from '@/lib/logger';
 
 /**
  * Task Recurrence Service
@@ -59,7 +60,7 @@ export const taskRecurrenceService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error creating recurring task:', error);
+      logger.error('Error creating recurring task:', error, { component: 'lib-task-recurrence-service', action: 'service_call' });
       throw error;
     }
   },
@@ -102,7 +103,7 @@ export const taskRecurrenceService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error generating task occurrence:', error);
+      logger.error('Error generating task occurrence:', error, { component: 'lib-task-recurrence-service', action: 'service_call' });
       throw error;
     }
   },
@@ -123,7 +124,7 @@ export const taskRecurrenceService = {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching recurring templates:', error);
+      logger.error('Error fetching recurring templates:', error, { component: 'lib-task-recurrence-service', action: 'service_call' });
       throw error;
     }
   },
@@ -143,7 +144,7 @@ export const taskRecurrenceService = {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching task instances:', error);
+      logger.error('Error fetching task instances:', error, { component: 'lib-task-recurrence-service', action: 'service_call' });
       throw error;
     }
   },
@@ -179,7 +180,7 @@ export const taskRecurrenceService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error updating recurring template:', error);
+      logger.error('Error updating recurring template:', error, { component: 'lib-task-recurrence-service', action: 'service_call' });
       throw error;
     }
   },
@@ -208,7 +209,7 @@ export const taskRecurrenceService = {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Error deleting recurring task:', error);
+      logger.error('Error deleting recurring task:', error, { component: 'lib-task-recurrence-service', action: 'service_call' });
       throw error;
     }
   },

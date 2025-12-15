@@ -6,6 +6,7 @@ import { Mail, MessageSquare, Shield, Check, AlertCircle, ArrowLeft } from 'luci
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useValidatedSearchParams, UnsubscribeParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
+import { logger } from '@/lib/logger';
 
 interface UnsubscribeResult {
   success: boolean;
@@ -55,7 +56,7 @@ function UnsubscribeContent() {
         setResult({ success: false, error: data.error || 'Failed to unsubscribe' });
       }
     } catch (error) {
-      console.error('Unsubscribe error:', error);
+      logger.error('Unsubscribe error:', error, { component: 'page', action: 'execution' });
       setResult({ success: false, error: 'An error occurred while processing your request' });
     } finally {
       setLoading(false);

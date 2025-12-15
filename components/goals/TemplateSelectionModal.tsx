@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, Search, TrendingUp, ChevronRight } from 'lucide-react';
 import { GoalTemplate } from '@/lib/services/goals-service';
 import { goalsService } from '@/lib/services/goals-service';
+import { logger } from '@/lib/logger';
 
 interface TemplateSelectionModalProps {
   isOpen: boolean;
@@ -135,7 +136,7 @@ export function TemplateSelectionModal({
       const data = await goalsService.getGoalTemplates(selectedCategory || undefined);
       setTemplates(data);
     } catch (error) {
-      console.error('Error loading templates, using fallback data:', error);
+      logger.error('Error loading templates, using fallback data:', error, { component: 'TemplateSelectionModal', action: 'component_action' });
       // Use fallback data when database is unavailable
       const filtered = selectedCategory
         ? fallbackTemplates.filter(t => t.category === selectedCategory)
@@ -151,7 +152,7 @@ export function TemplateSelectionModal({
       const data = await goalsService.getTemplateCategories();
       setCategories(data);
     } catch (error) {
-      console.error('Error loading categories, using fallback data:', error);
+      logger.error('Error loading categories, using fallback data:', error, { component: 'TemplateSelectionModal', action: 'component_action' });
       // Use fallback data when database is unavailable
       setCategories(fallbackCategories);
     }

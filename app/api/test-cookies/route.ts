@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { logger } from '@/lib/logger';
 
 // Force dynamic rendering for this route since it uses cookies
 export const dynamic = 'force-dynamic';
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
       cookieNames: Array.from(nextCookies.getAll()).map(c => c.name)
     });
   } catch (error) {
-    console.error('[TEST] Error:', error);
+    logger.error('[TEST] Error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

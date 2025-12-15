@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface FileUploadResult {
   id: string;
@@ -98,7 +99,7 @@ async function validateMagicBytes(file: File): Promise<boolean> {
     // Check if file starts with any of the expected signatures
     return expectedSignatures.some(signature => hex.startsWith(signature));
   } catch (error) {
-    console.warn('Magic bytes validation failed:', error);
+    logger.warn('Magic bytes validation failed:', { component: 'lib-file-upload-service', error: error });
     return false;
   }
 }
@@ -324,7 +325,7 @@ export const fileUploadService = {
           thumbnailUrl = thumbUrlData.publicUrl;
         }
       } catch (error) {
-        console.error('Failed to process image:', error);
+        logger.error('Failed to process image:', error, { component: 'lib-file-upload-service', action: 'service_call' });
       }
     }
 
@@ -336,7 +337,7 @@ export const fileUploadService = {
         height = metadata.height;
         duration = metadata.duration;
       } catch (error) {
-        console.error('Failed to get video metadata:', error);
+        logger.error('Failed to get video metadata:', error, { component: 'lib-file-upload-service', action: 'service_call' });
       }
     }
 
@@ -345,7 +346,7 @@ export const fileUploadService = {
       try {
         duration = await this.getAudioDuration(file);
       } catch (error) {
-        console.error('Failed to get audio duration:', error);
+        logger.error('Failed to get audio duration:', error, { component: 'lib-file-upload-service', action: 'service_call' });
       }
     }
 
@@ -411,7 +412,7 @@ export const fileUploadService = {
       .remove(pathsToDelete);
 
     if (storageError) {
-      console.error('Failed to delete from storage:', storageError);
+      logger.error('Failed to delete from storage:', storageError, { component: 'lib-file-upload-service', action: 'service_call' });
     }
 
     // Delete from database

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 export interface ActivityItem {
   id: string;
@@ -235,7 +236,7 @@ export const activityFeedService = {
       // Return only the requested number of activities
       return activities.slice(0, limit);
     } catch (error) {
-      console.error('Failed to fetch activities:', error);
+      logger.error('Failed to fetch activities:', error, { component: 'lib-activity-feed-service', action: 'service_call' });
       return [];
     }
   },

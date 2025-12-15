@@ -5,6 +5,7 @@ import { Download, Trash2, ExternalLink, FileIcon } from 'lucide-react';
 import { reminderAttachmentsService, ReminderAttachment } from '@/lib/services/reminder-attachments-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { logger } from '@/lib/logger';
 
 interface AttachmentListProps {
   reminderId: string;
@@ -33,7 +34,7 @@ export function AttachmentList({ reminderId, refreshTrigger }: AttachmentListPro
       const data = await reminderAttachmentsService.getAttachments(reminderId);
       setAttachments(data);
     } catch (error) {
-      console.error('Error fetching attachments:', error);
+      logger.error('Error fetching attachments:', error, { component: 'AttachmentList', action: 'component_action' });
       setAttachments([]); // Set empty array on error
     } finally {
       setLoading(false);
@@ -66,7 +67,7 @@ export function AttachmentList({ reminderId, refreshTrigger }: AttachmentListPro
       await reminderAttachmentsService.deleteAttachment(attachmentToDelete, user.id);
       setAttachments((prev) => prev.filter((a) => a.id !== attachmentToDelete));
     } catch (error) {
-      console.error('Error deleting attachment:', error);
+      logger.error('Error deleting attachment:', error, { component: 'AttachmentList', action: 'component_action' });
       alert(`Failed to delete attachment: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setDeletingId(null);

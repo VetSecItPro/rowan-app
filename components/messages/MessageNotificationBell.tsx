@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Bell } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface MessageNotificationBellProps {
   userId: string;
@@ -29,13 +30,13 @@ export function MessageNotificationBell({
         .neq('sender_id', userId);
 
       if (error) {
-        console.error('Error fetching unread count:', error);
+        logger.error('Error fetching unread count:', error, { component: 'MessageNotificationBell', action: 'component_action' });
         return;
       }
 
       setUnreadCount(count || 0);
     } catch (error) {
-      console.error('Error fetching unread count:', error);
+      logger.error('Error fetching unread count:', error, { component: 'MessageNotificationBell', action: 'component_action' });
     }
   };
 

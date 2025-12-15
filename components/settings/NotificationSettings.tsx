@@ -2,6 +2,7 @@
 
 import { useState, useEffect, memo, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { logger } from '@/lib/logger';
 import {
   Bell,
   Mail,
@@ -300,7 +301,7 @@ export function NotificationSettings() {
           setPreferences(created);
         }
       } catch (err) {
-        console.error('Error loading notification preferences:', err);
+        logger.error('Error loading notification preferences:', err, { component: 'NotificationSettings', action: 'component_action' });
         setError('Failed to load notification preferences');
       } finally {
         setLoading(false);
@@ -349,7 +350,7 @@ export function NotificationSettings() {
         }
       }
     } catch (err) {
-      console.error('Push toggle error:', err);
+      logger.error('Push toggle error:', err, { component: 'NotificationSettings', action: 'component_action' });
       if (err instanceof Error) {
         if (err.message.includes('denied')) {
           setPushError('Notifications are blocked. Please enable them in your browser settings.');
@@ -377,7 +378,7 @@ export function NotificationSettings() {
         setPushError(result.error || 'Failed to send test notification');
       }
     } catch (err) {
-      console.error('Test push error:', err);
+      logger.error('Test push error:', err, { component: 'NotificationSettings', action: 'component_action' });
       setPushError(err instanceof Error ? err.message : 'Failed to send test notification');
     } finally {
       setPushTestLoading(false);
@@ -434,7 +435,7 @@ export function NotificationSettings() {
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      console.error('Error saving notification preferences:', err);
+      logger.error('Error saving notification preferences:', err, { component: 'NotificationSettings', action: 'component_action' });
       setError('Failed to save preferences');
     } finally {
       setSaving(false);

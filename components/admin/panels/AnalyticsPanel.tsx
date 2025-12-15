@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, memo } from 'react';
+import { useState, memo, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
   BarChart3,
   TrendingUp,
@@ -144,7 +145,9 @@ const MiniChart = memo(function MiniChart({ data }: { data: Array<{ date: string
 });
 
 export const AnalyticsPanel = memo(function AnalyticsPanel() {
-  const [data, setData] = useState<AnalyticsData>({
+  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
+
+  const defaultData: AnalyticsData = {
     summary: {
       totalUsers: 0,
       totalNotifications: 0,
@@ -160,28 +163,26 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
       averageActivityScore: 0,
     },
     userGrowth: [],
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
-
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch(`/api/admin/analytics?range=${timeRange}`);
-      if (response.ok) {
-        const result = await response.json();
-        setData(result.analytics);
-      }
-    } catch (error) {
-      console.error('Failed to fetch analytics:', error);
-    } finally {
-      setIsLoading(false);
-    }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [timeRange]);
+  // React Query for analytics with caching
+  const { data: analyticsData, isLoading, refetch } = useQuery({
+    queryKey: ['admin-analytics', timeRange],
+    queryFn: async () => {
+      const response = await fetch(`/api/admin/analytics?range=${timeRange}`);
+      if (!response.ok) throw new Error('Failed to fetch analytics');
+      const result = await response.json();
+      return result.analytics;
+    },
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+
+  const data: AnalyticsData = analyticsData || defaultData;
+
+  const fetchData = useCallback(() => {
+    refetch();
+  }, [refetch]);
 
   if (isLoading) {
     return (
@@ -193,7 +194,7 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex-1 flex flex-col space-y-4 min-h-0 overflow-auto">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

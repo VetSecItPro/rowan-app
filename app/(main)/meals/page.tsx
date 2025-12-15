@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { CTAButton } from '@/components/ui/EnhancedButton';
+import { logger } from '@/lib/logger';
 // Dynamic imports for optimized bundle splitting
 import {
   MealCard,
@@ -285,7 +286,7 @@ export default function MealsPage() {
       setStats(statsData);
 
     } catch (error) {
-      console.error('Failed to load meals:', error);
+      logger.error('Failed to load meals:', error, { component: 'page', action: 'execution' });
     } finally {
       setLoading(false);
     }
@@ -302,7 +303,7 @@ export default function MealsPage() {
       const recipesData = await mealsService.getRecipes(spaceId);
       setRecipes(recipesData);
     } catch (error) {
-      console.error('Failed to load recipes:', error);
+      logger.error('Failed to load recipes:', error, { component: 'page', action: 'execution' });
     }
   }, [spaceId]);
 
@@ -319,7 +320,7 @@ export default function MealsPage() {
 
     // Subscribe to meal changes
     const mealsChannel = mealsService.subscribeToMeals(spaceId, (payload) => {
-      console.log('[Real-time] Meal change:', payload.eventType, payload.new || payload.old);
+      logger.info('[Real-time] Meal change:', { component: 'page', data: { eventType: payload.eventType, payload: payload.new || payload.old } });
 
       if (payload.eventType === 'INSERT' && payload.new) {
         // Add new meal to state
@@ -339,7 +340,7 @@ export default function MealsPage() {
 
     // Subscribe to recipe changes
     const recipesChannel = mealsService.subscribeToRecipes(spaceId, (payload) => {
-      console.log('[Real-time] Recipe change:', payload.eventType, payload.new || payload.old);
+      logger.info('[Real-time] Recipe change:', { component: 'page', data: { eventType: payload.eventType, payload: payload.new || payload.old } });
 
       if (payload.eventType === 'INSERT' && payload.new) {
         setRecipes(prev => {
@@ -355,7 +356,7 @@ export default function MealsPage() {
 
     // Cleanup on unmount
     return () => {
-      console.log('[Real-time] Unsubscribing from channels');
+      logger.info('[Real-time] Unsubscribing from channels', { component: 'page' });
       supabase.removeChannel(mealsChannel);
       supabase.removeChannel(recipesChannel);
 
@@ -368,7 +369,7 @@ export default function MealsPage() {
   const handleCreateMeal = useCallback(async (mealData: CreateMealInput, createShoppingList?: boolean) => {
     // If space is not available, don't allow meal creation
     if (!spaceId) {
-      console.warn('Cannot create meal: space not loaded yet');
+      logger.warn('Cannot create meal: space not loaded yet', { component: 'page' });
       return;
     }
 
@@ -413,7 +414,7 @@ export default function MealsPage() {
       loadMeals();
       setEditingMeal(null);
     } catch (error) {
-      console.error('Failed to save meal:', error);
+      logger.error('Failed to save meal:', error, { component: 'page', action: 'execution' });
     }
   }, [editingMeal, loadMeals, spaceId, recipes]);
 
@@ -434,7 +435,7 @@ export default function MealsPage() {
           return newMap;
         });
       } catch (error) {
-        console.error('Failed to delete meal:', error);
+        logger.error('Failed to delete meal:', error, { component: 'page', action: 'execution' });
         showError('Failed to delete meal');
         // Restore the meal if deletion failed
         setMeals(prev => [...prev, mealToDelete]);
@@ -468,7 +469,7 @@ export default function MealsPage() {
   const handleCreateRecipe = useCallback(async (recipeData: CreateRecipeInput) => {
     // If space is not available, don't allow recipe creation
     if (!spaceId) {
-      console.warn('Cannot create recipe: space not loaded yet');
+      logger.warn('Cannot create recipe: space not loaded yet', { component: 'page' });
       return;
     }
 
@@ -481,7 +482,7 @@ export default function MealsPage() {
       loadRecipes();
       setEditingRecipe(null);
     } catch (error) {
-      console.error('Failed to save recipe:', error);
+      logger.error('Failed to save recipe:', error, { component: 'page', action: 'execution' });
     }
   }, [editingRecipe, loadRecipes, spaceId]);
 
@@ -502,7 +503,7 @@ export default function MealsPage() {
           return newMap;
         });
       } catch (error) {
-        console.error('Failed to delete recipe:', error);
+        logger.error('Failed to delete recipe:', error, { component: 'page', action: 'execution' });
         showError('Failed to delete recipe');
         // Restore the recipe if deletion failed
         setRecipes(prev => [...prev, recipeToDelete]);
@@ -650,7 +651,7 @@ export default function MealsPage() {
 
       showSuccess('Recipe added to library and selected for your meal!');
     } catch (error) {
-      console.error('Failed to save discovered recipe:', error);
+      logger.error('Failed to save discovered recipe:', error, { component: 'page', action: 'execution' });
       showError('Failed to save recipe. Please try again.');
     }
   }, [spaceId, loadRecipes]);
@@ -730,7 +731,7 @@ export default function MealsPage() {
             showSuccess(`${mealIds.length} meal${mealIds.length > 1 ? 's' : ''} deleted successfully!`);
             loadMeals();
           } catch (error) {
-            console.error('Failed to delete meals:', error);
+            logger.error('Failed to delete meals:', error, { component: 'page', action: 'execution' });
             showError('Failed to delete some meals. Please try again.');
           }
         }
@@ -849,7 +850,7 @@ export default function MealsPage() {
         onClick: () => window.location.href = '/shopping'
       });
     } catch (error) {
-      console.error('Failed to create meal with shopping list:', error);
+      logger.error('Failed to create meal with shopping list:', error, { component: 'page', action: 'execution' });
       showError('Failed to create shopping list. Please try again.');
     }
   }, [pendingMealData, selectedRecipeForReview, spaceId, loadMeals]);

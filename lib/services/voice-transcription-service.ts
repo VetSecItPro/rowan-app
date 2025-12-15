@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface VoiceTranscriptionResult {
   transcription: string;
@@ -45,7 +46,7 @@ export const voiceTranscriptionService = {
 
       return mockResult;
     } catch (error) {
-      console.error('Error transcribing audio:', error);
+      logger.error('Error transcribing audio:', error, { component: 'lib-voice-transcription-service', action: 'service_call' });
       throw new Error('Failed to transcribe audio');
     }
   },
@@ -63,7 +64,7 @@ export const voiceTranscriptionService = {
 
       return this.mockAnalysis(transcription);
     } catch (error) {
-      console.error('Error analyzing transcription:', error);
+      logger.error('Error analyzing transcription:', error, { component: 'lib-voice-transcription-service', action: 'service_call' });
       throw new Error('Failed to analyze transcription');
     }
   },
@@ -82,7 +83,7 @@ export const voiceTranscriptionService = {
       .limit(limit);
 
     if (error) {
-      console.error('Error fetching transcription history:', error);
+      logger.error('Error fetching transcription history:', error, { component: 'lib-voice-transcription-service', action: 'service_call' });
       throw new Error('Failed to fetch transcription history');
     }
 
@@ -103,7 +104,7 @@ export const voiceTranscriptionService = {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error searching transcriptions:', error);
+      logger.error('Error searching transcriptions:', error, { component: 'lib-voice-transcription-service', action: 'service_call' });
       throw new Error('Failed to search transcriptions');
     }
 
@@ -178,7 +179,7 @@ export const voiceTranscriptionService = {
       });
 
     if (error) {
-      console.error('Error storing transcription:', error);
+      logger.error('Error storing transcription:', error, { component: 'lib-voice-transcription-service', action: 'service_call' });
     }
   },
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Shield, MapPin, ExternalLink, AlertCircle } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface LocationData {
   city: string;
@@ -54,7 +55,7 @@ export function CCPANoticeBanner({ onDismiss, autoDetect = true }: CCPANoticeBan
         setIsVisible(true);
       }
     } catch (error) {
-      console.error('Error detecting location:', error);
+      logger.error('Error detecting location:', error, { component: 'CCPANoticeBanner', action: 'component_action' });
       // Show notice on error for compliance
       setIsVisible(true);
     } finally {

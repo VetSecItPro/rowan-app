@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { X, Shield, AlertTriangle, CheckCircle, MapPin } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { logger } from '@/lib/logger';
 
 interface CCPAOptOutModalProps {
   isOpen: boolean;
@@ -45,7 +46,7 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
       setCcpaStatus(result.data);
       setCaliforniaResident(result.data.california_resident);
     } catch (error) {
-      console.error('Error loading CCPA status:', error);
+      logger.error('Error loading CCPA status:', error, { component: 'CCPAOptOutModal', action: 'component_action' });
       setError(error instanceof Error ? error.message : 'Failed to load status');
     } finally {
       setIsLoading(false);
@@ -82,7 +83,7 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
         onClose();
       }, 2000);
     } catch (error) {
-      console.error('Error updating CCPA status:', error);
+      logger.error('Error updating CCPA status:', error, { component: 'CCPAOptOutModal', action: 'component_action' });
       setError(error instanceof Error ? error.message : 'Failed to update status');
     } finally {
       setIsSaving(false);

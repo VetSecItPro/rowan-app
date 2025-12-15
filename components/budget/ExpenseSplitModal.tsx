@@ -5,6 +5,7 @@ import { X, Users, Calculator, DollarSign, Percent, TrendingUp, AlertCircle, Che
 import { SplitTypeSelector } from './SplitTypeSelector';
 import { SplitCalculator } from './SplitCalculator';
 import { SettlementTracker } from './SettlementTracker';
+import { logger } from '@/lib/logger';
 import {
   updateExpenseSplit,
   calculateIncomeBasedSplit,
@@ -61,7 +62,7 @@ export function ExpenseSplitModal({
         const data = await getPartnershipBalance(currentSpace.id);
         setPartnership(data);
       } catch (err) {
-        console.error('Failed to load partnership data:', err);
+        logger.error('Failed to load partnership data:', err, { component: 'ExpenseSplitModal', action: 'component_action' });
       }
     }
 
@@ -160,7 +161,7 @@ export function ExpenseSplitModal({
       onSave();
       onClose();
     } catch (err) {
-      console.error('Failed to update expense split:', err);
+      logger.error('Failed to update expense split:', err, { component: 'ExpenseSplitModal', action: 'component_action' });
       setError('Failed to update expense split. Please try again.');
     } finally {
       setLoading(false);

@@ -2,6 +2,7 @@
 // Phase 4: OAuth flow, Microsoft Graph API wrapper, and sync operations
 
 import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 import type {
   CalendarConnection,
   OutlookCalendarEvent,
@@ -104,7 +105,7 @@ export async function exchangeCodeForTokens(code: string): Promise<TokenResponse
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    console.error('[Outlook OAuth] Token exchange failed:', errorData);
+    logger.error('[Outlook OAuth] Token exchange failed:', errorData, { component: 'lib-outlook-calendar-service', action: 'service_call' });
     throw new Error(errorData.error_description || 'Failed to exchange code for tokens');
   }
 
@@ -131,7 +132,7 @@ export async function storeTokens(
   });
 
   if (accessError) {
-    console.error('[Outlook] Failed to store access token:', accessError);
+    logger.error('[Outlook] Failed to store access token:', accessError, { component: 'lib-outlook-calendar-service', action: 'service_call' });
     throw new Error('Failed to store access token');
   }
 
@@ -144,7 +145,7 @@ export async function storeTokens(
   });
 
   if (refreshError) {
-    console.error('[Outlook] Failed to store refresh token:', refreshError);
+    logger.error('[Outlook] Failed to store refresh token:', refreshError, { component: 'lib-outlook-calendar-service', action: 'service_call' });
     throw new Error('Failed to store refresh token');
   }
 
@@ -175,7 +176,7 @@ export async function refreshAccessToken(connectionId: string): Promise<TokenRef
     });
 
     if (refreshError || !refreshToken) {
-      console.error('[Outlook] Failed to get refresh token:', refreshError);
+      logger.error('[Outlook] Failed to get refresh token:', refreshError, { component: 'lib-outlook-calendar-service', action: 'service_call' });
       return { success: false, error: 'Failed to retrieve refresh token' };
     }
 
@@ -197,7 +198,7 @@ export async function refreshAccessToken(connectionId: string): Promise<TokenRef
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error('[Outlook] Token refresh failed:', errorData);
+      logger.error('[Outlook] Token refresh failed:', errorData, { component: 'lib-outlook-calendar-service', action: 'service_call' });
 
       // Mark connection as token_expired if refresh fails
       await supabase
@@ -223,7 +224,7 @@ export async function refreshAccessToken(connectionId: string): Promise<TokenRef
 
     return { success: true };
   } catch (error) {
-    console.error('[Outlook] Token refresh error:', error);
+    logger.error('[Outlook] Token refresh error:', error, { component: 'lib-outlook-calendar-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error refreshing token',
@@ -767,7 +768,7 @@ export async function syncCalendar(
       duration_ms: Date.now() - startTime,
     };
   } catch (error) {
-    console.error('[Outlook Sync] Error:', error);
+    logger.error('[Outlook Sync] Error:', error, { component: 'lib-outlook-calendar-service', action: 'service_call' });
 
     // Update connection with error
     await supabase

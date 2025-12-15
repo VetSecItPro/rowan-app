@@ -6,6 +6,7 @@ import { MessageCircle, Search, Plus, Archive, X, Edit2, Check, X as XIcon, More
 import { Conversation } from '@/lib/services/messages-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { SwipeableConversationItem } from './SwipeableConversationItem';
+import { logger } from '@/lib/logger';
 
 interface ConversationSidebarProps {
   conversations: Conversation[];
@@ -77,7 +78,7 @@ export function ConversationSidebar({
       setEditingConversationId(null);
       setEditingTitle('');
     } catch (error) {
-      console.error('Failed to rename conversation:', error);
+      logger.error('Failed to rename conversation:', error, { component: 'ConversationSidebar', action: 'component_action' });
       // Keep editing mode open on error
     }
   };

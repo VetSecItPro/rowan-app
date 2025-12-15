@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 import {
   exportAllDataToCsv,
   exportExpensesToCsv,
@@ -116,7 +117,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[API] Error exporting CSV data:', error);
+    logger.error('[API] Error exporting CSV data:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to export data' },
       { status: 500 }

@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { CalendarEvent } from '@/lib/services/calendar-service';
 import type { RealtimeChannel, RealtimePostgresChangesPayload, REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 export interface PresenceUser {
   user_id: string;
@@ -117,7 +118,7 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
       // Listen to broadcast messages (editing notifications)
       .on('broadcast', { event: 'event_editing' }, (payload: any) => {
         // Handle editing notifications
-        console.log('User editing:', payload.payload);
+        logger.info('User editing:', { component: 'lib-useCalendarRealtime', data: payload.payload });
       })
       .subscribe(async (status: `${REALTIME_SUBSCRIBE_STATES}`) => {
         if (status === 'SUBSCRIBED') {

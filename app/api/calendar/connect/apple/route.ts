@@ -8,6 +8,7 @@ import { AppleCalDAVCredentialsSchema } from '@/lib/validations/calendar-integra
 import { z } from 'zod';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,10 +36,10 @@ export async function POST(request: NextRequest) {
     const validatedData = AppleCalDAVCredentialsSchema.parse(body);
 
     // Verify user has access to the space
-    console.log('[Apple Calendar Connect] Checking space access:', {
+    logger.info('[Apple Calendar Connect] Checking space access:', { component: 'api-route', data: {
       space_id: validatedData.space_id,
       user_id: user.id,
-    });
+    } });
 
     const { data: spaceMember, error: spaceError } = await supabase
       .from('space_members')
@@ -48,19 +49,19 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (spaceError || !spaceMember) {
-      console.error('[Apple Calendar Connect] Space access denied:', {
+      logger.error('[Apple Calendar Connect] Space access denied:', undefined, { component: 'api-route', action: 'api_request', details: {
         spaceError,
         spaceMember,
         space_id: validatedData.space_id,
         user_id: user.id,
-      });
+      } });
       return NextResponse.json(
         { error: 'Space not found or access denied' },
         { status: 403 }
       );
     }
 
-    console.log('[Apple Calendar Connect] Space access confirmed:', spaceMember);
+    logger.info('[Apple Calendar Connect] Space access confirmed:', { component: 'api-route', data: spaceMember });
 
     // Check for existing active connection
     const { data: activeConnection } = await supabase
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate credentials with Apple CalDAV server
-    console.log('[Apple Calendar Connect] Validating credentials...');
+    logger.info('[Apple Calendar Connect] Validating credentials...', { component: 'api-route' });
     const validation = await appleCalDAVService.validateAppleCredentials(
       validatedData.email,
       validatedData.app_specific_password
@@ -100,7 +101,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('[Apple Calendar Connect] Credentials validated, found', validation.calendars?.length, 'calendars');
+    logger.info('[Apple Calendar Connect] Credentials validated, found', { component: 'api-route', data: { calendarsCount: validation.calendars?.length } });
 
     // Check for existing disconnected connection to reuse
     const { data: disconnectedConnection } = await supabase
@@ -116,7 +117,7 @@ export async function POST(request: NextRequest) {
 
     if (disconnectedConnection) {
       // Reuse existing disconnected connection
-      console.log('[Apple Calendar Connect] Reusing disconnected connection:', disconnectedConnection.id);
+      logger.info('[Apple Calendar Connect] Reusing disconnected connection:', { component: 'api-route', data: disconnectedConnection.id });
       const { data: updatedConnection, error: updateError } = await supabase
         .from('calendar_connections')
         .update({
@@ -130,7 +131,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (updateError) {
-        console.error('Failed to update connection:', updateError);
+        logger.error('Failed to update connection:', updateError, { component: 'api-route', action: 'api_request' });
         return NextResponse.json(
           { error: 'Failed to update calendar connection' },
           { status: 500 }
@@ -154,7 +155,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (connectionError) {
-        console.error('Failed to create connection:', connectionError);
+        logger.error('Failed to create connection:', connectionError, { component: 'api-route', action: 'api_request' });
         return NextResponse.json(
           { error: 'Failed to create calendar connection' },
           { status: 500 }
@@ -164,7 +165,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Store credentials securely in vault
-    console.log('[Apple Calendar Connect] Storing credentials securely...');
+    logger.info('[Apple Calendar Connect] Storing credentials securely...', { component: 'api-route' });
     try {
       await appleCalDAVService.storeAppleCredentials(
         connection.id,
@@ -172,7 +173,7 @@ export async function POST(request: NextRequest) {
         validatedData.app_specific_password
       );
     } catch (credentialError) {
-      console.error('Failed to store credentials:', credentialError);
+      logger.error('Failed to store credentials:', credentialError, { component: 'api-route', action: 'api_request' });
       // Clean up the connection if credential storage fails
       await supabase.from('calendar_connections').delete().eq('id', connection.id);
       return NextResponse.json(
@@ -202,7 +203,7 @@ export async function POST(request: NextRequest) {
       message: 'Apple Calendar connected successfully. Initial sync will begin shortly.',
     });
   } catch (error) {
-    console.error('Apple Calendar connect error:', error);
+    logger.error('Apple Calendar connect error:', error, { component: 'api-route', action: 'api_request' });
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -269,7 +270,7 @@ export async function GET(request: NextRequest) {
       connections: connections || [],
     });
   } catch (error) {
-    console.error('Failed to get Apple connections:', error);
+    logger.error('Failed to get Apple connections:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to fetch Apple Calendar connections' },
       { status: 500 }

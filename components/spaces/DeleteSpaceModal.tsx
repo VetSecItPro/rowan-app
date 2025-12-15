@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { X, AlertTriangle, Download, FileText, Database, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface DeleteSpaceModalProps {
   isOpen: boolean;
@@ -74,7 +75,7 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
 
       setExportSummary(result.data);
     } catch (error) {
-      console.error('Error loading export summary:', error);
+      logger.error('Error loading export summary:', error, { component: 'DeleteSpaceModal', action: 'component_action' });
       toast.error(error instanceof Error ? error.message : 'Failed to load export summary');
     } finally {
       setLoadingExportSummary(false);
@@ -125,7 +126,7 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
       setHasExported(true);
       toast.success('Space data exported successfully');
     } catch (error) {
-      console.error('Error exporting space data:', error);
+      logger.error('Error exporting space data:', error, { component: 'DeleteSpaceModal', action: 'component_action' });
       toast.error(error instanceof Error ? error.message : 'Failed to export space data');
     } finally {
       setIsExporting(false);
@@ -161,7 +162,7 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
       onSpaceDeleted();
       onClose();
     } catch (error) {
-      console.error('Error deleting space:', error);
+      logger.error('Error deleting space:', error, { component: 'DeleteSpaceModal', action: 'component_action' });
       toast.error(error instanceof Error ? error.message : 'Failed to delete space');
     } finally {
       setIsDeleting(false);

@@ -6,6 +6,7 @@ import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { BillsList } from '@/components/budget/BillsList';
 import { NewBillModal } from '@/components/projects/NewBillModal';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { logger } from '@/lib/logger';
 import {
   billsService,
   createBill,
@@ -48,7 +49,7 @@ export default function BillsManagementPage() {
       setBills(billsData);
       setStats(statsData);
     } catch (err) {
-      console.error('Failed to load bills:', err);
+      logger.error('Failed to load bills:', err, { component: 'page', action: 'execution' });
       setError('Failed to load bills. Please try again.');
     } finally {
       setLoading(false);
@@ -68,7 +69,7 @@ export default function BillsManagementPage() {
       await loadBillsData(); // Refresh data
       setShowCreateModal(false);
     } catch (error) {
-      console.error('Failed to create bill:', error);
+      logger.error('Failed to create bill:', error, { component: 'page', action: 'execution' });
       throw error;
     }
   };
@@ -89,7 +90,7 @@ export default function BillsManagementPage() {
       setShowCreateModal(false);
       setEditingBill(null);
     } catch (error) {
-      console.error('Failed to update bill:', error);
+      logger.error('Failed to update bill:', error, { component: 'page', action: 'execution' });
       throw error;
     }
   };
@@ -104,7 +105,7 @@ export default function BillsManagementPage() {
       await deleteBill(billId);
       await loadBillsData(); // Refresh data
     } catch (error) {
-      console.error('Failed to delete bill:', error);
+      logger.error('Failed to delete bill:', error, { component: 'page', action: 'execution' });
       setError('Failed to delete bill. Please try again.');
     }
   };
@@ -115,7 +116,7 @@ export default function BillsManagementPage() {
       await markBillAsPaid(billId, true); // Create expense record
       await loadBillsData(); // Refresh data
     } catch (error) {
-      console.error('Failed to mark bill as paid:', error);
+      logger.error('Failed to mark bill as paid:', error, { component: 'page', action: 'execution' });
       setError('Failed to mark bill as paid. Please try again.');
     }
   };

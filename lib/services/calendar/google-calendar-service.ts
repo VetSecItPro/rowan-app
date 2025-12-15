@@ -3,6 +3,7 @@
 
 import { google, calendar_v3 } from 'googleapis';
 import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 import type {
   CalendarConnection,
   GoogleCalendarEvent,
@@ -48,7 +49,7 @@ function createOAuth2Client() {
 async function getAuthenticatedClient(connectionId: string) {
   const supabase = await createClient();
 
-  console.log('[OAuth] Getting tokens for connection:', connectionId);
+  logger.info('[OAuth] Getting tokens for connection:', { component: 'lib-google-calendar-service', data: connectionId });
 
   // Get tokens from vault using RPC
   const { data: accessToken, error: accessError } = await supabase
@@ -58,7 +59,7 @@ async function getAuthenticatedClient(connectionId: string) {
     });
 
   if (accessError) {
-    console.error('[OAuth] Failed to get access token:', accessError);
+    logger.error('[OAuth] Failed to get access token:', accessError, { component: 'lib-google-calendar-service', action: 'service_call' });
     throw new Error('Failed to retrieve access token');
   }
 
@@ -69,15 +70,15 @@ async function getAuthenticatedClient(connectionId: string) {
     });
 
   if (refreshError) {
-    console.error('[OAuth] Failed to get refresh token:', refreshError);
+    logger.error('[OAuth] Failed to get refresh token:', refreshError, { component: 'lib-google-calendar-service', action: 'service_call' });
     throw new Error('Failed to retrieve refresh token');
   }
 
   // Check if tokens were actually retrieved (never log token values, only success/failure)
-  console.log('[OAuth] Token retrieval status - access:', !!accessToken, 'refresh:', !!refreshToken);
+  logger.info('[OAuth] Token retrieval status:', { component: 'lib-google-calendar-service', data: { access: !!accessToken, refresh: !!refreshToken } });
 
   if (!accessToken || !refreshToken) {
-    console.error('[OAuth] Tokens are null despite no error. Access:', !!accessToken, 'Refresh:', !!refreshToken);
+    logger.error('[OAuth] Tokens are null despite no error:', undefined, { component: 'lib-google-calendar-service', action: 'service_call', details: { access: !!accessToken, refresh: !!refreshToken } });
     throw new Error(`Missing OAuth tokens: access=${!!accessToken}, refresh=${!!refreshToken}`);
   }
 
@@ -118,7 +119,7 @@ async function storeTokens(
   });
 
   if (accessError) {
-    console.error('Failed to store access token:', accessError);
+    logger.error('Failed to store access token:', accessError, { component: 'lib-google-calendar-service', action: 'service_call' });
     throw new Error('Failed to store access token');
   }
 
@@ -131,7 +132,7 @@ async function storeTokens(
   });
 
   if (refreshError) {
-    console.error('Failed to store refresh token:', refreshError);
+    logger.error('Failed to store refresh token:', refreshError, { component: 'lib-google-calendar-service', action: 'service_call' });
     throw new Error('Failed to store refresh token');
   }
 
@@ -169,7 +170,7 @@ export async function refreshAccessToken(connectionId: string): Promise<TokenRef
 
     return { success: false, error: 'No access token in refresh response' };
   } catch (error) {
-    console.error('Token refresh failed:', error);
+    logger.error('Token refresh failed:', error, { component: 'lib-google-calendar-service', action: 'service_call' });
 
     // Mark connection as token expired
     const supabase = await createClient();
@@ -250,7 +251,7 @@ export async function exchangeCodeForTokens(
 
     return { success: true };
   } catch (error) {
-    console.error('Token exchange failed:', error);
+    logger.error('Token exchange failed:', error, { component: 'lib-google-calendar-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Token exchange failed',
@@ -333,7 +334,7 @@ export async function getEvents(
   } catch (error: unknown) {
     // Handle sync token invalidation (410 Gone)
     if (error && typeof error === 'object' && 'code' in error && error.code === 410) {
-      console.log('Sync token invalid, performing full sync');
+      logger.info('Sync token invalid, performing full sync', { component: 'lib-google-calendar-service' });
       // Clear sync token and retry
       const supabase = await createClient();
       await supabase

@@ -8,6 +8,7 @@ import { pointsService } from '@/lib/services/rewards';
 import { LEVEL_DEFINITIONS } from '@/lib/types/rewards';
 import type { LeaderboardEntry } from '@/lib/types/rewards';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { logger } from '@/lib/logger';
 
 interface LeaderboardWidgetProps {
   spaceId: string;
@@ -37,7 +38,7 @@ export function LeaderboardWidget({
         setEntries(leaderboard.slice(0, maxEntries));
         setError(null);
       } catch (err) {
-        console.error('Failed to load leaderboard:', err);
+        logger.error('Failed to load leaderboard:', err, { component: 'LeaderboardWidget', action: 'component_action' });
         setError('Failed to load leaderboard');
       } finally {
         setLoading(false);
