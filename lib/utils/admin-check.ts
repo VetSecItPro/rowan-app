@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 
 /**
  * Check if the currently authenticated user is an admin
@@ -13,7 +14,7 @@ export async function isAdmin(): Promise<boolean> {
     const { data, error } = await supabase.rpc('is_admin');
 
     if (error) {
-      console.error('Error checking admin status:', error);
+      logger.error('Error checking admin status', error, { component: 'admin-check', action: 'is_admin' });
       return false;
     }
 
@@ -35,7 +36,7 @@ export async function isUserAdmin(userId: string): Promise<boolean> {
     const { data, error } = await supabase.rpc('is_admin', { user_id: userId });
 
     if (error) {
-      console.error('Error checking admin status for user:', error);
+      logger.error('Error checking admin status for user', error, { component: 'admin-check', action: 'is_user_admin' });
       return false;
     }
 
