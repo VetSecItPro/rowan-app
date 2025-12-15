@@ -7,6 +7,9 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+import { updateCalendarEventSchema } from '@/lib/validations/calendar-event-schemas';
+import { sanitizePlainText } from '@/lib/sanitize';
 
 /**
  * GET /api/calendar/[id]
@@ -134,11 +137,29 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       );
     }
 
-    // Parse request body
-    const updates = await req.json();
+    // Parse and validate request body with Zod
+    const body = await req.json();
+    try {
+      updateCalendarEventSchema.parse(body);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return NextResponse.json(
+          { error: 'Validation failed', details: error.issues },
+          { status: 400 }
+        );
+      }
+      throw error;
+    }
 
-    // Update event using service
-    const updatedEvent = await calendarService.updateEvent(params.id, updates);
+    const { title, description, location } = body;
+
+    // Update event using service with sanitized inputs
+    const updatedEvent = await calendarService.updateEvent(params.id, {
+      ...body,
+      title: title ? sanitizePlainText(title) : undefined,
+      description: description ? sanitizePlainText(description) : undefined,
+      location: location ? sanitizePlainText(location) : undefined,
+    });
 
     return NextResponse.json({
       success: true,

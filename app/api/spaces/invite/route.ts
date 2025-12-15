@@ -8,6 +8,8 @@ import { verifySpaceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+import { spaceInviteSchema, validateAndSanitizeInvite } from '@/lib/validations/space-schemas';
 
 /**
  * POST /api/spaces/invite
@@ -42,43 +44,24 @@ export async function POST(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(session.user);
 
-    // Parse request body
+    // Parse and validate request body with Zod
     const body = await req.json();
-    const { space_id, email, role } = body;
-
-    // SECURITY: Input validation
-    if (!space_id || !email || typeof space_id !== 'string' || typeof email !== 'string') {
-      return NextResponse.json(
-        { error: 'Space ID and email are required' },
-        { status: 400 }
-      );
-    }
-
-    // Validate role parameter
-    const validRoles = ['member', 'admin'] as const;
-    const inviteRole = role && validRoles.includes(role) ? role : 'member';
-
-    // SECURITY: Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
-      );
-    }
-
-    // SECURITY: UUID validation for space_id
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(space_id)) {
-      return NextResponse.json(
-        { error: 'Invalid Space ID format' },
-        { status: 400 }
-      );
+    let validatedData;
+    try {
+      validatedData = validateAndSanitizeInvite(body);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return NextResponse.json(
+          { error: 'Validation failed', details: error.issues },
+          { status: 400 }
+        );
+      }
+      throw error;
     }
 
     // SECURITY: Verify user is member of space before creating invitation
     try {
-      await verifySpaceAccess(session.user.id, space_id);
+      await verifySpaceAccess(session.user.id, validatedData.space_id);
     } catch (error) {
       return NextResponse.json(
         { error: 'You do not have permission to invite users to this space' },
@@ -88,10 +71,10 @@ export async function POST(req: NextRequest) {
 
     // Create invitation using service
     const result = await createInvitation(
-      space_id,
-      email.toLowerCase().trim(),
+      validatedData.space_id,
+      validatedData.email,
       session.user.id,
-      inviteRole
+      validatedData.role
     );
 
     if (!result.success) {
@@ -105,7 +88,7 @@ export async function POST(req: NextRequest) {
     const { data: spaceData } = await supabase
       .from('spaces')
       .select('name')
-      .eq('id', space_id)
+      .eq('id', validatedData.space_id)
       .single();
 
     // Try to get inviter name, but handle permission errors gracefully
@@ -131,7 +114,7 @@ export async function POST(req: NextRequest) {
 
     // Send invitation email
     const emailResult = await sendSpaceInvitationEmail({
-      recipientEmail: email.toLowerCase().trim(),
+      recipientEmail: validatedData.email,
       inviterName: inviterData?.name || 'Someone',
       spaceName: spaceData?.name || 'a workspace',
       invitationUrl,
@@ -148,8 +131,8 @@ export async function POST(req: NextRequest) {
           email_error: true,
         },
         extra: {
-          recipientEmail: email.replace(/(.{2}).*(@.*)/, '$1***$2'), // Partially mask for privacy
-          spaceId: space_id,
+          recipientEmail: validatedData.email.replace(/(.{2}).*(@.*)/, '$1***$2'), // Partially mask for privacy
+          spaceId: validatedData.space_id,
           timestamp: new Date().toISOString(),
         },
       });

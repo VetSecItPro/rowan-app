@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { sanitizePlainText } from '@/lib/sanitize';
 
 export const dynamic = 'force-dynamic';
 
@@ -69,20 +70,20 @@ export async function GET(request: NextRequest) {
     }
 
     const recipes = data.map((recipe: any) => {
-      // Parse ingredients from comma-separated string
+      // Parse and sanitize ingredients from pipe-separated string (external data could contain XSS payloads)
       const ingredients = recipe.ingredients
         ?.split('|')
         .map((ing: string) => ({
-          name: ing.trim(),
+          name: sanitizePlainText(ing.trim()),
         })) || [];
 
       return {
-        id: `apininjas-${recipe.title}-${Date.now()}-${Math.random()}`,
+        id: `apininjas-${sanitizePlainText(recipe.title)}-${Date.now()}-${Math.random()}`,
         source: 'apininjas',
-        name: recipe.title,
+        name: sanitizePlainText(recipe.title),
         servings: recipe.servings ? parseInt(recipe.servings) : undefined,
         ingredients,
-        instructions: recipe.instructions,
+        instructions: sanitizePlainText(recipe.instructions),
       };
     });
 
