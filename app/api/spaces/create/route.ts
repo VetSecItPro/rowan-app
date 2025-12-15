@@ -7,6 +7,8 @@ import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { getUserTier } from '@/lib/services/subscription-service';
 import { getFeatureLimit } from '@/lib/config/feature-limits';
+import { z } from 'zod';
+import { createSpaceSchema, validateAndSanitizeSpace } from '@/lib/validations/space-schemas';
 
 /**
  * POST /api/spaces/create
@@ -40,15 +42,19 @@ export async function POST(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(session.user);
 
-    // Parse request body
+    // Parse and validate request body with Zod
     const body = await req.json();
-    const { name } = body;
-
-    if (!name || typeof name !== 'string' || name.trim().length === 0) {
-      return NextResponse.json(
-        { error: 'Space name is required' },
-        { status: 400 }
-      );
+    let validatedData;
+    try {
+      validatedData = validateAndSanitizeSpace(body);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return NextResponse.json(
+          { error: 'Validation failed', details: error.issues },
+          { status: 400 }
+        );
+      }
+      throw error;
     }
 
     // Check space limit based on user's subscription tier
@@ -85,7 +91,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create space using service (pass server supabase client)
-    const result = await createSpace(name.trim(), session.user.id, supabase);
+    const result = await createSpace(validatedData.name, session.user.id, supabase);
 
     if (!result.success) {
       return NextResponse.json(
