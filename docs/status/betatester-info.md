@@ -7,7 +7,7 @@ Welcome to the Rowan App Beta Testing Program! We're excited to have you help us
 
 ### Step 1: Access Beta Testing Portal
 1. Visit the beta testing signup page at `/beta-signup`
-2. Enter the beta testing password: `rowan-beta-2024`
+2. Enter the beta testing password (provided by your invitation source)
 3. Fill out your information (name, email, etc.)
 4. Create your beta testing account
 
@@ -205,6 +205,5 @@ Thank you for being part of the Rowan App journey! Your feedback is invaluable i
 
 ---
 
-*Last Updated: November 2024*
-*Beta Testing Password: `rowan-beta-2024`*
+*Last Updated: December 2024*
 *Questions? Contact beta-support@rowanapp.com*

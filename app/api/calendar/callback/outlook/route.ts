@@ -70,9 +70,11 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      // User not logged in, redirect to login with return URL
+      // User not logged in, redirect to login
+      // Security: We don't pass the full callback URL as redirect to prevent open redirect attacks
+      // After login, user will need to reconnect their calendar from settings
       const loginUrl = new URL('/login', baseUrl);
-      loginUrl.searchParams.set('redirect', request.url);
+      loginUrl.searchParams.set('returnTo', '/settings?tab=integrations&reconnect=outlook');
       return NextResponse.redirect(loginUrl);
     }
 
