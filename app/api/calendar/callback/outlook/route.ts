@@ -39,13 +39,20 @@ export async function GET(request: NextRequest) {
 
     // Handle OAuth errors from Microsoft
     if (params.error) {
-      logger.warn('Microsoft OAuth error', { component: 'calendar/callback/outlook', action: 'oauth_error', errorType: params.error });
+      // SECURITY: Log the detailed error for debugging but don't expose to user (L11)
+      logger.warn('Microsoft OAuth error', {
+        component: 'calendar/callback/outlook',
+        action: 'oauth_error',
+        errorType: params.error,
+        errorDescription: params.error_description
+      });
 
-      // Redirect to calendar settings with error
+      // Redirect to calendar settings with generic error (don't leak OAuth provider details)
       const errorUrl = new URL('/settings', baseUrl);
       errorUrl.searchParams.set('tab', 'integrations');
       errorUrl.searchParams.set('error', 'outlook_auth_denied');
-      errorUrl.searchParams.set('message', params.error_description || 'Authorization was denied');
+      // Use generic message to prevent information disclosure
+      errorUrl.searchParams.set('message', 'Authorization was denied or cancelled');
 
       return NextResponse.redirect(errorUrl);
     }
