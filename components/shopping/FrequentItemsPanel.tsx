@@ -5,6 +5,7 @@ import { Plus, Sparkles, X } from 'lucide-react';
 import { shoppingService } from '@/lib/services/shopping-service';
 import { getCategoryIcon } from '@/lib/constants/shopping-categories';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { logger } from '@/lib/logger';
 
 interface FrequentItem {
   name: string;
@@ -32,7 +33,7 @@ export function FrequentItemsPanel({ spaceId, onAddItem }: FrequentItemsPanelPro
       const items = await shoppingService.getFrequentItems(spaceId, 12);
       setFrequentItems(items);
     } catch (error) {
-      console.error('Failed to load frequent items:', error);
+      logger.error('Failed to load frequent items:', error, { component: 'FrequentItemsPanel', action: 'component_action' });
     } finally {
       setLoading(false);
     }

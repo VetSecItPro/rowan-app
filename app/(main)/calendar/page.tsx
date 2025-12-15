@@ -12,6 +12,7 @@ import { EventCard } from '@/components/calendar/EventCard';
 import { ProposalsList } from '@/components/calendar/ProposalsList';
 import { MiniCalendar } from '@/components/calendar/MiniCalendar';
 import { QuickAddEvent } from '@/components/calendar/QuickAddEvent';
+import { logger } from '@/lib/logger';
 
 // Phase 9: Unified Calendar View imports
 import { UnifiedCalendarFilters } from '@/components/calendar/UnifiedCalendarFilters';
@@ -79,12 +80,12 @@ function safeParseLocalStorage<T>(
     }
 
     // Validation failed - clear corrupted data and return default
-    console.warn(`Invalid localStorage data for key "${key}", clearing cache`);
+    logger.warn(`Invalid localStorage data for key "${key}", clearing cache`, { component: 'page' });
     localStorage.removeItem(key);
     return defaultValue;
   } catch {
     // JSON parse error - clear corrupted data and return default
-    console.warn(`Failed to parse localStorage key "${key}", clearing cache`);
+    logger.warn(`Failed to parse localStorage key "${key}", clearing cache`, { component: 'page' });
     localStorage.removeItem(key);
     return defaultValue;
   }
@@ -102,7 +103,7 @@ function safeGetLocalStorageString(
     if (!value) return null;
 
     if (validator && !validator(value)) {
-      console.warn(`Invalid localStorage value for key "${key}", clearing cache`);
+      logger.warn(`Invalid localStorage value for key "${key}", clearing cache`, { component: 'page' });
       localStorage.removeItem(key);
       return null;
     }
@@ -417,14 +418,14 @@ export default function CalendarPage() {
               linkedListsMap[lookupId] = linkedLists[0]; // Also store under master ID for other occurrences
             }
           } catch (error) {
-            console.error(`Failed to load shopping list for event ${event.id}:`, error);
+            logger.error('Failed to load shopping list for event ${event.id}:', error, { component: 'page', action: 'execution' });
           }
         })
       );
       setLinkedShoppingLists(linkedListsMap);
 
     } catch (error) {
-      console.error('Failed to load events:', error);
+      logger.error('Failed to load events:', error, { component: 'page', action: 'execution' });
     } finally {
       setLoading(false);
     }
@@ -446,7 +447,7 @@ export default function CalendarPage() {
 
       return createdEvent;
     } catch (error) {
-      console.error('Failed to save event:', error);
+      logger.error('Failed to save event:', error, { component: 'page', action: 'execution' });
       throw error; // Re-throw so modal can handle it
     }
   }, [editingEvent, loadEvents]);
@@ -466,7 +467,7 @@ export default function CalendarPage() {
     try {
       await calendarService.deleteEvent(eventId);
     } catch (error) {
-      console.error('Failed to delete event:', error);
+      logger.error('Failed to delete event:', error, { component: 'page', action: 'execution' });
       // Revert optimistic update on error
       loadEvents();
     }
@@ -485,7 +486,7 @@ export default function CalendarPage() {
     try {
       await calendarService.updateEventStatus(eventId, status);
     } catch (error) {
-      console.error('Failed to update event status:', error);
+      logger.error('Failed to update event status:', error, { component: 'page', action: 'execution' });
       // Revert on error
       loadEvents();
     }
@@ -518,7 +519,7 @@ export default function CalendarPage() {
         handleEditEvent(event);
       }, 100);
     } catch (error) {
-      console.error('Failed to create event from template:', error);
+      logger.error('Failed to create event from template:', error, { component: 'page', action: 'execution' });
       alert('Failed to create event from template');
     }
   }, [loadEvents, handleEditEvent]);
@@ -606,7 +607,7 @@ export default function CalendarPage() {
         localStorage.removeItem('rowan_calendar_last_sync');
       }
     } catch (error) {
-      console.error('Failed to check calendar connections:', error);
+      logger.error('Failed to check calendar connections:', error, { component: 'page', action: 'execution' });
     } finally {
       setConnectionChecked(true);
     }
@@ -636,17 +637,17 @@ export default function CalendarPage() {
           const data = await response.json();
 
           if (response.ok && data.success) {
-            console.log(`[${connection.provider}] Sync complete: ${data.events_synced} events processed`);
+            logger.info(`[${connection.provider}] Sync complete: ${data.events_synced} events processed`, { component: 'page' });
             return { success: true, events: data.events_synced || 0, provider: connection.provider };
           } else if (response.status === 429) {
-            console.log(`[${connection.provider}] Rate limited - please wait before syncing again`);
+            logger.info(`[${connection.provider}] Rate limited - please wait before syncing again`, { component: 'page' });
             return { success: false, events: 0, provider: connection.provider, rateLimited: true };
           } else {
-            console.error(`[${connection.provider}] Sync failed:`, data.error);
+            logger.error('[${connection.provider}] Sync failed:', undefined, { component: 'page', action: 'execution', details: data.error });
             return { success: false, events: 0, provider: connection.provider, error: data.error };
           }
         } catch (error) {
-          console.error(`[${connection.provider}] Sync error:`, error);
+          logger.error('[${connection.provider}] Sync error:', error, { component: 'page', action: 'execution' });
           return { success: false, events: 0, provider: connection.provider, error };
         }
       });
@@ -668,14 +669,14 @@ export default function CalendarPage() {
         const syncTime = new Date().toISOString();
         setLastSyncTime(syncTime);
         localStorage.setItem('rowan_calendar_last_sync', syncTime);
-        console.log(`Total sync complete: ${totalEventsSynced} events across ${calendarConnections.length} calendar(s)`);
+        logger.info(`Total sync complete: ${totalEventsSynced} events across ${calendarConnections.length} calendar(s)`, { component: 'page' });
       }
 
       if (hasError) {
-        console.warn('Some calendars failed to sync - check individual provider logs above');
+        logger.warn('Some calendars failed to sync - check individual provider logs above', { component: 'page' });
       }
     } catch (error) {
-      console.error('Sync error:', error);
+      logger.error('Sync error:', error, { component: 'page', action: 'execution' });
     } finally {
       setIsSyncing(false);
     }
@@ -702,7 +703,7 @@ export default function CalendarPage() {
 
       // Delete in background
       calendarService.deleteEvent(eventId).catch(error => {
-        console.error('Failed to auto-delete completed event:', error);
+        logger.error('Failed to auto-delete completed event:', error, { component: 'page', action: 'execution' });
         // Revert optimistic update on error
         loadEvents();
       });
@@ -760,10 +761,10 @@ export default function CalendarPage() {
         if (location) {
           const locationString = geolocationService.getLocationString(location);
           setUserLocation(locationString);
-          console.log('[Calendar] User location set:', locationString);
+          logger.info('[Calendar] User location set:', { component: 'page', data: locationString });
         }
       } catch (error) {
-        console.error('[Calendar] Failed to get user location:', error);
+        logger.error('[Calendar] Failed to get user location:', error, { component: 'page', action: 'execution' });
         // Set fallback location
         setUserLocation('Dallas, Texas, United States');
       } finally {

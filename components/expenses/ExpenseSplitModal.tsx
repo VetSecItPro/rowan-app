@@ -6,6 +6,7 @@ import { SplitTypeSelector } from './SplitTypeSelector';
 import { SplitCalculator, type SplitResult } from './SplitCalculator';
 import type { SplitType } from '@/lib/validations/expense-splitting';
 import { safeValidateUpdateSplitExpense } from '@/lib/validations/expense-splitting';
+import { logger } from '@/lib/logger';
 
 interface ExpenseSplitModalProps {
   isOpen: boolean;
@@ -108,7 +109,7 @@ export function ExpenseSplitModal({
         onClose();
       }, 1500);
     } catch (err) {
-      console.error('Failed to save split:', err);
+      logger.error('Failed to save split:', err, { component: 'ExpenseSplitModal', action: 'component_action' });
       setError('Failed to save split. Please try again.');
     } finally {
       setSaving(false);

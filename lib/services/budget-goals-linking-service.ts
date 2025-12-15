@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Goal, Milestone, createGoal, updateGoal, createMilestone } from './goals-service';
 import { getExpenseStatsByCategory } from './categories-tags-service';
 import { getDefaultCategoriesForDomain } from '@/lib/constants/default-categories';
+import { logger } from '@/lib/logger';
 
 // ==================== TYPES ====================
 
@@ -462,7 +463,7 @@ export async function autoUpdateBudgetGoalProgress(spaceId: string): Promise<voi
       });
 
     } catch (error) {
-      console.error(`Failed to update budget-goal link ${link.id}:`, error);
+      logger.error('Failed to update budget-goal link ${link.id}:', error, { component: 'lib-budget-goals-linking-service', action: 'service_call' });
     }
   }
 }

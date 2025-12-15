@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Breadcrumbs } from '@/components/admin/Breadcrumbs';
+import { logger } from '@/lib/logger';
 import {
   Shield,
   Users,
@@ -158,7 +159,7 @@ export default function AdminBetaPage() {
         setStats(prevStats => ({ ...prevStats, ...statsData.stats }));
       }
     } catch (error) {
-      console.error('Failed to fetch beta data:', error);
+      logger.error('Failed to fetch beta data:', error, { component: 'page', action: 'execution' });
     } finally {
       setIsLoading(false);
     }
@@ -197,7 +198,7 @@ export default function AdminBetaPage() {
         setSelectedFeedback(new Set()); // Clear selection
       }
     } catch (error) {
-      console.error('Failed to update feedback status:', error);
+      logger.error('Failed to update feedback status:', error, { component: 'page', action: 'execution' });
     }
   };
 

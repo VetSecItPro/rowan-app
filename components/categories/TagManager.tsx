@@ -8,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { logger } from '@/lib/logger';
 import {
   X,
   Plus,
@@ -64,7 +65,7 @@ function TagInput({ onTagAdd, existingTagIds, placeholder = "Add tags...", class
         const data = await getTags(currentSpace.id);
         setAllTags(data);
       } catch (err) {
-        console.error('Failed to load tags:', err);
+        logger.error('Failed to load tags:', err, { component: 'TagManager', action: 'component_action' });
       }
     };
 
@@ -93,7 +94,7 @@ function TagInput({ onTagAdd, existingTagIds, placeholder = "Add tags...", class
       setInputValue('');
       setOpen(false);
     } catch (err) {
-      console.error('Failed to create tag:', err);
+      logger.error('Failed to create tag:', err, { component: 'TagManager', action: 'component_action' });
     } finally {
       setLoading(false);
     }

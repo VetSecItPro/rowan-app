@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, Share2, Copy, Check, Eye, EyeOff, Globe, Lock } from 'lucide-react';
 import { ShoppingList } from '@/lib/services/shopping-service';
 import { copyToClipboard } from '@/lib/utils/share';
+import { logger } from '@/lib/logger';
 
 interface ShareListModalProps {
   isOpen: boolean;
@@ -51,7 +52,7 @@ export function ShareListModal({ isOpen, onClose, list, onUpdateSharing }: Share
         setShareUrl('');
       }
     } catch (error) {
-      console.error('Failed to update sharing:', error);
+      logger.error('Failed to update sharing:', error, { component: 'ShareListModal', action: 'component_action' });
     } finally {
       setIsSharing(false);
     }

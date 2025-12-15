@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import type { Reminder } from '@/lib/services/reminders-service';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface UseRemindersRealtimeOptions {
   spaceId: string;
@@ -124,7 +125,7 @@ export function useRemindersRealtime({
 
     const emergencyTimeout = setTimeout(() => {
       if (loading) {
-        console.warn('[useRemindersRealtime] Emergency timeout reached - forcing loading completion');
+        logger.warn('[useRemindersRealtime] Emergency timeout reached - forcing loading completion', { component: 'hook-useRemindersRealtime' });
         setTimeoutReached(true);
         setLoading(false);
         setError(new Error('Loading timeout - please refresh to try again'));
@@ -168,7 +169,7 @@ export function useRemindersRealtime({
 
         return !memberError && !!membership;
       } catch (err) {
-        console.warn('[useRemindersRealtime] Access verification timeout or error:', err);
+        logger.warn('[useRemindersRealtime] Access verification timeout or error:', { component: 'hook-useRemindersRealtime', error: err });
         return false;
       }
     }
@@ -177,7 +178,7 @@ export function useRemindersRealtime({
       try {
         // If timeout already reached, skip loading and use empty state
         if (timeoutReached) {
-          console.warn('[useRemindersRealtime] Timeout reached - skipping data load');
+          logger.warn('[useRemindersRealtime] Timeout reached - skipping data load', { component: 'hook-useRemindersRealtime' });
           setReminders([]);
           setLoading(false);
           return;

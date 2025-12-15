@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { apiRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
     const { error } = await supabase.auth.signOut();
 
     if (error) {
-      console.error('Signout error:', error);
+      logger.error('Signout error:', error, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: 'Failed to sign out. Please try again.' },
         { status: 500 }
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     // Generic error handler
-    console.error('Signout API error:', error);
+    logger.error('Signout API error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

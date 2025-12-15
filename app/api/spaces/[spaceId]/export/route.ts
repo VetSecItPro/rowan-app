@@ -5,15 +5,14 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/spaces/[spaceId]/export
  * Get export summary for a space (preview before deletion)
  */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { spaceId: string } }
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ spaceId: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
@@ -77,7 +76,7 @@ export async function GET(
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/spaces/[spaceId]/export GET error:', error);
+    logger.error('[API] /api/spaces/[spaceId]/export GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -89,10 +88,8 @@ export async function GET(
  * POST /api/spaces/[spaceId]/export
  * Export all data from a specific space (for space deletion)
  */
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { spaceId: string } }
-) {
+export async function POST(req: NextRequest, props: { params: Promise<{ spaceId: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
@@ -195,7 +192,7 @@ export async function POST(
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/spaces/[spaceId]/export POST error:', error);
+    logger.error('[API] /api/spaces/[spaceId]/export POST error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

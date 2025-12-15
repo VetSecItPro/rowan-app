@@ -16,8 +16,9 @@ import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { remindersService, Reminder, CreateReminderInput } from '@/lib/services/reminders-service';
 import { CTAButton } from '@/components/ui/EnhancedButton';
 import { useRemindersRealtime } from '@/hooks/useRemindersRealtime';
+import { logger } from '@/lib/logger';
 
-export default function RemindersPage(): JSX.Element {
+export default function RemindersPage(): React.JSX.Element {
   const { currentSpace, user, loading: authLoading } = useAuthWithSpaces();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
@@ -51,9 +52,9 @@ export default function RemindersPage(): JSX.Element {
   } = useRemindersRealtime({
     spaceId: currentSpace?.id || '',
     filters: memoizedFilters,
-    onReminderAdded: (reminder) => console.log('[RemindersPage] Reminder added via real-time:', reminder.title),
-    onReminderUpdated: (reminder) => console.log('[RemindersPage] Reminder updated via real-time:', reminder.title),
-    onReminderDeleted: (reminderId) => console.log('[RemindersPage] Reminder deleted via real-time:', reminderId),
+    onReminderAdded: (reminder) => logger.debug('Reminder added via real-time', { component: 'reminders-page', title: reminder.title }),
+    onReminderUpdated: (reminder) => logger.debug('Reminder updated via real-time', { component: 'reminders-page', title: reminder.title }),
+    onReminderDeleted: (reminderId) => logger.debug('Reminder deleted via real-time', { component: 'reminders-page', reminderId }),
   });
 
   // Use real-time reminders and loading state
@@ -216,7 +217,7 @@ export default function RemindersPage(): JSX.Element {
       }
       setEditingReminder(null);
     } catch (error) {
-      console.error('Failed to save reminder:', error);
+      logger.error('Failed to save reminder:', error, { component: 'page', action: 'execution' });
       // Could add toast notification here for better UX
       alert('Failed to save reminder. Please try again.');
     }
@@ -235,7 +236,7 @@ export default function RemindersPage(): JSX.Element {
     try {
       await remindersService.updateReminder(reminderId, { status: status as 'active' | 'completed' | 'snoozed' });
     } catch (error) {
-      console.error('Failed to update reminder status:', error);
+      logger.error('Failed to update reminder status:', error, { component: 'page', action: 'execution' });
       // Real-time will revert to server state automatically
     }
   }, [setReminders]);
@@ -249,7 +250,7 @@ export default function RemindersPage(): JSX.Element {
       await remindersService.deleteReminder(reminderId);
       // Real-time will handle the delete confirmation
     } catch (error) {
-      console.error('Failed to delete reminder:', error);
+      logger.error('Failed to delete reminder:', error, { component: 'page', action: 'execution' });
       // Real-time will revert to server state automatically
     }
   }, [setReminders]);
@@ -261,7 +262,7 @@ export default function RemindersPage(): JSX.Element {
       await remindersService.snoozeReminder(reminderId, minutes, user.id);
       // Real-time will handle the update automatically
     } catch (error) {
-      console.error('Failed to snooze reminder:', error);
+      logger.error('Failed to snooze reminder:', error, { component: 'page', action: 'execution' });
     }
   }, [user]);
 
@@ -282,7 +283,7 @@ export default function RemindersPage(): JSX.Element {
         )
       );
     } catch (error) {
-      console.error('Failed to mark bill as paid:', error);
+      logger.error('Failed to mark bill as paid:', error, { component: 'page', action: 'execution' });
       alert('Failed to mark bill as paid. Please try again.');
     }
   }, [setReminders]);

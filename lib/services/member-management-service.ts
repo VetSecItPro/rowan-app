@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import type { SpaceMemberRole } from '@/lib/types';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // MEMBER MANAGEMENT SERVICE
@@ -79,7 +80,7 @@ export async function removeMember(
       .eq('user_id', memberUserId);
 
     if (removeError) {
-      console.error('[member-management] removeMember error:', removeError);
+      logger.error('[member-management] removeMember error:', removeError, { component: 'lib-member-management-service', action: 'service_call' });
       return {
         success: false,
         error: 'Failed to remove member'
@@ -95,7 +96,7 @@ export async function removeMember(
 
     return { success: true };
   } catch (error) {
-    console.error('[member-management] removeMember error:', error);
+    logger.error('[member-management] removeMember error:', error, { component: 'lib-member-management-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to remove member'
@@ -178,7 +179,7 @@ export async function changeMemberRole(
       .eq('user_id', memberUserId);
 
     if (updateError) {
-      console.error('[member-management] changeMemberRole error:', updateError);
+      logger.error('[member-management] changeMemberRole error:', updateError, { component: 'lib-member-management-service', action: 'service_call' });
       return {
         success: false,
         error: 'Failed to update member role'
@@ -187,7 +188,7 @@ export async function changeMemberRole(
 
     return { success: true };
   } catch (error) {
-    console.error('[member-management] changeMemberRole error:', error);
+    logger.error('[member-management] changeMemberRole error:', error, { component: 'lib-member-management-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to update member role'
@@ -244,7 +245,7 @@ export async function leaveSpace(
       .eq('user_id', userId);
 
     if (removeError) {
-      console.error('[member-management] leaveSpace error:', removeError);
+      logger.error('[member-management] leaveSpace error:', removeError, { component: 'lib-member-management-service', action: 'service_call' });
       return {
         success: false,
         error: 'Failed to leave space'
@@ -260,7 +261,7 @@ export async function leaveSpace(
 
     return { success: true };
   } catch (error) {
-    console.error('[member-management] leaveSpace error:', error);
+    logger.error('[member-management] leaveSpace error:', error, { component: 'lib-member-management-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to leave space'
@@ -314,7 +315,7 @@ export async function cancelInvitation(
       .eq('id', invitationId);
 
     if (updateError) {
-      console.error('[member-management] cancelInvitation error:', updateError);
+      logger.error('[member-management] cancelInvitation error:', updateError, { component: 'lib-member-management-service', action: 'service_call' });
       return {
         success: false,
         error: 'Failed to cancel invitation'
@@ -323,7 +324,7 @@ export async function cancelInvitation(
 
     return { success: true };
   } catch (error) {
-    console.error('[member-management] cancelInvitation error:', error);
+    logger.error('[member-management] cancelInvitation error:', error, { component: 'lib-member-management-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to cancel invitation'

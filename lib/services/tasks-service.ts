@@ -319,11 +319,11 @@ export const tasksService = {
                   spaceName: spaceData?.name || 'Your Space',
                   description: task.description,
                 }
-              ).catch(console.error);
+              ).catch((error) => logger.error('Caught error', error, { component: 'lib-tasks-service', action: 'service_call' }));
             }
           }
         } catch (error) {
-          console.error('Failed to send task assignment notification:', error);
+          logger.error('Failed to send task assignment notification:', error, { component: 'lib-tasks-service', action: 'service_call' });
           // Don't throw here - task creation should succeed even if notification fails
         }
       }
@@ -522,9 +522,9 @@ export const tasksService = {
    * @example
    * ```typescript
    * const stats = await tasksService.getTaskStats(spaceId);
-   * console.log(`Total: ${stats.total}`);
-   * console.log(`Completed: ${stats.completed}`);
-   * console.log(`High Priority: ${stats.byPriority.high}`);
+   * logger.info(`Total: ${stats.total}`, { component: 'lib-tasks-service' });
+   * logger.info(`Completed: ${stats.completed}`, { component: 'lib-tasks-service' });
+   * logger.info(`High Priority: ${stats.byPriority.high}`, { component: 'lib-tasks-service' });
    * ```
    */
   async getTaskStats(spaceId: string): Promise<TaskStats> {
@@ -584,8 +584,8 @@ export const tasksService = {
    * @example
    * ```typescript
    * const channel = tasksService.subscribeToTasks(spaceId, (payload) => {
-   *   console.log('Change:', payload.eventType);
-   *   console.log('Task:', payload.new || payload.old);
+   *   logger.info('Change:', { component: 'lib-tasks-service', data: payload.eventType });
+   *   logger.info('Task:', { component: 'lib-tasks-service', data: payload.new || payload.old });
    * });
    *
    * // Later, cleanup

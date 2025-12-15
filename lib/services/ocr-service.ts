@@ -1,4 +1,5 @@
 import type { OCRResult } from './receipts-service';
+import { logger } from '@/lib/logger';
 
 // =====================================================
 // MERCHANT DETECTION PATTERNS
@@ -235,7 +236,7 @@ export async function processReceiptOCR(imageFile: File): Promise<OCRResult> {
 
       // If API fails, fall back to regex-based extraction
       if (errorData.fallback || response.status >= 500) {
-        console.warn('Gemini OCR failed, falling back to regex extraction');
+        logger.warn('Gemini OCR failed, falling back to regex extraction', { component: 'lib-ocr-service' });
         return await fallbackOCRExtraction(imageFile);
       }
 
@@ -245,7 +246,7 @@ export async function processReceiptOCR(imageFile: File): Promise<OCRResult> {
     const result: OCRResult = await response.json();
     return result;
   } catch (error) {
-    console.error('OCR processing error:', error);
+    logger.error('OCR processing error:', error, { component: 'lib-ocr-service', action: 'service_call' });
 
     // Fallback to regex-based extraction on any error
     try {

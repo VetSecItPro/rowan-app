@@ -6,15 +6,14 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { verifyResourceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/expenses/[id]
  * Get a single expense by ID
  */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
@@ -80,7 +79,7 @@ export async function GET(
       data: expense,
     });
   } catch (error) {
-    console.error('[API] /api/expenses/[id] GET error:', error);
+    logger.error('[API] /api/expenses/[id] GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -92,10 +91,8 @@ export async function GET(
  * PATCH /api/expenses/[id]
  * Update an expense
  */
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
@@ -194,7 +191,7 @@ export async function PATCH(
       data: expense,
     });
   } catch (error) {
-    console.error('[API] /api/expenses/[id] PATCH error:', error);
+    logger.error('[API] /api/expenses/[id] PATCH error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to update expense' },
       { status: 500 }
@@ -206,10 +203,8 @@ export async function PATCH(
  * DELETE /api/expenses/[id]
  * Delete an expense
  */
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
@@ -275,7 +270,7 @@ export async function DELETE(
       message: 'Expense deleted successfully',
     });
   } catch (error) {
-    console.error('[API] /api/expenses/[id] DELETE error:', error);
+    logger.error('[API] /api/expenses/[id] DELETE error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to delete expense' },
       { status: 500 }

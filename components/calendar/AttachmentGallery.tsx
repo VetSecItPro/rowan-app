@@ -5,6 +5,7 @@ import { Upload, Image as ImageIcon, FileText, Download, Trash2, X, Loader2, Pap
 import { eventAttachmentsService, EventAttachment } from '@/lib/services/event-attachments-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { logger } from '@/lib/logger';
 
 interface AttachmentGalleryProps {
   eventId: string;
@@ -41,12 +42,12 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
           const url = await eventAttachmentsService.getAttachmentUrl(attachment);
           urls[attachment.id] = url;
         } catch (error) {
-          console.error(`Failed to load URL for attachment ${attachment.id}:`, error);
+          logger.error('Failed to load URL for attachment ${attachment.id}:', error, { component: 'AttachmentGallery', action: 'component_action' });
         }
       }
       setAttachmentUrls(urls);
     } catch (error) {
-      console.error('Failed to load attachments:', error);
+      logger.error('Failed to load attachments:', error, { component: 'AttachmentGallery', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -67,7 +68,7 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
       }
       await loadAttachments();
     } catch (error) {
-      console.error('Failed to upload files:', error);
+      logger.error('Failed to upload files:', error, { component: 'AttachmentGallery', action: 'component_action' });
       alert('Failed to upload one or more files. Please try again.');
     } finally {
       setUploading(false);
@@ -92,7 +93,7 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
       delete newUrls[attachmentToDelete];
       setAttachmentUrls(newUrls);
     } catch (error) {
-      console.error('Failed to delete attachment:', error);
+      logger.error('Failed to delete attachment:', error, { component: 'AttachmentGallery', action: 'component_action' });
       alert('Failed to delete attachment. Please try again.');
     } finally {
       setShowDeleteConfirm(false);
@@ -117,7 +118,7 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
       document.body.removeChild(a);
       URL.revokeObjectURL(blobUrl);
     } catch (error) {
-      console.error('Failed to download attachment:', error);
+      logger.error('Failed to download attachment:', error, { component: 'AttachmentGallery', action: 'component_action' });
       alert('Failed to download file. Please try again.');
     }
   };

@@ -3,6 +3,8 @@
  * Aggregates recipes from multiple free APIs
  */
 
+import { logger } from '@/lib/logger';
+
 export interface ExternalRecipe {
   id: string;
   source: 'themealdb' | 'edamam' | 'spoonacular' | 'tasty' | 'apininjas';
@@ -37,7 +39,7 @@ async function searchTheMealDB(query: string): Promise<ExternalRecipe[]> {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('TheMealDB API error:', error);
+    logger.error('TheMealDB API error:', error, { component: 'lib-external-recipes-service', action: 'service_call' });
     return [];
   }
 }
@@ -57,7 +59,7 @@ async function searchSpoonacular(query: string): Promise<ExternalRecipe[]> {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Spoonacular API error:', error);
+    logger.error('Spoonacular API error:', error, { component: 'lib-external-recipes-service', action: 'service_call' });
     return [];
   }
 }
@@ -76,7 +78,7 @@ async function searchTasty(query: string): Promise<ExternalRecipe[]> {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Tasty API error:', error);
+    logger.error('Tasty API error:', error, { component: 'lib-external-recipes-service', action: 'service_call' });
     return [];
   }
 }
@@ -95,7 +97,7 @@ async function searchApiNinjas(query: string): Promise<ExternalRecipe[]> {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('API Ninjas error:', error);
+    logger.error('API Ninjas error:', error, { component: 'lib-external-recipes-service', action: 'service_call' });
     return [];
   }
 }
@@ -147,7 +149,7 @@ async function searchEdamam(query: string): Promise<ExternalRecipe[]> {
       };
     });
   } catch (error) {
-    console.error('Edamam API error:', error);
+    logger.error('Edamam API error:', error, { component: 'lib-external-recipes-service', action: 'service_call' });
     return [];
   }
 }
@@ -223,7 +225,7 @@ async function searchTheMealDBByCuisine(cuisine: string): Promise<ExternalRecipe
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('TheMealDB cuisine search error:', error);
+    logger.error('TheMealDB cuisine search error:', error, { component: 'lib-external-recipes-service', action: 'service_call' });
     return [];
   }
 }
@@ -284,7 +286,7 @@ export async function searchByCuisine(cuisine: string): Promise<ExternalRecipe[]
       return sourcePriority[a.source] - sourcePriority[b.source];
     });
   } catch (error) {
-    console.error('Cuisine search error:', error);
+    logger.error('Cuisine search error:', error, { component: 'lib-external-recipes-service', action: 'service_call' });
     return [];
   }
 }
@@ -345,7 +347,7 @@ export async function getRandomRecipes(count: number = 10): Promise<ExternalReci
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Random recipes error:', error);
+    logger.error('Random recipes error:', error, { component: 'lib-external-recipes-service', action: 'service_call' });
     return [];
   }
 }

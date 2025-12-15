@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { ShoppingBag, Check, X, Loader2, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { format } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 interface ShoppingItem {
   id: string;
@@ -60,7 +61,7 @@ export default function PublicShoppingListPage() {
           setExpandedCategories(new Set(Object.keys(result.data.itemsByCategory)));
         }
       } catch (err) {
-        console.error('Load error:', err);
+        logger.error('Load error:', err, { component: 'page', action: 'execution' });
         setError(err instanceof Error ? err.message : 'Failed to load shopping list');
       } finally {
         setLoading(false);
@@ -117,7 +118,7 @@ export default function PublicShoppingListPage() {
         throw new Error('Failed to update item');
       }
     } catch (err) {
-      console.error('Update error:', err);
+      logger.error('Update error:', err, { component: 'page', action: 'execution' });
       // Revert optimistic update on error
       setData(data);
     }

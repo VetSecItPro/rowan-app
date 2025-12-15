@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Breadcrumbs } from '@/components/admin/Breadcrumbs';
+import { logger } from '@/lib/logger';
 import {
   BarChart3,
   TrendingUp,
@@ -74,7 +75,7 @@ export default function AdminAnalyticsPage() {
         setAnalyticsData(data.analytics);
       }
     } catch (error) {
-      console.error('Failed to fetch analytics data:', error);
+      logger.error('Failed to fetch analytics data:', error, { component: 'page', action: 'execution' });
     } finally {
       setIsLoading(false);
     }

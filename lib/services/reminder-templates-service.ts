@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { sanitizeSearchInput } from '@/lib/utils';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // TYPES & VALIDATION
@@ -86,7 +87,7 @@ export const reminderTemplatesService = {
       .order('usage_count', { ascending: false });
 
     if (error) {
-      console.error('Error fetching templates:', error);
+      logger.error('Error fetching templates:', error, { component: 'lib-reminder-templates-service', action: 'service_call' });
       throw new Error('Failed to fetch templates');
     }
 
@@ -109,7 +110,7 @@ export const reminderTemplatesService = {
       .order('usage_count', { ascending: false });
 
     if (error) {
-      console.error('Error fetching system templates:', error);
+      logger.error('Error fetching system templates:', error, { component: 'lib-reminder-templates-service', action: 'service_call' });
       throw new Error('Failed to fetch system templates');
     }
 
@@ -138,7 +139,7 @@ export const reminderTemplatesService = {
       .order('usage_count', { ascending: false });
 
     if (error) {
-      console.error('Error fetching space templates:', error);
+      logger.error('Error fetching space templates:', error, { component: 'lib-reminder-templates-service', action: 'service_call' });
       throw new Error('Failed to fetch space templates');
     }
 
@@ -169,7 +170,7 @@ export const reminderTemplatesService = {
       .single();
 
     if (error) {
-      console.error('Error fetching template:', error);
+      logger.error('Error fetching template:', error, { component: 'lib-reminder-templates-service', action: 'service_call' });
       return null;
     }
 
@@ -197,7 +198,7 @@ export const reminderTemplatesService = {
       .single();
 
     if (membershipError || !membership) {
-      console.error('User is not a member of this space');
+      logger.error('User is not a member of this space', undefined, { component: 'lib-reminder-templates-service', action: 'service_call' });
       throw new Error('User is not a member of this space');
     }
 
@@ -220,7 +221,7 @@ export const reminderTemplatesService = {
       .single();
 
     if (error) {
-      console.error('Error creating template:', error);
+      logger.error('Error creating template:', error, { component: 'lib-reminder-templates-service', action: 'service_call' });
       throw new Error('Failed to create template');
     }
 
@@ -251,7 +252,7 @@ export const reminderTemplatesService = {
       .single();
 
     if (existingError || !existing) {
-      console.error('Template not found:', existingError);
+      logger.error('Template not found:', existingError, { component: 'lib-reminder-templates-service', action: 'service_call' });
       throw new Error('Template not found');
     }
 
@@ -283,7 +284,7 @@ export const reminderTemplatesService = {
       .single();
 
     if (error) {
-      console.error('Error updating template:', error);
+      logger.error('Error updating template:', error, { component: 'lib-reminder-templates-service', action: 'service_call' });
       throw new Error('Failed to update template');
     }
 
@@ -307,7 +308,7 @@ export const reminderTemplatesService = {
       .single();
 
     if (existingError || !existing) {
-      console.error('Template not found:', existingError);
+      logger.error('Template not found:', existingError, { component: 'lib-reminder-templates-service', action: 'service_call' });
       throw new Error('Template not found');
     }
 
@@ -326,7 +327,7 @@ export const reminderTemplatesService = {
       .eq('id', templateId);
 
     if (error) {
-      console.error('Error deleting template:', error);
+      logger.error('Error deleting template:', error, { component: 'lib-reminder-templates-service', action: 'service_call' });
       throw new Error('Failed to delete template');
     }
   },
@@ -342,7 +343,7 @@ export const reminderTemplatesService = {
     });
 
     if (error) {
-      console.error('Error incrementing template usage:', error);
+      logger.error('Error incrementing template usage:', error, { component: 'lib-reminder-templates-service', action: 'service_call' });
       // Don't throw - usage tracking is non-critical
     }
   },
@@ -446,7 +447,7 @@ export const reminderTemplatesService = {
       .limit(limit);
 
     if (error) {
-      console.error('Error fetching popular templates:', error);
+      logger.error('Error fetching popular templates:', error, { component: 'lib-reminder-templates-service', action: 'service_call' });
       throw new Error('Failed to fetch popular templates');
     }
 
@@ -474,7 +475,7 @@ export const reminderTemplatesService = {
     const { data, error } = await templatesQuery;
 
     if (error) {
-      console.error('Error searching templates:', error);
+      logger.error('Error searching templates:', error, { component: 'lib-reminder-templates-service', action: 'service_call' });
       throw new Error('Failed to search templates');
     }
 

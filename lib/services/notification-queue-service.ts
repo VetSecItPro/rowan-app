@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { NotificationFrequency } from './reminder-notifications-service';
+import { logger } from '@/lib/logger';
 
 export interface QueuedNotification {
   id: string;
@@ -51,7 +52,7 @@ export const notificationQueueService = {
       .single();
 
     if (error) {
-      console.error('Error queueing notification:', error);
+      logger.error('Error queueing notification:', error, { component: 'lib-notification-queue-service', action: 'service_call' });
       throw new Error('Failed to queue notification');
     }
 
@@ -81,7 +82,7 @@ export const notificationQueueService = {
     );
 
     if (timeError) {
-      console.error('Error calculating delivery time:', timeError);
+      logger.error('Error calculating delivery time:', timeError, { component: 'lib-notification-queue-service', action: 'service_call' });
       return now.toISOString();
     }
 
@@ -96,7 +97,7 @@ export const notificationQueueService = {
     );
 
     if (adjustError) {
-      console.error('Error adjusting for quiet hours:', adjustError);
+      logger.error('Error adjusting for quiet hours:', adjustError, { component: 'lib-notification-queue-service', action: 'service_call' });
       return baseTime || now.toISOString();
     }
 
@@ -119,7 +120,7 @@ export const notificationQueueService = {
       .limit(limit);
 
     if (error) {
-      console.error('Error fetching pending notifications:', error);
+      logger.error('Error fetching pending notifications:', error, { component: 'lib-notification-queue-service', action: 'service_call' });
       throw new Error('Failed to fetch pending notifications');
     }
 
@@ -142,7 +143,7 @@ export const notificationQueueService = {
       .in('id', notificationIds);
 
     if (error) {
-      console.error('Error marking notifications as sent:', error);
+      logger.error('Error marking notifications as sent:', error, { component: 'lib-notification-queue-service', action: 'service_call' });
       throw new Error('Failed to mark notifications as sent');
     }
   },
@@ -168,7 +169,7 @@ export const notificationQueueService = {
       .eq('id', notificationId);
 
     if (error) {
-      console.error('Error marking notification as failed:', error);
+      logger.error('Error marking notification as failed:', error, { component: 'lib-notification-queue-service', action: 'service_call' });
       throw new Error('Failed to mark notification as failed');
     }
   },
@@ -207,7 +208,7 @@ export const notificationQueueService = {
       .eq('id', notificationId);
 
     if (error) {
-      console.error('Error retrying notification:', error);
+      logger.error('Error retrying notification:', error, { component: 'lib-notification-queue-service', action: 'service_call' });
       throw new Error('Failed to retry notification');
     }
   },
@@ -224,7 +225,7 @@ export const notificationQueueService = {
       .eq('id', notificationId);
 
     if (error) {
-      console.error('Error cancelling notification:', error);
+      logger.error('Error cancelling notification:', error, { component: 'lib-notification-queue-service', action: 'service_call' });
       throw new Error('Failed to cancel notification');
     }
   },
@@ -244,7 +245,7 @@ export const notificationQueueService = {
       .select('id');
 
     if (error) {
-      console.error('Error cleaning up notifications:', error);
+      logger.error('Error cleaning up notifications:', error, { component: 'lib-notification-queue-service', action: 'service_call' });
       return 0;
     }
 

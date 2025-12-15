@@ -28,6 +28,7 @@ import { getUserProgress } from '@/lib/services/user-progress-service';
 import { format, isSameDay, isToday, isYesterday } from 'date-fns';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 // Family-friendly universal emojis (30 total) - organized by theme
 const EMOJIS = [
@@ -162,7 +163,7 @@ export default function MessagesPage() {
       setConversations(conversationsData);
 
     } catch (error) {
-      console.error('Failed to load messages:', error);
+      logger.error('Failed to load messages:', error, { component: 'page', action: 'service_call' });
     } finally {
       setLoading(false);
     }
@@ -235,14 +236,14 @@ export default function MessagesPage() {
         const typingData = await messagesService.getTypingUsers(conversationId, user.id);
         setTypingUsers(typingData);
       } catch (error) {
-        console.error('Failed to fetch typing users:', error);
+        logger.error('Failed to fetch typing users:', error, { component: 'page', action: 'service_call' });
       }
     }, 2000);
 
     // Initial fetch
     messagesService.getTypingUsers(conversationId, user.id)
       .then(setTypingUsers)
-      .catch((error) => console.error('Failed to fetch typing users:', error));
+      .catch((error) => logger.error('Failed to fetch typing users', error, { component: 'page', action: 'service_call' }));
 
     return () => {
       clearInterval(pollInterval);
@@ -255,7 +256,7 @@ export default function MessagesPage() {
       if (conversationId && user && typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
         messagesService.removeTypingIndicator(conversationId, user.id).catch((error) => {
-          console.error('Failed to cleanup typing indicator:', error);
+          logger.error('Failed to cleanup typing indicator:', error, { component: 'page', action: 'service_call' });
         });
       }
     };
@@ -285,7 +286,7 @@ export default function MessagesPage() {
       // Real-time subscription will handle adding new messages and confirming edits
       setEditingMessage(null);
     } catch (error) {
-      console.error('Failed to save message:', error);
+      logger.error('Failed to save message:', error, { component: 'page', action: 'service_call' });
 
       // Revert optimistic update on error for edits
       if (editingMessage) {
@@ -313,7 +314,7 @@ export default function MessagesPage() {
     try {
       await messagesService.deleteMessage(messageId);
     } catch (error) {
-      console.error('Failed to delete message:', error);
+      logger.error('Failed to delete message:', error, { component: 'page', action: 'service_call' });
       // Revert optimistic update on error
       loadMessages();
     }
@@ -334,7 +335,7 @@ export default function MessagesPage() {
 
       toast.success('Message pin toggled');
     } catch (error) {
-      console.error('Failed to toggle pin:', error);
+      logger.error('Failed to toggle pin:', error, { component: 'page', action: 'service_call' });
       toast.error('Failed to update pin status');
     }
   }, [user, conversationId]);
@@ -352,7 +353,7 @@ export default function MessagesPage() {
 
       toast.success('Message unpinned');
     } catch (error) {
-      console.error('Failed to unpin:', error);
+      logger.error('Failed to unpin:', error, { component: 'page', action: 'service_call' });
       toast.error('Failed to unpin message');
     }
   }, [conversationId]);
@@ -392,7 +393,7 @@ export default function MessagesPage() {
       typingTimeoutRef.current = null;
     }
     messagesService.removeTypingIndicator(conversationId, user.id).catch((error) => {
-      console.error('Failed to remove typing indicator:', error);
+      logger.error('Failed to remove typing indicator:', error, { component: 'page', action: 'service_call' });
     });
 
     // Create optimistic message
@@ -433,7 +434,7 @@ export default function MessagesPage() {
           currentSpace.id
         );
       } catch (mentionError) {
-        console.error('Failed to process mentions:', mentionError);
+        logger.error('Failed to process mentions', mentionError, { component: 'page', action: 'service_call' });
         // Don't block message sending if mentions fail
       }
 
@@ -461,7 +462,7 @@ export default function MessagesPage() {
     } catch (error) {
       // Remove optimistic message on error
       setMessages((prev) => prev.filter((m) => m.id !== tempId));
-      console.error('Failed to send message:', error);
+      logger.error('Failed to send message:', error, { component: 'page', action: 'service_call' });
       toast.error('Failed to send message', {
         description: 'Please try again',
       });
@@ -512,7 +513,7 @@ export default function MessagesPage() {
         const results = await messagesService.searchMessages(currentSpace.id, query);
         setSearchResults(results);
       } catch (error) {
-        console.error('Search failed:', error);
+        logger.error('Search failed:', error, { component: 'page', action: 'service_call' });
         toast.error('Search failed. Please try again.');
         setSearchResults([]);
       } finally {
@@ -534,14 +535,14 @@ export default function MessagesPage() {
 
       // Send typing indicator
       messagesService.updateTypingIndicator(conversationId, user.id).catch((error) => {
-        console.error('Failed to update typing indicator:', error);
+        logger.error('Failed to update typing indicator:', error, { component: 'page', action: 'service_call' });
       });
 
       // Stop typing after 3 seconds of inactivity
       typingTimeoutRef.current = setTimeout(() => {
         if (conversationId && user) {
           messagesService.removeTypingIndicator(conversationId, user.id).catch((error) => {
-            console.error('Failed to remove typing indicator:', error);
+            logger.error('Failed to remove typing indicator:', error, { component: 'page', action: 'service_call' });
           });
         }
       }, 3000);
@@ -628,7 +629,7 @@ export default function MessagesPage() {
       setShowForwardModal(false);
       setForwardingMessage(null);
     } catch (error) {
-      console.error('Failed to forward message:', error);
+      logger.error('Failed to forward message:', error, { component: 'page', action: 'service_call' });
       toast.error('Failed to forward message');
       throw error;
     }
@@ -665,7 +666,7 @@ export default function MessagesPage() {
         setStats(newStats);
       }
     } catch (error) {
-      console.error('Failed to load conversation:', error);
+      logger.error('Failed to load conversation:', error, { component: 'page', action: 'service_call' });
       toast.error('Failed to load conversation');
     }
   }, [currentSpace]);
@@ -701,7 +702,7 @@ export default function MessagesPage() {
 
       toast.success('Conversation deleted');
     } catch (error) {
-      console.error('Failed to delete conversation:', error);
+      logger.error('Failed to delete conversation:', error, { component: 'page', action: 'service_call' });
       toast.error('Failed to delete conversation');
       // Revert optimistic update on error
       const conversationsData = await messagesService.getConversationsList(currentSpace.id, user.id);
@@ -728,7 +729,7 @@ export default function MessagesPage() {
 
       toast.success('Conversation renamed');
     } catch (error) {
-      console.error('Failed to update conversation title:', error);
+      logger.error('Failed to update conversation title:', error, { component: 'page', action: 'service_call' });
       toast.error('Failed to rename conversation');
       throw error; // Re-throw to let the sidebar handle the error state
     }
@@ -755,7 +756,7 @@ export default function MessagesPage() {
 
       toast.success('Conversation created successfully');
     } catch (error) {
-      console.error('Failed to create conversation:', error);
+      logger.error('Failed to create conversation:', error, { component: 'page', action: 'service_call' });
       toast.error('Failed to create conversation');
       throw error;
     }
@@ -794,7 +795,7 @@ export default function MessagesPage() {
       toast.success('Voice message sent');
       setTimeout(scrollToBottom, 100);
     } catch (error) {
-      console.error('Failed to send voice message:', error);
+      logger.error('Failed to send voice message:', error, { component: 'page', action: 'service_call' });
       toast.error('Failed to send voice message');
       throw error;
     }
@@ -832,7 +833,7 @@ export default function MessagesPage() {
       setEditingConversationTitle(false);
       toast.success('Conversation renamed');
     } catch (error) {
-      console.error('Failed to update conversation title:', error);
+      logger.error('Failed to update conversation title:', error, { component: 'page', action: 'service_call' });
       toast.error('Failed to rename conversation');
       setEditingConversationTitle(false);
     }

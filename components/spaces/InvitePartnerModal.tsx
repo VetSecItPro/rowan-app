@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { X, Mail, UserPlus, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface InvitePartnerModalProps {
   isOpen: boolean;
@@ -67,7 +68,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
       toast.success('Invitation sent successfully');
       setInvitationUrl(result.data.invitation_url);
     } catch (error) {
-      console.error('Error sending invitation:', error);
+      logger.error('Error sending invitation:', error, { component: 'InvitePartnerModal', action: 'component_action' });
       toast.error(error instanceof Error ? error.message : 'Failed to send invitation');
     } finally {
       setLoading(false);

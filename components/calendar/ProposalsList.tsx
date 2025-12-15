@@ -5,6 +5,7 @@ import { Calendar, Sparkles, MessageSquarePlus } from 'lucide-react';
 import { EventProposal, eventProposalsService } from '@/lib/services/event-proposals-service';
 import { ProposalCard } from './ProposalCard';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface ProposalsListProps {
   spaceId: string;
@@ -29,7 +30,7 @@ export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, on
       const data = await eventProposalsService.getProposals(spaceId, statusFilter);
       setProposals(data);
     } catch (error) {
-      console.error('Failed to load proposals:', error);
+      logger.error('Failed to load proposals:', error, { component: 'ProposalsList', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -83,7 +84,7 @@ export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, on
       }
       await loadProposals();
     } catch (error) {
-      console.error('Failed to approve proposal:', error);
+      logger.error('Failed to approve proposal:', error, { component: 'ProposalsList', action: 'component_action' });
     }
   };
 
@@ -95,7 +96,7 @@ export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, on
       }
       await loadProposals();
     } catch (error) {
-      console.error('Failed to reject proposal:', error);
+      logger.error('Failed to reject proposal:', error, { component: 'ProposalsList', action: 'component_action' });
     }
   };
 

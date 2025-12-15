@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { feedbackService } from '@/lib/services/feedback-service';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export async function DELETE(
   request: NextRequest,
@@ -56,7 +57,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error('Error in feedback delete API:', error);
+    logger.error('Error in feedback delete API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { success: false, error: error.message || 'Internal server error' },
       { status: 500 }

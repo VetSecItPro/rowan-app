@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect, ReactNode } from 'react';
 import { Loader2 } from 'lucide-react';
 import { hapticLight } from '@/lib/utils/haptics';
+import { logger } from '@/lib/logger';
 
 interface PullToRefreshProps {
   onRefresh: () => Promise<void>;
@@ -65,7 +66,7 @@ export function PullToRefresh({ onRefresh, children, disabled = false }: PullToR
         try {
           await onRefresh();
         } catch (error) {
-          console.error('Refresh failed:', error);
+          logger.error('Refresh failed:', error, { component: 'PullToRefresh', action: 'component_action' });
         } finally {
           setIsRefreshing(false);
         }

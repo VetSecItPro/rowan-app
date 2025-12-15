@@ -7,6 +7,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Trash2, RefreshCw, AlertTriangle, Check, X, Archive, RotateCcw, ExternalLink, Calendar, Filter } from 'lucide-react';
 import { calendarService, CalendarEvent } from '@/lib/services/calendar-service';
 import { format, parseISO } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 interface BulkEventManagerProps {
   isOpen: boolean;
@@ -83,7 +84,7 @@ export function BulkEventManager({
       const deleted = await calendarService.getDeletedEvents(spaceId);
       setDeletedEvents(deleted);
     } catch (error) {
-      console.error('Failed to load deleted events:', error);
+      logger.error('Failed to load deleted events:', error, { component: 'BulkEventManager', action: 'component_action' });
     } finally {
       setLoadingDeleted(false);
     }

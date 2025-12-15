@@ -3,6 +3,8 @@
  * Provides tactile feedback for better UX on touch devices
  */
 
+import { logger } from '@/lib/logger';
+
 export type HapticFeedbackType = 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' | 'selection';
 
 interface HapticPattern {
@@ -52,7 +54,7 @@ export function triggerHaptic(type: HapticFeedbackType = 'light'): void {
     try {
       navigator.vibrate(pattern.vibrate);
     } catch (error) {
-      console.warn('Haptic feedback failed:', error);
+      logger.warn('Haptic feedback failed:', { component: 'lib-haptics', error: error });
     }
   }
 }

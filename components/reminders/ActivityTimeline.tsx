@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { logger } from '@/lib/logger';
 import {
   Plus,
   Edit,
@@ -62,7 +63,7 @@ export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelin
         const data = await reminderActivityService.getActivityLog(reminderId);
         setActivities(data);
       } catch (error) {
-        console.error('Error fetching activity log:', error);
+        logger.error('Error fetching activity log:', error, { component: 'ActivityTimeline', action: 'component_action' });
       } finally {
         setLoading(false);
       }

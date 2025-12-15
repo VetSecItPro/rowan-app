@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (!rapidApiKey) {
-      console.error('RapidAPI key not configured');
+      logger.error('RapidAPI key not configured', undefined, { component: 'api-route', action: 'api_request' });
       return NextResponse.json([]);
     }
 
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
     );
 
     if (!response.ok) {
-      console.error('Tasty API search failed:', response.statusText);
+      logger.error('Tasty API search failed:', undefined, { component: 'api-route', action: 'api_request', details: response.statusText });
       return NextResponse.json([]);
     }
 
@@ -99,7 +100,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(recipes);
   } catch (error) {
-    console.error('Tasty search API error:', error);
+    logger.error('Tasty search API error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to search recipes' },
       { status: 500 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { logger } from '@/lib/logger';
 import {
   DocumentTextIcon,
   CalendarIcon,
@@ -48,7 +49,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
       const blob = await downloadReportPDF(report.id);
       // The function already handles the download automatically
     } catch (error) {
-      console.error('Error downloading report:', error);
+      logger.error('Error downloading report:', error, { component: 'ReportLibrary', action: 'component_action' });
     } finally {
       setLoading(null);
     }
@@ -62,7 +63,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
       await deleteReport(report.id);
       onReportUpdated();
     } catch (error) {
-      console.error('Error deleting report:', error);
+      logger.error('Error deleting report:', error, { component: 'ReportLibrary', action: 'component_action' });
     } finally {
       setLoading(null);
     }
@@ -73,7 +74,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
       await toggleReportFavorite(report.id);
       onReportUpdated();
     } catch (error) {
-      console.error('Error toggling favorite:', error);
+      logger.error('Error toggling favorite:', error, { component: 'ReportLibrary', action: 'component_action' });
     }
   };
 

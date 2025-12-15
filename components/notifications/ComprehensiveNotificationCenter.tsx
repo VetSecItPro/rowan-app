@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Bell, Check, Trash2, X, Filter, CheckCircle2, Circle, DollarSign } from 'lucide-react';
+import { logger } from '@/lib/logger';
 import {
   inAppNotificationsService,
   type InAppNotification,
@@ -48,7 +49,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
       const count = await inAppNotificationsService.getUnreadCount(userId);
       setUnreadCount(count);
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      logger.error('Error fetching notifications:', error, { component: 'ComprehensiveNotificationCenter', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -91,7 +92,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
         await fetchNotifications();
       }
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      logger.error('Error marking notification as read:', error, { component: 'ComprehensiveNotificationCenter', action: 'component_action' });
     }
   };
 
@@ -103,7 +104,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
         await fetchNotifications();
       }
     } catch (error) {
-      console.error('Error marking all notifications as read:', error);
+      logger.error('Error marking all notifications as read:', error, { component: 'ComprehensiveNotificationCenter', action: 'component_action' });
     }
   };
 
@@ -115,7 +116,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
         await fetchNotifications();
       }
     } catch (error) {
-      console.error('Error deleting notification:', error);
+      logger.error('Error deleting notification:', error, { component: 'ComprehensiveNotificationCenter', action: 'component_action' });
     }
   };
 
@@ -124,7 +125,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
     // Get bill ID from related_item_id or metadata
     const billId = notification.related_item_id || notification.metadata?.billId;
     if (!billId) {
-      console.error('No bill ID found in notification');
+      logger.error('No bill ID found in notification', undefined, { component: 'ComprehensiveNotificationCenter', action: 'component_action' });
       return;
     }
 
@@ -137,7 +138,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
       // Refresh notifications
       await fetchNotifications();
     } catch (error) {
-      console.error('Error marking bill as paid:', error);
+      logger.error('Error marking bill as paid:', error, { component: 'ComprehensiveNotificationCenter', action: 'component_action' });
       alert('Failed to mark bill as paid. Please try again.');
     }
   };

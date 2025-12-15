@@ -11,6 +11,7 @@ import { useAuth } from '@/lib/contexts/auth-context';
 import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { RestoreAccountModal } from '@/components/settings/RestoreAccountModal';
 import { useValidatedSearchParams, LoginParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
+import { logger } from '@/lib/logger';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -81,7 +82,7 @@ export default function LoginPage() {
             }, 500);
           }
         } catch (checkError) {
-          console.error('Error checking deletion status:', checkError);
+          logger.error('Error checking deletion status:', checkError, { component: 'page', action: 'execution' });
           // If check fails, proceed to dashboard anyway (don't block login)
           setTimeout(() => {
             window.location.href = '/dashboard';

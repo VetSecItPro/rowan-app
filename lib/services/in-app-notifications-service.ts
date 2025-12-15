@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 // Comprehensive notification types
 export type NotificationType =
@@ -110,13 +111,13 @@ export class InAppNotificationsService {
       const { data, error } = await query;
 
       if (error) {
-        console.error('Error fetching notifications:', error);
+        logger.error('Error fetching notifications:', error, { component: 'lib-in-app-notifications-service', action: 'service_call' });
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error('Error in getUserNotifications:', error);
+      logger.error('Error in getUserNotifications:', error, { component: 'lib-in-app-notifications-service', action: 'service_call' });
       return [];
     }
   }
@@ -133,13 +134,13 @@ export class InAppNotificationsService {
         .eq('is_read', false);
 
       if (error) {
-        console.error('Error getting unread count:', error);
+        logger.error('Error getting unread count:', error, { component: 'lib-in-app-notifications-service', action: 'service_call' });
         return 0;
       }
 
       return count || 0;
     } catch (error) {
-      console.error('Error in getUnreadCount:', error);
+      logger.error('Error in getUnreadCount:', error, { component: 'lib-in-app-notifications-service', action: 'service_call' });
       return 0;
     }
   }
@@ -156,7 +157,7 @@ export class InAppNotificationsService {
         .eq('is_read', false);
 
       if (error) {
-        console.error('Error getting unread count by type:', error);
+        logger.error('Error getting unread count by type:', error, { component: 'lib-in-app-notifications-service', action: 'service_call' });
         return {} as Record<NotificationType, number>;
       }
 
@@ -167,7 +168,7 @@ export class InAppNotificationsService {
 
       return counts as Record<NotificationType, number>;
     } catch (error) {
-      console.error('Error in getUnreadCountByType:', error);
+      logger.error('Error in getUnreadCountByType:', error, { component: 'lib-in-app-notifications-service', action: 'service_call' });
       return {} as Record<NotificationType, number>;
     }
   }
@@ -189,13 +190,13 @@ export class InAppNotificationsService {
         .insert([notification]);
 
       if (error) {
-        console.error('Error creating notification:', error);
+        logger.error('Error creating notification:', error, { component: 'lib-in-app-notifications-service', action: 'service_call' });
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Error in createNotification:', error);
+      logger.error('Error in createNotification:', error, { component: 'lib-in-app-notifications-service', action: 'service_call' });
       return false;
     }
   }
@@ -214,13 +215,13 @@ export class InAppNotificationsService {
         .eq('id', notificationId);
 
       if (error) {
-        console.error('Error marking notification as read:', error);
+        logger.error('Error marking notification as read:', error, { component: 'lib-in-app-notifications-service', action: 'service_call' });
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Error in markAsRead:', error);
+      logger.error('Error in markAsRead:', error, { component: 'lib-in-app-notifications-service', action: 'service_call' });
       return false;
     }
   }
@@ -240,13 +241,13 @@ export class InAppNotificationsService {
         .eq('is_read', false);
 
       if (error) {
-        console.error('Error marking all notifications as read:', error);
+        logger.error('Error marking all notifications as read:', error, { component: 'lib-in-app-notifications-service', action: 'service_call' });
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Error in markAllAsRead:', error);
+      logger.error('Error in markAllAsRead:', error, { component: 'lib-in-app-notifications-service', action: 'service_call' });
       return false;
     }
   }
@@ -262,13 +263,13 @@ export class InAppNotificationsService {
         .eq('id', notificationId);
 
       if (error) {
-        console.error('Error deleting notification:', error);
+        logger.error('Error deleting notification:', error, { component: 'lib-in-app-notifications-service', action: 'service_call' });
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Error in deleteNotification:', error);
+      logger.error('Error in deleteNotification:', error, { component: 'lib-in-app-notifications-service', action: 'service_call' });
       return false;
     }
   }
@@ -285,13 +286,13 @@ export class InAppNotificationsService {
         .eq('is_read', true);
 
       if (error) {
-        console.error('Error deleting read notifications:', error);
+        logger.error('Error deleting read notifications:', error, { component: 'lib-in-app-notifications-service', action: 'service_call' });
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Error in deleteAllRead:', error);
+      logger.error('Error in deleteAllRead:', error, { component: 'lib-in-app-notifications-service', action: 'service_call' });
       return false;
     }
   }

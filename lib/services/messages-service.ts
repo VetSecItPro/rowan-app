@@ -3,6 +3,7 @@ import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supab
 import { FileUploadResult } from './file-upload-service';
 import { enhancedNotificationService } from './enhanced-notification-service';
 import { sanitizeSearchInput } from '@/lib/utils/input-sanitization';
+import { logger } from '@/lib/logger';
 
 export interface Message {
   id: string;
@@ -215,11 +216,11 @@ export const messagesService = {
                 spaceName: spaceData?.name || 'Your Space',
                 messageUrl: `${process.env.NEXT_PUBLIC_APP_URL}/messages/${input.conversation_id}?space_id=${input.space_id}`,
               }
-            ).catch(console.error);
+            ).catch((error) => logger.error('Caught error', error, { component: 'lib-messages-service', action: 'service_call' }));
           }
         }
       } catch (error) {
-        console.error('Failed to send message notification:', error);
+        logger.error('Failed to send message notification:', error, { component: 'lib-messages-service', action: 'service_call' });
         // Don't throw here - message creation should succeed even if notification fails
       }
     }
@@ -263,7 +264,7 @@ export const messagesService = {
       .single();
 
     if (fetchError || !message) {
-      console.error('Failed to fetch message:', fetchError);
+      logger.error('Failed to fetch message:', fetchError, { component: 'lib-messages-service', action: 'service_call' });
       return null;
     }
 
@@ -278,7 +279,7 @@ export const messagesService = {
       .single();
 
     if (refetchError) {
-      console.error('Failed to refetch message:', refetchError);
+      logger.error('Failed to refetch message:', refetchError, { component: 'lib-messages-service', action: 'service_call' });
       return null;
     }
 
@@ -297,7 +298,7 @@ export const messagesService = {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('Failed to mark conversation as read:', errorData);
+      logger.error('Failed to mark conversation as read:', errorData, { component: 'lib-messages-service', action: 'service_call' });
       throw new Error(errorData.error || 'Failed to mark conversation as read');
     }
 
@@ -705,7 +706,7 @@ export const messagesService = {
       .single();
 
     if (error) {
-      console.error('Error pinning message:', error);
+      logger.error('Error pinning message:', error, { component: 'lib-messages-service', action: 'service_call' });
       throw error;
     }
 
@@ -730,7 +731,7 @@ export const messagesService = {
       .single();
 
     if (error) {
-      console.error('Error unpinning message:', error);
+      logger.error('Error unpinning message:', error, { component: 'lib-messages-service', action: 'service_call' });
       throw error;
     }
 
@@ -754,7 +755,7 @@ export const messagesService = {
       .order('pinned_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching pinned messages:', error);
+      logger.error('Error fetching pinned messages:', error, { component: 'lib-messages-service', action: 'service_call' });
       throw error;
     }
 
@@ -775,7 +776,7 @@ export const messagesService = {
       .single();
 
     if (fetchError) {
-      console.error('Error fetching message:', fetchError);
+      logger.error('Error fetching message:', fetchError, { component: 'lib-messages-service', action: 'service_call' });
       throw fetchError;
     }
 
@@ -805,7 +806,7 @@ export const messagesService = {
       .order('last_message_at', { ascending: false, nullsFirst: false });
 
     if (conversationsError) {
-      console.error('Error fetching conversations:', conversationsError);
+      logger.error('Error fetching conversations:', conversationsError, { component: 'lib-messages-service', action: 'service_call' });
       throw conversationsError;
     }
 
@@ -856,7 +857,7 @@ export const messagesService = {
       .single();
 
     if (error) {
-      console.error('Error creating conversation:', error);
+      logger.error('Error creating conversation:', error, { component: 'lib-messages-service', action: 'service_call' });
       throw error;
     }
 
@@ -876,7 +877,7 @@ export const messagesService = {
       .single();
 
     if (error) {
-      console.error('Error fetching conversation:', error);
+      logger.error('Error fetching conversation:', error, { component: 'lib-messages-service', action: 'service_call' });
       return null;
     }
 
@@ -903,7 +904,7 @@ export const messagesService = {
       .single();
 
     if (error) {
-      console.error('Error updating conversation:', error);
+      logger.error('Error updating conversation:', error, { component: 'lib-messages-service', action: 'service_call' });
       throw error;
     }
 
@@ -927,7 +928,7 @@ export const messagesService = {
       .single();
 
     if (error) {
-      console.error('Error archiving conversation:', error);
+      logger.error('Error archiving conversation:', error, { component: 'lib-messages-service', action: 'service_call' });
       throw error;
     }
 
@@ -951,7 +952,7 @@ export const messagesService = {
       .single();
 
     if (error) {
-      console.error('Error unarchiving conversation:', error);
+      logger.error('Error unarchiving conversation:', error, { component: 'lib-messages-service', action: 'service_call' });
       throw error;
     }
 
@@ -970,7 +971,7 @@ export const messagesService = {
       .eq('id', conversationId);
 
     if (error) {
-      console.error('Error deleting conversation:', error);
+      logger.error('Error deleting conversation:', error, { component: 'lib-messages-service', action: 'service_call' });
       throw error;
     }
   },

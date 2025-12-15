@@ -6,6 +6,7 @@ import { X, BarChart3, TrendingUp, Eye, MousePointer, CheckCircle } from 'lucide
 import { smartNudgesService } from '@/lib/services/smart-nudges-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface NudgeAnalyticsProps {
   isOpen: boolean;
@@ -48,7 +49,7 @@ export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
       );
       setAnalytics(data);
     } catch (error) {
-      console.error('Failed to load analytics:', error);
+      logger.error('Failed to load analytics:', error, { component: 'NudgeAnalytics', action: 'component_action' });
       toast.error('Failed to load analytics');
     } finally {
       setLoading(false);

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
+import { logger } from '@/lib/logger';
 import {
   MessageSquare,
   Eye,
@@ -40,7 +41,7 @@ export default function MyFeedbackPage() {
         setFeedback(data.data || []);
       }
     } catch (error) {
-      console.error('Error loading feedback:', error);
+      logger.error('Error loading feedback:', error, { component: 'page', action: 'execution' });
       toast.error('Failed to load your feedback');
     } finally {
       setLoading(false);
@@ -66,7 +67,7 @@ export default function MyFeedbackPage() {
         toast.error('Failed to delete feedback');
       }
     } catch (error) {
-      console.error('Error deleting feedback:', error);
+      logger.error('Error deleting feedback:', error, { component: 'page', action: 'execution' });
       toast.error('Failed to delete feedback');
     }
   };

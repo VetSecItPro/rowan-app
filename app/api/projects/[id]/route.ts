@@ -6,15 +6,14 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { verifyResourceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/projects/[id]
  * Get a single project by ID
  */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
@@ -80,7 +79,7 @@ export async function GET(
       data: project,
     });
   } catch (error) {
-    console.error('[API] /api/projects/[id] GET error:', error);
+    logger.error('[API] /api/projects/[id] GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -92,10 +91,8 @@ export async function GET(
  * PATCH /api/projects/[id]
  * Update a project
  */
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
@@ -165,7 +162,7 @@ export async function PATCH(
       data: project,
     });
   } catch (error) {
-    console.error('[API] /api/projects/[id] PATCH error:', error);
+    logger.error('[API] /api/projects/[id] PATCH error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to update project' },
       { status: 500 }
@@ -177,10 +174,8 @@ export async function PATCH(
  * DELETE /api/projects/[id]
  * Delete a project
  */
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
@@ -239,7 +234,7 @@ export async function DELETE(
       message: 'Project deleted successfully',
     });
   } catch (error) {
-    console.error('[API] /api/projects/[id] DELETE error:', error);
+    logger.error('[API] /api/projects/[id] DELETE error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to delete project' },
       { status: 500 }

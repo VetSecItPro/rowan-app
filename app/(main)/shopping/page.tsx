@@ -10,6 +10,7 @@ import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { logger } from '@/lib/logger';
 // Lazy-loaded components for better initial page load
 import {
   LazyNewShoppingListModal,
@@ -110,7 +111,7 @@ export default function ShoppingPage() {
       setStats(statsData);
 
     } catch (error) {
-      console.error('Failed to load shopping lists:', error);
+      logger.error('Failed to load shopping lists:', error, { component: 'page', action: 'execution' });
     } finally {
       setLoading(false);
     }
@@ -212,7 +213,7 @@ export default function ShoppingPage() {
 
       setEditingList(null);
     } catch (error) {
-      console.error('Failed to save list:', error);
+      logger.error('Failed to save list:', error, { component: 'page', action: 'execution' });
       alert('Failed to save shopping list. Please try again.');
     }
   }, [editingList, setLists, user]);
@@ -239,7 +240,7 @@ export default function ShoppingPage() {
       await shoppingService.deleteList(listId);
       // Success - already removed from UI
     } catch (error) {
-      console.error('Failed to delete list:', error);
+      logger.error('Failed to delete list:', error, { component: 'page', action: 'execution' });
       // Revert on error - reload lists to restore deleted item
       loadLists();
     }
@@ -271,7 +272,7 @@ export default function ShoppingPage() {
       // Mark as completed in database (keep for history/productivity tracking)
       await shoppingService.updateList(listId, { status: 'completed' });
     } catch (error) {
-      console.error('Failed to complete list:', error);
+      logger.error('Failed to complete list:', error, { component: 'page', action: 'execution' });
       // Revert on error
       loadLists();
     }
@@ -308,7 +309,7 @@ export default function ShoppingPage() {
         }
       }
     } catch (error) {
-      console.error('Failed to toggle item:', error);
+      logger.error('Failed to toggle item:', error, { component: 'page', action: 'execution' });
       // Revert on error
       loadLists();
     }
@@ -329,7 +330,7 @@ export default function ShoppingPage() {
     try {
       await shoppingService.updateItem(itemId, { quantity: newQuantity } as any);
     } catch (error) {
-      console.error('Failed to update quantity:', error);
+      logger.error('Failed to update quantity:', error, { component: 'page', action: 'execution' });
       // Revert on error
       loadLists();
     }
@@ -417,7 +418,7 @@ export default function ShoppingPage() {
       await shoppingService.createListFromTemplate(templateId, currentSpace.id);
       loadLists();
     } catch (error) {
-      console.error('Failed to create list from template:', error);
+      logger.error('Failed to create list from template:', error, { component: 'page', action: 'execution' });
       throw error;
     }
   }, [currentSpace]);
@@ -505,7 +506,7 @@ export default function ShoppingPage() {
       setShowTemplateModal(false);
       setListForTemplate(null);
     } catch (error) {
-      console.error('Failed to save template:', error);
+      logger.error('Failed to save template:', error, { component: 'page', action: 'execution' });
       throw error;
     }
   }, [currentSpace, listForTemplate]);
@@ -529,19 +530,19 @@ export default function ShoppingPage() {
     reminderMinutes?: number;
   }) => {
     if (!currentSpace || !listToSchedule) {
-      console.error('Missing required data: currentSpace or listToSchedule');
+      logger.error('Missing required data: currentSpace or listToSchedule', undefined, { component: 'page', action: 'execution' });
       alert('Unable to schedule trip. Please try again.');
       return;
     }
 
     try {
-      console.log('Starting trip scheduling...', { eventData, listId: listToSchedule.id });
+      logger.info('Starting trip scheduling...', { component: 'page', data: { eventData, listId: listToSchedule.id } });
 
       // Combine date and time into a proper datetime
       const startDateTime = new Date(`${eventData.date}T${eventData.time}`);
       const endDateTime = new Date(startDateTime.getTime() + eventData.duration * 60000);
 
-      console.log('Creating calendar event...');
+      logger.info('Creating calendar event...', { component: 'page' });
 
       // First, create the calendar event
       const calendarEvent = await calendarService.createEvent({
@@ -554,12 +555,12 @@ export default function ShoppingPage() {
         location: listToSchedule.store_name || undefined,
       });
 
-      console.log('Calendar event created:', calendarEvent.id);
+      logger.info('Calendar event created:', { component: 'page', data: calendarEvent.id });
 
       // Create a reminder if reminderMinutes is specified
       let reminder = null;
       if (eventData.reminderMinutes && eventData.reminderMinutes > 0) {
-        console.log('Creating reminder...');
+        logger.info('Creating reminder...', { component: 'page' });
 
         // Calculate reminder time (event start time minus reminder minutes)
         const reminderTime = new Date(startDateTime.getTime() - eventData.reminderMinutes * 60000);
@@ -577,7 +578,7 @@ export default function ShoppingPage() {
           status: 'active',
         });
 
-        console.log('Reminder created:', reminder.id);
+        logger.info('Reminder created:', { component: 'page', data: reminder.id });
 
         // Link the reminder to the shopping list
         await shoppingIntegrationService.linkToReminder(
@@ -587,25 +588,25 @@ export default function ShoppingPage() {
           'time'
         );
 
-        console.log('Reminder linked to shopping list');
+        logger.info('Reminder linked to shopping list', { component: 'page' });
       }
 
       // Link the shopping list to the calendar event
-      console.log('Linking calendar event to shopping list...');
+      logger.info('Linking calendar event to shopping list...', { component: 'page' });
       await shoppingIntegrationService.linkToCalendar(
         listToSchedule.id,
         calendarEvent.id,
         eventData.reminderMinutes
       );
 
-      console.log('Trip scheduling completed successfully');
+      logger.info('Trip scheduling completed successfully', { component: 'page' });
 
       // Show success message
       alert(`Shopping trip scheduled for ${eventData.date} at ${eventData.time}!`);
       setShowScheduleTripModal(false);
       setListToSchedule(null);
     } catch (error) {
-      console.error('Failed to schedule trip:', error);
+      logger.error('Failed to schedule trip:', error, { component: 'page', action: 'execution' });
       let errorMessage = 'Failed to schedule shopping trip. ';
 
       if (error instanceof Error) {
@@ -654,7 +655,7 @@ export default function ShoppingPage() {
       // Show success message
       alert(`Task created: ${task.title}`);
     } catch (error) {
-      console.error('Failed to create task:', error);
+      logger.error('Failed to create task:', error, { component: 'page', action: 'execution' });
       alert('Failed to create task. Please try again.');
     }
   }, [currentSpace]);
@@ -687,7 +688,7 @@ export default function ShoppingPage() {
       // Reload lists to show the update
       await loadLists();
     } catch (error) {
-      console.error('Failed to add frequent item:', error);
+      logger.error('Failed to add frequent item:', error, { component: 'page', action: 'execution' });
     }
   }, [currentSpace, lists]);
 

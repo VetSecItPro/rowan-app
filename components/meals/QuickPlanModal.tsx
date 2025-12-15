@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X, Sunrise, Sun, Moon, Cookie, ShoppingCart, Calendar, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 interface QuickPlanModalProps {
   isOpen: boolean;
@@ -30,7 +31,7 @@ export function QuickPlanModal({ isOpen, onClose, onPlan, recipeName }: QuickPla
       await onPlan(selectedDate, selectedMealType, createShoppingList);
       onClose();
     } catch (error) {
-      console.error('Failed to plan meal:', error);
+      logger.error('Failed to plan meal:', error, { component: 'QuickPlanModal', action: 'component_action' });
     } finally {
       setIsPlanning(false);
     }

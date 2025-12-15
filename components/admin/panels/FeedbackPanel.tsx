@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useEffect, memo } from 'react';
+import { useState, memo, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { logger } from '@/lib/logger';
 import {
   MessageSquare,
   Bug,
@@ -50,28 +52,27 @@ const getStatusBadge = (status: FeedbackStatus) => {
 };
 
 export const FeedbackPanel = memo(function FeedbackPanel() {
-  const [feedback, setFeedback] = useState<FeedbackSubmission[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'new' | 'in_progress'>('all');
+  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
 
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch('/api/admin/feedback');
-      if (response.ok) {
-        const data = await response.json();
-        setFeedback(data.data || []);
-      }
-    } catch (error) {
-      console.error('Failed to fetch feedback:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // React Query for feedback with caching
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['admin-feedback', timeRange],
+    queryFn: async () => {
+      const response = await fetch(`/api/admin/feedback?range=${timeRange}`);
+      if (!response.ok) throw new Error('Failed to fetch feedback');
+      const result = await response.json();
+      return result.data || [];
+    },
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const feedback: FeedbackSubmission[] = data || [];
+
+  const fetchData = useCallback(() => {
+    refetch();
+  }, [refetch]);
 
   const updateStatus = async (id: string, status: FeedbackStatus) => {
     try {
@@ -84,7 +85,7 @@ export const FeedbackPanel = memo(function FeedbackPanel() {
         fetchData();
       }
     } catch (error) {
-      console.error('Failed to update status:', error);
+      logger.error('Failed to update status:', error, { component: 'FeedbackPanel', action: 'component_action' });
     }
   };
 
@@ -113,7 +114,7 @@ export const FeedbackPanel = memo(function FeedbackPanel() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex-1 flex flex-col space-y-4 min-h-0">
       {/* Stats Row */}
       <div className="grid grid-cols-5 gap-3">
         <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-center">
@@ -139,7 +140,7 @@ export const FeedbackPanel = memo(function FeedbackPanel() {
       </div>
 
       {/* Filter Row */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-gray-400" />
           {(['all', 'new', 'in_progress'] as const).map((f) => (
@@ -156,18 +157,35 @@ export const FeedbackPanel = memo(function FeedbackPanel() {
             </button>
           ))}
         </div>
-        <button
-          onClick={fetchData}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Time Range Filter */}
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
+            {(['7d', '30d', '90d'] as const).map((range) => (
+              <button
+                key={range}
+                onClick={() => setTimeRange(range)}
+                className={`px-2 py-1 text-xs font-medium rounded-md transition-colors ${
+                  timeRange === range
+                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                {range === '7d' ? '7d' : range === '30d' ? '30d' : '90d'}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={fetchData}
+            className="flex items-center gap-1.5 px-2 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Feedback List */}
-      <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-        <div className="max-h-[350px] overflow-y-auto divide-y divide-gray-200 dark:divide-gray-700">
+      <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden flex-1 flex flex-col min-h-0">
+        <div className="flex-1 overflow-y-auto min-h-0 divide-y divide-gray-200 dark:divide-gray-700">
           {filteredFeedback.length > 0 ? (
             filteredFeedback.slice(0, 10).map((item) => (
               <div key={item.id} className="p-3 hover:bg-gray-50 dark:hover:bg-gray-800/50">

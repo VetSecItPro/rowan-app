@@ -8,6 +8,7 @@ import { z } from 'zod';
 import type { ICSFeedConfig } from '@/lib/types/calendar-integration';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 // Validation schema for Cozi connection
 const CoziConnectSchema = z.object({
@@ -66,10 +67,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify user has access to the space
-    console.log('[Cozi Connect] Checking space access:', {
+    logger.info('[Cozi Connect] Checking space access:', { component: 'api-route', data: {
       space_id: validatedData.space_id,
       user_id: user.id,
-    });
+    } });
 
     const { data: spaceMember, error: spaceError } = await supabase
       .from('space_members')
@@ -79,22 +80,22 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (spaceError || !spaceMember) {
-      console.error('[Cozi Connect] Space access denied:', {
+      logger.error('[Cozi Connect] Space access denied:', undefined, { component: 'api-route', action: 'api_request', details: {
         spaceError,
         spaceMember,
         space_id: validatedData.space_id,
         user_id: user.id,
-      });
+      } });
       return NextResponse.json(
         { error: 'Space not found or access denied' },
         { status: 403 }
       );
     }
 
-    console.log('[Cozi Connect] Space access confirmed:', spaceMember);
+    logger.info('[Cozi Connect] Space access confirmed:', { component: 'api-route', data: spaceMember });
 
     // Test the Cozi ICS feed before creating connection
-    console.log('[Cozi Connect] Testing Cozi feed:', urlValidation.normalizedUrl);
+    logger.info('[Cozi Connect] Testing Cozi feed:', { component: 'api-route', data: urlValidation.normalizedUrl });
     const testResult = await icsImportService.testICSFeed(urlValidation.normalizedUrl);
 
     if (!testResult.success) {
@@ -108,10 +109,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('[Cozi Connect] Feed test passed:', {
+    logger.info('[Cozi Connect] Feed test passed:', { component: 'api-route', data: {
       eventCount: testResult.eventCount,
       calendarName: testResult.calendarName,
-    });
+    } });
 
     // Check for existing active Cozi connection
     const { data: existingConnection } = await supabase
@@ -173,14 +174,14 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (connectionError) {
-      console.error('[Cozi Connect] Failed to create connection:', connectionError);
+      logger.error('[Cozi Connect] Failed to create connection:', connectionError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: 'Failed to create calendar connection' },
         { status: 500 }
       );
     }
 
-    console.log('[Cozi Connect] Connection created:', connection.id);
+    logger.info('[Cozi Connect] Connection created:', { component: 'api-route', data: connection.id });
 
     // Log successful connection
     await supabase.from('calendar_sync_logs').insert({
@@ -197,7 +198,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Trigger initial sync using the ICS service (works for Cozi too)
-    console.log('[Cozi Connect] Triggering initial sync...');
+    logger.info('[Cozi Connect] Triggering initial sync...', { component: 'api-route' });
     const syncResult = await icsImportService.syncICSFeed(connection.id, true);
 
     return NextResponse.json({
@@ -212,7 +213,7 @@ export async function POST(request: NextRequest) {
       message: `Successfully connected Cozi calendar with ${testResult.eventCount} events`,
     });
   } catch (error) {
-    console.error('[Cozi Connect] Error:', error);
+    logger.error('[Cozi Connect] Error:', error, { component: 'api-route', action: 'api_request' });
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -282,7 +283,7 @@ export async function GET(request: NextRequest) {
       connections: connections || [],
     });
   } catch (error) {
-    console.error('[Cozi Connect] Failed to get connections:', error);
+    logger.error('[Cozi Connect] Failed to get connections:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to fetch Cozi connections' },
       { status: 500 }
@@ -370,7 +371,7 @@ export async function DELETE(request: NextRequest) {
       message: 'Cozi calendar disconnected successfully',
     });
   } catch (error) {
-    console.error('[Cozi Connect] Delete error:', error);
+    logger.error('[Cozi Connect] Delete error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to disconnect Cozi calendar' },
       { status: 500 }

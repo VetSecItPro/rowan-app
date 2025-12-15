@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import { useAuth } from './useAuth';
+import { logger } from '@/lib/logger';
 
 /**
  * Hook to check if the current user is an admin
@@ -34,7 +35,7 @@ export function useAdmin() {
         const { data, error } = await supabase.rpc('is_admin');
 
         if (error) {
-          console.error('Error checking admin status:', error);
+          logger.error('Error checking admin status:', error, { component: 'hook-useAdmin', action: 'hook_execution' });
           setIsAdmin(false);
         } else {
           setIsAdmin(data === true);

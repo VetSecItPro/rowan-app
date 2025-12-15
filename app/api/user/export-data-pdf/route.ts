@@ -5,6 +5,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -208,7 +209,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('PDF export error:', error);
+    logger.error('PDF export error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to generate PDF export' },
       { status: 500 }

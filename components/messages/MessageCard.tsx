@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { AttachmentPreview } from './AttachmentPreview';
 import { ReactionPicker } from './ReactionPicker';
 import { MentionHighlight } from './MentionHighlight';
+import { logger } from '@/lib/logger';
 // Simple text sanitization to prevent XSS (avoid DOMPurify during build)
 const stripTags = (str: string) => str.replace(/<[^>]*>/g, '').trim();
 
@@ -71,7 +72,7 @@ export function MessageCard({
         const reactionsData = await messagesService.getMessageReactions(message.id, currentUserId);
         setReactions(reactionsData);
       } catch (error) {
-        console.error('Failed to load reactions:', error);
+        logger.error('Failed to load reactions:', error, { component: 'MessageCard', action: 'component_action' });
       }
     }
 
@@ -89,7 +90,7 @@ export function MessageCard({
       const reactionsData = await messagesService.getMessageReactions(message.id, currentUserId);
       setReactions(reactionsData);
     } catch (error) {
-      console.error('Failed to add reaction:', error);
+      logger.error('Failed to add reaction:', error, { component: 'MessageCard', action: 'component_action' });
     } finally {
       setLoadingReaction(false);
     }

@@ -6,6 +6,7 @@ import { activityFeedService, type ActivityItem } from '@/lib/services/activity-
 import { createClient } from '@/lib/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
+import { logger } from '@/lib/logger';
 
 interface ActivityFeedProps {
   spaceId: string;
@@ -43,7 +44,7 @@ export function ActivityFeed({ spaceId, limit = 50 }: ActivityFeedProps) {
       const data = await activityFeedService.getRecentActivities(spaceId, limit);
       setActivities(data);
     } catch (error) {
-      console.error('Failed to load activities:', error);
+      logger.error('Failed to load activities:', error, { component: 'ActivityFeed', action: 'component_action' });
     } finally {
       setLoading(false);
     }

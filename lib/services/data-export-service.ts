@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 /**
  * Comprehensive Data Export Service
@@ -210,7 +211,7 @@ export async function exportAllUserData(userId: string): Promise<ExportResult> {
 
     return { success: true, data: exportData };
   } catch (error) {
-    console.error('Error exporting user data:', error);
+    logger.error('Error exporting user data:', error, { component: 'lib-data-export-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to export data'

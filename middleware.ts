@@ -1,9 +1,28 @@
+/**
+ * Next.js Edge Middleware
+ *
+ * SECURITY LAYER: Authentication, Authorization, CSRF Protection, Security Headers
+ *
+ * This middleware runs on ALL requests matching the config.matcher and provides:
+ * 1. Authentication - Validates Supabase sessions for protected routes
+ * 2. Authorization - Enforces admin access with SSO and encrypted session cookies
+ * 3. Beta Access Control - Validates beta program eligibility and expiration
+ * 4. CSRF Protection - Validates Origin headers on state-changing requests
+ * 5. Security Headers - CSP, HSTS, X-Frame-Options, etc.
+ *
+ * PERFORMANCE: Runs at edge (Vercel Edge Runtime) for minimal latency
+ *
+ * @see https://nextjs.org/docs/app/building-your-application/routing/middleware
+ */
+
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { decryptSessionData, validateSessionData, encryptSessionData } from '@/lib/utils/session-crypto-edge';
+import { logger } from '@/lib/logger';
 
-const ADMIN_SESSION_DURATION = 2 * 60 * 60; // 2 hours in seconds
+/** Admin session duration in seconds (2 hours) */
+const ADMIN_SESSION_DURATION = 2 * 60 * 60;
 
 export async function middleware(req: NextRequest) {
   let response = NextResponse.next({
@@ -134,7 +153,12 @@ export async function middleware(req: NextRequest) {
       return res;
 
     } catch (error) {
-      console.error('Admin SSO check failed:', error);
+      // SECURITY: Log admin access failures for audit trail
+      logger.error('Admin SSO check failed', error, {
+        component: 'middleware',
+        action: 'admin_sso_check',
+        path: req.nextUrl.pathname,
+      });
       const redirectUrl = new URL('/dashboard', req.url);
       redirectUrl.searchParams.set('error', 'admin_check_failed');
       return NextResponse.redirect(redirectUrl);
@@ -177,11 +201,15 @@ export async function middleware(req: NextRequest) {
       });
 
       // SECURITY: Fail-closed - if we can't verify, deny access
-      // But allow a grace period for transient errors
+      // This prevents expired beta users from gaining access during DB issues
       if (rpcError) {
-        console.error('Beta validation RPC error:', rpcError);
+        logger.error('Beta validation RPC error', rpcError, {
+          component: 'middleware',
+          action: 'beta_validation',
+          path: req.nextUrl.pathname,
+          userEmail: session.user.email,
+        });
         // For database errors, redirect to an error page instead of allowing access
-        // This prevents expired beta users from gaining access during DB issues
         const errorUrl = new URL('/error?code=beta_check_failed', req.url);
         return NextResponse.redirect(errorUrl);
       }
@@ -196,8 +224,12 @@ export async function middleware(req: NextRequest) {
         return res;
       }
     } catch (error) {
-      console.error('Beta validation exception:', error);
       // SECURITY: Fail-closed on unexpected errors
+      logger.error('Beta validation exception', error, {
+        component: 'middleware',
+        action: 'beta_validation',
+        path: req.nextUrl.pathname,
+      });
       const errorUrl = new URL('/error?code=beta_check_error', req.url);
       return NextResponse.redirect(errorUrl);
     }

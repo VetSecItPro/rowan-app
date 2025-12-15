@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { X, Star, Zap } from 'lucide-react';
 import { taskTemplatesService, TaskTemplate } from '@/lib/services/task-templates-service';
+import { logger } from '@/lib/logger';
 
 interface TemplatePickerModalProps {
   isOpen: boolean;
@@ -25,7 +26,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelect, spaceId }: Temp
       const data = await taskTemplatesService.getTemplates(spaceId);
       setTemplates(data);
     } catch (error) {
-      console.error('Error loading templates:', error);
+      logger.error('Error loading templates:', error, { component: 'TemplatePickerModal', action: 'component_action' });
     } finally {
       setLoading(false);
     }

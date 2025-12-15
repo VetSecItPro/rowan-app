@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { sendPasswordResetEmail, type PasswordResetData } from '@/lib/services/email-service';
 import { z } from 'zod';
 import crypto from 'crypto';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +15,7 @@ const PasswordResetRequestSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting: 5 attempts per hour per IP (uses fallback if Redis unavailable)
-    const ip = request.ip ?? request.headers.get('x-forwarded-for') ?? 'anonymous';
+    const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
     const { success: rateLimitPassed } = await checkAuthRateLimit(`password-reset:${ip}`);
 
     if (!rateLimitPassed) {
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
           });
 
         if (tokenError) {
-          console.error('Failed to store reset token:', tokenError);
+          logger.error('Failed to store reset token:', tokenError, { component: 'api-route', action: 'api_request' });
           // Still return success to prevent information leakage
         } else {
           // Send password reset email using our custom template
@@ -78,12 +79,12 @@ export async function POST(request: NextRequest) {
           const emailResult = await sendPasswordResetEmail(emailData);
           
           if (!emailResult.success) {
-            console.error('Failed to send password reset email:', emailResult.error);
+            logger.error('Failed to send password reset email:', undefined, { component: 'api-route', action: 'api_request', details: emailResult.error });
             // Still return success to user
           }
         }
       } catch (emailError) {
-        console.error('Password reset email error:', emailError);
+        logger.error('Password reset email error:', emailError, { component: 'api-route', action: 'api_request' });
         // Still return success to user
       }
     }
@@ -95,7 +96,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Password reset error:', error);
+    logger.error('Password reset error:', error, { component: 'api-route', action: 'api_request' });
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(

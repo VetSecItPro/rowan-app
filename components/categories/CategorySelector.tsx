@@ -10,6 +10,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { logger } from '@/lib/logger';
 import {
   Check,
   ChevronDown,
@@ -81,7 +82,7 @@ export function CategorySelector({
         const data = await getCustomCategories(currentSpace.id);
         setCategories(data);
       } catch (err) {
-        console.error('Failed to load categories:', err);
+        logger.error('Failed to load categories:', err, { component: 'CategorySelector', action: 'component_action' });
       } finally {
         setLoading(false);
       }
@@ -121,7 +122,7 @@ export function CategorySelector({
       setNewCategoryName('');
       setOpen(false);
     } catch (err) {
-      console.error('Failed to create category:', err);
+      logger.error('Failed to create category:', err, { component: 'CategorySelector', action: 'component_action' });
     }
   };
 
@@ -307,7 +308,7 @@ export function TagSelector({
         const data = await getTags(currentSpace.id);
         setTags(data);
       } catch (err) {
-        console.error('Failed to load tags:', err);
+        logger.error('Failed to load tags:', err, { component: 'CategorySelector', action: 'component_action' });
       } finally {
         setLoading(false);
       }
@@ -352,7 +353,7 @@ export function TagSelector({
       handleTagSelect(newTag.id);
       setInputValue('');
     } catch (err) {
-      console.error('Failed to create tag:', err);
+      logger.error('Failed to create tag:', err, { component: 'CategorySelector', action: 'component_action' });
     }
   };
 

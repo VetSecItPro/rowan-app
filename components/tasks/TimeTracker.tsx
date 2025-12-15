@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Play, Pause, Clock } from 'lucide-react';
 import { taskTimeTrackingService } from '@/lib/services/task-time-tracking-service';
+import { logger } from '@/lib/logger';
 
 interface TimeTrackerProps {
   taskId: string;
@@ -37,7 +38,7 @@ export function TimeTracker({ taskId, userId }: TimeTrackerProps) {
         setIsTracking(true);
       }
     } catch (error) {
-      console.error('Error checking timer:', error);
+      logger.error('Error checking timer:', error, { component: 'TimeTracker', action: 'component_action' });
     }
   }
 
@@ -46,7 +47,7 @@ export function TimeTracker({ taskId, userId }: TimeTrackerProps) {
       const total = await taskTimeTrackingService.getTotalDuration(taskId);
       setTotalTime(total);
     } catch (error) {
-      console.error('Error loading time:', error);
+      logger.error('Error loading time:', error, { component: 'TimeTracker', action: 'component_action' });
     }
   }
 
@@ -56,7 +57,7 @@ export function TimeTracker({ taskId, userId }: TimeTrackerProps) {
       setActiveEntry(entry);
       setIsTracking(true);
     } catch (error) {
-      console.error('Error starting timer:', error);
+      logger.error('Error starting timer:', error, { component: 'TimeTracker', action: 'component_action' });
     }
   }
 
@@ -70,7 +71,7 @@ export function TimeTracker({ taskId, userId }: TimeTrackerProps) {
         loadTotalTime();
       }
     } catch (error) {
-      console.error('Error stopping timer:', error);
+      logger.error('Error stopping timer:', error, { component: 'TimeTracker', action: 'component_action' });
     }
   }
 

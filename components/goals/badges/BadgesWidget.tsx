@@ -5,6 +5,7 @@ import { Trophy, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import type { UserBadge } from '@/lib/services/achievement-service';
 import { getUserBadges, getUserBadgeStats } from '@/lib/services/achievement-service';
+import { logger } from '@/lib/logger';
 
 interface BadgesWidgetProps {
   userId: string;
@@ -31,7 +32,7 @@ export default function BadgesWidget({ userId, spaceId }: BadgesWidgetProps) {
       setRecentBadges(badges.slice(0, 3));
       setStats(badgeStats);
     } catch (error) {
-      console.error('Error loading badges:', error);
+      logger.error('Error loading badges:', error, { component: 'BadgesWidget', action: 'component_action' });
     } finally {
       setLoading(false);
     }

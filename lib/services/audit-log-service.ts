@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 /**
  * User Audit Log Service
@@ -66,13 +67,13 @@ export async function logAuditEvent(entry: Omit<AuditLogEntry, 'id' | 'timestamp
       });
 
     if (error) {
-      console.error('Error logging audit event:', error);
+      logger.error('Error logging audit event:', error, { component: 'lib-audit-log-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error logging audit event:', error);
+    logger.error('Error logging audit event:', error, { component: 'lib-audit-log-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to log audit event',
@@ -127,13 +128,13 @@ export async function getUserAuditLog(
     const { data, error, count } = await query;
 
     if (error) {
-      console.error('Error fetching audit log:', error);
+      logger.error('Error fetching audit log:', error, { component: 'lib-audit-log-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, data: data as AuditLogEntry[], total: count || 0 };
   } catch (error) {
-    console.error('Error fetching audit log:', error);
+    logger.error('Error fetching audit log:', error, { component: 'lib-audit-log-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to fetch audit log',
@@ -217,7 +218,7 @@ export async function getUserAuditStats(userId: string): Promise<{
       },
     };
   } catch (error) {
-    console.error('Error fetching audit stats:', error);
+    logger.error('Error fetching audit stats:', error, { component: 'lib-audit-log-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to fetch audit stats',

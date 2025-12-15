@@ -9,6 +9,7 @@ import { rewardsService } from '@/lib/services/rewards';
 import { sanitizePlainText } from '@/lib/sanitize';
 import type { RewardCatalogItem, RewardCategory, CreateRewardInput } from '@/lib/types/rewards';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { logger } from '@/lib/logger';
 
 interface RewardsManagementProps {
   spaceId: string;
@@ -66,7 +67,7 @@ export function RewardsManagement({
       setRewards(data);
       setError(null);
     } catch (err) {
-      console.error('Failed to load rewards:', err);
+      logger.error('Failed to load rewards:', err, { component: 'RewardsManagement', action: 'component_action' });
       setError('Failed to load rewards');
     } finally {
       setLoading(false);
@@ -163,7 +164,7 @@ export function RewardsManagement({
       setShowModal(false);
       setError(null);
     } catch (err) {
-      console.error('Failed to save reward:', err);
+      logger.error('Failed to save reward:', err, { component: 'RewardsManagement', action: 'component_action' });
       setError(err instanceof Error ? err.message : 'Failed to save reward');
     } finally {
       setSaving(false);
@@ -177,7 +178,7 @@ export function RewardsManagement({
       await loadRewards();
       setDeleteConfirm(null);
     } catch (err) {
-      console.error('Failed to delete reward:', err);
+      logger.error('Failed to delete reward:', err, { component: 'RewardsManagement', action: 'component_action' });
       setError('Failed to delete reward');
     } finally {
       setSaving(false);
@@ -189,7 +190,7 @@ export function RewardsManagement({
       await rewardsService.updateReward(reward.id, { is_active: !reward.is_active });
       await loadRewards();
     } catch (err) {
-      console.error('Failed to toggle reward:', err);
+      logger.error('Failed to toggle reward:', err, { component: 'RewardsManagement', action: 'component_action' });
     }
   }
 

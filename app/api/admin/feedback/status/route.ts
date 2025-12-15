@@ -6,6 +6,7 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookies } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
@@ -129,7 +130,7 @@ export async function PATCH(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/admin/feedback/status PATCH error:', error);
+    logger.error('[API] /api/admin/feedback/status PATCH error:', error, { component: 'api-route', action: 'api_request' });
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -244,7 +245,7 @@ export async function POST(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/admin/feedback/status POST error:', error);
+    logger.error('[API] /api/admin/feedback/status POST error:', error, { component: 'api-route', action: 'api_request' });
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(

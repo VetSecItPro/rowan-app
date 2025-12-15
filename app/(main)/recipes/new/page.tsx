@@ -6,6 +6,7 @@ import { ChefHat, Plus, X, ArrowLeft, Loader2, Sparkles, Image as ImageIcon, Fil
 import { useAuth } from '@/lib/contexts/auth-context';
 import { mealsService } from '@/lib/services/meals-service';
 import Link from 'next/link';
+import { logger } from '@/lib/logger';
 
 interface Ingredient {
   name: string;
@@ -56,7 +57,7 @@ export default function NewRecipePage() {
           setCurrentSpaceId(spaces[0].id);
         }
       } catch (error) {
-        console.error('Failed to load space:', error);
+        logger.error('Failed to load space:', error, { component: 'page', action: 'execution' });
       }
     };
 
@@ -149,7 +150,7 @@ export default function NewRecipePage() {
 
       alert('✓ Recipe parsed successfully! Please review and edit as needed before saving.');
     } catch (error) {
-      console.error('Parse error:', error);
+      logger.error('Parse error:', error, { component: 'page', action: 'execution' });
       alert(error instanceof Error ? error.message : 'Failed to parse recipe. Please try again.');
     } finally {
       setParsing(false);
@@ -198,7 +199,7 @@ export default function NewRecipePage() {
       alert('✓ Recipe created successfully!');
       router.push('/recipes');
     } catch (error) {
-      console.error('Failed to create recipe:', error);
+      logger.error('Failed to create recipe:', error, { component: 'page', action: 'execution' });
       alert('Failed to create recipe. Please try again.');
     } finally {
       setLoading(false);

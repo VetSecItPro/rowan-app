@@ -6,6 +6,7 @@ import { CreateRecipeInput, Recipe } from '@/lib/services/meals-service';
 import ImageUpload from '@/components/shared/ImageUpload';
 import { searchExternalRecipes, searchByCuisine, getRandomRecipes, SUPPORTED_CUISINES, ExternalRecipe } from '@/lib/services/external-recipes-service';
 import { RecipePreviewModal } from '@/components/meals/RecipePreviewModal';
+import { logger } from '@/lib/logger';
 
 interface NewRecipeModalProps {
   isOpen: boolean;
@@ -188,7 +189,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
 
       alert('✓ Recipe parsed successfully! Please review and edit as needed before saving.');
     } catch (error) {
-      console.error('Parse error:', error);
+      logger.error('Parse error:', error, { component: 'NewRecipeModal', action: 'component_action' });
       alert(error instanceof Error ? error.message : 'Failed to parse recipe. Please try again.');
     } finally {
       setParsing(false);
@@ -250,7 +251,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
       const results = await searchExternalRecipes(searchQuery);
       setExternalRecipes(results);
     } catch (error) {
-      console.error('Search error:', error);
+      logger.error('Search error:', error, { component: 'NewRecipeModal', action: 'component_action' });
       setExternalRecipes([]);
     } finally {
       setLoading(false);
@@ -264,7 +265,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
       setExternalRecipes(results);
       setSearchQuery(cuisine); // Show the cuisine in search box
     } catch (error) {
-      console.error('Cuisine browse error:', error);
+      logger.error('Cuisine browse error:', error, { component: 'NewRecipeModal', action: 'component_action' });
       setExternalRecipes([]);
     } finally {
       setLoading(false);
@@ -278,7 +279,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
       setExternalRecipes(results);
       setSearchQuery(''); // Clear search when loading random
     } catch (error) {
-      console.error('Random recipes error:', error);
+      logger.error('Random recipes error:', error, { component: 'NewRecipeModal', action: 'component_action' });
       setExternalRecipes([]);
     } finally {
       setLoading(false);

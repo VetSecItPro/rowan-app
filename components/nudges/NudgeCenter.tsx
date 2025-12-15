@@ -5,6 +5,7 @@ import { Bell, Settings, BarChart3, RefreshCw, Lightbulb } from 'lucide-react';
 import { NudgeCard } from './NudgeCard';
 import { NudgeSettingsModal } from './NudgeSettingsModal';
 import { NudgeAnalytics } from './NudgeAnalytics';
+import { logger } from '@/lib/logger';
 import {
   smartNudgesService,
   SmartNudge,
@@ -58,7 +59,7 @@ export function NudgeCenter({
       );
       setNudges(data);
     } catch (error) {
-      console.error('Failed to load nudges:', error);
+      logger.error('Failed to load nudges:', error, { component: 'NudgeCenter', action: 'component_action' });
       toast.error('Failed to load nudges');
     } finally {
       setLoading(false);
@@ -75,7 +76,7 @@ export function NudgeCenter({
       );
       setSettings(data);
     } catch (error) {
-      console.error('Failed to load nudge settings:', error);
+      logger.error('Failed to load nudge settings:', error, { component: 'NudgeCenter', action: 'component_action' });
     }
   };
 
@@ -132,7 +133,7 @@ export function NudgeCenter({
           break;
       }
     } catch (error) {
-      console.error('Failed to handle nudge action:', error);
+      logger.error('Failed to handle nudge action:', error, { component: 'NudgeCenter', action: 'component_action' });
       toast.error('Failed to process action');
     }
   };

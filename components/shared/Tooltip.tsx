@@ -15,7 +15,7 @@ export function Tooltip({ content, children, delay = 300, position = 'top', clas
   const [isVisible, setIsVisible] = useState(false);
   const [coords, setCoords] = useState({ x: 0, y: 0 });
   const [mounted, setMounted] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

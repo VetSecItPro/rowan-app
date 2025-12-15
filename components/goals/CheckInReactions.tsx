@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Smile, Plus } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { hapticLight, hapticSuccess } from '@/lib/utils/haptics';
+import { logger } from '@/lib/logger';
 
 interface CheckInReaction {
   id: string;
@@ -69,12 +70,12 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
         .limit(1);
 
       if (checkInsError) {
-        console.error('Error checking check-in existence:', checkInsError);
+        logger.error('Error checking check-in existence:', checkInsError, { component: 'CheckInReactions', action: 'component_action' });
         return;
       }
 
       if (!checkInsData || checkInsData.length === 0) {
-        console.warn('Check-in not found:', checkInId);
+        logger.warn('Check-in not found:', { component: 'CheckInReactions', error: checkInId });
         return;
       }
 
@@ -89,7 +90,7 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
 
       if (error) {
         // Table might not exist yet, that's okay
-        console.log('Reactions table not available yet:', error.message);
+        logger.info('Reactions table not available yet:', { component: 'CheckInReactions', data: error.message });
         setReactions([]);
         setReactionCounts({});
         setUserReactions(new Set());
@@ -112,7 +113,7 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
       setReactionCounts(counts);
       setUserReactions(userReactionSet);
     } catch (error) {
-      console.error('Error loading reactions:', error);
+      logger.error('Error loading reactions:', error, { component: 'CheckInReactions', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -171,7 +172,7 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
 
       setShowEmojiPicker(false);
     } catch (error) {
-      console.error('Error handling reaction:', error);
+      logger.error('Error handling reaction:', error, { component: 'CheckInReactions', action: 'component_action' });
     }
   };
 

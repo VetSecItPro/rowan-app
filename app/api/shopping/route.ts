@@ -9,6 +9,7 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { createShoppingListSchema } from '@/lib/validations/shopping-schemas';
 import { ZodError } from 'zod';
 import { checkUsageLimit, trackUsage } from '@/lib/middleware/usage-check';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/shopping
@@ -82,7 +83,7 @@ export async function GET(req: NextRequest) {
       data: lists,
     });
   } catch (error) {
-    console.error('[API] /api/shopping GET error:', error);
+    logger.error('[API] /api/shopping GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -197,7 +198,7 @@ export async function POST(req: NextRequest) {
       data: list,
     });
   } catch (error) {
-    console.error('[API] /api/shopping POST error:', error);
+    logger.error('[API] /api/shopping POST error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to create shopping list' },
       { status: 500 }

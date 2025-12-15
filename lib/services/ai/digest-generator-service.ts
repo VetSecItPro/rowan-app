@@ -6,6 +6,7 @@
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // Types for digest data
 export interface DigestEvent {
@@ -161,14 +162,14 @@ Generate the daily briefing JSON:`;
       try {
         parsedJson = JSON.parse(cleanedResponse);
       } catch {
-        console.error('[DigestGenerator] Failed to parse JSON:', cleanedResponse);
+        logger.error('[DigestGenerator] Failed to parse JSON:', cleanedResponse, { component: 'lib-digest-generator-service', action: 'service_call' });
         return { success: false, error: 'AI response was not valid JSON' };
       }
 
       // Validate with Zod schema
       const validated = AIDigestResponseSchema.safeParse(parsedJson);
       if (!validated.success) {
-        console.error('[DigestGenerator] Validation failed:', validated.error.issues);
+        logger.error('[DigestGenerator] Validation failed:', undefined, { component: 'lib-digest-generator-service', action: 'service_call', details: validated.error.issues });
         return {
           success: false,
           error: `Invalid digest data: ${validated.error.issues.map((issue) => issue.message).join(', ')}`
@@ -183,7 +184,7 @@ Generate the daily briefing JSON:`;
         }
       };
     } catch (error) {
-      console.error('[DigestGenerator] Error generating digest:', error);
+      logger.error('[DigestGenerator] Error generating digest:', error, { component: 'lib-digest-generator-service', action: 'service_call' });
 
       if (error instanceof Error) {
         if (error.message.includes('API key')) {

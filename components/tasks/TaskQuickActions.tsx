@@ -2,6 +2,7 @@
 
 import { CheckCircle, Clock, UserPlus, Repeat, MessageSquare, Paperclip } from 'lucide-react';
 import { quickActionsService } from '@/lib/services/quick-actions-service';
+import { logger } from '@/lib/logger';
 
 interface TaskQuickActionsProps {
   taskId: string;
@@ -25,7 +26,7 @@ export function TaskQuickActions({ taskId, spaceId, userId, onAction }: TaskQuic
       await quickActionsService.trackAction(spaceId, userId, actionId, taskId);
       onAction(actionId);
     } catch (error) {
-      console.error('Error tracking action:', error);
+      logger.error('Error tracking action:', error, { component: 'TaskQuickActions', action: 'component_action' });
     }
   }
 

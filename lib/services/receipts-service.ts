@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { sanitizeSearchInput } from '@/lib/utils/input-sanitization';
+import { logger } from '@/lib/logger';
 
 // =====================================================
 // TYPES
@@ -88,7 +89,7 @@ export async function uploadReceiptImage(
     });
 
   if (error) {
-    console.error('Upload error:', error);
+    logger.error('Upload error:', error, { component: 'lib-receipts-service', action: 'service_call' });
     return { path: '', error: error.message };
   }
 
@@ -165,7 +166,7 @@ export async function createReceipt(
 
   if (error) {
     // Clean up uploaded file if database insert fails
-    await deleteReceiptImage(path).catch(console.error);
+    await deleteReceiptImage(path).catch((error) => logger.error('Caught error', error, { component: 'lib-receipts-service', action: 'service_call' }));
     throw error;
   }
 

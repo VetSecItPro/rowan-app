@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
+import { logger } from '@/lib/logger';
 import {
   ArrowLeftIcon,
   ArrowDownTrayIcon,
@@ -39,7 +40,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
       const blob = await downloadReportPDF(report.id);
       // The function handles the download automatically
     } catch (error) {
-      console.error('Error downloading report:', error);
+      logger.error('Error downloading report:', error, { component: 'ReportViewer', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -52,7 +53,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
       setShareUrl(shareUrl);
       setShowShareModal(true);
     } catch (error) {
-      console.error('Error generating share URL:', error);
+      logger.error('Error generating share URL:', error, { component: 'ReportViewer', action: 'component_action' });
     } finally {
       setLoading(false);
     }

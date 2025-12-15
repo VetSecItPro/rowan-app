@@ -8,6 +8,7 @@ import { pointsService } from '@/lib/services/rewards';
 import { LEVEL_DEFINITIONS } from '@/lib/types/rewards';
 import type { UserRewardsStats, LevelDefinition } from '@/lib/types/rewards';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { logger } from '@/lib/logger';
 
 interface PointsDisplayProps {
   userId: string;
@@ -36,7 +37,7 @@ export function PointsDisplay({
         setStats(userStats);
         setError(null);
       } catch (err) {
-        console.error('Failed to load points stats:', err);
+        logger.error('Failed to load points stats:', err, { component: 'PointsDisplay', action: 'component_action' });
         setError('Failed to load points');
       } finally {
         setLoading(false);

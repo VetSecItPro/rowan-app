@@ -33,6 +33,7 @@ import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 import { PointsDisplay } from '@/components/rewards';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { pointsService } from '@/lib/services/rewards';
+import { logger } from '@/lib/logger';
 
 type TaskType = 'task' | 'chore';
 type TaskOrChore = (Task & { type: 'task' }) | (Chore & { type: 'chore' });
@@ -88,9 +89,9 @@ export default function TasksPage() {
       assignedTo: filters.assignees?.[0], // Take first assignee for simplicity
       // Exclude frequency and other chore-specific filters
     },
-    onTaskAdded: (task) => console.log('Task added:', task.title),
-    onTaskUpdated: (task) => console.log('Task updated:', task.title),
-    onTaskDeleted: (taskId) => console.log('Task deleted:', taskId),
+    onTaskAdded: (task) => {}, // Silently handle - real-time updates shown via UI
+    onTaskUpdated: (task) => {}, // Silently handle - real-time updates shown via UI
+    onTaskDeleted: (taskId) => {}, // Silently handle - real-time updates shown via UI
   });
 
   // Real-time chores with enhanced filters
@@ -103,9 +104,9 @@ export default function TasksPage() {
       assignedTo: filters.assignees?.[0], // Take first assignee for simplicity
       search: filters.search, // Add search filter at hook level
     },
-    onChoreAdded: (chore) => console.log('Chore added:', chore.title),
-    onChoreUpdated: (chore) => console.log('Chore updated:', chore.title),
-    onChoreDeleted: (choreId) => console.log('Chore deleted:', choreId),
+    onChoreAdded: (chore) => {}, // Silently handle - real-time updates shown via UI
+    onChoreUpdated: (chore) => {}, // Silently handle - real-time updates shown via UI
+    onChoreDeleted: (choreId) => {}, // Silently handle - real-time updates shown via UI
   });
 
   // Always use realtime data
@@ -245,14 +246,14 @@ export default function TasksPage() {
               linkedListsMap[task.id] = linkedLists[0]; // For now, just take the first linked list
             }
           } catch (error) {
-            console.error(`Failed to load shopping list for task ${task.id}:`, error);
+            logger.error(`Failed to load shopping list for task ${task.id}`, error, { component: 'page', action: 'load_shopping_lists' });
           }
         })
       );
       setLinkedShoppingLists(linkedListsMap);
 
     } catch (error) {
-      console.error('Failed to load data:', error);
+      logger.error('Failed to load data', error, { component: 'page', action: 'load_data' });
     } finally {
       setLoading(false);
     }
@@ -265,12 +266,7 @@ export default function TasksPage() {
 
   // Unified modal handlers
   const handleSaveItem = useCallback(async (itemData: CreateTaskInput | CreateChoreInput): Promise<void | { id: string }> => {
-    console.log('=== ENHANCED DEBUG LOGGING - PHASE 1.2 ===');
-    console.log('🎯 handleSaveItem called with:', JSON.stringify(itemData, null, 2));
-    console.log('📝 editingItem:', editingItem);
-    console.log('🎛️ modalDefaultType:', modalDefaultType);
-    console.log('🏠 currentSpace:', currentSpace?.id);
-    console.log('👤 user:', user?.id);
+    // Debug logging removed - rely on structured logger for errors only
 
     try {
       if (editingItem) {
@@ -320,12 +316,11 @@ export default function TasksPage() {
               task.id === tempId ? createdTask : task
             ));
 
-            console.log('✅ Task created successfully with real ID:', createdTask.id);
             return { id: createdTask.id }; // Return real ID to caller
           } catch (error) {
             // Revert optimistic update on error
             setTasks(prev => prev.filter(task => task.id !== tempId));
-            console.error('❌ Failed to create task:', error);
+            logger.error('Failed to create task', error, { component: 'page', action: 'create_task' });
             throw error;
           }
         } else {
@@ -358,18 +353,17 @@ export default function TasksPage() {
               chore.id === tempId ? createdChore : chore
             ));
 
-            console.log('✅ Chore created successfully with real ID:', createdChore.id);
             return { id: createdChore.id }; // Return real ID to caller
           } catch (error) {
             // Revert optimistic update on error
             setChores(prev => prev.filter(chore => chore.id !== tempId));
-            console.error('❌ Failed to create chore:', error);
+            logger.error('Failed to create chore', error, { component: 'page', action: 'create_chore' });
             throw error;
           }
         }
       }
     } catch (error) {
-      console.error('Failed to save item:', error);
+      logger.error('Failed to save item', error, { component: 'page', action: 'save_item', itemType: modalDefaultType });
 
       // Enhanced error handling with user-friendly messages
       let errorMessage = `Failed to ${editingItem ? 'update' : 'create'} ${modalDefaultType}. Please try again.`;
@@ -385,8 +379,7 @@ export default function TasksPage() {
         }
       }
 
-      // TODO: Replace with actual toast notification system
-      console.warn('USER ERROR:', errorMessage);
+      // TODO: Replace with actual toast notification system (user-facing error shown via UI)
 
       // Additional recovery actions
       if (modalDefaultType === 'chore') {
@@ -429,9 +422,9 @@ export default function TasksPage() {
           if (status === 'completed' && user) {
             const result = await choresService.completeChoreWithRewards(itemId, user.id);
             // Show points earned notification (if points were awarded)
+            // TODO: Show toast notification with points earned
             if (result.pointsAwarded > 0) {
-              console.log(`🎉 Earned ${result.pointsAwarded} points! (${result.streakBonus > 0 ? `+${result.streakBonus} streak bonus` : 'no streak bonus'})`);
-              // TODO: Show toast notification with points earned
+              // Points awarded successfully - UI will be updated via real-time subscription
             }
           } else {
             // For other status changes, use regular update
@@ -472,11 +465,10 @@ export default function TasksPage() {
           if (status === 'completed' && user && spaceId && task) {
             try {
               await pointsService.awardTaskPoints(user.id, spaceId, itemId, task.title);
-              console.log(`🎉 Earned 5 points for completing task!`);
               // TODO: Show toast notification with points earned
             } catch (pointsError) {
               // Points failed but task is still completed - don't fail the whole operation
-              console.error('Failed to award points for task:', pointsError);
+              logger.error('Failed to award points for task', pointsError, { component: 'page', action: 'award_points' });
             }
           }
           // Real-time subscription will handle the final sync
@@ -487,7 +479,7 @@ export default function TasksPage() {
         }
       }
     } catch (error) {
-      console.error('Failed to update item status:', error);
+      logger.error('Failed to update item status', error, { component: 'page', action: 'update_status', itemId });
 
       // Show user-friendly error message based on error type
       let errorMessage = 'Failed to update status. Please try again.';
@@ -499,8 +491,7 @@ export default function TasksPage() {
         }
       }
 
-      // TODO: Replace with actual toast notification system
-      console.warn('USER ERROR:', errorMessage);
+      // TODO: Replace with actual toast notification system (user-facing error shown via UI)
 
       // Additional recovery for chores
       if (type === 'chore') {
@@ -535,7 +526,7 @@ export default function TasksPage() {
         await tasksService.deleteTask(itemId);
       }
     } catch (error) {
-      console.error(`Failed to delete ${type || 'task'}:`, error);
+      logger.error(`Failed to delete ${type || 'task'}`, error, { component: 'page', action: 'delete_item', itemId, type });
 
       // Show user-friendly error message
       let errorMessage = `Failed to delete ${type || 'task'}. Please try again.`;
@@ -549,8 +540,7 @@ export default function TasksPage() {
         }
       }
 
-      // TODO: Replace with actual toast notification system
-      console.warn('USER ERROR:', errorMessage);
+      // TODO: Replace with actual toast notification system (user-facing error shown via UI)
 
       if (type === 'chore') {
         setChoreLoading(false);
@@ -997,7 +987,6 @@ export default function TasksPage() {
                 isOpen={isTemplatePickerOpen}
                 onClose={() => setIsTemplatePickerOpen(false)}
                 onSelect={(templateId) => {
-                  console.log('Selected template:', templateId);
                   setIsTemplatePickerOpen(false);
                   // TODO: Create task from template
                 }}

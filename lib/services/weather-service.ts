@@ -1,5 +1,6 @@
 import { format, parseISO, addDays, differenceInDays } from 'date-fns';
 import { weatherCacheService } from './weather-cache-service';
+import { logger } from '@/lib/logger';
 
 export interface WeatherForecast {
   condition: 'clear' | 'clouds' | 'rain' | 'storm' | 'snow' | 'fog';
@@ -58,20 +59,20 @@ export const weatherService = {
       });
 
       if (!response.ok) {
-        console.warn('[Weather] User location detection failed:', response.status);
+        logger.warn('[Weather] User location detection failed', { component: 'lib-weather-service', status: response.status });
         return null;
       }
 
       const data = await response.json();
 
       if (data.success && data.location) {
-        console.log('[Weather] User location detected:', data.location.formatted);
+        logger.info('[Weather] User location detected:', { component: 'lib-weather-service', data: data.location.formatted });
         return data.location.formatted;
       }
 
       return null;
     } catch (error) {
-      console.warn('[Weather] User location detection error:', error instanceof Error ? error.message : 'Unknown error');
+      logger.warn('[Weather] User location detection error', { component: 'lib-weather-service', error: error instanceof Error ? error.message : 'Unknown error' });
       return null;
     }
   },
@@ -112,7 +113,7 @@ export const weatherService = {
       );
     } catch (error) {
       // Silently fail for weather - it's a nice-to-have feature
-      console.warn(`[Weather] Failed to get weather for ${effectiveLocation}:`, error instanceof Error ? error.message : 'Unknown error');
+      logger.warn(`[Weather] Failed to get weather for ${effectiveLocation}`, { component: 'lib-weather-service', error: error instanceof Error ? error.message : 'Unknown error' });
       return null;
     }
   },
@@ -132,7 +133,7 @@ export const weatherService = {
       const currentTime = new Date().toISOString();
       return await this.getWeatherForEvent(userLocation, currentTime);
     } catch (error) {
-      console.warn('[Weather] Failed to get weather for user location:', error instanceof Error ? error.message : 'Unknown error');
+      logger.warn('[Weather] Failed to get weather for user location', { component: 'lib-weather-service', error: error instanceof Error ? error.message : 'Unknown error' });
       return null;
     }
   },
@@ -155,7 +156,7 @@ export const weatherService = {
 
       // Additional validation to prevent undefined coordinates from reaching API
       if (!coords.lat || !coords.lon || typeof coords.lat !== 'number' || typeof coords.lon !== 'number') {
-        console.warn(`[Weather] Invalid coordinates received for ${location}:`, coords);
+        logger.warn(`[Weather] Invalid coordinates received for ${location}:`, { component: 'lib-weather-service', error: coords });
         return null;
       }
 
@@ -195,7 +196,7 @@ export const weatherService = {
         timestamp: eventTime,
       };
     } catch (error) {
-      console.error('[Weather] Failed to fetch weather:', error);
+      logger.error('[Weather] Failed to fetch weather:', error, { component: 'lib-weather-service', action: 'service_call' });
       return null;
     }
   },
@@ -214,7 +215,7 @@ export const weatherService = {
 
       if (!response.ok) {
         // Only log as warning, not error - geocoding failures are expected
-        console.warn(`[Weather] Geocoding failed for "${location}": ${response.status}`);
+        logger.warn(`[Weather] Geocoding failed for "${location}": ${response.status}`, { component: 'lib-weather-service' });
         return null;
       }
 
@@ -222,14 +223,14 @@ export const weatherService = {
 
       if (data.error) {
         // This is normal for locations that can't be found
-        console.log(`[Weather] Location "${location}" not found in geocoding database`);
+        logger.info(`[Weather] Location "${location}" not found in geocoding database`, { component: 'lib-weather-service' });
         return null;
       }
 
       // Validate that we have valid coordinates
       if (typeof data.lat !== 'number' || typeof data.lon !== 'number' ||
           isNaN(data.lat) || isNaN(data.lon)) {
-        console.warn(`[Weather] Invalid coordinates returned for "${location}":`, data);
+        logger.warn(`[Weather] Invalid coordinates returned for "${location}":`, { component: 'lib-weather-service', error: data });
         return null;
       }
 
@@ -240,9 +241,9 @@ export const weatherService = {
     } catch (error) {
       // Use warn instead of error for timeouts and network issues
       if (error instanceof Error && error.name === 'TimeoutError') {
-        console.warn(`[Weather] Geocoding timeout for "${location}"`);
+        logger.warn(`[Weather] Geocoding timeout for "${location}"`, { component: 'lib-weather-service' });
       } else {
-        console.warn(`[Weather] Geocoding error for "${location}":`, error instanceof Error ? error.message : 'Unknown error');
+        logger.warn(`[Weather] Geocoding error for "${location}"`, { component: 'lib-weather-service', error: error instanceof Error ? error.message : 'Unknown error' });
       }
       return null;
     }

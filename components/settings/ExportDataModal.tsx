@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X, Download, FileJson, FileSpreadsheet, FileText, Check, AlertCircle } from 'lucide-react';
 import { logDataExport } from '@/lib/services/audit-log-service';
+import { logger } from '@/lib/logger';
 
 interface ExportDataModalProps {
   isOpen: boolean;
@@ -101,7 +102,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
       // Close modal on success
       onClose();
     } catch (error) {
-      console.error('Export error:', error);
+      logger.error('Export error:', error, { component: 'ExportDataModal', action: 'component_action' });
       setError('Failed to export data. Please try again.');
     } finally {
       setIsExporting(false);

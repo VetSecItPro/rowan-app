@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import {
   Users,
   Plus,
@@ -104,7 +105,7 @@ export default function VendorManagementPage() {
 
       setStats({ total, preferred, active, totalSpend });
     } catch (err) {
-      console.error('Failed to load vendors:', err);
+      logger.error('Failed to load vendors:', err, { component: 'page', action: 'execution' });
       setError('Failed to load vendors. Please try again.');
     } finally {
       setLoading(false);
@@ -128,7 +129,7 @@ export default function VendorManagementPage() {
       await loadVendorData();
       setShowCreateModal(false);
     } catch (error) {
-      console.error('Failed to create vendor:', error);
+      logger.error('Failed to create vendor:', error, { component: 'page', action: 'execution' });
       throw error;
     }
   };
@@ -149,7 +150,7 @@ export default function VendorManagementPage() {
       setShowCreateModal(false);
       setEditingVendor(null);
     } catch (error) {
-      console.error('Failed to update vendor:', error);
+      logger.error('Failed to update vendor:', error, { component: 'page', action: 'execution' });
       throw error;
     }
   };
@@ -164,7 +165,7 @@ export default function VendorManagementPage() {
       await deleteVendor(vendorId);
       await loadVendorData();
     } catch (error) {
-      console.error('Failed to delete vendor:', error);
+      logger.error('Failed to delete vendor:', error, { component: 'page', action: 'execution' });
       setError('Failed to delete vendor. Please try again.');
     }
   };

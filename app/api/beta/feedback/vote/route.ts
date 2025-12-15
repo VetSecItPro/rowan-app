@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 const voteSchema = z.object({
   feedbackId: z.string().uuid(),
@@ -78,7 +79,7 @@ export async function POST(request: NextRequest) {
           .eq('id', existingVote.id);
 
         if (deleteError) {
-          console.error('Error removing vote:', deleteError);
+          logger.error('Error removing vote:', deleteError, { component: 'api-route', action: 'api_request' });
           return NextResponse.json(
             { error: 'Failed to remove vote' },
             { status: 500 }
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest) {
           .eq('id', existingVote.id);
 
         if (updateError) {
-          console.error('Error updating vote:', updateError);
+          logger.error('Error updating vote:', updateError, { component: 'api-route', action: 'api_request' });
           return NextResponse.json(
             { error: 'Failed to update vote' },
             { status: 500 }
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
         });
 
       if (insertError) {
-        console.error('Error creating vote:', insertError);
+        logger.error('Error creating vote:', insertError, { component: 'api-route', action: 'api_request' });
         return NextResponse.json(
           { error: 'Failed to create vote' },
           { status: 500 }
@@ -150,7 +151,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Beta feedback vote error:', error);
+    logger.error('Beta feedback vote error:', error, { component: 'api-route', action: 'api_request' });
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(

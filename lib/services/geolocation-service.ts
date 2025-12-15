@@ -3,6 +3,8 @@
  * Uses ipapi.co free API for IP geolocation
  */
 
+import { logger } from '@/lib/logger';
+
 interface IPLocation {
   city: string;
   region: string;
@@ -35,11 +37,11 @@ export const geolocationService = {
       // Check cache first
       const cached = this.getCachedLocation();
       if (cached) {
-        console.log('[Geolocation] Using cached location:', cached.city);
+        logger.info('[Geolocation] Using cached location:', { component: 'lib-geolocation-service', data: cached.city });
         return cached;
       }
 
-      console.log('[Geolocation] Fetching location from IP...');
+      logger.info('[Geolocation] Fetching location from IP...', { component: 'lib-geolocation-service' });
 
       // Use our server-side API route instead of direct external call
       const response = await fetch('/api/geolocation', {
@@ -62,11 +64,11 @@ export const geolocationService = {
       // Cache the result
       this.cacheLocation(data);
 
-      console.log('[Geolocation] Location detected:', `${data.city}, ${data.region}, ${data.country}`);
+      logger.info('[Geolocation] Location detected:', { component: 'lib-geolocation-service', data: `${data.city}, ${data.region}, ${data.country}` });
 
       return data;
     } catch (error) {
-      console.error('[Geolocation] Failed to get location:', error);
+      logger.error('[Geolocation] Failed to get location:', error, { component: 'lib-geolocation-service', action: 'service_call' });
 
       // Return fallback location (Dallas, since user mentioned being there) on error
       return {
@@ -98,7 +100,7 @@ export const geolocationService = {
       // Check cache version first
       const cacheVersion = localStorage.getItem(CACHE_VERSION_KEY);
       if (cacheVersion !== CURRENT_CACHE_VERSION) {
-        console.log('[Geolocation] Cache version mismatch, clearing cache');
+        logger.info('[Geolocation] Cache version mismatch, clearing cache', { component: 'lib-geolocation-service' });
         localStorage.removeItem(LOCATION_CACHE_KEY);
         localStorage.removeItem(CACHE_VERSION_KEY);
         return null;
@@ -119,7 +121,7 @@ export const geolocationService = {
         return null;
       }
     } catch (error) {
-      console.error('[Geolocation] Cache read error:', error);
+      logger.error('[Geolocation] Cache read error:', error, { component: 'lib-geolocation-service', action: 'service_call' });
       return null;
     }
   },
@@ -136,9 +138,9 @@ export const geolocationService = {
 
       localStorage.setItem(LOCATION_CACHE_KEY, JSON.stringify(cacheData));
       localStorage.setItem(CACHE_VERSION_KEY, CURRENT_CACHE_VERSION);
-      console.log('[Geolocation] Location cached for 24 hours');
+      logger.info('[Geolocation] Location cached for 24 hours', { component: 'lib-geolocation-service' });
     } catch (error) {
-      console.error('[Geolocation] Cache write error:', error);
+      logger.error('[Geolocation] Cache write error:', error, { component: 'lib-geolocation-service', action: 'service_call' });
     }
   },
 
@@ -149,9 +151,9 @@ export const geolocationService = {
     try {
       localStorage.removeItem(LOCATION_CACHE_KEY);
       localStorage.removeItem(CACHE_VERSION_KEY);
-      console.log('[Geolocation] Location cache cleared');
+      logger.info('[Geolocation] Location cache cleared', { component: 'lib-geolocation-service' });
     } catch (error) {
-      console.error('[Geolocation] Cache clear error:', error);
+      logger.error('[Geolocation] Cache clear error:', error, { component: 'lib-geolocation-service', action: 'service_call' });
     }
   },
 

@@ -4,6 +4,7 @@ import { ccpaService } from '@/lib/services/ccpa-service';
 import { z } from 'zod';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 /**
  * CCPA Opt-Out API Endpoint
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
       data: result.data,
     });
   } catch (error) {
-    console.error('Error getting CCPA opt-out status:', error);
+    logger.error('Error getting CCPA opt-out status:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -124,7 +125,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error('Error updating CCPA opt-out status:', error);
+    logger.error('Error updating CCPA opt-out status:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

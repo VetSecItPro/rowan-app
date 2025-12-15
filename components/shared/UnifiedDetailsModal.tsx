@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import {
   X, FileText, Paperclip, MessageSquare, Link, CheckCircle,
   Zap, Download, Calendar, Clock, User, Share2, Star,
@@ -141,7 +142,7 @@ export function UnifiedDetailsModal({
           break;
       }
     } catch (error) {
-      console.error('Error loading tab data:', error);
+      logger.error('Error loading tab data:', error, { component: 'UnifiedDetailsModal', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -188,7 +189,7 @@ export function UnifiedDetailsModal({
 
   const handleExport = async () => {
     // Implement export functionality
-    console.log('Exporting with options:', exportOptions);
+    logger.info('Exporting with options:', { component: 'UnifiedDetailsModal', data: exportOptions });
   };
 
   if (!isOpen) return null;

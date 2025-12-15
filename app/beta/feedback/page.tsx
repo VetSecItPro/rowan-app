@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { logger } from '@/lib/logger';
 import {
   TestTube,
   MessageSquare,
@@ -97,7 +98,7 @@ export default function BetaFeedbackPage() {
         setFeedback(data.feedback || []);
       }
     } catch (error) {
-      console.error('Error loading feedback:', error);
+      logger.error('Error loading feedback:', error, { component: 'page', action: 'execution' });
     } finally {
       setLoading(false);
     }
@@ -116,7 +117,7 @@ export default function BetaFeedbackPage() {
         await loadFeedback();
       }
     } catch (error) {
-      console.error('Error voting:', error);
+      logger.error('Error voting:', error, { component: 'page', action: 'execution' });
     }
   };
 

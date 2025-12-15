@@ -7,6 +7,7 @@ import { safeCookies } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { withCache, ADMIN_CACHE_KEYS, ADMIN_CACHE_TTL } from '@/lib/services/admin-cache-service';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // Query parameter validation schema
 const QueryParamsSchema = z.object({
@@ -59,7 +60,7 @@ export async function GET(req: NextRequest) {
         );
       }
     } catch (error) {
-      console.error('Admin session decryption failed:', error);
+      logger.error('Admin session decryption failed:', error, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: 'Invalid session' },
         { status: 401 }

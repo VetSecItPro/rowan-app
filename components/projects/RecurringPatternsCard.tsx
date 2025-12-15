@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Clock, TrendingUp, AlertTriangle, Check, X, Plus, Calendar } from 'lucide-react';
+import { logger } from '@/lib/logger';
 import {
   type RecurringExpensePattern,
   getRecurringPatterns,
@@ -53,7 +54,7 @@ export function RecurringPatternsCard({ spaceId, userId }: RecurringPatternsCard
       setUpcomingPatterns(upcoming);
       setDuplicates(possibleDuplicates);
     } catch (error) {
-      console.error('Error loading patterns:', error);
+      logger.error('Error loading patterns:', error, { component: 'RecurringPatternsCard', action: 'component_action' });
     } finally {
       setIsLoading(false);
     }
@@ -65,7 +66,7 @@ export function RecurringPatternsCard({ spaceId, userId }: RecurringPatternsCard
       await analyzeRecurringPatterns(spaceId);
       await loadPatterns();
     } catch (error) {
-      console.error('Error analyzing patterns:', error);
+      logger.error('Error analyzing patterns:', error, { component: 'RecurringPatternsCard', action: 'component_action' });
     } finally {
       setIsAnalyzing(false);
     }
@@ -76,7 +77,7 @@ export function RecurringPatternsCard({ spaceId, userId }: RecurringPatternsCard
       await confirmPattern(patternId);
       await loadPatterns();
     } catch (error) {
-      console.error('Error confirming pattern:', error);
+      logger.error('Error confirming pattern:', error, { component: 'RecurringPatternsCard', action: 'component_action' });
     }
   };
 
@@ -85,7 +86,7 @@ export function RecurringPatternsCard({ spaceId, userId }: RecurringPatternsCard
       await ignorePattern(patternId);
       await loadPatterns();
     } catch (error) {
-      console.error('Error ignoring pattern:', error);
+      logger.error('Error ignoring pattern:', error, { component: 'RecurringPatternsCard', action: 'component_action' });
     }
   };
 
@@ -99,7 +100,7 @@ export function RecurringPatternsCard({ spaceId, userId }: RecurringPatternsCard
         alert(`Error: ${result.error}`);
       }
     } catch (error) {
-      console.error('Error creating expense:', error);
+      logger.error('Error creating expense:', error, { component: 'RecurringPatternsCard', action: 'component_action' });
     }
   };
 

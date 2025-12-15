@@ -6,6 +6,7 @@ import { verifySpaceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/goals
@@ -79,7 +80,7 @@ export async function GET(req: NextRequest) {
       data: goals,
     });
   } catch (error) {
-    console.error('[API] /api/goals GET error:', error);
+    logger.error('[API] /api/goals GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -162,7 +163,7 @@ export async function POST(req: NextRequest) {
       data: goal,
     });
   } catch (error) {
-    console.error('[API] /api/goals POST error:', error);
+    logger.error('[API] /api/goals POST error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to create goal' },
       { status: 500 }
