@@ -1,8 +1,20 @@
 /**
  * Stripe Webhook Handler
- * Processes Stripe webhook events for subscription management
  *
  * SECURITY: Server-side only - validates webhook signatures
+ *
+ * Processes Stripe webhook events for subscription lifecycle management:
+ * - checkout.session.completed: New subscription purchase
+ * - customer.subscription.created: Subscription initialized
+ * - customer.subscription.updated: Status/plan changes
+ * - customer.subscription.deleted: Cancellation
+ * - invoice.payment_succeeded: Successful payment
+ * - invoice.payment_failed: Payment failure requiring user action
+ *
+ * IMPORTANT: All webhook handlers must be idempotent - Stripe may send duplicate events
+ *
+ * @see https://stripe.com/docs/webhooks
+ * @see https://stripe.com/docs/api/events/types
  */
 
 import { getStripeClient } from './client';
@@ -23,6 +35,7 @@ import {
   logPaymentFailed,
   logCheckoutSuccess,
 } from '../utils/monetization-logger';
+import { logger } from '../logger';
 import type Stripe from 'stripe';
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://rowanapp.com';
@@ -51,7 +64,7 @@ export function constructWebhookEvent(
   try {
     return stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (error) {
-    console.error('Webhook signature verification failed:', error);
+    logger.error('Webhook signature verification failed', error, { component: 'stripe-webhooks', action: 'signature_verification' });
     throw new Error('Invalid webhook signature');
   }
 }
@@ -97,7 +110,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<void> {
         break;
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        logger.info(`Unhandled Stripe event type: ${event.type}`, { component: 'stripe-webhooks', eventType: event.type });
     }
 
     // Log successful processing
@@ -130,7 +143,7 @@ async function handleCheckoutSessionCompleted(
   const period = session.metadata?.period as 'monthly' | 'annual' | undefined;
 
   if (!userId || !tier || !period) {
-    console.error('Missing metadata in checkout session:', session.id);
+    logger.error('Missing metadata in checkout session', undefined, { component: 'stripe-webhooks', action: 'checkout_session', sessionId: session.id });
     return;
   }
 
@@ -149,7 +162,7 @@ async function handleCheckoutSessionCompleted(
     });
 
   if (subError) {
-    console.error('Error creating subscription:', subError);
+    logger.error('Error creating subscription', subError, { component: 'stripe-webhooks', action: 'create_subscription' });
     return;
   }
 
@@ -204,13 +217,13 @@ async function handleCheckoutSessionCompleted(
     });
 
     if (emailResult.success) {
-      console.log(`Welcome email sent to ${user.email}`);
+      logger.info(`Welcome email sent`, { component: 'stripe-webhooks', action: 'send_welcome_email' });
     } else {
-      console.error('Failed to send welcome email:', emailResult.error);
+      logger.error('Failed to send welcome email', undefined, { component: 'stripe-webhooks', action: 'send_welcome_email', error: emailResult.error });
     }
   }
 
-  console.log(`Subscription created for user ${userId}: ${tier} ${period}`);
+  logger.info('Subscription created', { component: 'stripe-webhooks', userId, tier, period });
 }
 
 /**
@@ -223,7 +236,7 @@ async function handleSubscriptionCreated(
   const userId = subscription.metadata?.userId;
 
   if (!userId) {
-    console.error('Missing userId in subscription metadata:', subscription.id);
+    logger.error('Missing userId in subscription metadata', undefined, { component: 'stripe-webhooks', action: 'subscription_event', subscriptionId: subscription.id });
     return;
   }
 
@@ -243,7 +256,7 @@ async function handleSubscriptionCreated(
     .eq('stripe_subscription_id', subscription.id);
 
   if (error) {
-    console.error('Error updating subscription:', error);
+    logger.error('Error updating subscription', error, { component: 'stripe-webhooks', action: 'update_subscription' });
   }
 }
 
@@ -257,7 +270,7 @@ async function handleSubscriptionUpdated(
   const userId = subscription.metadata?.userId;
 
   if (!userId) {
-    console.error('Missing userId in subscription metadata:', subscription.id);
+    logger.error('Missing userId in subscription metadata', undefined, { component: 'stripe-webhooks', action: 'subscription_event', subscriptionId: subscription.id });
     return;
   }
 
@@ -275,7 +288,7 @@ async function handleSubscriptionUpdated(
     .eq('stripe_subscription_id', subscription.id);
 
   if (error) {
-    console.error('Error updating subscription:', error);
+    logger.error('Error updating subscription', error, { component: 'stripe-webhooks', action: 'update_subscription' });
     return;
   }
 
@@ -303,7 +316,7 @@ async function handleSubscriptionUpdated(
     },
   });
 
-  console.log(`Subscription updated for user ${userId}: ${status}`);
+  logger.info('Subscription updated', { component: 'stripe-webhooks', userId, status });
 }
 
 /**
@@ -316,7 +329,7 @@ async function handleSubscriptionDeleted(
   const userId = subscription.metadata?.userId;
 
   if (!userId) {
-    console.error('Missing userId in subscription metadata:', subscription.id);
+    logger.error('Missing userId in subscription metadata', undefined, { component: 'stripe-webhooks', action: 'subscription_event', subscriptionId: subscription.id });
     return;
   }
 
@@ -341,7 +354,7 @@ async function handleSubscriptionDeleted(
     .eq('stripe_subscription_id', subscription.id);
 
   if (error) {
-    console.error('Error canceling subscription:', error);
+    logger.error('Error canceling subscription', error, { component: 'stripe-webhooks', action: 'cancel_subscription' });
     return;
   }
 
@@ -392,13 +405,13 @@ async function handleSubscriptionDeleted(
     });
 
     if (emailResult.success) {
-      console.log(`Cancellation email sent to ${user.email}`);
+      logger.info('Cancellation email sent', { component: 'stripe-webhooks', action: 'send_cancellation_email' });
     } else {
-      console.error('Failed to send cancellation email:', emailResult.error);
+      logger.error('Failed to send cancellation email', undefined, { component: 'stripe-webhooks', action: 'send_cancellation_email', error: emailResult.error });
     }
   }
 
-  console.log(`Subscription canceled for user ${userId}`);
+  logger.info('Subscription canceled', { component: 'stripe-webhooks', userId });
 }
 
 /**
@@ -424,7 +437,7 @@ async function handleInvoicePaymentSucceeded(
     .eq('stripe_subscription_id', subscriptionId);
 
   if (error) {
-    console.error('Error updating subscription on payment success:', error);
+    logger.error('Error updating subscription on payment success', error, { component: 'stripe-webhooks', action: 'payment_success' });
   }
 
   // Log payment success
@@ -436,7 +449,7 @@ async function handleInvoicePaymentSucceeded(
     invoiceId: invoice.id,
   });
 
-  console.log(`Payment succeeded for subscription ${subscriptionId}`);
+  logger.info('Payment succeeded', { component: 'stripe-webhooks', subscriptionId });
 }
 
 /**
@@ -460,7 +473,7 @@ async function handleInvoicePaymentFailed(
     .single();
 
   if (!subscription) {
-    console.error('Subscription not found for invoice:', invoice.id);
+    logger.error('Subscription not found for invoice', undefined, { component: 'stripe-webhooks', action: 'invoice_payment_failed', invoiceId: invoice.id });
     return;
   }
 
@@ -473,7 +486,7 @@ async function handleInvoicePaymentFailed(
     .eq('stripe_subscription_id', subscriptionId);
 
   if (error) {
-    console.error('Error updating subscription on payment failure:', error);
+    logger.error('Error updating subscription on payment failure', error, { component: 'stripe-webhooks', action: 'payment_failure' });
     return;
   }
 
@@ -522,13 +535,13 @@ async function handleInvoicePaymentFailed(
     });
 
     if (emailResult.success) {
-      console.log(`Payment failed email sent to ${user.email}`);
+      logger.info('Payment failed email sent', { component: 'stripe-webhooks', action: 'send_payment_failed_email' });
     } else {
-      console.error('Failed to send payment failed email:', emailResult.error);
+      logger.error('Failed to send payment failed email', undefined, { component: 'stripe-webhooks', action: 'send_payment_failed_email', error: emailResult.error });
     }
   }
 
-  console.log(`Payment failed for subscription ${subscriptionId}`);
+  logger.info('Payment failed', { component: 'stripe-webhooks', subscriptionId });
 }
 
 /**

@@ -6,6 +6,7 @@ import { accountDeletionService } from '@/lib/services/account-deletion-service'
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface AccountDeletionModalProps {
   isOpen: boolean;
@@ -59,7 +60,7 @@ export function AccountDeletionModal({ isOpen, onClose }: AccountDeletionModalPr
       // Redirect to goodbye page
       router.push('/goodbye');
     } catch (error) {
-      console.error('Account deletion error:', error);
+      logger.error('Account deletion error:', error, { component: 'AccountDeletionModal', action: 'component_action' });
       alert('An unexpected error occurred. Please try again.');
       setIsDeleting(false);
     }

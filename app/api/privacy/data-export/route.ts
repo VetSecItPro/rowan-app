@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
 import { Resend } from 'resend';
+import { logger } from '@/lib/logger';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (insertError) {
-      console.error('Error creating export request:', insertError);
+      logger.error('Error creating export request:', insertError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { success: false, error: 'Failed to create export request' },
         { status: 500 }
@@ -93,7 +94,7 @@ export async function POST(request: NextRequest) {
 
     // Start export generation asynchronously
     generateDataExport(exportRequest.id, userId, validatedData).catch(error => {
-      console.error('Error in background export generation:', error);
+      logger.error('Error in background export generation:', error, { component: 'api-route', action: 'api_request' });
     });
 
     return NextResponse.json({
@@ -113,7 +114,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error('Data export POST error:', error);
+    logger.error('Data export POST error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -146,7 +147,7 @@ export async function GET(request: NextRequest) {
       .limit(1);
 
     if (error) {
-      console.error('Error fetching export status:', error);
+      logger.error('Error fetching export status:', error, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { success: false, error: 'Failed to fetch export status' },
         { status: 500 }
@@ -192,7 +193,7 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Data export GET error:', error);
+    logger.error('Data export GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -239,7 +240,7 @@ async function generateDataExport(
     await sendExportReadyEmail(userId, fileUrl, expiresAt, request.format, fileBuffer.length);
 
   } catch (error) {
-    console.error('Error generating data export:', error);
+    logger.error('Error generating data export:', error, { component: 'api-route', action: 'api_request' });
 
     // Update status to failed
     await supabase
@@ -372,7 +373,7 @@ async function collectUserData(supabase: any, userId: string, includeData: any =
 
     return data;
   } catch (error) {
-    console.error('Error collecting user data:', error);
+    logger.error('Error collecting user data:', error, { component: 'api-route', action: 'api_request' });
     throw new Error('Failed to collect user data');
   }
 }
@@ -461,7 +462,7 @@ async function uploadExportFile(
       expiresAt: expiresAt.toISOString(),
     };
   } catch (error) {
-    console.error('Error uploading export file:', error);
+    logger.error('Error uploading export file:', error, { component: 'api-route', action: 'api_request' });
     // Fallback to API endpoint
     return {
       fileUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/privacy/download/${exportId}`,
@@ -495,7 +496,7 @@ async function sendExportReadyEmail(
     const expirationDate = new Date(expiresAt).toLocaleDateString();
 
     if (!resend) {
-      console.error('Resend API key not configured');
+      logger.error('Resend API key not configured', undefined, { component: 'api-route', action: 'api_request' });
       throw new Error('Email service not available');
     }
 
@@ -549,6 +550,6 @@ async function sendExportReadyEmail(
       });
 
   } catch (error) {
-    console.error('Error sending export ready email:', error);
+    logger.error('Error sending export ready email:', error, { component: 'api-route', action: 'api_request' });
   }
 }

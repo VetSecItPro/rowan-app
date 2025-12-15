@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { reminderNotificationsService } from '@/lib/services/reminder-notifications-service';
 import { notificationService } from '@/lib/services/notification-service';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // TYPES
@@ -137,7 +138,7 @@ async function getCheckInRemindersNeedingNotification(supabase: any): Promise<Ch
     .gte('scheduled_for', now.toISOString());
 
   if (error) {
-    console.error('Error fetching check-in reminders:', error);
+    logger.error('Error fetching check-in reminders:', error, { component: 'goal-checkin-notifications-job', action: 'service_call' });
     throw new Error('Failed to fetch check-in reminders');
   }
 
@@ -204,7 +205,7 @@ async function sendInAppNotifications(batch: CheckInNotificationBatch): Promise<
         });
         sent++;
       } catch (error) {
-        console.error(`Failed to create in-app notification for check-in reminder ${reminder.id}:`, error);
+        logger.error(`Failed to create in-app notification for check-in reminder ${reminder.id}:`, error, { component: 'goal-checkin-notifications-job', action: 'service_call' });
       }
     }
 
@@ -247,7 +248,7 @@ async function sendEmailNotifications(batch: CheckInNotificationBatch): Promise<
           message: `Your check-in for "${reminder.goal_title}" is scheduled for ${new Date(reminder.scheduled_for).toLocaleString()}`,
         });
       } catch (error) {
-        console.error(`Failed to create email notification record for check-in reminder ${reminder.id}:`, error);
+        logger.error(`Failed to create email notification record for check-in reminder ${reminder.id}:`, error, { component: 'goal-checkin-notifications-job', action: 'service_call' });
       }
     }
 
@@ -391,7 +392,7 @@ async function markRemindersAsNotificationSent(supabase: any, reminderIds: strin
     .in('id', reminderIds);
 
   if (error) {
-    console.error('Error marking reminders as notification sent:', error);
+    logger.error('Error marking reminders as notification sent:', error, { component: 'goal-checkin-notifications-job', action: 'service_call' });
     throw error;
   }
 }

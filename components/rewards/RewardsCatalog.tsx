@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { rewardsService, pointsService } from '@/lib/services/rewards';
 import type { RewardCatalogItem } from '@/lib/types/rewards';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { logger } from '@/lib/logger';
 
 interface RewardsCatalogProps {
   spaceId: string;
@@ -50,7 +51,7 @@ export function RewardsCatalog({
         setUserPoints(points);
         setError(null);
       } catch (err) {
-        console.error('Failed to load rewards:', err);
+        logger.error('Failed to load rewards:', err, { component: 'RewardsCatalog', action: 'component_action' });
         setError('Failed to load rewards');
       } finally {
         setLoading(false);
@@ -80,7 +81,7 @@ export function RewardsCatalog({
 
       setShowConfirm(null);
     } catch (err) {
-      console.error('Failed to redeem reward:', err);
+      logger.error('Failed to redeem reward:', err, { component: 'RewardsCatalog', action: 'component_action' });
       setError(err instanceof Error ? err.message : 'Failed to redeem reward');
     } finally {
       setRedeeming(null);

@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
+import { logger } from '@/lib/logger';
 
 // Validation schema for privacy preference updates
 const PrivacyPreferenceUpdateSchema = z.object({
@@ -77,7 +78,7 @@ export async function GET(request: NextRequest) {
           .single();
 
         if (insertError) {
-          console.error('Error creating default privacy preferences:', insertError);
+          logger.error('Error creating default privacy preferences:', insertError, { component: 'api-route', action: 'api_request' });
           return NextResponse.json(
             { success: false, error: 'Failed to create privacy preferences' },
             { status: 500 }
@@ -87,7 +88,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ success: true, data: newData });
       }
 
-      console.error('Error fetching privacy preferences:', error);
+      logger.error('Error fetching privacy preferences:', error, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { success: false, error: 'Failed to fetch privacy preferences' },
         { status: 500 }
@@ -96,7 +97,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, data });
   } catch (error) {
-    console.error('Privacy preferences GET error:', error);
+    logger.error('Privacy preferences GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -152,7 +153,7 @@ export async function PATCH(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Error updating privacy preferences:', error);
+      logger.error('Error updating privacy preferences:', error, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { success: false, error: 'Failed to update privacy preferences' },
         { status: 500 }
@@ -178,7 +179,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    console.error('Privacy preferences PATCH error:', error);
+    logger.error('Privacy preferences PATCH error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -226,7 +227,7 @@ async function logPreferenceChanges(
         .insert(auditEntries);
     }
   } catch (error) {
-    console.error('Error logging preference changes:', error);
+    logger.error('Error logging preference changes:', error, { component: 'api-route', action: 'api_request' });
     // Don't throw error here to avoid breaking the main update
   }
 }
@@ -260,7 +261,7 @@ async function applyPrivacyChanges(userId: string, changes: Record<string, boole
       await updateThirdPartyAnalytics(userId, changes.third_party_analytics_enabled);
     }
   } catch (error) {
-    console.error('Error applying privacy changes:', error);
+    logger.error('Error applying privacy changes:', error, { component: 'api-route', action: 'api_request' });
     // Log error but don't throw to avoid breaking preference updates
   }
 }
@@ -269,7 +270,7 @@ async function applyPrivacyChanges(userId: string, changes: Record<string, boole
 async function updateExternalCookieConsent(cookieType: string, enabled: boolean) {
   // This would integrate with your cookie management service
   // For now, we'll store the preference and handle it client-side
-  console.log(`Cookie consent updated: ${cookieType} = ${enabled}`);
+  logger.info(`Cookie consent updated: ${cookieType} = ${enabled}`, { component: 'api-route' });
 }
 
 async function updateMarketingSubscription(userId: string, type: 'email' | 'sms', enabled: boolean) {
@@ -310,7 +311,7 @@ async function updateMarketingSubscription(userId: string, type: 'email' | 'sms'
       });
     }
   } catch (error) {
-    console.error(`Error updating ${type} subscription:`, error);
+    logger.error('Error updating ${type} subscription:', error, { component: 'api-route', action: 'api_request' });
   }
 }
 
@@ -318,12 +319,12 @@ async function updateDataSharingConsent(userId: string, allowSharing: boolean) {
   try {
     // This would update your data sharing agreements with partners
     // For now, we'll log the change and implement partner integrations later
-    console.log(`Data sharing consent updated for user ${userId}: ${allowSharing}`);
+    logger.info(`Data sharing consent updated for user ${userId}: ${allowSharing}`, { component: 'api-route' });
 
     // You could integrate with partner APIs here to update their systems
     // Example: await updatePartnerConsentStatus(userId, allowSharing);
   } catch (error) {
-    console.error('Error updating data sharing consent:', error);
+    logger.error('Error updating data sharing consent:', error, { component: 'api-route', action: 'api_request' });
   }
 }
 
@@ -331,11 +332,11 @@ async function updateThirdPartyAnalytics(userId: string, enabled: boolean) {
   try {
     // This would control third-party analytics services
     // For now, we'll log the change
-    console.log(`Third-party analytics updated for user ${userId}: ${enabled}`);
+    logger.info(`Third-party analytics updated for user ${userId}: ${enabled}`, { component: 'api-route' });
 
     // You could integrate with analytics services here
     // Example: await updateGoogleAnalyticsConsent(userId, enabled);
   } catch (error) {
-    console.error('Error updating third-party analytics:', error);
+    logger.error('Error updating third-party analytics:', error, { component: 'api-route', action: 'api_request' });
   }
 }

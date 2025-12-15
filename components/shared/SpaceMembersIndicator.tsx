@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface SpaceMember {
   user_id: string;
@@ -44,7 +45,7 @@ export function SpaceMembersIndicator() {
         .eq('space_id', currentSpace.id);
 
       if (error) {
-        console.error('Failed to load space members:', error);
+        logger.error('Failed to load space members:', error, { component: 'SpaceMembersIndicator', action: 'component_action' });
         return;
       }
 

@@ -9,6 +9,7 @@ import { AlertCircle, HardDrive, Settings } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type { WarningType } from '@/lib/services/storage-service';
+import { logger } from '@/lib/logger';
 
 interface StorageWarningModalProps {
   isOpen: boolean;
@@ -38,7 +39,7 @@ export function StorageWarningModal({
       await onDismiss();
       onClose();
     } catch (error) {
-      console.error('Failed to dismiss warning:', error);
+      logger.error('Failed to dismiss warning:', error, { component: 'StorageWarningModal', action: 'component_action' });
     } finally {
       setIsDismissing(false);
     }

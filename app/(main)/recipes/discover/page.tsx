@@ -5,6 +5,7 @@ import { Search, Plus, ExternalLink, Loader2, ChefHat, Clock, Users, Calendar, X
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { QuickPlanModal } from '@/components/meals/QuickPlanModal';
 import { RecipePreviewModal } from '@/components/meals/RecipePreviewModal';
+import { logger } from '@/lib/logger';
 import {
   searchExternalRecipes,
   getRandomRecipes,
@@ -56,7 +57,7 @@ export default function DiscoverRecipesPage() {
       const randomRecipes = await getRandomRecipes(12);
       setRecipes(randomRecipes);
     } catch (error) {
-      console.error('Failed to load random recipes:', error);
+      logger.error('Failed to load random recipes:', error, { component: 'page', action: 'execution' });
     } finally {
       setLoading(false);
     }
@@ -74,7 +75,7 @@ export default function DiscoverRecipesPage() {
       const results = await searchExternalRecipes(query);
       setRecipes(results);
     } catch (error) {
-      console.error('Search failed:', error);
+      logger.error('Search failed:', error, { component: 'page', action: 'execution' });
     } finally {
       setLoading(false);
     }
@@ -97,7 +98,7 @@ export default function DiscoverRecipesPage() {
       const results = await searchByCuisine(cuisine);
       setRecipes(results);
     } catch (error) {
-      console.error('Cuisine search failed:', error);
+      logger.error('Cuisine search failed:', error, { component: 'page', action: 'execution' });
     } finally {
       setLoading(false);
     }
@@ -208,7 +209,7 @@ export default function DiscoverRecipesPage() {
       setIsQuickPlanOpen(false);
       setPlanningRecipe(null);
     } catch (error: any) {
-      console.error('Failed to plan meal:', error);
+      logger.error('Failed to plan meal:', error, { component: 'page', action: 'execution' });
       showError(`Failed to plan meal: ${error?.message || 'Unknown error'}`);
     }
   }, [notifySpaceIssue, planningRecipe, spaceId]);
@@ -243,20 +244,20 @@ export default function DiscoverRecipesPage() {
         tags: [externalRecipe.source, externalRecipe.cuisine].filter(Boolean) as string[],
       };
 
-      console.log('Adding recipe to library:', recipeData);
+      logger.info('Adding recipe to library:', { component: 'page', data: recipeData });
 
       // Convert external recipe to our format
       const result = await mealsService.createRecipe(recipeData);
 
-      console.log('Recipe added successfully:', result);
+      logger.info('Recipe added successfully:', { component: 'page', data: result });
       showSuccess('Recipe added to your library!', {
         label: 'View Library',
         onClick: () => window.location.href = '/recipes'
       });
     } catch (error: any) {
-      console.error('Failed to add recipe - Full error:', error);
-      console.error('Error message:', error?.message);
-      console.error('Error details:', error?.details || error?.hint);
+      logger.error('Failed to add recipe - Full error:', error, { component: 'page', action: 'execution' });
+      logger.error('Error message:', undefined, { component: 'page', action: 'execution', details: error?.message });
+      logger.error('Error details:', undefined, { component: 'page', action: 'execution', details: error?.details || error?.hint });
 
       const errorMsg = error?.message || 'Unknown error occurred';
       showError(`Failed to add recipe: ${errorMsg}`);

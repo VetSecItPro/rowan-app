@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 
 /**
  * CCPA (California Consumer Privacy Act) Compliance Service
@@ -81,7 +82,7 @@ class CCPAService {
 
       return { success: true, data };
     } catch (error) {
-      console.error('Error setting CCPA opt-out status:', error);
+      logger.error('Error setting CCPA opt-out status:', error, { component: 'lib-ccpa-service', action: 'service_call' });
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to update opt-out status'
@@ -115,7 +116,7 @@ class CCPAService {
         }
       };
     } catch (error) {
-      console.error('Error getting CCPA opt-out status:', error);
+      logger.error('Error getting CCPA opt-out status:', error, { component: 'lib-ccpa-service', action: 'service_call' });
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to get opt-out status'
@@ -140,7 +141,7 @@ class CCPAService {
 
       return regionCode.trim() === 'CA';
     } catch (error) {
-      console.error('Error checking California residence:', error);
+      logger.error('Error checking California residence:', error, { component: 'lib-ccpa-service', action: 'service_call' });
       // Default to true for CCPA compliance if we can't determine location
       return true;
     }
@@ -178,7 +179,7 @@ class CCPAService {
 
       return { success: true, data: ccpaData };
     } catch (error) {
-      console.error('Error generating CCPA data export:', error);
+      logger.error('Error generating CCPA data export:', error, { component: 'lib-ccpa-service', action: 'service_call' });
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to generate CCPA data export'
@@ -206,7 +207,7 @@ class CCPAService {
           timestamp: new Date().toISOString(),
         });
     } catch (error) {
-      console.error('Error logging CCPA action:', error);
+      logger.error('Error logging CCPA action:', error, { component: 'lib-ccpa-service', action: 'service_call' });
       // Don't throw here - audit logging shouldn't break the main flow
     }
   }
@@ -242,7 +243,7 @@ class CCPAService {
 
       return { success: true, data };
     } catch (error) {
-      console.error('Error bulk updating California residents:', error);
+      logger.error('Error bulk updating California residents:', error, { component: 'lib-ccpa-service', action: 'service_call' });
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to bulk update residents'

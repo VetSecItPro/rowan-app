@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface UserSession {
   id: string;
@@ -48,19 +49,19 @@ export interface LocationInfo {
  * Parse User-Agent string to extract device information
  */
 export function parseUserAgent(userAgent: string): DeviceInfo {
-  console.log('parseUserAgent: input userAgent =', userAgent);
+  logger.info('parseUserAgent: input userAgent =', { component: 'lib-session-tracking-service', data: userAgent });
   const ua = userAgent.toLowerCase();
 
   // Detect device type
   let device_type = 'desktop';
   if (/mobile|android|iphone|ipod|blackberry|windows phone/i.test(userAgent)) {
     device_type = 'mobile';
-    console.log('parseUserAgent: detected mobile device due to userAgent containing mobile keywords');
+    logger.info('parseUserAgent: detected mobile device due to userAgent containing mobile keywords', { component: 'lib-session-tracking-service' });
   } else if (/ipad|tablet|kindle/i.test(userAgent)) {
     device_type = 'tablet';
-    console.log('parseUserAgent: detected tablet device');
+    logger.info('parseUserAgent: detected tablet device', { component: 'lib-session-tracking-service' });
   } else {
-    console.log('parseUserAgent: detected desktop device');
+    logger.info('parseUserAgent: detected desktop device', { component: 'lib-session-tracking-service' });
   }
 
   // Detect browser
@@ -88,16 +89,16 @@ export function parseUserAgent(userAgent: string): DeviceInfo {
   let os = 'Unknown';
   let os_version = '';
 
-  console.log('parseUserAgent: detecting OS from ua =', ua);
+  logger.info('parseUserAgent: detecting OS from ua =', { component: 'lib-session-tracking-service', data: ua });
   if (ua.includes('mac os x')) {
     os = 'macOS';
-    console.log('parseUserAgent: detected macOS');
+    logger.info('parseUserAgent: detected macOS', { component: 'lib-session-tracking-service' });
     const match = userAgent.match(/mac os x ([\d_]+)/i);
     if (match) {
       os_version = match[1].replace(/_/g, '.');
     }
   } else if (ua.includes('windows nt')) {
-    console.log('parseUserAgent: detected Windows');
+    logger.info('parseUserAgent: detected Windows', { component: 'lib-session-tracking-service' });
     os = 'Windows';
     const versionMap: Record<string, string> = {
       '10.0': '11',
@@ -117,14 +118,14 @@ export function parseUserAgent(userAgent: string): DeviceInfo {
     }
   } else if (ua.includes('android')) {
     os = 'Android';
-    console.log('parseUserAgent: detected Android');
+    logger.info('parseUserAgent: detected Android', { component: 'lib-session-tracking-service' });
     const match = userAgent.match(/android ([\d.]+)/i);
     if (match) {
       os_version = match[1];
     }
   } else if (ua.includes('linux')) {
     os = 'Linux';
-    console.log('parseUserAgent: detected Linux');
+    logger.info('parseUserAgent: detected Linux', { component: 'lib-session-tracking-service' });
   }
 
   // Determine device name
@@ -146,23 +147,23 @@ export function parseUserAgent(userAgent: string): DeviceInfo {
     device_name = 'iMac';
   } else if (device_type === 'mobile') {
     device_name = `${os} Phone`;
-    console.log('parseUserAgent: mobile device, setting device_name to:', device_name);
+    logger.info('parseUserAgent: mobile device, setting device_name to:', { component: 'lib-session-tracking-service', data: device_name });
   } else if (device_type === 'tablet') {
     device_name = `${os} Tablet`;
-    console.log('parseUserAgent: tablet device, setting device_name to:', device_name);
+    logger.info('parseUserAgent: tablet device, setting device_name to:', { component: 'lib-session-tracking-service', data: device_name });
   }
 
   // Append browser to device name for clarity
   device_name = `${device_name} - ${browser}`;
 
-  console.log('parseUserAgent: final result:', {
+  logger.info('parseUserAgent: final result:', { component: 'lib-session-tracking-service', data: {
     device_type,
     browser,
     browser_version,
     os,
     os_version,
     device_name,
-  });
+  } });
 
   return {
     device_type,
@@ -181,11 +182,11 @@ const locationCache = new Map<string, { data: LocationInfo; expires: number }>()
  * Get location information from IP address using ipapi.co
  */
 export async function getLocationFromIP(ip: string): Promise<LocationInfo> {
-  console.log('getLocationFromIP: attempting to get location for IP:', ip);
+  logger.info('getLocationFromIP: attempting to get location for IP:', { component: 'lib-session-tracking-service', data: ip });
 
   // Skip geolocation for anonymous IPs
   if (ip === 'anonymous' || !ip) {
-    console.log('getLocationFromIP: skipping geolocation for anonymous/empty IP');
+    logger.info('getLocationFromIP: skipping geolocation for anonymous/empty IP', { component: 'lib-session-tracking-service' });
     return {
       ip_address: ip,
       city: null,
@@ -199,7 +200,7 @@ export async function getLocationFromIP(ip: string): Promise<LocationInfo> {
 
   // In development mode, return mock data to avoid rate limiting
   if (process.env.NODE_ENV === 'development' && ip === '8.8.8.8') {
-    console.log('getLocationFromIP: returning mock data for development');
+    logger.info('getLocationFromIP: returning mock data for development', { component: 'lib-session-tracking-service' });
     return {
       ip_address: ip,
       city: 'Mountain View',
@@ -214,23 +215,23 @@ export async function getLocationFromIP(ip: string): Promise<LocationInfo> {
   // Check cache first
   const cached = locationCache.get(ip);
   if (cached && cached.expires > Date.now()) {
-    console.log('getLocationFromIP: returning cached result for IP:', ip);
+    logger.info('getLocationFromIP: returning cached result for IP:', { component: 'lib-session-tracking-service', data: ip });
     return cached.data;
   }
 
   try {
     const url = `https://ipapi.co/${ip}/json/`;
-    console.log('getLocationFromIP: fetching from URL:', url);
+    logger.info('getLocationFromIP: fetching from URL:', { component: 'lib-session-tracking-service', data: url });
 
     const response = await fetch(url);
-    console.log('getLocationFromIP: response status:', response.status);
+    logger.info('getLocationFromIP: response status:', { component: 'lib-session-tracking-service', data: response.status });
 
     if (!response.ok) {
       throw new Error(`Failed to fetch location: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log('getLocationFromIP: API response data:', data);
+    logger.info('getLocationFromIP: API response data:', { component: 'lib-session-tracking-service', data: data });
 
     const locationData = {
       ip_address: ip,
@@ -248,10 +249,10 @@ export async function getLocationFromIP(ip: string): Promise<LocationInfo> {
       expires: Date.now() + 5 * 60 * 1000, // 5 minutes
     });
 
-    console.log('getLocationFromIP: parsed location data:', locationData);
+    logger.info('getLocationFromIP: parsed location data:', { component: 'lib-session-tracking-service', data: locationData });
     return locationData;
   } catch (error) {
-    console.error('getLocationFromIP: error fetching location:', error);
+    logger.error('getLocationFromIP: error fetching location:', error, { component: 'lib-session-tracking-service', action: 'service_call' });
     const errorData = {
       ip_address: ip,
       city: null,
@@ -284,7 +285,7 @@ export async function getUserSessions(userId: string, supabaseClient?: any): Pro
     // Use provided client (from API route with auth context) or default client
     const supabase = supabaseClient || createClient();
 
-    console.log('getUserSessions: querying for user_id:', userId);
+    logger.info('getUserSessions: querying for user_id:', { component: 'lib-session-tracking-service', data: userId });
 
     // First, let's check if the table exists and has any data at all
     const { data: allSessions, error: countError } = await supabase
@@ -292,12 +293,12 @@ export async function getUserSessions(userId: string, supabaseClient?: any): Pro
       .select('id, user_id, created_at')
       .limit(5);
 
-    console.log('getUserSessions: table check - all sessions in DB:', { allSessions, countError });
+    logger.info('getUserSessions: table check - all sessions in DB:', { component: 'lib-session-tracking-service', data: { allSessions, countError } });
 
     // Test auth context - what does auth.uid() return?
     const { data: { user: authUser } } = await supabase.auth.getUser();
-    console.log('getUserSessions: auth context check - auth.uid():', authUser?.id);
-    console.log('getUserSessions: comparing auth.uid() vs queried userId:', authUser?.id, 'vs', userId);
+    logger.info('getUserSessions: auth context check - auth.uid():', { component: 'lib-session-tracking-service', data: authUser?.id });
+    logger.info('getUserSessions: comparing auth.uid() vs queried userId:', { component: 'lib-session-tracking-service', data: { authUserId: authUser?.id, queriedUserId: userId } });
 
     const { data, error } = await supabase
       .from('user_sessions')
@@ -306,17 +307,17 @@ export async function getUserSessions(userId: string, supabaseClient?: any): Pro
       .is('revoked_at', null)
       .order('last_active', { ascending: false });
 
-    console.log('getUserSessions: database query result:', { data, error });
+    logger.info('getUserSessions: database query result:', { component: 'lib-session-tracking-service', data: { data, error } });
 
     if (error) {
-      console.error('Error fetching user sessions:', error);
+      logger.error('Error fetching user sessions:', error, { component: 'lib-session-tracking-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
-    console.log('getUserSessions: returning sessions count:', data?.length || 0);
+    logger.info('getUserSessions: returning sessions count:', { component: 'lib-session-tracking-service', data: data?.length || 0 });
     return { success: true, sessions: data as UserSession[] };
   } catch (error) {
-    console.error('Error fetching user sessions:', error);
+    logger.error('Error fetching user sessions:', error, { component: 'lib-session-tracking-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to fetch sessions',
@@ -340,13 +341,13 @@ export async function revokeSession(sessionId: string): Promise<{
       .eq('id', sessionId);
 
     if (error) {
-      console.error('Error revoking session:', error);
+      logger.error('Error revoking session:', error, { component: 'lib-session-tracking-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error revoking session:', error);
+    logger.error('Error revoking session:', error, { component: 'lib-session-tracking-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to revoke session',
@@ -375,13 +376,13 @@ export async function revokeAllOtherSessions(
       .is('revoked_at', null);
 
     if (error) {
-      console.error('Error revoking other sessions:', error);
+      logger.error('Error revoking other sessions:', error, { component: 'lib-session-tracking-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error revoking other sessions:', error);
+    logger.error('Error revoking other sessions:', error, { component: 'lib-session-tracking-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to revoke sessions',
@@ -405,13 +406,13 @@ export async function updateSessionActivity(sessionId: string): Promise<{
       .eq('id', sessionId);
 
     if (error) {
-      console.error('Error updating session activity:', error);
+      logger.error('Error updating session activity:', error, { component: 'lib-session-tracking-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error updating session activity:', error);
+    logger.error('Error updating session activity:', error, { component: 'lib-session-tracking-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to update session',

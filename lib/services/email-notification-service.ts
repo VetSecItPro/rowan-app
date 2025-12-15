@@ -1,5 +1,6 @@
 import { Resend } from 'resend';
 import { accountDeletionService } from './account-deletion-service';
+import { logger } from '@/lib/logger';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -28,7 +29,7 @@ export async function sendDeletionInitiatedEmail(
 ): Promise<EmailResult> {
   try {
     if (!resend) {
-      console.warn('Resend API key not configured, skipping email notification');
+      logger.warn('Resend API key not configured, skipping email notification', { component: 'lib-email-notification-service' });
       return { success: false, error: 'Email service not configured' };
     }
 
@@ -118,7 +119,7 @@ export async function sendDeletionInitiatedEmail(
 
     return { success: true };
   } catch (error) {
-    console.error('Error sending deletion initiated email:', error);
+    logger.error('Error sending deletion initiated email:', error, { component: 'lib-email-notification-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to send email'
@@ -138,7 +139,7 @@ export async function send30DayWarningEmail(
 ): Promise<EmailResult> {
   try {
     if (!resend) {
-      console.warn('Resend API key not configured, skipping warning email notification');
+      logger.warn('Resend API key not configured, skipping warning email notification', { component: 'lib-email-notification-service' });
       return { success: false, error: 'Email service not configured' };
     }
 
@@ -222,7 +223,7 @@ export async function send30DayWarningEmail(
 
     return { success: true };
   } catch (error) {
-    console.error('Error sending 30-day warning email:', error);
+    logger.error('Error sending 30-day warning email:', error, { component: 'lib-email-notification-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to send email'
@@ -241,7 +242,7 @@ export async function sendPermanentDeletionConfirmationEmail(
 ): Promise<EmailResult> {
   try {
     if (!resend) {
-      console.warn('Resend API key not configured, skipping deletion confirmation email');
+      logger.warn('Resend API key not configured, skipping deletion confirmation email', { component: 'lib-email-notification-service' });
       return { success: false, error: 'Email service not configured' };
     }
 
@@ -323,7 +324,7 @@ export async function sendPermanentDeletionConfirmationEmail(
 
     return { success: true };
   } catch (error) {
-    console.error('Error sending permanent deletion confirmation email:', error);
+    logger.error('Error sending permanent deletion confirmation email:', error, { component: 'lib-email-notification-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to send email'

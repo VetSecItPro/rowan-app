@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 // Expense Types
 export interface Expense {
@@ -161,12 +162,12 @@ export const projectsService = {
         .maybeSingle();
 
       if (error) {
-        console.error('getBudget error:', error);
+        logger.error('getBudget error:', error, { component: 'lib-budgets-service', action: 'service_call' });
         return null;
       }
       return data;
     } catch (error) {
-      console.error('getBudget exception:', error);
+      logger.error('getBudget exception:', error, { component: 'lib-budgets-service', action: 'service_call' });
       return null;
     }
   },
@@ -234,7 +235,7 @@ export const projectsService = {
         pendingBills: expenses.filter(e => e.status === 'pending').length,
       };
     } catch (error) {
-      console.error('getBudgetStats error:', error);
+      logger.error('getBudgetStats error:', error, { component: 'lib-budgets-service', action: 'service_call' });
       // Return default values if there's an error
       return {
         monthlyBudget: 0,

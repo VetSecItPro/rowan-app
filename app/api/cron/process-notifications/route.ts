@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { notificationQueueService } from '@/lib/services/notification-queue-service';
+import { logger } from '@/lib/logger';
 import {
   sendTaskAssignmentEmail,
   sendEventReminderEmail,
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
   try {
     // SECURITY: Fail-closed if CRON_SECRET is not configured
     if (!process.env.CRON_SECRET) {
-      console.error('[CRON] CRON_SECRET environment variable not configured');
+      logger.error('[CRON] CRON_SECRET environment variable not configured', undefined, { component: 'api-route', action: 'api_request' });
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
 
@@ -72,7 +73,7 @@ export async function GET(request: NextRequest) {
                 throw new Error(result.error || 'Failed to send notification');
               }
             } catch (error) {
-              console.error('Error sending instant notification:', error);
+              logger.error('Error sending instant notification:', error, { component: 'api-route', action: 'api_request' });
               await notificationQueueService.markAsFailed(
                 notif.id,
                 error instanceof Error ? error.message : 'Unknown error',
@@ -83,7 +84,7 @@ export async function GET(request: NextRequest) {
           }
         } else {
           // Unknown delivery method - mark as failed
-          console.error('Unknown delivery method:', deliveryMethod);
+          logger.error('Unknown delivery method:', deliveryMethod, { component: 'api-route', action: 'api_request' });
           for (const notif of notifications) {
             await notificationQueueService.markAsFailed(
               notif.id,
@@ -94,7 +95,7 @@ export async function GET(request: NextRequest) {
           failed += notifications.length;
         }
       } catch (error) {
-        console.error('Error processing notification group:', error);
+        logger.error('Error processing notification group:', error, { component: 'api-route', action: 'api_request' });
         failed += notifications.length;
       }
     }
@@ -110,7 +111,7 @@ export async function GET(request: NextRequest) {
       cleaned,
     });
   } catch (error) {
-    console.error('Cron job error:', error);
+    logger.error('Cron job error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -237,7 +238,7 @@ async function sendInstantNotification(userId: string, notification: any): Promi
         return { success: false, error: `Unknown notification type: ${notificationType}` };
     }
   } catch (error) {
-    console.error('Error sending instant notification:', error);
+    logger.error('Error sending instant notification:', error, { component: 'api-route', action: 'api_request' });
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }

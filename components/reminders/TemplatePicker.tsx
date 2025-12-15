@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Search, Star, Sparkles, X } from 'lucide-react';
+import { logger } from '@/lib/logger';
 import {
   ReminderTemplate,
   reminderTemplatesService,
@@ -52,7 +53,7 @@ export function TemplatePicker({ spaceId, onSelectTemplate, onClose }: TemplateP
       setTemplates(data);
       setFilteredTemplates(data);
     } catch (error) {
-      console.error('Failed to load templates:', error);
+      logger.error('Failed to load templates:', error, { component: 'TemplatePicker', action: 'component_action' });
     } finally {
       setLoading(false);
     }

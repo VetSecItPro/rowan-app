@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { checkAndAwardBadges } from './achievement-service';
 import { enhancedNotificationService } from './enhanced-notification-service';
+import { logger } from '@/lib/logger';
 
 export interface Milestone {
   id: string;
@@ -431,7 +432,7 @@ export const goalsService = {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           // Trigger badge checking in the background (don't await to avoid blocking)
-          checkAndAwardBadges(user.id, data.space_id).catch(console.error);
+          checkAndAwardBadges(user.id, data.space_id).catch((error) => logger.error('Caught error', error, { component: 'lib-goals-service', action: 'service_call' }));
 
           // Get user name and space info for notifications
           const [{ data: userData }, { data: spaceData }] = await Promise.all([
@@ -455,11 +456,11 @@ export const goalsService = {
                 completionDate: finalUpdates.completed_at,
                 spaceName: spaceData?.name || 'Your Space',
               }
-            ).catch(console.error);
+            ).catch((error) => logger.error('Caught error', error, { component: 'lib-goals-service', action: 'service_call' }));
           }
         }
       } catch (error) {
-        console.error('Failed to check for achievement badges or send notifications:', error);
+        logger.error('Failed to check for achievement badges or send notifications:', error, { component: 'lib-goals-service', action: 'service_call' });
       }
     }
 
@@ -535,7 +536,7 @@ export const goalsService = {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           // Trigger badge checking in the background (don't await to avoid blocking)
-          checkAndAwardBadges(user.id, data.goal.space_id).catch(console.error);
+          checkAndAwardBadges(user.id, data.goal.space_id).catch((error) => logger.error('Caught error', error, { component: 'lib-goals-service', action: 'service_call' }));
 
           // Get goal details, user name and space info for notifications
           const [{ data: goalData }, { data: userData }, { data: spaceData }] = await Promise.all([
@@ -561,11 +562,11 @@ export const goalsService = {
                 spaceName: spaceData?.name || 'Your Space',
                 milestoneTitle: data.title,
               }
-            ).catch(console.error);
+            ).catch((error) => logger.error('Caught error', error, { component: 'lib-goals-service', action: 'service_call' }));
           }
         }
       } catch (error) {
-        console.error('Failed to check for achievement badges or send notifications:', error);
+        logger.error('Failed to check for achievement badges or send notifications:', error, { component: 'lib-goals-service', action: 'service_call' });
       }
     }
 
@@ -874,9 +875,9 @@ export const goalsService = {
     // Check for badge awards after check-in (for streak badges)
     if (data.goal?.space_id) {
       try {
-        checkAndAwardBadges(user.id, data.goal.space_id).catch(console.error);
+        checkAndAwardBadges(user.id, data.goal.space_id).catch((error) => logger.error('Caught error', error, { component: 'lib-goals-service', action: 'service_call' }));
       } catch (error) {
-        console.error('Failed to check for achievement badges:', error);
+        logger.error('Failed to check for achievement badges:', error, { component: 'lib-goals-service', action: 'service_call' });
       }
     }
 
@@ -934,7 +935,7 @@ export const goalsService = {
         .upload(fileName, photo);
 
       if (uploadError) {
-        console.error('Photo upload error:', uploadError);
+        logger.error('Photo upload error:', uploadError, { component: 'lib-goals-service', action: 'service_call' });
         continue;
       }
 
@@ -955,7 +956,7 @@ export const goalsService = {
         .single();
 
       if (photoError) {
-        console.error('Photo database error:', photoError);
+        logger.error('Photo database error:', photoError, { component: 'lib-goals-service', action: 'service_call' });
         continue;
       }
 
@@ -1135,14 +1136,14 @@ export const goalsService = {
       if (error) {
         // Handle table not found error gracefully
         if (error.message?.includes('goal_activities') || error.code === '42P01') {
-          console.warn('goal_activities table not found, returning empty activity feed');
+          logger.warn('goal_activities table not found, returning empty activity feed', { component: 'lib-goals-service' });
           return [];
         }
         throw error;
       }
       return data || [];
     } catch (error) {
-      console.error('Error fetching activity feed:', error);
+      logger.error('Error fetching activity feed:', error, { component: 'lib-goals-service', action: 'service_call' });
       return [];
     }
   },
@@ -1403,7 +1404,7 @@ export const goalsService = {
       .insert(mentionInserts);
 
     if (error) {
-      console.error('Failed to create mentions:', error);
+      logger.error('Failed to create mentions:', error, { component: 'lib-goals-service', action: 'service_call' });
     }
   },
 

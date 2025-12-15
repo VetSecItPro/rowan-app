@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import {
   Users,
   TrendingUp,
@@ -59,7 +60,7 @@ export function PartnerBalanceWidget({
         setTrends(trendsData);
         setStats(statsData);
       } catch (err) {
-        console.error('Failed to load balance data:', err);
+        logger.error('Failed to load balance data:', err, { component: 'PartnerBalanceWidget', action: 'component_action' });
         setError('Failed to load balance information');
       } finally {
         setLoading(false);

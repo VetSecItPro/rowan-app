@@ -5,6 +5,8 @@
  * while still logging them for debugging purposes.
  */
 
+import { logger } from '@/lib/logger';
+
 export interface SecureError {
   userMessage: string;
   logMessage: string;
@@ -22,7 +24,7 @@ export function createSecureError(
 ): SecureError {
   // Always log technical details for debugging (only in development)
   if (process.env.NODE_ENV === 'development') {
-    console.error(`[${context}] Technical error:`, technicalError);
+    logger.error('[${context}] Technical error:', technicalError, { component: 'lib-secure-error-handling', action: 'service_call' });
   }
 
   // Determine user-friendly message based on error type

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // TYPES & VALIDATION
@@ -111,7 +112,7 @@ export const reminderActivityService = {
       .single();
 
     if (error) {
-      console.error('Error logging activity:', error);
+      logger.error('Error logging activity:', error, { component: 'lib-reminder-activity-service', action: 'service_call' });
       throw new Error('Failed to log activity');
     }
 
@@ -148,7 +149,7 @@ export const reminderActivityService = {
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error fetching activity log:', error);
+      logger.error('Error fetching activity log:', error, { component: 'lib-reminder-activity-service', action: 'service_call' });
       throw new Error('Failed to fetch activity log');
     }
 
@@ -173,7 +174,7 @@ export const reminderActivityService = {
       .eq('space_id', spaceId);
 
     if (reminderError) {
-      console.error('Error fetching reminder IDs:', reminderError);
+      logger.error('Error fetching reminder IDs:', reminderError, { component: 'lib-reminder-activity-service', action: 'service_call' });
       throw new Error('Failed to fetch reminder IDs');
     }
 
@@ -204,7 +205,7 @@ export const reminderActivityService = {
       .limit(limit);
 
     if (error) {
-      console.error('Error fetching space activity:', error);
+      logger.error('Error fetching space activity:', error, { component: 'lib-reminder-activity-service', action: 'service_call' });
       throw new Error('Failed to fetch space activity');
     }
 

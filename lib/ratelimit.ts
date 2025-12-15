@@ -1,6 +1,7 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import { fallbackRateLimit } from './ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 // Check if Redis environment variables are available
 const hasRedisConfig = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -71,7 +72,7 @@ export async function checkRateLimit(
     try {
       return await rateLimiter.limit(ip);
     } catch (error) {
-      console.warn('Redis rate limiter failed, falling back to in-memory:', error);
+      logger.warn('Redis rate limiter failed, falling back to in-memory', { component: 'lib-ratelimit', error: error instanceof Error ? error.message : 'Unknown error' });
       // Fall through to fallback
     }
   }

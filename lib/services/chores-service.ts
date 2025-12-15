@@ -4,6 +4,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 import type { Chore } from '@/lib/types';
 import { pointsService } from '@/lib/services/rewards';
 import type { PointTransaction } from '@/lib/types/rewards';
+import { logger } from '@/lib/logger';
 
 // Chore Types - using main types file interface
 
@@ -97,20 +98,20 @@ export const choresService = {
                     .order('created_at', { ascending: false });
       } catch (sortError) {
         // Fallback to created_at only if sort_order column doesn't exist
-        console.warn('sort_order column may not exist, using created_at ordering:', sortError);
+        logger.warn('sort_order column may not exist, using created_at ordering', { component: 'lib-chores-service', error: sortError });
         query = query.order('created_at', { ascending: false });
       }
 
       const { data, error } = await query;
 
       if (error) {
-        console.error('❌ getChores Supabase error:', error);
+        logger.error('❌ getChores Supabase error:', error, { component: 'lib-chores-service', action: 'service_call' });
         throw new Error(`Failed to fetch chores: ${error.message}`);
       }
 
       return data || [];
     } catch (error) {
-      console.error('❌ Error in getChores:', error);
+      logger.error('❌ Error in getChores:', error, { component: 'lib-chores-service', action: 'service_call' });
       throw error;
     }
   },
@@ -139,7 +140,7 @@ export const choresService = {
 
       return data;
     } catch (error) {
-      console.error('Error in getChoreById:', error);
+      logger.error('Error in getChoreById:', error, { component: 'lib-chores-service', action: 'service_call' });
       throw error;
     }
   },
@@ -166,7 +167,7 @@ export const choresService = {
 
       return chore;
     } catch (error) {
-      console.error('Error in createChore:', error);
+      logger.error('Error in createChore:', error, { component: 'lib-chores-service', action: 'service_call' });
       throw error;
     }
   },
@@ -208,7 +209,7 @@ export const choresService = {
 
       return data;
     } catch (error) {
-      console.error('Error in updateChore:', error);
+      logger.error('Error in updateChore:', error, { component: 'lib-chores-service', action: 'service_call' });
       throw error;
     }
   },
@@ -231,7 +232,7 @@ export const choresService = {
         throw new Error(`Failed to delete chore: ${error.message}`);
       }
     } catch (error) {
-      console.error('Error in deleteChore:', error);
+      logger.error('Error in deleteChore:', error, { component: 'lib-chores-service', action: 'service_call' });
       throw error;
     }
   },
@@ -256,7 +257,7 @@ export const choresService = {
       if (error) {
         // Handle case where sort_order column might not exist
         if (error.code === '42703') {
-          console.warn('sort_order column does not exist, skipping order update');
+          logger.warn('sort_order column does not exist, skipping order update', { component: 'lib-chores-service' });
           // Return the chore without updating order
           const { data: choreData, error: fetchError } = await supabase
             .from('chores')
@@ -272,7 +273,7 @@ export const choresService = {
 
       return data;
     } catch (error) {
-      console.error('Error in updateChoreOrder:', error);
+      logger.error('Error in updateChoreOrder:', error, { component: 'lib-chores-service', action: 'service_call' });
       throw error;
     }
   },
@@ -290,7 +291,7 @@ export const choresService = {
         await this.updateChoreOrder(update.id, update.sort_order);
       }
     } catch (error) {
-      console.error('Error in bulkUpdateChoreOrder:', error);
+      logger.error('Error in bulkUpdateChoreOrder:', error, { component: 'lib-chores-service', action: 'service_call' });
       throw error;
     }
   },
@@ -318,7 +319,7 @@ export const choresService = {
 
       return data || [];
     } catch (error) {
-      console.error('Error in getChoresByUser:', error);
+      logger.error('Error in getChoresByUser:', error, { component: 'lib-chores-service', action: 'service_call' });
       throw error;
     }
   },
@@ -346,7 +347,7 @@ export const choresService = {
 
       return data || [];
     } catch (error) {
-      console.error('Error in getChoresByFrequency:', error);
+      logger.error('Error in getChoresByFrequency:', error, { component: 'lib-chores-service', action: 'service_call' });
       throw error;
     }
   },
@@ -469,7 +470,7 @@ export const choresService = {
       };
     } catch (pointsError) {
       // Points award failed, but chore is still completed
-      console.error('Failed to award points for chore completion:', pointsError);
+      logger.error('Failed to award points for chore completion:', pointsError, { component: 'lib-chores-service', action: 'service_call' });
       // Return without points info - chore is completed at least
       return {
         chore: updatedChore,

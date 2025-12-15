@@ -14,6 +14,7 @@ import { GoalComment, CreateCommentInput, goalsService } from '@/lib/services/go
 import { createClient } from '@/lib/supabase/client';
 import { hapticLight, hapticSuccess } from '@/lib/utils/haptics';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 interface GoalCommentsProps {
   goalId: string;
@@ -61,7 +62,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
         setReactionCounts(counts);
       }
     } catch (error) {
-      console.error('Error loading comments:', error);
+      logger.error('Error loading comments:', error, { component: 'GoalComments', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -84,7 +85,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
       setNewComment('');
       await loadComments(); // Reload to get updated reaction counts
     } catch (error) {
-      console.error('Error adding comment:', error);
+      logger.error('Error adding comment:', error, { component: 'GoalComments', action: 'component_action' });
     } finally {
       setIsSubmitting(false);
     }
@@ -102,7 +103,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
       setEditContent('');
       await loadComments();
     } catch (error) {
-      console.error('Error editing comment:', error);
+      logger.error('Error editing comment:', error, { component: 'GoalComments', action: 'component_action' });
     }
   };
 
@@ -115,7 +116,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
       hapticLight();
       setComments(prev => prev.filter(comment => comment.id !== commentId));
     } catch (error) {
-      console.error('Error deleting comment:', error);
+      logger.error('Error deleting comment:', error, { component: 'GoalComments', action: 'component_action' });
     }
   };
 
@@ -130,7 +131,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
       // Reload comments to get updated reaction counts
       await loadComments();
     } catch (error) {
-      console.error('Error handling reaction:', error);
+      logger.error('Error handling reaction:', error, { component: 'GoalComments', action: 'component_action' });
     }
   };
 

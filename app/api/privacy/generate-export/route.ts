@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
 import { Resend } from 'resend';
+import { logger } from '@/lib/logger';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
       .update({ status: 'processing' })
       .eq('id', exportId);
 
-    console.log(`🔄 Starting data export for user ${userId}, format: ${format}`);
+    logger.info(`🔄 Starting data export for user ${userId}, format: ${format}`, { component: 'api-route' });
 
     try {
       // Gather all user data
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
       // Send email notification with download link
       await sendExportCompletionEmail(userId, fileUrl, fileName, format, expiresAt);
 
-      console.log(`✅ Data export completed for user ${userId}, file: ${fileName}`);
+      logger.info(`✅ Data export completed for user ${userId}, file: ${fileName}`, { component: 'api-route' });
 
       return NextResponse.json({
         success: true,
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (error) {
-      console.error(`❌ Data export failed for user ${userId}:`, error);
+      logger.error('❌ Data export failed for user ${userId}:', error, { component: 'api-route', action: 'api_request' });
 
       // Update export status to failed
       await supabase
@@ -132,7 +133,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error('Data export API error:', error);
+    logger.error('Data export API error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -144,7 +145,7 @@ export async function POST(request: NextRequest) {
 async function gatherUserData(userId: string) {
   const supabase = createClient();
 
-  console.log(`📊 Gathering data for user ${userId}...`);
+  logger.info(`📊 Gathering data for user ${userId}...`, { component: 'api-route' });
 
   // User profile and account information
   const { data: profile } = await supabase
@@ -260,7 +261,7 @@ async function gatherUserData(userId: string) {
     },
   };
 
-  console.log(`✅ Data gathered: ${Object.keys(userData).length} categories`);
+  logger.info(`✅ Data gathered: ${Object.keys(userData).length} categories`, { component: 'api-route' });
   return userData;
 }
 
@@ -383,7 +384,7 @@ async function uploadExportFile(fileName: string, fileBuffer: Buffer, mimeType: 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://rowan.app';
   const fileUrl = `${baseUrl}/api/privacy/download-export?file=${encodeURIComponent(fileName)}`;
 
-  console.log(`📁 Mock upload: ${fileName} (${fileBuffer.length} bytes)`);
+  logger.info(`📁 Mock upload: ${fileName} (${fileBuffer.length} bytes)`, { component: 'api-route' });
 
   // In production, you would:
   // 1. Upload to cloud storage
@@ -412,17 +413,17 @@ async function sendExportCompletionEmail(
       .single();
 
     if (!profile?.email) {
-      console.log('❌ No email found for user, skipping notification');
+      logger.info('❌ No email found for user, skipping notification', { component: 'api-route' });
       return;
     }
 
     if (!resend) {
-      console.error('Resend API key not configured');
+      logger.error('Resend API key not configured', undefined, { component: 'api-route', action: 'api_request' });
       throw new Error('Email service not available');
     }
 
     if (!resend) {
-      console.error('Resend API key not configured');
+      logger.error('Resend API key not configured', undefined, { component: 'api-route', action: 'api_request' });
       throw new Error('Email service not available');
     }
 
@@ -488,9 +489,9 @@ async function sendExportCompletionEmail(
         email_address: profile.email,
       });
 
-    console.log(`📧 Export completion email sent to ${profile.email}`);
+    logger.info(`📧 Export completion email sent to ${profile.email}`, { component: 'api-route' });
   } catch (error) {
-    console.error('Error sending export completion email:', error);
+    logger.error('Error sending export completion email:', error, { component: 'api-route', action: 'api_request' });
   }
 }
 
@@ -507,12 +508,12 @@ async function sendExportFailureEmail(userId: string) {
       .single();
 
     if (!profile?.email) {
-      console.log('❌ No email found for user, skipping failure notification');
+      logger.info('❌ No email found for user, skipping failure notification', { component: 'api-route' });
       return;
     }
 
     if (!resend) {
-      console.error('Resend API key not configured');
+      logger.error('Resend API key not configured', undefined, { component: 'api-route', action: 'api_request' });
       throw new Error('Email service not available');
     }
 
@@ -567,8 +568,8 @@ async function sendExportFailureEmail(userId: string) {
         email_address: profile.email,
       });
 
-    console.log(`📧 Export failure email sent to ${profile.email}`);
+    logger.info(`📧 Export failure email sent to ${profile.email}`, { component: 'api-route' });
   } catch (error) {
-    console.error('Error sending export failure email:', error);
+    logger.error('Error sending export failure email:', error, { component: 'api-route', action: 'api_request' });
   }
 }

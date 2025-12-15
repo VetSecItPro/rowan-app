@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Bell, X, CheckCheck, Trash2, ExternalLink } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 import {
   getUserNotifications,
   getUnreadNotificationCount,
@@ -59,7 +60,7 @@ export default function NotificationBell() {
       } = await supabase.auth.getUser();
 
       if (userError) {
-        console.warn('Auth error loading user:', userError);
+        logger.warn('Auth error loading user:', { component: 'NotificationBell', error: userError });
         return;
       }
 
@@ -73,14 +74,14 @@ export default function NotificationBell() {
           setNotifications(notifs);
           setUnreadCount(count);
         } catch (notificationError) {
-          console.warn('Error loading notifications:', notificationError);
+          logger.warn('Error loading notifications:', { component: 'NotificationBell', error: notificationError });
           // Set empty state instead of crashing
           setNotifications([]);
           setUnreadCount(0);
         }
       }
     } catch (error) {
-      console.warn('Error in loadUserAndNotifications:', error);
+      logger.warn('Error in loadUserAndNotifications:', { component: 'NotificationBell', error: error });
     } finally {
       setLoading(false);
     }
@@ -94,7 +95,7 @@ export default function NotificationBell() {
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      logger.error('Error marking notification as read:', error, { component: 'NotificationBell', action: 'component_action' });
     }
   };
 
@@ -105,7 +106,7 @@ export default function NotificationBell() {
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       setUnreadCount(0);
     } catch (error) {
-      console.error('Error marking all as read:', error);
+      logger.error('Error marking all as read:', error, { component: 'NotificationBell', action: 'component_action' });
     }
   };
 
@@ -118,7 +119,7 @@ export default function NotificationBell() {
         setUnreadCount((prev) => Math.max(0, prev - 1));
       }
     } catch (error) {
-      console.error('Error deleting notification:', error);
+      logger.error('Error deleting notification:', error, { component: 'NotificationBell', action: 'component_action' });
     }
   };
 

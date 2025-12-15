@@ -70,7 +70,7 @@ export function SmartOnboarding({ isOpen, onClose }: SmartOnboardingProps) {
         throw new Error('Failed to create personal workspace');
       }
     } catch (error) {
-      console.error('Personal workspace setup failed:', error);
+      logger.error('Personal workspace setup failed:', error, { component: 'SmartOnboarding', action: 'component_action' });
       setError('Failed to set up personal workspace. Please try again.');
     } finally {
       setLoading(false);

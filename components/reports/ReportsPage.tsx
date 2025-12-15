@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import { logger } from '@/lib/logger';
 import {
   DocumentTextIcon,
   ChartBarIcon,
@@ -54,7 +55,7 @@ export function ReportsPage({ className = '' }: ReportsPageProps) {
       setTemplates(templates || []);
       setReports(reports || []);
     } catch (error) {
-      console.error('Error loading reports data:', error);
+      logger.error('Error loading reports data:', error, { component: 'ReportsPage', action: 'component_action' });
     } finally {
       setLoading(false);
     }

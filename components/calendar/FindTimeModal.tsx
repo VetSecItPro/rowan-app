@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, Clock, Calendar, Users, Sparkles, CheckCircle2 } from 'lucide-react';
 import { format, addDays, parseISO } from 'date-fns';
 import { smartSchedulingService, TimeSlot, DURATION_PRESETS } from '@/lib/services/smart-scheduling-service';
+import { logger } from '@/lib/logger';
 
 interface FindTimeModalProps {
   isOpen: boolean;
@@ -42,7 +43,7 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
       });
       setTimeSlots(slots);
     } catch (error) {
-      console.error('Failed to find time slots:', error);
+      logger.error('Failed to find time slots:', error, { component: 'FindTimeModal', action: 'component_action' });
       setTimeSlots([]);
     } finally {
       setLoading(false);

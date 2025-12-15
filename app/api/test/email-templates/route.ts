@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 import {
   sendTaskAssignmentEmail,
   sendEventReminderEmail,
@@ -208,7 +209,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Email test error:', error);
+    logger.error('Email test error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

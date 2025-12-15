@@ -4,6 +4,7 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import {
   generateShoppingList,
@@ -202,7 +203,7 @@ export async function POST(req: NextRequest) {
       }
     } catch (emailError) {
       // Log error but don't fail the request
-      console.error('[API] Failed to send shopping list email:', emailError);
+      logger.error('Failed to send shopping list email', emailError instanceof Error ? emailError : new Error(String(emailError)), { component: 'api-route', action: 'email-notification', endpoint: '/api/shopping/generate-from-meals' });
       Sentry.captureException(emailError, {
         tags: {
           endpoint: '/api/shopping/generate-from-meals',
@@ -230,10 +231,7 @@ export async function POST(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error(
-      '[API] /api/shopping/generate-from-meals POST error:',
-      error
-    );
+    logger.error('/api/shopping/generate-from-meals POST error', error instanceof Error ? error : new Error(String(error)), { component: 'api-route', action: 'POST', endpoint: '/api/shopping/generate-from-meals' });
     return NextResponse.json(
       { error: 'Failed to generate shopping list' },
       { status: 500 }

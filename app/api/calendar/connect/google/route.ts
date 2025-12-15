@@ -8,6 +8,7 @@ import { ConnectCalendarRequestSchema } from '@/lib/validations/calendar-integra
 import { z } from 'zod';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,10 +42,10 @@ export async function POST(request: NextRequest) {
     });
 
     // Verify user has access to the space
-    console.log('[Calendar Connect] Checking space access:', {
+    logger.info('[Calendar Connect] Checking space access:', { component: 'api-route', data: {
       space_id: validatedData.space_id,
       user_id: user.id,
-    });
+    } });
 
     const { data: spaceMember, error: spaceError } = await supabase
       .from('space_members')
@@ -54,19 +55,19 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (spaceError || !spaceMember) {
-      console.error('[Calendar Connect] Space access denied:', {
+      logger.error('[Calendar Connect] Space access denied:', undefined, { component: 'api-route', action: 'api_request', details: {
         spaceError,
         spaceMember,
         space_id: validatedData.space_id,
         user_id: user.id,
-      });
+      } });
       return NextResponse.json(
         { error: 'Space not found or access denied' },
         { status: 403 }
       );
     }
 
-    console.log('[Calendar Connect] Space access confirmed:', spaceMember);
+    logger.info('[Calendar Connect] Space access confirmed:', { component: 'api-route', data: spaceMember });
 
     // Check for existing active connection
     const { data: activeConnection } = await supabase
@@ -103,7 +104,7 @@ export async function POST(request: NextRequest) {
 
     if (disconnectedConnection) {
       // Reuse existing disconnected connection
-      console.log('[Calendar Connect] Reusing disconnected connection:', disconnectedConnection.id);
+      logger.info('[Calendar Connect] Reusing disconnected connection:', { component: 'api-route', data: disconnectedConnection.id });
       const { data: updatedConnection, error: updateError } = await supabase
         .from('calendar_connections')
         .update({
@@ -116,7 +117,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (updateError) {
-        console.error('Failed to update connection:', updateError);
+        logger.error('Failed to update connection:', updateError, { component: 'api-route', action: 'api_request' });
         return NextResponse.json(
           { error: 'Failed to update calendar connection' },
           { status: 500 }
@@ -139,7 +140,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (connectionError) {
-        console.error('Failed to create connection:', connectionError);
+        logger.error('Failed to create connection:', connectionError, { component: 'api-route', action: 'api_request' });
         return NextResponse.json(
           { error: 'Failed to create calendar connection' },
           { status: 500 }
@@ -167,7 +168,7 @@ export async function POST(request: NextRequest) {
       message: 'Redirect user to auth_url to complete Google Calendar connection',
     });
   } catch (error) {
-    console.error('Google OAuth connect error:', error);
+    logger.error('Google OAuth connect error:', error, { component: 'api-route', action: 'api_request' });
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -237,7 +238,7 @@ export async function GET(request: NextRequest) {
       connections: connections || [],
     });
   } catch (error) {
-    console.error('Failed to get Google connections:', error);
+    logger.error('Failed to get Google connections:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to fetch Google Calendar connections' },
       { status: 500 }

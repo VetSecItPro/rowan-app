@@ -1,27 +1,14 @@
 import { withSentryConfig } from '@sentry/nextjs';
 import bundleAnalyzer from '@next/bundle-analyzer';
 import path from 'path';
-import os from 'os';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // FIX: Webpack cache race condition with spaces in path
-  // Move cache to /tmp/rowan-app-cache (no spaces) to prevent ENOENT errors
-  webpack: (config, { dev }) => {
-    if (dev) {
-      // Use temp directory for webpack cache (no spaces in path)
-      const cacheDir = path.join(os.tmpdir(), 'rowan-app-cache');
-      config.cache = {
-        type: 'filesystem',
-        cacheDirectory: cacheDir,
-        // Prevent stale cache issues
-        compression: false,
-        // Use content hash for better cache invalidation
-        hashAlgorithm: 'xxhash64',
-      };
-    }
-    return config;
-  },
+  // FIX: Explicitly set workspace root to prevent lockfile confusion
+  outputFileTracingRoot: __dirname,
 
   eslint: {
     // ESLint is disabled during builds due to 3,500+ non-critical issues
@@ -52,7 +39,6 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
     // Disabled due to race condition causing 500 errors in dev
     // webpackBuildWorker: true,
-    instrumentationHook: false,
   },
 
   // Performance optimizations

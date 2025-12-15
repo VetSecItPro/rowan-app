@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Cookie, Shield, BarChart3, Megaphone, Settings, Palette, Calendar, AlertCircle, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { logger } from '@/lib/logger';
 import {
   getCookiePreferences,
   updateCookiePreferences,
@@ -72,7 +73,7 @@ export function CookiePreferences() {
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (error) {
-      console.error('Error saving cookie preferences:', error);
+      logger.error('Error saving cookie preferences:', error, { component: 'CookiePreferences', action: 'component_action' });
     } finally {
       setIsLoading(false);
     }

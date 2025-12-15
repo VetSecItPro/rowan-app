@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getStripeClient } from '@/lib/stripe/client';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 interface InvoiceData {
   id: string;
@@ -77,7 +78,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error fetching invoices:', error);
+    logger.error('Error fetching invoices:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to fetch invoices' },
       { status: 500 }

@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     // Get client IP address
     const forwarded = request.headers.get('x-forwarded-for');
     const realIP = request.headers.get('x-real-ip');
-    let clientIP = forwarded?.split(',')[0] || realIP || request.ip || '';
+    let clientIP = forwarded?.split(',')[0] || realIP || '';
 
     // Handle localhost and development - try to get real IP first
     if (!clientIP || clientIP === '::1' || clientIP === '127.0.0.1' || clientIP.includes('localhost')) {

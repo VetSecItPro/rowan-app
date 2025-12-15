@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { reminderNotificationsService } from '@/lib/services/reminder-notifications-service';
 import { Resend } from 'resend';
+import { logger } from '@/lib/logger';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -108,7 +109,7 @@ async function getRemindersNeedingNotification(supabase: any): Promise<ReminderT
     .lte('reminder_time', fifteenMinutesFromNow.toISOString());
 
   if (error) {
-    console.error('Error fetching reminders:', error);
+    logger.error('Error fetching reminders:', error, { component: 'reminder-notifications-job', action: 'service_call' });
     throw new Error('Failed to fetch reminders');
   }
 
@@ -210,7 +211,7 @@ async function sendInAppNotifications(batch: NotificationBatch): Promise<{
         });
         sent++;
       } catch (error) {
-        console.error(`Failed to create in-app notification for reminder ${reminder.id}:`, error);
+        logger.error(`Failed to create in-app notification for reminder ${reminder.id}:`, error, { component: 'reminder-notifications-job', action: 'service_call' });
       }
     }
 
@@ -255,7 +256,7 @@ async function sendEmailNotifications(batch: NotificationBatch): Promise<{
           channel: 'email',
         });
       } catch (error) {
-        console.error(`Failed to create email notification record for reminder ${reminder.id}:`, error);
+        logger.error(`Failed to create email notification record for reminder ${reminder.id}:`, error, { component: 'reminder-notifications-job', action: 'service_call' });
       }
     }
 
@@ -264,7 +265,7 @@ async function sendEmailNotifications(batch: NotificationBatch): Promise<{
     const emailSubject = generateEmailSubject(batch);
 
     if (!resend) {
-      console.warn('Resend API key not configured, skipping reminder email');
+      logger.warn('Resend API key not configured, skipping reminder email', { component: 'reminder-notifications-job' });
       return { sent: false };
     }
 

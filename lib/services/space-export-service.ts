@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // SPACE-SPECIFIC EXPORT SERVICE
@@ -246,7 +247,7 @@ export async function exportSpaceData(
         exportData[dataType] = result.value.data;
         totalRecords += result.value.data.length;
       } else {
-        console.warn(`Failed to export ${dataType}:`, result.status === 'rejected' ? result.reason : 'No data');
+        logger.warn(`Failed to export ${dataType}`, { component: 'lib-space-export-service', error: result.status === 'rejected' ? result.reason : 'No data' });
         exportData[dataType] = [];
       }
     });
@@ -263,7 +264,7 @@ export async function exportSpaceData(
     }
 
   } catch (error) {
-    console.error('[space-export-service] exportSpaceData error:', error);
+    logger.error('[space-export-service] exportSpaceData error:', error, { component: 'lib-space-export-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to export space data'
@@ -402,7 +403,7 @@ export async function getSpaceExportSummary(
     return { success: true, data: summary };
 
   } catch (error) {
-    console.error('[space-export-service] getSpaceExportSummary error:', error);
+    logger.error('[space-export-service] getSpaceExportSummary error:', error, { component: 'lib-space-export-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to get export summary'

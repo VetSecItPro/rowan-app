@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { TrendingUp, TrendingDown, AlertCircle, CheckCircle, DollarSign, Calendar } from 'lucide-react';
 import { budgetAlertsService } from '@/lib/services/budget-alerts-service';
+import { logger } from '@/lib/logger';
 
 interface SafeToSpendIndicatorProps {
   spaceId: string;
@@ -27,7 +28,7 @@ export function SafeToSpendIndicator({ spaceId }: SafeToSpendIndicatorProps) {
         const info = await budgetAlertsService.getSafeToSpendInfo(spaceId);
         setSafeToSpendInfo(info);
       } catch (error) {
-        console.error('Failed to load safe to spend info:', error);
+        logger.error('Failed to load safe to spend info:', error, { component: 'SafeToSpendIndicator', action: 'component_action' });
       } finally {
         setLoading(false);
       }

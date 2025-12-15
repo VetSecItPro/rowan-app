@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { sanitizeSearchInput } from '@/lib/utils';
 import type { FeedbackSubmission, CreateFeedbackInput, UpdateFeedbackInput, FeedbackStatus } from '@/lib/types';
+import { logger } from '@/lib/logger';
 
 export const feedbackService = {
   /**
@@ -38,13 +39,13 @@ export const feedbackService = {
         .single();
 
       if (error) {
-        console.error('Error submitting feedback:', error);
+        logger.error('Error submitting feedback:', error, { component: 'lib-feedback-service', action: 'service_call' });
         return { success: false, error: error.message };
       }
 
       return { success: true, data: data as FeedbackSubmission };
     } catch (error) {
-      console.error('Error submitting feedback:', error);
+      logger.error('Error submitting feedback:', error, { component: 'lib-feedback-service', action: 'service_call' });
       return { success: false, error: 'Failed to submit feedback' };
     }
   },
@@ -70,7 +71,7 @@ export const feedbackService = {
         });
 
       if (error) {
-        console.error('Error uploading screenshot:', error);
+        logger.error('Error uploading screenshot:', error, { component: 'lib-feedback-service', action: 'service_call' });
         return { success: false, error: error.message };
       }
 
@@ -81,7 +82,7 @@ export const feedbackService = {
 
       return { success: true, url: publicUrl };
     } catch (error) {
-      console.error('Error uploading screenshot:', error);
+      logger.error('Error uploading screenshot:', error, { component: 'lib-feedback-service', action: 'service_call' });
       return { success: false, error: 'Failed to upload screenshot' };
     }
   },
@@ -100,13 +101,13 @@ export const feedbackService = {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching user feedback:', error);
+        logger.error('Error fetching user feedback:', error, { component: 'lib-feedback-service', action: 'service_call' });
         return { success: false, error: error.message };
       }
 
       return { success: true, data: data as FeedbackSubmission[] };
     } catch (error) {
-      console.error('Error fetching user feedback:', error);
+      logger.error('Error fetching user feedback:', error, { component: 'lib-feedback-service', action: 'service_call' });
       return { success: false, error: 'Failed to fetch feedback' };
     }
   },
@@ -150,13 +151,13 @@ export const feedbackService = {
       const { data, error } = await query;
 
       if (error) {
-        console.error('Error fetching feedback:', error);
+        logger.error('Error fetching feedback:', error, { component: 'lib-feedback-service', action: 'service_call' });
         return { success: false, error: error.message };
       }
 
       return { success: true, data: data as FeedbackSubmission[] };
     } catch (error) {
-      console.error('Error fetching feedback:', error);
+      logger.error('Error fetching feedback:', error, { component: 'lib-feedback-service', action: 'service_call' });
       return { success: false, error: 'Failed to fetch feedback' };
     }
   },
@@ -178,13 +179,13 @@ export const feedbackService = {
         .single();
 
       if (error) {
-        console.error('Error fetching feedback:', error);
+        logger.error('Error fetching feedback:', error, { component: 'lib-feedback-service', action: 'service_call' });
         return { success: false, error: error.message };
       }
 
       return { success: true, data: data as FeedbackSubmission };
     } catch (error) {
-      console.error('Error fetching feedback:', error);
+      logger.error('Error fetching feedback:', error, { component: 'lib-feedback-service', action: 'service_call' });
       return { success: false, error: 'Failed to fetch feedback' };
     }
   },
@@ -207,13 +208,13 @@ export const feedbackService = {
         .single();
 
       if (error) {
-        console.error('Error updating feedback:', error);
+        logger.error('Error updating feedback:', error, { component: 'lib-feedback-service', action: 'service_call' });
         return { success: false, error: error.message };
       }
 
       return { success: true, data: data as FeedbackSubmission };
     } catch (error) {
-      console.error('Error updating feedback:', error);
+      logger.error('Error updating feedback:', error, { component: 'lib-feedback-service', action: 'service_call' });
       return { success: false, error: 'Failed to update feedback' };
     }
   },
@@ -249,13 +250,13 @@ export const feedbackService = {
         .eq('id', id);
 
       if (error) {
-        console.error('Error deleting feedback:', error);
+        logger.error('Error deleting feedback:', error, { component: 'lib-feedback-service', action: 'service_call' });
         return { success: false, error: error.message };
       }
 
       return { success: true };
     } catch (error) {
-      console.error('Error deleting feedback:', error);
+      logger.error('Error deleting feedback:', error, { component: 'lib-feedback-service', action: 'service_call' });
       return { success: false, error: 'Failed to delete feedback' };
     }
   },
@@ -272,7 +273,7 @@ export const feedbackService = {
         .select('status');
 
       if (error) {
-        console.error('Error fetching feedback stats:', error);
+        logger.error('Error fetching feedback stats:', error, { component: 'lib-feedback-service', action: 'service_call' });
         return { success: false, error: error.message };
       }
 
@@ -284,7 +285,7 @@ export const feedbackService = {
 
       return { success: true, data: stats };
     } catch (error) {
-      console.error('Error fetching feedback stats:', error);
+      logger.error('Error fetching feedback stats:', error, { component: 'lib-feedback-service', action: 'service_call' });
       return { success: false, error: 'Failed to fetch feedback stats' };
     }
   },

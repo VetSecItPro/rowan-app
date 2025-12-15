@@ -2,6 +2,7 @@
 // Handles all privacy-related database operations and business logic
 
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 import type {
   UserPrivacyPreferences,
   PrivacyPreferenceUpdate,
@@ -46,7 +47,7 @@ export async function getPrivacyPreferences(userId: string): Promise<PrivacyServ
 
     return { success: true, data };
   } catch (error) {
-    console.error('Error fetching privacy preferences:', error);
+    logger.error('Error fetching privacy preferences:', error, { component: 'lib-privacy-service', action: 'service_call' });
     return { success: false, error: 'Failed to fetch privacy preferences' };
   }
 }
@@ -77,7 +78,7 @@ export async function createDefaultPrivacyPreferences(userId: string): Promise<P
 
     return { success: true, data };
   } catch (error) {
-    console.error('Error creating default privacy preferences:', error);
+    logger.error('Error creating default privacy preferences:', error, { component: 'lib-privacy-service', action: 'service_call' });
     return { success: false, error: 'Failed to create default privacy preferences' };
   }
 }
@@ -101,7 +102,7 @@ export async function updatePrivacyPreferences(
 
     return { success: true, data };
   } catch (error) {
-    console.error('Error updating privacy preferences:', error);
+    logger.error('Error updating privacy preferences:', error, { component: 'lib-privacy-service', action: 'service_call' });
     return { success: false, error: 'Failed to update privacy preferences' };
   }
 }
@@ -138,7 +139,7 @@ async function applyPrivacyPreferences(userId: string, updates: PrivacyPreferenc
       await updateThirdPartyAnalytics(userId, updates.third_party_analytics_enabled);
     }
   } catch (error) {
-    console.error('Error applying privacy preferences:', error);
+    logger.error('Error applying privacy preferences:', error, { component: 'lib-privacy-service', action: 'service_call' });
     // Don't throw error here to avoid breaking the preference update
   }
 }
@@ -189,7 +190,7 @@ async function updateMarketingSubscription(userId: string, type: 'email' | 'sms'
       throw new Error('Failed to update marketing subscription');
     }
   } catch (error) {
-    console.error('Error updating marketing subscription:', error);
+    logger.error('Error updating marketing subscription:', error, { component: 'lib-privacy-service', action: 'service_call' });
   }
 }
 
@@ -206,7 +207,7 @@ async function updateDataSharingConsent(userId: string, allowSharing: boolean) {
       throw new Error('Failed to update data sharing consent');
     }
   } catch (error) {
-    console.error('Error updating data sharing consent:', error);
+    logger.error('Error updating data sharing consent:', error, { component: 'lib-privacy-service', action: 'service_call' });
   }
 }
 
@@ -223,7 +224,7 @@ async function updateThirdPartyAnalytics(userId: string, enabled: boolean) {
       throw new Error('Failed to update third-party analytics');
     }
   } catch (error) {
-    console.error('Error updating third-party analytics:', error);
+    logger.error('Error updating third-party analytics:', error, { component: 'lib-privacy-service', action: 'service_call' });
   }
 }
 
@@ -241,7 +242,7 @@ export async function getPrivacyPreferenceHistory(userId: string): Promise<Priva
 
     return { success: true, data: data || [] };
   } catch (error) {
-    console.error('Error fetching privacy preference history:', error);
+    logger.error('Error fetching privacy preference history:', error, { component: 'lib-privacy-service', action: 'service_call' });
     return { success: false, error: 'Failed to fetch privacy history' };
   }
 }
@@ -271,7 +272,7 @@ export async function requestAccountDeletion(
 
     return { success: true, data };
   } catch (error) {
-    console.error('Error requesting account deletion:', error);
+    logger.error('Error requesting account deletion:', error, { component: 'lib-privacy-service', action: 'service_call' });
     return { success: false, error: 'Failed to request account deletion' };
   }
 }
@@ -299,7 +300,7 @@ export async function cancelAccountDeletion(
 
     return { success: true, data };
   } catch (error) {
-    console.error('Error cancelling account deletion:', error);
+    logger.error('Error cancelling account deletion:', error, { component: 'lib-privacy-service', action: 'service_call' });
     return { success: false, error: 'Failed to cancel account deletion' };
   }
 }
@@ -349,7 +350,7 @@ export async function getDeletionStatus(userId: string): Promise<PrivacyServiceR
       },
     };
   } catch (error) {
-    console.error('Error getting deletion status:', error);
+    logger.error('Error getting deletion status:', error, { component: 'lib-privacy-service', action: 'service_call' });
     return { success: false, error: 'Failed to get deletion status' };
   }
 }
@@ -377,7 +378,7 @@ export async function requestDataExport(
 
     return { success: true, data };
   } catch (error) {
-    console.error('Error requesting data export:', error);
+    logger.error('Error requesting data export:', error, { component: 'lib-privacy-service', action: 'service_call' });
     return { success: false, error: 'Failed to request data export' };
   }
 }
@@ -420,7 +421,7 @@ export async function getExportStatus(userId: string): Promise<PrivacyServiceRes
       },
     };
   } catch (error) {
-    console.error('Error getting export status:', error);
+    logger.error('Error getting export status:', error, { component: 'lib-privacy-service', action: 'service_call' });
     return { success: false, error: 'Failed to get export status' };
   }
 }
@@ -441,7 +442,7 @@ async function initiateDataExport(exportId: string, userId: string, request: Req
       throw new Error('Failed to initiate data export');
     }
   } catch (error) {
-    console.error('Error initiating data export:', error);
+    logger.error('Error initiating data export:', error, { component: 'lib-privacy-service', action: 'service_call' });
     // Update the request status to failed
     await supabase
       .from('data_export_requests')
@@ -478,7 +479,7 @@ export async function getComplianceStatus(userId: string): Promise<PrivacyServic
       },
     };
   } catch (error) {
-    console.error('Error getting compliance status:', error);
+    logger.error('Error getting compliance status:', error, { component: 'lib-privacy-service', action: 'service_call' });
     return { success: false, error: 'Failed to get compliance status' };
   }
 }
@@ -492,7 +493,7 @@ async function sendDeletionConfirmationEmail(userId: string, deletionDate: Date)
       body: JSON.stringify({ userId, deletionDate: deletionDate.toISOString() }),
     });
   } catch (error) {
-    console.error('Error sending deletion confirmation email:', error);
+    logger.error('Error sending deletion confirmation email:', error, { component: 'lib-privacy-service', action: 'service_call' });
   }
 }
 
@@ -504,7 +505,7 @@ async function sendDeletionCancellationEmail(userId: string) {
       body: JSON.stringify({ userId }),
     });
   } catch (error) {
-    console.error('Error sending deletion cancellation email:', error);
+    logger.error('Error sending deletion cancellation email:', error, { component: 'lib-privacy-service', action: 'service_call' });
   }
 }
 
@@ -520,7 +521,7 @@ export async function getCookiePreferencesForUser(userId: string): Promise<Priva
     const cookiePrefs = privacyToCookiePreferences(privacyResult.data);
     return { success: true, data: cookiePrefs };
   } catch (error) {
-    console.error('Error getting cookie preferences for user:', error);
+    logger.error('Error getting cookie preferences for user:', error, { component: 'lib-privacy-service', action: 'service_call' });
     return { success: false, error: 'Failed to get cookie preferences' };
   }
 }
@@ -544,7 +545,7 @@ export async function updateCookiePreferencesForUser(
 
     return result;
   } catch (error) {
-    console.error('Error updating cookie preferences for user:', error);
+    logger.error('Error updating cookie preferences for user:', error, { component: 'lib-privacy-service', action: 'service_call' });
     return { success: false, error: 'Failed to update cookie preferences' };
   }
 }
@@ -563,7 +564,7 @@ export async function syncCookiePreferencesWithPrivacy(userId: string): Promise<
 
     return { success: true, data: true };
   } catch (error) {
-    console.error('Error syncing cookie preferences with privacy:', error);
+    logger.error('Error syncing cookie preferences with privacy:', error, { component: 'lib-privacy-service', action: 'service_call' });
     return { success: false, error: 'Failed to sync cookie preferences' };
   }
 }
@@ -585,7 +586,7 @@ export async function updateCookieConsentViaAPI(cookiePrefs: CookiePreferences):
     const result = await response.json();
     return { success: true, data: result.data.preferences };
   } catch (error) {
-    console.error('Error updating cookie consent via API:', error);
+    logger.error('Error updating cookie consent via API:', error, { component: 'lib-privacy-service', action: 'service_call' });
     return { success: false, error: 'Failed to update cookie preferences' };
   }
 }
@@ -605,7 +606,7 @@ export async function getCookieConsentViaAPI(): Promise<PrivacyServiceResponse<C
     const result = await response.json();
     return { success: true, data: result.data.preferences };
   } catch (error) {
-    console.error('Error getting cookie consent via API:', error);
+    logger.error('Error getting cookie consent via API:', error, { component: 'lib-privacy-service', action: 'service_call' });
     return { success: false, error: 'Failed to get cookie preferences' };
   }
 }
@@ -625,7 +626,7 @@ export async function resetCookieConsentViaAPI(): Promise<PrivacyServiceResponse
     const result = await response.json();
     return { success: true, data: result.data.preferences };
   } catch (error) {
-    console.error('Error resetting cookie consent via API:', error);
+    logger.error('Error resetting cookie consent via API:', error, { component: 'lib-privacy-service', action: 'service_call' });
     return { success: false, error: 'Failed to reset cookie preferences' };
   }
 }

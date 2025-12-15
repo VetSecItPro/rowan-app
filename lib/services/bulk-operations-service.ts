@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 /**
  * Bulk Operations Service
@@ -81,7 +82,7 @@ export async function bulkDeleteExpenses(
     const count = data?.length || 0;
 
     if (error) {
-      console.error('Error bulk deleting expenses:', error);
+      logger.error('Error bulk deleting expenses:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
@@ -90,7 +91,7 @@ export async function bulkDeleteExpenses(
       deleted_count: count || data?.length || 0,
     };
   } catch (error) {
-    console.error('Error bulk deleting expenses:', error);
+    logger.error('Error bulk deleting expenses:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to delete expenses',
@@ -140,7 +141,7 @@ export async function bulkDeleteTasks(
     const count = data?.length || 0;
 
     if (error) {
-      console.error('Error bulk deleting tasks:', error);
+      logger.error('Error bulk deleting tasks:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
@@ -149,7 +150,7 @@ export async function bulkDeleteTasks(
       deleted_count: count || data?.length || 0,
     };
   } catch (error) {
-    console.error('Error bulk deleting tasks:', error);
+    logger.error('Error bulk deleting tasks:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to delete tasks',
@@ -177,7 +178,7 @@ export async function bulkExportByDateRange(
       .eq('user_id', userId);
 
     if (spacesError) {
-      console.error('Error fetching user spaces:', spacesError);
+      logger.error('Error fetching user spaces:', spacesError, { component: 'lib-bulk-operations-service', action: 'service_call' });
       return { success: false, error: 'Failed to verify user permissions' };
     }
 
@@ -212,7 +213,7 @@ export async function bulkExportByDateRange(
       .order(config.dateColumn, { ascending: false });
 
     if (error) {
-      console.error(`Error exporting ${dataType}:`, error);
+      logger.error('Error exporting ${dataType}:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
@@ -222,7 +223,7 @@ export async function bulkExportByDateRange(
       count: count || 0,
     };
   } catch (error) {
-    console.error(`Error exporting ${dataType}:`, error);
+    logger.error('Error exporting ${dataType}:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to export data',
@@ -252,7 +253,7 @@ export async function archiveOldExpenses(
       .select('*');
 
     if (error) {
-      console.error('Error archiving expenses:', error);
+      logger.error('Error archiving expenses:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
@@ -261,7 +262,7 @@ export async function archiveOldExpenses(
       archived_count: count || data?.length || 0,
     };
   } catch (error) {
-    console.error('Error archiving expenses:', error);
+    logger.error('Error archiving expenses:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to archive expenses',
@@ -289,7 +290,7 @@ export async function archiveOldTasks(
       .select('*');
 
     if (error) {
-      console.error('Error archiving tasks:', error);
+      logger.error('Error archiving tasks:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
@@ -298,7 +299,7 @@ export async function archiveOldTasks(
       archived_count: count || data?.length || 0,
     };
   } catch (error) {
-    console.error('Error archiving tasks:', error);
+    logger.error('Error archiving tasks:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to archive tasks',
@@ -325,7 +326,7 @@ export async function archiveOldCalendarEvents(
       .select('*');
 
     if (error) {
-      console.error('Error archiving calendar events:', error);
+      logger.error('Error archiving calendar events:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
@@ -334,7 +335,7 @@ export async function archiveOldCalendarEvents(
       archived_count: count || data?.length || 0,
     };
   } catch (error) {
-    console.error('Error archiving calendar events:', error);
+    logger.error('Error archiving calendar events:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to archive calendar events',
@@ -384,7 +385,7 @@ export async function getExpensesBulkDeleteCount(
     const { count } = await query;
     return count || 0;
   } catch (error) {
-    console.error('Error getting bulk delete count:', error);
+    logger.error('Error getting bulk delete count:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
     return 0;
   }
 }

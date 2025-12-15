@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { authRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // Input validation schema
 const SignInSchema = z.object({
@@ -113,7 +114,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generic error handler
-    console.error('Signin API error:', error);
+    logger.error('Signin API error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

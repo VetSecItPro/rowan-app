@@ -22,6 +22,7 @@
  */
 
 import { useCallback, useEffect, useRef } from 'react';
+import { logger } from '@/lib/logger';
 
 // Feature names must match the API validation
 export type FeatureName =
@@ -110,14 +111,14 @@ async function flushEvents(): Promise<void> {
       if (eventQueue.length < MAX_QUEUE_SIZE) {
         eventQueue.push(...events.slice(0, MAX_QUEUE_SIZE - eventQueue.length));
       }
-      console.error('Failed to track events:', response.status);
+      logger.error('Failed to track events:', undefined, { component: 'lib-useFeatureTracking', action: 'service_call', details: response.status });
     }
   } catch (error) {
     // Re-queue events on network error
     if (eventQueue.length < MAX_QUEUE_SIZE) {
       eventQueue.push(...events.slice(0, MAX_QUEUE_SIZE - eventQueue.length));
     }
-    console.error('Error tracking events:', error);
+    logger.error('Error tracking events:', error, { component: 'lib-useFeatureTracking', action: 'service_call' });
   }
 }
 
@@ -162,7 +163,7 @@ async function trackImmediate(event: TrackingEvent): Promise<void> {
       }),
     });
   } catch (error) {
-    console.error('Error tracking event:', error);
+    logger.error('Error tracking event:', error, { component: 'lib-useFeatureTracking', action: 'service_call' });
   }
 }
 

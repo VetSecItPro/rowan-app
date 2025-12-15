@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Search, Receipt as ReceiptIcon, Calendar, DollarSign, Tag, Trash2, ExternalLink } from 'lucide-react';
 import { receiptsService, type Receipt, type ReceiptSearchParams } from '@/lib/services/receipts-service';
 import { format } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 interface ReceiptsListCardProps {
   spaceId: string;
@@ -26,7 +27,7 @@ export function ReceiptsListCard({ spaceId, onDelete }: ReceiptsListCardProps) {
       const data = await receiptsService.searchReceipts(spaceId, searchParams);
       setReceipts(data);
     } catch (error) {
-      console.error('Failed to load receipts:', error);
+      logger.error('Failed to load receipts:', error, { component: 'ReceiptsListCard', action: 'component_action' });
     } finally {
       setIsLoading(false);
     }
@@ -47,7 +48,7 @@ export function ReceiptsListCard({ spaceId, onDelete }: ReceiptsListCardProps) {
       setReceipts(receipts.filter(r => r.id !== receiptId));
       onDelete?.(receiptId);
     } catch (error) {
-      console.error('Failed to delete receipt:', error);
+      logger.error('Failed to delete receipt:', error, { component: 'ReceiptsListCard', action: 'component_action' });
     }
   };
 
@@ -56,7 +57,7 @@ export function ReceiptsListCard({ spaceId, onDelete }: ReceiptsListCardProps) {
       const url = await receiptsService.getReceiptImageUrl(receipt.storage_path);
       window.open(url, '_blank');
     } catch (error) {
-      console.error('Failed to get receipt URL:', error);
+      logger.error('Failed to get receipt URL:', error, { component: 'ReceiptsListCard', action: 'component_action' });
     }
   };
 

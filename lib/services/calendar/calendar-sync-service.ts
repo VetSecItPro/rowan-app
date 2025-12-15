@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { googleCalendarService } from './google-calendar-service';
 import { appleCalDAVService } from './apple-caldav-service';
 import { eventMapper } from './event-mapper';
+import { logger } from '@/lib/logger';
 import type {
   CalendarConnection,
   CalendarEventMapping,
@@ -55,7 +56,7 @@ export async function performSync(
   }
 
   // Create sync log entry
-  console.log('[Sync] Creating sync log entry...');
+  logger.info('[Sync] Creating sync log entry...', { component: 'lib-calendar-sync-service' });
   const { data: syncLog, error: syncLogError } = await supabase
     .from('calendar_sync_logs')
     .insert({
@@ -69,9 +70,9 @@ export async function performSync(
     .single();
 
   if (syncLogError) {
-    console.error('[Sync] Failed to create sync log:', syncLogError);
+    logger.error('[Sync] Failed to create sync log:', syncLogError, { component: 'lib-calendar-sync-service', action: 'service_call' });
   } else {
-    console.log('[Sync] Created sync log:', syncLog?.id);
+    logger.info('[Sync] Created sync log:', { component: 'lib-calendar-sync-service', data: syncLog?.id });
   }
 
   // Update connection status to syncing
@@ -130,7 +131,7 @@ export async function performSync(
 
     return result;
   } catch (error) {
-    console.error('Sync failed:', error);
+    logger.error('Sync failed:', error, { component: 'lib-calendar-sync-service', action: 'service_call' });
 
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
@@ -185,24 +186,24 @@ async function syncGoogleCalendar(
 
   const supabase = await createClient();
 
-  console.log('[Sync] Starting Google Calendar sync for connection:', connection.id);
-  console.log('[Sync] Sync type:', syncType, 'Direction:', connection.sync_direction);
+  logger.info('[Sync] Starting Google Calendar sync for connection:', { component: 'lib-calendar-sync-service', data: connection.id });
+  logger.info('[Sync] Sync type and direction:', { component: 'lib-calendar-sync-service', data: { syncType, direction: connection.sync_direction } });
 
   try {
     // 1. INBOUND: Fetch events from Google Calendar
-    console.log('[Sync] Fetching events from Google Calendar...');
+    logger.info('[Sync] Fetching events from Google Calendar...', { component: 'lib-calendar-sync-service' });
     const syncResponse = await googleCalendarService.getEvents(connection.id, {
       syncToken: syncType === 'incremental' ? connection.sync_token || undefined : undefined,
     });
 
-    console.log('[Sync] Received', syncResponse.items.length, 'events from Google');
+    logger.info('[Sync] Received events from Google', { component: 'lib-calendar-sync-service', data: syncResponse.items.length });
     nextSyncToken = syncResponse.nextSyncToken;
 
     // Process inbound events (External → Rowan)
     if (connection.sync_direction !== 'outbound_only') {
-      console.log('[Sync] Processing inbound events...');
+      logger.info('[Sync] Processing inbound events...', { component: 'lib-calendar-sync-service' });
       for (const googleEvent of syncResponse.items) {
-        console.log('[Sync] Processing event:', googleEvent.id, '-', googleEvent.summary);
+        logger.info('[Sync] Processing event:', { component: 'lib-calendar-sync-service', data: { id: googleEvent.id, summary: googleEvent.summary } });
         try {
           const result = await processInboundEvent(
             connection,
@@ -210,13 +211,13 @@ async function syncGoogleCalendar(
             connection.sync_direction
           );
 
-          console.log('[Sync] Event result:', result.action);
+          logger.info('[Sync] Event result:', { component: 'lib-calendar-sync-service', data: result.action });
           if (result.action === 'created') eventsCreated++;
           if (result.action === 'updated') eventsUpdated++;
           if (result.action === 'deleted') eventsDeleted++;
           if (result.conflict) conflictsDetected++;
         } catch (error) {
-          console.error('[Sync] Error processing event:', googleEvent.id, error);
+          logger.error('[Sync] Error processing event:', undefined, { component: 'lib-calendar-sync-service', action: 'service_call', details: googleEvent.id, error });
           errors.push({
             external_event_id: googleEvent.id,
             operation: 'update',
@@ -227,7 +228,7 @@ async function syncGoogleCalendar(
         }
       }
     } else {
-      console.log('[Sync] Skipping inbound - direction is outbound_only');
+      logger.info('[Sync] Skipping inbound - direction is outbound_only', { component: 'lib-calendar-sync-service' });
     }
 
     // 2. OUTBOUND: Process pending queue items (Rowan → Google)
@@ -289,7 +290,7 @@ async function processInboundEvent(
 
       if (hasLocalEnhancements) {
         // Preserve Rowan event, just disconnect from external
-        console.log('[Sync] External deleted but Rowan has local enhancements - preserving event');
+        logger.info('[Sync] External deleted but Rowan has local enhancements - preserving event', { component: 'lib-calendar-sync-service' });
         await supabase
           .from('events')
           .update({ external_source: null, last_external_sync: null })
@@ -336,13 +337,13 @@ async function processInboundEvent(
     // This preserves Rowan enhancements (recurrence, status, category, etc.)
     const mergedData = mergeEventData(rowanEvent, externalData, conflictInfo);
 
-    console.log('[Sync] Merging event data (non-destructive):', {
+    logger.info('[Sync] Merging event data (non-destructive):', { component: 'lib-calendar-sync-service', data: {
       eventId: mapping.rowan_event_id,
       rowanModified: conflictInfo.rowanModified,
       externalModified: conflictInfo.externalModified,
       hasConflict: conflictInfo.hasConflict,
       preservedRecurrence: mergedData.is_recurring ? mergedData.recurrence_pattern : null,
-    });
+    } });
 
     if (conflictInfo.hasConflict) {
       // Record conflict for user review, but continue with merge
@@ -364,7 +365,7 @@ async function processInboundEvent(
       .eq('id', mapping.rowan_event_id);
 
     if (updateError) {
-      console.error('[Sync] Failed to update event:', updateError);
+      logger.error('[Sync] Failed to update event:', updateError, { component: 'lib-calendar-sync-service', action: 'service_call' });
       throw new Error(`Failed to update event: ${updateError.message}`);
     }
 
@@ -379,13 +380,13 @@ async function processInboundEvent(
       .eq('id', mapping.id);
 
     if (mappingError) {
-      console.error('[Sync] Failed to update mapping:', mappingError);
+      logger.error('[Sync] Failed to update mapping:', mappingError, { component: 'lib-calendar-sync-service', action: 'service_call' });
     }
 
     return { action: 'updated', conflict: conflictInfo.hasConflict };
   } else {
     // Create new Rowan event
-    console.log('[Sync] Creating new event with data:', externalData);
+    logger.info('[Sync] Creating new event with data:', { component: 'lib-calendar-sync-service', data: externalData });
     const { data: newEvent, error: insertError } = await supabase
       .from('events')
       .insert({
@@ -396,7 +397,7 @@ async function processInboundEvent(
       .single();
 
     if (insertError) {
-      console.error('[Sync] Failed to create event:', insertError);
+      logger.error('[Sync] Failed to create event:', insertError, { component: 'lib-calendar-sync-service', action: 'service_call' });
       throw new Error(`Failed to create event: ${insertError.message}`);
     }
 
@@ -412,10 +413,10 @@ async function processInboundEvent(
       });
 
       if (mappingError) {
-        console.error('[Sync] Failed to create mapping:', mappingError);
+        logger.error('[Sync] Failed to create mapping:', mappingError, { component: 'lib-calendar-sync-service', action: 'service_call' });
       }
 
-      console.log('[Sync] Created event:', newEvent.id, 'for external:', externalEvent.id);
+      logger.info('[Sync] Created event for external:', { component: 'lib-calendar-sync-service', data: { eventId: newEvent.id, externalId: externalEvent.id } });
     }
 
     return { action: 'created', conflict: false };
@@ -799,12 +800,12 @@ async function syncAppleCalendar(
 
   const supabase = await createClient();
 
-  console.log('[Sync] Starting Apple Calendar sync for connection:', connection.id);
-  console.log('[Sync] Sync type:', syncType, 'Direction:', connection.sync_direction);
+  logger.info('[Sync] Starting Apple Calendar sync for connection:', { component: 'lib-calendar-sync-service', data: connection.id });
+  logger.info('[Sync] Sync type and direction:', { component: 'lib-calendar-sync-service', data: { syncType, direction: connection.sync_direction } });
 
   try {
     // 1. INBOUND: Fetch events from Apple Calendar
-    console.log('[Sync] Fetching events from Apple Calendar...');
+    logger.info('[Sync] Fetching events from Apple Calendar...', { component: 'lib-calendar-sync-service' });
     const { events: calDavEvents, nextSyncToken: newCtag } = await appleCalDAVService.getEvents(
       connection.id,
       {
@@ -813,15 +814,15 @@ async function syncAppleCalendar(
       }
     );
 
-    console.log('[Sync] Received', calDavEvents.length, 'events from Apple Calendar');
+    logger.info('[Sync] Received events from Apple Calendar', { component: 'lib-calendar-sync-service', data: calDavEvents.length });
     nextSyncToken = newCtag;
 
     // Process inbound events (External → Rowan)
     if (connection.sync_direction !== 'outbound_only') {
-      console.log('[Sync] Processing inbound events...');
+      logger.info('[Sync] Processing inbound events...', { component: 'lib-calendar-sync-service' });
       for (const calDavEvent of calDavEvents) {
         if (!calDavEvent.calendarData) {
-          console.log('[Sync] Skipping event without parsed data');
+          logger.info('[Sync] Skipping event without parsed data', { component: 'lib-calendar-sync-service' });
           continue;
         }
 
@@ -832,13 +833,13 @@ async function syncAppleCalendar(
             connection.sync_direction
           );
 
-          console.log('[Sync] Event result:', result.action);
+          logger.info('[Sync] Event result:', { component: 'lib-calendar-sync-service', data: result.action });
           if (result.action === 'created') eventsCreated++;
           if (result.action === 'updated') eventsUpdated++;
           if (result.action === 'deleted') eventsDeleted++;
           if (result.conflict) conflictsDetected++;
         } catch (error) {
-          console.error('[Sync] Error processing event:', calDavEvent.calendarData?.uid, error);
+          logger.error('[Sync] Error processing event:', undefined, { component: 'lib-calendar-sync-service', action: 'service_call', details: calDavEvent.calendarData?.uid, error });
           errors.push({
             external_event_id: calDavEvent.calendarData?.uid || calDavEvent.url,
             operation: 'update',
@@ -849,7 +850,7 @@ async function syncAppleCalendar(
         }
       }
     } else {
-      console.log('[Sync] Skipping inbound - direction is outbound_only');
+      logger.info('[Sync] Skipping inbound - direction is outbound_only', { component: 'lib-calendar-sync-service' });
     }
 
     // 2. OUTBOUND: Process pending queue items (Rowan → Apple)
@@ -915,7 +916,7 @@ async function processAppleInboundEvent(
 
       if (hasLocalEnhancements) {
         // Preserve Rowan event, just disconnect from external
-        console.log('[Sync] External deleted but Rowan has local enhancements - preserving event');
+        logger.info('[Sync] External deleted but Rowan has local enhancements - preserving event', { component: 'lib-calendar-sync-service' });
         await supabase
           .from('events')
           .update({ external_source: null, last_external_sync: null })
@@ -960,12 +961,12 @@ async function processAppleInboundEvent(
     // Use non-destructive merge
     const mergedData = mergeAppleEventData(rowanEvent, externalData as Record<string, unknown>, conflictInfo);
 
-    console.log('[Sync] Merging Apple event data (non-destructive):', {
+    logger.info('[Sync] Merging Apple event data (non-destructive):', { component: 'lib-calendar-sync-service', data: {
       eventId: mapping.rowan_event_id,
       rowanModified: conflictInfo.rowanModified,
       externalModified: conflictInfo.externalModified,
       hasConflict: conflictInfo.hasConflict,
-    });
+    } });
 
     if (conflictInfo.hasConflict) {
       // Record conflict for user review
@@ -987,7 +988,7 @@ async function processAppleInboundEvent(
       .eq('id', mapping.rowan_event_id);
 
     if (updateError) {
-      console.error('[Sync] Failed to update event:', updateError);
+      logger.error('[Sync] Failed to update event:', updateError, { component: 'lib-calendar-sync-service', action: 'service_call' });
       throw new Error(`Failed to update event: ${updateError.message}`);
     }
 
@@ -1002,13 +1003,13 @@ async function processAppleInboundEvent(
       .eq('id', mapping.id);
 
     if (mappingError) {
-      console.error('[Sync] Failed to update mapping:', mappingError);
+      logger.error('[Sync] Failed to update mapping:', mappingError, { component: 'lib-calendar-sync-service', action: 'service_call' });
     }
 
     return { action: 'updated', conflict: conflictInfo.hasConflict };
   } else {
     // Create new Rowan event
-    console.log('[Sync] Creating new event from Apple Calendar:', parsedEvent.summary);
+    logger.info('[Sync] Creating new event from Apple Calendar:', { component: 'lib-calendar-sync-service', data: parsedEvent.summary });
     const { data: newEvent, error: insertError } = await supabase
       .from('events')
       .insert({
@@ -1020,7 +1021,7 @@ async function processAppleInboundEvent(
       .single();
 
     if (insertError) {
-      console.error('[Sync] Failed to create event:', insertError);
+      logger.error('[Sync] Failed to create event:', insertError, { component: 'lib-calendar-sync-service', action: 'service_call' });
       throw new Error(`Failed to create event: ${insertError.message}`);
     }
 
@@ -1036,10 +1037,10 @@ async function processAppleInboundEvent(
       });
 
       if (mappingError) {
-        console.error('[Sync] Failed to create mapping:', mappingError);
+        logger.error('[Sync] Failed to create mapping:', mappingError, { component: 'lib-calendar-sync-service', action: 'service_call' });
       }
 
-      console.log('[Sync] Created event:', newEvent.id, 'for external:', parsedEvent.uid);
+      logger.info('[Sync] Created event for external:', { component: 'lib-calendar-sync-service', data: { eventId: newEvent.id, externalUid: parsedEvent.uid } });
     }
 
     return { action: 'created', conflict: false };

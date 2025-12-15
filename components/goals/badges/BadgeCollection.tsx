@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import type { BadgeProgress } from '@/lib/types';
 import type { AchievementBadge, UserBadge } from '@/lib/services/achievement-service';
 import BadgeCard from './BadgeCard';
+import { logger } from '@/lib/logger';
 import {
   getAllBadges,
   getUserBadges,
@@ -55,7 +56,7 @@ export default function BadgeCollection({ userId, spaceId }: BadgeCollectionProp
       setBadgeProgress(progress);
       setStats(badgeStats);
     } catch (error) {
-      console.error('Error loading badge data:', error);
+      logger.error('Error loading badge data:', error, { component: 'BadgeCollection', action: 'component_action' });
     } finally {
       setLoading(false);
     }

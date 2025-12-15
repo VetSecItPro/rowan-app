@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching cookie status:', error);
+    logger.error('Error fetching cookie status:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to fetch cookie status' },
       { status: 500 }
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
       data: preferences,
     });
   } catch (error) {
-    console.error('Error updating cookie preferences:', error);
+    logger.error('Error updating cookie preferences:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to update cookie preferences' },
       { status: 500 }

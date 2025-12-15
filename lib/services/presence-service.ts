@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import type { SpaceMemberWithPresence, UserPresence } from '@/lib/types';
 import { PresenceStatus } from '@/lib/types';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // SIMPLE PRESENCE SERVICE (CACHED, NOT REAL-TIME)
@@ -42,13 +43,13 @@ export async function updateUserPresence(
       });
 
     if (upsertError) {
-      console.error('[presence-service] updateUserPresence error:', upsertError);
+      logger.error('[presence-service] updateUserPresence error:', upsertError, { component: 'lib-presence-service', action: 'service_call' });
       return { success: false, error: 'Failed to update presence' };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('[presence-service] updateUserPresence error:', error);
+    logger.error('[presence-service] updateUserPresence error:', error, { component: 'lib-presence-service', action: 'service_call' });
     return { success: false, error: 'Failed to update presence' };
   }
 }
@@ -70,7 +71,7 @@ export async function getSpaceMembersWithPresence(
       .eq('space_id', spaceId);
 
     if (error) {
-      console.error('[presence-service] getSpaceMembersWithPresence error:', error);
+      logger.error('[presence-service] getSpaceMembersWithPresence error:', error, { component: 'lib-presence-service', action: 'service_call' });
       return { success: false, error: 'Failed to fetch space members' };
     }
 
@@ -90,7 +91,7 @@ export async function getSpaceMembersWithPresence(
 
     return { success: true, data: members };
   } catch (error) {
-    console.error('[presence-service] getSpaceMembersWithPresence error:', error);
+    logger.error('[presence-service] getSpaceMembersWithPresence error:', error, { component: 'lib-presence-service', action: 'service_call' });
     return { success: false, error: 'Failed to fetch space members' };
   }
 }
@@ -102,7 +103,7 @@ export async function markUserOffline(spaceId: string): Promise<void> {
   try {
     await updateUserPresence(spaceId, PresenceStatus.OFFLINE);
   } catch (error) {
-    console.error('[presence-service] markUserOffline error:', error);
+    logger.error('[presence-service] markUserOffline error:', error, { component: 'lib-presence-service', action: 'service_call' });
     // Don't throw - this is often called on page unload
   }
 }
@@ -129,7 +130,7 @@ export async function getSpacePresenceSummary(
       members: members,
     };
   } catch (error) {
-    console.error('[presence-service] getSpacePresenceSummary error:', error);
+    logger.error('[presence-service] getSpacePresenceSummary error:', error, { component: 'lib-presence-service', action: 'service_call' });
     return { total: 0, online: 0, members: [] };
   }
 }
@@ -146,13 +147,13 @@ export async function cleanupInactiveUsers(): Promise<{ success: boolean; error?
     const { error } = await supabase.rpc('mark_inactive_users_offline');
 
     if (error) {
-      console.error('[presence-service] cleanupInactiveUsers error:', error);
+      logger.error('[presence-service] cleanupInactiveUsers error:', error, { component: 'lib-presence-service', action: 'service_call' });
       return { success: false, error: 'Failed to cleanup inactive users' };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('[presence-service] cleanupInactiveUsers error:', error);
+    logger.error('[presence-service] cleanupInactiveUsers error:', error, { component: 'lib-presence-service', action: 'service_call' });
     return { success: false, error: 'Failed to cleanup inactive users' };
   }
 }
@@ -173,7 +174,7 @@ export async function isUserOnline(userId: string): Promise<boolean> {
 
     return !error && data && data.length > 0;
   } catch (error) {
-    console.error('[presence-service] isUserOnline error:', error);
+    logger.error('[presence-service] isUserOnline error:', error, { component: 'lib-presence-service', action: 'service_call' });
     return false;
   }
 }
@@ -196,7 +197,7 @@ export async function initializePresence(spaceId: string): Promise<void> {
       try {
         await updateUserPresence(spaceId, PresenceStatus.ONLINE);
       } catch (error) {
-        console.error('Presence update error:', error);
+        logger.error('Presence update error:', error, { component: 'lib-presence-service', action: 'service_call' });
       }
     }, 2 * 60 * 1000); // 2 minutes
 
@@ -217,7 +218,7 @@ export async function initializePresence(spaceId: string): Promise<void> {
       });
     }
   } catch (error) {
-    console.error('[presence-service] initializePresence error:', error);
+    logger.error('[presence-service] initializePresence error:', error, { component: 'lib-presence-service', action: 'service_call' });
   }
 }
 

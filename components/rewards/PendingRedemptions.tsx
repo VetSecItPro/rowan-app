@@ -4,6 +4,7 @@
 // Parent UI to approve, deny, or fulfill reward redemption requests
 
 import { useEffect, useState, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import {
   Clock,
   Check,
@@ -54,7 +55,7 @@ export function PendingRedemptions({
       setRedemptions([...pending, ...approved]);
       setError(null);
     } catch (err) {
-      console.error('Failed to load redemptions:', err);
+      logger.error('Failed to load redemptions:', err, { component: 'PendingRedemptions', action: 'component_action' });
       setError('Failed to load redemption requests');
     } finally {
       setLoading(false);
@@ -71,7 +72,7 @@ export function PendingRedemptions({
       await rewardsService.approveRedemption(redemptionId, currentUserId);
       await loadRedemptions(); // Refresh list
     } catch (err) {
-      console.error('Failed to approve:', err);
+      logger.error('Failed to approve:', err, { component: 'PendingRedemptions', action: 'component_action' });
       setError('Failed to approve request');
     } finally {
       setProcessingId(null);
@@ -84,7 +85,7 @@ export function PendingRedemptions({
       await rewardsService.fulfillRedemption(redemptionId);
       await loadRedemptions(); // Refresh - will remove fulfilled item
     } catch (err) {
-      console.error('Failed to fulfill:', err);
+      logger.error('Failed to fulfill:', err, { component: 'PendingRedemptions', action: 'component_action' });
       setError('Failed to mark as fulfilled');
     } finally {
       setProcessingId(null);
@@ -108,7 +109,7 @@ export function PendingRedemptions({
       setDenyReasonModal(null);
       setDenyReason('');
     } catch (err) {
-      console.error('Failed to deny:', err);
+      logger.error('Failed to deny:', err, { component: 'PendingRedemptions', action: 'component_action' });
       setError('Failed to deny request');
     } finally {
       setProcessingId(null);

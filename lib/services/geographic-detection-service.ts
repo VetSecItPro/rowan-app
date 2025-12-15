@@ -6,6 +6,8 @@
  * privacy notices and rights under the California Consumer Privacy Act.
  */
 
+import { logger } from '@/lib/logger';
+
 export interface LocationData {
   ip: string;
   country: string;
@@ -97,7 +99,7 @@ class GeographicDetectionService {
         confidence: 'low'
       };
     } catch (error) {
-      console.error('Error detecting location:', error);
+      logger.error('Error detecting location:', error, { component: 'lib-geographic-detection-service', action: 'service_call' });
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to detect location'
@@ -145,7 +147,7 @@ class GeographicDetectionService {
         confidence: this.calculateConfidence(data)
       };
     } catch (error) {
-      console.error('Error with ipapi.co:', error);
+      logger.error('Error with ipapi.co:', error, { component: 'lib-geographic-detection-service', action: 'service_call' });
       return {
         success: false,
         error: error instanceof Error ? error.message : 'IP API service failed'
@@ -198,7 +200,7 @@ class GeographicDetectionService {
         confidence: this.calculateConfidence(data)
       };
     } catch (error) {
-      console.error('Error with ipgeolocation.io:', error);
+      logger.error('Error with ipgeolocation.io:', error, { component: 'lib-geographic-detection-service', action: 'service_call' });
       return {
         success: false,
         error: error instanceof Error ? error.message : 'IP Geolocation service failed'

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 /**
  * Task Time Tracking Service
@@ -45,7 +46,7 @@ export const taskTimeTrackingService = {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching time entries:', error);
+      logger.error('Error fetching time entries:', error, { component: 'lib-task-time-tracking-service', action: 'service_call' });
       throw error;
     }
   },
@@ -71,7 +72,7 @@ export const taskTimeTrackingService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error starting timer:', error);
+      logger.error('Error starting timer:', error, { component: 'lib-task-time-tracking-service', action: 'service_call' });
       throw error;
     }
   },
@@ -94,7 +95,7 @@ export const taskTimeTrackingService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error stopping timer:', error);
+      logger.error('Error stopping timer:', error, { component: 'lib-task-time-tracking-service', action: 'service_call' });
       throw error;
     }
   },
@@ -120,7 +121,7 @@ export const taskTimeTrackingService = {
       }
       return data;
     } catch (error) {
-      console.error('Error fetching active timer:', error);
+      logger.error('Error fetching active timer:', error, { component: 'lib-task-time-tracking-service', action: 'service_call' });
       throw error;
     }
   },
@@ -143,7 +144,7 @@ export const taskTimeTrackingService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error adding manual entry:', error);
+      logger.error('Error adding manual entry:', error, { component: 'lib-task-time-tracking-service', action: 'service_call' });
       throw error;
     }
   },
@@ -164,7 +165,7 @@ export const taskTimeTrackingService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error updating entry:', error);
+      logger.error('Error updating entry:', error, { component: 'lib-task-time-tracking-service', action: 'service_call' });
       throw error;
     }
   },
@@ -182,7 +183,7 @@ export const taskTimeTrackingService = {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Error deleting entry:', error);
+      logger.error('Error deleting entry:', error, { component: 'lib-task-time-tracking-service', action: 'service_call' });
       throw error;
     }
   },
@@ -212,7 +213,7 @@ export const taskTimeTrackingService = {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching user time entries:', error);
+      logger.error('Error fetching user time entries:', error, { component: 'lib-task-time-tracking-service', action: 'service_call' });
       throw error;
     }
   },

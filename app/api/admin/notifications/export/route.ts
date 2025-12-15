@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookies } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/admin/notifications/export
@@ -141,7 +142,7 @@ export async function POST(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/admin/notifications/export POST error:', error);
+    logger.error('[API] /api/admin/notifications/export POST error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to export notifications' },
       { status: 500 }
@@ -189,7 +190,7 @@ export async function GET(req: NextRequest) {
     return POST(req);
 
   } catch (error) {
-    console.error('[API] /api/admin/notifications/export GET error:', error);
+    logger.error('[API] /api/admin/notifications/export GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to export notifications' },
       { status: 500 }

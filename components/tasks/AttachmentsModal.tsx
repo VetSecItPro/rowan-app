@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, Paperclip, Upload, Download, Trash2, FileText, Image as ImageIcon } from 'lucide-react';
 import { taskAttachmentsService, TaskAttachment } from '@/lib/services/task-attachments-service';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { logger } from '@/lib/logger';
 
 interface AttachmentsModalProps {
   isOpen: boolean;
@@ -31,7 +32,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
       const data = await taskAttachmentsService.getAttachments(taskId);
       setAttachments(data);
     } catch (error) {
-      console.error('Error loading attachments:', error);
+      logger.error('Error loading attachments:', error, { component: 'AttachmentsModal', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -67,7 +68,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
         loadAttachments();
       }, 500);
     } catch (error) {
-      console.error('Error uploading file:', error);
+      logger.error('Error uploading file:', error, { component: 'AttachmentsModal', action: 'component_action' });
       alert('Failed to upload file');
       setUploading(false);
       setUploadProgress(0);
@@ -79,7 +80,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
       const url = await taskAttachmentsService.getAttachmentUrl((attachment as any).file_path);
       window.open(url, '_blank');
     } catch (error) {
-      console.error('Error downloading file:', error);
+      logger.error('Error downloading file:', error, { component: 'AttachmentsModal', action: 'component_action' });
     }
   }
 
@@ -95,7 +96,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
       setConfirmDialog({ isOpen: false, attachmentId: null });
       loadAttachments();
     } catch (error) {
-      console.error('Error deleting attachment:', error);
+      logger.error('Error deleting attachment:', error, { component: 'AttachmentsModal', action: 'component_action' });
     }
   }
 

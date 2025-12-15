@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, DollarSign, Users, TrendingUp, Info, Check } from 'lucide-react';
+import { logger } from '@/lib/logger';
 import type {
   BudgetTemplate,
   BudgetTemplateCategory,
@@ -67,7 +68,7 @@ export function BudgetTemplateModal({
       await onApply(selectedTemplate.id, parseFloat(monthlyIncome));
       onClose();
     } catch (error) {
-      console.error('Failed to apply template:', error);
+      logger.error('Failed to apply template:', error, { component: 'BudgetTemplateModal', action: 'component_action' });
     } finally {
       setIsApplying(false);
     }

@@ -1,6 +1,7 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import LRUCache from 'lru-cache';
+import { logger } from '@/lib/logger';
 
 // Configure Redis for Upstash
 const redis = Redis.fromEnv();
@@ -30,7 +31,7 @@ export async function checkShoppingTokenRateLimit(ip: string): Promise<{ success
   try {
     return await shoppingTokenRateLimit.limit(ip);
   } catch (error) {
-    console.warn('Shopping token rate limit fallback - Redis unavailable:', error);
+    logger.warn('Shopping token rate limit fallback - Redis unavailable', { component: 'lib-ratelimit-shopping', error: error instanceof Error ? error.message : 'Unknown error' });
 
     // Fallback to in-memory cache
     const key = `shopping_token_${ip}`;

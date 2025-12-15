@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 // ==================== TYPES ====================
 
@@ -26,7 +27,7 @@ export async function createBillCalendarEvent(expenseId: string): Promise<string
   });
 
   if (error) {
-    console.error('Error creating bill calendar event:', error);
+    logger.error('Error creating bill calendar event:', error, { component: 'lib-bill-calendar-service', action: 'service_call' });
     return null;
   }
 
@@ -48,7 +49,7 @@ export async function getUpcomingBills(
   });
 
   if (error) {
-    console.error('Error getting upcoming bills:', error);
+    logger.error('Error getting upcoming bills:', error, { component: 'lib-bill-calendar-service', action: 'service_call' });
     return [];
   }
 
@@ -97,7 +98,7 @@ export async function getOverdueBills(spaceId: string): Promise<UpcomingBill[]> 
     .order('start_time', { ascending: true });
 
   if (error) {
-    console.error('Error getting overdue bills:', error);
+    logger.error('Error getting overdue bills:', error, { component: 'lib-bill-calendar-service', action: 'service_call' });
     return [];
   }
 
@@ -131,7 +132,7 @@ export async function markBillAsPaid(expenseId: string): Promise<void> {
     .eq('id', expenseId);
 
   if (error) {
-    console.error('Error marking bill as paid:', error);
+    logger.error('Error marking bill as paid:', error, { component: 'lib-bill-calendar-service', action: 'service_call' });
     throw error;
   }
 }

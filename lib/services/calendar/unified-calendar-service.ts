@@ -8,6 +8,7 @@ import { mealsService } from '@/lib/services/meals-service';
 import { remindersService } from '@/lib/services/reminders-service';
 import { goalsService } from '@/lib/services/goals-service';
 import { unifiedCalendarMapper } from './unified-calendar-mapper';
+import { logger } from '@/lib/logger';
 import type {
   UnifiedCalendarItem,
   UnifiedCalendarFilters,
@@ -59,7 +60,7 @@ export const unifiedCalendarService = {
             allItems.push(...items);
           })
           .catch((error) => {
-            console.error('[UnifiedCalendar] Error fetching events:', error);
+            logger.error('[UnifiedCalendar] Error fetching events:', error, { component: 'lib-unified-calendar-service', action: 'service_call' });
             errors.push('Failed to fetch calendar events');
           })
       );
@@ -73,7 +74,7 @@ export const unifiedCalendarService = {
             allItems.push(...items);
           })
           .catch((error) => {
-            console.error('[UnifiedCalendar] Error fetching tasks:', error);
+            logger.error('[UnifiedCalendar] Error fetching tasks:', error, { component: 'lib-unified-calendar-service', action: 'service_call' });
             errors.push('Failed to fetch tasks');
           })
       );
@@ -87,7 +88,7 @@ export const unifiedCalendarService = {
             allItems.push(...items);
           })
           .catch((error) => {
-            console.error('[UnifiedCalendar] Error fetching meals:', error);
+            logger.error('[UnifiedCalendar] Error fetching meals:', error, { component: 'lib-unified-calendar-service', action: 'service_call' });
             errors.push('Failed to fetch meals');
           })
       );
@@ -101,7 +102,7 @@ export const unifiedCalendarService = {
             allItems.push(...items);
           })
           .catch((error) => {
-            console.error('[UnifiedCalendar] Error fetching reminders:', error);
+            logger.error('[UnifiedCalendar] Error fetching reminders:', error, { component: 'lib-unified-calendar-service', action: 'service_call' });
             errors.push('Failed to fetch reminders');
           })
       );
@@ -115,7 +116,7 @@ export const unifiedCalendarService = {
             allItems.push(...items);
           })
           .catch((error) => {
-            console.error('[UnifiedCalendar] Error fetching goals:', error);
+            logger.error('[UnifiedCalendar] Error fetching goals:', error, { component: 'lib-unified-calendar-service', action: 'service_call' });
             errors.push('Failed to fetch goals');
           })
       );
@@ -156,7 +157,7 @@ export const unifiedCalendarService = {
 
       return unifiedCalendarMapper.mapEvents(events);
     } catch (error) {
-      console.error('[UnifiedCalendar] fetchEvents error:', error);
+      logger.error('[UnifiedCalendar] fetchEvents error:', error, { component: 'lib-unified-calendar-service', action: 'service_call' });
       throw error;
     }
   },
@@ -186,7 +187,7 @@ export const unifiedCalendarService = {
       // Filter by date range
       return unifiedCalendarMapper.filterByDateRange(mappedItems, startDate, endDate);
     } catch (error) {
-      console.error('[UnifiedCalendar] fetchTasks error:', error);
+      logger.error('[UnifiedCalendar] fetchTasks error:', error, { component: 'lib-unified-calendar-service', action: 'service_call' });
       throw error;
     }
   },
@@ -209,7 +210,7 @@ export const unifiedCalendarService = {
       // Filter by date range
       return unifiedCalendarMapper.filterByDateRange(mappedItems, startDate, endDate);
     } catch (error) {
-      console.error('[UnifiedCalendar] fetchMeals error:', error);
+      logger.error('[UnifiedCalendar] fetchMeals error:', error, { component: 'lib-unified-calendar-service', action: 'service_call' });
       throw error;
     }
   },
@@ -238,7 +239,7 @@ export const unifiedCalendarService = {
       // Filter by date range
       return unifiedCalendarMapper.filterByDateRange(mappedItems, startDate, endDate);
     } catch (error) {
-      console.error('[UnifiedCalendar] fetchReminders error:', error);
+      logger.error('[UnifiedCalendar] fetchReminders error:', error, { component: 'lib-unified-calendar-service', action: 'service_call' });
       throw error;
     }
   },
@@ -267,7 +268,7 @@ export const unifiedCalendarService = {
       // Filter by date range
       return unifiedCalendarMapper.filterByDateRange(mappedItems, startDate, endDate);
     } catch (error) {
-      console.error('[UnifiedCalendar] fetchGoals error:', error);
+      logger.error('[UnifiedCalendar] fetchGoals error:', error, { component: 'lib-unified-calendar-service', action: 'service_call' });
       throw error;
     }
   },

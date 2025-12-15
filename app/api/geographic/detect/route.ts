@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { ccpaService } from '@/lib/services/ccpa-service';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 /**
  * Geographic Detection API Endpoint
@@ -84,7 +85,7 @@ export async function GET(request: NextRequest) {
       }
     } catch (authError) {
       // Don't fail the request if auth check fails - just continue
-      console.log('Auth check failed during geographic detection:', authError);
+      logger.info('Auth check failed during geographic detection:', { component: 'api-route', data: authError });
     }
 
     return NextResponse.json({
@@ -97,7 +98,7 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Error in geographic detection API:', error);
+    logger.error('Error in geographic detection API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       {
         error: 'Internal server error',
@@ -171,7 +172,7 @@ export async function POST(request: NextRequest) {
       message: `California residency status updated: ${declaredResident ? 'CA resident' : 'Non-CA resident'}`
     });
   } catch (error) {
-    console.error('Error updating geographic status:', error);
+    logger.error('Error updating geographic status:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

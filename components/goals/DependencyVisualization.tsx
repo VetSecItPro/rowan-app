@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import {
   ArrowRight,
   CheckCircle2,
@@ -119,7 +120,7 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
       calculatePositions(nodes);
       setGoalNodes(nodes);
     } catch (err) {
-      console.error('Failed to load dependency data:', err);
+      logger.error('Failed to load dependency data:', err, { component: 'DependencyVisualization', action: 'component_action' });
     } finally {
       setLoading(false);
     }

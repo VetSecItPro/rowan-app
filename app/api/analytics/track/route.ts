@@ -12,6 +12,7 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 // Valid features in the app
 const VALID_FEATURES = [
@@ -189,7 +190,7 @@ export async function POST(request: NextRequest) {
       });
 
       if (error) {
-        console.error('Error recording feature event:', error);
+        logger.error('Error recording feature event:', error, { component: 'api-route', action: 'api_request' });
         return { success: false, error: error.message };
       }
 
@@ -217,7 +218,7 @@ export async function POST(request: NextRequest) {
       recorded: results.length,
     });
   } catch (error) {
-    console.error('Error in analytics track API:', error);
+    logger.error('Error in analytics track API:', error, { component: 'api-route', action: 'api_request' });
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(

@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { MentionInput } from './MentionInput';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 interface CommentsSectionProps {
   reminderId: string;
@@ -33,7 +34,7 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
       const data = await reminderCommentsService.getComments(reminderId);
       setComments(data);
     } catch (error) {
-      console.error('Error fetching comments:', error);
+      logger.error('Error fetching comments:', error, { component: 'CommentsSection', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -57,13 +58,13 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
           filter: `reminder_id=eq.${reminderId}`,
         },
         (payload: RealtimePostgresChangesPayload<{[key: string]: unknown}>) => {
-          console.log('Real-time comment update:', payload);
+          logger.info('Real-time comment update:', { component: 'CommentsSection', data: payload });
           // Refresh comments when changes occur, but debounce to avoid excessive calls
           setTimeout(() => fetchComments(), 100);
         }
       )
       .subscribe((status: string) => {
-        console.log('Comment subscription status:', status);
+        logger.info('Comment subscription status:', { component: 'CommentsSection', data: status });
       });
 
     return () => {
@@ -114,7 +115,7 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
       setTimeout(() => fetchComments(), 1000);
 
     } catch (error) {
-      console.error('Error creating comment:', error);
+      logger.error('Error creating comment:', error, { component: 'CommentsSection', action: 'component_action' });
 
       // Remove temp comment on error
       setComments(prev => prev.filter(c => c.id !== tempComment.id));
@@ -150,7 +151,7 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
       setEditContent('');
       // Comments will update via real-time subscription
     } catch (error) {
-      console.error('Error updating comment:', error);
+      logger.error('Error updating comment:', error, { component: 'CommentsSection', action: 'component_action' });
       alert('Failed to update comment. Please try again.');
     }
   };
@@ -169,7 +170,7 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
       await reminderCommentsService.deleteComment(commentToDelete, user.id);
       // Comments will update via real-time subscription
     } catch (error) {
-      console.error('Error deleting comment:', error);
+      logger.error('Error deleting comment:', error, { component: 'CommentsSection', action: 'component_action' });
       alert('Failed to delete comment. Please try again.');
     } finally {
       setShowDeleteConfirm(false);

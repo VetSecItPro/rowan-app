@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X, Send, Search } from 'lucide-react';
 import { Conversation } from '@/lib/services/messages-service';
+import { logger } from '@/lib/logger';
 
 interface ForwardMessageModalProps {
   isOpen: boolean;
@@ -45,7 +46,7 @@ export function ForwardMessageModal({
       setSearchQuery('');
       onClose();
     } catch (error) {
-      console.error('Failed to forward message:', error);
+      logger.error('Failed to forward message:', error, { component: 'ForwardMessageModal', action: 'component_action' });
     } finally {
       setIsForwarding(false);
     }

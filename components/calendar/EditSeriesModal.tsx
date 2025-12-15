@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X, Calendar, Edit3, Trash2, Copy, AlertTriangle } from 'lucide-react';
 import { CalendarEvent, CreateEventInput, calendarService } from '@/lib/services/calendar-service';
+import { logger } from '@/lib/logger';
 
 interface EditSeriesModalProps {
   isOpen: boolean;
@@ -96,7 +97,7 @@ export function EditSeriesModal({
       onEventUpdated?.();
       onClose();
     } catch (err) {
-      console.error('Error processing recurring event action:', err);
+      logger.error('Error processing recurring event action:', err, { component: 'EditSeriesModal', action: 'component_action' });
       setError('Failed to process the action. Please try again.');
     } finally {
       setIsProcessing(false);

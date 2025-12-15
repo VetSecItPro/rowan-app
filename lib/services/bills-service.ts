@@ -3,6 +3,7 @@ import { projectsService } from './budgets-service';
 import { remindersService } from './reminders-service';
 import { calendarService } from './calendar-service';
 import { subDays } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 // =====================================================
 // TYPES
@@ -207,7 +208,7 @@ export async function createBill(
       });
       updates.linked_reminder_id = reminder.id;
     } catch (reminderError) {
-      console.error('Failed to create linked reminder:', reminderError);
+      logger.error('Failed to create linked reminder:', reminderError, { component: 'lib-bills-service', action: 'service_call' });
       // Continue without reminder - don't fail the bill creation
     }
   }
@@ -226,7 +227,7 @@ export async function createBill(
     });
     updates.linked_calendar_event_id = event.id;
   } catch (calendarError) {
-    console.error('Failed to create linked calendar event:', calendarError);
+    logger.error('Failed to create linked calendar event:', calendarError, { component: 'lib-bills-service', action: 'service_call' });
     // Continue without calendar event - don't fail the bill creation
   }
 
@@ -240,7 +241,7 @@ export async function createBill(
       .single();
 
     if (updateError) {
-      console.error('Failed to update bill with linked IDs:', updateError);
+      logger.error('Failed to update bill with linked IDs:', updateError, { component: 'lib-bills-service', action: 'service_call' });
       return bill; // Return original bill if update fails
     }
     return updatedBill;
@@ -333,7 +334,7 @@ export async function markBillAsPaid(
         status: 'completed',
       });
     } catch (reminderError) {
-      console.error('Failed to complete linked reminder:', reminderError);
+      logger.error('Failed to complete linked reminder:', reminderError, { component: 'lib-bills-service', action: 'service_call' });
       // Continue - don't fail the bill payment
     }
   }
@@ -346,7 +347,7 @@ export async function markBillAsPaid(
         'completed'
       );
     } catch (eventError) {
-      console.error('Failed to complete linked calendar event:', eventError);
+      logger.error('Failed to complete linked calendar event:', eventError, { component: 'lib-bills-service', action: 'service_call' });
       // Continue - don't fail the bill payment
     }
   }

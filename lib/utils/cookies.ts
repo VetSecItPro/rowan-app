@@ -2,6 +2,7 @@
 // Provides actual cookie control functionality for GDPR/CCPA compliance
 
 import { UserPrivacyPreferences } from '../types/privacy';
+import { logger } from '@/lib/logger';
 
 export interface CookiePreferences {
   necessary: boolean; // Always true, cannot be disabled
@@ -117,7 +118,7 @@ export function getCookiePreferences(): CookiePreferences {
       };
     }
   } catch (error) {
-    console.error('Error reading cookie preferences:', error);
+    logger.error('Error reading cookie preferences:', error, { component: 'lib-cookies', action: 'service_call' });
   }
 
   return getDefaultCookiePreferences();
@@ -148,9 +149,9 @@ export function updateCookiePreferences(preferences: CookiePreferences): void {
     // Set consent timestamp
     setCookie('cookie-consent', new Date().toISOString(), 365);
 
-    console.log('✅ Cookie preferences updated:', preferences);
+    logger.info('✅ Cookie preferences updated:', { component: 'lib-cookies', data: preferences });
   } catch (error) {
-    console.error('❌ Error updating cookie preferences:', error);
+    logger.error('❌ Error updating cookie preferences:', error, { component: 'lib-cookies', action: 'service_call' });
   }
 }
 
@@ -190,7 +191,7 @@ export function setCookie(name: string, value: string, days: number): void {
 
     document.cookie = `${name}=${value}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
   } catch (error) {
-    console.error(`Error setting cookie ${name}:`, error);
+    logger.error('Error setting cookie ${name}:', error, { component: 'lib-cookies', action: 'service_call' });
   }
 }
 
@@ -208,7 +209,7 @@ export function getCookie(name: string): string | null {
       if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
     }
   } catch (error) {
-    console.error(`Error getting cookie ${name}:`, error);
+    logger.error('Error getting cookie ${name}:', error, { component: 'lib-cookies', action: 'service_call' });
   }
 
   return null;
@@ -231,7 +232,7 @@ export function deleteCookie(name: string): void {
       });
     });
   } catch (error) {
-    console.error(`Error deleting cookie ${name}:`, error);
+    logger.error('Error deleting cookie ${name}:', error, { component: 'lib-cookies', action: 'service_call' });
   }
 }
 
@@ -248,7 +249,7 @@ export function deleteMatchingCookies(pattern: string): void {
       }
     });
   } catch (error) {
-    console.error(`Error deleting cookies matching ${pattern}:`, error);
+    logger.error('Error deleting cookies matching ${pattern}:', error, { component: 'lib-cookies', action: 'service_call' });
   }
 }
 
@@ -278,9 +279,9 @@ export function toggleThirdPartyScripts(preferences: CookiePreferences): void {
       disableVercelAnalytics();
     }
 
-    console.log('📊 Third-party scripts updated based on cookie preferences');
+    logger.info('📊 Third-party scripts updated based on cookie preferences', { component: 'lib-cookies' });
   } catch (error) {
-    console.error('Error toggling third-party scripts:', error);
+    logger.error('Error toggling third-party scripts:', error, { component: 'lib-cookies', action: 'service_call' });
   }
 }
 

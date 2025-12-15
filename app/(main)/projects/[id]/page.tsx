@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { logger } from '@/lib/logger';
 import {
   ArrowLeft,
   Folder,
@@ -63,7 +64,7 @@ export default function ProjectDetailPage() {
       setExpenses(expensesData);
       setPhotos(photosData);
     } catch (err) {
-      console.error('Error loading project:', err);
+      logger.error('Error loading project:', err, { component: 'page', action: 'execution' });
       setError('Failed to load project details');
     } finally {
       setLoading(false);
@@ -81,7 +82,7 @@ export default function ProjectDetailPage() {
       await deleteProject(projectId);
       router.push('/projects');
     } catch (err) {
-      console.error('Error deleting project:', err);
+      logger.error('Error deleting project:', err, { component: 'page', action: 'execution' });
       alert('Failed to delete project');
     }
   };

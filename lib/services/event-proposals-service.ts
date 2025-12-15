@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 export interface TimeSlot {
   start_time: string;
@@ -360,7 +361,7 @@ export const eventProposalsService = {
     eventId?: string
   ): Promise<void> {
     // Placeholder for notification logic
-    console.log(`Notify space ${spaceId} about ${type} for proposal ${proposalId}`);
+    logger.info(`Notify space ${spaceId} about ${type} for proposal ${proposalId}`, { component: 'lib-event-proposals-service' });
   },
 
   /**

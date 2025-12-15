@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
+import { logger } from '@/lib/logger';
 
 interface CommentFormProps {
   onSubmit: (content: string) => Promise<void>;
@@ -154,7 +155,7 @@ export default function CommentForm({
       await onSubmit(content.trim());
       setContent('');
     } catch (err) {
-      console.error('Failed to submit comment:', err);
+      logger.error('Failed to submit comment:', err, { component: 'CommentForm', action: 'component_action' });
     }
   };
 

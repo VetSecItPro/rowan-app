@@ -3,6 +3,7 @@
 import { ReactNode } from 'react';
 import { ErrorBoundary } from './ErrorBoundary';
 import { AlertTriangle, RefreshCw, ArrowLeft } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface PageErrorBoundaryProps {
   children: ReactNode;
@@ -17,7 +18,7 @@ export default function PageErrorBoundary({
 }: PageErrorBoundaryProps) {
   const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
     // Log error with page context
-    console.error(`${pageName} error:`, error, errorInfo);
+    logger.error('${pageName} error:', undefined, { component: 'PageErrorBoundary', action: 'component_action', details: error, errorInfo });
 
     // In production, this could send to error reporting service with page context
     if (process.env.NODE_ENV === 'production') {

@@ -14,6 +14,7 @@ import Image from 'next/image';
 import { Sparkles, Clock, Shield, Loader2 } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { featureFlags } from '@/lib/constants/feature-flags';
+import { logger } from '@/lib/logger';
 
 // Initialize Stripe.js
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -93,7 +94,7 @@ export default function PricingPage() {
         throw new Error(stripeError.message);
       }
     } catch (err) {
-      console.error('Checkout error:', err);
+      logger.error('Checkout error:', err, { component: 'page', action: 'execution' });
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(null);

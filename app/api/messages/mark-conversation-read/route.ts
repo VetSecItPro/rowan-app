@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
       .select('id');
 
     if (updateError) {
-      console.error('Failed to mark conversation as read:', updateError);
+      logger.error('Failed to mark conversation as read:', updateError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: 'Failed to mark messages as read' },
         { status: 500 }
@@ -93,7 +94,7 @@ export async function POST(request: NextRequest) {
       markedCount: data?.length || 0
     });
   } catch (error) {
-    console.error('Error in mark-conversation-read:', error);
+    logger.error('Error in mark-conversation-read:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

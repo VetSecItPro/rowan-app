@@ -8,15 +8,14 @@ import { setSentryUser } from '@/lib/sentry-utils';
 import { updateTaskSchema } from '@/lib/validations/task-schemas';
 import { ZodError } from 'zod';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/tasks/[id]
  * Get a single task by ID
  */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
@@ -77,7 +76,7 @@ export async function GET(
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/tasks/[id] GET error:', error);
+    logger.error('[API] /api/tasks/[id] GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -89,10 +88,8 @@ export async function GET(
  * PATCH /api/tasks/[id]
  * Update a task
  */
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
@@ -184,7 +181,7 @@ export async function PATCH(
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/tasks/[id] PATCH error:', error);
+    logger.error('[API] /api/tasks/[id] PATCH error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to update task' },
       { status: 500 }
@@ -196,10 +193,8 @@ export async function PATCH(
  * DELETE /api/tasks/[id]
  * Delete a task
  */
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
@@ -263,7 +258,7 @@ export async function DELETE(
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/tasks/[id] DELETE error:', error);
+    logger.error('[API] /api/tasks/[id] DELETE error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to delete task' },
       { status: 500 }

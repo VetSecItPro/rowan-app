@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface PushSubscription {
   id: string;
@@ -55,7 +56,7 @@ export const pushSubscriptionService = {
    */
   async registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
     if (!('serviceWorker' in navigator)) {
-      console.warn('Service workers not supported');
+      logger.warn('Service workers not supported', { component: 'lib-push-subscription-service' });
       return null;
     }
 
@@ -64,14 +65,14 @@ export const pushSubscriptionService = {
         scope: '/',
       });
 
-      console.log('Service worker registered:', registration);
+      logger.info('Service worker registered:', { component: 'lib-push-subscription-service', data: registration });
 
       // Wait for service worker to be ready
       await navigator.serviceWorker.ready;
 
       return registration;
     } catch (error) {
-      console.error('Service worker registration failed:', error);
+      logger.error('Service worker registration failed:', error, { component: 'lib-push-subscription-service', action: 'service_call' });
       return null;
     }
   },
@@ -156,13 +157,13 @@ export const pushSubscriptionService = {
         .single();
 
       if (error) {
-        console.error('Error saving push subscription:', error);
+        logger.error('Error saving push subscription:', error, { component: 'lib-push-subscription-service', action: 'service_call' });
         throw new Error('Failed to save push subscription');
       }
 
       return data;
     } catch (error) {
-      console.error('Push subscription failed:', error);
+      logger.error('Push subscription failed:', error, { component: 'lib-push-subscription-service', action: 'service_call' });
       throw error;
     }
   },
@@ -188,7 +189,7 @@ export const pushSubscriptionService = {
       .eq('user_id', userId);
 
     if (error) {
-      console.error('Error deactivating push subscription:', error);
+      logger.error('Error deactivating push subscription:', error, { component: 'lib-push-subscription-service', action: 'service_call' });
       throw new Error('Failed to unsubscribe');
     }
   },
@@ -207,7 +208,7 @@ export const pushSubscriptionService = {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching subscriptions:', error);
+      logger.error('Error fetching subscriptions:', error, { component: 'lib-push-subscription-service', action: 'service_call' });
       throw new Error('Failed to fetch subscriptions');
     }
 
@@ -226,7 +227,7 @@ export const pushSubscriptionService = {
       .eq('id', subscriptionId);
 
     if (error) {
-      console.error('Error deleting subscription:', error);
+      logger.error('Error deleting subscription:', error, { component: 'lib-push-subscription-service', action: 'service_call' });
       throw new Error('Failed to delete subscription');
     }
   },
@@ -255,7 +256,7 @@ export const pushSubscriptionService = {
 
       return !error && !!data;
     } catch (error) {
-      console.error('Error checking subscription status:', error);
+      logger.error('Error checking subscription status:', error, { component: 'lib-push-subscription-service', action: 'service_call' });
       return false;
     }
   },

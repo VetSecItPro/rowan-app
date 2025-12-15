@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 import {
   getActivityFeed,
   getActivityStats,
@@ -68,7 +69,7 @@ export default function ActivityFeed({
       setActivities(data);
       setError(null);
     } catch (err) {
-      console.error('Failed to load activity feed:', err);
+      logger.error('Failed to load activity feed:', err, { component: 'ActivityFeed', action: 'component_action' });
       setError('Failed to load activity feed');
     } finally {
       setLoading(false);
@@ -83,7 +84,7 @@ export default function ActivityFeed({
       const data = await getActivityStats(spaceId);
       setStats(data);
     } catch (err) {
-      console.error('Failed to load activity stats:', err);
+      logger.error('Failed to load activity stats:', err, { component: 'ActivityFeed', action: 'component_action' });
     }
   };
 

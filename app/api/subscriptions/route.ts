@@ -14,6 +14,7 @@ import { getSubscriptionStatus } from '@/lib/services/subscription-service';
 import type { SubscriptionTier } from '@/lib/types';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 /**
  * GET handler - Get user's subscription details including features and usage
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
     const isDev = process.env.NODE_ENV === 'development';
 
     if (isDev && mockTier) {
-      console.log(`[DEV] Mocking subscription tier: ${mockTier}`);
+      logger.info(`[DEV] Mocking subscription tier: ${mockTier}`, { component: 'api-route' });
 
       // Return mock data for testing (bypasses auth for dev testing)
       const isTrialMock = mockTier === 'trial';
@@ -115,7 +116,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching subscription:', error);
+    logger.error('Error fetching subscription:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to fetch subscription details' },
       { status: 500 }

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, TestTube, ArrowRight, Shield, Users, Lightbulb } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 // Security: Beta password is validated server-side only (never expose in client bundle)
 
@@ -102,7 +103,7 @@ export default function BetaSignupPage() {
       router.push('/dashboard?welcome=beta');
 
     } catch (error) {
-      console.error('Beta signup error:', error);
+      logger.error('Beta signup error:', error, { component: 'page', action: 'execution' });
       setSignupError(error instanceof Error ? error.message : 'Failed to create account. Please try again.');
     } finally {
       setIsLoading(false);

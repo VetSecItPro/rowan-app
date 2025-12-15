@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { Toggle } from '@/components/ui/Toggle';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { logger } from '@/lib/logger';
 import {
   Shield,
   Database,
@@ -73,7 +74,7 @@ export function PrivacyDataManager() {
         }
       }
     } catch (error) {
-      console.error('Error loading privacy data:', error);
+      logger.error('Error loading privacy data:', error, { component: 'PrivacyDataManager', action: 'component_action' });
       setError('Failed to load privacy settings');
     } finally {
       setLoading(false);

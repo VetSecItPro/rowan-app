@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // TYPES & VALIDATION
@@ -179,7 +180,7 @@ export const recurringGoalsService = {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching recurring goal templates:', error);
+      logger.error('Error fetching recurring goal templates:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
       throw new Error('Failed to fetch recurring goal templates');
     }
 
@@ -277,13 +278,13 @@ export const recurringGoalsService = {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching habit templates, using fallback data:', error);
+        logger.error('Error fetching habit templates, using fallback data:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
         return fallbackHabitTemplates;
       }
 
       return data || fallbackHabitTemplates;
     } catch (error) {
-      console.error('Database connection failed for habit templates, using fallback data:', error);
+      logger.error('Database connection failed for habit templates, using fallback data:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
       return fallbackHabitTemplates;
     }
   },
@@ -310,7 +311,7 @@ export const recurringGoalsService = {
       .single();
 
     if (error) {
-      console.error('Error creating recurring goal template:', error);
+      logger.error('Error creating recurring goal template:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
       throw new Error('Failed to create recurring goal template');
     }
 
@@ -319,7 +320,7 @@ export const recurringGoalsService = {
       try {
         await this.generateInstances(data.id);
       } catch (error) {
-        console.error('Error generating initial instances:', error);
+        logger.error('Error generating initial instances:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
         // Don't fail the creation, just log the error
       }
     }
@@ -344,7 +345,7 @@ export const recurringGoalsService = {
       .single();
 
     if (error) {
-      console.error('Error updating recurring goal template:', error);
+      logger.error('Error updating recurring goal template:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
       throw new Error('Failed to update recurring goal template');
     }
 
@@ -367,7 +368,7 @@ export const recurringGoalsService = {
       .eq('id', id);
 
     if (error) {
-      console.error('Error deleting recurring goal template:', error);
+      logger.error('Error deleting recurring goal template:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
       throw new Error('Failed to delete recurring goal template');
     }
   },
@@ -389,7 +390,7 @@ export const recurringGoalsService = {
       });
 
     if (error) {
-      console.error('Error generating instances:', error);
+      logger.error('Error generating instances:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
       throw new Error('Failed to generate instances');
     }
 
@@ -422,7 +423,7 @@ export const recurringGoalsService = {
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error fetching instances:', error);
+      logger.error('Error fetching instances:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
       throw new Error('Failed to fetch instances');
     }
 
@@ -457,7 +458,7 @@ export const recurringGoalsService = {
       .single();
 
     if (error) {
-      console.error('Error updating instance:', error);
+      logger.error('Error updating instance:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
       throw new Error('Failed to update instance');
     }
 
@@ -502,7 +503,7 @@ export const recurringGoalsService = {
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error fetching habit entries:', error);
+      logger.error('Error fetching habit entries:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
       throw new Error('Failed to fetch habit entries');
     }
 
@@ -556,7 +557,7 @@ export const recurringGoalsService = {
       .single();
 
     if (error) {
-      console.error('Error upserting habit entry:', error);
+      logger.error('Error upserting habit entry:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
       throw new Error('Failed to save habit entry');
     }
 
@@ -592,7 +593,7 @@ export const recurringGoalsService = {
       .single();
 
     if (error) {
-      console.error('Error updating habit entry:', error);
+      logger.error('Error updating habit entry:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
       throw new Error('Failed to update habit entry');
     }
 
@@ -624,7 +625,7 @@ export const recurringGoalsService = {
       .order('streak_type', { ascending: true });
 
     if (error) {
-      console.error('Error fetching habit streaks:', error);
+      logger.error('Error fetching habit streaks:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
       throw new Error('Failed to fetch habit streaks');
     }
 
@@ -652,7 +653,7 @@ export const recurringGoalsService = {
       .limit(12); // Last 12 periods
 
     if (error) {
-      console.error('Error fetching habit analytics:', error);
+      logger.error('Error fetching habit analytics:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
       throw new Error('Failed to fetch habit analytics');
     }
 
@@ -679,7 +680,7 @@ export const recurringGoalsService = {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
-        console.log('User not authenticated for habits, using fallback data');
+        logger.info('User not authenticated for habits, using fallback data', { component: 'lib-recurring-goals-service' });
         // Return fallback habits with basic template data
         const fallbackHabits = await this.getHabitTemplates(spaceId);
         return fallbackHabits.map(template => ({ template }));
@@ -705,7 +706,7 @@ export const recurringGoalsService = {
               streak: streaks[0],
             };
           } catch (error) {
-            console.error(`Error loading data for habit ${template.title}, using fallback:`, error);
+            logger.error('Error loading data for habit ${template.title}, using fallback:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
             // Return template with no entry/streak data on error
             return {
               template,
@@ -716,7 +717,7 @@ export const recurringGoalsService = {
 
       return results;
     } catch (error) {
-      console.error('Error loading today\'s habits, using fallback data:', error);
+      logger.error('Error loading today\'s habits, using fallback data:', error, { component: 'recurring-goals-service', action: 'service_call' });
       // Get fallback habit templates and return them without entries/streaks
       const fallbackHabits = await this.getHabitTemplates(spaceId);
       return fallbackHabits.map(template => ({ template }));

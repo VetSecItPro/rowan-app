@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import type { Project } from '@/lib/services/project-tracking-service';
+import { logger } from '@/lib/logger';
 
 export interface CreateProjectInput {
   space_id: string;
@@ -142,7 +143,7 @@ export const projectsOnlyService = {
         totalBudget: projects.reduce((sum, p) => sum + ((p as any).budget_amount || p.estimated_budget || 0), 0),
       };
     } catch (error) {
-      console.error('getProjectStats error:', error);
+      logger.error('getProjectStats error:', error, { component: 'lib-projects-service', action: 'service_call' });
       return {
         total: 0,
         planning: 0,

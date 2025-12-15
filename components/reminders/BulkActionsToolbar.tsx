@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { CheckCircle2, Trash2, UserPlus, Flag, Tag, Download, X, ChevronDown } from 'lucide-react';
 import { remindersBulkService } from '@/lib/services/reminders-bulk-service';
 import { Reminder } from '@/lib/services/reminders-service';
+import { logger } from '@/lib/logger';
 
 interface BulkActionsToolbarProps {
   selectedCount: number;
@@ -41,7 +42,7 @@ export function BulkActionsToolbar({
         alert(`Completed ${result.successCount}, failed ${result.failedCount}`);
       }
     } catch (error) {
-      console.error('Bulk complete failed:', error);
+      logger.error('Bulk complete failed:', error, { component: 'BulkActionsToolbar', action: 'component_action' });
       alert('Failed to complete reminders');
     } finally {
       setIsProcessing(false);
@@ -61,7 +62,7 @@ export function BulkActionsToolbar({
         alert(`Deleted ${result.successCount}, failed ${result.failedCount}`);
       }
     } catch (error) {
-      console.error('Bulk delete failed:', error);
+      logger.error('Bulk delete failed:', error, { component: 'BulkActionsToolbar', action: 'component_action' });
       alert('Failed to delete reminders');
     } finally {
       setIsProcessing(false);
@@ -81,7 +82,7 @@ export function BulkActionsToolbar({
         alert(`Updated ${result.successCount}, failed ${result.failedCount}`);
       }
     } catch (error) {
-      console.error('Bulk priority change failed:', error);
+      logger.error('Bulk priority change failed:', error, { component: 'BulkActionsToolbar', action: 'component_action' });
       alert('Failed to change priority');
     } finally {
       setIsProcessing(false);
@@ -104,7 +105,7 @@ export function BulkActionsToolbar({
         alert(`Updated ${result.successCount}, failed ${result.failedCount}`);
       }
     } catch (error) {
-      console.error('Bulk category change failed:', error);
+      logger.error('Bulk category change failed:', error, { component: 'BulkActionsToolbar', action: 'component_action' });
       alert('Failed to change category');
     } finally {
       setIsProcessing(false);

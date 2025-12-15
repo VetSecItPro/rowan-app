@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { TrendingUp, TrendingDown, DollarSign, FolderOpen, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
 import { getProjectStats } from '@/lib/services/project-tracking-service';
+import { logger } from '@/lib/logger';
 
 type ProjectStats = {
   total_projects: number;
@@ -33,7 +34,7 @@ export default function ProjectStatsComponent({ spaceId }: ProjectStatsProps) {
         const data = await getProjectStats(spaceId);
         setStats(data);
       } catch (err) {
-        console.error('Error loading project stats:', err);
+        logger.error('Error loading project stats:', err, { component: 'ProjectStats', action: 'component_action' });
         setError('Failed to load project statistics');
       } finally {
         setLoading(false);

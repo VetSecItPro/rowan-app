@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { X, Clock, Calendar, History } from 'lucide-react';
 import { taskSnoozeService } from '@/lib/services/task-snooze-service';
+import { logger } from '@/lib/logger';
 
 interface SnoozeModalProps {
   isOpen: boolean;
@@ -46,7 +47,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
       const data = await taskSnoozeService.getSnoozeHistory(taskId);
       setHistory(data);
     } catch (error) {
-      console.error('Error loading history:', error);
+      logger.error('Error loading history:', error, { component: 'SnoozeModal', action: 'component_action' });
     }
   }
 
@@ -57,7 +58,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
       onSnooze?.();
       onClose();
     } catch (error) {
-      console.error('Error snoozing task:', error);
+      logger.error('Error snoozing task:', error, { component: 'SnoozeModal', action: 'component_action' });
       alert('Failed to snooze task');
     } finally {
       setLoading(false);

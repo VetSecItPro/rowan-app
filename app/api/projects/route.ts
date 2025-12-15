@@ -6,6 +6,7 @@ import { verifySpaceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/projects
@@ -79,7 +80,7 @@ export async function GET(req: NextRequest) {
       data: projects,
     });
   } catch (error) {
-    console.error('[API] /api/projects GET error:', error);
+    logger.error('[API] /api/projects GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -183,7 +184,7 @@ export async function POST(req: NextRequest) {
       data: project,
     });
   } catch (error) {
-    console.error('[API] /api/projects POST error:', error);
+    logger.error('[API] /api/projects POST error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to create project' },
       { status: 500 }

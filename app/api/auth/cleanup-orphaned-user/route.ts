@@ -5,6 +5,7 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: Request) {
   try {
@@ -68,7 +69,7 @@ export async function POST(req: Request) {
     const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !supabaseServiceRoleKey) {
-      console.error('Missing Supabase credentials');
+      logger.error('Missing Supabase credentials', undefined, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: 'Server configuration error' },
         { status: 500 }
@@ -87,7 +88,7 @@ export async function POST(req: Request) {
     const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
 
     if (error) {
-      console.error('[SECURITY] Error deleting orphaned user:', error);
+      logger.error('[SECURITY] Error deleting orphaned user:', error, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
         { error: 'Failed to delete orphaned user' },
         { status: 500 }
@@ -95,7 +96,7 @@ export async function POST(req: Request) {
     }
 
     // SECURITY: Audit log for user deletion
-    console.info(`[AUDIT] User ${session.user.id} successfully deleted orphaned user ${userId}`);
+    logger.info(`[AUDIT] User ${session.user.id} successfully deleted orphaned user ${userId}`, { component: 'api-route' });
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -108,7 +109,7 @@ export async function POST(req: Request) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('Cleanup error:', error);
+    logger.error('Cleanup error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

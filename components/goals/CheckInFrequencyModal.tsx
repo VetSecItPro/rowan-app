@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, Calendar, Clock, Bell, Settings, Repeat } from 'lucide-react';
 import { goalsService } from '@/lib/services/goals-service';
 import { hapticLight, hapticSuccess } from '@/lib/utils/haptics';
+import { logger } from '@/lib/logger';
 
 interface CheckInFrequencySettings {
   frequency: 'daily' | 'weekly' | 'biweekly' | 'monthly';
@@ -88,7 +89,7 @@ export function CheckInFrequencyModal({ isOpen, onClose, goalId, goalTitle }: Ch
         // Keep default settings
       }
     } catch (error) {
-      console.error('Error loading check-in settings:', error);
+      logger.error('Error loading check-in settings:', error, { component: 'CheckInFrequencyModal', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -125,7 +126,7 @@ export function CheckInFrequencyModal({ isOpen, onClose, goalId, goalTitle }: Ch
       hapticSuccess();
       onClose();
     } catch (error) {
-      console.error('Error saving check-in settings:', error);
+      logger.error('Error saving check-in settings:', error, { component: 'CheckInFrequencyModal', action: 'component_action' });
     } finally {
       setSaving(false);
     }

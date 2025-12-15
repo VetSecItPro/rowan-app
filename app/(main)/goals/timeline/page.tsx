@@ -4,6 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import {
   Clock,
   Target,
@@ -164,7 +165,7 @@ export default function GoalsTimelinePage() {
             }
           }
         } catch (err) {
-          console.error(`Failed to load milestones for goal ${goal.id}:`, err);
+          logger.error('Failed to load milestones for goal ${goal.id}:', err, { component: 'page', action: 'execution' });
         }
 
         // Load recent check-ins (last 30 days)
@@ -185,7 +186,7 @@ export default function GoalsTimelinePage() {
             });
           }
         } catch (err) {
-          console.error(`Failed to load check-ins for goal ${goal.id}:`, err);
+          logger.error('Failed to load check-ins for goal ${goal.id}:', err, { component: 'page', action: 'execution' });
         }
       }
 
@@ -197,7 +198,7 @@ export default function GoalsTimelinePage() {
       setTimelineGroups(grouped);
 
     } catch (err) {
-      console.error('Failed to load timeline data:', err);
+      logger.error('Failed to load timeline data:', err, { component: 'page', action: 'execution' });
       setError('Failed to load timeline. Please try again.');
     } finally {
       setLoading(false);

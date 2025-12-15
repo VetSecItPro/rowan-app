@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { logger } from '@/lib/logger';
 import {
   DndContext,
   DragEndEvent,
@@ -377,19 +378,19 @@ export function DraggableItemList({
               )
             );
           } else {
-            console.log('🏠 sort_order column not found for chores, skipping chore reordering');
+            logger.info('🏠 sort_order column not found for chores, skipping chore reordering', { component: 'DraggableItemList' });
           }
         } catch (sortOrderError) {
-          console.log('🏠 sort_order column not available for chores yet, skipping chore reordering');
+          logger.info('🏠 sort_order column not available for chores yet, skipping chore reordering', { component: 'DraggableItemList' });
         }
       }
 
       // Execute both task and chore updates
       await Promise.all([...taskUpdates, ...choreUpdates]);
 
-      console.log('✅ Successfully updated sort order for available items');
+      logger.info('✅ Successfully updated sort order for available items', { component: 'DraggableItemList' });
     } catch (error) {
-      console.error('❌ Error updating item order:', error);
+      logger.error('❌ Error updating item order:', error, { component: 'DraggableItemList', action: 'component_action' });
       // Revert on error
       setItems(initialItems);
     }

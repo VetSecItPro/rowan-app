@@ -6,6 +6,7 @@ import { eventCommentsService, EventComment } from '@/lib/services/event-comment
 import { useAuth } from '@/lib/contexts/auth-context';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { formatDistance } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 interface EventCommentThreadProps {
   eventId: string;
@@ -34,7 +35,7 @@ export function EventCommentThread({ eventId, spaceId, onClose }: EventCommentTh
       const data = await eventCommentsService.getComments(eventId);
       setComments(data);
     } catch (error) {
-      console.error('Failed to load comments:', error);
+      logger.error('Failed to load comments:', error, { component: 'EventCommentThread', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -56,7 +57,7 @@ export function EventCommentThread({ eventId, spaceId, onClose }: EventCommentTh
       setReplyTo(null);
       await loadComments();
     } catch (error) {
-      console.error('Failed to post comment:', error);
+      logger.error('Failed to post comment:', error, { component: 'EventCommentThread', action: 'component_action' });
     }
   };
 
@@ -72,7 +73,7 @@ export function EventCommentThread({ eventId, spaceId, onClose }: EventCommentTh
       setEditContent('');
       await loadComments();
     } catch (error) {
-      console.error('Failed to update comment:', error);
+      logger.error('Failed to update comment:', error, { component: 'EventCommentThread', action: 'component_action' });
     }
   };
 
@@ -88,7 +89,7 @@ export function EventCommentThread({ eventId, spaceId, onClose }: EventCommentTh
       await eventCommentsService.deleteComment(commentToDelete);
       await loadComments();
     } catch (error) {
-      console.error('Failed to delete comment:', error);
+      logger.error('Failed to delete comment:', error, { component: 'EventCommentThread', action: 'component_action' });
     } finally {
       setShowDeleteConfirm(false);
       setCommentToDelete(null);

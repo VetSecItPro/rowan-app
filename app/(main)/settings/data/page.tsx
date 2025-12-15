@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { logger } from '@/lib/logger';
 import {
   HardDrive,
   Trash2,
@@ -76,7 +77,7 @@ export default function DataManagementPage() {
       const data = await response.json();
       setStorageUsage(data.usage);
     } catch (err) {
-      console.error('Error loading storage usage:', err);
+      logger.error('Error loading storage usage:', err, { component: 'page', action: 'execution' });
       setError(err instanceof Error ? err.message : 'Failed to load storage usage');
     } finally {
       setIsLoadingUsage(false);
@@ -99,7 +100,7 @@ export default function DataManagementPage() {
       const data = await response.json();
       setFiles(data.files || []);
     } catch (err) {
-      console.error('Error loading files:', err);
+      logger.error('Error loading files:', err, { component: 'page', action: 'execution' });
       // Don't set error here - files are optional
     } finally {
       setIsLoadingFiles(false);
@@ -137,7 +138,7 @@ export default function DataManagementPage() {
       // Clear selection
       setSelectedFiles(new Set());
     } catch (err) {
-      console.error('Error deleting files:', err);
+      logger.error('Error deleting files:', err, { component: 'page', action: 'execution' });
       setError(err instanceof Error ? err.message : 'Failed to delete files');
     } finally {
       setIsDeleting(false);

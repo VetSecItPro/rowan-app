@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { pushService } from './push-service';
+import { logger } from '@/lib/logger';
 // Removed notification-preferences-service and digest-service dependencies - using direct notification system
 
 export interface NotificationPayload {
@@ -46,7 +47,7 @@ export const enhancedNotificationService = {
       .eq('space_id', spaceId);
 
     if (error) {
-      console.error('Error fetching space members:', error);
+      logger.error('Error fetching space members:', error, { component: 'lib-enhanced-notification-service', action: 'service_call' });
       return [];
     }
 
@@ -83,7 +84,7 @@ export const enhancedNotificationService = {
       const result = await response.json();
       return result;
     } catch (error) {
-      console.error('Email notification API error:', error);
+      logger.error('Email notification API error:', error, { component: 'lib-enhanced-notification-service', action: 'service_call' });
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',

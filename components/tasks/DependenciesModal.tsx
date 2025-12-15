@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, Link2, AlertCircle, Search, Trash2 } from 'lucide-react';
 import { taskDependenciesService } from '@/lib/services/task-dependencies-service';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface TaskDependency {
   id: string;
@@ -53,7 +54,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
       const data = await taskDependenciesService.getDependencies(taskId);
       setDependencies(data);
     } catch (error) {
-      console.error('Error loading dependencies:', error);
+      logger.error('Error loading dependencies:', error, { component: 'DependenciesModal', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -83,7 +84,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
       if (error.message?.includes('circular')) {
         alert('Cannot add dependency: This would create a circular dependency chain');
       } else {
-        console.error('Error adding dependency:', error);
+        logger.error('Error adding dependency:', error, { component: 'DependenciesModal', action: 'component_action' });
         alert('Failed to add dependency');
       }
     } finally {
@@ -96,7 +97,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
       await taskDependenciesService.removeDependency(dependencyId);
       loadDependencies();
     } catch (error) {
-      console.error('Error removing dependency:', error);
+      logger.error('Error removing dependency:', error, { component: 'DependenciesModal', action: 'component_action' });
     }
   }
 

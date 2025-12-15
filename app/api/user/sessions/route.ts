@@ -45,7 +45,7 @@ export async function GET(request: Request) {
     const result = await getUserSessions(user.id, supabase);
 
     if (!result.success) {
-      console.error('getUserSessions failed:', result.error);
+      logger.error('getUserSessions failed:', undefined, { component: 'api-route', action: 'api_request', details: result.error });
       return NextResponse.json({ error: result.error }, { status: 500 });
     }
 
