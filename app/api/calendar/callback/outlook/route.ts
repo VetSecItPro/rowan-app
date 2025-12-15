@@ -17,7 +17,12 @@ interface OAuthState {
   connection_id: string;
   space_id: string;
   user_id: string;
+  nonce?: string; // For replay protection
+  timestamp?: number; // For expiration check
 }
+
+// OAuth state expiration time (10 minutes)
+const OAUTH_STATE_EXPIRATION_MS = 10 * 60 * 1000;
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -101,6 +106,39 @@ export async function GET(request: NextRequest) {
       errorUrl.searchParams.set('tab', 'integrations');
       errorUrl.searchParams.set('error', 'connection_not_found');
       return NextResponse.redirect(errorUrl);
+    }
+
+    // SECURITY: Verify nonce and timestamp to prevent replay attacks
+    if (oauthState.nonce && oauthState.timestamp) {
+      // Check if state has expired (10 minute window)
+      if (Date.now() - oauthState.timestamp > OAUTH_STATE_EXPIRATION_MS) {
+        logger.warn('OAuth state expired', { component: 'calendar/callback/outlook', action: 'state_expired' });
+        const errorUrl = new URL('/settings', baseUrl);
+        errorUrl.searchParams.set('tab', 'integrations');
+        errorUrl.searchParams.set('error', 'state_expired');
+        return NextResponse.redirect(errorUrl);
+      }
+
+      // Verify nonce matches what we stored in the connection record
+      if (connection.oauth_state_nonce !== oauthState.nonce) {
+        logger.warn('OAuth state nonce mismatch - possible replay attack', {
+          component: 'calendar/callback/outlook',
+          action: 'nonce_mismatch',
+        });
+        const errorUrl = new URL('/settings', baseUrl);
+        errorUrl.searchParams.set('tab', 'integrations');
+        errorUrl.searchParams.set('error', 'invalid_state');
+        return NextResponse.redirect(errorUrl);
+      }
+
+      // Clear the nonce after successful verification (one-time use)
+      await supabase
+        .from('calendar_connections')
+        .update({
+          oauth_state_nonce: null,
+          oauth_state_created_at: null,
+        })
+        .eq('id', connection.id);
     }
 
     // Exchange authorization code for tokens
