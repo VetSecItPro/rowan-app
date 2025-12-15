@@ -7,6 +7,9 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+import { createGoalSchema } from '@/lib/validations/goal-schemas';
+import { sanitizePlainText } from '@/lib/sanitize';
 
 /**
  * GET /api/goals
@@ -120,17 +123,25 @@ export async function POST(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(session.user);
 
-    // Parse request body
+    // Parse and validate request body with Zod
     const body = await req.json();
-    const { space_id, title } = body;
-
-    // Validate required fields
-    if (!space_id || !title) {
-      return NextResponse.json(
-        { error: 'space_id and title are required' },
-        { status: 400 }
-      );
+    try {
+      // Validate input structure and types
+      createGoalSchema.parse({
+        ...body,
+        created_by: session.user.id,
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return NextResponse.json(
+          { error: 'Validation failed', details: error.issues },
+          { status: 400 }
+        );
+      }
+      throw error;
     }
+
+    const { space_id, title, description } = body;
 
     // Verify user has access to this space
     try {
@@ -152,9 +163,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create goal using service
+    // Create goal using service with sanitized inputs
     const goal = await goalsService.createGoal({
       ...body,
+      title: sanitizePlainText(title),
+      description: description ? sanitizePlainText(description) : undefined,
       created_by: session.user.id,
     });
 

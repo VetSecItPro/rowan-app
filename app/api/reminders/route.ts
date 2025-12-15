@@ -7,6 +7,9 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+import { createReminderSchema } from '@/lib/validations/reminder-schemas';
+import { sanitizePlainText } from '@/lib/sanitize';
 
 /**
  * GET /api/reminders
@@ -122,17 +125,24 @@ export async function POST(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(session.user);
 
-    // Parse request body
+    // Parse and validate request body with Zod
     const body = await req.json();
-    const { space_id, title } = body;
-
-    // Validate required fields
-    if (!space_id || !title) {
-      return NextResponse.json(
-        { error: 'space_id and title are required' },
-        { status: 400 }
-      );
+    try {
+      createReminderSchema.parse({
+        ...body,
+        created_by: session.user.id,
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return NextResponse.json(
+          { error: 'Validation failed', details: error.issues },
+          { status: 400 }
+        );
+      }
+      throw error;
     }
+
+    const { space_id, title, description } = body;
 
     // Verify user has access to this space
     try {
@@ -144,8 +154,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create reminder using service
-    const reminder = await remindersService.createReminder(body);
+    // Create reminder using service with sanitized inputs
+    const reminder = await remindersService.createReminder({
+      ...body,
+      title: sanitizePlainText(title),
+      description: description ? sanitizePlainText(description) : undefined,
+    });
 
     return NextResponse.json({
       success: true,

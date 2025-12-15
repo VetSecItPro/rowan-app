@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { sanitizePlainText, sanitizeUrl } from '@/lib/sanitize';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,6 +69,7 @@ export async function GET(request: NextRequest) {
     const meals = await Promise.all(detailPromises);
 
     const recipes = meals.filter(Boolean).map((meal: any) => {
+      // Parse and sanitize ingredients (external data could contain XSS payloads)
       const ingredients: Array<{ name: string; amount?: string; unit?: string }> = [];
       for (let i = 1; i <= 20; i++) {
         const ingredient = meal[`strIngredient${i}`];
@@ -75,8 +77,8 @@ export async function GET(request: NextRequest) {
 
         if (ingredient && ingredient.trim()) {
           ingredients.push({
-            name: ingredient.trim(),
-            amount: measure?.trim() || undefined,
+            name: sanitizePlainText(ingredient.trim()),
+            amount: sanitizePlainText(measure?.trim()) || undefined,
           });
         }
       }
@@ -84,13 +86,13 @@ export async function GET(request: NextRequest) {
       return {
         id: `themealdb-${meal.idMeal}`,
         source: 'themealdb',
-        name: meal.strMeal,
-        description: `${meal.strCategory} - ${meal.strArea} cuisine`,
-        image_url: meal.strMealThumb,
-        cuisine: meal.strArea,
+        name: sanitizePlainText(meal.strMeal),
+        description: sanitizePlainText(`${meal.strCategory} - ${meal.strArea} cuisine`),
+        image_url: sanitizeUrl(meal.strMealThumb),
+        cuisine: sanitizePlainText(meal.strArea),
         ingredients,
-        instructions: meal.strInstructions,
-        source_url: meal.strSource || meal.strYoutube,
+        instructions: sanitizePlainText(meal.strInstructions),
+        source_url: sanitizeUrl(meal.strSource || meal.strYoutube),
       };
     });
 

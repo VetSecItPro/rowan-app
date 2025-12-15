@@ -5,6 +5,11 @@ import { enhancedNotificationService } from './enhanced-notification-service';
 import { sanitizeSearchInput } from '@/lib/utils/input-sanitization';
 import { logger } from '@/lib/logger';
 
+/**
+ * Security: Default maximum limit for list queries to prevent unbounded data retrieval
+ */
+const DEFAULT_MAX_LIMIT = 500;
+
 export interface Message {
   id: string;
   space_id: string;
@@ -379,7 +384,8 @@ export const messagesService = {
         attachments_data:message_attachments(*)
       `)
       .eq('parent_message_id', parentMessageId)
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true })
+      .limit(DEFAULT_MAX_LIMIT); // SECURITY: Prevent unbounded queries
 
     if (error) throw error;
     return data || [];

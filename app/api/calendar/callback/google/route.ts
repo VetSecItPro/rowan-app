@@ -12,7 +12,12 @@ interface OAuthState {
   connection_id: string;
   space_id: string;
   user_id: string;
+  nonce?: string; // For replay protection
+  timestamp?: number; // For expiration check
 }
+
+// OAuth state expiration time (10 minutes)
+const OAUTH_STATE_EXPIRATION_MS = 10 * 60 * 1000;
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -29,13 +34,20 @@ export async function GET(request: NextRequest) {
 
     // Handle OAuth errors from Google
     if (params.error) {
-      logger.warn('Google OAuth error', { component: 'calendar/callback/google', action: 'oauth_error', errorType: params.error });
+      // SECURITY: Log the detailed error for debugging but don't expose to user (L11)
+      logger.warn('Google OAuth error', {
+        component: 'calendar/callback/google',
+        action: 'oauth_error',
+        errorType: params.error,
+        errorDescription: params.error_description
+      });
 
-      // Redirect to calendar settings with error
+      // Redirect to calendar settings with generic error (don't leak OAuth provider details)
       const errorUrl = new URL('/settings', baseUrl);
       errorUrl.searchParams.set('tab', 'integrations');
       errorUrl.searchParams.set('error', 'google_auth_denied');
-      errorUrl.searchParams.set('message', params.error_description || 'Authorization was denied');
+      // Use generic message to prevent information disclosure
+      errorUrl.searchParams.set('message', 'Authorization was denied or cancelled');
 
       return NextResponse.redirect(errorUrl);
     }
@@ -65,9 +77,11 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      // User not logged in, redirect to login with return URL
+      // User not logged in, redirect to login
+      // Security: We don't pass the full callback URL as redirect to prevent open redirect attacks
+      // After login, user will need to reconnect their calendar from settings
       const loginUrl = new URL('/login', baseUrl);
-      loginUrl.searchParams.set('redirect', request.url);
+      loginUrl.searchParams.set('returnTo', '/settings?tab=integrations&reconnect=google');
       return NextResponse.redirect(loginUrl);
     }
 
@@ -94,6 +108,39 @@ export async function GET(request: NextRequest) {
       errorUrl.searchParams.set('tab', 'integrations');
       errorUrl.searchParams.set('error', 'connection_not_found');
       return NextResponse.redirect(errorUrl);
+    }
+
+    // SECURITY: Verify nonce and timestamp to prevent replay attacks
+    if (oauthState.nonce && oauthState.timestamp) {
+      // Check if state has expired (10 minute window)
+      if (Date.now() - oauthState.timestamp > OAUTH_STATE_EXPIRATION_MS) {
+        logger.warn('OAuth state expired', { component: 'calendar/callback/google', action: 'state_expired' });
+        const errorUrl = new URL('/settings', baseUrl);
+        errorUrl.searchParams.set('tab', 'integrations');
+        errorUrl.searchParams.set('error', 'state_expired');
+        return NextResponse.redirect(errorUrl);
+      }
+
+      // Verify nonce matches what we stored in the connection record
+      if (connection.oauth_state_nonce !== oauthState.nonce) {
+        logger.warn('OAuth state nonce mismatch - possible replay attack', {
+          component: 'calendar/callback/google',
+          action: 'nonce_mismatch',
+        });
+        const errorUrl = new URL('/settings', baseUrl);
+        errorUrl.searchParams.set('tab', 'integrations');
+        errorUrl.searchParams.set('error', 'invalid_state');
+        return NextResponse.redirect(errorUrl);
+      }
+
+      // Clear the nonce after successful verification (one-time use)
+      await supabase
+        .from('calendar_connections')
+        .update({
+          oauth_state_nonce: null,
+          oauth_state_created_at: null,
+        })
+        .eq('id', connection.id);
     }
 
     // Exchange authorization code for tokens

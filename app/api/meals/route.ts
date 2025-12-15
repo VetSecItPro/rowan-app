@@ -7,6 +7,9 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+import { createMealSchema } from '@/lib/validations/meal-schemas';
+import { sanitizePlainText } from '@/lib/sanitize';
 
 /**
  * GET /api/meals
@@ -120,17 +123,21 @@ export async function POST(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(session.user);
 
-    // Parse request body
+    // Parse and validate request body with Zod
     const body = await req.json();
-    const { space_id, meal_type, scheduled_date } = body;
-
-    // Validate required fields
-    if (!space_id || !meal_type || !scheduled_date) {
-      return NextResponse.json(
-        { error: 'space_id, meal_type, and scheduled_date are required' },
-        { status: 400 }
-      );
+    try {
+      createMealSchema.parse(body);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return NextResponse.json(
+          { error: 'Validation failed', details: error.issues },
+          { status: 400 }
+        );
+      }
+      throw error;
     }
+
+    const { space_id, recipe_name, notes } = body;
 
     // Verify user has access to this space
     try {
@@ -152,8 +159,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create meal using service
-    const meal = await mealsService.createMeal(body);
+    // Create meal using service with sanitized inputs
+    const meal = await mealsService.createMeal({
+      ...body,
+      recipe_name: recipe_name ? sanitizePlainText(recipe_name) : undefined,
+      notes: notes ? sanitizePlainText(notes) : undefined,
+    });
 
     return NextResponse.json({
       success: true,

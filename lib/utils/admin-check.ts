@@ -1,45 +1,47 @@
 import { createClient } from '@/lib/supabase/server';
-
-const ADMIN_EMAIL = 'vetsecitpro@gmail.com';
+import { logger } from '@/lib/logger';
 
 /**
  * Check if the currently authenticated user is an admin
- * Admin is determined by email address match
+ * Uses the database is_admin() RPC function which checks admin_users table
  */
 export async function isAdmin(): Promise<boolean> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const { data: { user }, error } = await supabase.auth.getUser();
+    // Use RPC call to is_admin() function which has SECURITY DEFINER
+    // This bypasses RLS and checks admin_users table securely
+    const { data, error } = await supabase.rpc('is_admin');
 
-  if (error || !user) {
+    if (error) {
+      logger.error('Error checking admin status', error, { component: 'admin-check', action: 'is_admin' });
+      return false;
+    }
+
+    return data === true;
+  } catch {
     return false;
   }
-
-  return user.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
 }
 
 /**
  * Check if a given user ID belongs to an admin
+ * Uses the database is_admin() RPC function with explicit user_id
  */
 export async function isUserAdmin(userId: string): Promise<boolean> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const { data: user, error } = await supabase
-    .from('users')
-    .select('email')
-    .eq('id', userId)
-    .single();
+    // Use RPC call with explicit user_id parameter
+    const { data, error } = await supabase.rpc('is_admin', { user_id: userId });
 
-  if (error || !user) {
+    if (error) {
+      logger.error('Error checking admin status for user', error, { component: 'admin-check', action: 'is_user_admin' });
+      return false;
+    }
+
+    return data === true;
+  } catch {
     return false;
   }
-
-  return user.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-}
-
-/**
- * Get admin email (for backend use)
- */
-export function getAdminEmail(): string {
-  return ADMIN_EMAIL;
 }

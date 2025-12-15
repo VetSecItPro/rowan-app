@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { sanitizePlainText, sanitizeUrl } from '@/lib/sanitize';
 
 export const dynamic = 'force-dynamic';
 
@@ -73,34 +74,34 @@ export async function GET(request: NextRequest) {
     }
 
     const recipes = searchData.results.map((recipe: any) => {
-      // Parse ingredients
+      // Parse and sanitize ingredients (external data could contain XSS payloads)
       const ingredients = recipe.extendedIngredients?.map((ing: any) => ({
-        name: ing.name || ing.original,
+        name: sanitizePlainText(ing.name || ing.original),
         amount: ing.amount ? ing.amount.toString() : undefined,
-        unit: ing.unit || undefined,
+        unit: sanitizePlainText(ing.unit) || undefined,
       })) || [];
 
-      // Parse instructions
+      // Parse and sanitize instructions
       let instructions = '';
       if (recipe.analyzedInstructions && recipe.analyzedInstructions.length > 0) {
         instructions = recipe.analyzedInstructions[0].steps
-          .map((step: any) => `${step.number}. ${step.step}`)
+          .map((step: any) => `${step.number}. ${sanitizePlainText(step.step)}`)
           .join('\n\n');
       }
 
       return {
         id: `spoonacular-${recipe.id}`,
         source: 'spoonacular',
-        name: recipe.title,
-        description: recipe.summary?.replace(/<[^>]*>/g, ''), // Strip HTML tags
-        image_url: recipe.image,
+        name: sanitizePlainText(recipe.title),
+        description: sanitizePlainText(recipe.summary), // Properly sanitize with DOMPurify
+        image_url: sanitizeUrl(recipe.image),
         prep_time: recipe.preparationMinutes,
         cook_time: recipe.cookingMinutes,
         servings: recipe.servings,
-        cuisine: recipe.cuisines?.[0],
+        cuisine: sanitizePlainText(recipe.cuisines?.[0]),
         ingredients,
         instructions,
-        source_url: recipe.sourceUrl || recipe.spoonacularSourceUrl,
+        source_url: sanitizeUrl(recipe.sourceUrl || recipe.spoonacularSourceUrl),
       };
     });
 

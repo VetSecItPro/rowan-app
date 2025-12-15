@@ -257,8 +257,12 @@ export async function trackPaymentFailure(data: {
   checkAndResetWindow();
   errorTracker.paymentFailures++;
 
-  // Always log critical payment failures
-  console.error('[ERROR_ALERTING] Payment failure:', JSON.stringify(data));
+  // Always log critical payment failures (sanitized - no sensitive data in production logs)
+  logger.error('[ERROR_ALERTING] Payment failure', undefined, {
+    component: 'error-alerting',
+    action: 'payment_failure',
+    details: { error: data.error, hasAmount: !!data.amount }
+  });
 
   // Check thresholds
   await checkThresholds();
@@ -293,7 +297,11 @@ export async function trackWebhookError(data: {
   checkAndResetWindow();
   errorTracker.webhookErrors++;
 
-  console.error('[ERROR_ALERTING] Webhook error:', JSON.stringify(data));
+  logger.error('[ERROR_ALERTING] Webhook error', undefined, {
+    component: 'error-alerting',
+    action: 'webhook_error',
+    details: { eventType: data.eventType, eventId: data.stripeEventId }
+  });
 
   // Check thresholds
   await checkThresholds();

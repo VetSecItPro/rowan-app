@@ -13,6 +13,12 @@ import type {
 import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 /**
+ * Security: Default maximum limit for list queries to prevent unbounded data retrieval
+ * This protects against DoS attacks and ensures predictable API response sizes
+ */
+const DEFAULT_MAX_LIMIT = 500;
+
+/**
  * Tasks Service
  *
  * Comprehensive service for managing tasks with full CRUD operations,
@@ -120,13 +126,13 @@ export const tasksService = {
       const sortOrder = options?.order === 'asc' ? { ascending: true } : { ascending: false };
       query = query.order(sortField, sortOrder);
 
-      // Apply pagination
-      if (options?.limit) {
-        query = query.limit(options.limit);
-      }
+      // Apply pagination with enforced maximum limit for security
+      // SECURITY: Always apply a limit to prevent unbounded queries
+      const effectiveLimit = Math.min(options?.limit || DEFAULT_MAX_LIMIT, DEFAULT_MAX_LIMIT);
+      query = query.limit(effectiveLimit);
 
       if (options?.offset) {
-        query = query.range(options.offset, options.offset + (options.limit || 10) - 1);
+        query = query.range(options.offset, options.offset + effectiveLimit - 1);
       }
 
       const { data, error } = await query;
