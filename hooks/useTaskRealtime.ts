@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import type { Task } from '@/lib/types';
+import { logger } from '@/lib/logger';
 
 interface UseTaskRealtimeOptions {
   spaceId: string;
@@ -115,7 +116,7 @@ export function useTaskRealtime({
 
     const emergencyTimeout = setTimeout(() => {
       if (loading) {
-        console.warn('[useTaskRealtime] Emergency timeout reached - forcing loading completion');
+        logger.warn('[useTaskRealtime] Emergency timeout reached - forcing loading completion', { component: 'hook-useTaskRealtime' });
         setTimeoutReached(true);
         setLoading(false);
         setError(new Error('Loading timeout - please refresh to try again'));
@@ -159,7 +160,7 @@ export function useTaskRealtime({
 
         return !memberError && !!membership;
       } catch (err) {
-        console.warn('[useTaskRealtime] Access verification timeout or error:', err);
+        logger.warn('[useTaskRealtime] Access verification timeout or error:', { component: 'hook-useTaskRealtime', error: err });
         return false;
       }
     }
@@ -168,7 +169,7 @@ export function useTaskRealtime({
       try {
         // If timeout already reached, skip loading and use empty state
         if (timeoutReached) {
-          console.warn('[useTaskRealtime] Timeout reached - skipping data load');
+          logger.warn('[useTaskRealtime] Timeout reached - skipping data load', { component: 'hook-useTaskRealtime' });
           setTasks([]);
           setLoading(false);
           return;
@@ -363,7 +364,7 @@ export function useSubtaskRealtime(taskId: string) {
         if (error) throw error;
         setSubtasks(data || []);
       } catch (err) {
-        console.error('Error loading subtasks:', err);
+        logger.error('Error loading subtasks:', err, { component: 'hook-useTaskRealtime', action: 'hook_execution' });
       } finally {
         setLoading(false);
       }
@@ -422,7 +423,7 @@ export function useCommentsRealtime(taskId: string) {
         if (error) throw error;
         setComments(data || []);
       } catch (err) {
-        console.error('Error loading comments:', err);
+        logger.error('Error loading comments:', err, { component: 'hook-useTaskRealtime', action: 'hook_execution' });
       } finally {
         setLoading(false);
       }

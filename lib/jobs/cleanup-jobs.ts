@@ -8,9 +8,10 @@ import { createClient } from '@/lib/supabase/client';
 import { taskSnoozeService } from '@/lib/services/task-snooze-service';
 import { quickActionsService } from '@/lib/services/quick-actions-service';
 import { mealPlanTasksService } from '@/lib/services/meal-plan-tasks-service';
+import { logger } from '@/lib/logger';
 
 export async function runDailyCleanup() {
-  console.log('Running daily cleanup tasks...');
+  logger.info('Running daily cleanup tasks...', { component: 'cleanup-jobs' });
 
   await Promise.all([
     cleanupExpiredSnoozedTasks(),
@@ -20,24 +21,24 @@ export async function runDailyCleanup() {
     cleanupExpiredShoppingTasks(),
   ]);
 
-  console.log('Daily cleanup complete');
+  logger.info('Daily cleanup complete', { component: 'cleanup-jobs' });
 }
 
 async function cleanupExpiredSnoozedTasks() {
   try {
     await taskSnoozeService.autoUnsnoozeExpired();
-    console.log('✓ Cleaned up expired snoozed tasks');
+    logger.info('✓ Cleaned up expired snoozed tasks', { component: 'cleanup-jobs' });
   } catch (error) {
-    console.error('✗ Error cleaning up snoozed tasks:', error);
+    logger.error('✗ Error cleaning up snoozed tasks:', error, { component: 'cleanup-jobs', action: 'service_call' });
   }
 }
 
 async function cleanupOldQuickActionUsage() {
   try {
     await quickActionsService.cleanupOldUsage();
-    console.log('✓ Cleaned up old quick action usage');
+    logger.info('✓ Cleaned up old quick action usage', { component: 'cleanup-jobs' });
   } catch (error) {
-    console.error('✗ Error cleaning up quick actions:', error);
+    logger.error('✗ Error cleaning up quick actions:', error, { component: 'cleanup-jobs', action: 'service_call' });
   }
 }
 
@@ -45,18 +46,18 @@ async function cleanupOldActivityLogs() {
   try {
     const supabase = createClient();
     await supabase.rpc('cleanup_old_activity_logs');
-    console.log('✓ Cleaned up old activity logs');
+    logger.info('✓ Cleaned up old activity logs', { component: 'cleanup-jobs' });
   } catch (error) {
-    console.error('✗ Error cleaning up activity logs:', error);
+    logger.error('✗ Error cleaning up activity logs:', error, { component: 'cleanup-jobs', action: 'service_call' });
   }
 }
 
 async function autoCompleteMealPlanTasks() {
   try {
     await mealPlanTasksService.autoCompleteMealTasks();
-    console.log('✓ Auto-completed meal plan tasks');
+    logger.info('✓ Auto-completed meal plan tasks', { component: 'cleanup-jobs' });
   } catch (error) {
-    console.error('✗ Error auto-completing meal tasks:', error);
+    logger.error('✗ Error auto-completing meal tasks:', error, { component: 'cleanup-jobs', action: 'service_call' });
   }
 }
 
@@ -65,17 +66,17 @@ async function cleanupExpiredShoppingTasks() {
     const supabase = createClient();
     await supabase.rpc('cleanup_expired_shopping_tasks');
     await supabase.rpc('auto_complete_shopping_tasks');
-    console.log('✓ Cleaned up expired shopping tasks');
+    logger.info('✓ Cleaned up expired shopping tasks', { component: 'cleanup-jobs' });
   } catch (error) {
-    console.error('✗ Error cleaning up shopping tasks:', error);
+    logger.error('✗ Error cleaning up shopping tasks:', error, { component: 'cleanup-jobs', action: 'service_call' });
   }
 }
 
 export async function refreshMaterializedViews() {
   try {
     await quickActionsService.refreshStats();
-    console.log('✓ Refreshed materialized views');
+    logger.info('✓ Refreshed materialized views', { component: 'cleanup-jobs' });
   } catch (error) {
-    console.error('✗ Error refreshing views:', error);
+    logger.error('✗ Error refreshing views:', error, { component: 'cleanup-jobs', action: 'service_call' });
   }
 }

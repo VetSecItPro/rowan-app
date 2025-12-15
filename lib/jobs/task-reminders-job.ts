@@ -6,6 +6,7 @@
 
 import { createClient } from '@/lib/supabase/client';
 import { taskRemindersService } from '@/lib/services/task-reminders-service';
+import { logger } from '@/lib/logger';
 
 export async function processTaskReminders() {
   try {
@@ -27,14 +28,14 @@ export async function processTaskReminders() {
         await taskRemindersService.markReminderSent(reminder.reminder_id);
         sent++;
       } catch (error) {
-        console.error(`Failed to send reminder ${reminder.reminder_id}:`, error);
+        logger.error(`Failed to send reminder ${reminder.reminder_id}:`, error, { component: 'task-reminders-job', action: 'service_call' });
       }
     }
 
-    console.log(`Sent ${sent} task reminders`);
+    logger.info(`Sent ${sent} task reminders`, { component: 'task-reminders-job' });
     return { success: true, sent };
   } catch (error) {
-    console.error('Error processing reminders:', error);
+    logger.error('Error processing reminders:', error, { component: 'task-reminders-job', action: 'service_call' });
     return { success: false, error };
   }
 }
@@ -53,5 +54,5 @@ async function sendPushNotification(reminder: any) {
 
 async function sendEmailReminder(reminder: any) {
   // TODO: Implement email via Resend or similar
-  console.log(`Email reminder for task ${reminder.task_id}`);
+  logger.info(`Email reminder for task ${reminder.task_id}`, { component: 'task-reminders-job' });
 }

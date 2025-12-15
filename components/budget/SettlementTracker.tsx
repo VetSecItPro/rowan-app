@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import {
   CheckCircle,
   Clock,
@@ -56,7 +57,7 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
         s.expense_ids?.includes(expenseId)
       ));
     } catch (err) {
-      console.error('Failed to load settlement data:', err);
+      logger.error('Failed to load settlement data:', err, { component: 'SettlementTracker', action: 'component_action' });
       setError('Failed to load settlement data');
     } finally {
       setLoading(false);
@@ -73,7 +74,7 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
       await settleExpenseSplit(splitId, amount);
       await loadData(); // Refresh data
     } catch (err) {
-      console.error('Failed to settle amount:', err);
+      logger.error('Failed to settle amount:', err, { component: 'SettlementTracker', action: 'component_action' });
       setError('Failed to process settlement');
     }
   };
@@ -100,7 +101,7 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
       setNewSettlement({ amount: '', paymentMethod: '', referenceNumber: '', notes: '' });
       await loadData(); // Refresh data
     } catch (err) {
-      console.error('Failed to create settlement:', err);
+      logger.error('Failed to create settlement:', err, { component: 'SettlementTracker', action: 'component_action' });
       setError('Failed to create settlement');
     }
   };

@@ -1,6 +1,7 @@
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface AutoSpaceResult {
   success: boolean;
@@ -41,7 +42,7 @@ export async function ensureUserHasSpace(): Promise<AutoSpaceResult> {
       .eq('user_id', user.id);
 
     if (spacesError) {
-      console.error('Error checking existing spaces:', spacesError);
+      logger.error('Error checking existing spaces:', spacesError, { component: 'lib-space-auto-creation-service', action: 'service_call' });
       return {
         success: false,
         error: 'Failed to check existing spaces'
@@ -58,7 +59,7 @@ export async function ensureUserHasSpace(): Promise<AutoSpaceResult> {
     }
 
     // User has no spaces - create a default one
-    console.log('[auto-space] Creating default space for user:', user.id);
+    logger.info('[auto-space] Creating default space for user:', { component: 'lib-space-auto-creation-service', data: user.id });
 
     const defaultSpaceName = "My Space";
 
@@ -75,7 +76,7 @@ export async function ensureUserHasSpace(): Promise<AutoSpaceResult> {
       .single();
 
     if (spaceError || !newSpace) {
-      console.error('[auto-space] Failed to create default space:', spaceError);
+      logger.error('[auto-space] Failed to create default space:', spaceError, { component: 'lib-space-auto-creation-service', action: 'service_call' });
       return {
         success: false,
         error: spaceError?.message || 'Failed to create default space'
@@ -93,14 +94,14 @@ export async function ensureUserHasSpace(): Promise<AutoSpaceResult> {
       });
 
     if (memberError) {
-      console.error('[auto-space] Failed to add user to space:', memberError);
+      logger.error('[auto-space] Failed to add user to space:', memberError, { component: 'lib-space-auto-creation-service', action: 'service_call' });
       return {
         success: false,
         error: memberError.message || 'Failed to add user to space'
       };
     }
 
-    console.log('[auto-space] Successfully created default space:', newSpace.id);
+    logger.info('[auto-space] Successfully created default space:', { component: 'lib-space-auto-creation-service', data: newSpace.id });
 
     return {
       success: true,
@@ -108,7 +109,7 @@ export async function ensureUserHasSpace(): Promise<AutoSpaceResult> {
     };
 
   } catch (error) {
-    console.error('[auto-space] Unexpected error:', error);
+    logger.error('[auto-space] Unexpected error:', error, { component: 'lib-space-auto-creation-service', action: 'service_call' });
     return {
       success: false,
       error: 'Unexpected error during space creation'
@@ -167,7 +168,7 @@ export async function createDefaultSpace(userId: string, customName?: string): P
     };
 
   } catch (error) {
-    console.error('[auto-space] Error creating default space:', error);
+    logger.error('[auto-space] Error creating default space:', error, { component: 'lib-space-auto-creation-service', action: 'service_call' });
     return {
       success: false,
       error: 'Unexpected error during space creation'

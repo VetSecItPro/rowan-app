@@ -1,5 +1,6 @@
 import { Resend } from 'resend';
 import { render } from '@react-email/components';
+import { logger } from '@/lib/logger';
 
 // Import all email templates
 import TaskAssignmentEmail from '@/lib/emails/templates/TaskAssignmentEmail';
@@ -258,13 +259,13 @@ export async function sendTaskAssignmentEmail(data: TaskAssignmentData): Promise
     });
 
     if (error) {
-      console.error('Failed to send task assignment email:', error);
+      logger.error('Failed to send task assignment email:', error, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, messageId: result?.id };
   } catch (error) {
-    console.error('Error sending task assignment email:', error);
+    logger.error('Error sending task assignment email:', error, { component: 'lib-email-service', action: 'service_call' });
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
@@ -294,13 +295,13 @@ export async function sendEventReminderEmail(data: EventReminderData): Promise<E
     });
 
     if (error) {
-      console.error('Failed to send event reminder email:', error);
+      logger.error('Failed to send event reminder email:', error, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, messageId: result?.id };
   } catch (error) {
-    console.error('Error sending event reminder email:', error);
+    logger.error('Error sending event reminder email:', error, { component: 'lib-email-service', action: 'service_call' });
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
@@ -329,13 +330,13 @@ export async function sendNewMessageEmail(data: NewMessageData): Promise<EmailRe
     });
 
     if (error) {
-      console.error('Failed to send new message email:', error);
+      logger.error('Failed to send new message email:', error, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, messageId: result?.id };
   } catch (error) {
-    console.error('Error sending new message email:', error);
+    logger.error('Error sending new message email:', error, { component: 'lib-email-service', action: 'service_call' });
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
@@ -371,13 +372,13 @@ export async function sendShoppingListEmail(data: ShoppingListData): Promise<Ema
     });
 
     if (error) {
-      console.error('Failed to send shopping list email:', error);
+      logger.error('Failed to send shopping list email:', error, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, messageId: result?.id };
   } catch (error) {
-    console.error('Error sending shopping list email:', error);
+    logger.error('Error sending shopping list email:', error, { component: 'lib-email-service', action: 'service_call' });
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
@@ -414,13 +415,13 @@ export async function sendMealReminderEmail(data: MealReminderData): Promise<Ema
     });
 
     if (error) {
-      console.error('Failed to send meal reminder email:', error);
+      logger.error('Failed to send meal reminder email:', error, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, messageId: result?.id };
   } catch (error) {
-    console.error('Error sending meal reminder email:', error);
+    logger.error('Error sending meal reminder email:', error, { component: 'lib-email-service', action: 'service_call' });
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
@@ -451,13 +452,13 @@ export async function sendGeneralReminderEmail(data: GeneralReminderData): Promi
     });
 
     if (error) {
-      console.error('Failed to send general reminder email:', error);
+      logger.error('Failed to send general reminder email:', error, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, messageId: result?.id };
   } catch (error) {
-    console.error('Error sending general reminder email:', error);
+    logger.error('Error sending general reminder email:', error, { component: 'lib-email-service', action: 'service_call' });
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
@@ -468,7 +469,7 @@ export async function sendGeneralReminderEmail(data: GeneralReminderData): Promi
 export async function sendSpaceInvitationEmail(data: SpaceInvitationData): Promise<EmailResult> {
   try {
     if (!resend) {
-      console.error('Resend not initialized - missing RESEND_API_KEY');
+      logger.error('Resend not initialized - missing RESEND_API_KEY', undefined, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: 'Email service not configured' };
     }
 
@@ -488,13 +489,13 @@ export async function sendSpaceInvitationEmail(data: SpaceInvitationData): Promi
     });
 
     if (error) {
-      console.error('Failed to send space invitation email:', error);
+      logger.error('Failed to send space invitation email:', error, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, messageId: result?.id };
   } catch (error) {
-    console.error('Error sending space invitation email:', error);
+    logger.error('Error sending space invitation email:', error, { component: 'lib-email-service', action: 'service_call' });
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
@@ -505,7 +506,7 @@ export async function sendSpaceInvitationEmail(data: SpaceInvitationData): Promi
 export async function sendPasswordResetEmail(data: PasswordResetData): Promise<EmailResult> {
   try {
     if (!resend) {
-      console.error('Resend not initialized - missing RESEND_API_KEY');
+      logger.error('Resend not initialized - missing RESEND_API_KEY', undefined, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: 'Email service not configured' };
     }
 
@@ -524,13 +525,13 @@ export async function sendPasswordResetEmail(data: PasswordResetData): Promise<E
     });
 
     if (error) {
-      console.error('Failed to send password reset email:', error);
+      logger.error('Failed to send password reset email:', error, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, messageId: result?.id };
   } catch (error) {
-    console.error('Error sending password reset email:', error);
+    logger.error('Error sending password reset email:', error, { component: 'lib-email-service', action: 'service_call' });
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
@@ -541,7 +542,7 @@ export async function sendPasswordResetEmail(data: PasswordResetData): Promise<E
 export async function sendMagicLinkEmail(data: MagicLinkData): Promise<EmailResult> {
   try {
     if (!resend) {
-      console.error('Resend not initialized - missing RESEND_API_KEY');
+      logger.error('Resend not initialized - missing RESEND_API_KEY', undefined, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: 'Email service not configured' };
     }
 
@@ -560,13 +561,13 @@ export async function sendMagicLinkEmail(data: MagicLinkData): Promise<EmailResu
     });
 
     if (error) {
-      console.error('Failed to send magic link email:', error);
+      logger.error('Failed to send magic link email:', error, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, messageId: result?.id };
   } catch (error) {
-    console.error('Error sending magic link email:', error);
+    logger.error('Error sending magic link email:', error, { component: 'lib-email-service', action: 'service_call' });
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
@@ -577,7 +578,7 @@ export async function sendMagicLinkEmail(data: MagicLinkData): Promise<EmailResu
 export async function sendEmailVerificationEmail(data: EmailVerificationData): Promise<EmailResult> {
   try {
     if (!resend) {
-      console.error('Resend not initialized - missing RESEND_API_KEY');
+      logger.error('Resend not initialized - missing RESEND_API_KEY', undefined, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: 'Email service not configured' };
     }
 
@@ -596,13 +597,13 @@ export async function sendEmailVerificationEmail(data: EmailVerificationData): P
     });
 
     if (error) {
-      console.error('Failed to send email verification email:', error);
+      logger.error('Failed to send email verification email:', error, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, messageId: result?.id };
   } catch (error) {
-    console.error('Error sending email verification email:', error);
+    logger.error('Error sending email verification email:', error, { component: 'lib-email-service', action: 'service_call' });
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
@@ -613,7 +614,7 @@ export async function sendEmailVerificationEmail(data: EmailVerificationData): P
 export async function sendDailyDigestEmail(data: DailyDigestData): Promise<EmailResult> {
   try {
     if (!resend) {
-      console.error('Resend not initialized - missing RESEND_API_KEY');
+      logger.error('Resend not initialized - missing RESEND_API_KEY', undefined, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: 'Email service not configured' };
     }
 
@@ -643,13 +644,13 @@ export async function sendDailyDigestEmail(data: DailyDigestData): Promise<Email
     });
 
     if (error) {
-      console.error('Failed to send daily digest email:', error);
+      logger.error('Failed to send daily digest email:', error, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, messageId: result?.id };
   } catch (error) {
-    console.error('Error sending daily digest email:', error);
+    logger.error('Error sending daily digest email:', error, { component: 'lib-email-service', action: 'service_call' });
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
@@ -660,7 +661,7 @@ export async function sendDailyDigestEmail(data: DailyDigestData): Promise<Email
 export async function sendAIDailyDigestEmail(data: AIDailyDigestData): Promise<EmailResult> {
   try {
     if (!resend) {
-      console.error('Resend not initialized - missing RESEND_API_KEY');
+      logger.error('Resend not initialized - missing RESEND_API_KEY', undefined, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: 'Email service not configured' };
     }
 
@@ -696,13 +697,13 @@ export async function sendAIDailyDigestEmail(data: AIDailyDigestData): Promise<E
     });
 
     if (error) {
-      console.error('Failed to send AI daily digest email:', error);
+      logger.error('Failed to send AI daily digest email:', error, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, messageId: result?.id };
   } catch (error) {
-    console.error('Error sending AI daily digest email:', error);
+    logger.error('Error sending AI daily digest email:', error, { component: 'lib-email-service', action: 'service_call' });
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
@@ -840,7 +841,7 @@ export interface SubscriptionCancelledData {
 export async function sendSubscriptionWelcomeEmail(data: SubscriptionWelcomeData): Promise<EmailResult> {
   try {
     if (!resend) {
-      console.error('Resend not initialized - missing RESEND_API_KEY');
+      logger.error('Resend not initialized - missing RESEND_API_KEY', undefined, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: 'Email service not configured' };
     }
 
@@ -861,13 +862,13 @@ export async function sendSubscriptionWelcomeEmail(data: SubscriptionWelcomeData
     });
 
     if (error) {
-      console.error('Failed to send subscription welcome email:', error);
+      logger.error('Failed to send subscription welcome email:', error, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, messageId: result?.id };
   } catch (error) {
-    console.error('Error sending subscription welcome email:', error);
+    logger.error('Error sending subscription welcome email:', error, { component: 'lib-email-service', action: 'service_call' });
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
@@ -878,7 +879,7 @@ export async function sendSubscriptionWelcomeEmail(data: SubscriptionWelcomeData
 export async function sendPaymentFailedEmail(data: PaymentFailedData): Promise<EmailResult> {
   try {
     if (!resend) {
-      console.error('Resend not initialized - missing RESEND_API_KEY');
+      logger.error('Resend not initialized - missing RESEND_API_KEY', undefined, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: 'Email service not configured' };
     }
 
@@ -898,13 +899,13 @@ export async function sendPaymentFailedEmail(data: PaymentFailedData): Promise<E
     });
 
     if (error) {
-      console.error('Failed to send payment failed email:', error);
+      logger.error('Failed to send payment failed email:', error, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, messageId: result?.id };
   } catch (error) {
-    console.error('Error sending payment failed email:', error);
+    logger.error('Error sending payment failed email:', error, { component: 'lib-email-service', action: 'service_call' });
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
@@ -915,7 +916,7 @@ export async function sendPaymentFailedEmail(data: PaymentFailedData): Promise<E
 export async function sendSubscriptionCancelledEmail(data: SubscriptionCancelledData): Promise<EmailResult> {
   try {
     if (!resend) {
-      console.error('Resend not initialized - missing RESEND_API_KEY');
+      logger.error('Resend not initialized - missing RESEND_API_KEY', undefined, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: 'Email service not configured' };
     }
 
@@ -935,13 +936,13 @@ export async function sendSubscriptionCancelledEmail(data: SubscriptionCancelled
     });
 
     if (error) {
-      console.error('Failed to send subscription cancelled email:', error);
+      logger.error('Failed to send subscription cancelled email:', error, { component: 'lib-email-service', action: 'service_call' });
       return { success: false, error: error.message };
     }
 
     return { success: true, messageId: result?.id };
   } catch (error) {
-    console.error('Error sending subscription cancelled email:', error);
+    logger.error('Error sending subscription cancelled email:', error, { component: 'lib-email-service', action: 'service_call' });
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }

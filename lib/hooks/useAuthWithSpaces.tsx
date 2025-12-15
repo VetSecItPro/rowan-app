@@ -3,6 +3,7 @@
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useSpaces } from '@/lib/contexts/spaces-context';
 import { useMemo, useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 /**
  * UNIFIED AUTH WITH SPACES HOOK - PHASE 3 INTEGRATION
@@ -68,7 +69,7 @@ export function useAuthWithSpaces(): AuthWithSpacesState {
 
     if (isLoading && !emergencyTimeoutReached) {
       const emergencyTimeout = setTimeout(() => {
-        console.warn('[useAuthWithSpaces] Emergency timeout reached - forcing loading completion');
+        logger.warn('[useAuthWithSpaces] Emergency timeout reached - forcing loading completion', { component: 'lib-useAuthWithSpaces' });
         setEmergencyTimeoutReached(true);
       }, 15000); // 15 second emergency timeout
 

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 // =====================================================
 // TYPES
@@ -109,7 +110,7 @@ export async function createMentions(
     .select();
 
   if (error) {
-    console.error('Error creating mentions:', error);
+    logger.error('Error creating mentions:', error, { component: 'lib-mentions-service', action: 'service_call' });
     throw error;
   }
 
@@ -130,7 +131,7 @@ export async function getMentionsForMessage(
     .order('created_at', { ascending: true });
 
   if (error) {
-    console.error('Error fetching mentions for message:', error);
+    logger.error('Error fetching mentions for message:', error, { component: 'lib-mentions-service', action: 'service_call' });
     throw error;
   }
 
@@ -159,7 +160,7 @@ export async function getUnreadMentions(
   const { data, error } = await query;
 
   if (error) {
-    console.error('Error fetching unread mentions:', error);
+    logger.error('Error fetching unread mentions:', error, { component: 'lib-mentions-service', action: 'service_call' });
     throw error;
   }
 
@@ -187,7 +188,7 @@ export async function getUnreadMentionCount(
   const { count, error } = await query;
 
   if (error) {
-    console.error('Error fetching unread mention count:', error);
+    logger.error('Error fetching unread mention count:', error, { component: 'lib-mentions-service', action: 'service_call' });
     return 0;
   }
 
@@ -212,7 +213,7 @@ export async function markMentionAsRead(
     .single();
 
   if (error) {
-    console.error('Error marking mention as read:', error);
+    logger.error('Error marking mention as read:', error, { component: 'lib-mentions-service', action: 'service_call' });
     throw error;
   }
 
@@ -237,7 +238,7 @@ export async function markMessageMentionsAsRead(
     .eq('mentioned_user_id', userId);
 
   if (error) {
-    console.error('Error marking message mentions as read:', error);
+    logger.error('Error marking message mentions as read:', error, { component: 'lib-mentions-service', action: 'service_call' });
     throw error;
   }
 }
@@ -255,7 +256,7 @@ export async function deleteMentionsForMessage(
     .eq('message_id', messageId);
 
   if (error) {
-    console.error('Error deleting mentions for message:', error);
+    logger.error('Error deleting mentions for message:', error, { component: 'lib-mentions-service', action: 'service_call' });
     throw error;
   }
 }
@@ -286,7 +287,7 @@ export async function getMentionableUsers(
     .eq('space_id', spaceId);
 
   if (error) {
-    console.error('Error fetching mentionable users:', error);
+    logger.error('Error fetching mentionable users:', error, { component: 'lib-mentions-service', action: 'service_call' });
     return [];
   }
 

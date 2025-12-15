@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { X, Upload, Camera, Loader, CheckCircle, AlertCircle } from 'lucide-react';
 import { receiptsService } from '@/lib/services/receipts-service';
 import { ocrService } from '@/lib/services/ocr-service';
+import { logger } from '@/lib/logger';
 
 interface ReceiptUploadModalProps {
   isOpen: boolean;
@@ -59,7 +60,7 @@ export function ReceiptUploadModal({
       setCategory(result.category || '');
       setOcrComplete(true);
     } catch (err) {
-      console.error('OCR error:', err);
+      logger.error('OCR error:', err, { component: 'ReceiptUploadModal', action: 'component_action' });
       setError('Could not process receipt. You can enter details manually.');
     } finally {
       setIsProcessing(false);
@@ -94,7 +95,7 @@ export function ReceiptUploadModal({
       onSuccess?.();
       handleClose();
     } catch (err) {
-      console.error('Upload error:', err);
+      logger.error('Upload error:', err, { component: 'ReceiptUploadModal', action: 'component_action' });
       setError('Failed to upload receipt. Please try again.');
     } finally {
       setIsUploading(false);

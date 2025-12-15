@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import {
   X,
   Plus,
@@ -102,7 +103,7 @@ export function DependenciesModal({
       const deps = await goalDependenciesService.getGoalDependencies(goal.id);
       setDependencies(deps);
     } catch (err) {
-      console.error('Failed to load dependencies:', err);
+      logger.error('Failed to load dependencies:', err, { component: 'DependenciesModal', action: 'component_action' });
       setError('Failed to load dependencies');
     } finally {
       setLoading(false);
@@ -114,7 +115,7 @@ export function DependenciesModal({
       const goals = await goalDependenciesService.getAvailableGoalsForDependency(spaceId, goal.id);
       setAvailableGoals(goals);
     } catch (err) {
-      console.error('Failed to load available goals:', err);
+      logger.error('Failed to load available goals:', err, { component: 'DependenciesModal', action: 'component_action' });
     }
   };
 
@@ -143,7 +144,7 @@ export function DependenciesModal({
       resetForm();
       onRefresh?.();
     } catch (err: any) {
-      console.error('Failed to create dependency:', err);
+      logger.error('Failed to create dependency:', err, { component: 'DependenciesModal', action: 'component_action' });
       setError(err.message || 'Failed to create dependency');
     } finally {
       setSaving(false);
@@ -159,7 +160,7 @@ export function DependenciesModal({
       await loadAvailableGoals();
       onRefresh?.();
     } catch (err) {
-      console.error('Failed to delete dependency:', err);
+      logger.error('Failed to delete dependency:', err, { component: 'DependenciesModal', action: 'component_action' });
       setError('Failed to remove dependency');
     }
   };
@@ -173,7 +174,7 @@ export function DependenciesModal({
       await loadDependencies();
       onRefresh?.();
     } catch (err) {
-      console.error('Failed to bypass dependency:', err);
+      logger.error('Failed to bypass dependency:', err, { component: 'DependenciesModal', action: 'component_action' });
       setError('Failed to bypass dependency');
     }
   };

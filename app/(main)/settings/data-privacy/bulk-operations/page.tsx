@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { logger } from '@/lib/logger';
 import {
   Database,
   Trash2,
@@ -48,7 +49,7 @@ export default function BulkOperationsPage() {
       const data = await response.json();
       setDeleteCount(data.count || 0);
     } catch (error) {
-      console.error('Error getting delete count:', error);
+      logger.error('Error getting delete count:', error, { component: 'page', action: 'execution' });
       alert('Failed to get count');
     }
   };
@@ -90,7 +91,7 @@ export default function BulkOperationsPage() {
         alert('Failed to delete expenses: ' + (data.error || 'Unknown error'));
       }
     } catch (error) {
-      console.error('Error deleting expenses:', error);
+      logger.error('Error deleting expenses:', error, { component: 'page', action: 'execution' });
       alert('Failed to delete expenses');
     } finally {
       setIsDeleting(false);
@@ -134,7 +135,7 @@ export default function BulkOperationsPage() {
         alert('Failed to archive tasks: ' + (data.error || 'Unknown error'));
       }
     } catch (error) {
-      console.error('Error archiving tasks:', error);
+      logger.error('Error archiving tasks:', error, { component: 'page', action: 'execution' });
       alert('Failed to archive tasks');
     } finally {
       setIsArchiving(false);

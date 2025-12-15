@@ -5,6 +5,7 @@
 
 import { createClient } from '@/lib/supabase/client';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // TYPES & INTERFACES
@@ -117,7 +118,7 @@ export const reminderAttachmentsService = {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching attachments:', error);
+      logger.error('Error fetching attachments:', error, { component: 'lib-reminder-attachments-service', action: 'service_call' });
       throw new Error('Failed to fetch attachments');
     }
 
@@ -155,7 +156,7 @@ export const reminderAttachmentsService = {
       });
 
     if (uploadError) {
-      console.error('Error uploading file:', uploadError);
+      logger.error('Error uploading file:', uploadError, { component: 'lib-reminder-attachments-service', action: 'service_call' });
       throw new Error('Failed to upload file');
     }
 
@@ -185,7 +186,7 @@ export const reminderAttachmentsService = {
     if (error) {
       // Clean up uploaded file if database insert fails
       await supabase.storage.from('reminder-attachments').remove([fileName]);
-      console.error('Error creating attachment record:', error);
+      logger.error('Error creating attachment record:', error, { component: 'lib-reminder-attachments-service', action: 'service_call' });
       throw new Error('Failed to create attachment record');
     }
 
@@ -230,7 +231,7 @@ export const reminderAttachmentsService = {
       .single();
 
     if (error) {
-      console.error('Error creating URL attachment:', error);
+      logger.error('Error creating URL attachment:', error, { component: 'lib-reminder-attachments-service', action: 'service_call' });
       throw new Error('Failed to create URL attachment');
     }
 
@@ -277,7 +278,7 @@ export const reminderAttachmentsService = {
       .single();
 
     if (error) {
-      console.error('Error creating link attachment:', error);
+      logger.error('Error creating link attachment:', error, { component: 'lib-reminder-attachments-service', action: 'service_call' });
       throw new Error('Failed to create link attachment');
     }
 
@@ -299,7 +300,7 @@ export const reminderAttachmentsService = {
       .single();
 
     if (fetchError || !attachment) {
-      console.error('Error fetching attachment:', fetchError);
+      logger.error('Error fetching attachment:', fetchError, { component: 'lib-reminder-attachments-service', action: 'service_call' });
       throw new Error('Attachment not found or unauthorized');
     }
 
@@ -310,7 +311,7 @@ export const reminderAttachmentsService = {
       .eq('id', attachmentId);
 
     if (deleteError) {
-      console.error('Error deleting attachment:', deleteError);
+      logger.error('Error deleting attachment:', deleteError, { component: 'lib-reminder-attachments-service', action: 'service_call' });
       throw new Error('Failed to delete attachment');
     }
 

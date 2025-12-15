@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,7 +28,7 @@ export async function GET(req: NextRequest) {
     });
 
     // Log to console as well
-    console.error('[TEST] Sentry test error:', error);
+    logger.error('[TEST] Sentry test error:', error, { component: 'api-route', action: 'api_request' });
 
     // Return error response
     return NextResponse.json(

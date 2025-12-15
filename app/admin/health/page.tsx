@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronRight, LayoutDashboard } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface HealthMetric {
   name: string;
@@ -114,7 +115,7 @@ export default function SystemHealthPage() {
       setPerformanceData(data.performance || []);
       setLastRefresh(new Date());
     } catch (err) {
-      console.error('Failed to fetch health data:', err);
+      logger.error('Failed to fetch health data:', err, { component: 'page', action: 'execution' });
       setError(err instanceof Error ? err.message : 'Unknown error occurred');
     } finally {
       setLoading(false);

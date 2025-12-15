@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { logger } from '@/lib/logger';
 
 // Initialize Gemini API
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
@@ -84,7 +85,7 @@ export const geminiService = {
 
       return parsed;
     } catch (error) {
-      console.error('Error generating digest with Gemini:', error);
+      logger.error('Error generating digest with Gemini:', error, { component: 'lib-gemini-service', action: 'service_call' });
 
       // Fallback to template-based digest
       return this.generateFallbackDigest(userData);
@@ -123,7 +124,7 @@ export const geminiService = {
 
               return { userId, email: parsed };
             } catch (error) {
-              console.error(`Error generating digest for user ${userId}:`, error);
+              logger.error('Error generating digest for user ${userId}:', error, { component: 'lib-gemini-service', action: 'service_call' });
 
               const userData = batchRequest.users.find(u => u.userId === userId)!;
               const fallback = this.generateFallbackDigest(userData);
@@ -143,7 +144,7 @@ export const geminiService = {
 
       return { digests: results };
     } catch (error) {
-      console.error('Error in batch digest generation:', error);
+      logger.error('Error in batch digest generation:', error, { component: 'lib-gemini-service', action: 'service_call' });
       throw error;
     }
   },
@@ -224,7 +225,7 @@ FORMAT as JSON: {"subject": "Daily Digest - [Date]", "html": "complete HTML emai
         textContent: this.htmlToText(generatedContent)
       };
     } catch (error) {
-      console.error('Error parsing generated digest:', error);
+      logger.error('Error parsing generated digest:', error, { component: 'lib-gemini-service', action: 'service_call' });
 
       // Ultimate fallback
       return {

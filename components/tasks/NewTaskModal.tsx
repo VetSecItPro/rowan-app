@@ -5,6 +5,7 @@ import { X, Smile, ChevronDown, Repeat, Loader2 } from 'lucide-react';
 import { CreateTaskInput, Task } from '@/lib/types';
 import { taskRecurrenceService } from '@/lib/services/task-recurrence-service';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { logger } from '@/lib/logger';
 
 // 20 family-friendly universal emojis
 const EMOJIS = ['😊', '😂', '❤️', '👍', '🎉', '🙏', '👏', '🤝', '💪', '🌟', '✨', '🎈', '🌸', '🌈', '☀️', '🍕', '☕', '📅', '✅', '🏠'];
@@ -176,7 +177,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
         onClose();
         return;
       } catch (error) {
-        console.error('Error creating recurring task:', error);
+        logger.error('Error creating recurring task:', error, { component: 'NewTaskModal', action: 'component_action' });
         setDateError('Failed to create recurring task');
         return;
       }

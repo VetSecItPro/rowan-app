@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { TrendingDown, TrendingUp, AlertCircle, CheckCircle, Target, Calendar } from 'lucide-react';
+import { logger } from '@/lib/logger';
 import {
   varianceAnalysisService,
   type MonthlyVariance,
@@ -43,7 +44,7 @@ export default function VarianceDashboard({ spaceId }: VarianceDashboardProps) {
       setProblematicCategories(problematic);
       setPerformingCategories(performing);
     } catch (error) {
-      console.error('Error loading variance data:', error);
+      logger.error('Error loading variance data:', error, { component: 'VarianceDashboard', action: 'component_action' });
     } finally {
       setLoading(false);
     }

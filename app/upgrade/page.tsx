@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Check, Sparkles, ArrowRight, Users, Shield, Zap } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 
 export default function UpgradePage() {
   const searchParams = useSearchParams();
@@ -23,7 +24,7 @@ export default function UpgradePage() {
     try {
       await supabase.rpc('track_upgrade_page_visit', { user_email: email });
     } catch (error) {
-      console.error('Error tracking upgrade visit:', error);
+      logger.error('Error tracking upgrade visit:', error, { component: 'page', action: 'execution' });
       // Fail silently - don't disrupt user experience
     }
   }

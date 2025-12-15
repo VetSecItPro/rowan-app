@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { BillCard } from '@/components/projects/BillCard';
+import { logger } from '@/lib/logger';
 import {
   getBills,
   getBillsByStatus,
@@ -56,7 +57,7 @@ export function BillsList({
       const fetchedBills = await getBills(spaceId);
       setBills(fetchedBills);
     } catch (err) {
-      console.error('Error fetching bills:', err);
+      logger.error('Error fetching bills:', err, { component: 'BillsList', action: 'component_action' });
       setError('Failed to load bills. Please try again.');
     } finally {
       setLoading(false);

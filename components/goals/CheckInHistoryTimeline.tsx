@@ -5,6 +5,7 @@ import { Calendar, MessageSquare, Camera, Mic, TrendingUp, TrendingDown, Minus, 
 import { format, formatDistanceToNow } from 'date-fns';
 import { GoalCheckIn, GoalCheckInPhoto, goalsService } from '@/lib/services/goals-service';
 import { CheckInReactions } from './CheckInReactions';
+import { logger } from '@/lib/logger';
 
 interface CheckInHistoryTimelineProps {
   goalId: string;
@@ -45,12 +46,12 @@ export function CheckInHistoryTimeline({ goalId, isOpen, onClose }: CheckInHisto
             photosMap[checkIn.id] = photos;
           }
         } catch (error) {
-          console.error(`Failed to load photos for check-in ${checkIn.id}:`, error);
+          logger.error('Failed to load photos for check-in ${checkIn.id}:', error, { component: 'CheckInHistoryTimeline', action: 'component_action' });
         }
       }
       setCheckInPhotos(photosMap);
     } catch (error) {
-      console.error('Failed to load check-in history:', error);
+      logger.error('Failed to load check-in history:', error, { component: 'CheckInHistoryTimeline', action: 'component_action' });
     } finally {
       setLoading(false);
     }

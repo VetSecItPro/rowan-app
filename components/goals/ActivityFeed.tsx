@@ -6,6 +6,7 @@ import { MessageCircle, Heart, ThumbsUp, Smile, Users, Calendar, CheckCircle2, T
 import { GoalActivity, GoalComment, CreateCommentInput } from '@/lib/services/goals-service';
 import { createClient } from '@/lib/supabase/client';
 import { hapticLight, hapticSuccess } from '@/lib/utils/haptics';
+import { logger } from '@/lib/logger';
 
 interface ActivityFeedProps {
   spaceId: string;
@@ -100,7 +101,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
       if (error) throw error;
       setActivities(activitiesData || []);
     } catch (error) {
-      console.error('Error loading activities:', error);
+      logger.error('Error loading activities:', error, { component: 'ActivityFeed', action: 'component_action' });
       setActivities([]);
     } finally {
       setLoading(false);
@@ -123,7 +124,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
       if (error) throw error;
       setComments(prev => ({ ...prev, [activityId]: commentsData || [] }));
     } catch (error) {
-      console.error('Error loading comments:', error);
+      logger.error('Error loading comments:', error, { component: 'ActivityFeed', action: 'component_action' });
     }
   };
 
@@ -158,7 +159,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
       setNewComment(prev => ({ ...prev, [activityId]: '' }));
       await loadComments(activityId);
     } catch (error) {
-      console.error('Error adding comment:', error);
+      logger.error('Error adding comment:', error, { component: 'ActivityFeed', action: 'component_action' });
     } finally {
       setIsSubmitting(false);
     }
@@ -170,7 +171,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
       // This would need to be implemented in your goals service
       // await goalsService.toggleCommentReaction(commentId, emoji);
     } catch (error) {
-      console.error('Error adding reaction:', error);
+      logger.error('Error adding reaction:', error, { component: 'ActivityFeed', action: 'component_action' });
     }
   };
 

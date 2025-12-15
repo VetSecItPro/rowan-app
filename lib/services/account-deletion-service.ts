@@ -1,4 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 /**
  * Account Deletion Service
@@ -43,7 +44,7 @@ async function logDeletionAction(
   supabase?: SupabaseClient
 ) {
   if (!supabase) {
-    console.error('No supabase client provided to logDeletionAction');
+    logger.error('No supabase client provided to logDeletionAction', undefined, { component: 'lib-account-deletion-service', action: 'service_call' });
     return;
   }
   const client = supabase;
@@ -56,7 +57,7 @@ async function logDeletionAction(
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Failed to log deletion action:', error);
+    logger.error('Failed to log deletion action:', error, { component: 'lib-account-deletion-service', action: 'service_call' });
     // Don't throw - audit logging shouldn't block the main operation
   }
 }
@@ -155,7 +156,7 @@ async function deleteUserAccount(userId: string, supabase: SupabaseClient): Prom
 
     return { success: true };
   } catch (error) {
-    console.error('Error deleting user account:', error);
+    logger.error('Error deleting user account:', error, { component: 'lib-account-deletion-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to delete account',
@@ -197,7 +198,7 @@ async function cancelAccountDeletion(userId: string, supabase: SupabaseClient): 
 
     return { success: true };
   } catch (error) {
-    console.error('Error canceling account deletion:', error);
+    logger.error('Error canceling account deletion:', error, { component: 'lib-account-deletion-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to cancel deletion',

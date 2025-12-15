@@ -12,6 +12,7 @@
  */
 
 import { Resend } from 'resend';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // TYPES
@@ -103,7 +104,7 @@ async function sendAlertEmail(alert: AlertEvent): Promise<boolean> {
   const resendApiKey = process.env.RESEND_API_KEY;
 
   if (!resendApiKey) {
-    console.error('[ERROR_ALERTING] RESEND_API_KEY not configured');
+    logger.error('[ERROR_ALERTING] RESEND_API_KEY not configured', undefined, { component: 'lib-error-alerting', action: 'service_call' });
     return false;
   }
 
@@ -178,10 +179,10 @@ async function sendAlertEmail(alert: AlertEvent): Promise<boolean> {
       `,
     });
 
-    console.log(`[ERROR_ALERTING] Alert email sent: ${alert.title}`);
+    logger.info(`[ERROR_ALERTING] Alert email sent: ${alert.title}`, { component: 'lib-error-alerting' });
     return true;
   } catch (error) {
-    console.error('[ERROR_ALERTING] Failed to send alert email:', error);
+    logger.error('[ERROR_ALERTING] Failed to send alert email:', error, { component: 'lib-error-alerting', action: 'service_call' });
     return false;
   }
 }

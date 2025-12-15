@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Breadcrumbs } from '@/components/admin/Breadcrumbs';
+import { logger } from '@/lib/logger';
 import {
   MessageSquare,
   Filter,
@@ -55,7 +56,7 @@ export default function AdminBetaFeedbackPage() {
         setFeedback(data.data || []);
       }
     } catch (error) {
-      console.error('Error loading feedback:', error);
+      logger.error('Error loading feedback:', error, { component: 'page', action: 'execution' });
     } finally {
       setLoading(false);
     }
@@ -79,7 +80,7 @@ export default function AdminBetaFeedbackPage() {
         }
       }
     } catch (error) {
-      console.error('Error updating feedback:', error);
+      logger.error('Error updating feedback:', error, { component: 'page', action: 'execution' });
     }
   };
 
@@ -99,7 +100,7 @@ export default function AdminBetaFeedbackPage() {
         }
       }
     } catch (error) {
-      console.error('Error deleting feedback:', error);
+      logger.error('Error deleting feedback:', error, { component: 'page', action: 'execution' });
     }
   };
 

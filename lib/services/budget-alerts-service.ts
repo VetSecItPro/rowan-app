@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { projectsService, type Budget } from './budgets-service';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 // =====================================================
 // TYPES
@@ -100,7 +101,7 @@ export async function triggerBudgetAlert(
     .eq('space_id', spaceId);
 
   if (error) {
-    console.error('Failed to update alert timestamp:', error);
+    logger.error('Failed to update alert timestamp:', error, { component: 'lib-budget-alerts-service', action: 'service_call' });
   }
 
   // Get budget for notification preferences

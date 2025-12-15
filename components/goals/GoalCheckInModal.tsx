@@ -6,6 +6,7 @@ import { CreateCheckInInput } from '@/lib/services/goals-service';
 import { AdvancedVoiceRecorder } from './AdvancedVoiceRecorder';
 import { voiceTranscriptionService } from '@/lib/services/voice-transcription-service';
 import { PremiumButton, SecondaryButton } from '@/components/ui/EnhancedButton';
+import { logger } from '@/lib/logger';
 
 // Mood emoji options
 const MOOD_OPTIONS = [
@@ -66,7 +67,7 @@ export function GoalCheckInModal({
           keywords: transcriptionResult.keywords
         }));
       } catch (error) {
-        console.error('Failed to transcribe voice note:', error);
+        logger.error('Failed to transcribe voice note:', error, { component: 'GoalCheckInModal', action: 'component_action' });
       }
     }
   };
@@ -132,7 +133,7 @@ export function GoalCheckInModal({
       await onSave(checkInData);
       onClose();
     } catch (error) {
-      console.error('Error saving check-in:', error);
+      logger.error('Error saving check-in:', error, { component: 'GoalCheckInModal', action: 'component_action' });
       alert('Failed to save check-in. Please try again.');
     } finally {
       setIsSubmitting(false);

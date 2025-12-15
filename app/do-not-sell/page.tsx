@@ -6,6 +6,7 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import { Shield, MapPin, CheckCircle, AlertTriangle, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { logger } from '@/lib/logger';
 
 interface CCPAStatus {
   opted_out: boolean;
@@ -44,7 +45,7 @@ export default function DoNotSellPage() {
       setCcpaStatus(result.data);
       setCaliforniaResident(result.data.california_resident);
     } catch (error) {
-      console.error('Error loading CCPA status:', error);
+      logger.error('Error loading CCPA status:', error, { component: 'page', action: 'execution' });
       setError(error instanceof Error ? error.message : 'Failed to load status');
     } finally {
       setIsLoading(false);
@@ -78,7 +79,7 @@ export default function DoNotSellPage() {
       setCcpaStatus(result.data);
       setSuccess('Successfully opted out of personal information sales. Your preference has been saved.');
     } catch (error) {
-      console.error('Error opting out:', error);
+      logger.error('Error opting out:', error, { component: 'page', action: 'execution' });
       setError(error instanceof Error ? error.message : 'Failed to opt out');
     } finally {
       setIsSaving(false);
@@ -112,7 +113,7 @@ export default function DoNotSellPage() {
       setCcpaStatus(result.data);
       setSuccess('Successfully opted back in to personal information sharing. Your preference has been saved.');
     } catch (error) {
-      console.error('Error opting in:', error);
+      logger.error('Error opting in:', error, { component: 'page', action: 'execution' });
       setError(error instanceof Error ? error.message : 'Failed to opt in');
     } finally {
       setIsSaving(false);

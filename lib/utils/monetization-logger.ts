@@ -14,6 +14,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 // SECURITY: Runtime check to prevent accidental client-side import
 if (typeof window !== 'undefined') {
@@ -33,7 +34,7 @@ function getSupabaseAdmin() {
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseServiceKey) {
-    console.warn('[MONETIZATION_LOGGER] Supabase credentials not configured - logs will only go to console');
+    logger.warn('[MONETIZATION_LOGGER] Supabase credentials not configured - logs will only go to console', { component: 'lib-monetization-logger' });
     return null;
   }
 
@@ -119,7 +120,7 @@ async function outputLog(entry: MonetizationLogEntry): Promise<void> {
       console.error(prefix, logLine);
       break;
     case 'warn':
-      console.warn(prefix, logLine);
+      logger.warn(prefix, { component: 'lib-monetization-logger', error: logLine });
       break;
     default:
       console.log(prefix, logLine);
@@ -127,7 +128,7 @@ async function outputLog(entry: MonetizationLogEntry): Promise<void> {
 
   // Persist to database (non-blocking)
   persistLogToDatabase(entry).catch((err) => {
-    console.error('[MONETIZATION_LOGGER] Failed to persist log:', err);
+    logger.error('[MONETIZATION_LOGGER] Failed to persist log:', err, { component: 'lib-monetization-logger', action: 'service_call' });
   });
 }
 
@@ -158,10 +159,10 @@ async function persistLogToDatabase(entry: MonetizationLogEntry): Promise<void> 
     });
 
     if (error) {
-      console.error('[MONETIZATION_LOGGER] Database insert error:', error);
+      logger.error('[MONETIZATION_LOGGER] Database insert error:', error, { component: 'lib-monetization-logger', action: 'service_call' });
     }
   } catch (err) {
-    console.error('[MONETIZATION_LOGGER] Database persistence error:', err);
+    logger.error('[MONETIZATION_LOGGER] Database persistence error:', err, { component: 'lib-monetization-logger', action: 'service_call' });
   }
 }
 

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface EventComment {
   id: string;
@@ -244,7 +245,7 @@ export const eventCommentsService = {
     try {
       await supabase.from('notifications').insert(notifications);
     } catch (error) {
-      console.error('Failed to create mention notifications:', error);
+      logger.error('Failed to create mention notifications:', error, { component: 'lib-event-comments-service', action: 'service_call' });
     }
   }
 };

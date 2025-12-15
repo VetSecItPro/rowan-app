@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { User, Search, X, UserCheck } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface SpaceMember {
   user_id: string;
@@ -56,14 +57,14 @@ export function UserPicker({
           .eq('space_id', spaceId);
 
         if (error) {
-          console.error('Error fetching space members:', error);
+          logger.error('Error fetching space members:', error, { component: 'UserPicker', action: 'component_action' });
           return;
         }
 
         setMembers((data as unknown as SpaceMember[]) || []);
         setFilteredMembers((data as unknown as SpaceMember[]) || []);
       } catch (error) {
-        console.error('Error fetching space members:', error);
+        logger.error('Error fetching space members:', error, { component: 'UserPicker', action: 'component_action' });
       } finally {
         setLoading(false);
       }

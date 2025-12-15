@@ -5,6 +5,7 @@ import { isAdmin } from '@/lib/utils/admin-check';
 import { FeedbackStatus, FeedbackType } from '@/lib/types';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -64,7 +65,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: result.data });
   } catch (error: any) {
-    console.error('Error in admin feedback API:', error);
+    logger.error('Error in admin feedback API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { success: false, error: error.message || 'Internal server error' },
       { status: 500 }

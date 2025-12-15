@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Check, X, Loader2, Home } from 'lucide-react';
 import Link from 'next/link';
 import { useValidatedSearchParams, TokenParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
+import { logger } from '@/lib/logger';
 
 function AcceptInvitationContent() {
   const router = useRouter();
@@ -72,7 +73,7 @@ function AcceptInvitationContent() {
         setSpaceName(space?.name || 'the space');
         setSuccess(true);
       } catch (err) {
-        console.error('Error accepting invitation:', err);
+        logger.error('Error accepting invitation:', err, { component: 'page', action: 'execution' });
         setError(err instanceof Error ? err.message : 'Failed to accept invitation');
       } finally {
         setLoading(false);

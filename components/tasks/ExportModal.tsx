@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { X, Download, FileText, CheckSquare } from 'lucide-react';
 import { taskExportService } from '@/lib/services/task-export-service';
 import { TaskFilters } from './TaskFilterPanel';
+import { logger } from '@/lib/logger';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -67,7 +68,7 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
 
       onClose();
     } catch (error) {
-      console.error('Error exporting tasks:', error);
+      logger.error('Error exporting tasks:', error, { component: 'ExportModal', action: 'component_action' });
       alert('Failed to export tasks');
     } finally {
       setLoading(false);

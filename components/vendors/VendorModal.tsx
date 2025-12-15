@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, Star, Shield, Building2, Phone, Mail, MapPin, ExternalLink, User } from 'lucide-react';
 import type { Vendor, CreateVendorInput } from '@/lib/services/project-tracking-service';
 import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
+import { logger } from '@/lib/logger';
 
 // Vendor data without space_id and created_by (added by parent component)
 type VendorFormData = Omit<CreateVendorInput, 'space_id' | 'created_by'>;
@@ -128,7 +129,7 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
     try {
       await onSave(formData);
     } catch (error) {
-      console.error('Failed to save vendor:', error);
+      logger.error('Failed to save vendor:', error, { component: 'VendorModal', action: 'component_action' });
       setErrors({ general: 'Failed to save vendor. Please try again.' });
     } finally {
       setSaving(false);

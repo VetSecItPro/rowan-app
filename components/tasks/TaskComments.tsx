@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { MessageSquare, Send } from 'lucide-react';
 import { taskCommentsService, TaskComment } from '@/lib/services/task-comments-service';
 import { CTAButton } from '@/components/ui/EnhancedButton';
+import { logger } from '@/lib/logger';
 
 interface TaskCommentsProps {
   taskId: string;
@@ -24,7 +25,7 @@ export function TaskComments({ taskId, userId }: TaskCommentsProps) {
       const data = await taskCommentsService.getComments(taskId);
       setComments(data);
     } catch (error) {
-      console.error('Error loading comments:', error);
+      logger.error('Error loading comments:', error, { component: 'TaskComments', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -43,7 +44,7 @@ export function TaskComments({ taskId, userId }: TaskCommentsProps) {
       setNewComment('');
       loadComments();
     } catch (error) {
-      console.error('Error adding comment:', error);
+      logger.error('Error adding comment:', error, { component: 'TaskComments', action: 'component_action' });
     }
   }
 
@@ -52,7 +53,7 @@ export function TaskComments({ taskId, userId }: TaskCommentsProps) {
       await taskCommentsService.addCommentReaction(commentId, userId, emoji);
       loadComments();
     } catch (error) {
-      console.error('Error adding reaction:', error);
+      logger.error('Error adding reaction:', error, { component: 'TaskComments', action: 'component_action' });
     }
   }
 

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, CheckCircle, XCircle, Clock, UserCheck, MessageSquare } from 'lucide-react';
 import { taskApprovalsService } from '@/lib/services/task-approvals-service';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface ApprovalModalProps {
   isOpen: boolean;
@@ -58,7 +59,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
       const data = await taskApprovalsService.getApprovals(taskId);
       setApprovals(data);
     } catch (error) {
-      console.error('Error loading approvals:', error);
+      logger.error('Error loading approvals:', error, { component: 'ApprovalModal', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -91,7 +92,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
       setSelectedApprover('');
       loadApprovals();
     } catch (error) {
-      console.error('Error requesting approval:', error);
+      logger.error('Error requesting approval:', error, { component: 'ApprovalModal', action: 'component_action' });
       alert('Failed to request approval');
     } finally {
       setRequesting(false);
@@ -109,7 +110,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
       setReviewNote('');
       loadApprovals();
     } catch (error) {
-      console.error('Error approving:', error);
+      logger.error('Error approving:', error, { component: 'ApprovalModal', action: 'component_action' });
       alert('Failed to approve');
     }
   }
@@ -125,7 +126,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
       setReviewNote('');
       loadApprovals();
     } catch (error) {
-      console.error('Error rejecting:', error);
+      logger.error('Error rejecting:', error, { component: 'ApprovalModal', action: 'component_action' });
       alert('Failed to reject');
     }
   }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { logger } from '@/lib/logger';
 import {
   DollarSign,
   Plus,
@@ -93,7 +94,7 @@ export function ProjectLineItems({
 
   const handleMarkPaid = async (itemId: string) => {
     // TODO: Implement mark as paid functionality
-    console.log('Mark item as paid:', itemId);
+    logger.info('Mark item as paid:', { component: 'ProjectLineItems', data: itemId });
   };
 
   const handleEditItem = (item: ProjectLineItem) => {
@@ -103,7 +104,7 @@ export function ProjectLineItems({
   const handleDeleteItem = async (itemId: string) => {
     if (window.confirm('Are you sure you want to delete this line item?')) {
       // TODO: Implement delete functionality
-      console.log('Delete item:', itemId);
+      logger.info('Delete item:', { component: 'ProjectLineItems', data: itemId });
     }
   };
 

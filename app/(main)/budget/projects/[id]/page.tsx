@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
+import { logger } from '@/lib/logger';
 import {
   Hammer,
   DollarSign,
@@ -76,7 +77,7 @@ export default function ProjectTrackingPage() {
         setCostBreakdown(costBreakdownData);
         setExpenses(expensesData);
       } catch (err) {
-        console.error('Failed to load project data:', err);
+        logger.error('Failed to load project data:', err, { component: 'page', action: 'execution' });
         setError('Failed to load project information');
       } finally {
         setLoading(false);

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, memo } from 'react';
+import { useState, useEffect, memo, useCallback, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -39,6 +40,7 @@ import {
   FeatureUsagePanel,
   FeedbackPanel,
   SubscriptionsPanel,
+  BetaFeedbackPanel,
 } from '@/components/admin/panels';
 
 interface DashboardStats {
@@ -206,10 +208,26 @@ const StatsSkeleton = memo(function StatsSkeleton() {
   );
 });
 
-export default function AdminDashboardPage() {
+function AdminDashboardContent() {
   const { theme, setTheme } = useTheme();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabId>('users');
+
+  // Get initial tab from URL or default to null (no default tab)
+  const tabFromUrl = searchParams.get('tab') as TabId | null;
+  const validTabs: TabId[] = ['users', 'beta', 'notifications', 'analytics', 'subscriptions', 'features', 'beta-feedback', 'feedback', 'health', 'export'];
+  const initialTab = tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : null;
+
+  const [activeTab, setActiveTabState] = useState<TabId | null>(initialTab);
+
+  // Update URL when tab changes
+  const setActiveTab = useCallback((tab: TabId) => {
+    setActiveTabState(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', tab);
+    router.replace(`?${params.toString()}`, { scroll: false });
+  }, [router, searchParams]);
 
   // Prevent hydration mismatch with theme
   useEffect(() => {
@@ -232,6 +250,19 @@ export default function AdminDashboardPage() {
 
   // Render the active panel content
   const renderPanel = () => {
+    // If no tab is selected, show a welcome/select message
+    if (!activeTab) {
+      return (
+        <div className="flex flex-col items-center justify-center py-12 text-center h-full">
+          <Layers className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Management Console</h3>
+          <p className="text-gray-500 dark:text-gray-400 max-w-md">
+            Select a tab above to manage users, view analytics, handle feedback, and more.
+          </p>
+        </div>
+      );
+    }
+
     switch (activeTab) {
       case 'users':
         return <UsersPanel />;
@@ -255,16 +286,7 @@ export default function AdminDashboardPage() {
       case 'features':
         return <FeatureUsagePanel />;
       case 'beta-feedback':
-        return (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <TestTube className="w-12 h-12 text-violet-500 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Beta Feedback</h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-4">Feedback from beta testers</p>
-            <Link href="/admin/beta-feedback" className="text-blue-600 hover:underline text-sm">
-              Open Full Page →
-            </Link>
-          </div>
-        );
+        return <BetaFeedbackPanel />;
       case 'feedback':
         return <FeedbackPanel />;
       case 'health':
@@ -290,7 +312,7 @@ export default function AdminDashboardPage() {
           </div>
         );
       default:
-        return <UsersPanel />;
+        return null;
     }
   };
 
@@ -343,7 +365,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-6 space-y-4 flex flex-col" style={{ minHeight: 'calc(100vh - 80px)' }}>
         {/* Row 1: Stats Cards */}
         {isLoading || !stats ? (
           <StatsSkeleton />
@@ -400,7 +422,53 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Row 2: Recent Activity Bar */}
+        {/* Row 2: System Status */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <Monitor className="w-4 h-4 text-emerald-500" />
+              System Status
+            </h3>
+            <Link
+              href="/admin/health"
+              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              View Details
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Database</p>
+                <p className="text-xs text-gray-500">Operational</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">API</p>
+                <p className="text-xs text-gray-500">Running</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Rate Limit</p>
+                <p className="text-xs text-gray-500">Active</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Beta</p>
+                <p className="text-xs text-gray-500">{stats?.betaUsers ?? 0}/30</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Row 3: Recent Activity Bar */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
@@ -454,8 +522,8 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Row 3: Management Console (Tabbed Content Area) */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        {/* Row 4: Management Console (Tabbed Content Area) - Fills remaining space */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden flex-1 flex flex-col">
           {/* Tab Navigation - Horizontal Scrollable */}
           <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-2 py-2">
             <div className="flex items-center justify-between gap-2">
@@ -469,76 +537,45 @@ export default function AdminDashboardPage() {
                   />
                 ))}
               </div>
-              <Link
-                href={`/admin/${
-                  activeTab === 'users' ? 'users' :
-                  activeTab === 'beta' ? 'beta' :
-                  activeTab === 'features' ? 'feature-usage' :
-                  activeTab === 'beta-feedback' ? 'beta-feedback' :
-                  activeTab === 'feedback' ? 'beta-feedback' :
-                  activeTab === 'export' ? 'health' :
-                  activeTab
-                }`}
-                className="flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors flex-shrink-0 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600"
-              >
-                <ExternalLink className="w-3 h-3" />
-                <span className="hidden sm:inline">Full Page</span>
-              </Link>
+              {activeTab && (
+                <Link
+                  href={`/admin/${
+                    activeTab === 'users' ? 'users' :
+                    activeTab === 'beta' ? 'beta' :
+                    activeTab === 'features' ? 'feature-usage' :
+                    activeTab === 'beta-feedback' ? 'beta-feedback' :
+                    activeTab === 'feedback' ? 'beta-feedback' :
+                    activeTab === 'export' ? 'health' :
+                    activeTab
+                  }`}
+                  className="flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors flex-shrink-0 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  <span className="hidden sm:inline">Full Page</span>
+                </Link>
+              )}
             </div>
           </div>
 
-          {/* Content Area */}
-          <div className="p-4 min-h-[500px]">
+          {/* Content Area - Fills remaining height */}
+          <div className="p-4 flex-1 overflow-hidden flex flex-col min-h-0">
             {renderPanel()}
-          </div>
-        </div>
-
-        {/* Row 4: System Status */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <Monitor className="w-4 h-4 text-emerald-500" />
-              System Status
-            </h3>
-            <Link
-              href="/admin/health"
-              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              View Details
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Database</p>
-                <p className="text-xs text-gray-500">Operational</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">API</p>
-                <p className="text-xs text-gray-500">Running</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Rate Limit</p>
-                <p className="text-xs text-gray-500">Active</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Beta</p>
-                <p className="text-xs text-gray-500">{stats?.betaUsers ?? 0}/30</p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+// Wrap with Suspense for useSearchParams
+export default function AdminDashboardPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <AdminDashboardContent />
+    </Suspense>
   );
 }

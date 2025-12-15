@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { CheckCircle2, AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { logger } from '@/lib/logger';
 
 function MagicLinkHandler() {
   const router = useRouter();
@@ -118,7 +119,7 @@ function MagicLinkHandler() {
         }, 1000);
 
       } catch (error) {
-        console.error('Magic link error:', error);
+        logger.error('Magic link error:', error, { component: 'page', action: 'execution' });
         setStatus('error');
         setMessage('Something went wrong during authentication. Please try again.');
       }

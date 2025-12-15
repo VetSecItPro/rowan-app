@@ -1,6 +1,7 @@
 import { shoppingService } from '@/lib/services/shopping-service';
 import { Recipe } from '@/lib/services/meals-service';
 import { format } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 /**
  * Creates a shopping list from a recipe's ingredients
@@ -42,7 +43,7 @@ export async function createShoppingListFromRecipe(
 
     return list.id;
   } catch (error) {
-    console.error('Error creating shopping list from recipe:', error);
+    logger.error('Error creating shopping list from recipe:', error, { component: 'lib-shopping-list-helpers', action: 'service_call' });
     throw error;
   }
 }

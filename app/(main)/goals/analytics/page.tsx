@@ -7,6 +7,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { getGoalAnalytics, GoalAnalytics, DateRange } from '@/lib/services/goal-analytics-service';
 import StatCards from '@/components/goals/analytics/StatCards';
+import { logger } from '@/lib/logger';
 // Use dynamic imports for chart components to reduce initial bundle size
 import {
   DynamicCompletionRateChart,
@@ -64,7 +65,7 @@ export default function GoalsAnalyticsPage() {
       const data = await getGoalAnalytics(spaceId, dateRange);
       setAnalytics(data);
     } catch (err) {
-      console.error('Failed to fetch analytics:', err);
+      logger.error('Failed to fetch analytics:', err, { component: 'page', action: 'execution' });
       setError('Failed to load analytics data');
     } finally {
       setLoading(false);

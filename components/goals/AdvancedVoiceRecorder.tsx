@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import {
   Mic,
   Square,
@@ -182,7 +183,7 @@ export function AdvancedVoiceRecorder({
       });
 
     } catch (error) {
-      console.error('Failed to initialize WaveSurfer:', error);
+      logger.error('Failed to initialize WaveSurfer:', error, { component: 'AdvancedVoiceRecorder', action: 'component_action' });
       // Fallback to basic audio element
     }
   };
@@ -233,7 +234,7 @@ export function AdvancedVoiceRecorder({
       }
 
     } catch (error) {
-      console.error('Error accessing microphone:', error);
+      logger.error('Error accessing microphone:', error, { component: 'AdvancedVoiceRecorder', action: 'component_action' });
       setPermissionDenied(true);
       toast.error('Microphone permission denied');
     }
@@ -305,7 +306,7 @@ export function AdvancedVoiceRecorder({
       setMetadata(prev => ({ ...prev, transcription: mockTranscription }));
       toast.success('Transcription completed!');
     } catch (error) {
-      console.error('Transcription failed:', error);
+      logger.error('Transcription failed:', error, { component: 'AdvancedVoiceRecorder', action: 'component_action' });
       toast.error('Failed to transcribe audio');
     } finally {
       setIsTranscribing(false);
@@ -352,7 +353,7 @@ export function AdvancedVoiceRecorder({
       await onSendVoice(audioBlob, recordingDuration, metadata);
       handleDelete();
     } catch (error) {
-      console.error('Failed to send voice message:', error);
+      logger.error('Failed to send voice message:', error, { component: 'AdvancedVoiceRecorder', action: 'component_action' });
       toast.error('Failed to send voice message');
     } finally {
       setSending(false);

@@ -8,6 +8,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { logger } from '@/lib/logger';
 import {
   Crown,
   Clock,
@@ -117,7 +118,7 @@ export function SubscriptionSettings() {
           setBillingInfo(data);
         })
         .catch(err => {
-          console.error('Failed to fetch billing info:', err);
+          logger.error('Failed to fetch billing info:', err, { component: 'SubscriptionSettings', action: 'component_action' });
         })
         .finally(() => {
           setIsBillingInfoLoading(false);
@@ -148,7 +149,7 @@ export function SubscriptionSettings() {
       // Redirect to Stripe Customer Portal
       window.location.href = url;
     } catch (error) {
-      console.error('Error opening billing portal:', error);
+      logger.error('Error opening billing portal:', error, { component: 'SubscriptionSettings', action: 'component_action' });
       setBillingError(error instanceof Error ? error.message : 'Failed to open billing portal');
       setIsBillingLoading(false);
     }

@@ -5,6 +5,7 @@ import { Repeat, Users, Calendar, Settings, Trash2, Play, Pause } from 'lucide-r
 import { choreRotationService } from '@/lib/services/chore-rotation-service';
 import { createClient } from '@/lib/supabase/client';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { logger } from '@/lib/logger';
 
 interface ChoreRotationConfigProps {
   taskId: string;
@@ -58,7 +59,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
         setFormData(data);
       }
     } catch (error) {
-      console.error('Error loading rotation:', error);
+      logger.error('Error loading rotation:', error, { component: 'ChoreRotationConfig', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -103,7 +104,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
       loadRotation();
       setEditing(false);
     } catch (error) {
-      console.error('Error saving rotation:', error);
+      logger.error('Error saving rotation:', error, { component: 'ChoreRotationConfig', action: 'component_action' });
       alert('Failed to save rotation');
     } finally {
       setSaving(false);
@@ -125,7 +126,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
         is_active: true,
       });
     } catch (error) {
-      console.error('Error deleting rotation:', error);
+      logger.error('Error deleting rotation:', error, { component: 'ChoreRotationConfig', action: 'component_action' });
       alert('Failed to delete rotation');
     }
   }
@@ -139,7 +140,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
       });
       loadRotation();
     } catch (error) {
-      console.error('Error toggling rotation:', error);
+      logger.error('Error toggling rotation:', error, { component: 'ChoreRotationConfig', action: 'component_action' });
     }
   }
 

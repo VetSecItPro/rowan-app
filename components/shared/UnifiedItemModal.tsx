@@ -8,6 +8,7 @@ import { taskRecurrenceService } from '@/lib/services/task-recurrence-service';
 import { choreCalendarService } from '@/lib/services/chore-calendar-service';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { DateTimePicker } from '@/components/ui/DateTimePicker';
+import { logger } from '@/lib/logger';
 import {
   TASK_CATEGORIES,
   CHORE_CATEGORIES,
@@ -252,12 +253,12 @@ export function UnifiedItemModal({
     try {
       // Validate due date
       if (formData.due_date && new Date(formData.due_date) < new Date()) {
-        console.log('❌ FAILED: Due date in past');
+        logger.info('❌ FAILED: Due date in past', { component: 'UnifiedItemModal' });
         setDateError('Due date cannot be in the past');
         return;
       }
 
-      console.log('✅ Date validation passed');
+      logger.info('✅ Date validation passed', { component: 'UnifiedItemModal' });
 
       // Prepare submission data - different fields for tasks vs chores
       const submissionData: CreateTaskInput | CreateChoreInput = itemType === 'task' ? {
@@ -312,7 +313,7 @@ export function UnifiedItemModal({
       } else if (itemType === 'chore' && isRecurring) {
         // Handle recurring chores by setting frequency field
         (submissionData as CreateChoreInput).frequency = recurringData.pattern as 'daily' | 'weekly' | 'biweekly' | 'monthly';
-        console.log('✅ Setting chore frequency to:', recurringData.pattern);
+        logger.info('✅ Setting chore frequency to:', { component: 'UnifiedItemModal', data: recurringData.pattern });
 
         // Save the chore first
         const result = await onSave(submissionData);
@@ -320,40 +321,40 @@ export function UnifiedItemModal({
         // If chore has calendar sync enabled and result contains the chore ID, sync to calendar
         if (calendarSync && result && typeof result === 'object' && 'id' in result) {
           try {
-            console.log('🗓️ Syncing chore to calendar...');
+            logger.info('🗓️ Syncing chore to calendar...', { component: 'UnifiedItemModal' });
             await choreCalendarService.syncChoreToCalendar(result.id as string);
-            console.log('✅ Chore synced to calendar successfully');
+            logger.info('✅ Chore synced to calendar successfully', { component: 'UnifiedItemModal' });
           } catch (error) {
-            console.error('❌ Failed to sync chore to calendar:', error);
+            logger.error('❌ Failed to sync chore to calendar:', error, { component: 'UnifiedItemModal', action: 'component_action' });
           }
         }
       } else if (itemType === 'chore') {
         // Handle non-recurring chores
-        console.log('💾 Calling onSave for chore...');
+        logger.info('💾 Calling onSave for chore...', { component: 'UnifiedItemModal' });
         const result = await onSave(submissionData);
 
         // If chore has calendar sync enabled and result contains the chore ID, sync to calendar
         if (calendarSync && result && typeof result === 'object' && 'id' in result) {
           try {
-            console.log('🗓️ Syncing chore to calendar...');
+            logger.info('🗓️ Syncing chore to calendar...', { component: 'UnifiedItemModal' });
             await choreCalendarService.syncChoreToCalendar(result.id as string);
-            console.log('✅ Chore synced to calendar successfully');
+            logger.info('✅ Chore synced to calendar successfully', { component: 'UnifiedItemModal' });
           } catch (error) {
-            console.error('❌ Failed to sync chore to calendar:', error);
+            logger.error('❌ Failed to sync chore to calendar:', error, { component: 'UnifiedItemModal', action: 'component_action' });
           }
         }
       } else {
-        console.log('💾 Calling onSave with submission data...');
-        console.log('onSave function:', typeof onSave);
+        logger.info('💾 Calling onSave with submission data...', { component: 'UnifiedItemModal' });
+        logger.info('onSave function:', { component: 'UnifiedItemModal', data: typeof onSave });
         await onSave(submissionData);
-        console.log('✅ onSave completed successfully');
+        logger.info('✅ onSave completed successfully', { component: 'UnifiedItemModal' });
       }
 
-      console.log('🚪 Closing modal...');
+      logger.info('🚪 Closing modal...', { component: 'UnifiedItemModal' });
       onClose();
     } catch (error) {
-      console.error('❌ Failed to save item:', error);
-      console.error('Error details:', error);
+      logger.error('❌ Failed to save item:', error, { component: 'UnifiedItemModal', action: 'component_action' });
+      logger.error('Error details:', error, { component: 'UnifiedItemModal', action: 'component_action' });
     }
   };
 
@@ -901,11 +902,7 @@ export function UnifiedItemModal({
               </button>
               <button
                 onClick={() => {
-                  console.log('🔘 Submit button clicked!');
-                  console.log('Button disabled?', !formData.title.trim() || !!dateError);
-                  console.log('Title:', `"${formData.title}"`);
-                  console.log('Title trimmed:', `"${formData.title.trim()}"`);
-                  console.log('Date error:', dateError);
+                  logger.info('Submit button clicked', { component: 'UnifiedItemModal', data: { titleTrimmed: formData.title.trim(), dateError } });
                   handleSubmit();
                 }}
                 disabled={!formData.title.trim() || !!dateError}

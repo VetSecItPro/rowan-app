@@ -1,4 +1,5 @@
 import { Redis } from '@upstash/redis';
+import { logger } from './logger';
 
 /**
  * Redis Cache Service
@@ -51,7 +52,7 @@ export async function getCache<T>(key: string): Promise<T | null> {
     const cached = await redis.get<T>(key);
     return cached;
   } catch (error) {
-    console.warn('[Cache] Get failed for key:', key, error);
+    logger.warn('Cache get failed', { component: 'lib-cache', action: 'get', key, error });
     return null;
   }
 }
@@ -70,7 +71,7 @@ export async function setCache<T>(
     await redis.set(key, value, { ex: ttlSeconds });
     return true;
   } catch (error) {
-    console.warn('[Cache] Set failed for key:', key, error);
+    logger.warn('Cache set failed', { component: 'lib-cache', action: 'set', key, ttlSeconds, error });
     return false;
   }
 }
@@ -85,7 +86,7 @@ export async function deleteCache(key: string): Promise<boolean> {
     await redis.del(key);
     return true;
   } catch (error) {
-    console.warn('[Cache] Delete failed for key:', key, error);
+    logger.warn('Cache delete failed', { component: 'lib-cache', action: 'delete', key, error });
     return false;
   }
 }
@@ -115,7 +116,7 @@ export async function deleteCachePattern(pattern: string): Promise<boolean> {
 
     return true;
   } catch (error) {
-    console.warn('[Cache] Delete pattern failed:', pattern, error);
+    logger.warn('Cache delete pattern failed', { component: 'lib-cache', action: 'delete_pattern', pattern, error });
     return false;
   }
 }

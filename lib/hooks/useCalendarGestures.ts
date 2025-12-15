@@ -15,7 +15,7 @@ export interface CalendarGestureHandlers {
  * - Swipe Right: Navigate to previous period
  */
 export function useCalendarGestures(
-  ref: RefObject<HTMLElement>,
+  ref: RefObject<HTMLElement | null>,
   handlers: CalendarGestureHandlers
 ) {
   const { onSwipeLeft, onSwipeRight, enabled = true } = handlers;

@@ -6,6 +6,7 @@ import { Target, Award, TrendingUp, CheckCircle, Calendar, BarChart3, Activity, 
 import { format, subMonths } from 'date-fns';
 import { DynamicAreaChart, DynamicPieChart, DynamicBarChart } from '@/components/charts/DynamicCharts';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { logger } from '@/lib/logger';
 import {
   getGoalAnalytics,
   getGoalQuickStats,
@@ -44,7 +45,7 @@ export default function GoalsAnalyticsPage() {
         setAnalytics(analyticsData);
         setQuickStats(statsData);
       } catch (err) {
-        console.error('Failed to load analytics:', err);
+        logger.error('Failed to load analytics:', err, { component: 'page', action: 'execution' });
         setError('Failed to load analytics data');
       } finally {
         setLoading(false);

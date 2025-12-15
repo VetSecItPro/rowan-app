@@ -1,4 +1,5 @@
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
+import { logger } from '@/lib/logger';
 
 /**
  * Key rotation support for admin session encryption
@@ -35,7 +36,7 @@ const getEncryptionKeys = (): Map<number, Buffer> => {
     const oldKey = process.env[`ADMIN_SESSION_SECRET_V${version}`];
     if (oldKey) {
       if (oldKey.length !== 64) {
-        console.warn(`ADMIN_SESSION_SECRET_V${version} has invalid length, skipping`);
+        logger.warn(`ADMIN_SESSION_SECRET_V${version} has invalid length, skipping`, { component: 'lib-session-crypto' });
         continue;
       }
       keys.set(version, Buffer.from(oldKey, 'hex'));
@@ -95,7 +96,7 @@ export function encryptSessionData(data: object): string {
     return combined.toString('base64');
 
   } catch (error) {
-    console.error('Session encryption failed:', error);
+    logger.error('Session encryption failed:', error, { component: 'lib-session-crypto', action: 'service_call' });
     throw new Error('Failed to encrypt session data');
   }
 }
@@ -151,7 +152,7 @@ export function decryptSessionData(encryptedData: string): object {
     return JSON.parse(decrypted.toString('utf8'));
 
   } catch (error) {
-    console.error('Session decryption failed:', error);
+    logger.error('Session decryption failed:', error, { component: 'lib-session-crypto', action: 'service_call' });
     throw new Error('Failed to decrypt session data');
   }
 }

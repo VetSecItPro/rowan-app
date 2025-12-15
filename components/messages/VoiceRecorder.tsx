@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Mic, Square, Play, Pause, Trash2, Send, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface VoiceRecorderProps {
   onSendVoice: (audioBlob: Blob, duration: number) => Promise<void>;
@@ -65,7 +66,7 @@ export function VoiceRecorder({ onSendVoice, onCancel }: VoiceRecorderProps) {
       setIsRecording(true);
       setPermissionDenied(false);
     } catch (error) {
-      console.error('Error accessing microphone:', error);
+      logger.error('Error accessing microphone:', error, { component: 'VoiceRecorder', action: 'component_action' });
       setPermissionDenied(true);
       toast.error('Microphone permission denied');
     }
@@ -120,7 +121,7 @@ export function VoiceRecorder({ onSendVoice, onCancel }: VoiceRecorderProps) {
       await onSendVoice(audioBlob, recordingDuration);
       handleDelete();
     } catch (error) {
-      console.error('Failed to send voice message:', error);
+      logger.error('Failed to send voice message:', error, { component: 'VoiceRecorder', action: 'component_action' });
       toast.error('Failed to send voice message');
     } finally {
       setSending(false);

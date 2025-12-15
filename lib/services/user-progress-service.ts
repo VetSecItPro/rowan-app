@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import type { UserProgress, UpdateUserProgressInput } from '@/lib/types';
+import { logger } from '@/lib/logger';
 
 /**
  * Get user progress for tracking onboarding completion
@@ -26,7 +27,7 @@ export async function getUserProgress(userId: string): Promise<{
 
     return { success: true, data };
   } catch (error) {
-    console.error('[userProgressService] getUserProgress error:', error);
+    logger.error('[userProgressService] getUserProgress error:', error, { component: 'lib-user-progress-service', action: 'service_call' });
     return { success: false, error: 'Failed to fetch user progress' };
   }
 }
@@ -61,7 +62,7 @@ export async function createUserProgress(
 
     return { success: true, data };
   } catch (error) {
-    console.error('[userProgressService] createUserProgress error:', error);
+    logger.error('[userProgressService] createUserProgress error:', error, { component: 'lib-user-progress-service', action: 'service_call' });
     return { success: false, error: 'Failed to create user progress' };
   }
 }
@@ -113,7 +114,7 @@ export async function updateUserProgress(
 
     return { success: true, data };
   } catch (error) {
-    console.error('[userProgressService] updateUserProgress error:', error);
+    logger.error('[userProgressService] updateUserProgress error:', error, { component: 'lib-user-progress-service', action: 'service_call' });
     return { success: false, error: 'Failed to update user progress' };
   }
 }
@@ -144,7 +145,7 @@ export async function getOrCreateUserProgress(
     // Create new progress if doesn't exist
     return await createUserProgress(userId, spaceId);
   } catch (error) {
-    console.error('[userProgressService] getOrCreateUserProgress error:', error);
+    logger.error('[userProgressService] getOrCreateUserProgress error:', error, { component: 'lib-user-progress-service', action: 'service_call' });
     return { success: false, error: 'Failed to get or create user progress' };
   }
 }

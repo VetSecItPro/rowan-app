@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import {
   TrendingUp,
   TrendingDown,
@@ -64,7 +65,7 @@ export default function SpendingInsightsDashboard({ spaceId }: SpendingInsightsD
       setTrends(trendsData);
       setAnomalies(anomaliesData);
     } catch (error) {
-      console.error('Error loading spending insights:', error);
+      logger.error('Error loading spending insights:', error, { component: 'SpendingInsightsDashboard', action: 'component_action' });
     } finally {
       setLoading(false);
     }

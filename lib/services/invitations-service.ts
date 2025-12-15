@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { randomBytes } from 'crypto';
 import type { SpaceInvitation, CreateInvitationInput, InvitationStatus } from '@/lib/types';
+import { logger } from '@/lib/logger';
 
 // =============================================
 // VALIDATION SCHEMAS
@@ -100,13 +101,13 @@ export async function createInvitation(
       .single();
 
     if (createError) {
-      console.error('[invitations-service] createInvitation error:', createError);
+      logger.error('[invitations-service] createInvitation error:', createError, { component: 'lib-invitations-service', action: 'service_call' });
       throw createError;
     }
 
     return { success: true, data: invitation };
   } catch (error) {
-    console.error('[invitations-service] createInvitation error:', error);
+    logger.error('[invitations-service] createInvitation error:', error, { component: 'lib-invitations-service', action: 'service_call' });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to create invitation'
@@ -138,7 +139,7 @@ export async function getInvitationByToken(
       .single();
 
     if (error) {
-      console.error('[invitations-service] getInvitationByToken error:', error);
+      logger.error('[invitations-service] getInvitationByToken error:', error, { component: 'lib-invitations-service', action: 'service_call' });
       return {
         success: false,
         error: 'Invalid invitation token'
@@ -169,7 +170,7 @@ export async function getInvitationByToken(
 
     return { success: true, data };
   } catch (error) {
-    console.error('[invitations-service] getInvitationByToken error:', error);
+    logger.error('[invitations-service] getInvitationByToken error:', error, { component: 'lib-invitations-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to get invitation'
@@ -234,7 +235,7 @@ export async function acceptInvitation(
       });
 
     if (memberError) {
-      console.error('[invitations-service] acceptInvitation member error:', memberError);
+      logger.error('[invitations-service] acceptInvitation member error:', memberError, { component: 'lib-invitations-service', action: 'service_call' });
       throw memberError;
     }
 
@@ -245,7 +246,7 @@ export async function acceptInvitation(
       .eq('id', invitation.id);
 
     if (updateError) {
-      console.error('[invitations-service] acceptInvitation update error:', updateError);
+      logger.error('[invitations-service] acceptInvitation update error:', updateError, { component: 'lib-invitations-service', action: 'service_call' });
       // Don't throw - membership is created, just log the error
     }
 
@@ -254,7 +255,7 @@ export async function acceptInvitation(
       data: { spaceId: invitation.space_id }
     };
   } catch (error) {
-    console.error('[invitations-service] acceptInvitation error:', error);
+    logger.error('[invitations-service] acceptInvitation error:', error, { component: 'lib-invitations-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to accept invitation'
@@ -311,13 +312,13 @@ export async function cancelInvitation(
       .eq('id', invitationId);
 
     if (updateError) {
-      console.error('[invitations-service] cancelInvitation error:', updateError);
+      logger.error('[invitations-service] cancelInvitation error:', updateError, { component: 'lib-invitations-service', action: 'service_call' });
       throw updateError;
     }
 
     return { success: true };
   } catch (error) {
-    console.error('[invitations-service] cancelInvitation error:', error);
+    logger.error('[invitations-service] cancelInvitation error:', error, { component: 'lib-invitations-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to cancel invitation'
@@ -362,7 +363,7 @@ export async function getPendingInvitations(
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('[invitations-service] getPendingInvitations error:', error);
+      logger.error('[invitations-service] getPendingInvitations error:', error, { component: 'lib-invitations-service', action: 'service_call' });
       throw error;
     }
 
@@ -381,7 +382,7 @@ export async function getPendingInvitations(
 
     return { success: true, data: activeInvitations };
   } catch (error) {
-    console.error('[invitations-service] getPendingInvitations error:', error);
+    logger.error('[invitations-service] getPendingInvitations error:', error, { component: 'lib-invitations-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to fetch pending invitations'
@@ -444,7 +445,7 @@ export async function resendInvitation(
       userId
     );
   } catch (error) {
-    console.error('[invitations-service] resendInvitation error:', error);
+    logger.error('[invitations-service] resendInvitation error:', error, { component: 'lib-invitations-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to resend invitation'
@@ -476,13 +477,13 @@ export async function cleanupExpiredInvitations(
     const { data, error, count } = await query.select();
 
     if (error) {
-      console.error('[invitations-service] cleanupExpiredInvitations error:', error);
+      logger.error('[invitations-service] cleanupExpiredInvitations error:', error, { component: 'lib-invitations-service', action: 'service_call' });
       throw error;
     }
 
     return { success: true, count: count || 0 };
   } catch (error) {
-    console.error('[invitations-service] cleanupExpiredInvitations error:', error);
+    logger.error('[invitations-service] cleanupExpiredInvitations error:', error, { component: 'lib-invitations-service', action: 'service_call' });
     return {
       success: false,
       error: 'Failed to cleanup expired invitations'

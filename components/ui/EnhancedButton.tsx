@@ -74,7 +74,7 @@ function useFeatureDetection(): EnhancedButtonProps['feature'] {
 }
 
 // Hook for magnetic attraction effect
-function useMagneticAttraction(enabled: boolean, ref: React.RefObject<HTMLButtonElement>) {
+function useMagneticAttraction(enabled: boolean, ref: React.RefObject<HTMLButtonElement | null>) {
   const [isHovering, setIsHovering] = useState(false);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {

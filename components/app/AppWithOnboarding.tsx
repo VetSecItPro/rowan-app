@@ -6,6 +6,7 @@ import { DashboardSkeleton, SpacesLoadingState } from '@/components/ui/LoadingSt
 import { BetaFeedbackButton } from '@/components/beta/BetaFeedbackButton';
 import { SubscriptionProvider } from '@/lib/contexts/subscription-context';
 import { UpgradeModal } from '@/components/subscription';
+import { logger } from '@/lib/logger';
 
 interface AppWithOnboardingProps {
   children: React.ReactNode;
@@ -48,18 +49,18 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
 
         // If still no spaces after refresh, check if user is orphaned and auto-fix
         if (!currentSpace && !hasZeroSpaces) {
-          console.log('[AppWithOnboarding] Auto-fixing orphaned user...');
+          logger.info('[AppWithOnboarding] Auto-fixing orphaned user...', { component: 'AppWithOnboarding' });
 
           // Create a space for this orphaned user
           const spaceName = `${user?.email?.split('@')[0] || 'My'} Space`;
           const result = await createSpace(spaceName);
 
           if (result.success) {
-            console.log('[AppWithOnboarding] Successfully created space for orphaned user');
+            logger.info('[AppWithOnboarding] Successfully created space for orphaned user', { component: 'AppWithOnboarding' });
             // Refresh spaces again to load the new space
             await refreshSpaces();
           } else {
-            console.error('[AppWithOnboarding] Failed to create space for orphaned user:', result.error);
+            logger.error('[AppWithOnboarding] Failed to create space for orphaned user:', undefined, { component: 'AppWithOnboarding', action: 'component_action', details: result.error });
           }
         }
       } finally {

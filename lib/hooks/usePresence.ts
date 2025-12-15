@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { RealtimeChannel, REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 export interface PresenceUser {
   user_id: string;
@@ -44,10 +45,10 @@ export function usePresence({ channelName, spaceId, userId, userEmail }: UsePres
         setPresenceState(state as unknown as Record<string, PresenceUser[]>);
       })
       .on('presence', { event: 'join' }, ({ key, newPresences }: { key: string; newPresences: PresenceUser[] }) => {
-        console.log('User joined:', key, newPresences);
+        logger.info('User joined:', { component: 'lib-usePresence', data: key, newPresences });
       })
       .on('presence', { event: 'leave' }, ({ key, leftPresences }: { key: string; leftPresences: PresenceUser[] }) => {
-        console.log('User left:', key, leftPresences);
+        logger.info('User left:', { component: 'lib-usePresence', data: key, leftPresences });
       })
       .subscribe(async (status: `${REALTIME_SUBSCRIBE_STATES}`) => {
         if (status === 'SUBSCRIBED') {

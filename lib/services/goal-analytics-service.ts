@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { subDays, subMonths, startOfWeek, endOfWeek, format, eachWeekOfInterval } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 // =====================================================
 // TYPES
@@ -68,7 +69,7 @@ export async function getGoalAnalytics(
     const analytics = calculateAnalytics(goals || [], checkIns || [], startDate, endDate);
     return analytics;
   } catch (error) {
-    console.error('Failed to fetch goal analytics:', error);
+    logger.error('Failed to fetch goal analytics:', error, { component: 'lib-goal-analytics-service', action: 'service_call' });
     throw error;
   }
 }
@@ -392,7 +393,7 @@ export async function getGoalQuickStats(spaceId: string): Promise<{
       thisWeekProgress,
     };
   } catch (error) {
-    console.error('Failed to fetch quick stats:', error);
+    logger.error('Failed to fetch quick stats:', error, { component: 'lib-goal-analytics-service', action: 'service_call' });
     throw error;
   }
 }

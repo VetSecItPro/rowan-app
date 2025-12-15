@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { logger } from '@/lib/logger';
 import {
   createComment,
   updateComment,
@@ -53,7 +54,7 @@ export default function CommentItem({
       const data = await getCommentReactions(comment.id);
       setReactions(data);
     } catch (err) {
-      console.error('Failed to load reactions:', err);
+      logger.error('Failed to load reactions:', err, { component: 'CommentItem', action: 'component_action' });
     } finally {
       setLoadingReactions(false);
     }
@@ -75,7 +76,7 @@ export default function CommentItem({
       setIsReplying(false);
       onReply();
     } catch (err) {
-      console.error('Failed to create reply:', err);
+      logger.error('Failed to create reply:', err, { component: 'CommentItem', action: 'component_action' });
     }
   };
 
@@ -86,7 +87,7 @@ export default function CommentItem({
       setIsEditing(false);
       onReply();
     } catch (err) {
-      console.error('Failed to update comment:', err);
+      logger.error('Failed to update comment:', err, { component: 'CommentItem', action: 'component_action' });
     }
   };
 
@@ -99,7 +100,7 @@ export default function CommentItem({
       await loadReactions();
       setShowReactionPicker(false);
     } catch (err) {
-      console.error('Failed to toggle reaction:', err);
+      logger.error('Failed to toggle reaction:', err, { component: 'CommentItem', action: 'component_action' });
     }
   };
 

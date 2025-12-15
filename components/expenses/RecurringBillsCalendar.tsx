@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, DollarSign, AlertC
 import { createClient } from '@/lib/supabase/client';
 import type { Expense } from '@/lib/services/expense-service';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, parseISO } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 interface RecurringBillsCalendarProps {
   spaceId: string;
@@ -46,7 +47,7 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
       setRecurringExpenses(data || []);
       generateBillOccurrences(data || []);
     } catch (error) {
-      console.error('Error loading recurring expenses:', error);
+      logger.error('Error loading recurring expenses:', error, { component: 'RecurringBillsCalendar', action: 'component_action' });
     } finally {
       setLoading(false);
     }

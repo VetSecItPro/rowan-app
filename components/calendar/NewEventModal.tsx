@@ -9,6 +9,7 @@ import { shoppingIntegrationService } from '@/lib/services/shopping-integration-
 import { toDateTimeLocalValue, fromDateTimeLocalValue, fromUTC, toUTC } from '@/lib/utils/timezone-utils';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { DateTimePicker } from '@/components/ui/DateTimePicker';
+import { logger } from '@/lib/logger';
 
 interface NewEventModalProps {
   isOpen: boolean;
@@ -156,7 +157,7 @@ export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, sp
       const activeLists = lists.filter(list => list.status === 'active');
       setShoppingLists(activeLists);
     } catch (error) {
-      console.error('Failed to load shopping lists:', error);
+      logger.error('Failed to load shopping lists:', error, { component: 'NewEventModal', action: 'component_action' });
     }
   };
 
@@ -223,7 +224,7 @@ export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, sp
               file
             });
           } catch (error) {
-            console.error('Failed to upload attachment:', file.name, error);
+            logger.error('Failed to upload attachment:', undefined, { component: 'NewEventModal', action: 'component_action', details: file.name, error });
             // Continue uploading other files even if one fails
           }
         }
@@ -234,14 +235,14 @@ export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, sp
         try {
           await shoppingIntegrationService.linkToCalendar(selectedListId, createdEvent.id);
         } catch (error) {
-          console.error('Failed to link shopping list:', error);
+          logger.error('Failed to link shopping list:', error, { component: 'NewEventModal', action: 'component_action' });
           // Don't fail the whole operation if linking fails
         }
       }
 
       onClose();
     } catch (error) {
-      console.error('Failed to save event:', error);
+      logger.error('Failed to save event:', error, { component: 'NewEventModal', action: 'component_action' });
       setDateError('Failed to save event. Please try again.');
     } finally {
       setUploading(false);

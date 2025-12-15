@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import {
   getSpaceMembersWithPresence,
   updateUserPresence,
@@ -38,12 +39,12 @@ export function usePresence(spaceId: string | null): PresenceHookData {
         setMembers(result.data);
       } else {
         setError(result.error);
-        console.error('Failed to fetch presence data:', result.error);
+        logger.error('Failed to fetch presence data:', undefined, { component: 'hook-usePresence', action: 'hook_execution', details: result.error });
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch presence data';
       setError(errorMessage);
-      console.error('Presence hook error:', err);
+      logger.error('Presence hook error:', err, { component: 'hook-usePresence', action: 'hook_execution' });
     } finally {
       setIsLoading(false);
     }
@@ -69,7 +70,7 @@ export function usePresence(spaceId: string | null): PresenceHookData {
           try {
             await updateUserPresence(spaceId, PresenceStatus.ONLINE);
           } catch (err) {
-            console.error('Presence update error:', err);
+            logger.error('Presence update error:', err, { component: 'hook-usePresence', action: 'hook_execution' });
           }
         }, 2 * 60 * 1000); // 2 minutes
 
@@ -77,7 +78,7 @@ export function usePresence(spaceId: string | null): PresenceHookData {
         refreshInterval = setInterval(refreshPresence, 30 * 1000); // 30 seconds
 
       } catch (err) {
-        console.error('Failed to initialize presence:', err);
+        logger.error('Failed to initialize presence:', err, { component: 'hook-usePresence', action: 'hook_execution' });
         setError('Failed to initialize presence tracking');
         setIsLoading(false);
       }
@@ -92,7 +93,7 @@ export function usePresence(spaceId: string | null): PresenceHookData {
         try {
           await markUserOffline(spaceId);
         } catch (err) {
-          console.error('Error marking user offline:', err);
+          logger.error('Error marking user offline:', err, { component: 'hook-usePresence', action: 'hook_execution' });
         }
       } else {
         // Tab visible - mark online and refresh
@@ -100,7 +101,7 @@ export function usePresence(spaceId: string | null): PresenceHookData {
           await updateUserPresence(spaceId, PresenceStatus.ONLINE);
           await refreshPresence();
         } catch (err) {
-          console.error('Error marking user online:', err);
+          logger.error('Error marking user online:', err, { component: 'hook-usePresence', action: 'hook_execution' });
         }
       }
     };
@@ -110,7 +111,7 @@ export function usePresence(spaceId: string | null): PresenceHookData {
       try {
         await markUserOffline(spaceId);
       } catch (err) {
-        console.error('Error on page unload:', err);
+        logger.error('Error on page unload:', err, { component: 'hook-usePresence', action: 'hook_execution' });
       }
     };
 
@@ -132,7 +133,7 @@ export function usePresence(spaceId: string | null): PresenceHookData {
 
       // Mark user offline on cleanup
       markUserOffline(spaceId).catch(err => {
-        console.error('Error during cleanup:', err);
+        logger.error('Error during cleanup:', err, { component: 'hook-usePresence', action: 'hook_execution' });
       });
     };
   }, [spaceId, refreshPresence]);

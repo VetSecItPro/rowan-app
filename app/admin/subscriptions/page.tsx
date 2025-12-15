@@ -3,6 +3,7 @@
 import { useState, useEffect, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Breadcrumbs } from '@/components/admin/Breadcrumbs';
+import { logger } from '@/lib/logger';
 import {
   DollarSign,
   TrendingUp,
@@ -183,7 +184,7 @@ export default function AdminSubscriptionsPage() {
         setDailyRevenue(data.dailyRevenue || []);
       }
     } catch (error) {
-      console.error('Failed to fetch subscription analytics:', error);
+      logger.error('Failed to fetch subscription analytics:', error, { component: 'page', action: 'execution' });
     } finally {
       setIsLoading(false);
     }

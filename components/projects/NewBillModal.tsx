@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { X, AlertCircle, DollarSign } from 'lucide-react';
 import type { Bill, CreateBillInput, BillFrequency } from '@/lib/services/bills-service';
+import { logger } from '@/lib/logger';
 import {
   createBillSchema,
   updateBillSchema,
@@ -116,7 +117,7 @@ export function NewBillModal({
       await onSave(validation.data);
       onClose();
     } catch (error) {
-      console.error('Failed to save bill:', error);
+      logger.error('Failed to save bill:', error, { component: 'NewBillModal', action: 'component_action' });
       setGeneralError('Failed to save bill. Please try again.');
     } finally {
       setIsSaving(false);

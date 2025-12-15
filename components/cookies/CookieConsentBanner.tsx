@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Cookie, X, Shield, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { logger } from '@/lib/logger';
 import {
   hasUserMadeCookieChoice,
   updateCookiePreferences,
@@ -27,7 +28,7 @@ export function CookieConsentBanner() {
         }
       } catch (error) {
         // Silently handle any localStorage errors during SSR
-        console.warn('Cookie consent check failed:', error);
+        logger.warn('Cookie consent check failed', { component: 'CookieConsentBanner', error });
       }
     }
   }, [mounted]);

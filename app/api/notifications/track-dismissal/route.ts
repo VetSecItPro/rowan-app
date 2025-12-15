@@ -7,6 +7,7 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // Validation schema
 const trackDismissalSchema = z.object({
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
 
     if (logError) {
       // Log error but don't fail - this is analytics, not critical
-      console.error('Error logging notification dismissal:', logError);
+      logger.error('Error logging notification dismissal:', logError, { component: 'api-route', action: 'api_request' });
     }
 
     // If we have a notification_id, try to mark it as read if clicked
@@ -91,7 +92,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     // Don't report to Sentry for tracking failures - too noisy
-    console.error('[API] /api/notifications/track-dismissal POST error:', error);
+    logger.error('[API] /api/notifications/track-dismissal POST error:', error, { component: 'api-route', action: 'api_request' });
 
     // Still return success to SW - we don't want to cause issues
     return NextResponse.json({

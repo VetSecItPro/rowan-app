@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/launch/notify
@@ -117,7 +118,7 @@ export async function POST(req: NextRequest) {
       .rpc('increment_launch_signups', { target_date: today });
 
     if (analyticsError) {
-      console.error('Failed to update analytics:', analyticsError);
+      logger.error('Failed to update analytics:', analyticsError, { component: 'api-route', action: 'api_request' });
     }
 
     // Get total subscriber count for response
@@ -127,7 +128,7 @@ export async function POST(req: NextRequest) {
       .eq('subscribed', true);
 
     if (countError) {
-      console.error('Failed to get subscriber count:', countError);
+      logger.error('Failed to get subscriber count:', countError, { component: 'api-route', action: 'api_request' });
     }
 
     // Success response
@@ -147,7 +148,7 @@ export async function POST(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/launch/notify POST error:', error);
+    logger.error('[API] /api/launch/notify POST error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to subscribe to notifications' },
       { status: 500 }

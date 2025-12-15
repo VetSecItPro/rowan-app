@@ -7,6 +7,7 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { verifySpaceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/spaces/invite
@@ -117,7 +118,7 @@ export async function POST(req: NextRequest) {
 
     if (userError) {
       // If we can't access user table due to RLS, use fallback
-      console.log('Could not fetch inviter name due to permissions, using fallback');
+      logger.info('Could not fetch inviter name due to permissions, using fallback', { component: 'api-route' });
     } else {
       inviterData = userData;
     }
@@ -139,7 +140,7 @@ export async function POST(req: NextRequest) {
 
     // Log email result but don't fail the invitation if email fails
     if (!emailResult.success) {
-      console.error('Failed to send invitation email:', emailResult.error);
+      logger.error('Failed to send invitation email:', undefined, { component: 'api-route', action: 'api_request', details: emailResult.error });
       // Log to Sentry for monitoring
       Sentry.captureException(new Error(`Invitation email failed: ${emailResult.error}`), {
         tags: {
@@ -172,7 +173,7 @@ export async function POST(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/spaces/invite error:', error);
+    logger.error('[API] /api/spaces/invite error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

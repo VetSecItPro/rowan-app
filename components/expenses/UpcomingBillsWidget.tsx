@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { AlertCircle, Calendar, DollarSign, Clock, CheckCircle } from 'lucide-react';
 import { billCalendarService, type UpcomingBill } from '@/lib/services/bill-calendar-service';
 import { formatDistanceToNow } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 interface UpcomingBillsWidgetProps {
   spaceId: string;
@@ -49,7 +50,7 @@ export default function UpcomingBillsWidget({
       setOverdueBills(overdue);
       setTotalAmount(totals.totalAmount);
     } catch (error) {
-      console.error('Error loading bills:', error);
+      logger.error('Error loading bills:', error, { component: 'UpcomingBillsWidget', action: 'component_action' });
     } finally {
       setLoading(false);
     }
@@ -74,7 +75,7 @@ export default function UpcomingBillsWidget({
       // Reload bills to reflect the change
       await loadBills();
     } catch (error) {
-      console.error('Error marking bill as paid:', error);
+      logger.error('Error marking bill as paid:', error, { component: 'UpcomingBillsWidget', action: 'component_action' });
     }
   };
 

@@ -5,6 +5,7 @@ import { Target, TrendingUp, Calendar, Users, DollarSign, CheckCircle, AlertCirc
 import type { FinancialGoal } from '@/lib/services/goal-contributions-service';
 import { getGoalContributions, calculateProjectedCompletionDate } from '@/lib/services/goal-contributions-service';
 import { formatDistanceToNow } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 interface GoalProgressCardProps {
   goal: FinancialGoal;
@@ -29,7 +30,7 @@ export default function GoalProgressCard({ goal, onClick }: GoalProgressCardProp
       const contributions = await getGoalContributions(goal.id);
       setRecentContributions(contributions.slice(0, 3));
     } catch (error) {
-      console.error('Error loading goal data:', error);
+      logger.error('Error loading goal data:', error, { component: 'GoalProgressCard', action: 'component_action' });
     }
   };
 

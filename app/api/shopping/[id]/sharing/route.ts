@@ -5,15 +5,14 @@ import { verifyResourceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 /**
  * PATCH /api/shopping/[id]/sharing
  * Update sharing settings for a shopping list (make public/private)
  */
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting
     const ip = extractIP(req.headers);
@@ -125,7 +124,7 @@ export async function PATCH(
     }
 
     // Log the sharing action for security monitoring
-    console.log(`Shopping list sharing updated: ${listId} -> ${isPublic ? 'public' : 'private'} by user ${session.user.id} from IP ${ip}`);
+    logger.info(`Shopping list sharing updated: ${listId} -> ${isPublic ? 'public' : 'private'} by user ${session.user.id} from IP ${ip}`, { component: 'api-route' });
 
     // Prepare response data
     const responseData = {
@@ -151,7 +150,7 @@ export async function PATCH(
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/shopping/[id]/sharing PATCH error:', error);
+    logger.error('[API] /api/shopping/[id]/sharing PATCH error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to update sharing settings' },
       { status: 500 }
@@ -163,10 +162,8 @@ export async function PATCH(
  * GET /api/shopping/[id]/sharing
  * Get current sharing status and link for a shopping list
  */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // Rate limiting
     const ip = extractIP(req.headers);
@@ -244,7 +241,7 @@ export async function GET(
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/shopping/[id]/sharing GET error:', error);
+    logger.error('[API] /api/shopping/[id]/sharing GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to get sharing information' },
       { status: 500 }

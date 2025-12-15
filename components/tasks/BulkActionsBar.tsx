@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { CheckCircle, Trash2, User, Tag, AlertCircle, X, MoreHorizontal } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { logger } from '@/lib/logger';
 
 interface BulkActionsBarProps {
   selectedTaskIds: string[];
@@ -32,7 +33,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
       onActionComplete();
       onClearSelection();
     } catch (error) {
-      console.error('Error updating tasks:', error);
+      logger.error('Error updating tasks:', error, { component: 'BulkActionsBar', action: 'component_action' });
       alert('Failed to update tasks');
     } finally {
       setLoading(false);
@@ -53,7 +54,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
       onActionComplete();
       onClearSelection();
     } catch (error) {
-      console.error('Error updating tasks:', error);
+      logger.error('Error updating tasks:', error, { component: 'BulkActionsBar', action: 'component_action' });
       alert('Failed to update tasks');
     } finally {
       setLoading(false);
@@ -75,7 +76,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
       onActionComplete();
       onClearSelection();
     } catch (error) {
-      console.error('Error deleting tasks:', error);
+      logger.error('Error deleting tasks:', error, { component: 'BulkActionsBar', action: 'component_action' });
       alert('Failed to delete tasks');
     } finally {
       setLoading(false);
@@ -100,7 +101,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
       onActionComplete();
       onClearSelection();
     } catch (error) {
-      console.error('Error completing tasks:', error);
+      logger.error('Error completing tasks:', error, { component: 'BulkActionsBar', action: 'component_action' });
       alert('Failed to complete tasks');
     } finally {
       setLoading(false);

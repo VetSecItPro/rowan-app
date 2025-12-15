@@ -1,5 +1,6 @@
 import { Redis } from '@upstash/redis';
 import { WeatherForecast } from './weather-service';
+import { logger } from '@/lib/logger';
 
 // Initialize Upstash Redis with error handling
 let redis: Redis | null = null;
@@ -18,7 +19,7 @@ try {
   }
 } catch (error) {
   redisConnectionError = error instanceof Error ? error.message : 'Unknown Redis initialization error';
-  console.warn('[Weather Cache] Failed to initialize Upstash Redis:', redisConnectionError);
+  logger.warn('[Weather Cache] Failed to initialize Upstash Redis:', { component: 'lib-weather-cache-service', error: redisConnectionError });
 }
 
 interface CachedWeather {
@@ -91,7 +92,7 @@ export const weatherCacheService = {
 
       return forecast;
     } catch (error) {
-      console.warn('[Weather Cache] Cache error, falling back to direct fetch:', error instanceof Error ? error.message : 'Unknown error');
+      logger.warn('[Weather Cache] Cache error, falling back to direct fetch', { component: 'lib-weather-cache-service', error: error instanceof Error ? error.message : 'Unknown error' });
       // Fall back to fetching without cache
       return await fetchFn();
     }
@@ -148,13 +149,13 @@ export const weatherCacheService = {
    */
   async clearWeatherCache(): Promise<void> {
     if (!redis) {
-      console.log('[Weather Cache] No cache available to clear');
+      logger.info('[Weather Cache] No cache available to clear', { component: 'lib-weather-cache-service' });
       return;
     }
     // Note: Upstash Redis doesn't support SCAN in REST API
     // So we can't easily clear all keys matching a pattern
     // This would need to be done manually or with a different approach
-    console.log('[Weather Cache] Manual clear not implemented for Upstash REST API');
+    logger.info('[Weather Cache] Manual clear not implemented for Upstash REST API', { component: 'lib-weather-cache-service' });
   },
 
   /**

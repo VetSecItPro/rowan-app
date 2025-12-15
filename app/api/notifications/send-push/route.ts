@@ -9,6 +9,7 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { z } from 'zod';
 import webpush from 'web-push';
+import { logger } from '@/lib/logger';
 
 // Configure web-push with VAPID keys
 const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
@@ -114,7 +115,7 @@ export async function POST(req: NextRequest) {
         );
 
       if (error) {
-        console.error('Error checking space membership:', error);
+        logger.error('Error checking space membership:', error, { component: 'api-route', action: 'api_request' });
         return false;
       }
 
@@ -199,7 +200,7 @@ export async function POST(req: NextRequest) {
     Sentry.captureException(error, {
       tags: { endpoint: '/api/notifications/send-push', method: 'POST' },
     });
-    console.error('[API] /api/notifications/send-push POST error:', error);
+    logger.error('[API] /api/notifications/send-push POST error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -224,7 +225,7 @@ async function sendPushToUser(
       .eq('is_active', true);
 
     if (fetchError) {
-      console.error('Error fetching subscriptions:', fetchError);
+      logger.error('Error fetching subscriptions:', fetchError, { component: 'api-route', action: 'api_request' });
       return { success: false, sent: 0, failed: 0, error: fetchError.message };
     }
 
@@ -255,7 +256,7 @@ async function sendPushToUser(
         sent++;
       } catch (pushError: unknown) {
         failed++;
-        console.error('Push send error:', pushError);
+        logger.error('Push send error:', pushError, { component: 'api-route', action: 'api_request' });
 
         // If subscription is invalid, mark as inactive
         if (pushError instanceof Error) {
@@ -276,7 +277,7 @@ async function sendPushToUser(
 
     return { success: true, sent, failed };
   } catch (error) {
-    console.error('Error in sendPushToUser:', error);
+    logger.error('Error in sendPushToUser:', error, { component: 'api-route', action: 'api_request' });
     return {
       success: false,
       sent: 0,

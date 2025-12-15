@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookies } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
+import { logger } from '@/lib/logger';
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
@@ -156,7 +157,7 @@ export async function GET(req: NextRequest) {
     [totalResult, subscribedResult, unsubscribedResult, todaySignupsResult, weekSignupsResult, sourcesResult]
       .forEach((result, index) => {
         if (result.status === 'rejected') {
-          console.error(`Notification stat query ${index} failed:`, result.reason);
+          logger.error('Notification stat query ${index} failed:', undefined, { component: 'api-route', action: 'api_request', details: result.reason });
         }
       });
 
@@ -177,7 +178,7 @@ export async function GET(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/admin/notifications/stats GET error:', error);
+    logger.error('[API] /api/admin/notifications/stats GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to fetch notification statistics' },
       { status: 500 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching privacy data settings:', error);
+    logger.error('Error fetching privacy data settings:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to fetch privacy data settings' },
       { status: 500 }
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
       data: settings,
     });
   } catch (error) {
-    console.error('Error updating privacy data settings:', error);
+    logger.error('Error updating privacy data settings:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to update privacy data settings' },
       { status: 500 }

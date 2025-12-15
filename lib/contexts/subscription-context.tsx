@@ -7,6 +7,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import type { SubscriptionTier, TrialStatus, FeatureLimits } from '@/lib/types';
+import { logger } from '@/lib/logger';
 
 // Feature limits by tier
 const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
@@ -128,7 +129,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         const mockTier = urlParams.get('mockTier');
         if (mockTier) {
           url = `/api/subscriptions?mockTier=${mockTier}`;
-          console.log(`[DEV] Testing with mock tier: ${mockTier}`);
+          logger.info(`[DEV] Testing with mock tier: ${mockTier}`, { component: 'subscription-context' });
         }
       }
 
@@ -157,7 +158,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         });
       }
     } catch (error) {
-      console.error('Error fetching subscription:', error);
+      logger.error('Error fetching subscription:', error, { component: 'subscription-context', action: 'service_call' });
       // Default to free on error
       setTier('free');
     } finally {

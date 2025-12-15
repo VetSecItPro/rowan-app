@@ -12,6 +12,7 @@ import { incrementUsage, getTodayUsage } from '../services/usage-service';
 import { getUserTier } from '../services/subscription-service';
 import { getFeatureLimits } from '../config/feature-limits';
 import type { UsageType } from '../types';
+import { logger } from '@/lib/logger';
 
 /**
  * API Route Handler type
@@ -99,14 +100,14 @@ export function withUsageCheck(
       if (autoIncrement && response.status >= 200 && response.status < 300) {
         const incrementResult = await incrementUsage(user.id, usageType);
         if (!incrementResult.success) {
-          console.error('Failed to increment usage:', incrementResult.error);
+          logger.error('Failed to increment usage:', undefined, { component: 'lib-usage-check', action: 'service_call', details: incrementResult.error });
           // Don't fail the request, just log the error
         }
       }
 
       return response;
     } catch (error) {
-      console.error('Error in usage check middleware:', error);
+      logger.error('Error in usage check middleware:', error, { component: 'lib-usage-check', action: 'service_call' });
       return NextResponse.json(
         { error: 'Internal error', message: 'Failed to check usage limits' },
         { status: 500 }

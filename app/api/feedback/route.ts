@@ -5,6 +5,7 @@ import { sanitizePlainText, sanitizeUrl } from '@/lib/sanitize';
 import { FeedbackType } from '@/lib/types';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: result.data });
   } catch (error: any) {
-    console.error('Error in feedback API:', error);
+    logger.error('Error in feedback API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { success: false, error: error.message || 'Internal server error' },
       { status: 500 }
@@ -93,7 +94,7 @@ export async function POST(request: NextRequest) {
       try {
         browserInfo = JSON.parse(browserInfoRaw);
       } catch (e) {
-        console.error('Failed to parse browser info:', e);
+        logger.error('Failed to parse browser info:', e, { component: 'api-route', action: 'api_request' });
       }
     }
 
@@ -129,7 +130,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: result.data });
   } catch (error: any) {
-    console.error('Error in feedback API:', error);
+    logger.error('Error in feedback API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { success: false, error: error.message || 'Internal server error' },
       { status: 500 }

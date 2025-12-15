@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Smartphone, X, Key, QrCode, Copy, Check } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface TwoFactorAuthProps {
   onStatusChange?: (enabled: boolean) => void;
@@ -53,7 +54,7 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
         }
       }
     } catch (error) {
-      console.error('Error loading MFA status:', error);
+      logger.error('Error loading MFA status:', error, { component: 'TwoFactorAuth', action: 'component_action' });
     } finally {
       setIsLoading(false);
     }
@@ -80,7 +81,7 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
         alert('Failed to start 2FA setup: ' + result.error);
       }
     } catch (error) {
-      console.error('Error starting 2FA setup:', error);
+      logger.error('Error starting 2FA setup:', error, { component: 'TwoFactorAuth', action: 'component_action' });
       alert('Failed to start 2FA setup');
     } finally {
       setIsProcessing(false);
@@ -130,7 +131,7 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
         alert('Invalid verification code. Please try again.');
       }
     } catch (error) {
-      console.error('Error verifying 2FA code:', error);
+      logger.error('Error verifying 2FA code:', error, { component: 'TwoFactorAuth', action: 'component_action' });
       alert('Failed to verify code. Please try again.');
     } finally {
       setIsProcessing(false);
@@ -174,7 +175,7 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
         alert('Failed to disable 2FA: ' + result.error);
       }
     } catch (error) {
-      console.error('Error disabling 2FA:', error);
+      logger.error('Error disabling 2FA:', error, { component: 'TwoFactorAuth', action: 'component_action' });
       alert('Failed to disable 2FA');
     } finally {
       setIsProcessing(false);

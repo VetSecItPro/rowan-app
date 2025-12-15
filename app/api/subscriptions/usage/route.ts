@@ -11,6 +11,7 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 import {
   getTodayUsageStats,
   getUsageWithLimits,
@@ -63,7 +64,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching usage stats:', error);
+    logger.error('Error fetching usage stats:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to fetch usage stats' },
       { status: 500 }
@@ -130,7 +131,7 @@ export async function POST(request: NextRequest) {
     if (increment) {
       const incrementResult = await incrementUsage(user.id, usageType);
       if (!incrementResult.success) {
-        console.error('Failed to increment usage:', incrementResult.error);
+        logger.error('Failed to increment usage:', undefined, { component: 'api-route', action: 'api_request', details: incrementResult.error });
         // Don't fail the request, just log the error
       }
     }
@@ -141,7 +142,7 @@ export async function POST(request: NextRequest) {
       limit: accessCheck.limit,
     });
   } catch (error) {
-    console.error('Error checking usage action:', error);
+    logger.error('Error checking usage action:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to check usage action' },
       { status: 500 }

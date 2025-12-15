@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, memo } from 'react';
+import { useState, memo, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
   Layers,
   Eye,
@@ -80,30 +81,27 @@ const DeviceBar = memo(function DeviceBar({ breakdown }: { breakdown: { mobile: 
 });
 
 export const FeatureUsagePanel = memo(function FeatureUsagePanel() {
-  const [data, setData] = useState<FeatureUsageData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('7d');
 
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
+  // React Query for feature usage with caching
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['admin-feature-usage', timeRange],
+    queryFn: async () => {
       const response = await fetch(`/api/admin/feature-usage?range=${timeRange}`);
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          setData(result.data);
-        }
+      if (!response.ok) throw new Error('Failed to fetch feature usage');
+      const result = await response.json();
+      if (result.success) {
+        return result.data as FeatureUsageData;
       }
-    } catch (error) {
-      console.error('Failed to fetch feature usage:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      return null;
+    },
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
 
-  useEffect(() => {
-    fetchData();
-  }, [timeRange]);
+  const fetchData = useCallback(() => {
+    refetch();
+  }, [refetch]);
 
   const formatNumber = (num: number): string => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -130,7 +128,7 @@ export const FeatureUsagePanel = memo(function FeatureUsagePanel() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex-1 flex flex-col space-y-4 min-h-0">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -220,8 +218,8 @@ export const FeatureUsagePanel = memo(function FeatureUsagePanel() {
       </div>
 
       {/* Feature Table */}
-      <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-        <div className="overflow-x-auto max-h-[280px] overflow-y-auto">
+      <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden flex-1 flex flex-col min-h-0">
+        <div className="overflow-x-auto flex-1 overflow-y-auto min-h-0">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
               <tr>

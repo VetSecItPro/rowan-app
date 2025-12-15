@@ -12,6 +12,7 @@ import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
 import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import { DeleteSpaceModal } from '@/components/spaces/DeleteSpaceModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { logger } from '@/lib/logger';
 // Dynamic imports for optimized bundle splitting
 import {
   PasswordConfirmModal,
@@ -538,7 +539,7 @@ export default function SettingsPage() {
       await refreshProfile();
 
     } catch (error) {
-      console.error('Failed to update profile:', error);
+      logger.error('Failed to update profile:', error, { component: 'page', action: 'execution' });
 
       // Show user-friendly error message
       const errorMessage = error instanceof Error ? error.message : 'Failed to update profile. Please try again.';
@@ -659,7 +660,7 @@ export default function SettingsPage() {
       refreshSpaces();
 
     } catch (error) {
-      console.error('Failed to rename space:', error);
+      logger.error('Failed to rename space:', error, { component: 'page', action: 'execution' });
       alert('Failed to rename space. Please try again.');
     } finally {
       setIsSavingSpaceName(false);
@@ -721,10 +722,10 @@ export default function SettingsPage() {
   //     if (result.success) {
   //       setPrivacySettings(result.data);
   //     } else {
-  //       console.error('Failed to load privacy settings:', result.error);
+  //       logger.error('Failed to load privacy settings:', undefined, { component: 'page', action: 'execution', details: result.error });
   //     }
   //   } catch (error) {
-  //     console.error('Error loading privacy settings:', error);
+  //     logger.error('Error loading privacy settings:', error, { component: 'page', action: 'execution' });
   //   } finally {
   //     setIsLoadingPrivacy(false);
   //   }
@@ -747,12 +748,12 @@ export default function SettingsPage() {
   //     if (!result.success) {
   //       // Revert the change if it failed
   //       setPrivacySettings(prev => ({ ...prev, [key]: !value }));
-  //       console.error('Failed to save privacy setting:', result.error);
+  //       logger.error('Failed to save privacy setting:', undefined, { component: 'page', action: 'execution', details: result.error });
   //     }
   //   } catch (error) {
   //     // Revert the change if it failed
   //     setPrivacySettings(prev => ({ ...prev, [key]: !value }));
-  //     console.error('Error saving privacy setting:', error);
+  //     logger.error('Error saving privacy setting:', error, { component: 'page', action: 'execution' });
   //   } finally {
   //     setIsSavingPrivacy(false);
   //   }
@@ -785,19 +786,19 @@ export default function SettingsPage() {
   const fetchActiveSessions = async () => {
     try {
       setIsLoadingSessions(true);
-      console.log('Fetching active sessions...');
+      logger.info('Fetching active sessions...', { component: 'page' });
       const response = await fetch('/api/user/sessions');
       const result = await response.json();
-      console.log('Sessions API response:', result);
+      logger.info('Sessions API response:', { component: 'page', data: result });
 
       if (result.success) {
-        console.log('Setting active sessions:', result.sessions);
+        logger.info('Setting active sessions:', { component: 'page', data: result.sessions });
         setActiveSessions(result.sessions);
       } else {
-        console.error('Failed to load sessions:', result.error);
+        logger.error('Failed to load sessions:', undefined, { component: 'page', action: 'execution', details: result.error });
       }
     } catch (error) {
-      console.error('Error loading sessions:', error);
+      logger.error('Error loading sessions:', error, { component: 'page', action: 'execution' });
     } finally {
       setIsLoadingSessions(false);
     }
@@ -822,7 +823,7 @@ export default function SettingsPage() {
         alert('Failed to revoke session');
       }
     } catch (error) {
-      console.error('Error revoking session:', error);
+      logger.error('Error revoking session:', error, { component: 'page', action: 'execution' });
       alert('Failed to revoke session');
     }
   };
@@ -842,13 +843,13 @@ export default function SettingsPage() {
       });
 
       if (error) {
-        console.error('Password reset error:', error);
+        logger.error('Password reset error:', error, { component: 'page', action: 'execution' });
         alert('Failed to send password reset email. Please try again.');
       } else {
         setResetEmailSent(true);
       }
     } catch (error) {
-      console.error('Password reset error:', error);
+      logger.error('Password reset error:', error, { component: 'page', action: 'execution' });
       alert('Failed to send password reset email. Please try again.');
     } finally {
       setIsRequestingReset(false);

@@ -10,6 +10,7 @@ import { TemplateGallery } from '@/components/budget/TemplateGallery';
 import { TemplatePreview } from '@/components/budget/TemplatePreview';
 import { IncomeInput } from '@/components/budget/IncomeInput';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { logger } from '@/lib/logger';
 import {
   budgetTemplatesService,
   type BudgetTemplate,
@@ -54,7 +55,7 @@ export default function BudgetSetupPage() {
         );
         setTemplateCategories(categoriesMap);
       } catch (err) {
-        console.error('Failed to load templates:', err);
+        logger.error('Failed to load templates:', err, { component: 'page', action: 'execution' });
         setError('Failed to load budget templates. Please try again.');
       } finally {
         setLoading(false);
@@ -93,7 +94,7 @@ export default function BudgetSetupPage() {
         router.push('/projects?tab=budgets');
       }, 2000);
     } catch (err) {
-      console.error('Failed to apply template:', err);
+      logger.error('Failed to apply template:', err, { component: 'page', action: 'execution' });
       setError('Failed to apply budget template. Please try again.');
     } finally {
       setApplying(false);

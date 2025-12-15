@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { X, Home } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface CreateSpaceModalProps {
   isOpen: boolean;
@@ -50,7 +51,7 @@ export function CreateSpaceModal({ isOpen, onClose, onSpaceCreated }: CreateSpac
       onSpaceCreated(result.data.id, result.data.name);
       onClose();
     } catch (error) {
-      console.error('Error creating space:', error);
+      logger.error('Error creating space:', error, { component: 'CreateSpaceModal', action: 'component_action' });
       toast.error(error instanceof Error ? error.message : 'Failed to create space');
     } finally {
       setLoading(false);

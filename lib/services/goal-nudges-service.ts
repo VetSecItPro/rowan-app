@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { goalsService, Goal, Milestone } from './goals-service';
 import { differenceInDays, parseISO, addDays, subDays, isAfter, isBefore, format } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 export interface GoalNudge {
   id: string;
@@ -373,7 +374,7 @@ export const goalNudgesService = {
         : metrics.days_since_created;
 
     } catch (error) {
-      console.error('Error fetching activities:', error);
+      logger.error('Error fetching activities:', error, { component: 'lib-goal-nudges-service', action: 'service_call' });
       metrics.activity_count = 0;
       metrics.days_without_progress = metrics.days_since_created;
     }
@@ -392,7 +393,7 @@ export const goalNudgesService = {
         : metrics.days_since_created;
 
     } catch (error) {
-      console.error('Error fetching check-ins:', error);
+      logger.error('Error fetching check-ins:', error, { component: 'lib-goal-nudges-service', action: 'service_call' });
       metrics.days_without_checkin = metrics.days_since_created;
     }
 
@@ -541,7 +542,7 @@ export const goalNudgesService = {
       .single();
 
     if (error) {
-      console.error('Error creating nudge:', error);
+      logger.error('Error creating nudge:', error, { component: 'lib-goal-nudges-service', action: 'service_call' });
       return null;
     }
 
@@ -566,7 +567,7 @@ export const goalNudgesService = {
       .single();
 
     if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
-      console.error('Error checking recent nudges:', error);
+      logger.error('Error checking recent nudges:', error, { component: 'lib-goal-nudges-service', action: 'service_call' });
     }
 
     return data || null;
@@ -599,7 +600,7 @@ export const goalNudgesService = {
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error fetching user nudges:', error);
+      logger.error('Error fetching user nudges:', error, { component: 'lib-goal-nudges-service', action: 'service_call' });
       return [];
     }
 
@@ -621,7 +622,7 @@ export const goalNudgesService = {
       .eq('id', nudgeId);
 
     if (error) {
-      console.error('Error dismissing nudge:', error);
+      logger.error('Error dismissing nudge:', error, { component: 'lib-goal-nudges-service', action: 'service_call' });
       throw error;
     }
   },
@@ -642,7 +643,7 @@ export const goalNudgesService = {
       }]);
 
     if (error) {
-      console.error('Error logging nudge action:', error);
+      logger.error('Error logging nudge action:', error, { component: 'lib-goal-nudges-service', action: 'service_call' });
     }
   },
 
@@ -738,7 +739,7 @@ export const goalNudgesService = {
       .select('id');
 
     if (error) {
-      console.error('Error cleaning up expired nudges:', error);
+      logger.error('Error cleaning up expired nudges:', error, { component: 'lib-goal-nudges-service', action: 'service_call' });
       return 0;
     }
 

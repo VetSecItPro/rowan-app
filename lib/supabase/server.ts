@@ -1,5 +1,7 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
+import { logger } from '@/lib/logger';
 
 export const createClient = () => {
   // Runtime check to prevent execution during build time
@@ -12,7 +14,7 @@ export const createClient = () => {
 
   if (!supabaseUrl || !supabaseAnonKey) {
     // During build time or when env vars are missing, return a mock client to prevent errors
-    console.warn('Missing Supabase environment variables, using mock client during build');
+    logger.warn('Missing Supabase environment variables, using mock client during build', { component: 'lib-server' });
     return {
       from: () => ({
         select: () => ({ data: [], error: null }),
@@ -31,39 +33,23 @@ export const createClient = () => {
     } as any;
   }
 
-  // Safely get cookies with error handling
-  let cookieStore;
-  try {
-    cookieStore = cookies();
-  } catch (error) {
-    // During build time, provide a mock cookie store
-    console.warn('Cookies not available during build time, using mock store');
-    cookieStore = {
-      get: () => undefined,
-      set: () => {},
-      delete: () => {}
-    };
-  }
+  // In Next.js 15+, cookies() returns a Promise, but we use React.use() to unwrap it
+  // This is a server-only module, so we can safely import React here
+  const React = require('react');
+  const cookieStore = React.use(cookies());
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      get(name: string) {
-        return cookieStore.get(name)?.value;
+      getAll() {
+        return cookieStore.getAll();
       },
-      set(name: string, value: string, options: CookieOptions) {
+      setAll(cookiesToSet: Array<{ name: string; value: string; options?: Partial<ResponseCookie> }>) {
         try {
-          cookieStore.set({ name, value, ...options });
-        } catch (error) {
-          // The `set` method was called from a Server Component.
-          // This can be ignored if you have middleware refreshing
-          // user sessions.
-        }
-      },
-      remove(name: string, options: CookieOptions) {
-        try {
-          cookieStore.set({ name, value: '', ...options });
-        } catch (error) {
-          // The `delete` method was called from a Server Component.
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          );
+        } catch {
+          // The `setAll` method was called from a Server Component.
           // This can be ignored if you have middleware refreshing
           // user sessions.
         }

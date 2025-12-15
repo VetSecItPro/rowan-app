@@ -10,6 +10,7 @@ import { useAuth } from '@/lib/contexts/auth-context';
 import { featureFlags } from '@/lib/constants/feature-flags';
 import { personalWorkspaceService } from '@/lib/services/personal-workspace-service';
 import type { Space } from '@/lib/types';
+import { logger } from '@/lib/logger';
 
 /**
  * Workspace Migration Modal
@@ -147,7 +148,7 @@ export function MigrationModal({ isOpen, onClose, personalSpace, targetSpaces }:
         throw new Error('Migration failed');
       }
     } catch (error) {
-      console.error('Migration error:', error);
+      logger.error('Migration error:', error, { component: 'MigrationModal', action: 'component_action' });
       setError('Migration failed. Please try again or contact support.');
       setStep('confirmation'); // Go back to allow retry
     }

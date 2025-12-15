@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { ExportDataModal } from '@/components/settings/ExportDataModal';
+import { logger } from '@/lib/logger';
 import {
   Download,
   FileJson,
@@ -62,7 +63,7 @@ export default function DataExportPage() {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      console.error('Export error:', error);
+      logger.error('Export error:', error, { component: 'page', action: 'execution' });
       alert('Failed to export data. Please try again.');
     } finally {
       setIsExporting(false);

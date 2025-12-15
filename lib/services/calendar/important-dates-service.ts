@@ -3,6 +3,7 @@
 // Phase 16: Added calendar integration - auto-creates calendar events for important dates
 
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 import type {
   ImportantDate,
   ImportantDateWithMeta,
@@ -110,7 +111,7 @@ async function syncToCalendar(
       .eq('id', importantDate.linked_calendar_event_id);
 
     if (error) {
-      console.error('Error updating linked calendar event:', error);
+      logger.error('Error updating linked calendar event:', error, { component: 'lib-important-dates-service', action: 'service_call' });
     }
     return importantDate.linked_calendar_event_id;
   }
@@ -130,7 +131,7 @@ async function syncToCalendar(
       .eq('id', existingEvent.id);
 
     if (error) {
-      console.error('Error updating calendar event:', error);
+      logger.error('Error updating calendar event:', error, { component: 'lib-important-dates-service', action: 'service_call' });
     }
 
     // Update the link in important_dates
@@ -150,7 +151,7 @@ async function syncToCalendar(
     .single();
 
   if (error) {
-    console.error('Error creating calendar event:', error);
+    logger.error('Error creating calendar event:', error, { component: 'lib-important-dates-service', action: 'service_call' });
     return null;
   }
 
@@ -177,7 +178,7 @@ async function deleteLinkedCalendarEvent(importantDateId: string): Promise<void>
     .eq('important_date_id', importantDateId);
 
   if (error) {
-    console.error('Error deleting linked calendar event:', error);
+    logger.error('Error deleting linked calendar event:', error, { component: 'lib-important-dates-service', action: 'service_call' });
   }
 }
 
@@ -299,7 +300,7 @@ export const importantDatesService = {
       const { data, error } = await query.order('month').order('day_of_month');
 
       if (error) {
-        console.error('Error fetching important dates:', error);
+        logger.error('Error fetching important dates:', error, { component: 'lib-important-dates-service', action: 'service_call' });
         return { dates: [], error: error.message };
       }
 
@@ -323,7 +324,7 @@ export const importantDatesService = {
 
       return { dates: enrichedDates, error: null };
     } catch (err) {
-      console.error('Error in getImportantDates:', err);
+      logger.error('Error in getImportantDates:', err, { component: 'lib-important-dates-service', action: 'service_call' });
       return { dates: [], error: 'Failed to fetch important dates' };
     }
   },
@@ -362,7 +363,7 @@ export const importantDatesService = {
 
       return enrichWithMeta(data);
     } catch (err) {
-      console.error('Error in getImportantDateById:', err);
+      logger.error('Error in getImportantDateById:', err, { component: 'lib-important-dates-service', action: 'service_call' });
       return null;
     }
   },
@@ -415,7 +416,7 @@ export const importantDatesService = {
         .single();
 
       if (error) {
-        console.error('Error creating important date:', error);
+        logger.error('Error creating important date:', error, { component: 'lib-important-dates-service', action: 'service_call' });
         return null;
       }
 
@@ -428,7 +429,7 @@ export const importantDatesService = {
 
       return enriched;
     } catch (err) {
-      console.error('Error in createImportantDate:', err);
+      logger.error('Error in createImportantDate:', err, { component: 'lib-important-dates-service', action: 'service_call' });
       return null;
     }
   },
@@ -452,7 +453,7 @@ export const importantDatesService = {
         .single();
 
       if (error) {
-        console.error('Error updating important date:', error);
+        logger.error('Error updating important date:', error, { component: 'lib-important-dates-service', action: 'service_call' });
         return null;
       }
 
@@ -468,7 +469,7 @@ export const importantDatesService = {
 
       return enriched;
     } catch (err) {
-      console.error('Error in updateImportantDate:', err);
+      logger.error('Error in updateImportantDate:', err, { component: 'lib-important-dates-service', action: 'service_call' });
       return null;
     }
   },
@@ -490,13 +491,13 @@ export const importantDatesService = {
         .eq('id', id);
 
       if (error) {
-        console.error('Error deleting important date:', error);
+        logger.error('Error deleting important date:', error, { component: 'lib-important-dates-service', action: 'service_call' });
         return false;
       }
 
       return true;
     } catch (err) {
-      console.error('Error in deleteImportantDate:', err);
+      logger.error('Error in deleteImportantDate:', err, { component: 'lib-important-dates-service', action: 'service_call' });
       return false;
     }
   },
@@ -550,7 +551,7 @@ export const importantDatesService = {
     const result = await this.getImportantDates(spaceId, { is_active: true });
 
     if (result.error) {
-      console.error('Error fetching important dates for sync:', result.error);
+      logger.error('Error fetching important dates for sync:', undefined, { component: 'lib-important-dates-service', action: 'service_call', details: result.error });
       return { synced: 0, errors: 1 };
     }
 
@@ -567,13 +568,13 @@ export const importantDatesService = {
             errors++;
           }
         } catch (err) {
-          console.error(`Error syncing important date ${date.id}:`, err);
+          logger.error('Error syncing important date ${date.id}:', err, { component: 'lib-important-dates-service', action: 'service_call' });
           errors++;
         }
       }
     }
 
-    console.log(`[ImportantDatesService] Synced ${synced} dates to calendar, ${errors} errors`);
+    logger.info(`[ImportantDatesService] Synced ${synced} dates to calendar, ${errors} errors`, { component: 'lib-important-dates-service' });
     return { synced, errors };
   },
 };

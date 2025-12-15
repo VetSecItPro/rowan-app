@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { Shield, Download, Trash2, Eye, EyeOff } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export default function PrivacyDataPage() {
   const [privacySettings, setPrivacySettings] = useState({
@@ -40,7 +41,7 @@ export default function PrivacyDataPage() {
         setPrivacySettings(data.data);
       }
     } catch (error) {
-      console.error('Failed to load privacy settings:', error);
+      logger.error('Failed to load privacy settings:', error, { component: 'page', action: 'execution' });
     }
   };
 
@@ -61,7 +62,7 @@ export default function PrivacyDataPage() {
         throw new Error('Failed to update settings');
       }
     } catch (error) {
-      console.error('Failed to save privacy settings:', error);
+      logger.error('Failed to save privacy settings:', error, { component: 'page', action: 'execution' });
       alert('Failed to update privacy settings. Please try again.');
     } finally {
       setLoading(false);

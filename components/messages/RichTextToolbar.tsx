@@ -4,7 +4,7 @@ import { Bold, Italic, Code, Link2 } from 'lucide-react';
 import { RefObject } from 'react';
 
 interface RichTextToolbarProps {
-  textareaRef: RefObject<HTMLTextAreaElement>;
+  textareaRef: RefObject<HTMLTextAreaElement | null>;
   onFormatApplied?: () => void;
 }
 

@@ -10,6 +10,7 @@ import { getPendingInvitations } from '@/lib/services/invitations-service';
 import { removeMember, changeMemberRole } from '@/lib/services/member-management-service';
 import type { SpaceMemberWithPresence, SpaceInvitation } from '@/lib/types';
 import { PresenceStatus } from '@/lib/types';
+import { logger } from '@/lib/logger';
 
 interface EnhancedMemberManagementProps {
   spaceId: string;
@@ -39,7 +40,7 @@ export function EnhancedMemberManagement({
           setPendingInvitations(result.data);
         }
       } catch (err) {
-        console.error('Failed to load invitations:', err);
+        logger.error('Failed to load invitations:', err, { component: 'EnhancedMemberManagement', action: 'component_action' });
       } finally {
         setInvitationsLoading(false);
       }
@@ -63,7 +64,7 @@ export function EnhancedMemberManagement({
         toast.error(result.error || 'Failed to remove member');
       }
     } catch (error) {
-      console.error('Error removing member:', error);
+      logger.error('Error removing member:', error, { component: 'EnhancedMemberManagement', action: 'component_action' });
       toast.error('Failed to remove member');
     }
   };
@@ -84,7 +85,7 @@ export function EnhancedMemberManagement({
         toast.error(result.error || 'Failed to update member role');
       }
     } catch (error) {
-      console.error('Error changing member role:', error);
+      logger.error('Error changing member role:', error, { component: 'EnhancedMemberManagement', action: 'component_action' });
       toast.error('Failed to update member role');
     }
   };

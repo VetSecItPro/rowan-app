@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (!apiKey) {
-      console.error('API Ninjas key not configured');
+      logger.error('API Ninjas key not configured', undefined, { component: 'api-route', action: 'api_request' });
       return NextResponse.json([]);
     }
 
@@ -57,7 +58,7 @@ export async function GET(request: NextRequest) {
     );
 
     if (!response.ok) {
-      console.error('API Ninjas search failed:', response.statusText);
+      logger.error('API Ninjas search failed:', undefined, { component: 'api-route', action: 'api_request', details: response.statusText });
       return NextResponse.json([]);
     }
 
@@ -87,7 +88,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(recipes);
   } catch (error) {
-    console.error('API Ninjas search API error:', error);
+    logger.error('API Ninjas search API error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to search recipes' },
       { status: 500 }

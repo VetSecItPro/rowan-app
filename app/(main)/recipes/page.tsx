@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/contexts/auth-context';
 import { mealsService, type Recipe } from '@/lib/services/meals-service';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import Link from 'next/link';
+import { logger } from '@/lib/logger';
 
 export default function RecipesPage() {
   const { user } = useAuth();
@@ -39,7 +40,7 @@ export default function RecipesPage() {
           setCurrentSpaceId(spaces[0].id);
         }
       } catch (error) {
-        console.error('Failed to load space:', error);
+        logger.error('Failed to load space:', error, { component: 'page', action: 'execution' });
       } finally {
         setLoading(false);
       }
@@ -58,7 +59,7 @@ export default function RecipesPage() {
         const data = await mealsService.getRecipes(currentSpaceId);
         setRecipes(data);
       } catch (error) {
-        console.error('Failed to load recipes:', error);
+        logger.error('Failed to load recipes:', error, { component: 'page', action: 'execution' });
       } finally {
         setLoading(false);
       }
@@ -108,7 +109,7 @@ export default function RecipesPage() {
       await mealsService.deleteRecipe(recipeId);
       setRecipes(prev => prev.filter(r => r.id !== recipeId));
     } catch (error) {
-      console.error('Failed to delete recipe:', error);
+      logger.error('Failed to delete recipe:', error, { component: 'page', action: 'execution' });
       alert('Failed to delete recipe. Please try again.');
     } finally {
       setDeletingId(null);

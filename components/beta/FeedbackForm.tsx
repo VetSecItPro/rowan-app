@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { logger } from '@/lib/logger';
 import {
   Bug,
   Lightbulb,
@@ -103,7 +104,7 @@ export function FeedbackForm({ onSubmit, onCancel }: FeedbackFormProps) {
       }
 
     } catch (error) {
-      console.error('Feedback submission error:', error);
+      logger.error('Feedback submission error:', error, { component: 'FeedbackForm', action: 'component_action' });
       setError(error instanceof Error ? error.message : 'Failed to submit feedback. Please try again.');
     } finally {
       setIsSubmitting(false);

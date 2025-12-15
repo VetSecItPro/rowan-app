@@ -11,6 +11,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { PRICING } from '@/lib/stripe/products';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // TYPES
@@ -151,7 +152,7 @@ export async function getSubscriptionMetrics(): Promise<SubscriptionMetrics> {
     .in('status', ['active', 'past_due']);
 
   if (subError) {
-    console.error('Error fetching subscriptions:', subError);
+    logger.error('Error fetching subscriptions:', subError, { component: 'lib-subscription-analytics-service', action: 'service_call' });
     throw subError;
   }
 
@@ -162,7 +163,7 @@ export async function getSubscriptionMetrics(): Promise<SubscriptionMetrics> {
     .gte('created_at', startOfMonth.toISOString());
 
   if (eventsError) {
-    console.error('Error fetching subscription events:', eventsError);
+    logger.error('Error fetching subscription events:', eventsError, { component: 'lib-subscription-analytics-service', action: 'service_call' });
   }
 
   // Fetch trial users
@@ -316,7 +317,7 @@ export async function getSubscriptionEvents(options: {
     .range(offset, offset + limit - 1);
 
   if (error) {
-    console.error('Error fetching subscription events:', error);
+    logger.error('Error fetching subscription events:', error, { component: 'lib-subscription-analytics-service', action: 'service_call' });
     // Return empty on error
     return { events: [], total: 0 };
   }
@@ -428,7 +429,7 @@ export async function logSubscriptionEvent(
   });
 
   if (error) {
-    console.error('Error logging subscription event:', error);
+    logger.error('Error logging subscription event:', error, { component: 'lib-subscription-analytics-service', action: 'service_call' });
   }
 }
 
@@ -445,7 +446,7 @@ export async function getUserSubscription(userId: string) {
     .single();
 
   if (error && error.code !== 'PGRST116') { // Not found is ok
-    console.error('Error fetching user subscription:', error);
+    logger.error('Error fetching user subscription:', error, { component: 'lib-subscription-analytics-service', action: 'service_call' });
   }
 
   return data;

@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookies } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/admin/notifications/bulk-unsubscribe
@@ -124,7 +125,7 @@ export async function POST(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    console.error('[API] /api/admin/notifications/bulk-unsubscribe POST error:', error);
+    logger.error('[API] /api/admin/notifications/bulk-unsubscribe POST error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
       { error: 'Failed to process bulk unsubscribe' },
       { status: 500 }

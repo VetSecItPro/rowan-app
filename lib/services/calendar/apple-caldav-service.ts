@@ -4,6 +4,7 @@
 import { createDAVClient, DAVCalendar, DAVObject, DAVClient } from 'tsdav';
 import { createClient } from '@/lib/supabase/server';
 import { eventMapper } from './event-mapper';
+import { logger } from '@/lib/logger';
 import type {
   CalendarConnection,
   CalDAVEvent,
@@ -98,7 +99,7 @@ export async function storeAppleCredentials(
   });
 
   if (passwordError) {
-    console.error('Failed to store app-specific password:', passwordError);
+    logger.error('Failed to store app-specific password:', passwordError, { component: 'lib-apple-caldav-service', action: 'service_call' });
     throw new Error('Failed to store credentials securely');
   }
 
@@ -112,7 +113,7 @@ export async function storeAppleCredentials(
     .eq('id', connectionId);
 
   if (updateError) {
-    console.error('Failed to update connection:', updateError);
+    logger.error('Failed to update connection:', updateError, { component: 'lib-apple-caldav-service', action: 'service_call' });
     throw new Error('Failed to update connection');
   }
 }
@@ -143,7 +144,7 @@ export async function validateAppleCredentials(
       calendars: calendars.map(mapDAVCalendar),
     };
   } catch (error) {
-    console.error('Apple CalDAV validation error:', error);
+    logger.error('Apple CalDAV validation error:', error, { component: 'lib-apple-caldav-service', action: 'service_call' });
 
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
@@ -372,7 +373,7 @@ export async function getEvent(
 
     return null;
   } catch (error) {
-    console.error('Failed to get event:', error);
+    logger.error('Failed to get event:', error, { component: 'lib-apple-caldav-service', action: 'service_call' });
     return null;
   }
 }
@@ -423,7 +424,7 @@ function parseICalendar(icalData: string): ParsedICalEvent | undefined {
 
     return event as ParsedICalEvent;
   } catch (error) {
-    console.error('Failed to parse iCalendar:', error);
+    logger.error('Failed to parse iCalendar:', error, { component: 'lib-apple-caldav-service', action: 'service_call' });
     return undefined;
   }
 }

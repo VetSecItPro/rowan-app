@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { sanitizeSearchInput } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 /**
  * Task Templates Service
@@ -59,7 +60,7 @@ export const taskTemplatesService = {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching templates:', error);
+      logger.error('Error fetching templates:', error, { component: 'lib-task-templates-service', action: 'service_call' });
       throw error;
     }
   },
@@ -80,7 +81,7 @@ export const taskTemplatesService = {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching favorite templates:', error);
+      logger.error('Error fetching favorite templates:', error, { component: 'lib-task-templates-service', action: 'service_call' });
       throw error;
     }
   },
@@ -108,7 +109,7 @@ export const taskTemplatesService = {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error searching templates:', error);
+      logger.error('Error searching templates:', error, { component: 'lib-task-templates-service', action: 'service_call' });
       throw error;
     }
   },
@@ -128,7 +129,7 @@ export const taskTemplatesService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error creating template:', error);
+      logger.error('Error creating template:', error, { component: 'lib-task-templates-service', action: 'service_call' });
       throw error;
     }
   },
@@ -167,7 +168,7 @@ export const taskTemplatesService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error creating template from task:', error);
+      logger.error('Error creating template from task:', error, { component: 'lib-task-templates-service', action: 'service_call' });
       throw error;
     }
   },
@@ -188,7 +189,7 @@ export const taskTemplatesService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error updating template:', error);
+      logger.error('Error updating template:', error, { component: 'lib-task-templates-service', action: 'service_call' });
       throw error;
     }
   },
@@ -219,7 +220,7 @@ export const taskTemplatesService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error toggling favorite:', error);
+      logger.error('Error toggling favorite:', error, { component: 'lib-task-templates-service', action: 'service_call' });
       throw error;
     }
   },
@@ -237,7 +238,7 @@ export const taskTemplatesService = {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Error deleting template:', error);
+      logger.error('Error deleting template:', error, { component: 'lib-task-templates-service', action: 'service_call' });
       throw error;
     }
   },
@@ -289,7 +290,7 @@ export const taskTemplatesService = {
       if (taskError) throw taskError;
       return task;
     } catch (error) {
-      console.error('Error creating task from template:', error);
+      logger.error('Error creating task from template:', error, { component: 'lib-task-templates-service', action: 'service_call' });
       throw error;
     }
   },
