@@ -5,7 +5,18 @@ import { logger } from '@/lib/logger';
 // Force dynamic rendering for this route since it uses cookies
 export const dynamic = 'force-dynamic';
 
+// SECURITY: This is a test endpoint for debugging cookie issues
+// Disabled in production to prevent information disclosure
+
 export async function GET(req: NextRequest) {
+  // SECURITY: Block this endpoint in production to prevent cookie metadata leakage
+  if (process.env.NODE_ENV === 'production' && !process.env.ALLOW_TEST_ENDPOINTS) {
+    return NextResponse.json(
+      { error: 'Not found' },
+      { status: 404 }
+    );
+  }
+
   try {
     // Test both methods of cookie access
     const nextCookies = await cookies();

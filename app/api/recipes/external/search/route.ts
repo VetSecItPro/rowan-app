@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify authentication
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { session }, error: authError } = await supabase.auth.getSession();
 
     if (authError || !session) {

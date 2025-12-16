@@ -16,7 +16,7 @@ export async function removeMember(
   requestingUserId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check if requesting user has permission (admin or owner)
     const { data: requestingMember, error: authError } = await supabase
@@ -115,7 +115,7 @@ export async function changeMemberRole(
   requestingUserId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check if requesting user has permission (admin or owner)
     const { data: requestingMember, error: authError } = await supabase
@@ -204,7 +204,7 @@ export async function leaveSpace(
   userId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get user's current role
     const { data: userMember, error: memberError } = await supabase
@@ -277,7 +277,7 @@ export async function cancelInvitation(
   requestingUserId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get invitation details
     const { data: invitation, error: inviteError } = await supabase

@@ -43,7 +43,7 @@ export async function createInvitation(
   role: 'member' | 'admin' = 'member'
 ): Promise<{ success: true; data: SpaceInvitation } | { success: false; error: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Validate input
     const validated = CreateInvitationSchema.parse({ space_id: spaceId, email });
@@ -124,7 +124,7 @@ export async function getInvitationByToken(
   token: string
 ): Promise<{ success: true; data: any } | { success: false; error: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data, error } = await supabase
       .from('space_invitations')
@@ -189,7 +189,7 @@ export async function acceptInvitation(
   userId: string
 ): Promise<{ success: true; data: { spaceId: string } } | { success: false; error: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get invitation details
     const invitationResult = await getInvitationByToken(token);
@@ -274,7 +274,7 @@ export async function cancelInvitation(
   userId: string
 ): Promise<{ success: true } | { success: false; error: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get invitation
     const { data: invitation, error: inviteError } = await supabase
@@ -337,7 +337,7 @@ export async function getPendingInvitations(
   userId: string
 ): Promise<{ success: true; data: any[] } | { success: false; error: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check if user is a member of the space
     const { data: membership, error: memberError } = await supabase
@@ -401,7 +401,7 @@ export async function resendInvitation(
   userId: string
 ): Promise<{ success: true; data: SpaceInvitation } | { success: false; error: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get original invitation
     const { data: originalInvitation, error: inviteError } = await supabase
@@ -462,7 +462,7 @@ export async function cleanupExpiredInvitations(
   spaceId?: string
 ): Promise<{ success: true; count: number } | { success: false; error: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     let query = supabase
       .from('space_invitations')

@@ -26,8 +26,18 @@ export const dynamic = 'force-dynamic';
 
 // Test endpoint for email templates
 // Usage: POST /api/test/email-templates with { type: 'task', email: 'test@example.com' }
+//
+// SECURITY: This endpoint is disabled in production to prevent abuse (spam, phishing, cost burn)
 
 export async function POST(request: NextRequest) {
+  // SECURITY: Block this endpoint in production to prevent spam/phishing abuse
+  if (process.env.NODE_ENV === 'production' && !process.env.ALLOW_TEST_ENDPOINTS) {
+    return NextResponse.json(
+      { error: 'Not found' },
+      { status: 404 }
+    );
+  }
+
   try {
     const body = await request.json();
     const { type, email } = body;
@@ -218,6 +228,14 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
+  // SECURITY: Block this endpoint in production to prevent information disclosure
+  if (process.env.NODE_ENV === 'production' && !process.env.ALLOW_TEST_ENDPOINTS) {
+    return NextResponse.json(
+      { error: 'Not found' },
+      { status: 404 }
+    );
+  }
+
   return NextResponse.json({
     message: 'Email Templates Test Endpoint',
     usage: 'POST with { type: "task|event|message|shopping|meal|reminder|password-reset|magic-link|email-verification|verify", email: "test@example.com" }',

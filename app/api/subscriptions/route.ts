@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get authenticated user
-    const supabase = createClient();
+    const supabase = await createClient();
     const {
       data: { user },
       error: authError,

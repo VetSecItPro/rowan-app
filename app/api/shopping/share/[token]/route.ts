@@ -47,7 +47,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ token: st
     }
 
     const validatedToken = tokenValidation.data;
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Find shopping list by share token
     // Must be public to be accessible
@@ -182,7 +182,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ token: 
 
     const { itemId, isPurchased } = bodyValidation.data;
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verify the list is public, not read-only, and get list ID
     const { data: shoppingList, error: listError } = await supabase

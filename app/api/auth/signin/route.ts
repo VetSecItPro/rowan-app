@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     const validated = SignInSchema.parse(body);
 
     // Create Supabase client
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Attempt signin with Supabase
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -78,11 +78,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Success response
+    // SECURITY: Do NOT return full session object as it contains access/refresh tokens
+    // Tokens are set via httpOnly cookies by Supabase SSR, not exposed in response body
     return NextResponse.json(
       {
         success: true,
-        user: data.user,
-        session: data.session
+        user: {
+          id: data.user.id,
+          email: data.user.email,
+          email_confirmed_at: data.user.email_confirmed_at,
+          created_at: data.user.created_at,
+          updated_at: data.user.updated_at,
+          user_metadata: data.user.user_metadata,
+        },
+        // Only return non-sensitive session metadata, not tokens
+        session: {
+          expires_at: data.session?.expires_at,
+        }
       },
       {
         headers: {

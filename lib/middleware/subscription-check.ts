@@ -78,7 +78,7 @@ export function withSubscriptionCheck(
   return async (request: NextRequest, context?: Record<string, unknown>) => {
     try {
       // Get authenticated user
-      const supabase = createClient();
+      const supabase = await createClient();
       const {
         data: { user },
         error: authError,

@@ -20,7 +20,7 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '');
 export async function POST(request: NextRequest) {
   try {
     // Authentication check
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
     if (sessionError || !session) {
@@ -203,14 +203,44 @@ Extract the data now:`;
   }
 }
 
-// Handle OPTIONS for CORS
+// Handle OPTIONS for CORS preflight
+// SECURITY: Restrict to same-origin only (no CORS needed for same-origin requests)
+// This endpoint requires authentication, so cross-origin requests would fail anyway
 export async function OPTIONS(request: NextRequest) {
+  // Get the origin from the request
+  const origin = request.headers.get('origin');
+  const host = request.headers.get('host');
+
+  // SECURITY: Only allow same-origin or Vercel preview deployments
+  let allowedOrigin = '';
+  if (origin && host) {
+    const originUrl = new URL(origin);
+    const originHost = originUrl.host.split(':')[0];
+    const expectedHost = host.split(':')[0];
+
+    // Check for same origin or Vercel preview
+    const isVercelPreview = originHost.endsWith('.vercel.app') &&
+      (originHost.startsWith('rowan-app-') || originHost === 'rowan-app.vercel.app');
+
+    if (originHost === expectedHost || isVercelPreview ||
+        (process.env.NODE_ENV === 'development' && originHost === 'localhost')) {
+      allowedOrigin = origin;
+    }
+  }
+
+  // If no valid origin, don't set CORS headers (browser will block)
+  if (!allowedOrigin) {
+    return new NextResponse(null, { status: 204 });
+  }
+
   return new NextResponse(null, {
-    status: 200,
+    status: 204,
     headers: {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': allowedOrigin,
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Allow-Credentials': 'true',
+      'Access-Control-Max-Age': '86400',
     },
   });
 }

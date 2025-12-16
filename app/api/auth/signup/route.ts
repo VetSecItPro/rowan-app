@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     // Create Supabase client (runtime only)
     let supabase;
     try {
-      supabase = createClient();
+      supabase = await createClient();
     } catch {
       return NextResponse.json(
         { error: 'Service temporarily unavailable' },
@@ -333,11 +333,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Success response
+    // SECURITY: Do NOT return full session object as it contains access/refresh tokens
+    // Tokens are set via httpOnly cookies by Supabase SSR, not exposed in response body
     return NextResponse.json(
       {
         success: true,
-        user: data.user,
-        session: data.session,
+        user: data.user ? {
+          id: data.user.id,
+          email: data.user.email,
+          email_confirmed_at: data.user.email_confirmed_at,
+          created_at: data.user.created_at,
+          updated_at: data.user.updated_at,
+          user_metadata: data.user.user_metadata,
+        } : null,
+        // Only return non-sensitive session metadata, not tokens
+        session: data.session ? {
+          expires_at: data.session.expires_at,
+        } : null,
         message: data.user?.email_confirmed_at
           ? 'Account created successfully'
           : 'Account created. Please check your email to verify your account.'

@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify authentication
-    const supabase = createClient();
+    const supabase = await createClient();
     const {
       data: { session },
       error: authError,

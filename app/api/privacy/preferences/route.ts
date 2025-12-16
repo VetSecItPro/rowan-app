@@ -24,7 +24,7 @@ const PrivacyPreferenceUpdateSchema = z.object({
 // GET - Fetch user's privacy preferences
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
 // PATCH - Update user's privacy preferences
 export async function PATCH(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -276,7 +276,7 @@ async function updateExternalCookieConsent(cookieType: string, enabled: boolean)
 async function updateMarketingSubscription(userId: string, type: 'email' | 'sms', enabled: boolean) {
   try {
     // Get user profile for email/phone
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: profile } = await supabase
       .from('profiles')
       .select('email, phone_number')

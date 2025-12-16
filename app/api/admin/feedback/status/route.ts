@@ -70,7 +70,7 @@ export async function PATCH(req: NextRequest) {
     const validatedData = updateStatusSchema.parse(body);
 
     // Create Supabase client
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Update feedback status
     const { data: feedback, error: updateError } = await supabase
@@ -208,7 +208,7 @@ export async function POST(req: NextRequest) {
     const validatedData = bulkUpdateSchema.parse(body);
 
     // Create Supabase client
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Bulk update feedback
     const { data: updatedFeedback, error: updateError } = await supabase
