@@ -89,8 +89,8 @@ const features = [
 const benefits = [
   {
     icon: Users,
-    title: "Built for Families",
-    description: "Designed specifically for couples and families to collaborate effortlessly",
+    title: "Built for Households",
+    description: "Everything you need in one place.",
     gradient: "from-blue-500 to-indigo-500"
   },
   {
@@ -352,10 +352,10 @@ export default function HomePage() {
                           <benefit.icon className={`w-6 h-6 ${iconColorMap[benefit.gradient]}`} />
                         </div>
                       </div>
-                      <h3 className="font-display font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">
+                      <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">
                         {benefit.title}
                       </h3>
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed font-light">
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic">
                         {benefit.description}
                       </p>
                     </motion.div>

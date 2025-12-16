@@ -91,7 +91,7 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
     maxSpaces: 1,
 
     // Storage
-    storageGB: 5,
+    storageGB: 2,
 
     // Support
     prioritySupport: false,
@@ -134,7 +134,7 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
     maxSpaces: 1,
 
     // Storage
-    storageGB: 15,
+    storageGB: 5,
 
     // Support
     prioritySupport: true,
