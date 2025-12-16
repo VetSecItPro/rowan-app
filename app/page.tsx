@@ -297,7 +297,7 @@ export default function HomePage() {
                 transition={{ duration: 0.6, delay: 0.3 }}
                 className="text-xl sm:text-2xl text-gray-600 dark:text-gray-300 leading-relaxed font-serif italic"
               >
-                Rowan brings tasks, schedules, lists, meals, budgets, and goals into one elegant workspace — so your family stays aligned without constant reminders.
+                Rowan brings tasks, schedules, lists, meals, budgets, and goals into one elegant workspace, so your family stays aligned without constant reminders.
               </motion.p>
 
               <motion.div
@@ -381,7 +381,7 @@ export default function HomePage() {
       </section>
 
       {/* Pain Points Section - Subtle & Relatable */}
-      <section className="relative py-16 px-4 sm:px-6 lg:px-8">
+      <section className="relative py-1 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center">
           <motion.p
             initial={{ opacity: 0 }}
