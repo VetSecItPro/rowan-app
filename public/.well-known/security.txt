@@ -1,12 +1,14 @@
 # Rowan Family Organization App - Security Policy
 # RFC 9116 compliant security.txt
+# https://securitytxt.org/
 
 # Contact for security vulnerability reports
 Contact: mailto:security@rowan.app
+Contact: https://rowan.app/security
 Contact: https://github.com/VetSecItPro/rowan-app/security/advisories/new
 
 # This file expires in 1 year - please update annually
-Expires: 2026-12-10T00:00:00.000Z
+Expires: 2025-12-16T00:00:00.000Z
 
 # Preferred language for communication
 Preferred-Languages: en
@@ -14,10 +16,37 @@ Preferred-Languages: en
 # Canonical location of this file
 Canonical: https://rowan.app/.well-known/security.txt
 
-# Security policy
+# Security policy and information
+Policy: https://rowan.app/security
 Policy: https://github.com/VetSecItPro/rowan-app/security/policy
 
 # We appreciate responsible disclosure
-Acknowledgments: https://rowan.app/security/thanks
+Acknowledgments: https://rowan.app/security#acknowledgments
 
 # Encryption not required but PGP available on request
+
+# Scope - What we want reported:
+# - Authentication or authorization vulnerabilities
+# - Data exposure or privacy issues
+# - Cross-site scripting (XSS)
+# - SQL injection or database vulnerabilities
+# - Server-side request forgery (SSRF)
+# - Remote code execution
+# - API security issues
+# - Insecure direct object references
+
+# Out of Scope:
+# - Denial of Service (DoS) attacks
+# - Social engineering attacks
+# - Physical attacks on infrastructure
+# - Spam or phishing testing
+# - Third-party services (report to them directly)
+# - Issues in outdated browsers
+# - Self-XSS or attacks requiring social engineering
+
+# Responsible Disclosure Guidelines:
+# - Give us reasonable time (90 days) to fix issues before disclosure
+# - Make a good faith effort to avoid privacy violations
+# - Do not access or modify other users' data
+# - Do not perform actions that could harm our users or services
+# - Report only verified vulnerabilities with proof of concept
