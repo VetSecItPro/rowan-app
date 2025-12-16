@@ -11,6 +11,7 @@ import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { TaskCard } from '@/components/tasks/TaskCard';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { tasksService } from '@/lib/services/tasks-service';
+import { taskTemplatesService } from '@/lib/services/task-templates-service';
 import { choresService, CreateChoreInput } from '@/lib/services/chores-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { Task, Chore } from '@/lib/types';
@@ -569,6 +570,21 @@ export default function TasksPage() {
     setIsDetailsModalOpen(true);
   }, []);
 
+  const handleSaveAsTemplate = useCallback(async (item: Task & { type?: 'task' | 'chore' }) => {
+    if (item.type !== 'task' || !currentSpace || !user) return;
+
+    try {
+      await taskTemplatesService.createFromTask(item.id, `${item.title} Template`, user.id);
+      // Could show a success toast here
+    } catch (error) {
+      logger.error('Failed to save task as template', error, {
+        component: 'tasks-page',
+        action: 'save_as_template',
+        taskId: item.id
+      });
+    }
+  }, [currentSpace, user]);
+
   const handleCloseModal = useCallback(() => {
     setIsUnifiedModalOpen(false);
     setEditingItem(null);
@@ -673,6 +689,14 @@ export default function TasksPage() {
                     <Home className="w-4 h-4" />
                   )}
                   <span className="text-sm">{choreLoading ? 'Creating...' : 'New Chore'}</span>
+                </button>
+                <button
+                  onClick={() => setIsTemplatePickerOpen(true)}
+                  className="px-3 sm:px-4 py-2 sm:py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
+                  title="Create task from template"
+                >
+                  <FileText className="w-4 h-4" />
+                  <span className="text-sm hidden sm:inline">Templates</span>
                 </button>
               </div>
             </div>
@@ -916,6 +940,7 @@ export default function TasksPage() {
                         onEdit={handleEditItem as any}
                         onDelete={handleDeleteItem}
                         onViewDetails={handleViewDetails as any}
+                        onSaveAsTemplate={handleSaveAsTemplate}
                         linkedShoppingList={item.type === 'task' ? linkedShoppingLists[item.id] : undefined}
                       />
                     ))}
@@ -986,9 +1011,21 @@ export default function TasksPage() {
               <LazyTaskTemplatePickerModal
                 isOpen={isTemplatePickerOpen}
                 onClose={() => setIsTemplatePickerOpen(false)}
-                onSelect={(templateId) => {
+                onSelect={async (templateId) => {
                   setIsTemplatePickerOpen(false);
-                  // TODO: Create task from template
+                  try {
+                    const newTask = await taskTemplatesService.createTaskFromTemplate(templateId);
+                    if (newTask) {
+                      // Refresh tasks to show the new task
+                      refreshTasks();
+                    }
+                  } catch (error) {
+                    logger.error('Failed to create task from template', error, {
+                      component: 'tasks-page',
+                      action: 'create_from_template',
+                      templateId
+                    });
+                  }
                 }}
                 spaceId={currentSpace.id}
               />
