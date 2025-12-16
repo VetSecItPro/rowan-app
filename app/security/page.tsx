@@ -295,6 +295,47 @@ export default function SecurityPage() {
               <li>Privacy questions: <a href="mailto:privacy@rowan.app" className="text-purple-600 dark:text-purple-400 hover:underline">privacy@rowan.app</a></li>
             </ul>
           </section>
+
+          <section className="mb-8" id="acknowledgments">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Security Acknowledgments</h2>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              We appreciate the security researchers and community members who help keep Rowan safe by responsibly reporting vulnerabilities.
+            </p>
+            <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+              <p className="text-gray-600 dark:text-gray-400 text-center italic">
+                No security researchers have been acknowledged yet. Be the first to help secure Rowan!
+              </p>
+            </div>
+            <p className="text-gray-700 dark:text-gray-300 mt-4 text-sm">
+              To be included in this hall of fame, please responsibly disclose security vulnerabilities to <a href="mailto:security@rowan.app" className="text-purple-600 dark:text-purple-400 hover:underline">security@rowan.app</a>.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Security Resources</h2>
+            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2">
+              <li>
+                <a href="/.well-known/security.txt" className="text-purple-600 dark:text-purple-400 hover:underline" target="_blank" rel="noopener noreferrer">
+                  security.txt
+                </a> - RFC 9116 compliant security contact information
+              </li>
+              <li>
+                <a href="https://github.com/VetSecItPro/rowan-app/security/advisories" className="text-purple-600 dark:text-purple-400 hover:underline" target="_blank" rel="noopener noreferrer">
+                  GitHub Security Advisories
+                </a> - Report vulnerabilities through GitHub
+              </li>
+              <li>
+                <Link href="/privacy" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  Privacy Policy
+                </Link> - How we handle your data
+              </li>
+              <li>
+                <Link href="/terms" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  Terms of Service
+                </Link> - Our terms and conditions
+              </li>
+            </ul>
+          </section>
         </div>
         </div>
       </div>

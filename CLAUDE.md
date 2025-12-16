@@ -32,7 +32,54 @@
 - When in doubt, ask questions and clarify requirements before coding
 
 ## Stack
-Next.js 15 App Router · Supabase (DB + Auth) · TypeScript strict · Tailwind · Zod · Upstash Redis · Resend
+
+### Core Framework
+- **Next.js 16.0.10** (App Router) - React framework with Turbopack/Webpack dev server
+- **React 19** - UI library
+- **TypeScript 5** - Strict mode enabled
+
+### Database & Auth
+- **Supabase** - PostgreSQL database + Authentication + Row Level Security
+  - `@supabase/supabase-js ^2.58.0`
+  - `@supabase/ssr ^0.8.0`
+
+### Styling
+- **Tailwind CSS 4** - Utility-first CSS
+- **Framer Motion 12** - Animations
+- **Lucide React** - Icon library
+
+### Backend Services
+- **Upstash Redis** - Rate limiting & caching (`@upstash/ratelimit`, `@upstash/redis`)
+- **Resend 6** - Transactional email
+- **Stripe 20** - Payments
+
+### Monitoring & Security
+- **Sentry 10** - Error tracking
+- **DOMPurify** - XSS sanitization
+
+### Data & Forms
+- **Zod 4** - Schema validation
+- **date-fns 4** - Date utilities
+- **Sonner** - Toast notifications
+
+## Known Issues & Workarounds
+
+### Next.js 16 Dev Server Race Conditions (December 2024)
+**Issue:** The Next.js 16 dev server frequently crashes with ENOENT errors on startup:
+```
+Error: ENOENT: no such file or directory, open '.next/dev/prerender-manifest.json'
+Error: ENOENT: no such file or directory, open '.next/dev/static/chunks/app/layout.js'
+```
+
+**Root Cause:** File system race conditions in Next.js 16's webpack/turbopack dev server when generating build artifacts.
+
+**Workaround:**
+1. The dev server is **unstable in Claude Code CLI environment** - it may crash on first request
+2. **For local development**, the user should run `npm run dev` directly in their terminal (not via Claude)
+3. **For CI/CD**, `npm run build` works reliably - use GitHub Actions for verification
+4. TypeScript checks (`npx tsc --noEmit`) work fine and should be used for validation
+
+**DO NOT** waste tokens repeatedly trying different dev server approaches. This is a known limitation.
 
 ## Security Rules
 

@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/DynamicSettingsComponents';
 import { DataManagementTab } from '@/components/settings/DataManagementTab';
 import { NotificationSettings } from '@/components/settings/NotificationSettings';
+import { ChangePasswordForm } from '@/components/settings/ChangePasswordForm';
 import { SubscriptionSettings } from '@/components/settings/SubscriptionSettings';
 import { CalendarConnections } from '@/components/calendar/CalendarConnections';
 import { Toggle } from '@/components/ui/Toggle';
@@ -1257,6 +1258,9 @@ export default function SettingsPage() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Change Password */}
+                    <ChangePasswordForm />
 
                     {/* Two-Factor Authentication */}
                     <TwoFactorAuth />

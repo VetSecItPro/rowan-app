@@ -186,6 +186,7 @@ export interface FeatureLimits {
   canUseHousehold: boolean;
   canUseAI: boolean;
   canUseIntegrations: boolean;
+  canUseEventProposals: boolean;
 
   // Real-time
   realtimeSyncDelay: number; // milliseconds (0 = instant)

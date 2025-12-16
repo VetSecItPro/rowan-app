@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckSquare, Clock, Flag, User, Calendar as CalendarIcon, MoreVertical, ShoppingCart } from 'lucide-react';
+import { CheckSquare, Clock, Flag, User, Calendar as CalendarIcon, MoreVertical, ShoppingCart, FileText } from 'lucide-react';
 import { Task } from '@/lib/types';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState, memo } from 'react';
@@ -19,6 +19,7 @@ interface TaskCardProps {
   onEdit: (task: Task & { type?: 'task' | 'chore' }) => void;
   onDelete: (taskId: string, type?: 'task' | 'chore') => void;
   onViewDetails?: (task: Task & { type?: 'task' | 'chore' }) => void;
+  onSaveAsTemplate?: (task: Task & { type?: 'task' | 'chore' }) => void;
   linkedShoppingList?: LinkedShoppingList;
 }
 
@@ -36,7 +37,7 @@ const statusColors = {
   cancelled: 'bg-red-500',
 };
 
-const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails, linkedShoppingList }: TaskCardProps) {
+const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete, onViewDetails, onSaveAsTemplate, linkedShoppingList }: TaskCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'completed';
@@ -190,6 +191,18 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
                 >
                   Edit
                 </button>
+                {onSaveAsTemplate && task.type === 'task' && (
+                  <button
+                    onClick={() => {
+                      onSaveAsTemplate(task);
+                      setShowMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 text-purple-600 dark:text-purple-400"
+                  >
+                    <FileText className="w-4 h-4" />
+                    Save as Template
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     onDelete(task.id, task.type);

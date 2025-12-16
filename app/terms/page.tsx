@@ -45,7 +45,7 @@ export default function TermsPage() {
           </Link>
 
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Terms of Service</h1>
-        <p className="text-gray-600 dark:text-gray-400 mb-8">Last updated: January 2025</p>
+        <p className="text-gray-600 dark:text-gray-400 mb-8">Last updated: December 2024</p>
 
         <div className="prose dark:prose-invert max-w-none">
           <section className="mb-8">
@@ -69,6 +69,102 @@ export default function TermsPage() {
               <li>Household task management</li>
               <li>Goals and milestone tracking</li>
             </ul>
+          </section>
+
+          <section className="mb-8 p-6 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Beta Program Terms</h2>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              <strong>Rowan is currently in beta.</strong> By participating in our beta program, you acknowledge and agree to the following:
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">Beta Status Disclaimer</h3>
+            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+              <li>The service is provided in a pre-release state and may contain bugs, errors, or incomplete features</li>
+              <li>Features may be added, modified, or removed without notice</li>
+              <li>The service may experience unexpected downtime or performance issues</li>
+              <li>Data formats or structures may change, potentially requiring migration</li>
+              <li>We make no guarantees regarding uptime, data retention, or feature availability during beta</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">Feedback and Improvements</h3>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              As a beta user, you may provide feedback, suggestions, or bug reports. By doing so:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+              <li>You grant us a non-exclusive, perpetual, royalty-free license to use, modify, and incorporate your feedback into the service</li>
+              <li>You will not be entitled to any compensation for feedback or suggestions</li>
+              <li>We are not obligated to implement any feedback or suggestions</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">Data During Beta</h3>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              While we take reasonable precautions to protect your data:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+              <li>We recommend maintaining your own backups of important information</li>
+              <li>Data migration between beta versions may occasionally result in data transformation</li>
+              <li>We will provide reasonable notice before any planned data migrations</li>
+              <li>Your data rights under our Privacy Policy remain fully in effect during beta</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">Transition to General Availability</h3>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              When Rowan transitions from beta to general availability:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+              <li>We will notify you of any changes to terms, pricing, or features</li>
+              <li>Your account and data will be preserved unless you choose to delete them</li>
+              <li>You may be offered special pricing or benefits as a beta participant</li>
+            </ul>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">AI-Powered Features</h2>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              Rowan incorporates artificial intelligence features to enhance your experience. By using these features, you acknowledge:
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">AI Services Used</h3>
+            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+              <li><strong>Recipe Import:</strong> Uses Google Gemini AI to extract recipe information from URLs you provide</li>
+              <li><strong>Receipt Scanning:</strong> Uses Google Gemini AI to extract shopping items from receipt images you upload</li>
+              <li><strong>Smart Suggestions:</strong> AI may provide suggestions for tasks, reminders, or organization</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">AI Limitations and Disclaimers</h3>
+            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+              <li>AI-generated content may not always be accurate or complete</li>
+              <li>You are responsible for reviewing and verifying AI-extracted information</li>
+              <li>AI features are provided "as is" without warranties of accuracy</li>
+              <li>We are not liable for errors in AI-processed content</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">Data Processing for AI Features</h3>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              When you use AI-powered features:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+              <li>URLs and images you submit are sent to Google's AI services for processing</li>
+              <li>Processing is done in real-time and data is not stored by Google beyond immediate processing</li>
+              <li>We do not use your content to train AI models</li>
+              <li>See our <Link href="/privacy" className="text-purple-600 dark:text-purple-400 hover:underline">Privacy Policy</Link> for complete data handling details</li>
+            </ul>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Third-Party Services</h2>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              Rowan integrates with third-party services to provide functionality. By using our service, you acknowledge:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+              <li><strong>Payment Processing:</strong> Stripe handles all payment transactions securely</li>
+              <li><strong>Calendar Integration:</strong> Google Calendar sync is available for scheduling features</li>
+              <li><strong>Email Services:</strong> Resend delivers transactional emails on our behalf</li>
+              <li><strong>AI Processing:</strong> Google Gemini powers our recipe and receipt scanning features</li>
+            </ul>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              Your use of these integrated services is subject to their respective terms of service and privacy policies.
+            </p>
           </section>
 
           <section className="mb-8">

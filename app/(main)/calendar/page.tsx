@@ -37,6 +37,7 @@ import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
 import { useCalendarShortcuts } from '@/lib/hooks/useCalendarShortcuts';
 import { useCalendarGestures } from '@/lib/hooks/useCalendarGestures';
+import { useFeatureAccess } from '@/lib/contexts/subscription-context';
 import { CalendarDaySkeleton } from '@/components/ui/Skeleton';
 import { calendarService, CalendarEvent, CreateEventInput } from '@/lib/services/calendar-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
@@ -116,6 +117,7 @@ function safeGetLocalStorageString(
 
 export default function CalendarPage() {
   const { currentSpace, user } = useAuthWithSpaces();
+  const { hasAccess: canUseEventProposals, requestUpgrade: requestProposalUpgrade } = useFeatureAccess('canUseEventProposals');
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -1214,15 +1216,23 @@ export default function CalendarPage() {
                     Timeline
                   </button>
                   <button
-                    onClick={() => setViewMode('proposal')}
+                    onClick={() => {
+                      if (canUseEventProposals) {
+                        setViewMode('proposal');
+                      } else {
+                        requestProposalUpgrade();
+                      }
+                    }}
                     className={`px-2 py-1.5 rounded text-xs font-medium transition-colors ${
                       viewMode === 'proposal'
                         ? 'bg-purple-600 text-white'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                        : canUseEventProposals
+                          ? 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                          : 'text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
-                    title="Proposal View (P)"
+                    title={canUseEventProposals ? "Proposal View (P)" : "Upgrade to Pro to use Event Proposals"}
                   >
-                    Proposal
+                    Proposal {!canUseEventProposals && '🔒'}
                   </button>
                 </div>
 
@@ -2033,8 +2043,8 @@ export default function CalendarPage() {
         />
       )}
 
-      {/* Event Proposal Modal */}
-      {currentSpace && (
+      {/* Event Proposal Modal - Only rendered for Pro+ users */}
+      {currentSpace && canUseEventProposals && (
         <EventProposalModal
           isOpen={isProposalModalOpen}
           onClose={() => setIsProposalModalOpen(false)}
