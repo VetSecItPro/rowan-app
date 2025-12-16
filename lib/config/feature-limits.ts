@@ -39,6 +39,7 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
     canUseHousehold: false,
     canUseAI: false,
     canUseIntegrations: false,
+    canUseEventProposals: false,
 
     // Performance
     realtimeSyncDelay: 0, // milliseconds
@@ -82,6 +83,7 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
     canUseHousehold: true,
     canUseAI: false, // Family tier only
     canUseIntegrations: false, // Family tier only
+    canUseEventProposals: true, // Pro tier and above
 
     // Performance
     realtimeSyncDelay: 0,
@@ -125,6 +127,7 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
     canUseHousehold: true,
     canUseAI: true,
     canUseIntegrations: true,
+    canUseEventProposals: true,
 
     // Performance
     realtimeSyncDelay: 0,
@@ -228,6 +231,7 @@ export const FEATURE_NAMES: Record<string, string> = {
   canUseHousehold: 'Household Management',
   canUseAI: 'AI Features',
   canUseIntegrations: 'External Integrations',
+  canUseEventProposals: 'Event Proposals & Find Time',
   maxUsers: 'Maximum Users',
   maxSpaces: 'Maximum Spaces',
   storageGB: 'Storage (GB)',
