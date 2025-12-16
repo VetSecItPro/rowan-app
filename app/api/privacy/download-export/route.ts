@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
     let userId: string | null = null;
 
     // Determine authentication method
@@ -120,7 +120,7 @@ export async function GET(request: NextRequest) {
 // Validate download token
 async function validateDownloadToken(token: string): Promise<string | null> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Look for token in notifications table
     const { data: tokenRecord, error } = await supabase
@@ -153,7 +153,7 @@ async function validateDownloadToken(token: string): Promise<string | null> {
 // Generate mock file response (in production this would fetch from storage)
 async function generateMockFileResponse(exportRequest: any, fileName: string) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get user data to generate the file
     const userData = await gatherUserDataForDownload(exportRequest.user_id);
@@ -206,7 +206,7 @@ async function generateMockFileResponse(exportRequest: any, fileName: string) {
 
 // Simplified data gathering for download (reusing logic from generate-export)
 async function gatherUserDataForDownload(userId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Get essential user data
   const { data: profile } = await supabase

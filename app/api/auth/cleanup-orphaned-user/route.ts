@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     }
 
     // SECURITY: Verify authentication
-    const supabase = createServerClient();
+    const supabase = await createServerClient();
     const { data: { session }, error: authError } = await supabase.auth.getSession();
 
     if (authError || !session) {

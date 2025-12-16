@@ -30,7 +30,7 @@ const DataExportRequestSchema = z.object({
 // POST - Request data export
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
 // GET - Get export status
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -207,7 +207,7 @@ async function generateDataExport(
   userId: string,
   request: z.infer<typeof DataExportRequestSchema>
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     // Update status to processing
@@ -439,7 +439,7 @@ async function uploadExportFile(
   expiresAt.setHours(expiresAt.getHours() + 24); // 24-hour expiration
 
   // Simulate file upload to Supabase Storage
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const { data, error } = await supabase.storage
@@ -479,7 +479,7 @@ async function sendExportReadyEmail(
   format: string,
   fileSize: number
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     // Get user profile

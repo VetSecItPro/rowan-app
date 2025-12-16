@@ -70,7 +70,7 @@ export async function exportSpaceData(
   format: 'json' | 'csv' = 'json'
 ): Promise<{ success: true; data: SpaceExportData | string } | { success: false; error: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Validate input
     const validated = SpaceExportSchema.parse({ spaceId, userId, format });
@@ -346,7 +346,7 @@ export async function getSpaceExportSummary(
   userId: string
 ): Promise<{ success: true; data: Record<string, number> } | { success: false; error: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verify user is owner of the space
     const { data: membership, error: memberError } = await supabase

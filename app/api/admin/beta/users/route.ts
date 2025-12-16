@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Create Supabase client
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get beta users by joining beta_access_requests with auth.users
     const { data: betaRequests, error: betaError } = await supabase

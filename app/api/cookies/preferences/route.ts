@@ -19,7 +19,7 @@ const CookiePreferencesSchema = z.object({
 // GET - Get current cookie preferences for authenticated user
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
 // POST - Update cookie preferences for authenticated user
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -223,7 +223,7 @@ async function applyCookiePreferences(userId: string, preferences: any) {
 // DELETE - Reset cookie preferences to defaults
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();

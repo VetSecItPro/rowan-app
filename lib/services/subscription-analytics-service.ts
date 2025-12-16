@@ -141,7 +141,7 @@ function calculateMRR(tier: string, period: string): number {
  * Get comprehensive subscription analytics
  */
 export async function getSubscriptionMetrics(): Promise<SubscriptionMetrics> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
@@ -293,7 +293,7 @@ export async function getSubscriptionEvents(options: {
   startDate?: Date;
   endDate?: Date;
 }): Promise<{ events: SubscriptionEvent[]; total: number }> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { limit = 50, offset = 0, eventType, startDate, endDate } = options;
 
   let query = supabase
@@ -341,7 +341,7 @@ export async function getSubscriptionEvents(options: {
  * Get daily revenue data for charts
  */
 export async function getDailyRevenueData(days: number = 30): Promise<DailyRevenueData[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const now = new Date();
   const startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
@@ -417,7 +417,7 @@ export async function logSubscriptionEvent(
     metadata?: Record<string, unknown>;
   } = {}
 ): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { error } = await supabase.from('subscription_events').insert({
     user_id: userId,
@@ -437,7 +437,7 @@ export async function logSubscriptionEvent(
  * Get subscription by user ID
  */
 export async function getUserSubscription(userId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('subscriptions')

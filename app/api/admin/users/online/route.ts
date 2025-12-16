@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Create Supabase client
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get all users with their presence info
     const { data: users, error: usersError } = await supabase

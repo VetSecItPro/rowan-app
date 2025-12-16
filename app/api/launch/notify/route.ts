@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     const sanitizedEmail = email.trim().toLowerCase().slice(0, 255); // Normalize email
 
     // Create Supabase client with service role for public access
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check for duplicate email
     const { data: existingSubscription, error: checkError } = await supabase

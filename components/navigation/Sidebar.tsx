@@ -29,7 +29,9 @@ const NavItemComponent = memo(function NavItemComponent({
       <Link
         href={item.href}
         prefetch={true}
-        className={`group relative flex items-center gap-3 px-2.5 py-3 rounded-lg transition-all duration-200 ${
+        className={`group relative flex items-center py-3 rounded-lg transition-all duration-200 ${
+          isExpanded ? 'gap-3 px-2.5' : 'justify-center px-2'
+        } ${
           isActive
             ? 'bg-gradient-to-r from-blue-50/80 to-indigo-50/60 dark:from-blue-900/20 dark:to-indigo-900/10 shadow-sm border border-blue-100 dark:border-blue-800/30'
             : 'hover:bg-gray-100/60 dark:hover:bg-gray-800/50 hover:shadow-sm border border-transparent'
@@ -207,7 +209,7 @@ export function Sidebar() {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={`hidden md:flex flex-col h-screen sticky top-0 bg-gradient-to-b from-white/90 via-white/80 to-gray-50/90 dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-950/90 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-700/30 transition-all duration-300 ease-out shadow-xl shadow-gray-200/20 dark:shadow-black/20 ${
-        effectivelyExpanded ? 'w-64' : 'w-[60px]'
+        effectivelyExpanded ? 'w-64' : 'w-[72px]'
       } ${isHoverExpanded ? 'z-50' : ''}`}
     >
       {/* Header with subtle branding */}
@@ -235,9 +237,9 @@ export function Sidebar() {
       </div>
 
       {/* Navigation Items */}
-      <nav className="flex-1 py-3 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
+      <nav className="flex-1 py-3 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
         {/* Features Section with subtle background */}
-        <div className="mx-2 mb-3 rounded-xl bg-gradient-to-b from-gray-50/40 to-transparent dark:from-gray-800/20 dark:to-transparent p-2">
+        <div className={`mb-3 rounded-xl bg-gradient-to-b from-gray-50/40 to-transparent dark:from-gray-800/20 dark:to-transparent ${effectivelyExpanded ? 'mx-2 p-2' : 'mx-1 p-1'}`}>
           <ul className="space-y-1.5">
             {NAVIGATION_ITEMS.map((item, index) => (
               <NavItemComponent
@@ -253,7 +255,7 @@ export function Sidebar() {
 
       {/* Admin Section - separate from features */}
       {isAdmin && (
-        <div className="mx-2 mb-2 px-2 pt-2 pb-3 border-t border-gray-200/50 dark:border-gray-700/30">
+        <div className={`mb-2 pt-2 pb-3 border-t border-gray-200/50 dark:border-gray-700/30 ${effectivelyExpanded ? 'mx-2 px-2' : 'mx-1 px-1'}`}>
           {effectivelyExpanded && (
             <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2.5 mb-2 block">
               Admin

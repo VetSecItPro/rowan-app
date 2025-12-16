@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Create Supabase client
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get date ranges
     const today = new Date().toISOString().split('T')[0];

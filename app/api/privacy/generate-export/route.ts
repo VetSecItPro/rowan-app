@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { exportId, userId, format } = ExportRequestSchema.parse(body);
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Update export status to processing
     await supabase
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
 
 // Gather comprehensive user data from all relevant tables
 async function gatherUserData(userId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   logger.info(`📊 Gathering data for user ${userId}...`, { component: 'api-route' });
 
@@ -403,7 +403,7 @@ async function sendExportCompletionEmail(
   expiresAt: Date
 ) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get user email
     const { data: profile } = await supabase
@@ -498,7 +498,7 @@ async function sendExportCompletionEmail(
 // Send export failure email
 async function sendExportFailureEmail(userId: string) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get user email
     const { data: profile } = await supabase

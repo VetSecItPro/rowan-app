@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
     const today = new Date();
     const results = {
       sevenDayReminders: 0,
@@ -323,7 +323,7 @@ async function send1DayDeletionReminder(
 
 // Execute the actual account deletion
 async function executeAccountDeletion(userId: string, email: string, userName: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     // 1. Delete user data from all tables
@@ -396,7 +396,7 @@ async function sendDeletionCompletedEmail(email: string, userName: string) {
     });
 
     // Log the final email notification
-    const supabase = createClient();
+    const supabase = await createClient();
     await supabase
       .from('privacy_email_notifications')
       .insert({
