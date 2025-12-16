@@ -21,7 +21,7 @@ export async function getTodayUsage(
   userId: string,
   usageType: UsageType
 ): Promise<number> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
   // Map UsageType to the actual database column name
@@ -60,7 +60,7 @@ export async function incrementUsage(
   usageType: UsageType,
   amount: number = 1
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const today = new Date().toISOString().split('T')[0];
 
   // Map UsageType to the actual database column name
@@ -266,7 +266,7 @@ export async function getUsageWithLimits(userId: string): Promise<{
  * Reset usage counters (typically run via cron job at midnight)
  */
 export async function resetDailyUsage(): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const today = new Date().toISOString().split('T')[0];
 
   // Delete old records (older than today)

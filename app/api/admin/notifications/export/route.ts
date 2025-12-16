@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     const { ids, format = 'csv', includeAll = false } = body;
 
     // Create Supabase client
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Build query
     let query = supabase

@@ -137,7 +137,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<void> {
 async function handleCheckoutSessionCompleted(
   session: Stripe.Checkout.Session
 ): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const userId = session.metadata?.userId;
   const tier = session.metadata?.tier as 'pro' | 'family' | undefined;
   const period = session.metadata?.period as 'monthly' | 'annual' | undefined;
@@ -232,7 +232,7 @@ async function handleCheckoutSessionCompleted(
 async function handleSubscriptionCreated(
   subscription: Stripe.Subscription
 ): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const userId = subscription.metadata?.userId;
 
   if (!userId) {
@@ -266,7 +266,7 @@ async function handleSubscriptionCreated(
 async function handleSubscriptionUpdated(
   subscription: Stripe.Subscription
 ): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const userId = subscription.metadata?.userId;
 
   if (!userId) {
@@ -325,7 +325,7 @@ async function handleSubscriptionUpdated(
 async function handleSubscriptionDeleted(
   subscription: Stripe.Subscription
 ): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const userId = subscription.metadata?.userId;
 
   if (!userId) {
@@ -420,7 +420,7 @@ async function handleSubscriptionDeleted(
 async function handleInvoicePaymentSucceeded(
   invoice: Stripe.Invoice
 ): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const subscriptionId = (invoice as any).subscription;
 
   if (!subscriptionId || typeof subscriptionId !== 'string') {
@@ -458,7 +458,7 @@ async function handleInvoicePaymentSucceeded(
 async function handleInvoicePaymentFailed(
   invoice: Stripe.Invoice
 ): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const subscriptionId = (invoice as any).subscription;
 
   if (!subscriptionId || typeof subscriptionId !== 'string') {

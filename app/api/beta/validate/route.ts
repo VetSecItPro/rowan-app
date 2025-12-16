@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create Supabase client with service role for public access
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Use timing-safe comparison to prevent timing attacks
     const isValidPassword = timingSafeCompare(password, BETA_PASSWORD);

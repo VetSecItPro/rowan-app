@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     const { token, password } = validatedData;
 
     // Create Supabase client
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verify the reset token
     const { data: tokenData, error: tokenError } = await supabase
@@ -144,7 +144,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check token validity
     const { data: tokenData, error: tokenError } = await supabase

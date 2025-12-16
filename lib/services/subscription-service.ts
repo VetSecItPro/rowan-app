@@ -16,7 +16,7 @@ export const TRIAL_DURATION_DAYS = 14;
  * Get user's current subscription
  */
 export async function getUserSubscription(userId: string): Promise<Subscription | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('subscriptions')
@@ -143,7 +143,7 @@ export async function upsertSubscription(
   userId: string,
   data: Partial<Subscription>
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { error } = await supabase
     .from('subscriptions')
@@ -167,7 +167,7 @@ export async function upsertSubscription(
 export async function cancelSubscription(
   userId: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { error } = await supabase
     .from('subscriptions')
@@ -198,7 +198,7 @@ export async function cancelSubscription(
 export async function reactivateSubscription(
   userId: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { error } = await supabase
     .from('subscriptions')

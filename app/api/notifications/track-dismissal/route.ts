@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     const { notification_id, tag, action, timestamp, user_id } = parseResult.data;
 
     // Try to get session (may not always be available from SW)
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { session } } = await supabase.auth.getSession();
 
     const effectiveUserId = user_id || session?.user?.id;

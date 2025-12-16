@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Create Supabase client
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get query parameters for time range
     const { searchParams } = new URL(req.url);

@@ -16,7 +16,7 @@ export async function isUserSpaceMember(
   spaceId: string
 ): Promise<boolean> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data, error } = await supabase
       .from('space_members')

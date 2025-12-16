@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const { email } = validatedData;
 
     // Create Supabase client
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check if user exists
     const { data: userData, error: userError } = await supabase

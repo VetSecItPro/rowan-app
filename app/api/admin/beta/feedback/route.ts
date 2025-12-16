@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Create Supabase client
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get all feedback with user information and engagement metrics
     const { data: feedback, error: feedbackError } = await supabase

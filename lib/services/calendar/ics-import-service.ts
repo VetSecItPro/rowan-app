@@ -42,7 +42,85 @@ interface ICSFetchResult {
 }
 
 /**
+ * SSRF Protection: Check if hostname is a private/internal IP
+ * Blocks RFC1918 (private), link-local, loopback, and cloud metadata endpoints
+ */
+function isPrivateOrReservedHost(hostname: string): boolean {
+  // Check for common metadata endpoints (AWS, GCP, Azure, etc.)
+  const metadataHosts = [
+    '169.254.169.254',     // AWS/GCP metadata
+    'metadata.google.internal',
+    'metadata.goog',
+    '100.100.100.200',     // Alibaba Cloud metadata
+    'fd00:ec2::254',       // AWS IPv6 metadata
+  ];
+  if (metadataHosts.includes(hostname.toLowerCase())) {
+    return true;
+  }
+
+  // Check for localhost variations
+  if (hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname === '::1' ||
+      hostname.endsWith('.localhost') ||
+      hostname === '0.0.0.0') {
+    return true;
+  }
+
+  // Check for IP address patterns
+  const ipv4Match = hostname.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (ipv4Match) {
+    const octets = ipv4Match.slice(1).map(Number);
+    const [a, b, c, d] = octets;
+
+    // Validate octets are in range
+    if (octets.some(o => o > 255)) return true;
+
+    // RFC1918 Private ranges
+    if (a === 10) return true;                           // 10.0.0.0/8
+    if (a === 172 && b >= 16 && b <= 31) return true;    // 172.16.0.0/12
+    if (a === 192 && b === 168) return true;             // 192.168.0.0/16
+
+    // Loopback (127.0.0.0/8)
+    if (a === 127) return true;
+
+    // Link-local (169.254.0.0/16)
+    if (a === 169 && b === 254) return true;
+
+    // CGNAT (100.64.0.0/10)
+    if (a === 100 && b >= 64 && b <= 127) return true;
+
+    // Reserved (0.0.0.0/8)
+    if (a === 0) return true;
+
+    // Documentation ranges (shouldn't be used but block anyway)
+    if (a === 192 && b === 0 && c === 2) return true;    // 192.0.2.0/24
+    if (a === 198 && b === 51 && c === 100) return true; // 198.51.100.0/24
+    if (a === 203 && b === 0 && c === 113) return true;  // 203.0.113.0/24
+
+    // Broadcast
+    if (a === 255 && b === 255 && c === 255 && d === 255) return true;
+  }
+
+  // Block internal domain patterns
+  const internalPatterns = [
+    /\.internal$/i,
+    /\.local$/i,
+    /\.corp$/i,
+    /\.home$/i,
+    /\.lan$/i,
+    /\.intranet$/i,
+  ];
+  if (internalPatterns.some(p => p.test(hostname))) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
  * Validate an ICS feed URL
+ * SECURITY: Includes SSRF protection to block private/internal targets
  */
 export function validateICSUrl(url: string): { valid: boolean; normalizedUrl: string; error?: string } {
   try {
@@ -55,15 +133,32 @@ export function validateICSUrl(url: string): { valid: boolean; normalizedUrl: st
     // Validate URL format
     const parsedUrl = new URL(normalizedUrl);
 
-    // Only allow https (and http for localhost dev)
-    if (!['https:', 'http:'].includes(parsedUrl.protocol)) {
-      return { valid: false, normalizedUrl, error: 'URL must use HTTPS protocol' };
+    // SECURITY: Only allow HTTPS in production to prevent MITM attacks
+    // Allow http:// only in development for local testing
+    if (process.env.NODE_ENV === 'production') {
+      if (parsedUrl.protocol !== 'https:') {
+        return { valid: false, normalizedUrl, error: 'URL must use HTTPS protocol' };
+      }
+    } else {
+      // Development: allow http and https
+      if (!['https:', 'http:'].includes(parsedUrl.protocol)) {
+        return { valid: false, normalizedUrl, error: 'URL must use HTTP or HTTPS protocol' };
+      }
     }
 
-    // Block localhost in production
-    if (process.env.NODE_ENV === 'production' &&
-        (parsedUrl.hostname === 'localhost' || parsedUrl.hostname === '127.0.0.1')) {
-      return { valid: false, normalizedUrl, error: 'Localhost URLs not allowed in production' };
+    // SECURITY: Block private/internal IPs to prevent SSRF attacks
+    // This blocks: RFC1918, loopback, link-local, cloud metadata, internal domains
+    if (isPrivateOrReservedHost(parsedUrl.hostname)) {
+      logger.warn('[ICS Validation] Blocked SSRF attempt to private/internal host', {
+        component: 'lib-ics-import-service',
+        hostname: parsedUrl.hostname,
+      });
+      return { valid: false, normalizedUrl, error: 'URL points to a private or internal address' };
+    }
+
+    // Block non-standard ports in production (except 443 for HTTPS)
+    if (process.env.NODE_ENV === 'production' && parsedUrl.port && parsedUrl.port !== '443') {
+      return { valid: false, normalizedUrl, error: 'Non-standard ports are not allowed' };
     }
 
     return { valid: true, normalizedUrl };

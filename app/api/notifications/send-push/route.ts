@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify authentication
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { session }, error: authError } = await supabase.auth.getSession();
 
     if (authError || !session) {
@@ -212,7 +212,7 @@ export async function POST(req: NextRequest) {
  * Send push notification to a specific user's subscribed devices
  */
 async function sendPushToUser(
-  supabase: ReturnType<typeof createClient>,
+  supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
   payload: z.infer<typeof pushPayloadSchema>
 ): Promise<{ success: boolean; sent: number; failed: number; error?: string }> {

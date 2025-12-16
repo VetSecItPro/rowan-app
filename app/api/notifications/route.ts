@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Verify authentication
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { session }, error: authError } = await supabase.auth.getSession();
 
     if (authError || !session) {
@@ -150,7 +150,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify authentication
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { session }, error: authError } = await supabase.auth.getSession();
 
     if (authError || !session) {
@@ -219,7 +219,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     // Verify authentication
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { session }, error: authError } = await supabase.auth.getSession();
 
     if (authError || !session) {
@@ -307,7 +307,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     // Verify authentication
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { session }, error: authError } = await supabase.auth.getSession();
 
     if (authError || !session) {
