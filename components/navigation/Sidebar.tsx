@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, memo } from 'react';
+import { useState, useEffect, useMemo, memo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronLeft, ChevronRight, LayoutDashboard } from 'lucide-react';
@@ -9,6 +9,8 @@ import { useAdmin } from '@/hooks/useAdmin';
 import { TrialBadge } from '@/components/subscription';
 
 const SIDEBAR_STORAGE_KEY = 'sidebar-expanded';
+const HOVER_DELAY = 200; // ms delay before hover expand
+const HOVER_COLLAPSE_DELAY = 300; // ms delay before hover collapse
 
 // Memoized nav item for performance
 const NavItemComponent = memo(function NavItemComponent({
@@ -90,9 +92,16 @@ const NavItemComponent = memo(function NavItemComponent({
 
 export function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(true); // Start expanded by default for new users
+  const [isHoverExpanded, setIsHoverExpanded] = useState(false); // Temporary expansion on hover
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { isAdmin } = useAdmin();
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const collapseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
+
+  // Effective expanded state (either pinned or hover-expanded)
+  const effectivelyExpanded = isExpanded || isHoverExpanded;
 
   // Load saved state from localStorage
   useEffect(() => {
@@ -107,11 +116,73 @@ export function Sidebar() {
     }
   }, []);
 
+  // Keyboard toggle with [ key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only trigger if not in an input/textarea
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+      if (e.key === '[') {
+        e.preventDefault();
+        setIsExpanded(prev => {
+          const newState = !prev;
+          localStorage.setItem(SIDEBAR_STORAGE_KEY, String(newState));
+          return newState;
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+      if (collapseTimeoutRef.current) clearTimeout(collapseTimeoutRef.current);
+    };
+  }, []);
+
+  // Handle hover expand (only when collapsed)
+  const handleMouseEnter = useCallback(() => {
+    if (isExpanded) return; // Don't hover-expand if already pinned open
+
+    // Clear any pending collapse
+    if (collapseTimeoutRef.current) {
+      clearTimeout(collapseTimeoutRef.current);
+      collapseTimeoutRef.current = null;
+    }
+
+    // Delay before expanding
+    hoverTimeoutRef.current = setTimeout(() => {
+      setIsHoverExpanded(true);
+    }, HOVER_DELAY);
+  }, [isExpanded]);
+
+  const handleMouseLeave = useCallback(() => {
+    // Clear any pending expand
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+
+    // Delay before collapsing
+    collapseTimeoutRef.current = setTimeout(() => {
+      setIsHoverExpanded(false);
+    }, HOVER_COLLAPSE_DELAY);
+  }, []);
+
   // Memoize toggle function
-  const toggleSidebar = useMemo(() => () => {
+  const toggleSidebar = useCallback(() => {
     setIsExpanded(prev => {
       const newState = !prev;
       localStorage.setItem(SIDEBAR_STORAGE_KEY, String(newState));
+      // Clear hover state when pinning
+      if (newState) {
+        setIsHoverExpanded(false);
+      }
       return newState;
     });
   }, []);
@@ -132,13 +203,16 @@ export function Sidebar() {
 
   return (
     <aside
+      ref={sidebarRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       className={`hidden md:flex flex-col h-screen sticky top-0 bg-gradient-to-b from-white/90 via-white/80 to-gray-50/90 dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-950/90 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-700/30 transition-all duration-300 ease-out shadow-xl shadow-gray-200/20 dark:shadow-black/20 ${
-        isExpanded ? 'w-64' : 'w-[60px]'
-      }`}
+        effectivelyExpanded ? 'w-64' : 'w-[60px]'
+      } ${isHoverExpanded ? 'z-50' : ''}`}
     >
       {/* Header with subtle branding */}
-      <div className={`flex items-center h-14 px-3 border-b border-gray-200/50 dark:border-gray-700/30 ${isExpanded ? 'justify-between' : 'justify-center'}`}>
-        {isExpanded && (
+      <div className={`flex items-center h-14 px-3 border-b border-gray-200/50 dark:border-gray-700/30 ${effectivelyExpanded ? 'justify-between' : 'justify-center'}`}>
+        {effectivelyExpanded && (
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
               Features
@@ -149,7 +223,8 @@ export function Sidebar() {
         <button
           onClick={toggleSidebar}
           className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
-          aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
+          aria-label={isExpanded ? 'Collapse sidebar (Press [ to toggle)' : 'Expand sidebar (Press [ to toggle)'}
+          title={`Press [ to toggle sidebar`}
         >
           {isExpanded ? (
             <ChevronLeft className="w-4 h-4" />
@@ -169,7 +244,7 @@ export function Sidebar() {
                 key={item.href}
                 item={item}
                 isActive={activeStates[index] ?? false}
-                isExpanded={isExpanded}
+                isExpanded={effectivelyExpanded}
               />
             ))}
           </ul>
@@ -179,7 +254,7 @@ export function Sidebar() {
       {/* Admin Section - separate from features */}
       {isAdmin && (
         <div className="mx-2 mb-2 px-2 pt-2 pb-3 border-t border-gray-200/50 dark:border-gray-700/30">
-          {isExpanded && (
+          {effectivelyExpanded && (
             <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2.5 mb-2 block">
               Admin
             </span>
@@ -194,7 +269,7 @@ export function Sidebar() {
                 description: 'Analytics & metrics',
               }}
               isActive={pathname === '/admin/dashboard' || (pathname?.startsWith('/admin/dashboard') ?? false)}
-              isExpanded={isExpanded}
+              isExpanded={effectivelyExpanded}
             />
           </ul>
         </div>

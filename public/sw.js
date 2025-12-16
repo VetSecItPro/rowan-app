@@ -304,6 +304,9 @@ const ALLOWED_MESSAGE_TYPES = [
   'SKIP_WAITING',
   'CLEAR_CACHE',
   'GET_VERSION',
+  'SYNC_OFFLINE_QUEUE',
+  'CACHE_DATA',
+  'GET_CACHED_DATA',
 ];
 
 // Message event - for communication with main thread
@@ -362,8 +365,177 @@ self.addEventListener('message', (event) => {
       }
       break;
 
+    case 'SYNC_OFFLINE_QUEUE':
+      // Handle background sync for offline queue
+      handleOfflineQueueSync(event.data.queue, event.source);
+      break;
+
+    case 'CACHE_DATA':
+      // Cache custom data (e.g., dashboard state for offline)
+      handleCacheData(event.data.key, event.data.value, event.source);
+      break;
+
+    case 'GET_CACHED_DATA':
+      // Retrieve cached custom data
+      handleGetCachedData(event.data.key, event.source);
+      break;
+
     default:
       // This shouldn't happen due to allowlist check, but just in case
       console.warn('[Service Worker] Unhandled message type:', type);
   }
 });
+
+// Custom data cache name for app state
+const APP_DATA_CACHE_NAME = 'rowan-app-data-v1';
+
+/**
+ * Handle offline queue synchronization
+ * Processes queued actions when connection is restored
+ */
+async function handleOfflineQueueSync(queue, source) {
+  if (!queue || !Array.isArray(queue)) {
+    source?.postMessage({ type: 'SYNC_RESULT', success: false, error: 'Invalid queue' });
+    return;
+  }
+
+  console.log('[Service Worker] Processing offline queue:', queue.length, 'items');
+
+  const results = [];
+  for (const action of queue) {
+    try {
+      const response = await fetch(action.endpoint, {
+        method: action.method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(action.data),
+      });
+
+      results.push({
+        id: action.id,
+        success: response.ok,
+        status: response.status,
+      });
+    } catch (error) {
+      results.push({
+        id: action.id,
+        success: false,
+        error: error.message,
+      });
+    }
+  }
+
+  source?.postMessage({
+    type: 'SYNC_RESULT',
+    success: true,
+    results,
+    syncedCount: results.filter(r => r.success).length,
+    failedCount: results.filter(r => !r.success).length,
+  });
+}
+
+/**
+ * Cache custom data for offline access
+ * Used for caching dashboard state, user preferences, etc.
+ */
+async function handleCacheData(key, value, source) {
+  if (!key || typeof key !== 'string') {
+    source?.postMessage({ type: 'CACHE_DATA_RESULT', success: false, error: 'Invalid key' });
+    return;
+  }
+
+  try {
+    const cache = await caches.open(APP_DATA_CACHE_NAME);
+    const response = new Response(JSON.stringify(value), {
+      headers: { 'Content-Type': 'application/json' },
+    });
+    await cache.put(`/app-data/${key}`, response);
+
+    source?.postMessage({ type: 'CACHE_DATA_RESULT', success: true, key });
+  } catch (error) {
+    console.error('[Service Worker] Error caching data:', error);
+    source?.postMessage({ type: 'CACHE_DATA_RESULT', success: false, error: error.message });
+  }
+}
+
+/**
+ * Retrieve cached custom data
+ */
+async function handleGetCachedData(key, source) {
+  if (!key || typeof key !== 'string') {
+    source?.postMessage({ type: 'CACHED_DATA', success: false, error: 'Invalid key' });
+    return;
+  }
+
+  try {
+    const cache = await caches.open(APP_DATA_CACHE_NAME);
+    const response = await cache.match(`/app-data/${key}`);
+
+    if (response) {
+      const data = await response.json();
+      source?.postMessage({ type: 'CACHED_DATA', success: true, key, data });
+    } else {
+      source?.postMessage({ type: 'CACHED_DATA', success: false, key, error: 'Not found' });
+    }
+  } catch (error) {
+    console.error('[Service Worker] Error retrieving cached data:', error);
+    source?.postMessage({ type: 'CACHED_DATA', success: false, error: error.message });
+  }
+}
+
+// Background Sync for offline queue (when supported)
+self.addEventListener('sync', (event) => {
+  console.log('[Service Worker] Background sync event:', event.tag);
+
+  if (event.tag === 'offline-queue-sync') {
+    event.waitUntil(syncOfflineQueueFromStorage());
+  }
+});
+
+/**
+ * Sync offline queue from localStorage (for background sync)
+ */
+async function syncOfflineQueueFromStorage() {
+  try {
+    // Get the queue from a cached request or IndexedDB
+    const cache = await caches.open(APP_DATA_CACHE_NAME);
+    const queueResponse = await cache.match('/app-data/offline-queue');
+
+    if (!queueResponse) {
+      console.log('[Service Worker] No offline queue found');
+      return;
+    }
+
+    const queueData = await queueResponse.json();
+    if (!queueData.queue || queueData.queue.length === 0) {
+      console.log('[Service Worker] Offline queue is empty');
+      return;
+    }
+
+    console.log('[Service Worker] Background syncing', queueData.queue.length, 'items');
+
+    for (const action of queueData.queue) {
+      try {
+        await fetch(action.endpoint, {
+          method: action.method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(action.data),
+        });
+      } catch (error) {
+        console.error('[Service Worker] Background sync failed for action:', action.id, error);
+      }
+    }
+
+    // Clear the queue after sync
+    await cache.delete('/app-data/offline-queue');
+
+    // Notify all clients that sync is complete
+    const clients = await self.clients.matchAll();
+    clients.forEach(client => {
+      client.postMessage({ type: 'BACKGROUND_SYNC_COMPLETE' });
+    });
+  } catch (error) {
+    console.error('[Service Worker] Background sync error:', error);
+  }
+}

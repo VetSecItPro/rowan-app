@@ -386,7 +386,7 @@ export default function DataManagementPage() {
             Need More Space?
           </h3>
           <p className="text-sm text-blue-700 dark:text-blue-300 mb-4">
-            Upgrade to Pro for 5GB or Family for 15GB of storage space. Cloud storage integrations (Dropbox, Google Drive) coming soon!
+            Upgrade to Pro for 2GB or Family for 5GB of storage space.
           </p>
           <button
             onClick={() => router.push('/pricing')}

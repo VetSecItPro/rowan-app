@@ -10,25 +10,13 @@ const nextConfig = {
   // FIX: Explicitly set workspace root to prevent lockfile confusion
   outputFileTracingRoot: __dirname,
 
-  eslint: {
-    // ESLint is disabled during builds due to 3,500+ non-critical issues
-    // (mostly react/no-unescaped-entities and unused-vars)
-    //
-    // SECURITY NOTE: Security-critical rules (no-eval, no-implied-eval, no-new-func)
-    // have been verified to pass. Only 1 warning exists for the documented
-    // dangerouslySetInnerHTML usage in layout.tsx (theme flash prevention).
-    //
-    // TODO: Gradually fix ESLint issues to enable in builds
-    // Priority: Low - no security-critical violations
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     // TypeScript errors are now fixed - strict mode enabled
     ignoreBuildErrors: false,
   },
   // Workaround for Next.js 15.x Html import bug
   skipTrailingSlashRedirect: true,
-  skipMiddlewareUrlNormalize: true,
+  skipProxyUrlNormalize: true, // Updated from deprecated skipMiddlewareUrlNormalize
   // Use standalone output only on Vercel (not local builds)
   ...(process.env.VERCEL === '1' && { output: 'standalone' }),
   // Disable static error page generation to prevent Next.js 15 Html import issues
@@ -213,9 +201,9 @@ const nextConfig = {
   },
 };
 
-// Sentry configuration
+// Sentry configuration - Updated to new format (v10.x+)
 const sentryWebpackPluginOptions = {
-  // Sentry webpack plugin options
+  // Sentry organization and project
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,
@@ -226,25 +214,28 @@ const sentryWebpackPluginOptions = {
   // Upload source maps during build
   widenClientFileUpload: true,
 
-  // Automatically annotate React components to show their full name in breadcrumbs and session replay
-  reactComponentAnnotation: {
-    enabled: true,
-  },
-
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers
   tunnelRoute: '/monitoring',
 
   // Hides source maps from generated client bundles
   hideSourceMaps: true,
 
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
+  // Webpack-specific options (new format for v10.x+)
+  webpack: {
+    // Automatically annotate React components to show their full name in breadcrumbs and session replay
+    reactComponentAnnotation: {
+      enabled: true,
+    },
 
-  // Disable automatic instrumentation of error pages to prevent Next.js 15 Html component issues
-  autoInstrumentServerFunctions: false,
-  autoInstrumentMiddleware: false,
+    // Disable automatic instrumentation of error pages to prevent Next.js 15 Html component issues
+    autoInstrumentServerFunctions: false,
+    autoInstrumentMiddleware: false,
 
-  // Source map upload enabled (org/project names verified)
+    // Tree-shake Sentry logger statements to reduce bundle size
+    treeshake: {
+      removeDebugLogging: true,
+    },
+  },
 };
 
 // Configure bundle analyzer
