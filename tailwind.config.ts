@@ -44,8 +44,12 @@ const config: Config & { safelist?: any[] } = {
   theme: {
     extend: {
       fontFamily: {
-        // Use Playfair Display for headings, system fonts for body
-        sans: ['var(--font-playfair)', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        // Plus Jakarta Sans for body text and UI - modern, clean
+        sans: ['var(--font-jakarta)', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        // Plus Jakarta Sans for display headings - bold, impactful
+        display: ['var(--font-jakarta)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        // Playfair Display for elegant serif accents
+        serif: ['var(--font-playfair)', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
         playfair: ['var(--font-playfair)', 'serif'],
       },
       colors: {

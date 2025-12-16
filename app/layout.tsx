@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display } from "next/font/google";
+import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthProvider } from "@/lib/contexts/auth-context";
@@ -12,9 +12,20 @@ import { Toaster } from 'sonner';
 
 // Optimized font loading with Next.js font module
 // Automatically self-hosted, preloaded, and optimized
+
+// Plus Jakarta Sans - Modern geometric sans-serif for headings & UI
+// Used by premium SaaS products for its clean, professional look
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-jakarta',
+  weight: ['300', '400', '500', '600', '700', '800'],
+});
+
+// Playfair Display - Elegant serif for descriptions & quotes
 const playfair = Playfair_Display({
   subsets: ['latin'],
-  display: 'swap', // Ensures text is visible while font loads
+  display: 'swap',
   variable: '--font-playfair',
   weight: ['400', '500', '600', '700', '800', '900'],
   style: ['normal', 'italic'],
@@ -98,7 +109,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${playfair.variable} font-sans antialiased bg-gradient-to-br from-gray-50 via-slate-50 to-stone-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 text-gray-900 dark:text-white`} style={{ scrollbarGutter: 'stable' }}>
+      <body className={`${jakarta.variable} ${playfair.variable} font-sans antialiased bg-gradient-to-br from-gray-50 via-slate-50 to-stone-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 text-gray-900 dark:text-white`} style={{ scrollbarGutter: 'stable' }}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

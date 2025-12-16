@@ -65,7 +65,7 @@ const FEATURE_MESSAGES: Record<string, { title: string; description: string; ico
 
 const PRO_FEATURES = [
   'Unlimited tasks & calendar events',
-  'Photo uploads (5GB storage)',
+  'Photo uploads (2GB storage)',
   'Meal planning & recipes',
   'Goals & milestones',
   'Household management',
@@ -77,8 +77,7 @@ const FAMILY_EXTRAS = [
   'AI-powered features',
   'External integrations',
   'Up to 6 family members',
-  '3 separate spaces',
-  '15GB storage',
+  '5GB storage',
   'Priority support',
 ];
 
