@@ -164,7 +164,7 @@ export default function PricingPage() {
                 'Photo uploads (trial)',
                 'Meal planning (trial)',
                 'Goals & milestones (trial)',
-                '2 users, 1 space',
+                '2 household members',
                 'Falls back to free tier after trial',
               ]}
               cta="Start 14-Day Trial"
@@ -185,13 +185,12 @@ export default function PricingPage() {
                 'Unlimited tasks & calendar',
                 'Unlimited messages',
                 'Unlimited shopping lists',
-                'Photo upload (5GB storage)',
+                'Photo upload (2GB storage)',
                 'Meal planning & recipes',
                 'Goals & milestones',
                 'Household management',
                 'Real-time collaboration',
-                '2 users',
-                '1 space',
+                '2 household members',
               ]}
               cta="Upgrade to Pro"
               popular={true}
@@ -204,15 +203,14 @@ export default function PricingPage() {
             <PricingCard
               tier="family"
               title="Family"
-              description="Complete family organization for up to 6 users"
+              description="Complete family organization for up to 6 members"
               monthlyPrice={17.99}
               annualPrice={179}
               period={period}
               features={[
                 'Everything in Pro, plus:',
-                '6 users (vs 2 in Pro)',
-                '3 spaces (vs 1 in Pro)',
-                '15GB storage (vs 5GB)',
+                '6 household members (vs 2)',
+                '5GB storage (vs 2GB)',
                 'AI features',
                 'External integrations',
                 'Priority support',
