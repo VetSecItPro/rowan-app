@@ -32,7 +32,35 @@
 - When in doubt, ask questions and clarify requirements before coding
 
 ## Stack
-Next.js 16 App Router · Supabase (DB + Auth) · TypeScript strict · Tailwind · Zod · Upstash Redis · Resend · React 19
+
+### Core Framework
+- **Next.js 16.0.10** (App Router) - React framework with Turbopack/Webpack dev server
+- **React 19** - UI library
+- **TypeScript 5** - Strict mode enabled
+
+### Database & Auth
+- **Supabase** - PostgreSQL database + Authentication + Row Level Security
+  - `@supabase/supabase-js ^2.58.0`
+  - `@supabase/ssr ^0.8.0`
+
+### Styling
+- **Tailwind CSS 4** - Utility-first CSS
+- **Framer Motion 12** - Animations
+- **Lucide React** - Icon library
+
+### Backend Services
+- **Upstash Redis** - Rate limiting & caching (`@upstash/ratelimit`, `@upstash/redis`)
+- **Resend 6** - Transactional email
+- **Stripe 20** - Payments
+
+### Monitoring & Security
+- **Sentry 10** - Error tracking
+- **DOMPurify** - XSS sanitization
+
+### Data & Forms
+- **Zod 4** - Schema validation
+- **date-fns 4** - Date utilities
+- **Sonner** - Toast notifications
 
 ## Known Issues & Workarounds
 
