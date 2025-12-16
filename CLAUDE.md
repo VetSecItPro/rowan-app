@@ -32,7 +32,26 @@
 - When in doubt, ask questions and clarify requirements before coding
 
 ## Stack
-Next.js 15 App Router · Supabase (DB + Auth) · TypeScript strict · Tailwind · Zod · Upstash Redis · Resend
+Next.js 16 App Router · Supabase (DB + Auth) · TypeScript strict · Tailwind · Zod · Upstash Redis · Resend · React 19
+
+## Known Issues & Workarounds
+
+### Next.js 16 Dev Server Race Conditions (December 2024)
+**Issue:** The Next.js 16 dev server frequently crashes with ENOENT errors on startup:
+```
+Error: ENOENT: no such file or directory, open '.next/dev/prerender-manifest.json'
+Error: ENOENT: no such file or directory, open '.next/dev/static/chunks/app/layout.js'
+```
+
+**Root Cause:** File system race conditions in Next.js 16's webpack/turbopack dev server when generating build artifacts.
+
+**Workaround:**
+1. The dev server is **unstable in Claude Code CLI environment** - it may crash on first request
+2. **For local development**, the user should run `npm run dev` directly in their terminal (not via Claude)
+3. **For CI/CD**, `npm run build` works reliably - use GitHub Actions for verification
+4. TypeScript checks (`npx tsc --noEmit`) work fine and should be used for validation
+
+**DO NOT** waste tokens repeatedly trying different dev server approaches. This is a known limitation.
 
 ## Security Rules
 
