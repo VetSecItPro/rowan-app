@@ -94,7 +94,7 @@ export async function uploadFile(
       return { success: false, error: validation.error };
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Generate unique file path
     const filePath = generateFilePath(userId, file.name);
@@ -152,7 +152,7 @@ export async function deleteFile(
   filePath: string
 ): Promise<DeleteResult> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { error } = await supabase.storage.from(bucket).remove([filePath]);
 
@@ -183,8 +183,8 @@ export async function deleteFile(
  * @param filePath - The path to the file in the bucket
  * @returns Public URL
  */
-export function getPublicUrl(bucket: BucketName, filePath: string): string {
-  const supabase = createClient();
+export async function getPublicUrl(bucket: BucketName, filePath: string): Promise<string> {
+  const supabase = await createClient();
   const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
   return data.publicUrl;
 }
@@ -200,7 +200,7 @@ export async function uploadAvatar(
   userId: string
 ): Promise<UploadResult> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get current avatar URL to delete old one
     const { data: user } = await supabase
@@ -326,7 +326,7 @@ export async function getSpaceStorageUsage(
   spaceId: string
 ): Promise<{ success: true; data: StorageUsage } | { success: false; error: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get current usage from storage_usage table
     const { data: usage, error: usageError } = await supabase
@@ -391,7 +391,7 @@ export async function checkStorageQuota(
   fileSizeBytes: number
 ): Promise<{ success: true; data: QuotaCheckResult } | { success: false; error: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data, error } = await supabase.rpc('check_storage_quota', {
       p_space_id: spaceId,
@@ -443,7 +443,7 @@ export async function shouldShowStorageWarning(
   | { success: false; error: string }
 > {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get current storage usage
     const usageResult = await getSpaceStorageUsage(spaceId);
@@ -517,7 +517,7 @@ export async function dismissStorageWarning(
   warningType: WarningType
 ): Promise<{ success: true } | { success: false; error: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get current storage usage for context
     const usageResult = await getSpaceStorageUsage(spaceId);
@@ -561,7 +561,7 @@ export async function recalculateStorageUsage(
   spaceId: string
 ): Promise<{ success: true; data: StorageUsage } | { success: false; error: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Call database function to recalculate
     const { data, error } = await supabase.rpc('calculate_space_storage', {

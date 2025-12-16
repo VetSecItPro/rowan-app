@@ -3,7 +3,13 @@ import { cookies } from 'next/headers';
 import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { logger } from '@/lib/logger';
 
-export const createClient = () => {
+/**
+ * Creates an async Supabase client for server-side use (API routes, Server Actions, Route Handlers).
+ * In Next.js 15+, cookies() returns a Promise, so this function must be async.
+ *
+ * Usage: const supabase = await createClient();
+ */
+export async function createClient() {
   // Runtime check to prevent execution during build time
   if (typeof window !== 'undefined') {
     throw new Error('Server client called in browser context');
@@ -26,17 +32,17 @@ export const createClient = () => {
       }),
       auth: {
         getUser: () => ({ data: { user: null }, error: null }),
+        getSession: () => ({ data: { session: null }, error: null }),
         signUp: () => ({ data: { user: null }, error: null }),
         signInWithPassword: () => ({ data: { user: null }, error: null }),
+        signOut: () => ({ error: null }),
       },
       rpc: () => ({ data: null, error: null }),
     } as any;
   }
 
-  // In Next.js 15+, cookies() returns a Promise, but we use React.use() to unwrap it
-  // This is a server-only module, so we can safely import React here
-  const React = require('react');
-  const cookieStore = React.use(cookies());
+  // In Next.js 15+, cookies() returns a Promise - must await it
+  const cookieStore = await cookies();
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
@@ -56,4 +62,4 @@ export const createClient = () => {
       },
     },
   });
-};
+}

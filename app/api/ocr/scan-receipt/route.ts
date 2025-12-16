@@ -20,7 +20,7 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '');
 export async function POST(request: NextRequest) {
   try {
     // Authentication check
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
     if (sessionError || !session) {

@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const csrfError = validateCsrfRequest(request);
     if (csrfError) return csrfError;
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -147,7 +147,7 @@ export async function DELETE(request: NextRequest) {
     const csrfError = validateCsrfRequest(request);
     if (csrfError) return csrfError;
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -267,7 +267,7 @@ export async function DELETE(request: NextRequest) {
 // GET - Get deletion status
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();

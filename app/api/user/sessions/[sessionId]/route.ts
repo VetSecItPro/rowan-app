@@ -19,7 +19,7 @@ export async function DELETE(request: NextRequest, props: { params: Promise<{ se
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get authenticated user
     const {

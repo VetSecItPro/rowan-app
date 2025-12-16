@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     const { token } = validatedData;
 
     // Create Supabase client
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verify the magic link token
     const { data: tokenData, error: tokenError } = await supabase
@@ -162,7 +162,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check token validity without using it
     const { data: tokenData, error: tokenError } = await supabase

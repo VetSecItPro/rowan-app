@@ -26,7 +26,7 @@ const UnsubscribeTokenSchema = z.object({
 // POST - Update marketing subscription preferences
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
 // GET - Get current marketing subscription status
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check if this is a token-based unsubscribe request
     const url = new URL(request.url);
@@ -269,7 +269,7 @@ async function updateResendAudience(userId: string, enableMarketing: boolean) {
       return;
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get user email
     const { data: profile } = await supabase
@@ -324,7 +324,7 @@ async function updateEmailServiceProvider(userId: string, enableEmail: boolean) 
 // Log marketing preference changes for audit trail
 async function logMarketingPreferenceChange(userId: string, preferences: any) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Log each preference change
     const notifications = [];
@@ -350,7 +350,7 @@ async function logMarketingPreferenceChange(userId: string, preferences: any) {
 // Generate unsubscribe token for email links
 async function generateUnsubscribeToken(userId: string, type: string): Promise<string> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Create a secure token
     const token = crypto.randomUUID() + crypto.randomUUID();
@@ -377,7 +377,7 @@ async function generateUnsubscribeToken(userId: string, type: string): Promise<s
 // Handle token-based unsubscribe
 async function handleTokenUnsubscribe(token: string, type: string) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Find the token in notifications
     const { data: tokenRecord, error: tokenError } = await supabase

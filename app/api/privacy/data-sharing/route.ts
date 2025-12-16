@@ -15,7 +15,7 @@ const DataSharingRequestSchema = z.object({
 // POST - Update data sharing consent
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();
@@ -184,7 +184,7 @@ async function logDataSharingChange(
   newValue: boolean
 ) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Log the change in preference history
     await supabase
@@ -213,7 +213,7 @@ async function logDataSharingChange(
 // GET - Get current data sharing status and partner list
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession();

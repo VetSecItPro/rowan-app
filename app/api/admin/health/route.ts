@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Create Supabase client
-    const supabase = createClient();
+    const supabase = await createClient();
     const now = new Date().toISOString();
 
     // Health checks array

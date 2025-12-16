@@ -26,7 +26,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ spaceId: 
     }
 
     // Verify authentication
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { session }, error: authError } = await supabase.auth.getSession();
 
     if (authError || !session) {
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ spaceId:
     }
 
     // Verify authentication
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { session }, error: authError } = await supabase.auth.getSession();
 
     if (authError || !session) {

@@ -138,7 +138,7 @@ export class YearInReviewService {
    * Generate comprehensive year in review for a user and space
    */
   async generateYearInReview(
-    supabase: ReturnType<typeof createClient>,
+    supabase: Awaited<ReturnType<typeof createClient>>,
     userId: string,
     spaceId: string,
     year: number = new Date().getFullYear()
@@ -192,7 +192,7 @@ export class YearInReviewService {
    * Calculate overview statistics for the year
    */
   private async calculateOverviewStats(
-    supabase: ReturnType<typeof createClient>,
+    supabase: Awaited<ReturnType<typeof createClient>>,
     spaceId: string,
     yearStart: Date,
     yearEnd: Date
@@ -270,7 +270,7 @@ export class YearInReviewService {
    * Calculate monthly breakdown of activity
    */
   private async calculateMonthlyBreakdown(
-    supabase: ReturnType<typeof createClient>,
+    supabase: Awaited<ReturnType<typeof createClient>>,
     spaceId: string,
     year: number
   ): Promise<MonthlyStats[]> {
@@ -343,7 +343,7 @@ export class YearInReviewService {
    * Generate achievement summary including badges and milestones
    */
   private async generateAchievementSummary(
-    supabase: ReturnType<typeof createClient>,
+    supabase: Awaited<ReturnType<typeof createClient>>,
     userId: string,
     spaceId: string,
     yearStart: Date,
@@ -439,7 +439,7 @@ export class YearInReviewService {
    * Generate personal insights and patterns
    */
   private async generatePersonalInsights(
-    supabase: ReturnType<typeof createClient>,
+    supabase: Awaited<ReturnType<typeof createClient>>,
     spaceId: string,
     yearStart: Date,
     yearEnd: Date
@@ -484,7 +484,7 @@ export class YearInReviewService {
   }
 
   // Placeholder methods for additional data
-  private async getTasksForYear(supabase: ReturnType<typeof createClient>, spaceId: string, yearStart: Date, yearEnd: Date) {
+  private async getTasksForYear(supabase: Awaited<ReturnType<typeof createClient>>, spaceId: string, yearStart: Date, yearEnd: Date) {
     const { data } = await supabase
       .from('tasks')
       .select('*')
@@ -494,7 +494,7 @@ export class YearInReviewService {
     return data || [];
   }
 
-  private async getGoalsForYear(supabase: ReturnType<typeof createClient>, spaceId: string, yearStart: Date, yearEnd: Date) {
+  private async getGoalsForYear(supabase: Awaited<ReturnType<typeof createClient>>, spaceId: string, yearStart: Date, yearEnd: Date) {
     const { data } = await supabase
       .from('goals')
       .select('*')
@@ -504,7 +504,7 @@ export class YearInReviewService {
     return data || [];
   }
 
-  private async getExpensesForYear(supabase: ReturnType<typeof createClient>, spaceId: string, yearStart: Date, yearEnd: Date) {
+  private async getExpensesForYear(supabase: Awaited<ReturnType<typeof createClient>>, spaceId: string, yearStart: Date, yearEnd: Date) {
     const { data } = await supabase
       .from('expenses')
       .select('*')
@@ -519,7 +519,7 @@ export class YearInReviewService {
     return [];
   }
 
-  private async getTopCategories(supabase: ReturnType<typeof createClient>, spaceId: string, yearStart: Date, yearEnd: Date): Promise<CategoryStats[]> {
+  private async getTopCategories(supabase: Awaited<ReturnType<typeof createClient>>, spaceId: string, yearStart: Date, yearEnd: Date): Promise<CategoryStats[]> {
     // Placeholder - would aggregate categories across all entities
     return [
       { category: 'work', count: 45, percentage: 35 },
@@ -528,7 +528,7 @@ export class YearInReviewService {
     ];
   }
 
-  private async generateGoalsSummary(supabase: ReturnType<typeof createClient>, spaceId: string, yearStart: Date, yearEnd: Date): Promise<GoalsSummary> {
+  private async generateGoalsSummary(supabase: Awaited<ReturnType<typeof createClient>>, spaceId: string, yearStart: Date, yearEnd: Date): Promise<GoalsSummary> {
     const { count: totalGoals } = await supabase
       .from('goals')
       .select('id', { count: 'exact' })
@@ -555,7 +555,7 @@ export class YearInReviewService {
     };
   }
 
-  private async generateExpensesSummary(supabase: ReturnType<typeof createClient>, spaceId: string, yearStart: Date, yearEnd: Date): Promise<ExpensesSummary> {
+  private async generateExpensesSummary(supabase: Awaited<ReturnType<typeof createClient>>, spaceId: string, yearStart: Date, yearEnd: Date): Promise<ExpensesSummary> {
     const { data: expenses } = await supabase
       .from('expenses')
       .select('amount')
@@ -575,7 +575,7 @@ export class YearInReviewService {
     };
   }
 
-  private async calculateProductivityMetrics(supabase: ReturnType<typeof createClient>, spaceId: string, yearStart: Date, yearEnd: Date): Promise<ProductivityMetrics> {
+  private async calculateProductivityMetrics(supabase: Awaited<ReturnType<typeof createClient>>, spaceId: string, yearStart: Date, yearEnd: Date): Promise<ProductivityMetrics> {
     const { count: totalTasks } = await supabase
       .from('tasks')
       .select('id', { count: 'exact' })

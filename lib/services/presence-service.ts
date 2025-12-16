@@ -21,7 +21,7 @@ export async function updateUserPresence(
   status: PresenceStatus = PresenceStatus.ONLINE
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -62,7 +62,7 @@ export async function getSpaceMembersWithPresence(
   spaceId: string
 ): Promise<{ success: true; data: SpaceMemberWithPresence[] } | { success: false; error: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Use the database view we created
     const { data, error } = await supabase
@@ -141,7 +141,7 @@ export async function getSpacePresenceSummary(
  */
 export async function cleanupInactiveUsers(): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Call the database function
     const { error } = await supabase.rpc('mark_inactive_users_offline');
@@ -163,7 +163,7 @@ export async function cleanupInactiveUsers(): Promise<{ success: boolean; error?
  */
 export async function isUserOnline(userId: string): Promise<boolean> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data, error } = await supabase
       .from('user_presence')

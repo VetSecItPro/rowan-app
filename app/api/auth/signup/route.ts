@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     // Create Supabase client (runtime only)
     let supabase;
     try {
-      supabase = createClient();
+      supabase = await createClient();
     } catch {
       return NextResponse.json(
         { error: 'Service temporarily unavailable' },

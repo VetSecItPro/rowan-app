@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create Supabase client
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get current timestamp for unsubscribed_at
     const unsubscribedAt = new Date().toISOString();

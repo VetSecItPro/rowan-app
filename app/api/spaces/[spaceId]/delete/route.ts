@@ -31,7 +31,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ spaceI
     }
 
     // Verify authentication
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { session }, error: authError } = await supabase.auth.getSession();
 
     if (authError || !session) {
