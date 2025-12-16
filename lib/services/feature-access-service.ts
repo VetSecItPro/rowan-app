@@ -15,16 +15,19 @@ import type { SubscriptionTier, UsageType } from '../types';
  */
 export async function canAccessFeature(
   userId: string,
-  feature: 'canUploadPhotos' | 'canUseMealPlanning' | 'canUseReminders' | 'canUseGoals' | 'canUseHousehold' | 'canUseAI' | 'canUseIntegrations'
+  feature: 'canUploadPhotos' | 'canUseMealPlanning' | 'canUseReminders' | 'canUseGoals' | 'canUseHousehold' | 'canUseAI' | 'canUseIntegrations' | 'canUseEventProposals'
 ): Promise<{ allowed: boolean; reason?: string; tier?: SubscriptionTier }> {
   const tier = await getUserTier(userId);
   const limits = getFeatureLimits(tier);
   const allowed = limits[feature] === true;
 
   if (!allowed) {
+    // Family-only features
+    const familyOnlyFeatures = ['canUseAI', 'canUseIntegrations'];
+    const requiredTier = familyOnlyFeatures.includes(feature) ? 'Family' : 'Pro';
     return {
       allowed: false,
-      reason: `This feature requires ${feature === 'canUseAI' || feature === 'canUseIntegrations' ? 'Family' : 'Pro'} tier`,
+      reason: `This feature requires ${requiredTier} tier`,
       tier,
     };
   }
@@ -96,6 +99,7 @@ export async function getUserFeatureAccess(userId: string): Promise<{
     household: boolean;
     ai: boolean;
     integrations: boolean;
+    eventProposals: boolean;
   };
   limits: {
     activeTasks: number;
@@ -138,6 +142,7 @@ export async function getUserFeatureAccess(userId: string): Promise<{
       household: limits.canUseHousehold,
       ai: limits.canUseAI,
       integrations: limits.canUseIntegrations,
+      eventProposals: limits.canUseEventProposals,
     },
     limits: {
       activeTasks: limits.maxActiveTasks,
@@ -187,6 +192,7 @@ export async function shouldPromptUpgrade(
     mealPlanning: 'pro',
     goals: 'pro',
     household: 'pro',
+    eventProposals: 'pro',
     ai: 'family',
     integrations: 'family',
   };

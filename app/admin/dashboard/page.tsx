@@ -41,6 +41,9 @@ import {
   FeedbackPanel,
   SubscriptionsPanel,
   BetaFeedbackPanel,
+  NotificationsPanel,
+  HealthPanel,
+  ExportPanel,
 } from '@/components/admin/panels';
 
 interface DashboardStats {
@@ -50,6 +53,15 @@ interface DashboardStats {
   launchSignups: number;
   betaRequestsToday: number;
   signupsToday: number;
+}
+
+interface ActivityItem {
+  id: string;
+  type: 'user_signup' | 'beta_granted' | 'beta_feedback' | 'feedback';
+  title: string;
+  description: string;
+  timestamp: string;
+  email?: string;
 }
 
 type TabId = 'users' | 'beta' | 'notifications' | 'analytics' | 'subscriptions' | 'features' | 'beta-feedback' | 'feedback' | 'health' | 'export';
@@ -248,6 +260,66 @@ function AdminDashboardContent() {
     refetchInterval: 5 * 60 * 1000,
   });
 
+  // Fetch recent activity data
+  const { data: activityData } = useQuery({
+    queryKey: ['admin-recent-activity'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/activity?limit=6&hours=24');
+      if (!response.ok) throw new Error('Failed to fetch activity');
+      const data = await response.json();
+      return data.activities as ActivityItem[];
+    },
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchInterval: 2 * 60 * 1000,
+  });
+
+  // Helper to format relative time
+  const formatRelativeTime = (timestamp: string) => {
+    const now = new Date();
+    const date = new Date(timestamp);
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${diffDays}d ago`;
+  };
+
+  // Get icon and colors for activity type
+  const getActivityConfig = (type: ActivityItem['type']) => {
+    switch (type) {
+      case 'user_signup':
+        return {
+          icon: UserPlus,
+          iconBg: 'bg-green-100 dark:bg-green-900/30',
+          iconColor: 'text-green-600 dark:text-green-400',
+        };
+      case 'beta_granted':
+        return {
+          icon: Shield,
+          iconBg: 'bg-purple-100 dark:bg-purple-900/30',
+          iconColor: 'text-purple-600 dark:text-purple-400',
+        };
+      case 'beta_feedback':
+      case 'feedback':
+        return {
+          icon: MessageSquare,
+          iconBg: 'bg-pink-100 dark:bg-pink-900/30',
+          iconColor: 'text-pink-600 dark:text-pink-400',
+        };
+      default:
+        return {
+          icon: Activity,
+          iconBg: 'bg-blue-100 dark:bg-blue-900/30',
+          iconColor: 'text-blue-600 dark:text-blue-400',
+        };
+    }
+  };
+
   // Render the active panel content
   const renderPanel = () => {
     // If no tab is selected, show a welcome/select message
@@ -269,16 +341,7 @@ function AdminDashboardContent() {
       case 'beta':
         return <BetaProgramPanel />;
       case 'notifications':
-        return (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <Mail className="w-12 h-12 text-green-500 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Launch Notifications</h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-4">Manage launch notification subscribers</p>
-            <Link href="/admin/notifications" className="text-blue-600 hover:underline text-sm">
-              Open Full Page →
-            </Link>
-          </div>
-        );
+        return <NotificationsPanel />;
       case 'analytics':
         return <AnalyticsPanel />;
       case 'subscriptions':
@@ -290,27 +353,9 @@ function AdminDashboardContent() {
       case 'feedback':
         return <FeedbackPanel />;
       case 'health':
-        return (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <HeartPulse className="w-12 h-12 text-red-500 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">System Health</h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-4">Database, API, and service health monitoring</p>
-            <Link href="/admin/health" className="text-blue-600 hover:underline text-sm">
-              Open Full Page →
-            </Link>
-          </div>
-        );
+        return <HealthPanel />;
       case 'export':
-        return (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <Download className="w-12 h-12 text-gray-500 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Export Data</h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-4">Export user data and analytics</p>
-            <Link href="/admin/health" className="text-blue-600 hover:underline text-sm">
-              Open Full Page →
-            </Link>
-          </div>
-        );
+        return <ExportPanel />;
       default:
         return null;
     }
@@ -478,41 +523,21 @@ function AdminDashboardContent() {
             <span className="text-xs text-gray-500">Last 24 hours</span>
           </div>
           <div className="flex gap-4 overflow-x-auto pb-1">
-            {stats && stats.totalUsers > 0 ? (
-              <>
-                <ActivityItem
-                  icon={UserPlus}
-                  title="New user signup"
-                  description="john@example.com registered"
-                  time="2m ago"
-                  iconBg="bg-green-100 dark:bg-green-900/30"
-                  iconColor="text-green-600 dark:text-green-400"
-                />
-                <ActivityItem
-                  icon={Shield}
-                  title="Beta access granted"
-                  description="Beta request approved"
-                  time="15m ago"
-                  iconBg="bg-purple-100 dark:bg-purple-900/30"
-                  iconColor="text-purple-600 dark:text-purple-400"
-                />
-                <ActivityItem
-                  icon={CheckCircle}
-                  title="Task completed"
-                  description="User completed onboarding"
-                  time="1h ago"
-                  iconBg="bg-blue-100 dark:bg-blue-900/30"
-                  iconColor="text-blue-600 dark:text-blue-400"
-                />
-                <ActivityItem
-                  icon={MessageSquare}
-                  title="New feedback"
-                  description="Feature request submitted"
-                  time="2h ago"
-                  iconBg="bg-pink-100 dark:bg-pink-900/30"
-                  iconColor="text-pink-600 dark:text-pink-400"
-                />
-              </>
+            {activityData && activityData.length > 0 ? (
+              activityData.map((activity) => {
+                const config = getActivityConfig(activity.type);
+                return (
+                  <ActivityItem
+                    key={activity.id}
+                    icon={config.icon}
+                    title={activity.title}
+                    description={activity.description}
+                    time={formatRelativeTime(activity.timestamp)}
+                    iconBg={config.iconBg}
+                    iconColor={config.iconColor}
+                  />
+                );
+              })
             ) : (
               <div className="flex-1 flex items-center justify-center py-4 text-gray-500 dark:text-gray-400 text-sm">
                 <Activity className="w-4 h-4 mr-2 opacity-50" />
