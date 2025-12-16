@@ -16,6 +16,170 @@ html:not(.dark) .bg-white {
   background-color: #fafafa !important;
 }
 
+/* ==================== TRUE DARK MODE SYSTEM ==================== */
+/* True dark (#0a0a0a) instead of gray dark for a more premium feel */
+
+/* CSS Custom Properties for consistent theming */
+:root {
+  /* Light mode - Refined slate-based neutrals */
+  --color-surface-primary: #fafafa;
+  --color-surface-secondary: #f1f5f9;
+  --color-surface-elevated: #ffffff;
+  --color-border-subtle: rgba(148, 163, 184, 0.2);
+  --color-border-default: rgba(148, 163, 184, 0.3);
+
+  /* Semantic colors */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #3b82f6;
+}
+
+.dark {
+  /* True dark mode - Deep blacks with subtle differentiation */
+  --color-surface-primary: #0a0a0a;
+  --color-surface-secondary: #111111;
+  --color-surface-elevated: #171717;
+  --color-border-subtle: rgba(255, 255, 255, 0.06);
+  --color-border-default: rgba(255, 255, 255, 0.1);
+}
+
+/* Override gray-900 backgrounds to true dark in dark mode */
+.dark .bg-gray-900 {
+  background-color: #0a0a0a !important;
+}
+
+.dark .dark\:bg-gray-900 {
+  background-color: #0a0a0a !important;
+}
+
+/* Override gray-800 to slightly elevated dark */
+.dark .bg-gray-800,
+.dark .dark\:bg-gray-800 {
+  background-color: #141414 !important;
+}
+
+/* Override gray-950 to true dark */
+.dark .bg-gray-950,
+.dark .dark\:bg-gray-950 {
+  background-color: #0a0a0a !important;
+}
+
+/* Gradient backgrounds in dark mode */
+.dark .dark\:from-gray-900 {
+  --tw-gradient-from: #0a0a0a !important;
+}
+
+.dark .dark\:via-gray-900 {
+  --tw-gradient-via: #0a0a0a !important;
+}
+
+.dark .dark\:to-gray-900 {
+  --tw-gradient-to: #0a0a0a !important;
+}
+
+.dark .dark\:from-gray-950 {
+  --tw-gradient-from: #050505 !important;
+}
+
+.dark .dark\:to-gray-950 {
+  --tw-gradient-to: #050505 !important;
+}
+
+/* Card surfaces in dark mode - subtle elevation */
+.dark .dark\:bg-gray-800\/90,
+.dark .bg-gray-800\/90 {
+  background-color: rgba(20, 20, 20, 0.9) !important;
+}
+
+.dark .dark\:bg-gray-800\/80,
+.dark .bg-gray-800\/80 {
+  background-color: rgba(20, 20, 20, 0.8) !important;
+}
+
+.dark .dark\:bg-gray-900\/90,
+.dark .bg-gray-900\/90 {
+  background-color: rgba(10, 10, 10, 0.9) !important;
+}
+
+.dark .dark\:bg-gray-900\/80,
+.dark .bg-gray-900\/80 {
+  background-color: rgba(10, 10, 10, 0.8) !important;
+}
+
+/* Border refinements in dark mode */
+.dark .dark\:border-gray-700,
+.dark .border-gray-700 {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .dark\:border-gray-800,
+.dark .border-gray-800 {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.dark .dark\:border-gray-700\/50 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .dark\:border-gray-700\/30 {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ==================== CONSISTENT CORNER RADIUS ==================== */
+/* Standardize to 12px (rounded-xl) for cards and containers */
+
+/* Utility class for consistent card radius */
+.card-radius {
+  border-radius: 0.75rem; /* 12px */
+}
+
+/* Override common variations to be consistent */
+.rounded-2xl {
+  border-radius: 0.75rem; /* Standardize to 12px */
+}
+
+/* Keep some specific sizes for buttons and small elements */
+.rounded-full {
+  border-radius: 9999px; /* Pills stay as pills */
+}
+
+/* ==================== REFINED CARD DESIGN ==================== */
+/* Subtle borders instead of heavy shadows, glassmorphism for overlays */
+
+.card-refined {
+  background-color: var(--color-surface-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.75rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-refined:hover {
+  border-color: var(--color-border-default);
+}
+
+.dark .card-refined {
+  background-color: #141414;
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.dark .card-refined:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Glass effect for modals and overlays */
+.glass-overlay {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass-overlay {
+  background: rgba(10, 10, 10, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 /* ==================== TOUCH SCROLL OPTIMIZATION ==================== */
 /* Better touch scrolling on mobile devices */
 .touch-scroll {
