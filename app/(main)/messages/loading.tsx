@@ -2,7 +2,7 @@ import { SkeletonLoader } from '@/components/shared/SkeletonLoader';
 
 export default function MessagesLoading() {
   return (
-    <div className="flex h-[calc(100vh-4rem)] animate-in fade-in duration-300">
+    <div className="flex h-main-content animate-in fade-in duration-300">
       {/* Sidebar skeleton */}
       <div className="w-80 border-r border-gray-200 dark:border-gray-700 p-4 space-y-4">
         <div className="flex items-center justify-between">
