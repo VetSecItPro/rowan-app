@@ -26,13 +26,13 @@ const ThemeToggle = memo(function ThemeToggle() {
   return (
     <button
       onClick={handleToggle}
-      className="btn-icon-mobile rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
+      className="w-10 h-10 flex items-center justify-center transition-colors"
       aria-label="Toggle theme"
     >
       {isDark ? (
-        <Sun className="w-5 h-5 text-gray-300" />
+        <Sun className="w-5 h-5 text-amber-400 hover:text-amber-300 transition-colors" />
       ) : (
-        <Moon className="w-5 h-5 text-gray-700" />
+        <Moon className="w-5 h-5 text-gray-600 hover:text-gray-800 transition-colors" />
       )}
     </button>
   );

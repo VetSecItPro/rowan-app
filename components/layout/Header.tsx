@@ -100,11 +100,16 @@ export function Header() {
               </div>
             </div>
 
-            {/* Pricing Link - Only show for non-logged-in users */}
+            {/* Features & Pricing Links - Only show for non-logged-in users */}
             {!user && (
-              <a href="#pricing" className="hidden md:block inline-block py-2 px-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95">
-                Pricing
-              </a>
+              <>
+                <a href="#features" className="hidden sm:inline-block py-2 px-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95">
+                  Features
+                </a>
+                <a href="#pricing" className="hidden sm:inline-block py-2 px-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95">
+                  Pricing
+                </a>
+              </>
             )}
 
             {/* Show Dashboard only for logged-in users, Create Account for non-logged-in */}
@@ -132,7 +137,7 @@ export function Header() {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-full text-white font-medium transition-all hover:opacity-90 active:scale-95 min-w-[90px] ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-full text-white font-semibold transition-all hover:opacity-90 active:scale-95 min-w-[90px] ${
                     COLOR_THEMES[user.color_theme as keyof typeof COLOR_THEMES] || 'bg-emerald-600'
                   }`}
                 >
@@ -244,7 +249,7 @@ export function Header() {
             ) : (
               <Link
                 href="/login"
-                className="px-6 py-2 bg-emerald-600 text-white rounded-full hover:opacity-90 transition-all shadow-lg active:scale-95"
+                className="px-6 py-2.5 bg-emerald-600 text-white font-semibold rounded-full hover:bg-emerald-700 transition-all shadow-lg active:scale-95"
               >
                 Login
               </Link>
