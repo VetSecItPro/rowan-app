@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -28,13 +29,27 @@ export function Header() {
   const { user, signOut } = useAuth();
   const { currentSpace, spaces, switchSpace } = useSpaces();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
+
+  // Mount check for portal
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      // Check if click is outside both the button and the dropdown
+      if (
+        dropdownRef.current && !dropdownRef.current.contains(target) &&
+        buttonRef.current && !buttonRef.current.contains(target)
+      ) {
         setIsDropdownOpen(false);
       }
     }
@@ -42,6 +57,17 @@ export function Header() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Calculate dropdown position when opening
+  useEffect(() => {
+    if (isDropdownOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + 8, // 8px gap (mt-2 equivalent)
+        right: window.innerWidth - rect.right,
+      });
+    }
+  }, [isDropdownOpen]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -134,8 +160,9 @@ export function Header() {
 
             {/* Conditional: Show user dropdown if logged in, otherwise show Login button */}
             {user ? (
-              <div className="relative" ref={dropdownRef}>
+              <div className="relative">
                 <button
+                  ref={buttonRef}
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className={`flex items-center gap-2 px-3 py-2 rounded-full text-white font-semibold transition-all hover:opacity-90 active:scale-95 min-w-[90px] ${
                     COLOR_THEMES[user.color_theme as keyof typeof COLOR_THEMES] || 'bg-emerald-600'
@@ -160,9 +187,19 @@ export function Header() {
                   <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
-                {/* Dropdown Menu */}
-                {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-56 dropdown-mobile bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-lg shadow-xl border border-gray-200/50 dark:border-gray-700/50 py-1 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                {/* Dropdown Menu - Rendered via portal for proper positioning on mobile */}
+                {isDropdownOpen && mounted && createPortal(
+                  <div
+                    ref={dropdownRef}
+                    className="fixed w-56 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-lg shadow-xl border border-gray-200/50 dark:border-gray-700/50 py-1 animate-in fade-in slide-in-from-top-2 duration-200"
+                    style={{
+                      top: `${dropdownPosition.top}px`,
+                      right: `${dropdownPosition.right}px`,
+                      zIndex: 10000,
+                      maxHeight: 'calc(100vh - 100px)',
+                      overflowY: 'auto',
+                    }}
+                  >
                     {/* Profile Section */}
                     <div className="px-4 py-3 border-b border-gray-200/50 dark:border-gray-700/50">
                       <div className="flex items-center gap-3">
@@ -243,7 +280,8 @@ export function Header() {
                       <LogOut className="w-4 h-4" />
                       Sign Out
                     </button>
-                  </div>
+                  </div>,
+                  document.body
                 )}
               </div>
             ) : (
