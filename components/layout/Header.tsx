@@ -60,14 +60,45 @@ export function Header() {
 
   // Calculate dropdown position when opening
   useEffect(() => {
-    if (isDropdownOpen && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setDropdownPosition({
-        top: rect.bottom + 8, // 8px gap (mt-2 equivalent)
-        right: window.innerWidth - rect.right,
-      });
+    if (isDropdownOpen && buttonRef.current && mounted) {
+      const updatePosition = () => {
+        if (!buttonRef.current) return;
+        const rect = buttonRef.current.getBoundingClientRect();
+        const dropdownWidth = 224; // w-56 = 14rem = 224px
+        const viewportWidth = window.innerWidth;
+
+        // Calculate right position, ensuring dropdown stays within viewport
+        let rightPos = viewportWidth - rect.right;
+
+        // On mobile, if dropdown would overflow left side, adjust position
+        if (rect.right - dropdownWidth < 8) {
+          rightPos = viewportWidth - dropdownWidth - 8; // 8px padding from edge
+        }
+
+        // Ensure right position doesn't push dropdown off right edge
+        if (rightPos < 8) {
+          rightPos = 8;
+        }
+
+        setDropdownPosition({
+          top: rect.bottom + 8, // 8px gap (mt-2 equivalent)
+          right: rightPos,
+        });
+      };
+
+      // Initial calculation
+      updatePosition();
+
+      // Recalculate on resize/scroll
+      window.addEventListener('resize', updatePosition);
+      window.addEventListener('scroll', updatePosition, true);
+
+      return () => {
+        window.removeEventListener('resize', updatePosition);
+        window.removeEventListener('scroll', updatePosition, true);
+      };
     }
-  }, [isDropdownOpen]);
+  }, [isDropdownOpen, mounted]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -188,7 +219,7 @@ export function Header() {
                 </button>
 
                 {/* Dropdown Menu - Rendered via portal for proper positioning on mobile */}
-                {isDropdownOpen && mounted && createPortal(
+                {isDropdownOpen && mounted && dropdownPosition.top > 0 && createPortal(
                   <div
                     ref={dropdownRef}
                     className="fixed w-56 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-lg shadow-xl border border-gray-200/50 dark:border-gray-700/50 py-1 animate-in fade-in slide-in-from-top-2 duration-200"
