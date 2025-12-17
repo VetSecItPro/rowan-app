@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { X } from 'lucide-react';
+import { useScrollLock } from '@/lib/hooks/useScrollLock';
 
 interface ModalProps {
   isOpen: boolean;
@@ -45,17 +46,8 @@ export function Modal({
   const modalRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
+  // Lock scroll on the correct scroll container (main element)
+  useScrollLock(isOpen);
 
   // Close on escape key
   useEffect(() => {

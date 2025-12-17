@@ -957,7 +957,7 @@ export default function MessagesPage() {
 
 
           {/* Conversations and Chat Interface */}
-          <div className="flex gap-4 h-[calc(100vh-380px)] sm:h-[calc(100vh-400px)] min-h-[500px]">
+          <div className="flex gap-4 h-chat-container min-h-[500px]">
             {/* Conversation Sidebar - Desktop */}
             <div className="hidden md:block w-80 flex-shrink-0">
               <div className="sticky top-4 h-full">

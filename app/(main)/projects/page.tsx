@@ -527,7 +527,7 @@ export default function ProjectsPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700/50 rounded-xl p-6 overflow-visible min-h-[calc(100vh-380px)]">
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700/50 rounded-xl p-6 overflow-visible min-h-content-panel">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
                 <h2 className="text-xl font-bold text-amber-900 dark:text-amber-100">
