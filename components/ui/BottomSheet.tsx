@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
+import { useScrollLock } from '@/lib/hooks/useScrollLock';
 
 interface BottomSheetProps {
   /** Whether the bottom sheet is open */
@@ -64,19 +65,14 @@ export function BottomSheet({
     return () => setMounted(false);
   }, []);
 
+  // Lock scroll on the correct scroll container (main element)
+  useScrollLock(isOpen);
+
   // Handle open/close animation
   useEffect(() => {
     if (isOpen) {
       setIsAnimating(true);
-      // Prevent body scroll
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
     }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
   }, [isOpen]);
 
   // Handle escape key
