@@ -495,6 +495,42 @@ select:focus,
     padding-top: calc(1rem + env(safe-area-inset-top, 0px));
   }
 
+  /* ==================== DYNAMIC VIEWPORT HEIGHT UTILITIES ==================== */
+  /* These utilities use dvh (dynamic viewport height) for iOS Safari compatibility */
+  /* dvh adjusts for the dynamic toolbar/address bar on mobile browsers */
+  /* Falls back to vh for browsers that don't support dvh */
+
+  /* Full screen height with fallback */
+  .h-screen-dynamic {
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  /* For chat/messages container: calc(100vh - 380px) on mobile, calc(100vh - 400px) on desktop */
+  .h-chat-container {
+    height: calc(100vh - 380px);
+    height: calc(100dvh - 380px);
+  }
+
+  @media (min-width: 640px) {
+    .h-chat-container {
+      height: calc(100vh - 400px);
+      height: calc(100dvh - 400px);
+    }
+  }
+
+  /* For loading skeleton: calc(100vh - 4rem) */
+  .h-main-content {
+    height: calc(100vh - 4rem);
+    height: calc(100dvh - 4rem);
+  }
+
+  /* For projects container: min-height calc(100vh - 380px) */
+  .min-h-content-panel {
+    min-height: calc(100vh - 380px);
+    min-height: calc(100dvh - 380px);
+  }
+
   .gradient-primary {
     @apply bg-gradient-to-r from-slate-600 to-gray-700;
   }
@@ -1395,6 +1431,73 @@ select:focus,
   /* Smaller icon buttons for status checkboxes (32x32px) */
   .btn-icon-small {
     @apply w-8 h-8 md:w-7 md:h-7;
+  }
+
+  /* ==================== MOBILE TAP TARGET UTILITIES ==================== */
+  /* WCAG 2.5.5 Target Size (Enhanced) requires 44×44 minimum touch targets */
+
+  /* Minimum 44×44 tap target - applies to checkboxes, radio buttons, small icons */
+  .tap-target-44 {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Tap target for icon-only buttons on mobile, normal size on desktop */
+  .tap-target-mobile {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  @media (min-width: 768px) {
+    .tap-target-mobile {
+      min-width: auto;
+      min-height: auto;
+    }
+  }
+
+  /* ==================== iOS ZOOM PREVENTION UTILITIES ==================== */
+  /* iOS Safari zooms the page when focusing inputs with font-size < 16px */
+  /* These utilities ensure inputs have 16px font-size to prevent auto-zoom */
+
+  /* Apply to textarea and select elements to prevent iOS zoom */
+  .input-ios-safe {
+    font-size: 16px;
+  }
+
+  @media (min-width: 640px) {
+    .input-ios-safe {
+      font-size: 14px; /* Can use smaller fonts on desktop */
+    }
+  }
+
+  /* Global fix: ensure all form inputs have at least 16px on mobile */
+  @media (max-width: 639px) {
+    textarea,
+    select,
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="tel"],
+    input[type="url"],
+    input[type="search"] {
+      font-size: 16px !important;
+    }
+  }
+
+  /* ==================== Z-INDEX UTILITIES FOR MODALS ==================== */
+  /* Ensure form controls in modals appear above other modal elements */
+
+  .z-modal-input {
+    z-index: 10001;
+  }
+
+  .z-modal-dropdown {
+    z-index: 10002;
+  }
+
+  .z-modal-popover {
+    z-index: 10003;
   }
 
   /* Hide scrollbar */

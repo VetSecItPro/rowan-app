@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Calendar, Clock, X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { useScrollLock } from '@/lib/hooks/useScrollLock';
 
 // Check if we're on a mobile device (touch-first)
 const isMobileDevice = () => {
@@ -48,6 +49,9 @@ export function DateTimePicker({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Lock scroll when picker is open on mobile (bottom sheet mode)
+  useScrollLock(isOpen && isMobile);
 
   // Parse existing value into date and time components
   useEffect(() => {

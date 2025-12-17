@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { NAVIGATION_ITEMS } from '@/lib/navigation';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { useScrollLock } from '@/lib/hooks/useScrollLock';
 // import { useCommandPaletteTrigger } from '@/hooks/useCommandPalette'; // Temporarily disabled
 
 export function HamburgerMenu() {
@@ -21,26 +22,8 @@ export function HamburgerMenu() {
     setIsOpen(false);
   }, [pathname]);
 
-  // Lock body scroll when menu is open on mobile
-  useEffect(() => {
-    if (isOpen) {
-      // Lock scroll
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-    } else {
-      // Unlock scroll
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-    };
-  }, [isOpen]);
+  // Lock scroll on the correct scroll container (main element)
+  useScrollLock(isOpen);
 
   // Close menu when clicking outside (desktop only)
   useEffect(() => {
