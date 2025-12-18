@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown, TrendingUp, X } from 'lucide-react';
+import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -418,7 +419,12 @@ export default function RemindersPage(): React.JSX.Element {
           </div>
 
           {/* Stats Cards - Horizontal Row */}
-          <div className="stats-grid-mobile gap-4 sm:gap-6">
+          <CollapsibleStatsGrid
+            icon={Bell}
+            title="Reminders Stats"
+            summary={`${stats.active} active • ${stats.overdue} overdue`}
+            iconGradient="bg-gradient-reminders"
+          >
             {/* Active */}
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
@@ -501,7 +507,7 @@ export default function RemindersPage(): React.JSX.Element {
                 )}
               </div>
             </div>
-          </div>
+          </CollapsibleStatsGrid>
 
           {/* Search & Filter Bar */}
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 space-y-3">

@@ -11,8 +11,13 @@ import { ComprehensiveNotificationCenter } from '@/components/notifications/Comp
 import { FeedbackButton } from '@/components/feedback/FeedbackButton';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useSpaces } from '@/lib/contexts/spaces-context';
-import { LogOut, User as UserIcon, ChevronDown, Trophy, Shield, UserPlus } from 'lucide-react';
+import { LogOut, User as UserIcon, ChevronDown, Trophy, Shield, UserPlus, TestTube } from 'lucide-react';
 import { hasAdminAccess } from '@/lib/utils/admin-utils';
+
+// Helper to check beta tester status
+const isBetaTester = (user: { is_beta_tester?: boolean; beta_status?: string } | null) => {
+  return user?.is_beta_tester && user.beta_status === 'approved';
+};
 
 const COLOR_THEMES = {
   emerald: 'bg-emerald-500',
@@ -109,10 +114,10 @@ export function Header() {
   return (
     <>
       <header className="bg-white/80 dark:bg-black/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-800/50 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between py-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between py-2 sm:py-4">
           {/* Logo and Brand - Clickable */}
-          <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-3 group active:scale-95">
+          <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2 sm:gap-3 group active:scale-95">
             <Image
               src="/rowan-logo.png"
               alt="Rowan Logo"
@@ -122,58 +127,63 @@ export function Header() {
               className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 transition-transform group-hover:scale-110"
               priority
             />
-            <span className="text-2xl font-semibold gradient-text">Rowan</span>
+            <span className="hidden sm:inline text-2xl font-semibold gradient-text">Rowan</span>
           </Link>
 
           {/* Menu, Theme Toggle & Auth Buttons */}
-          <div className="flex items-center gap-4">
-            {/* Grouped: Feedback, Hamburger Menu, Notifications, Settings, and Theme */}
-            <div className="flex items-center space-x-0.5">
+          <div className="flex items-center gap-1 sm:gap-4">
+            {/* Desktop only: Feedback button */}
+            <div className="hidden sm:block">
               <FeedbackButton />
-              <HamburgerMenu />
-
-              {/* Only show Settings and Notifications for logged-in users */}
-              {user && (
-                <>
-                  <div title="Notifications">
-                    <ComprehensiveNotificationCenter userId={user.id} spaceId={currentSpace?.id} />
-                  </div>
-                  <Link
-                    href="/settings"
-                    className="hidden sm:flex items-center justify-center w-10 h-10 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors active:scale-95"
-                    aria-label="Settings"
-                    title="Settings"
-                  >
-                    <svg className="w-5 h-5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </Link>
-                </>
-              )}
-
-              <div title="Toggle dark mode">
-                <ThemeToggle />
-              </div>
             </div>
 
-            {/* Features & Pricing Links - Only show for non-logged-in users */}
+            {/* Hamburger Menu - always visible */}
+            <HamburgerMenu />
+
+            {/* Only show Notifications for logged-in users */}
+            {user && (
+              <div title="Notifications">
+                <ComprehensiveNotificationCenter userId={user.id} spaceId={currentSpace?.id} />
+              </div>
+            )}
+
+            {/* Desktop only: Settings link */}
+            {user && (
+              <Link
+                href="/settings"
+                className="hidden sm:flex items-center justify-center w-10 h-10 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors active:scale-95"
+                aria-label="Settings"
+                title="Settings"
+              >
+                <svg className="w-5 h-5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </Link>
+            )}
+
+            {/* Desktop only: Theme toggle */}
+            <div className="hidden sm:block" title="Toggle dark mode">
+              <ThemeToggle />
+            </div>
+
+            {/* Features & Pricing Links - Only show for non-logged-in users on desktop */}
             {!user && (
               <>
-                <a href="#features" className="hidden sm:inline-block py-2 px-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95">
+                <a href="#features" className="hidden md:inline-block py-2 px-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95">
                   Features
                 </a>
-                <a href="#pricing" className="hidden sm:inline-block py-2 px-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95">
+                <a href="#pricing" className="hidden md:inline-block py-2 px-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95">
                   Pricing
                 </a>
               </>
             )}
 
-            {/* Show Dashboard only for logged-in users, Create Account for non-logged-in */}
+            {/* Desktop: Show Dashboard button for logged-in users, Create Account for non-logged-in */}
             {user ? (
               <Link
                 href="/dashboard"
-                className={`hidden sm:flex items-center gap-2 px-4 py-2 ${user.color_theme ? `shimmer-theme-${user.color_theme}` : 'shimmer-bg'} text-white rounded-full hover:opacity-90 transition-all shadow-md hover:shadow-lg font-medium active:scale-95`}
+                className={`hidden md:flex items-center gap-2 px-4 py-2 ${user.color_theme ? `shimmer-theme-${user.color_theme}` : 'shimmer-bg'} text-white rounded-full hover:opacity-90 transition-all shadow-md hover:shadow-lg font-medium active:scale-95`}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -183,19 +193,39 @@ export function Header() {
             ) : (
               <Link
                 href="/signup"
-                className="hidden sm:flex items-center gap-2 px-5 py-2 bg-green-600 text-white rounded-full hover:opacity-90 transition-all shadow-md hover:shadow-lg font-medium active:scale-95"
+                className="hidden md:flex items-center gap-2 px-5 py-2 bg-green-600 text-white rounded-full hover:opacity-90 transition-all shadow-md hover:shadow-lg font-medium active:scale-95"
               >
                 Create Your Account
               </Link>
             )}
 
-            {/* Conditional: Show user dropdown if logged in, otherwise show Login button */}
+            {/* Admin/Beta Tester Badge - inline in header */}
+            {user && (hasAdminAccess(user) || isBetaTester(user)) && (
+              <div className="hidden sm:flex">
+                {hasAdminAccess(user) ? (
+                  <Link
+                    href="/admin/beta"
+                    className="flex items-center gap-1.5 px-2.5 py-1 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-300 dark:border-indigo-700 text-indigo-800 dark:text-indigo-300 rounded-full text-xs font-medium hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors"
+                  >
+                    <Shield className="w-3 h-3" />
+                    <span>Admin</span>
+                  </Link>
+                ) : (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-300 rounded-full text-xs font-medium">
+                    <TestTube className="w-3 h-3" />
+                    <span>Beta</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* User dropdown (logged in) or Login button (not logged in) */}
             {user ? (
               <div className="relative">
                 <button
                   ref={buttonRef}
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-full text-white font-semibold transition-all hover:opacity-90 active:scale-95 min-w-[90px] ${
+                  className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-full text-white font-semibold transition-all hover:opacity-90 active:scale-95 ${
                     COLOR_THEMES[user.color_theme as keyof typeof COLOR_THEMES] || 'bg-emerald-600'
                   }`}
                 >
@@ -205,17 +235,17 @@ export function Header() {
                       alt={user.name || 'User'}
                       width={24}
                       height={24}
-                      className="w-6 h-6 rounded-full object-cover border border-white/20"
-                      sizes="24px"
+                      className="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover border border-white/20"
+                      sizes="28px"
                       priority
                     />
                   ) : (
-                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-semibold">
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 flex items-center justify-center text-xs font-semibold">
                       {(user.name || 'U').charAt(0).toUpperCase()}
                     </div>
                   )}
-                  <span className="text-sm truncate max-w-[100px]">{user.name}</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                  <span className="hidden sm:inline text-sm truncate max-w-[100px]">{user.name}</span>
+                  <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* Dropdown Menu - Rendered via portal for proper positioning on mobile */}
@@ -318,7 +348,7 @@ export function Header() {
             ) : (
               <Link
                 href="/login"
-                className="px-6 py-2.5 bg-emerald-600 text-white font-semibold rounded-full hover:bg-emerald-700 transition-all shadow-lg active:scale-95"
+                className="px-4 sm:px-6 py-2 sm:py-2.5 bg-emerald-600 text-white text-sm sm:text-base font-semibold rounded-full hover:bg-emerald-700 transition-all shadow-lg active:scale-95"
               >
                 Login
               </Link>
