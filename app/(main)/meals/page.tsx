@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback, memo, useRef } from 'react';
 import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, TrendingUp, ShoppingBag, ChevronLeft, ChevronRight, LayoutGrid, List, ChefHat, ExternalLink, X, CheckSquare } from 'lucide-react';
+import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { Tooltip } from '@/components/ui/Tooltip';
 import Link from 'next/link';
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
@@ -958,7 +959,12 @@ export default function MealsPage() {
           </div>
 
           {/* Stats Dashboard */}
-          <div className="stats-grid-mobile gap-4 sm:gap-6">
+          <CollapsibleStatsGrid
+            icon={UtensilsCrossed}
+            title="Meals Stats"
+            summary={`${stats.thisWeek} this week • ${stats.savedRecipes} recipes`}
+            iconGradient="bg-gradient-meals"
+          >
             {/* This Week Card */}
             <button
               onClick={handleThisWeekClick}
@@ -1038,7 +1044,7 @@ export default function MealsPage() {
                 )}
               </div>
             </Link>
-          </div>
+          </CollapsibleStatsGrid>
 
           {/* Search Bar */}
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">

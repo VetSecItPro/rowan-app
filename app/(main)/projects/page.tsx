@@ -6,6 +6,7 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Folder, Plus, Search, Wallet, Receipt, DollarSign, CheckCircle, Clock, FileText, FileCheck, X } from 'lucide-react';
+import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { CTAButton } from '@/components/ui/EnhancedButton';
@@ -443,7 +444,12 @@ export default function ProjectsPage() {
           </div>
 
           {activeTab === 'expenses' && expenses.length > 0 && (
-            <div className="stats-grid-mobile gap-4 sm:gap-6">
+            <CollapsibleStatsGrid
+              icon={Receipt}
+              title="Expense Stats"
+              summary={`${expenseStats.pendingCount} pending • $${expenseStats.totalAmount.toLocaleString()}`}
+              iconGradient="bg-amber-500"
+            >
               {/* Total Expenses */}
               <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
@@ -487,7 +493,7 @@ export default function ProjectsPage() {
                   ${expenseStats.totalAmount.toLocaleString()}
                 </p>
               </div>
-            </div>
+            </CollapsibleStatsGrid>
           )}
 
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">

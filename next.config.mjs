@@ -16,7 +16,7 @@ const nextConfig = {
   },
   // Workaround for Next.js 15.x Html import bug
   skipTrailingSlashRedirect: true,
-  skipProxyUrlNormalize: true, // Updated from deprecated skipMiddlewareUrlNormalize
+  // Note: skipProxyUrlNormalize removed in Next.js 16
   // Use standalone output only on Vercel (not local builds)
   ...(process.env.VERCEL === '1' && { output: 'standalone' }),
   // Disable static error page generation to prevent Next.js 15 Html import issues

@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle, GitBranch, X, BarChart3, Calendar, MoreHorizontal, ChevronDown } from 'lucide-react';
+import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { format } from 'date-fns';
 import Link from 'next/link';
@@ -762,7 +763,12 @@ export default function GoalsPage() {
           </div>
 
           {/* Stats Dashboard */}
-          <div className="stats-grid-mobile gap-4 sm:gap-6">
+          <CollapsibleStatsGrid
+            icon={Target}
+            title="Goals Stats"
+            summary={loading ? 'Loading...' : `${stats.active} active • ${stats.completed} done`}
+            iconGradient="bg-gradient-goals"
+          >
             {loading ? (
               <>
                 <StatsCardSkeleton />
@@ -857,7 +863,7 @@ export default function GoalsPage() {
 
             </>
             )}
-          </div>
+          </CollapsibleStatsGrid>
 
           {/* Search Bar */}
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
