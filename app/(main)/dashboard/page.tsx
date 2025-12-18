@@ -1066,7 +1066,7 @@ export default function DashboardPage() {
           <div>
 
             {loading ? (
-              <div className="stats-grid-mobile gap-4 sm:gap-6">
+              <div className="grid stats-grid-mobile gap-4 sm:gap-6">
                 {[...Array(8)].map((_, i) => (
                   <div key={i} className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/20 dark:border-gray-700/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg animate-pulse">
                     <div className="h-28 sm:h-32 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -1079,7 +1079,7 @@ export default function DashboardPage() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
-                className="stats-grid-mobile gap-4 sm:gap-6"
+                className="grid stats-grid-mobile gap-4 sm:gap-6"
               >
                 {/* Tasks & Chores Card */}
                 <motion.div variants={fadeInUp} className="h-full">

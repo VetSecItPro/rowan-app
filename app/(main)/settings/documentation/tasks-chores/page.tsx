@@ -1087,7 +1087,7 @@ export default function TasksChoresDocumentationPage() {
               </p>
 
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Popular Category Examples</h3>
-              <div className="stats-grid-mobile gap-3 sm:gap-4 my-4">
+              <div className="grid stats-grid-mobile gap-3 sm:gap-4 my-4">
                 <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-center">
                   <span className="text-blue-700 dark:text-blue-300 font-semibold">🏠 Home</span>
                 </div>
@@ -1536,7 +1536,7 @@ export default function TasksChoresDocumentationPage() {
                 The dashboard shows four stat cards at the top: Pending, In Progress, Completed, and Total. Each updates in real-time.
               </p>
 
-              <div className="stats-grid-mobile gap-4 sm:gap-6 my-4">
+              <div className="grid stats-grid-mobile gap-4 sm:gap-6 my-4">
                 <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg text-center">
                   <div className="text-3xl font-bold text-red-600 dark:text-red-400 mb-1">12</div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">Pending</div>

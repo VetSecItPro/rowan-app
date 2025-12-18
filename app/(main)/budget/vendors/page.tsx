@@ -19,6 +19,7 @@ import {
   TrendingUp,
   AlertCircle
 } from 'lucide-react';
+import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { VendorModal } from '@/components/vendors/VendorModal';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
@@ -229,7 +230,13 @@ export default function VendorManagementPage() {
 
           {/* Stats Cards */}
           {!loading && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <CollapsibleStatsGrid
+              icon={Users}
+              title="Vendor Stats"
+              summary={`${stats.total} vendors • $${stats.totalSpend.toLocaleString()} spent`}
+              iconGradient="bg-gradient-to-br from-blue-500 to-blue-600"
+              gridClassName="grid stats-grid-mobile gap-6"
+            >
               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg">
@@ -277,7 +284,7 @@ export default function VendorManagementPage() {
                 </div>
                 <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Spend</h3>
               </div>
-            </div>
+            </CollapsibleStatsGrid>
           )}
 
           {/* Controls */}

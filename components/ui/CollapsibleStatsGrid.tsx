@@ -56,15 +56,22 @@ export function CollapsibleStatsGrid({
       <button
         onClick={() => setMobileCollapsed(!mobileCollapsed)}
         className="sm:hidden w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl active:scale-[0.98] transition-all"
+        aria-expanded={!mobileCollapsed}
+        aria-label={mobileCollapsed ? `Expand ${title}` : `Collapse ${title}`}
       >
         <div className="flex items-center gap-3">
           <div className={`w-8 h-8 ${iconGradient} rounded-lg flex items-center justify-center`}>
             <Icon className="w-4 h-4 text-white" />
           </div>
           <div className="text-left">
-            <span className="text-sm font-medium text-gray-900 dark:text-white">{title}</span>
-            <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
-              {summary}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-900 dark:text-white">{title}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {summary}
+              </span>
+            </div>
+            <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 block">
+              {mobileCollapsed ? 'Tap to view all stats' : 'Tap to collapse'}
             </span>
           </div>
         </div>
