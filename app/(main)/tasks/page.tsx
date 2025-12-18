@@ -46,6 +46,7 @@ export default function TasksPage() {
   // Basic state
   const [loading, setLoading] = useState(true);
   const [choreLoading, setChoreLoading] = useState(false);
+  const [mobileStatsCollapsed, setMobileStatsCollapsed] = useState(true); // Collapsed by default on mobile
 
   // Individual item loading states
   const [itemLoadingStates, setItemLoadingStates] = useState<Record<string, {
@@ -703,88 +704,110 @@ export default function TasksPage() {
           </div>
 
 
-          {/* Stats Dashboard */}
-          <div className="stats-grid-mobile gap-4 sm:gap-6">
-            {/* Pending */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Pending</h3>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-500 rounded-xl flex items-center justify-center">
-                  <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+          {/* Stats Dashboard - Collapsible on mobile */}
+          <div className="space-y-3">
+            {/* Mobile toggle button - only visible on mobile */}
+            <button
+              onClick={() => setMobileStatsCollapsed(!mobileStatsCollapsed)}
+              className="sm:hidden w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl active:scale-[0.98] transition-all"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gradient-tasks rounded-lg flex items-center justify-center">
+                  <CheckSquare className="w-4 h-4 text-white" />
+                </div>
+                <div className="text-left">
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">Stats Overview</span>
+                  <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                    {stats.pending} pending • {stats.inProgress} active • {stats.completed} done
+                  </span>
                 </div>
               </div>
-              <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.pending}</p>
-                {stats.pending > 0 && (
-                  <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
-                    <AlertCircle className="w-3 h-3" />
-                    <span className="text-xs font-medium">To start</span>
-                  </div>
-                )}
-              </div>
-            </div>
+              <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${mobileStatsCollapsed ? '' : 'rotate-180'}`} />
+            </button>
 
-            {/* In Progress */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">In Progress</h3>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-500 rounded-xl flex items-center justify-center">
-                  <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            {/* Stats cards - hidden on mobile when collapsed, always visible on desktop */}
+            <div className={`stats-grid-mobile gap-4 sm:gap-6 ${mobileStatsCollapsed ? 'hidden sm:grid' : 'grid'}`}>
+              {/* Pending */}
+              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-between mb-3 sm:mb-4">
+                  <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Pending</h3>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-500 rounded-xl flex items-center justify-center">
+                    <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                  </div>
+                </div>
+                <div className="flex items-end justify-between">
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.pending}</p>
+                  {stats.pending > 0 && (
+                    <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                      <AlertCircle className="w-3 h-3" />
+                      <span className="text-xs font-medium">To start</span>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.inProgress}</p>
-                {stats.inProgress > 0 && (
-                  <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
-                    <TrendingUp className="w-3 h-3" />
-                    <span className="text-xs font-medium">Active</span>
-                  </div>
-                )}
-              </div>
-            </div>
 
-            {/* Completed */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Completed</h3>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center">
-                  <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              {/* In Progress */}
+              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-between mb-3 sm:mb-4">
+                  <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">In Progress</h3>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-500 rounded-xl flex items-center justify-center">
+                    <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                  </div>
+                </div>
+                <div className="flex items-end justify-between">
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.inProgress}</p>
+                  {stats.inProgress > 0 && (
+                    <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
+                      <TrendingUp className="w-3 h-3" />
+                      <span className="text-xs font-medium">Active</span>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
-                {stats.total > 0 && (
-                  <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
-                    <TrendingUp className="w-3 h-3" />
-                    <span className="text-xs font-medium">
-                      {(() => {
-                        const percentage = Math.round((stats.completed / stats.total) * 100);
-                        if (percentage >= 67) return `${percentage}% 🎉`;
-                        if (percentage >= 34) return `${percentage}%`;
-                        return percentage > 0 ? `${percentage}%` : 'Start';
-                      })()}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
 
-            {/* Total Tasks & Chores */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Total Tasks & Chores</h3>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-tasks rounded-xl flex items-center justify-center">
-                  <CheckSquare className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              {/* Completed */}
+              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-between mb-3 sm:mb-4">
+                  <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Completed</h3>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                    <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                  </div>
+                </div>
+                <div className="flex items-end justify-between">
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
+                  {stats.total > 0 && (
+                    <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                      <TrendingUp className="w-3 h-3" />
+                      <span className="text-xs font-medium">
+                        {(() => {
+                          const percentage = Math.round((stats.completed / stats.total) * 100);
+                          if (percentage >= 67) return `${percentage}% 🎉`;
+                          if (percentage >= 34) return `${percentage}%`;
+                          return percentage > 0 ? `${percentage}%` : 'Start';
+                        })()}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
-                {stats.total > 0 && (
-                  <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
-                    <Minus className="w-3 h-3" />
-                    <span className="text-xs font-medium">Overall</span>
+
+              {/* Total Tasks & Chores */}
+              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-between mb-3 sm:mb-4">
+                  <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Total Tasks & Chores</h3>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-tasks rounded-xl flex items-center justify-center">
+                    <CheckSquare className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
-                )}
+                </div>
+                <div className="flex items-end justify-between">
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+                  {stats.total > 0 && (
+                    <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                      <Minus className="w-3 h-3" />
+                      <span className="text-xs font-medium">Overall</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

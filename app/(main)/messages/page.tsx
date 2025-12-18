@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as ImageIcon, Paperclip, TrendingUp, X, CalendarClock } from 'lucide-react';
+import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { MessageCard } from '@/components/messages/MessageCard';
@@ -881,7 +882,13 @@ export default function MessagesPage() {
 
 
           {/* Stats Dashboard */}
-          <div className="stats-grid-mobile gap-3 sm:gap-6">
+          <CollapsibleStatsGrid
+            icon={MessageCircle}
+            title="Messages Stats"
+            summary={`${stats.unread} unread • ${stats.today} today`}
+            iconGradient="bg-gradient-messages"
+            gridClassName="stats-grid-mobile gap-3 sm:gap-6"
+          >
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-2 sm:mb-4">
                 <h3 className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">Today</h3>
@@ -953,7 +960,7 @@ export default function MessagesPage() {
                 )}
               </div>
             </div>
-          </div>
+          </CollapsibleStatsGrid>
 
 
           {/* Conversations and Chat Interface */}

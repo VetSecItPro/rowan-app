@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package, X, TrendingUp } from 'lucide-react';
+import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
@@ -714,7 +715,12 @@ export default function ShoppingPage() {
           </div>
 
           {/* Stats Dashboard */}
-          <div className="stats-grid-mobile gap-4 sm:gap-6">
+          <CollapsibleStatsGrid
+            icon={ShoppingCart}
+            title="Shopping Stats"
+            summary={`${memoizedStats.activeLists} active • ${memoizedStats.itemsThisWeek} items`}
+            iconGradient="bg-emerald-500"
+          >
             <button
               onClick={handleItemsThisWeekClick}
               className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer text-left"
@@ -794,7 +800,7 @@ export default function ShoppingPage() {
                 )}
               </div>
             </button>
-          </div>
+          </CollapsibleStatsGrid>
 
           {/* Frequent Items Panel */}
           {currentSpace && lists.length > 0 && (
