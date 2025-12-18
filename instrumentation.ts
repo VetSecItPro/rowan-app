@@ -5,9 +5,10 @@
 export async function register() {
   // Only initialize Sentry if DSN is provided
   if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
-    if (process.env.NEXT_RUNTIME === 'nodejs') {
-      // Server-side initialization
-      const { init } = await import('@sentry/nextjs');
+    try {
+      if (process.env.NEXT_RUNTIME === 'nodejs') {
+        // Server-side initialization
+        const { init } = await import('@sentry/nextjs');
 
       init({
         dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
@@ -45,11 +46,11 @@ export async function register() {
 
         // Automatic instrumentation disabled to prevent Next.js 15 issues
       });
-    }
+      }
 
-    if (process.env.NEXT_RUNTIME === 'edge') {
-      // Edge runtime initialization
-      const { init } = await import('@sentry/nextjs');
+      if (process.env.NEXT_RUNTIME === 'edge') {
+        // Edge runtime initialization
+        const { init } = await import('@sentry/nextjs');
 
       init({
         dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
@@ -64,6 +65,9 @@ export async function register() {
         // Don't send events in development
         enabled: process.env.NODE_ENV === 'production',
       });
+      }
+    } catch (error) {
+      console.error('Failed to initialize Sentry:', error);
     }
   }
 }

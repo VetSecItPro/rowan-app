@@ -710,15 +710,22 @@ export default function TasksPage() {
             <button
               onClick={() => setMobileStatsCollapsed(!mobileStatsCollapsed)}
               className="sm:hidden w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl active:scale-[0.98] transition-all"
+              aria-expanded={!mobileStatsCollapsed}
+              aria-label={mobileStatsCollapsed ? 'Expand Stats Overview' : 'Collapse Stats Overview'}
             >
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-gradient-tasks rounded-lg flex items-center justify-center">
                   <CheckSquare className="w-4 h-4 text-white" />
                 </div>
                 <div className="text-left">
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">Stats Overview</span>
-                  <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
-                    {stats.pending} pending • {stats.inProgress} active • {stats.completed} done
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">Stats Overview</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {stats.pending} pending • {stats.inProgress} active • {stats.completed} done
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 block">
+                    {mobileStatsCollapsed ? 'Tap to view all stats' : 'Tap to collapse'}
                   </span>
                 </div>
               </div>

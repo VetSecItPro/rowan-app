@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState } from 'react';
 import { logger } from '@/lib/logger';
+import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 // Using native HTML elements and existing components
 import { EnhancedButton } from '@/components/ui/EnhancedButton';
 import { FeatureGateWrapper } from '@/components/subscription/FeatureGateWrapper';
@@ -114,7 +115,13 @@ export default function ExpensesPage() {
       </div>
 
       {/* Expense Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      <CollapsibleStatsGrid
+        icon={DollarSign}
+        title="Expense Stats"
+        summary={`${formatCurrency(recentExpenses.thisMonth)} this month • 23 receipts`}
+        iconGradient="bg-gradient-to-br from-amber-500 to-amber-600"
+        gridClassName="grid stats-grid-mobile gap-4"
+      >
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
@@ -162,7 +169,7 @@ export default function ExpensesPage() {
             <p className="text-xs text-muted-foreground">This month</p>
           </CardContent>
         </Card>
-      </div>
+      </CollapsibleStatsGrid>
 
       {/* Category Breakdown */}
       <Card>
