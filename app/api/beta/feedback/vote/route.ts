@@ -31,16 +31,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user is a beta tester
+    // Check if user is a beta tester OR admin
     const { data: userData, error: userError } = await supabase
       .from('users')
       .select('is_beta_tester, beta_status')
       .eq('id', user.id)
       .single();
 
-    if (userError || !userData?.is_beta_tester || userData.beta_status !== 'approved') {
+    // Check admin status via RPC
+    const { data: isAdminUser } = await supabase.rpc('is_admin');
+
+    const isBetaTester = userData?.is_beta_tester && userData.beta_status === 'approved';
+
+    if (userError || (!isBetaTester && !isAdminUser)) {
       return NextResponse.json(
-        { error: 'Beta tester access required' },
+        { error: 'Beta tester or admin access required' },
         { status: 403 }
       );
     }

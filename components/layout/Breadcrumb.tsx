@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ChevronLeft, Home, LayoutDashboard, CheckSquare, Calendar, MessageCircle, ShoppingCart, UtensilsCrossed, Target, FolderOpen, Settings, BarChart3, Zap, Users, FileText, Bell } from 'lucide-react';
+import { Home, LayoutDashboard, CheckSquare, Calendar, MessageCircle, ShoppingCart, UtensilsCrossed, Target, FolderOpen, Settings, BarChart3, Users, FileText, Bell } from 'lucide-react';
 
 interface BreadcrumbProps {
   items?: {
@@ -42,45 +42,27 @@ const getIconForLabel = (label: string) => {
 };
 
 export function Breadcrumb({ items = [] }: BreadcrumbProps) {
-  const handleBack = () => {
-    if (typeof window !== 'undefined') {
-      window.history.back();
-    }
-  };
+  // Filter out Dashboard from items since we always show it as root
+  const filteredItems = items.filter(item => item.label !== 'Dashboard');
 
   return (
     <nav className="px-4 sm:px-8 py-2">
       <ol className="max-w-7xl mx-auto flex items-center gap-1 overflow-x-auto scrollbar-hide">
-        {/* Mobile: Back Button (only show if we have items to navigate back to) */}
-        {items.length > 1 && (
-          <li className="sm:hidden flex items-center gap-2 flex-shrink-0">
-            <button
-              onClick={handleBack}
-              className="btn-touch flex items-center gap-1 py-1 px-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all active:scale-95"
-              aria-label="Go back"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Back</span>
-            </button>
-            <span className="text-gray-400 text-sm">→</span>
-          </li>
-        )}
-
-        {/* Home Link - Hidden on mobile when there are multiple items */}
-        <li className={items.length > 1 ? 'hidden sm:flex flex-shrink-0' : 'flex flex-shrink-0'}>
+        {/* Dashboard Link - Always show as root */}
+        <li className={filteredItems.length > 1 ? 'hidden sm:flex flex-shrink-0' : 'flex flex-shrink-0'}>
           <Link
-            href="/"
+            href="/dashboard"
             className="inline-flex items-center gap-0.5 py-0 px-0 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all active:scale-95"
           >
-            <Home className="w-4 h-4" />
-            Home
+            <LayoutDashboard className="w-4 h-4" />
+            <span className="hidden sm:inline">Dashboard</span>
           </Link>
         </li>
 
-        {/* Dynamic Items */}
-        {items?.map((item, index) => {
-          const isLast = index === items.length - 1;
-          const shouldHideOnMobile = items.length > 2 && index < items.length - 2;
+        {/* Dynamic Items (excluding Dashboard) */}
+        {filteredItems.map((item, index) => {
+          const isLast = index === filteredItems.length - 1;
+          const shouldHideOnMobile = filteredItems.length > 1 && index < filteredItems.length - 1;
           const IconComponent = getIconForLabel(item.label);
 
           return (
