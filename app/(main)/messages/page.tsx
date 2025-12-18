@@ -1035,6 +1035,41 @@ export default function MessagesPage() {
               </div>
             </div>
 
+            {/* Mobile Thread Navigation Bar - WhatsApp-style */}
+            {conversations.length > 1 && (
+              <div className="md:hidden px-3 py-2 border-b border-emerald-200/20 dark:border-gray-700/50 bg-gradient-to-r from-emerald-50/30 to-green-50/30 dark:from-gray-800/50 dark:to-gray-900/50">
+                <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
+                  {conversations.map((conv) => (
+                    <button
+                      key={conv.id}
+                      onClick={() => handleSelectConversation(conv.id)}
+                      className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                        conv.id === conversationId
+                          ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-md'
+                          : 'bg-white/60 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 border border-gray-200/50 dark:border-gray-600/50'
+                      }`}
+                    >
+                      <span className="truncate max-w-[100px] inline-block align-middle">
+                        {conv.title || 'Untitled'}
+                      </span>
+                      {conv.unread_count > 0 && conv.id !== conversationId && (
+                        <span className="ml-1.5 inline-flex items-center justify-center w-4 h-4 text-[10px] font-bold bg-red-500 text-white rounded-full">
+                          {conv.unread_count > 9 ? '9+' : conv.unread_count}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                  {/* New Thread Button */}
+                  <button
+                    onClick={() => setShowNewConversationModal(true)}
+                    className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium bg-white/60 dark:bg-gray-700/60 text-emerald-600 dark:text-emerald-400 border border-dashed border-emerald-300 dark:border-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all duration-200"
+                  >
+                    + New
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto overflow-x-visible px-4 sm:px-6 py-6 space-y-6 bg-gradient-to-b from-emerald-50/30 via-white/60 to-green-50/40 dark:from-gray-900/70 dark:via-gray-900/80 dark:to-gray-800/70 backdrop-blur-sm relative">
               {/* Subtle Chat Pattern Background with Glassmorphism */}
@@ -1144,7 +1179,7 @@ export default function MessagesPage() {
                     onChange={handleMessageInputChange}
                     onSubmit={handleSubmitMessage}
                     spaceId={currentSpace.id}
-                    placeholder="Send message (use @ to mention)"
+                    placeholder="Message..."
                     disabled={isSending}
                     className="flex-1 text-sm sm:text-base rounded-full"
                   />
