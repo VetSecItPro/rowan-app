@@ -34,7 +34,7 @@
 ## Stack
 
 ### Core Framework
-- **Next.js 16.0.10** (App Router) - React framework with Turbopack/Webpack dev server
+- **Next.js 15.5.9** (App Router) - React framework with Turbopack dev server
 - **React 19** - UI library
 - **TypeScript 5** - Strict mode enabled
 
@@ -62,24 +62,74 @@
 - **date-fns 4** - Date utilities
 - **Sonner** - Toast notifications
 
-## Known Issues & Workarounds
+## Development Server Setup (IMPORTANT)
 
-### Next.js 16 Dev Server Race Conditions (December 2024)
-**Issue:** The Next.js 16 dev server frequently crashes with ENOENT errors on startup:
+### Stable Configuration (December 2024)
+**Next.js Version:** 15.5.9 (security patched, 0 vulnerabilities)
+
+### Quick Start (Recommended)
+```bash
+# Standard dev server start
+npm run dev
 ```
-Error: ENOENT: no such file or directory, open '.next/dev/prerender-manifest.json'
-Error: ENOENT: no such file or directory, open '.next/dev/static/chunks/app/layout.js'
+Server runs at http://localhost:3000 with Turbopack (fast HMR).
+
+### Clean Start (If Issues Occur)
+```bash
+# Kill existing processes, clean cache, start fresh
+pkill -f "next" || true && rm -rf .next && npm run dev
 ```
 
-**Root Cause:** File system race conditions in Next.js 16's webpack/turbopack dev server when generating build artifacts.
+### Nuclear Option (For Persistent Issues)
+```bash
+# Full reinstall - use only when nothing else works
+pkill -f "next" || true
+rm -rf .next node_modules package-lock.json
+npm install
+npm run dev
+```
 
-**Workaround:**
-1. The dev server is **unstable in Claude Code CLI environment** - it may crash on first request
-2. **For local development**, the user should run `npm run dev` directly in their terminal (not via Claude)
-3. **For CI/CD**, `npm run build` works reliably - use GitHub Actions for verification
-4. TypeScript checks (`npx tsc --noEmit`) work fine and should be used for validation
+### Production Mode Testing
+```bash
+# Build and run production server (no HMR, more stable)
+rm -rf .next && npm run build && npm run start
+```
 
-**DO NOT** waste tokens repeatedly trying different dev server approaches. This is a known limitation.
+### Why This Configuration Works
+
+**1. Next.js 15.5.9 (not 15.1.x or 16.x)**
+- 15.1.x has critical security vulnerabilities
+- 16.x has filesystem race conditions on Node 22
+- 15.5.9 is security-patched and stable
+
+**2. Turbopack for Dev (`--turbopack` flag)**
+- Faster compilation than Webpack
+- Better hot module replacement
+- More stable in Next.js 15.5.x
+
+**3. Sentry Disabled in Development**
+- Sentry configs only initialize in production
+- No worker creation errors (CSP violations)
+- No console spam from error tracking
+- Clean console for actual debugging
+
+**4. CSP Disabled in Development**
+- `next.config.mjs` returns empty headers array in dev
+- No browser security policy blocking scripts/workers
+
+### Package.json Scripts (Correct Configuration)
+```json
+{
+  "dev": "next dev --turbopack",
+  "build": "next build",
+  "start": "next start"
+}
+```
+
+### Maintenance
+- **Security updates:** Run `npm audit fix` weekly
+- **Before major changes:** Always do a clean start
+- **After npm install:** Clean `.next` directory
 
 ## Security Rules
 

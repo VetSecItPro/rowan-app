@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Receipt, Plus, AlertCircle, TrendingUp, Calendar, DollarSign } from 'lucide-react';
+import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { BillsList } from '@/components/budget/BillsList';
 import { NewBillModal } from '@/components/projects/NewBillModal';
@@ -166,7 +167,13 @@ export default function BillsManagementPage() {
 
           {/* Stats Cards */}
           {stats && !loading && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <CollapsibleStatsGrid
+              icon={Receipt}
+              title="Bills Stats"
+              summary={`${stats.total} bills • $${stats.totalAmountDue.toFixed(0)} due`}
+              iconGradient="bg-gradient-to-br from-amber-500 to-amber-600"
+              gridClassName="grid stats-grid-mobile gap-6"
+            >
               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg">
@@ -214,7 +221,7 @@ export default function BillsManagementPage() {
                 </div>
                 <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Amount Due</h3>
               </div>
-            </div>
+            </CollapsibleStatsGrid>
           )}
 
           {/* Action Button */}

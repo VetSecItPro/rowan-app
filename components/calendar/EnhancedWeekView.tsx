@@ -34,42 +34,8 @@ export function EnhancedWeekView({
   const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
   const allWeekDays = eachDayOfInterval({ start: weekStart, end: weekEnd });
 
-  // Responsive day display - show fewer days on smaller screens
-  const [visibleDays, setVisibleDays] = useState(1);
-
-  useEffect(() => {
-    const updateVisibleDays = () => {
-      const width = window.innerWidth;
-      if (width < 640) setVisibleDays(1);      // Mobile: 1 day
-      else if (width < 1024) setVisibleDays(3); // Tablet: 3 days
-      else setVisibleDays(7);                  // Desktop: 7 days
-    };
-
-    updateVisibleDays();
-    window.addEventListener('resize', updateVisibleDays);
-    return () => window.removeEventListener('resize', updateVisibleDays);
-  }, []);
-
-  // Calculate which days to show based on current date and visible days
-  const getDisplayDays = () => {
-    if (visibleDays === 7) return allWeekDays;
-
-    // Find today's index in the week
-    const todayIndex = allWeekDays.findIndex(day => isSameDay(day, date));
-    const centerIndex = todayIndex >= 0 ? todayIndex : 0;
-
-    if (visibleDays === 1) {
-      return [allWeekDays[centerIndex]];
-    } else if (visibleDays === 3) {
-      // Show day before, today, day after (or best 3-day window)
-      const start = Math.max(0, Math.min(centerIndex - 1, allWeekDays.length - 3));
-      return allWeekDays.slice(start, start + 3);
-    }
-
-    return allWeekDays;
-  };
-
-  const weekDays = getDisplayDays();
+  // Always show all 7 days - the container is scrollable on mobile
+  const weekDays = allWeekDays;
 
   // Update current time every minute
   useEffect(() => {
@@ -204,14 +170,14 @@ export function EnhancedWeekView({
           return (
             <div
               key={day.toISOString()}
-              className={`flex-1 min-w-0 p-2 sm:p-3 text-center border-r border-gray-200 dark:border-gray-700 last:border-r-0 ${
+              className={`flex-1 min-w-[100px] sm:min-w-0 p-2 sm:p-3 text-center border-r border-gray-200 dark:border-gray-700 last:border-r-0 ${
                 isTodayDate ? 'bg-purple-50 dark:bg-purple-900/20' : ''
               }`}
             >
               <div className={`text-xs sm:text-sm font-medium ${
                 isTodayDate ? 'text-purple-600 dark:text-purple-400' : 'text-gray-600 dark:text-gray-400'
               }`}>
-                {format(day, visibleDays === 1 ? 'EEEE' : 'EEE')}
+                {format(day, 'EEE')}
               </div>
               <div className={`text-xl sm:text-2xl font-bold mt-1 ${
                 isTodayDate
@@ -253,7 +219,7 @@ export function EnhancedWeekView({
           return (
             <div
               key={day.toISOString()}
-              className={`flex-1 min-w-0 relative border-r border-gray-200 dark:border-gray-700 last:border-r-0 ${
+              className={`flex-1 min-w-[100px] sm:min-w-0 relative border-r border-gray-200 dark:border-gray-700 last:border-r-0 ${
                 isTodayDate ? 'bg-purple-50/30 dark:bg-purple-900/10' : ''
               }`}
               style={{ height: `${HOURS.length * HOUR_HEIGHT}px` }}

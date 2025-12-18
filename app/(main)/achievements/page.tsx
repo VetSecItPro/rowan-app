@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Trophy, Star, Award, TrendingUp, Target, Calendar } from 'lucide-react';
+import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { BadgeGallery } from '@/components/achievements/BadgeGallery';
 import { BadgeCard } from '@/components/achievements/BadgeCard';
@@ -152,7 +153,13 @@ export default function AchievementsPage() {
 
             {/* Stats Overview */}
             {stats && levelInfo && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              <CollapsibleStatsGrid
+                icon={Trophy}
+                title="Achievement Stats"
+                summary={`Level ${levelInfo.level} • ${stats.earned_badges}/${stats.total_badges} badges`}
+                iconGradient="bg-gradient-to-br from-yellow-500 to-orange-500"
+                gridClassName="grid stats-grid-mobile gap-4 sm:gap-6"
+              >
                 {/* Achievement Level */}
                 <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border border-purple-200 dark:border-purple-700 rounded-xl p-4 sm:p-6">
                   <div className="flex items-center justify-between mb-3">
@@ -209,7 +216,7 @@ export default function AchievementsPage() {
                     {progress.length}
                   </div>
                 </div>
-              </div>
+              </CollapsibleStatsGrid>
             )}
 
             {/* Category Tabs */}
