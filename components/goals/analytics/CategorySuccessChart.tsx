@@ -75,8 +75,8 @@ export default function CategorySuccessChart({ data }: CategorySuccessChartProps
               borderRadius: '8px',
               color: '#fff',
             }}
-            formatter={(value: number, name: string, props: any) => [
-              `${value}% (${props.payload.completed}/${props.payload.total})`,
+            formatter={(value, _name, props) => [
+              `${value ?? 0}% (${props.payload.completed}/${props.payload.total})`,
               'Success Rate',
             ]}
             cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}

@@ -937,7 +937,7 @@ export default function CalendarPage() {
           </div>
 
           {/* Stats Dashboard */}
-          <div className="stats-grid-mobile gap-4 sm:gap-6">
+          <div className="grid stats-grid-mobile gap-4 sm:gap-6">
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Today</h3>
@@ -1147,11 +1147,11 @@ export default function CalendarPage() {
                   Manage
                 </button>
 
-                {/* View Mode Toggle - Always visible */}
-                <div className="bg-gray-100 dark:bg-gray-800 border border-purple-300 dark:border-purple-600 rounded-lg p-0.5 flex gap-0.5">
+                {/* View Mode Toggle - Scrollable on mobile */}
+                <div className="bg-gray-100 dark:bg-gray-800 border border-purple-300 dark:border-purple-600 rounded-lg p-0.5 flex gap-0.5 overflow-x-auto max-w-[calc(100vw-2rem)] sm:max-w-none scrollbar-hide">
                   <button
                     onClick={() => setViewMode('day')}
-                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors ${
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors flex-shrink-0 ${
                       viewMode === 'day'
                         ? 'bg-purple-600 text-white'
                         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -1162,7 +1162,7 @@ export default function CalendarPage() {
                   </button>
                   <button
                     onClick={() => setViewMode('week')}
-                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors ${
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors flex-shrink-0 ${
                       viewMode === 'week'
                         ? 'bg-purple-600 text-white'
                         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -1173,7 +1173,7 @@ export default function CalendarPage() {
                   </button>
                   <button
                     onClick={() => setViewMode('month')}
-                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors ${
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors flex-shrink-0 ${
                       viewMode === 'month'
                         ? 'bg-purple-600 text-white'
                         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -1184,7 +1184,7 @@ export default function CalendarPage() {
                   </button>
                   <button
                     onClick={() => setViewMode('agenda')}
-                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors ${
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors flex-shrink-0 ${
                       viewMode === 'agenda'
                         ? 'bg-purple-600 text-white'
                         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -1195,7 +1195,7 @@ export default function CalendarPage() {
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors ${
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors flex-shrink-0 ${
                       viewMode === 'list'
                         ? 'bg-purple-600 text-white'
                         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -1206,7 +1206,7 @@ export default function CalendarPage() {
                   </button>
                   <button
                     onClick={() => setViewMode('timeline')}
-                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors ${
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors flex-shrink-0 ${
                       viewMode === 'timeline'
                         ? 'bg-purple-600 text-white'
                         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -1223,7 +1223,7 @@ export default function CalendarPage() {
                         requestProposalUpgrade();
                       }
                     }}
-                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors ${
+                    className={`px-2 py-1.5 rounded text-xs font-medium transition-colors flex-shrink-0 whitespace-nowrap ${
                       viewMode === 'proposal'
                         ? 'bg-purple-600 text-white'
                         : canUseEventProposals
@@ -1401,13 +1401,13 @@ export default function CalendarPage() {
                     </button>
                   </div>
 
-                  {/* Calendar Grid */}
-                  <div className="grid grid-cols-7 gap-1 sm:gap-2">
+                  {/* Calendar Grid - Scrollable on mobile for better readability */}
+                  <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+                    <div className="grid grid-cols-7 gap-1 sm:gap-2 min-w-[500px] sm:min-w-0">
                     {/* Day headers */}
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
                       <div key={day} className="text-center text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 py-1 sm:py-2">
-                        <span className="hidden sm:inline">{day}</span>
-                        <span className="sm:hidden">{day.slice(0, 1)}</span>
+                        {day}
                       </div>
                     ))}
 
@@ -1521,6 +1521,7 @@ export default function CalendarPage() {
                         </div>
                       );
                     })}
+                    </div>
                   </div>
                 </div>
               ) : viewMode === 'week' ? (

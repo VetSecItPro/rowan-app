@@ -2,14 +2,18 @@
 // This file is automatically loaded on the client side
 import * as Sentry from '@sentry/nextjs';
 
-// Only initialize if DSN is provided and we're in the browser
-if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_SENTRY_DSN) {
+// COMPLETELY SKIP Sentry initialization in development to avoid console errors
+const isProduction = process.env.NODE_ENV === 'production';
+const hasDSN = !!process.env.NEXT_PUBLIC_SENTRY_DSN;
+const isBrowser = typeof window !== 'undefined';
+
+// Only initialize Sentry in production with a valid DSN
+if (isBrowser && isProduction && hasDSN) {
   Sentry.init({
     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
-    // Set tracesSampleRate to 1.0 to capture 100% of transactions
-    // Lower in production to reduce costs (0.1 = 10%)
-    tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+    // Set tracesSampleRate to capture 10% of transactions in production
+    tracesSampleRate: 0.1,
 
     // Capture Replay for 10% of all sessions,
     // plus 100% of sessions with an error
@@ -17,12 +21,9 @@ if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_SENTRY_DSN) {
     replaysOnErrorSampleRate: 1.0,
 
     // Set environment
-    environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT || process.env.NODE_ENV || 'development',
+    environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT || 'production',
 
-    // Don't send events in development
-    enabled: process.env.NODE_ENV === 'production',
-
-    // Ignore common errors
+    // Ignore common errors that aren't actionable
     ignoreErrors: [
       'ResizeObserver loop limit exceeded',
       'Non-Error promise rejection captured',
@@ -49,16 +50,6 @@ if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_SENTRY_DSN) {
         blockAllMedia: true,
       }),
     ],
-
-    // Set user context
-    beforeSend(event, hint) {
-      // Don't send events in development
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Sentry Error (not sent in dev):', hint.originalException || hint.syntheticException);
-        return null;
-      }
-      return event;
-    },
 
     // Performance monitoring options
     beforeSendTransaction(event) {
