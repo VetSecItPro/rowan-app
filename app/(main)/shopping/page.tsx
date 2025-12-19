@@ -699,13 +699,13 @@ export default function ShoppingPage() {
         <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-              <div className="w-12 h-12 rounded-lg bg-emerald-500 flex items-center justify-center">
-                <ShoppingCart className="w-6 h-6 text-white" />
+            <div className="flex flex-row items-center gap-3 sm:gap-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">Shopping Lists</h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">Collaborative shopping made easy</p>
+                <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">Shopping Lists</h1>
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Collaborative shopping made easy</p>
               </div>
             </div>
             <button onClick={handleOpenNewListModal} className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2">
@@ -841,60 +841,64 @@ export default function ShoppingPage() {
           </div>
 
           {/* Shopping Lists */}
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
             {/* Header with Month Badge and Status Filter */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-              <div className="flex items-center gap-3">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                  {timeFilter === 'week' ? 'This Week\'s Lists' : 'All Shopping Lists'} ({filteredLists.length})
-                </h2>
-                <span className="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 text-sm font-medium rounded-full">
-                  {timeFilter === 'week' ? 'This Week' : format(new Date(), 'MMM yyyy')}
-                </span>
+            <div className="flex flex-col gap-4 mb-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                    {timeFilter === 'week' ? 'This Week\'s Lists' : 'All Shopping Lists'} ({filteredLists.length})
+                  </h2>
+                  <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 text-xs sm:text-sm font-medium rounded-full">
+                    {timeFilter === 'week' ? 'This Week' : format(new Date(), 'MMM yyyy')}
+                  </span>
+                </div>
               </div>
 
-              {/* Status Filter - Segmented Buttons */}
-              <div className="bg-gray-50 dark:bg-gray-900 border border-emerald-200 dark:border-emerald-700 rounded-lg p-1 flex gap-1 w-fit">
-                <button
-                  onClick={() => { setStatusFilter('all'); setTimeFilter('all'); }}
-                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-colors whitespace-nowrap min-w-[60px] ${
-                    statusFilter === 'all' && timeFilter === 'all'
-                      ? 'bg-emerald-500 text-white'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => { setTimeFilter('week'); }}
-                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-colors whitespace-nowrap min-w-[80px] ${
-                    timeFilter === 'week'
-                      ? 'bg-emerald-500 text-white'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  This Week
-                </button>
-                <button
-                  onClick={() => { setStatusFilter('active'); setTimeFilter('all'); }}
-                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-colors whitespace-nowrap min-w-[60px] ${
-                    statusFilter === 'active' && timeFilter === 'all'
-                      ? 'bg-emerald-500 text-white'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  Active
-                </button>
-                <button
-                  onClick={() => { setStatusFilter('completed'); setTimeFilter('all'); }}
-                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-colors whitespace-nowrap min-w-[80px] ${
-                    statusFilter === 'completed' && timeFilter === 'all'
-                      ? 'bg-emerald-500 text-white'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  Completed
-                </button>
+              {/* Status Filter - Segmented Buttons - Full width on mobile */}
+              <div className="w-full">
+                <div className="bg-gray-100 dark:bg-gray-900 border border-emerald-200 dark:border-emerald-700 rounded-xl p-1.5 flex w-full">
+                  <button
+                    onClick={() => { setStatusFilter('all'); setTimeFilter('all'); }}
+                    className={`flex-1 px-2 py-3 sm:py-2.5 text-sm sm:text-sm font-semibold rounded-lg transition-all whitespace-nowrap active:scale-[0.98] ${
+                      statusFilter === 'all' && timeFilter === 'all'
+                        ? 'bg-emerald-500 text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800'
+                    }`}
+                  >
+                    All
+                  </button>
+                  <button
+                    onClick={() => { setTimeFilter('week'); setStatusFilter('all'); }}
+                    className={`flex-1 px-2 py-3 sm:py-2.5 text-sm sm:text-sm font-semibold rounded-lg transition-all whitespace-nowrap active:scale-[0.98] ${
+                      timeFilter === 'week'
+                        ? 'bg-emerald-500 text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800'
+                    }`}
+                  >
+                    Week
+                  </button>
+                  <button
+                    onClick={() => { setStatusFilter('active'); setTimeFilter('all'); }}
+                    className={`flex-1 px-2 py-3 sm:py-2.5 text-sm sm:text-sm font-semibold rounded-lg transition-all whitespace-nowrap active:scale-[0.98] ${
+                      statusFilter === 'active' && timeFilter === 'all'
+                        ? 'bg-emerald-500 text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800'
+                    }`}
+                  >
+                    Active
+                  </button>
+                  <button
+                    onClick={() => { setStatusFilter('completed'); setTimeFilter('all'); }}
+                    className={`flex-1 px-2 py-3 sm:py-2.5 text-sm sm:text-sm font-semibold rounded-lg transition-all whitespace-nowrap active:scale-[0.98] ${
+                      statusFilter === 'completed' && timeFilter === 'all'
+                        ? 'bg-emerald-500 text-white shadow-md'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800'
+                    }`}
+                  >
+                    Done
+                  </button>
+                </div>
               </div>
             </div>
             {loading ? (

@@ -179,7 +179,7 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="e.g., Drink 8 glasses of water"
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white"
             />
           </div>
 
@@ -194,7 +194,7 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Add notes or details about this habit..."
               rows={3}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white resize-none"
             />
           </div>
 
@@ -237,7 +237,7 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
                 max="100"
                 value={formData.target_count || 1}
                 onChange={(e) => setFormData({ ...formData, target_count: parseInt(e.target.value) || 1 })}
-                className="w-20 px-3 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 dark:text-white text-center"
+                className="w-20 px-3 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white text-center"
               />
               <span className="text-sm text-gray-600 dark:text-gray-400">
                 times per {formData.frequency_type === 'daily' ? 'day' : formData.frequency_type === 'weekly' ? 'week' : 'month'}

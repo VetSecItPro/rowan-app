@@ -4,7 +4,7 @@
  * Compatible with Next.js Edge Runtime (middleware)
  */
 
-import { logger } from '@/lib/logger';
+import { logger } from '@/lib/logger-edge';
 
 const CURRENT_KEY_VERSION = 1;
 

@@ -2,6 +2,7 @@ import { shoppingService } from '@/lib/services/shopping-service';
 import { Recipe } from '@/lib/services/meals-service';
 import { format } from 'date-fns';
 import { logger } from '@/lib/logger';
+import { parseIngredient, categorizeIngredient } from '@/lib/services/ingredient-parser';
 
 /**
  * Creates a shopping list from a recipe's ingredients
@@ -31,13 +32,17 @@ export async function createShoppingListFromRecipe(
     // Add each ingredient as a shopping item
     if (recipe.ingredients && recipe.ingredients.length > 0) {
       await Promise.all(
-        recipe.ingredients.map((ingredient) =>
-          shoppingService.createItem({
+        recipe.ingredients.map((ingredient) => {
+          // Parse ingredient text to extract quantity, unit, and name
+          const parsed = parseIngredient(ingredient, recipe.id, recipe.name);
+          return shoppingService.createItem({
             list_id: list.id,
-            name: ingredient,
-            quantity: 1,
-          })
-        )
+            name: parsed.name,
+            quantity: Math.round(parsed.amount) || 1,
+            unit: parsed.unit || undefined,
+            category: categorizeIngredient(parsed.name),
+          });
+        })
       );
     }
 

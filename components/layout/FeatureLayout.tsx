@@ -16,13 +16,16 @@ interface FeatureLayoutProps {
   }[];
   backgroundVariant?: 'subtle' | 'ambient' | 'vibrant';
   enableTimeAware?: boolean;
+  /** Hide footer on mobile for chat-style interfaces */
+  hideFooterOnMobile?: boolean;
 }
 
 export function FeatureLayout({
   children,
   breadcrumbItems,
   backgroundVariant = 'ambient',
-  enableTimeAware = false
+  enableTimeAware = false,
+  hideFooterOnMobile = false
 }: FeatureLayoutProps) {
   const pathname = usePathname();
 
@@ -98,7 +101,10 @@ export function FeatureLayout({
       <Header />
       <Breadcrumb items={breadcrumbItems} />
       <main className="flex-1">{children}</main>
-      <Footer />
+      {/* Hide footer on mobile for chat-style interfaces like Messages */}
+      <div className={hideFooterOnMobile ? 'hidden md:block' : ''}>
+        <Footer />
+      </div>
     </SmartBackgroundCanvas>
   );
 }

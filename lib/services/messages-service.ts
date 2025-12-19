@@ -26,7 +26,14 @@ export interface Message {
   pinned_by?: string;
   created_at: string;
   updated_at: string;
+  // Soft delete fields for WhatsApp-style deletion
+  deleted_at?: string;
+  deleted_for_everyone?: boolean;
+  deleted_by?: string;
+  deleted_for_users?: string[];
 }
+
+export type DeleteMessageMode = 'for_me' | 'for_everyone';
 
 export interface MessageWithAttachments extends Message {
   attachments_data?: FileUploadResult[];
@@ -246,7 +253,58 @@ export const messagesService = {
     return data;
   },
 
-  async deleteMessage(id: string): Promise<void> {
+  /**
+   * Delete a message with WhatsApp-style options
+   * @param id - Message ID to delete
+   * @param userId - Current user ID
+   * @param mode - 'for_me' (soft delete for this user only) or 'for_everyone' (soft delete for all)
+   */
+  async deleteMessage(id: string, userId?: string, mode: DeleteMessageMode = 'for_everyone'): Promise<void> {
+    const supabase = createClient();
+
+    if (mode === 'for_me' && userId) {
+      // Delete for me only - add user to deleted_for_users array
+      // First get current deleted_for_users
+      const { data: message, error: fetchError } = await supabase
+        .from('messages')
+        .select('deleted_for_users')
+        .eq('id', id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      const currentDeletedUsers = message?.deleted_for_users || [];
+      if (!currentDeletedUsers.includes(userId)) {
+        const { error } = await supabase
+          .from('messages')
+          .update({
+            deleted_for_users: [...currentDeletedUsers, userId]
+          })
+          .eq('id', id);
+
+        if (error) throw error;
+      }
+    } else {
+      // Delete for everyone - soft delete with timestamp
+      const { error } = await supabase
+        .from('messages')
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_for_everyone: true,
+          deleted_by: userId || null,
+          content: '' // Clear content for privacy
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+    }
+  },
+
+  /**
+   * Hard delete a message (admin only or for cleanup)
+   * @deprecated Use deleteMessage with mode parameter instead
+   */
+  async hardDeleteMessage(id: string): Promise<void> {
     const supabase = createClient();
     const { error } = await supabase
       .from('messages')

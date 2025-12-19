@@ -19,7 +19,7 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { decryptSessionData, validateSessionData, encryptSessionData } from '@/lib/utils/session-crypto-edge';
-import { logger } from '@/lib/logger';
+import { logger } from '@/lib/logger-edge';
 
 /** Admin session duration in seconds (2 hours) */
 const ADMIN_SESSION_DURATION = 2 * 60 * 60;

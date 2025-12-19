@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
     const shoppingItems = aggregatedIngredients.map((ingredient) => ({
       list_id: shoppingList.id,
       name: ingredient.name,
-      quantity: `${ingredient.amount} ${ingredient.unit}`.trim(),
+      quantity: Math.round(ingredient.amount) || 1, // Ensure quantity is a whole number
       unit: ingredient.unit || null,
       category: categorizeIngredient(ingredient.name),
       notes:

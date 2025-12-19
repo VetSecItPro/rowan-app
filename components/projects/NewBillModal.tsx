@@ -179,7 +179,7 @@ export function NewBillModal({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g., Electric Bill, Netflix, Rent"
-                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${
+                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
                     errors.name
                       ? 'border-red-500 dark:border-red-500'
                       : 'border-gray-300 dark:border-gray-600'
@@ -206,7 +206,7 @@ export function NewBillModal({
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="0.00"
-                    className={`w-full pl-8 pr-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${
+                    className={`w-full pl-8 pr-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
                       errors.amount
                         ? 'border-red-500 dark:border-red-500'
                         : 'border-gray-300 dark:border-gray-600'
@@ -228,7 +228,7 @@ export function NewBillModal({
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${
+                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
                     errors.due_date
                       ? 'border-red-500 dark:border-red-500'
                       : 'border-gray-300 dark:border-gray-600'
@@ -248,7 +248,7 @@ export function NewBillModal({
                   id="frequency"
                   value={frequency}
                   onChange={(e) => setFrequency(e.target.value as BillFrequency)}
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent relative z-50"
+                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 relative z-50"
                   style={{ position: 'relative', zIndex: 9999 }}
                 >
                   {frequencies.map((freq) => (
@@ -267,7 +267,7 @@ export function NewBillModal({
                   id="category"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent relative z-50 ${
+                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 relative z-50 ${
                     errors.category
                       ? 'border-red-500 dark:border-red-500'
                       : 'border-gray-300 dark:border-gray-600'
@@ -297,7 +297,7 @@ export function NewBillModal({
                   onChange={(e) => setPayee(e.target.value)}
                   placeholder="Who to pay"
                   maxLength={255}
-                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${
+                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
                     errors.payee
                       ? 'border-red-500 dark:border-red-500'
                       : 'border-gray-300 dark:border-gray-600'
@@ -319,7 +319,7 @@ export function NewBillModal({
                   placeholder="Additional notes..."
                   rows={3}
                   maxLength={1000}
-                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none ${
+                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 resize-none ${
                     errors.notes
                       ? 'border-red-500 dark:border-red-500'
                       : 'border-gray-300 dark:border-gray-600'

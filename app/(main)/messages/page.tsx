@@ -10,7 +10,8 @@ import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { MessageCard } from '@/components/messages/MessageCard';
 import { NewMessageModal } from '@/components/messages/NewMessageModal';
-import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { DeleteMessageModal } from '@/components/messages/DeleteMessageModal';
+import { DeleteMessageMode } from '@/lib/services/messages-service';
 import { ThreadView } from '@/components/messages/ThreadView';
 import { TypingIndicator } from '@/components/messages/TypingIndicator';
 import { VoiceRecorder } from '@/components/messages/VoiceRecorder';
@@ -68,7 +69,7 @@ export default function MessagesPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, messageId: '' });
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, messageId: '', isOwnMessage: false });
   const [selectedThread, setSelectedThread] = useState<MessageWithReplies | null>(null);
   const [typingUsers, setTypingUsers] = useState<TypingIndicatorType[]>([]);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -300,26 +301,40 @@ export default function MessagesPage() {
     }
   }, [editingMessage]);
 
-  // Memoize handleDeleteMessage callback
+  // Memoize handleDeleteMessage callback - now tracks if it's own message for delete options
   const handleDeleteMessage = useCallback(async (messageId: string) => {
-    setConfirmDialog({ isOpen: true, messageId });
-  }, []);
+    const message = messages.find(m => m.id === messageId);
+    const isOwnMessage = message?.sender_id === user?.id;
+    setConfirmDialog({ isOpen: true, messageId, isOwnMessage });
+  }, [messages, user?.id]);
 
-  const handleConfirmDelete = useCallback(async () => {
+  const handleConfirmDelete = useCallback(async (mode: DeleteMessageMode) => {
     const messageId = confirmDialog.messageId;
-    setConfirmDialog({ isOpen: false, messageId: '' });
+    setConfirmDialog({ isOpen: false, messageId: '', isOwnMessage: false });
 
-    // Optimistic update - remove from UI immediately
-    setMessages(prev => prev.filter(message => message.id !== messageId));
+    if (mode === 'for_me') {
+      // Delete for me - just hide from UI locally (message still exists for others)
+      setMessages(prev => prev.filter(message => message.id !== messageId));
+      toast.success('Message deleted for you');
+    } else {
+      // Delete for everyone - show placeholder, update message in place
+      setMessages(prev => prev.map(message =>
+        message.id === messageId
+          ? { ...message, deleted_at: new Date().toISOString(), deleted_for_everyone: true, content: '' }
+          : message
+      ));
+      toast.success('Message deleted for everyone');
+    }
 
     try {
-      await messagesService.deleteMessage(messageId);
+      await messagesService.deleteMessage(messageId, user?.id, mode);
     } catch (error) {
       logger.error('Failed to delete message:', error, { component: 'page', action: 'service_call' });
+      toast.error('Failed to delete message');
       // Revert optimistic update on error
       loadMessages();
     }
-  }, [confirmDialog, loadMessages]);
+  }, [confirmDialog, loadMessages, user?.id]);
 
   // Handle pin/unpin toggle
   const handleTogglePin = useCallback(async (messageId: string) => {
@@ -854,12 +869,13 @@ export default function MessagesPage() {
   };
 
   return (
-    <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Messages' }]}>
+    <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Messages' }]} hideFooterOnMobile>
       <PageErrorBoundary>
-        <div className="p-4 sm:p-8">
-        <div className="max-w-7xl mx-auto space-y-4 sm:space-y-8">
-          {/* Header */}
-          <div className="flex items-center gap-3 sm:gap-4">
+        {/* Mobile: fixed height container that doesn't scroll; Desktop: normal layout */}
+        <div className="md:p-8 p-2 h-[calc(100dvh-100px)] md:h-auto overflow-hidden md:overflow-visible">
+        <div className="max-w-7xl mx-auto h-full md:h-auto flex flex-col md:block md:space-y-8">
+          {/* Header - Hidden on mobile for more chat space */}
+          <div className="hidden md:flex items-center gap-3 sm:gap-4">
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-messages flex items-center justify-center">
               <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
@@ -881,7 +897,7 @@ export default function MessagesPage() {
           </div>
 
 
-          {/* Stats Dashboard */}
+          {/* Stats Dashboard - Collapsed on mobile, expanded on desktop */}
           <CollapsibleStatsGrid
             icon={MessageCircle}
             title="Messages Stats"
@@ -962,9 +978,8 @@ export default function MessagesPage() {
             </div>
           </CollapsibleStatsGrid>
 
-
           {/* Conversations and Chat Interface */}
-          <div className="flex gap-4 h-chat-container min-h-[500px]">
+          <div className="flex gap-4 flex-1 min-h-0 md:h-chat-container md:min-h-[500px]">
             {/* Conversation Sidebar - Desktop */}
             <div className="hidden md:block w-80 flex-shrink-0">
               <div className="sticky top-4 h-full">
@@ -980,18 +995,19 @@ export default function MessagesPage() {
             </div>
 
             {/* Chat Interface */}
-            <div className="flex-1 bg-gradient-to-br from-white/80 via-emerald-50/40 to-green-50/60 dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-800/90 backdrop-blur-2xl border border-emerald-200/30 dark:border-gray-700/50 rounded-3xl overflow-visible flex flex-col h-full shadow-2xl shadow-emerald-500/10 dark:shadow-gray-900/50">
+            <div className="flex-1 min-h-0 bg-gradient-to-br from-white/80 via-emerald-50/40 to-green-50/60 dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-800/90 backdrop-blur-2xl border border-emerald-200/30 dark:border-gray-700/50 rounded-3xl overflow-hidden flex flex-col shadow-2xl shadow-emerald-500/10 dark:shadow-gray-900/50">
             {/* Chat Header */}
             <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-emerald-200/30 dark:border-gray-700 bg-gradient-to-r from-emerald-400/10 via-green-400/10 to-teal-400/10 dark:from-gray-800 dark:to-gray-900 backdrop-blur-sm">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  {/* Mobile Menu Button */}
+                  {/* Mobile Menu Button - Opens conversation sidebar */}
                   <button
                     onClick={() => setShowConversationSidebar(true)}
-                    className="md:hidden p-2 hover:bg-emerald-100/50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 flex-shrink-0"
+                    className="md:hidden flex items-center gap-1.5 px-2.5 py-1.5 hover:bg-emerald-100/50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 flex-shrink-0 border border-emerald-200/50 dark:border-gray-600/50"
                     aria-label="Open conversations"
                   >
-                    <MessageCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    <MessageCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">Chats</span>
                   </button>
 
                   <div className="flex items-center gap-3 min-w-0">
@@ -1036,9 +1052,16 @@ export default function MessagesPage() {
             </div>
 
             {/* Mobile Thread Navigation Bar - WhatsApp-style */}
-            {conversations.length > 1 && (
+            {conversations.length >= 1 && (
               <div className="md:hidden px-3 py-2 border-b border-emerald-200/20 dark:border-gray-700/50 bg-gradient-to-r from-emerald-50/30 to-green-50/30 dark:from-gray-800/50 dark:to-gray-900/50">
                 <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
+                  {/* New Thread Button - First */}
+                  <button
+                    onClick={() => setShowNewConversationModal(true)}
+                    className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-500 text-white shadow-md hover:bg-emerald-600 transition-all duration-200"
+                  >
+                    + New
+                  </button>
                   {conversations.map((conv) => (
                     <button
                       key={conv.id}
@@ -1059,19 +1082,12 @@ export default function MessagesPage() {
                       )}
                     </button>
                   ))}
-                  {/* New Thread Button */}
-                  <button
-                    onClick={() => setShowNewConversationModal(true)}
-                    className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium bg-white/60 dark:bg-gray-700/60 text-emerald-600 dark:text-emerald-400 border border-dashed border-emerald-300 dark:border-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all duration-200"
-                  >
-                    + New
-                  </button>
                 </div>
               </div>
             )}
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto overflow-x-visible px-4 sm:px-6 py-6 space-y-6 bg-gradient-to-b from-emerald-50/30 via-white/60 to-green-50/40 dark:from-gray-900/70 dark:via-gray-900/80 dark:to-gray-800/70 backdrop-blur-sm relative">
+            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6 bg-gradient-to-b from-emerald-50/30 via-white/60 to-green-50/40 dark:from-gray-900/70 dark:via-gray-900/80 dark:to-gray-800/70 backdrop-blur-sm relative">
               {/* Subtle Chat Pattern Background with Glassmorphism */}
               <div className="absolute inset-0 opacity-30 dark:opacity-15">
                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-100/40 via-transparent to-green-100/30 dark:from-gray-800/30 dark:to-gray-700/20"></div>
@@ -1170,7 +1186,7 @@ export default function MessagesPage() {
             </div>
 
             {/* Message Input */}
-            <div className="px-4 sm:px-6 py-4 sm:py-5 border-t border-emerald-200/30 dark:border-gray-700 bg-gradient-to-r from-emerald-50/50 via-white to-green-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 backdrop-blur-sm">
+            <div className="flex-shrink-0 px-3 sm:px-6 py-3 sm:py-5 border-t border-emerald-200/30 dark:border-gray-700 bg-gradient-to-r from-emerald-50/50 via-white to-green-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 backdrop-blur-sm">
               <div className="flex items-center gap-2 sm:gap-3">
                 {/* Message Input - Left */}
                 {currentSpace && (
@@ -1508,15 +1524,11 @@ export default function MessagesPage() {
         />
       )}
 
-      <ConfirmDialog
+      <DeleteMessageModal
         isOpen={confirmDialog.isOpen}
-        onClose={() => setConfirmDialog({ isOpen: false, messageId: '' })}
+        onClose={() => setConfirmDialog({ isOpen: false, messageId: '', isOwnMessage: false })}
         onConfirm={handleConfirmDelete}
-        title="Delete Message"
-        message="Are you sure you want to delete this message? This action cannot be undone."
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
-        variant="danger"
+        isOwnMessage={confirmDialog.isOwnMessage}
       />
 
       {/* New Conversation Modal */}

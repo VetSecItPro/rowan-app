@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Trash2, Edit2 } from 'lucide-react';
 
 interface SwipeableMessageCardProps {
@@ -20,31 +20,75 @@ export function SwipeableMessageCard({
   const [isDragging, setIsDragging] = useState(false);
   const startX = useRef(0);
   const currentX = useRef(0);
+  const autoRevertTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const EDIT_THRESHOLD = 50; // Swipe 50px right to reveal edit
   const DELETE_THRESHOLD = -70; // Swipe 70px left to reveal delete
   const SNAP_THRESHOLD = 20; // Minimum swipe to maintain reveal
+  const AUTO_REVERT_DELAY = 3000; // Auto-revert after 3 seconds of inactivity
+
+  // Clear any existing timeout
+  const clearAutoRevertTimeout = useCallback(() => {
+    if (autoRevertTimeoutRef.current) {
+      clearTimeout(autoRevertTimeoutRef.current);
+      autoRevertTimeoutRef.current = null;
+    }
+  }, []);
+
+  // Start auto-revert timer when swipe action is revealed
+  const startAutoRevertTimer = useCallback(() => {
+    clearAutoRevertTimeout();
+    autoRevertTimeoutRef.current = setTimeout(() => {
+      setOffsetX(0);
+    }, AUTO_REVERT_DELAY);
+  }, [clearAutoRevertTimeout]);
+
+  // Handle click outside to dismiss swipe action
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (offsetX !== 0 && containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setOffsetX(0);
+        clearAutoRevertTimeout();
+      }
+    };
+
+    if (offsetX !== 0) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [offsetX, clearAutoRevertTimeout]);
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      clearAutoRevertTimeout();
+    };
+  }, [clearAutoRevertTimeout]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    // Only allow swipe on own messages
-    if (!isOwn) return;
-
+    // Allow swipe for delete on all messages (delete for me)
+    // Only allow edit swipe on own messages
     startX.current = e.touches[0].clientX;
     setIsDragging(true);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || !isOwn) return;
+    if (!isDragging) return;
 
     currentX.current = e.touches[0].clientX;
     const diff = currentX.current - startX.current;
 
-    // Allow swipe in both directions for own messages
-    if (diff > 0 && onEdit) {
-      // Right swipe for edit
+    // Right swipe for edit - only for own messages
+    if (diff > 0 && onEdit && isOwn) {
       setOffsetX(Math.min(diff, EDIT_THRESHOLD));
     } else if (diff < 0 && onDelete) {
-      // Left swipe for delete
+      // Left swipe for delete - works for all messages (delete for me or delete for everyone)
       setOffsetX(Math.max(diff, DELETE_THRESHOLD));
     }
   };
@@ -55,34 +99,34 @@ export function SwipeableMessageCard({
     // Snap to action or reset with improved thresholds
     if (offsetX > SNAP_THRESHOLD) {
       setOffsetX(EDIT_THRESHOLD);
+      startAutoRevertTimer(); // Start timer when edit is revealed
     } else if (offsetX < -SNAP_THRESHOLD) {
       setOffsetX(DELETE_THRESHOLD);
+      startAutoRevertTimer(); // Start timer when delete is revealed
     } else {
       setOffsetX(0);
+      clearAutoRevertTimeout();
     }
   };
 
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
+    clearAutoRevertTimeout();
     onEdit?.();
     setOffsetX(0);
   };
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
+    clearAutoRevertTimeout();
     onDelete?.();
     setOffsetX(0);
   };
 
-  // Don't make swipeable if not own message
-  if (!isOwn) {
-    return <>{children}</>;
-  }
-
   return (
-    <div className="relative">
-      {/* Edit Button (Left Side - Revealed on Right Swipe) */}
-      {onEdit && (
+    <div ref={containerRef} className="relative">
+      {/* Edit Button (Left Side - Revealed on Right Swipe) - Only for own messages */}
+      {onEdit && isOwn && (
         <div className="absolute inset-y-0 left-0 w-16 flex items-center justify-start pl-2 z-20">
           <div className={`transition-all duration-300 ${offsetX > EDIT_THRESHOLD / 3 ? 'scale-100 opacity-100' : 'scale-75 opacity-0'}`}>
             <button
