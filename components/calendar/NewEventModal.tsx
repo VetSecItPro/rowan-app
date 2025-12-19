@@ -383,7 +383,7 @@ export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, sp
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Team meeting"
-                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white"
               />
 
               {/* Emoji Picker Button */}
@@ -429,7 +429,7 @@ export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, sp
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Add event details..."
               rows={3}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white"
             />
             <div className="flex items-center gap-2 mt-2">
               {/* Image Attachment Button */}
@@ -584,7 +584,7 @@ export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, sp
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
               placeholder="Add location..."
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white"
             />
           </div>
 
@@ -758,7 +758,7 @@ export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, sp
                   onChange={(e) => setCountdownLabel(e.target.value)}
                   placeholder="e.g., Birthday!, Vacation, Wedding Day"
                   maxLength={50}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
                 <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
                   A custom label to display instead of the event title. Leave empty to use the event title.

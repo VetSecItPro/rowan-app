@@ -31,11 +31,12 @@ export function Tooltip({ content, children, position = 'top', delay = 0 }: Tool
     setIsVisible(false);
   };
 
+  const [horizontalOffset, setHorizontalOffset] = useState(0);
+
   // Smart positioning to prevent overflow
   useEffect(() => {
     if (isVisible && tooltipRef.current && triggerRef.current) {
       const tooltipRect = tooltipRef.current.getBoundingClientRect();
-      const triggerRect = triggerRef.current.getBoundingClientRect();
       const viewport = {
         width: window.innerWidth,
         height: window.innerHeight,
@@ -43,7 +44,7 @@ export function Tooltip({ content, children, position = 'top', delay = 0 }: Tool
 
       let newPosition = position;
 
-      // Check if tooltip overflows viewport and adjust
+      // Check if tooltip overflows viewport vertically and adjust
       if (position === 'top' && tooltipRect.top < 0) {
         newPosition = 'bottom';
       } else if (position === 'bottom' && tooltipRect.bottom > viewport.height) {
@@ -57,24 +58,53 @@ export function Tooltip({ content, children, position = 'top', delay = 0 }: Tool
       if (newPosition !== tooltipPosition) {
         setTooltipPosition(newPosition);
       }
+
+      // Check horizontal overflow for top/bottom positioned tooltips
+      if (newPosition === 'top' || newPosition === 'bottom') {
+        const padding = 8; // Padding from viewport edge
+        let offset = 0;
+
+        if (tooltipRect.left < padding) {
+          // Tooltip is cut off on the left
+          offset = padding - tooltipRect.left;
+        } else if (tooltipRect.right > viewport.width - padding) {
+          // Tooltip is cut off on the right
+          offset = viewport.width - padding - tooltipRect.right;
+        }
+
+        if (offset !== horizontalOffset) {
+          setHorizontalOffset(offset);
+        }
+      } else {
+        if (horizontalOffset !== 0) {
+          setHorizontalOffset(0);
+        }
+      }
     }
-  }, [isVisible, position, tooltipPosition]);
+  }, [isVisible, position, tooltipPosition, horizontalOffset]);
 
   const getTooltipStyles = () => {
     const baseStyles = 'absolute z-50 px-2 py-1 text-xs text-white bg-gray-900 dark:bg-gray-700 rounded shadow-lg whitespace-nowrap pointer-events-none';
 
     switch (tooltipPosition) {
       case 'top':
-        return `${baseStyles} bottom-full left-1/2 -translate-x-1/2 mb-2`;
+        return `${baseStyles} bottom-full left-1/2 mb-2`;
       case 'bottom':
-        return `${baseStyles} top-full left-1/2 -translate-x-1/2 mt-2`;
+        return `${baseStyles} top-full left-1/2 mt-2`;
       case 'left':
         return `${baseStyles} right-full top-1/2 -translate-y-1/2 mr-2`;
       case 'right':
         return `${baseStyles} left-full top-1/2 -translate-y-1/2 ml-2`;
       default:
-        return `${baseStyles} bottom-full left-1/2 -translate-x-1/2 mb-2`;
+        return `${baseStyles} bottom-full left-1/2 mb-2`;
     }
+  };
+
+  const getTooltipTransform = () => {
+    if (tooltipPosition === 'top' || tooltipPosition === 'bottom') {
+      return `translateX(calc(-50% + ${horizontalOffset}px))`;
+    }
+    return undefined;
   };
 
   return (
@@ -91,6 +121,7 @@ export function Tooltip({ content, children, position = 'top', delay = 0 }: Tool
         <div
           ref={tooltipRef}
           className={getTooltipStyles()}
+          style={{ transform: getTooltipTransform() }}
           role="tooltip"
         >
           {content}

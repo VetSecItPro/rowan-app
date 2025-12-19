@@ -257,7 +257,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Complete project report"
-                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
               />
 
               {/* Emoji Picker Button */}
@@ -303,7 +303,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Add details about this task..."
               rows={3}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
             />
           </div>
 
@@ -318,7 +318,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                 <select
                   value={formData.priority}
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value as 'low' | 'medium' | 'high' | 'urgent' })}
-                  className="w-full pl-4 pr-12 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white relative z-50"
+                  className="w-full pl-4 pr-12 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white relative z-50"
                   style={{ position: 'relative', zIndex: 9999 }}
                 >
                   <option value="low">Low</option>
@@ -339,7 +339,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value as 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed' })}
-                  className="w-full pl-4 pr-12 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white relative z-50"
+                  className="w-full pl-4 pr-12 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white relative z-50"
                   style={{ position: 'relative', zIndex: 9999 }}
                 >
                   <option value="pending">Pending</option>
@@ -364,7 +364,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                 <select
                   value={formData.category || ''}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full pl-4 pr-12 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white relative z-50"
+                  className="w-full pl-4 pr-12 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white relative z-50"
                   style={{ position: 'relative', zIndex: 9999 }}
                 >
                   <option value="">Select category...</option>
@@ -409,7 +409,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                     setDateError('');
                   }
                 }}
-                className={`w-full px-4 py-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-gray-900 dark:text-white ${
+                className={`w-full px-4 py-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white ${
                   dateError ? 'border-red-500 dark:border-red-500' : 'border-gray-200/50 dark:border-gray-700/50'
                 }`}
               />
@@ -462,7 +462,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                           pattern: e.target.value as any,
                           daysOfWeek: [] // Reset days when pattern changes
                         })}
-                        className="w-full pl-4 pr-12 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none"
+                        className="w-full pl-4 pr-12 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white appearance-none"
                       >
                         <option value="daily">Daily</option>
                         <option value="weekly">Weekly</option>
@@ -488,7 +488,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                         ...recurringData,
                         interval: Math.max(1, parseInt(e.target.value) || 1)
                       })}
-                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>

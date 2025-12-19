@@ -8,9 +8,10 @@ import { logger } from '@/lib/logger';
 interface VoiceRecorderProps {
   onSendVoice: (audioBlob: Blob, duration: number) => Promise<void>;
   onCancel?: () => void;
+  autoSendOnStop?: boolean; // If true, auto-send when recording stops (default: true)
 }
 
-export function VoiceRecorder({ onSendVoice, onCancel }: VoiceRecorderProps) {
+export function VoiceRecorder({ onSendVoice, onCancel, autoSendOnStop = true }: VoiceRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -18,6 +19,7 @@ export function VoiceRecorder({ onSendVoice, onCancel }: VoiceRecorderProps) {
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [sending, setSending] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState(false);
+  const durationAtStopRef = useRef(0); // Store duration at stop time for auto-send
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -50,16 +52,38 @@ export function VoiceRecorder({ onSendVoice, onCancel }: VoiceRecorderProps) {
         }
       };
 
-      mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        const url = URL.createObjectURL(audioBlob);
-
-        setAudioUrl(url);
-        setAudioBlob(audioBlob);
-        setIsRecording(false);
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const url = URL.createObjectURL(blob);
 
         // Stop all tracks to release microphone
         stream.getTracks().forEach(track => track.stop());
+
+        // Auto-send if enabled, otherwise show playback UI
+        if (autoSendOnStop) {
+          setIsRecording(false);
+          setSending(true);
+          try {
+            await onSendVoice(blob, durationAtStopRef.current);
+            // Clean up
+            URL.revokeObjectURL(url);
+            setRecordingDuration(0);
+            if (onCancel) onCancel();
+          } catch (error) {
+            logger.error('Failed to send voice message:', error, { component: 'VoiceRecorder', action: 'component_action' });
+            toast.error('Failed to send voice message');
+            // On error, show playback UI so user can retry
+            setAudioUrl(url);
+            setAudioBlob(blob);
+          } finally {
+            setSending(false);
+          }
+        } else {
+          // Legacy behavior: show playback UI
+          setAudioUrl(url);
+          setAudioBlob(blob);
+          setIsRecording(false);
+        }
       };
 
       mediaRecorder.start();
@@ -74,6 +98,8 @@ export function VoiceRecorder({ onSendVoice, onCancel }: VoiceRecorderProps) {
 
   const handleStopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
+      // Capture duration before stopping (since timer will be cleared)
+      durationAtStopRef.current = recordingDuration;
       mediaRecorderRef.current.stop();
     }
   };
@@ -136,8 +162,18 @@ export function VoiceRecorder({ onSendVoice, onCancel }: VoiceRecorderProps) {
 
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+      {/* Sending State (Auto-send in progress) */}
+      {sending && !audioUrl && !isRecording && (
+        <div className="flex items-center justify-center gap-3 py-2">
+          <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            Sending voice message...
+          </span>
+        </div>
+      )}
+
       {/* Recording State */}
-      {!audioUrl && !isRecording && (
+      {!audioUrl && !isRecording && !sending && (
         <div className="flex items-center justify-center gap-4">
           <button
             onClick={handleStartRecording}

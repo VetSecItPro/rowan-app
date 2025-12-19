@@ -133,7 +133,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
                 required
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm pr-12 bg-gray-50 dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm pr-12 bg-gray-50 dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
               />
 
               {/* Emoji Picker Button */}
@@ -199,7 +199,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
                   setDateError('');
                 }
               }}
-              className={`w-full px-4 py-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border rounded-lg focus:ring-2 focus:ring-amber-500/50 focus:border-transparent text-gray-900 dark:text-white ${
+              className={`w-full px-4 py-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white ${
                 dateError ? 'border-red-500 dark:border-red-500' : 'border-gray-200/50 dark:border-gray-700/50'
               }`}
             />

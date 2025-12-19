@@ -835,23 +835,23 @@ export default function CalendarPage() {
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-calendar flex items-center justify-center">
-                <CalendarIcon className="w-6 h-6 text-white" />
+            <div className="flex flex-row items-center gap-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-calendar flex items-center justify-center flex-shrink-0">
+                <CalendarIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <div className="flex items-center gap-3">
-                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-calendar bg-clip-text text-transparent">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold bg-gradient-calendar bg-clip-text text-transparent">
                     Calendar
                   </h1>
                   {realtimeConnected && (
-                    <div className="flex items-center gap-1.5 px-2 py-1 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-full">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                      <span className="text-xs font-medium text-green-700 dark:text-green-300">Live</span>
+                    <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-full">
+                      <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full animate-pulse" />
+                      <span className="text-[10px] sm:text-xs font-medium text-green-700 dark:text-green-300">Live</span>
                     </div>
                   )}
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                   Shared events and schedules
                 </p>
               </div>

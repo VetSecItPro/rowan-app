@@ -147,7 +147,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
                   id="field-1"
               onChange={(e) =>  setEmail(e.target.value)}
                   placeholder="partner@example.com"
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white"
                   disabled={loading}
                 />
               </div>
@@ -164,7 +164,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value as 'member' | 'admin')}
-                className="w-full pl-4 pr-10 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none relative z-50"
+                className="w-full pl-4 pr-10 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white appearance-none relative z-50"
                 disabled={loading}
                 id="role-select"
                 style={{

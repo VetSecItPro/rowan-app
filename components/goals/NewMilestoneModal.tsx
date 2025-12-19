@@ -143,7 +143,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Save $5,000 for vacation"
-                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white"
               />
 
               {/* Emoji Picker Button */}
@@ -190,7 +190,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Add details about this milestone..."
               rows={3}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white"
             />
           </div>
 
@@ -247,7 +247,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
                   value={formData.target_value || ''}
                   onChange={(e) => setFormData({ ...formData, target_value: parseFloat(e.target.value) || 0 })}
                   placeholder={formData.type === 'percentage' ? '100' : formData.type === 'money' ? '10000' : '20'}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
@@ -261,7 +261,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
                   value={formData.current_value || ''}
                   onChange={(e) => setFormData({ ...formData, current_value: parseFloat(e.target.value) || 0 })}
                   placeholder="0"
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white"
                 />
               </div>
             </div>
@@ -278,7 +278,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
                 required={formData.type === 'date'}
                 value={formData.target_date}
                 onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white"
               />
             </div>
           )}

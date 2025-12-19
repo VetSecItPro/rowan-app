@@ -86,123 +86,123 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-colors group">
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <div className="flex items-center gap-4 mb-2">
-            <Tooltip content={list.status === 'completed' ? 'List completed' : 'Mark entire list as complete'} delay={0}>
-              <button
-                onClick={() => onCompleteList?.(list.id)}
-                disabled={list.status === 'completed'}
-                aria-label={`Mark entire shopping list as ${list.status === 'completed' ? 'completed' : 'complete'}`}
-                className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                  list.status === 'completed'
-                    ? 'bg-green-500 border-green-500 cursor-not-allowed'
-                    : 'border-emerald-400 dark:border-emerald-500 hover:border-emerald-600 dark:hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 cursor-pointer'
-                }`}
-              >
-                {list.status === 'completed' && <Check className="w-4 h-4 text-white" />}
-              </button>
-            </Tooltip>
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 sm:p-6 hover:shadow-md transition-colors group">
+      <div className="flex items-start justify-between mb-3 sm:mb-4">
+        <div className="flex-1 min-w-0">
+          {/* Mobile: Stack checkbox + progress vertically, then title. Desktop: All inline */}
+          <div className="flex gap-3 sm:gap-4 mb-2">
+            {/* Checkbox + Progress container - stacked on mobile */}
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 flex-shrink-0">
+              <Tooltip content={list.status === 'completed' ? 'List completed' : 'Mark entire list as complete'} delay={0}>
+                <button
+                  onClick={() => onCompleteList?.(list.id)}
+                  disabled={list.status === 'completed'}
+                  aria-label={`Mark entire shopping list as ${list.status === 'completed' ? 'completed' : 'complete'}`}
+                  className={`flex-shrink-0 w-6 h-6 sm:w-5 sm:h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                    list.status === 'completed'
+                      ? 'bg-green-500 border-green-500 cursor-not-allowed'
+                      : 'border-emerald-400 dark:border-emerald-500 hover:border-emerald-600 dark:hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 cursor-pointer'
+                  }`}
+                >
+                  {list.status === 'completed' && <Check className="w-4 h-4 text-white" />}
+                </button>
+              </Tooltip>
 
-            {/* Circular Progress Ring */}
-            <Tooltip content={`${checkedItems} of ${totalItems} items checked`} delay={0}>
-              <div className="flex-shrink-0">
-                <CircularProgress
-                  progress={progress}
-                  size={56}
-                  strokeWidth={5}
-                  color="emerald"
-                  showPercentage={true}
-                />
-              </div>
-            </Tooltip>
+              {/* Circular Progress Ring - below checkbox on mobile */}
+              <Tooltip content={`${checkedItems} of ${totalItems} items checked`} delay={0}>
+                <div className="flex-shrink-0">
+                  <CircularProgress
+                    progress={progress}
+                    size={44}
+                    strokeWidth={4}
+                    color="emerald"
+                    showPercentage={true}
+                  />
+                </div>
+              </Tooltip>
+            </div>
 
+            {/* Title and subtitle */}
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white leading-tight">
                 {list.title}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-0.5">
                 {checkedItems} of {totalItems} items • {list.store_name || 'No store set'}
               </p>
             </div>
           </div>
 
           {list.description && (
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 ml-[76px] break-words line-clamp-2">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:ml-[76px] leading-relaxed">
               <span className="font-medium">Note:</span> {list.description}
             </p>
           )}
 
           {/* Items Preview - Grouped by Category */}
           {list.items && list.items.length > 0 && (
-            <div className="space-y-3">
+            <div className="space-y-3 mt-2">
               {Object.entries(itemsByCategory).slice(0, isExpanded ? undefined : 2).map(([category, items]) => (
-                <div key={category} className="space-y-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-lg">{getCategoryIcon(category as any)}</span>
-                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                <div key={category} className="space-y-1.5">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <span className="text-base sm:text-lg">{getCategoryIcon(category as any)}</span>
+                    <span className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       {getCategoryLabel(category as any)}
                     </span>
                   </div>
                   {items?.slice(0, isExpanded ? undefined : 3).map((item) => (
-                    <div key={item.id} className="flex items-center gap-2 ml-7 group/item">
-                      <Tooltip content={item.checked ? 'Mark as not purchased' : 'Mark as purchased'} delay={0}>
-                        <button
-                          onClick={() => onToggleItem?.(item.id, !item.checked)}
-                          aria-label={`Toggle item: ${item.name}`}
-                          className={`flex-shrink-0 w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
-                            item.checked
-                              ? 'bg-green-500 border-green-500'
-                              : 'border-gray-300 dark:border-gray-600 hover:border-emerald-500'
-                          }`}
-                        >
-                          {item.checked && <Check className="w-3 h-3 text-white" />}
-                        </button>
-                      </Tooltip>
-
-                      {/* Item name and quantity controls grouped together */}
-                      <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                        <span className={`text-sm truncate ${item.checked ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                    <div key={item.id} className="flex items-center justify-between gap-2 ml-0 sm:ml-2 -mr-1 sm:mr-0 group/item">
+                      {/* Left side: checkbox + item name */}
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <Tooltip content={item.checked ? 'Mark as not purchased' : 'Mark as purchased'} delay={0}>
+                          <button
+                            onClick={() => onToggleItem?.(item.id, !item.checked)}
+                            aria-label={`Toggle item: ${item.name}`}
+                            className={`flex-shrink-0 w-5 h-5 sm:w-4 sm:h-4 rounded border-2 flex items-center justify-center transition-colors ${
+                              item.checked
+                                ? 'bg-green-500 border-green-500'
+                                : 'border-gray-300 dark:border-gray-600 hover:border-emerald-500'
+                            }`}
+                          >
+                            {item.checked && <Check className="w-3 h-3 text-white" />}
+                          </button>
+                        </Tooltip>
+                        <span className={`text-xs sm:text-sm truncate ${item.checked ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-300'}`}>
                           {item.name}
                         </span>
-
-                        {/* Quantity Controls - right next to item name */}
-                        {onUpdateQuantity && (
-                          <div className="flex items-center gap-0.5">
-                            <Tooltip content="Decrease quantity" delay={0}>
-                              <button
-                                onClick={() => onUpdateQuantity(item.id, Math.max(1, Number(item.quantity) - 1))}
-                                disabled={Number(item.quantity) <= 1}
-                                className="w-5 h-5 flex-shrink-0 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                                aria-label="Decrease quantity"
-                              >
-                                <span className="text-xs font-bold text-gray-600 dark:text-gray-300">−</span>
-                              </button>
-                            </Tooltip>
-                            <input
-                              type="text"
-                              inputMode="numeric"
-                              value={editingQuantities[item.id] ?? item.quantity}
-                              onChange={(e) => handleQuantityChange(item.id, e.target.value)}
-                              onBlur={() => handleQuantityBlur(item.id, item.quantity)}
-                              onKeyPress={(e) => handleQuantityKeyPress(e, item.id)}
-                              className="w-10 sm:w-12 text-xs font-medium text-gray-700 dark:text-gray-300 text-center bg-gray-50 dark:bg-gray-800 border border-gray-200/50 dark:border-gray-600/50 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                              aria-label="Edit quantity"
-                            />
-                            <Tooltip content="Increase quantity" delay={0}>
-                              <button
-                                onClick={() => onUpdateQuantity(item.id, Math.min(200, Number(item.quantity) + 1))}
-                                disabled={Number(item.quantity) >= 200}
-                                className="w-5 h-5 flex-shrink-0 rounded bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-800/50 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                                aria-label="Increase quantity"
-                              >
-                                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">+</span>
-                              </button>
-                            </Tooltip>
-                          </div>
-                        )}
                       </div>
+
+                      {/* Right side: Quantity Controls - pushed to right edge */}
+                      {onUpdateQuantity && (
+                        <div className="flex items-center gap-0.5 flex-shrink-0">
+                          <button
+                            onClick={() => onUpdateQuantity(item.id, Math.max(1, Number(item.quantity) - 1))}
+                            disabled={Number(item.quantity) <= 1}
+                            className="w-6 h-6 sm:w-5 sm:h-5 flex-shrink-0 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
+                            aria-label="Decrease quantity"
+                          >
+                            <span className="text-sm sm:text-xs font-bold text-gray-600 dark:text-gray-300">−</span>
+                          </button>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={editingQuantities[item.id] ?? item.quantity}
+                            onChange={(e) => handleQuantityChange(item.id, e.target.value)}
+                            onBlur={() => handleQuantityBlur(item.id, item.quantity)}
+                            onKeyPress={(e) => handleQuantityKeyPress(e, item.id)}
+                            className="w-8 h-6 sm:h-5 text-sm sm:text-xs font-semibold text-gray-700 dark:text-gray-300 text-center bg-gray-50 dark:bg-gray-800 border border-gray-200/50 dark:border-gray-600/50 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            aria-label="Edit quantity"
+                          />
+                          <button
+                            onClick={() => onUpdateQuantity(item.id, Math.min(200, Number(item.quantity) + 1))}
+                            disabled={Number(item.quantity) >= 200}
+                            className="w-6 h-6 sm:w-5 sm:h-5 flex-shrink-0 rounded bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-800/50 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
+                            aria-label="Increase quantity"
+                          >
+                            <span className="text-sm sm:text-xs font-bold text-emerald-600 dark:text-emerald-400">+</span>
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -210,7 +210,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
               {(Object.keys(itemsByCategory).length > 2 || list.items.length > 6) && (
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="text-xs text-emerald-600 dark:text-emerald-400 ml-7 hover:underline transition-opacity"
+                  className="text-xs text-emerald-600 dark:text-emerald-400 ml-1 sm:ml-2 hover:underline transition-opacity"
                 >
                   {isExpanded ? 'Show less' : `+${list.items.length - 6} more items`}
                 </button>

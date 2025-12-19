@@ -1,6 +1,6 @@
 'use client';
 
-import { Clock, Check, CheckCheck, MoreVertical, MessageSquare, Pin, Forward, Edit3, Trash2 } from 'lucide-react';
+import { Clock, Check, CheckCheck, MoreVertical, MessageSquare, Pin, Forward, Edit3, Trash2, Ban } from 'lucide-react';
 import { MessageWithAttachments, MessageWithReplies, MessageReactionSummary, messagesService } from '@/lib/services/messages-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState, useEffect } from 'react';
@@ -113,12 +113,43 @@ export function MessageCard({
 
   const colorClasses = getColorClasses(senderColor);
 
+  // Check if message was deleted for everyone
+  const isDeleted = message.deleted_for_everyone || message.deleted_at;
+
   // Check if message is long (more than ~200 characters or 3-4 lines)
   const isLongMessage = message.content && message.content.length > 200;
   const shouldTruncate = isLongMessage && !isExpanded;
   const displayContent = shouldTruncate
     ? message.content.substring(0, 200) + '...'
     : message.content;
+
+  // Render deleted message placeholder
+  if (isDeleted) {
+    return (
+      <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
+        <div className={`max-w-[85%] sm:max-w-[75%] md:max-w-[70%] lg:max-w-[65%] ${isOwn ? 'items-end' : 'items-start'} flex flex-col`}>
+          <div className="px-4 pb-1">
+            <p className={`text-xs font-medium ${colorClasses.textColor}`}>
+              {senderName}
+            </p>
+          </div>
+          <div className={`relative rounded-2xl px-4 py-3 backdrop-blur-lg backdrop-saturate-150 ${
+            isOwn
+              ? 'bg-gradient-to-br from-gray-200/40 via-gray-100/30 to-gray-200/20 dark:from-gray-700/30 dark:via-gray-600/20 dark:to-gray-700/10 border border-gray-300/30 dark:border-gray-600/25'
+              : 'bg-gradient-to-br from-gray-100/50 via-gray-50/40 to-gray-100/30 dark:from-gray-800/40 dark:via-gray-700/30 dark:to-gray-800/20 border border-gray-200/40 dark:border-gray-600/30'
+          }`}>
+            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 italic">
+              <Ban className="w-4 h-4" />
+              <span className="text-sm">This message was deleted</span>
+            </div>
+            <div className="flex items-center gap-2 mt-1.5 text-xs text-gray-400 dark:text-gray-500">
+              <span>{formatTimestamp(message.created_at, 'h:mm a')}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>

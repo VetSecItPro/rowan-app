@@ -268,6 +268,19 @@ export const fileUploadService = {
   ): Promise<FileUploadResult> {
     const supabase = createClient();
 
+    // First, refresh the session to ensure we have a valid, non-expired token
+    // This is critical because storage API rejects stale/expired tokens with 400 errors
+    const { error: refreshError } = await supabase.auth.refreshSession();
+    if (refreshError) {
+      logger.warn('Session refresh failed, attempting to continue:', { component: 'lib-file-upload-service', error: refreshError });
+    }
+
+    // Validate user exists with Supabase Auth server (not from cached cookies)
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      throw new Error('Authentication required. Please refresh the page and try again.');
+    }
+
     // Validate file
     const validation = await this.validateFile(file);
     if (!validation.valid) {
@@ -279,12 +292,13 @@ export const fileUploadService = {
     const fileName = `${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
     const storagePath = `${spaceId}/${messageId}/${fileName}`;
 
-    // Upload main file
+    // Upload main file - explicitly set contentType to handle browser variations
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('message-attachments')
       .upload(storagePath, file, {
         cacheControl: '3600',
         upsert: false,
+        contentType: file.type,
       });
 
     if (uploadError) {
@@ -351,6 +365,7 @@ export const fileUploadService = {
     }
 
     // Save attachment record to database
+    // Note: uploaded_by is required by RLS policy and must match auth.uid()
     const { data: attachmentData, error: dbError } = await supabase
       .from('message_attachments')
       .insert({
@@ -361,6 +376,7 @@ export const fileUploadService = {
         mime_type: file.type,
         storage_path: storagePath,
         thumbnail_path: thumbnailPath,
+        uploaded_by: user.id,
         width,
         height,
         duration,

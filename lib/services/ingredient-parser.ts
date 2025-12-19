@@ -80,6 +80,20 @@ const UNIT_CONVERSIONS: Record<string, string> = {
   'packages': 'package',
   'bunch': 'bunch',
   'bunches': 'bunch',
+  'block': 'block',
+  'blocks': 'block',
+  'stick': 'stick',
+  'sticks': 'stick',
+  'head': 'head',
+  'heads': 'head',
+  'bag': 'bag',
+  'bags': 'bag',
+  'box': 'box',
+  'boxes': 'box',
+  'jar': 'jar',
+  'jars': 'jar',
+  'bottle': 'bottle',
+  'bottles': 'bottle',
 };
 
 /**

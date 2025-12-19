@@ -76,7 +76,7 @@ export function NewBudgetModal({
                 id="field-1"
               onChange={(e) =>  setAmount(e.target.value)}
                 placeholder="5000.00"
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white text-lg"
+                className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white text-lg"
                 required
               />
             </div>

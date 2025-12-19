@@ -66,14 +66,14 @@ export function HamburgerMenu() {
         <>
           {/* Mobile Backdrop */}
           <div
-            className="fixed inset-0 bg-black/50 z-40 sm:hidden animate-in fade-in duration-200"
+            className="fixed inset-0 bg-black/50 z-[55] sm:hidden animate-in fade-in duration-200"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Menu Panel */}
-          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-gray-900 shadow-2xl z-50 overflow-y-auto overscroll-contain sm:absolute sm:inset-auto sm:top-full sm:right-0 sm:mt-2 sm:w-80 sm:max-w-none sm:rounded-xl sm:border sm:border-gray-200 sm:dark:border-gray-700 animate-in slide-in-from-right duration-300 sm:slide-in-from-top-2 sm:fade-in sm:duration-200">
-            {/* Mobile Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800 sm:hidden">
+          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-gray-900 shadow-2xl z-[60] flex flex-col sm:absolute sm:inset-auto sm:top-full sm:right-0 sm:mt-2 sm:w-80 sm:max-w-none sm:rounded-xl sm:border sm:border-gray-200 sm:dark:border-gray-700 animate-in slide-in-from-right duration-300 sm:slide-in-from-top-2 sm:fade-in sm:duration-200">
+            {/* Mobile Header - Sticky at top */}
+            <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800 sm:hidden pt-safe">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Menu</h2>
               <button
                 onClick={() => setIsOpen(false)}
@@ -84,8 +84,8 @@ export function HamburgerMenu() {
               </button>
             </div>
 
-            {/* Menu Content */}
-            <div className="py-2">
+            {/* Menu Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto overscroll-contain py-2">
               {/* Command Palette Trigger - Temporarily disabled */}
               {/*
               <div className="px-4 py-3 sm:py-2 border-b border-gray-200 dark:border-gray-800">

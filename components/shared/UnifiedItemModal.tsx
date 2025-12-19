@@ -516,7 +516,7 @@ export function UnifiedItemModal({
                       value={formData.title}
                       onChange={(e) => handleInputChange('title', e.target.value)}
                       placeholder={`What ${itemType} needs to be done?`}
-                      className="w-full px-4 py-3 text-lg border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
+                      className="w-full px-4 py-3 text-lg border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
                     />
                   </div>
 
@@ -530,7 +530,7 @@ export function UnifiedItemModal({
                       onChange={(e) => handleInputChange('description', e.target.value)}
                       placeholder="Add details, instructions, or notes..."
                       rows={3}
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 resize-none"
+                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 resize-none"
                     />
                   </div>
 
@@ -597,7 +597,7 @@ export function UnifiedItemModal({
                           placeholder="10"
                           min="1"
                           max="1000"
-                          className="w-full px-4 py-3 pr-16 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
+                          className="w-full px-4 py-3 pr-16 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
                         />
                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-600 dark:text-amber-400 text-sm font-medium">
                           pts
@@ -622,7 +622,7 @@ export function UnifiedItemModal({
                         placeholder="How long will this take?"
                         min="0"
                         step="0.5"
-                        className="w-full px-4 py-3 pr-16 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
+                        className="w-full px-4 py-3 pr-16 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
                       />
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
                         hours
@@ -640,7 +640,7 @@ export function UnifiedItemModal({
                       value={formData.tags}
                       onChange={(e) => handleInputChange('tags', e.target.value)}
                       placeholder="urgent, outdoor, fun, weekly..."
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
+                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
                     />
                   </div>
 
@@ -654,7 +654,7 @@ export function UnifiedItemModal({
                       value={quickNote}
                       onChange={(e) => setQuickNote(e.target.value)}
                       placeholder="Leave a quick note for the family..."
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
+                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
                     />
                   </div>
                 </div>
@@ -691,7 +691,7 @@ export function UnifiedItemModal({
                       value={formData.assigned_to}
                       onChange={(e) => handleInputChange('assigned_to', e.target.value)}
                       placeholder="Enter name or email..."
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
+                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
                     />
                   </div>
                 </div>

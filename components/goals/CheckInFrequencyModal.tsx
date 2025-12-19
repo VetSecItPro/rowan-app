@@ -299,7 +299,7 @@ export function CheckInFrequencyModal({ isOpen, onClose, goalId, goalTitle }: Ch
                       max="31"
                       value={settings.day_of_month}
                       onChange={(e) => updateSettings({ day_of_month: parseInt(e.target.value) || 1 })}
-                      className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
                     <span className="text-gray-600 dark:text-gray-400">
                       day of each month
@@ -318,7 +318,7 @@ export function CheckInFrequencyModal({ isOpen, onClose, goalId, goalTitle }: Ch
                   type="time"
                   value={settings.reminder_time}
                   onChange={(e) => updateSettings({ reminder_time: e.target.value })}
-                  className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
+                  className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-lg"
                 />
               </div>
 
@@ -363,7 +363,7 @@ export function CheckInFrequencyModal({ isOpen, onClose, goalId, goalTitle }: Ch
                       <select
                         value={settings.reminder_days_before}
                         onChange={(e) => updateSettings({ reminder_days_before: parseInt(e.target.value) })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent relative z-50"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 relative z-50"
                         style={{ position: 'relative', zIndex: 9999 }}
                       >
                         {REMINDER_DAYS_OPTIONS.map((option) => (
