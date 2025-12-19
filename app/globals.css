@@ -506,13 +506,24 @@ select:focus,
     height: 100dvh;
   }
 
-  /* For chat/messages container: calc(100vh - 380px) on mobile, calc(100vh - 400px) on desktop */
+  /* For chat/messages container: account for header, breadcrumb, and stats */
+  /* Mobile: footer is hidden so we have more space for chat */
+  /* Header ~64px + Breadcrumb ~40px + Stats collapsed ~80px + padding ~32px = ~216px */
   .h-chat-container {
-    height: calc(100vh - 380px);
-    height: calc(100dvh - 380px);
+    height: calc(100vh - 240px);
+    height: calc(100dvh - 240px);
   }
 
-  @media (min-width: 640px) {
+  /* Tablet and up: footer is visible */
+  @media (min-width: 768px) {
+    .h-chat-container {
+      height: calc(100vh - 380px);
+      height: calc(100dvh - 380px);
+    }
+  }
+
+  /* Desktop: more generous spacing */
+  @media (min-width: 1024px) {
     .h-chat-container {
       height: calc(100vh - 400px);
       height: calc(100dvh - 400px);

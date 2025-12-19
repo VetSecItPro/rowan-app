@@ -151,7 +151,7 @@ export function LaunchNotificationModal({ isOpen, onClose }: LaunchNotificationM
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Enter your first name"
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-white"
                   required
                   disabled={isLoading}
                 />
@@ -168,7 +168,7 @@ export function LaunchNotificationModal({ isOpen, onClose }: LaunchNotificationM
                   value={formData.email}
                   onChange={(e) => handleEmailChange(e.target.value)}
                   placeholder="Enter your email address"
-                  className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 dark:text-white ${
+                  className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-white ${
                     emailError ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'
                   }`}
                   required

@@ -88,7 +88,7 @@ export function ScheduleTripModal({ isOpen, onClose, onSchedule, list }: Schedul
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Shopping Trip"
               required
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
             />
           </div>
 
@@ -103,7 +103,7 @@ export function ScheduleTripModal({ isOpen, onClose, onSchedule, list }: Schedul
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 required
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
               />
             </div>
             <div>
@@ -116,7 +116,7 @@ export function ScheduleTripModal({ isOpen, onClose, onSchedule, list }: Schedul
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
                 required
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
               />
             </div>
           </div>
@@ -130,7 +130,7 @@ export function ScheduleTripModal({ isOpen, onClose, onSchedule, list }: Schedul
               id="event-duration"
               value={duration}
               onChange={(e) => setDuration(Number(e.target.value))}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white relative z-50"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white relative z-50"
               style={{ position: 'relative', zIndex: 9999 }}
             >
               <option value={30}>30 minutes</option>
@@ -150,7 +150,7 @@ export function ScheduleTripModal({ isOpen, onClose, onSchedule, list }: Schedul
               id="reminder"
               value={reminderMinutes}
               onChange={(e) => setReminderMinutes(Number(e.target.value))}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white relative z-50"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white relative z-50"
               style={{ position: 'relative', zIndex: 9999 }}
             >
               <option value={0}>No reminder</option>

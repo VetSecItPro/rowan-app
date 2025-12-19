@@ -121,7 +121,7 @@ export function BudgetTemplateModal({
                       value={monthlyIncome}
                       onChange={(e) => setMonthlyIncome(e.target.value)}
                       placeholder="5000"
-                      className="w-full pl-8 pr-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      className="w-full pl-8 pr-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                     />
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -136,7 +136,7 @@ export function BudgetTemplateModal({
                   <select
                     value={householdFilter}
                     onChange={(e) => setHouseholdFilter(e.target.value as HouseholdType | 'all')}
-                    className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent relative z-50"
+                    className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 relative z-50"
                     style={{ position: 'relative', zIndex: 9999 }}
                   >
                     <option value="all">All Templates</option>

@@ -64,9 +64,10 @@ export const createClient = () => {
       },
     },
     global: {
+      // Note: Removed Content-Type header - it interferes with storage uploads
+      // Storage uploads need multipart/form-data or specific MIME types, not application/json
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
       },
       fetch: (url, options = {}) => {
         // Add timeout to all Supabase requests to prevent hanging

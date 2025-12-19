@@ -55,10 +55,10 @@ export function FrequentItemsPanel({ spaceId, onAddItem }: FrequentItemsPanelPro
   }
 
   return (
-    <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
+    <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 sm:p-6">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
           <div>
@@ -82,20 +82,19 @@ export function FrequentItemsPanel({ spaceId, onAddItem }: FrequentItemsPanelPro
       </div>
 
       {isExpanded && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+        <div className="flex flex-wrap gap-2 sm:gap-2.5">
           {frequentItems.map((item, index) => (
             <Tooltip key={`${item.name}-${index}`} content={`Added ${item.count}x recently`} delay={0}>
               <button
                 onClick={() => onAddItem(item.name, item.category)}
-                className="group relative flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-emerald-200 dark:border-emerald-700 rounded-lg hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="group relative flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 bg-gray-50 dark:bg-gray-800 border border-emerald-200 dark:border-emerald-700 rounded-full hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all hover:shadow-sm"
               >
-                <span className="text-lg flex-shrink-0">{getCategoryIcon(item.category as any)}</span>
-                <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate flex-1 text-left">
+                <span className="text-base sm:text-lg flex-shrink-0">{getCategoryIcon(item.category as any)}</span>
+                <span className="text-xs font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap max-w-[120px] sm:max-w-none truncate">
                   {item.name}
                 </span>
-                <Plus className="w-3 h-3 text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                 {/* Purchased count badge */}
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow-sm">
+                <div className="w-4 h-4 bg-emerald-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center flex-shrink-0">
                   {item.count}
                 </div>
               </button>

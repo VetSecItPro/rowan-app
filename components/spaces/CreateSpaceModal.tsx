@@ -103,7 +103,7 @@ export function CreateSpaceModal({ isOpen, onClose, onSpaceCreated }: CreateSpac
               id="field-1"
               onChange={(e) =>  setSpaceName(e.target.value)}
               placeholder="e.g., Our Family, The Johnsons, Home Sweet Home"
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-gray-900 dark:text-white"
               disabled={loading}
               maxLength={100}
             />

@@ -224,7 +224,7 @@ export function EventProposalModal({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g., Team Planning Session"
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white"
               />
             </div>
 
@@ -238,7 +238,7 @@ export function EventProposalModal({
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="What's this event about?"
                 rows={3}
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white"
               />
             </div>
 
@@ -252,7 +252,7 @@ export function EventProposalModal({
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Where will this take place?"
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white"
               />
             </div>
 
@@ -289,7 +289,7 @@ export function EventProposalModal({
                           required
                           value={slot.start_time ? new Date(slot.start_time).toISOString().slice(0, 16) : ''}
                           onChange={(e) => updateTimeSlot(index, 'start_time', e.target.value)}
-                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white text-sm"
+                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white text-sm"
                         />
                       </div>
                       <div>
@@ -301,7 +301,7 @@ export function EventProposalModal({
                           required
                           value={slot.end_time ? new Date(slot.end_time).toISOString().slice(0, 16) : ''}
                           onChange={(e) => updateTimeSlot(index, 'end_time', e.target.value)}
-                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white text-sm"
+                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white text-sm"
                         />
                       </div>
                     </div>

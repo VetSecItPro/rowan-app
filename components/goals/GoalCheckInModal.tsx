@@ -227,7 +227,7 @@ export function GoalCheckInModal({
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               placeholder="Share what you've accomplished, what's working well, or any insights..."
               rows={3}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white"
             />
           </div>
 
@@ -241,7 +241,7 @@ export function GoalCheckInModal({
               onChange={(e) => setFormData({ ...formData, blockers: e.target.value })}
               placeholder="What's standing in your way? What obstacles have you encountered?"
               rows={2}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white"
             />
           </div>
 

@@ -676,15 +676,15 @@ export default function GoalsPage() {
           <div className="max-w-7xl mx-auto space-y-8">
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-goals flex items-center justify-center">
-                <Target className="w-6 h-6 text-white" />
+            <div className="flex flex-row items-center gap-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-goals flex items-center justify-center flex-shrink-0">
+                <Target className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-goals bg-clip-text text-transparent">
+                <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold bg-gradient-goals bg-clip-text text-transparent">
                   Goals & Milestones
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                   Achieve your dreams together
                 </p>
               </div>

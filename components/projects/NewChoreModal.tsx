@@ -154,7 +154,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                 id="field-1"
               onChange={(e) =>  setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Clean the kitchen"
-                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white"
               />
 
               {/* Emoji Picker Button */}
@@ -202,7 +202,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
               onChange={(e) =>  setFormData({ ...formData, description: e.target.value })}
               placeholder="Add details about this chore..."
               rows={3}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white"
             />
           </div>
 
@@ -218,7 +218,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                   value={category}
                   id="field-3"
               onChange={(e) =>  setCategory(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none relative z-50"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white appearance-none relative z-50"
                   style={{ paddingRight: '2.5rem', position: 'relative', zIndex: 9999 }}
                 >
                   <option value="">Select category...</option>
@@ -247,7 +247,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                   value={formData.frequency}
                   id="field-4"
               onChange={(e) =>  setFormData({ ...formData, frequency: e.target.value as any })}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none relative z-50"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white appearance-none relative z-50"
                   style={{ paddingRight: '2.5rem', position: 'relative', zIndex: 9999 }}
                 >
                   <option value="daily">Daily</option>
@@ -340,7 +340,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                   value={formData.status}
                   id="field-7"
               onChange={(e) =>  setFormData({ ...formData, status: e.target.value as 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed' })}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white appearance-none relative z-50"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white appearance-none relative z-50"
                   style={{ paddingRight: '2.5rem', position: 'relative', zIndex: 9999 }}
                 >
                   <option value="pending">Pending</option>
@@ -380,7 +380,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                     setDateError('');
                   }
                 }}
-                className={`w-full px-4 py-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-gray-900 dark:text-white ${
+                className={`w-full px-4 py-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white ${
                   dateError ? 'border-red-500 dark:border-red-500' : 'border-gray-200/50 dark:border-gray-700/50'
                 }`}
               />

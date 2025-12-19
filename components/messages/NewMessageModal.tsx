@@ -209,7 +209,7 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
               onChange={(e) => setContent(e.target.value)}
               placeholder="Type your message..."
               rows={6}
-              className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
+              className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-white resize-none"
             />
           </div>
 
