@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Menu, X, Search, Command as CommandIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -11,11 +12,19 @@ import { useScrollLock } from '@/lib/hooks/useScrollLock';
 
 export function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useAuth();
   // const { trigger } = useCommandPaletteTrigger(); // Temporarily disabled
+
+  // Mount check for portal
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   // Close menu when route changes
   useEffect(() => {
@@ -44,34 +53,32 @@ export function HamburgerMenu() {
 
   return (
     <div className="relative" ref={menuRef}>
-      {/* Hamburger Button with Tooltip */}
-      <div className="relative">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-10 h-10 rounded-lg transition-colors active:scale-95 cursor-pointer flex items-center justify-center"
-          aria-label="Menu"
-          title="Menu"
-        >
-          {isOpen ? (
-            <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-          ) : (
-            <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-          )}
-        </button>
+      {/* Hamburger Button */}
+      <button
+        ref={buttonRef}
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-10 h-10 rounded-lg transition-colors active:scale-95 cursor-pointer flex items-center justify-center"
+        aria-label="Menu"
+        title="Menu"
+      >
+        {isOpen ? (
+          <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+        ) : (
+          <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+        )}
+      </button>
 
-      </div>
-
-      {/* Mobile: Full-Screen Overlay | Desktop: Dropdown */}
-      {isOpen && (
+      {/* Mobile: Full-Screen Overlay | Desktop: Dropdown - Rendered via Portal */}
+      {isOpen && mounted && createPortal(
         <>
           {/* Mobile Backdrop */}
           <div
-            className="fixed inset-0 bg-black/50 z-[55] sm:hidden animate-in fade-in duration-200"
+            className="fixed inset-0 bg-black/50 z-[9998] sm:hidden animate-in fade-in duration-200"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Menu Panel */}
-          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-gray-900 shadow-2xl z-[60] flex flex-col sm:absolute sm:inset-auto sm:top-full sm:right-0 sm:mt-2 sm:w-80 sm:max-w-none sm:rounded-xl sm:border sm:border-gray-200 sm:dark:border-gray-700 animate-in slide-in-from-right duration-300 sm:slide-in-from-top-2 sm:fade-in sm:duration-200">
+          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-gray-900 shadow-2xl z-[9999] flex flex-col sm:absolute sm:inset-auto sm:top-16 sm:right-4 sm:w-80 sm:max-w-none sm:max-h-[calc(100vh-5rem)] sm:rounded-xl sm:border sm:border-gray-200 sm:dark:border-gray-700 animate-in slide-in-from-right duration-300 sm:slide-in-from-top-2 sm:fade-in sm:duration-200">
             {/* Mobile Header - Sticky at top */}
             <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800 sm:hidden pt-safe">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Menu</h2>
@@ -176,7 +183,8 @@ export function HamburgerMenu() {
               <div className="pb-safe sm:hidden" />
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
     </div>
   );

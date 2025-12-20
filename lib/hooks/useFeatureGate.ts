@@ -5,8 +5,8 @@
  * Provides feature access checking with upgrade prompts
  */
 
-import { useCallback, useMemo, useState } from 'react';
-import { useSubscription, useSubscriptionSafe } from '@/lib/contexts/subscription-context';
+import { useCallback, useMemo, useState, useContext } from 'react';
+import { useSubscriptionSafe } from '@/lib/contexts/subscription-context';
 import type { FeatureLimits, SubscriptionTier } from '@/lib/types';
 
 export type GatedFeature =
@@ -110,14 +110,16 @@ interface UseFeatureGateResult {
  * ```
  */
 export function useFeatureGate(feature: GatedFeature): UseFeatureGateResult {
-  const {
-    canAccess,
-    effectiveTier,
-    isLoading,
-    isInTrial,
-    trialDaysRemaining,
-    showUpgradeModal
-  } = useSubscription();
+  // Use safe version that returns null if provider not available
+  const subscription = useSubscriptionSafe();
+
+  // Default values when provider isn't available (during loading/auth)
+  const canAccess = subscription?.canAccess ?? (() => true);
+  const effectiveTier = subscription?.effectiveTier ?? 'free';
+  const isLoading = subscription?.isLoading ?? true;
+  const isInTrial = subscription?.isInTrial ?? false;
+  const trialDaysRemaining = subscription?.trialDaysRemaining ?? 0;
+  const showUpgradeModal = subscription?.showUpgradeModal ?? (() => {});
 
   const limitKey = FEATURE_LIMIT_MAP[feature];
   const hasAccess = canAccess(limitKey);
@@ -201,7 +203,10 @@ export function useMultiFeatureGate(features: GatedFeature[]): {
   isLoading: boolean;
   tier: SubscriptionTier;
 } {
-  const { canAccess, effectiveTier, isLoading } = useSubscription();
+  const subscription = useSubscriptionSafe();
+  const canAccess = subscription?.canAccess ?? (() => true);
+  const effectiveTier = subscription?.effectiveTier ?? 'free';
+  const isLoading = subscription?.isLoading ?? true;
 
   const accessMap = useMemo(() => {
     const map: Partial<Record<GatedFeature, boolean>> = {};
@@ -237,7 +242,11 @@ export function useNumericLimit(
   checkWithinLimit: (currentCount: number) => boolean;
   promptIfExceeded: (currentCount: number) => boolean;
 } {
-  const { limits, effectiveTier, isLoading, showUpgradeModal } = useSubscription();
+  const subscription = useSubscriptionSafe();
+  const limits = subscription?.limits ?? { maxActiveTasks: Infinity, maxShoppingLists: Infinity, maxShoppingItems: Infinity, maxUsers: Infinity, maxSpaces: Infinity };
+  const effectiveTier = subscription?.effectiveTier ?? 'free';
+  const isLoading = subscription?.isLoading ?? true;
+  const showUpgradeModal = subscription?.showUpgradeModal ?? (() => {});
 
   const limit = limits[limitKey] as number;
   const isUnlimited = limit === Infinity;
