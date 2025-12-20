@@ -127,7 +127,7 @@ export async function GET(req: NextRequest) {
           if (error) throw error;
 
           const activeBetaUsers = Number(data) || 0;
-          const capacity = 30;
+          const capacity = 100; // Beta program capacity is 100 users
           const usage = Math.round((activeBetaUsers / capacity) * 100);
 
           return {

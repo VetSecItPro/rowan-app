@@ -161,8 +161,8 @@ export async function GET(req: NextRequest) {
         const totalLaunchNotifications = launchNotifications.length;
         const totalUserRegistrations = userRegistrations.length;
 
-        // Beta program status
-        const betaCapacity = 30;
+        // Beta program status (100 users limit)
+        const betaCapacity = 100;
         const activeBetaUsers = betaUsers.length;
         const capacityUsage = Math.round((activeBetaUsers / betaCapacity) * 100);
 
