@@ -39,6 +39,49 @@ export function CalendarDaySkeleton() {
   );
 }
 
+// Mobile-optimized day card skeleton that matches the vertical card layout
+export function MobileDayCardSkeleton() {
+  return (
+    <div className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
+      {/* Day Header */}
+      <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-3">
+          <div>
+            <Skeleton className="h-4 w-16 mb-1" />
+            <Skeleton className="h-8 w-8" />
+          </div>
+        </div>
+        <Skeleton className="w-10 h-10 rounded-lg" />
+      </div>
+      {/* Meal items */}
+      <div className="space-y-2">
+        <Skeleton className="h-16 w-full rounded-lg" />
+        <Skeleton className="h-16 w-full rounded-lg" />
+      </div>
+    </div>
+  );
+}
+
+// Mobile calendar loading skeleton with day strip + stacked cards
+export function MobileCalendarSkeleton() {
+  return (
+    <div className="space-y-4">
+      {/* Day strip skeleton */}
+      <div className="grid grid-cols-7 gap-1">
+        {[...Array(7)].map((_, i) => (
+          <Skeleton key={i} className="h-[60px] rounded-lg" />
+        ))}
+      </div>
+      {/* Stacked day cards skeleton */}
+      <div className="space-y-3">
+        {[...Array(4)].map((_, i) => (
+          <MobileDayCardSkeleton key={i} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function RecipeCardSkeleton() {
   return (
     <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">

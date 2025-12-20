@@ -7,6 +7,7 @@ import { useState, useEffect, useMemo, useCallback, memo, useRef } from 'react';
 import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, TrendingUp, ShoppingBag, ChevronLeft, ChevronRight, LayoutGrid, List, ChefHat, ExternalLink, X, CheckSquare } from 'lucide-react';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import Link from 'next/link';
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -23,7 +24,7 @@ import {
   WeekCalendarView,
   TwoWeekCalendarView,
 } from '@/components/ui/DynamicMealComponents';
-import { MealCardSkeleton, CalendarDaySkeleton, RecipeCardSkeleton } from '@/components/ui/Skeleton';
+import { MealCardSkeleton, CalendarDaySkeleton, RecipeCardSkeleton, MobileCalendarSkeleton } from '@/components/ui/Skeleton';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { mealsService, Meal, CreateMealInput, Recipe, CreateRecipeInput } from '@/lib/services/meals-service';
 import { shoppingService } from '@/lib/services/shopping-service';
@@ -810,6 +811,11 @@ export default function MealsPage() {
     }
   ]);
 
+  // Pull-to-refresh handler
+  const handlePullToRefresh = useCallback(async () => {
+    await Promise.all([loadMeals(), loadRecipes()]);
+  }, [loadMeals, loadRecipes]);
+
   const handleIngredientConfirm = useCallback(async (selectedIngredients: string[]) => {
     if (!pendingMealData || !selectedRecipeForReview || !spaceId) return;
 
@@ -863,6 +869,7 @@ export default function MealsPage() {
       description="Plan your family meals, save recipes, and automatically generate shopping lists. Upgrade to Pro to unlock this feature."
     >
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Meal Planning' }]}>
+      <PullToRefresh onRefresh={handlePullToRefresh}>
       <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -1116,10 +1123,16 @@ export default function MealsPage() {
                 ) : viewMode === 'calendar' ? (
                   /* Loading Skeletons for Calendar */
                   <div>
-                    <div className="flex items-center justify-center mb-6">
-                      <div className="h-12 w-[500px] bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
+                    {/* Toggle skeleton */}
+                    <div className="flex items-center justify-center mb-6 px-2 sm:px-0">
+                      <div className="h-12 w-full sm:w-[400px] bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
                     </div>
-                    <div className="grid grid-cols-7 gap-3">
+                    {/* Mobile: Stacked card skeleton */}
+                    <div className="sm:hidden">
+                      <MobileCalendarSkeleton />
+                    </div>
+                    {/* Desktop: Grid skeleton */}
+                    <div className="hidden sm:grid grid-cols-7 gap-3">
                       {[...Array(7)].map((_, i) => (
                         <CalendarDaySkeleton key={i} />
                       ))}
@@ -1180,12 +1193,12 @@ export default function MealsPage() {
             ) : viewMode === 'calendar' ? (
               /* Calendar View */
               <div className="w-full">
-                {/* Calendar View Mode Selector - Mobile Optimized */}
-                <div className="flex items-center justify-center mb-6">
-                  <div className="inline-flex items-center gap-1 p-1 sm:p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700">
+                {/* Calendar View Mode Selector - Full Width on Mobile */}
+                <div className="flex items-center justify-center mb-6 px-2 sm:px-0">
+                  <div className="flex items-center w-full sm:w-auto sm:inline-flex gap-1 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700">
                     <button
                       onClick={() => setCalendarViewMode('week')}
-                      className={`px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
+                      className={`flex-1 sm:flex-none px-3 sm:px-5 py-3 sm:py-2.5 rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
                         calendarViewMode === 'week'
                           ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
                           : 'text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900/50'
@@ -1196,18 +1209,18 @@ export default function MealsPage() {
                     </button>
                     <button
                       onClick={() => setCalendarViewMode('2weeks')}
-                      className={`px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
+                      className={`flex-1 sm:flex-none px-3 sm:px-5 py-3 sm:py-2.5 rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
                         calendarViewMode === '2weeks'
                           ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
                           : 'text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900/50'
                       }`}
                     >
-                      <span className="hidden sm:inline">Next Two Weeks</span>
+                      <span className="hidden sm:inline">Two Weeks</span>
                       <span className="sm:hidden">2 Weeks</span>
                     </button>
                     <button
                       onClick={() => setCalendarViewMode('month')}
-                      className={`px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
+                      className={`flex-1 sm:flex-none px-3 sm:px-5 py-3 sm:py-2.5 rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
                         calendarViewMode === 'month'
                           ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
                           : 'text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900/50'
@@ -1247,7 +1260,7 @@ export default function MealsPage() {
                   <div className="w-full space-y-4">
                     {/* Month Navigation and Actions */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-center sm:justify-start gap-2">
                         <button
                           onClick={handlePreviousMonth}
                           className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
@@ -1479,6 +1492,7 @@ export default function MealsPage() {
         spaceId={spaceId}
         onSuccess={() => loadMeals()}
       />
+      </PullToRefresh>
     </FeatureLayout>
     </FeatureGateWrapper>
   );

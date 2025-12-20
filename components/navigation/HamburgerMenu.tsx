@@ -14,6 +14,7 @@ export function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const portalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
   const router = useRouter();
@@ -34,10 +35,15 @@ export function HamburgerMenu() {
   // Lock scroll on the correct scroll container (main element)
   useScrollLock(isOpen);
 
-  // Close menu when clicking outside (desktop only)
+  // Close menu when clicking outside - check both button container AND portal content
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      const isInsideButton = menuRef.current?.contains(target);
+      const isInsidePortal = portalRef.current?.contains(target);
+
+      // Only close if click is outside BOTH the button and the portal menu
+      if (!isInsideButton && !isInsidePortal) {
         setIsOpen(false);
       }
     }
@@ -70,7 +76,7 @@ export function HamburgerMenu() {
 
       {/* Mobile: Full-Screen Overlay | Desktop: Dropdown - Rendered via Portal */}
       {isOpen && mounted && createPortal(
-        <>
+        <div ref={portalRef}>
           {/* Mobile Backdrop */}
           <div
             className="fixed inset-0 bg-black/50 z-[9998] sm:hidden animate-in fade-in duration-200"
@@ -129,11 +135,37 @@ export function HamburgerMenu() {
               <nav className="space-y-1 sm:space-y-0">
                 {NAVIGATION_ITEMS.map((item) => {
                   const Icon = item.icon;
+                  const hasHash = item.href.includes('#');
+
+                  const handleClick = (e: React.MouseEvent) => {
+                    setIsOpen(false);
+
+                    // Handle hash navigation specially
+                    if (hasHash) {
+                      e.preventDefault();
+                      const [path, hash] = item.href.split('#');
+                      const targetPath = path || '/dashboard';
+
+                      // If we're already on the target page, scroll directly
+                      if (pathname === targetPath || (pathname === '/' && targetPath === '/dashboard')) {
+                        setTimeout(() => {
+                          const element = document.getElementById(hash);
+                          if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }
+                        }, 100);
+                      } else {
+                        // Navigate to page first, then scroll
+                        router.push(item.href);
+                      }
+                    }
+                  };
+
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      onClick={() => setIsOpen(false)}
+                      onClick={handleClick}
                       className="btn-touch flex items-center gap-3 px-4 py-4 sm:py-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors active:scale-[0.98] group"
                     >
                       <div className={`w-11 h-11 sm:w-10 sm:h-10 rounded-lg ${item.gradient} flex items-center justify-center flex-shrink-0`}>
@@ -183,7 +215,7 @@ export function HamburgerMenu() {
               <div className="pb-safe sm:hidden" />
             </div>
           </div>
-        </>,
+        </div>,
         document.body
       )}
     </div>

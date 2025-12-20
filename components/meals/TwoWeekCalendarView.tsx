@@ -209,7 +209,7 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
     <div className="w-full space-y-4">
       {/* Week Navigation Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center sm:justify-start gap-2">
           <button
             onClick={handlePreviousWeek}
             className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
@@ -275,13 +275,41 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
         </div>
       )}
 
-      {/* Mobile: Two Week Sections with Vertical Cards */}
+      {/* Mobile: Two Week Day Grids + Vertical Cards */}
       <div className="sm:hidden space-y-6">
         {/* Week 1 */}
         <div>
-          <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1">
+          <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 px-1 uppercase tracking-wide">
             Week 1: {format(firstWeekStart, 'MMM d')} - {format(endOfWeek(firstWeekStart), 'MMM d')}
           </h4>
+          {/* Week 1 Day Grid */}
+          <div className="grid grid-cols-7 gap-1 mb-3">
+            {firstWeekDays.map((day) => {
+              const isToday = isSameDay(day, new Date());
+              const dayMeals = getMealsForDate(day);
+              const hasMeals = dayMeals.length > 0;
+              return (
+                <button
+                  key={day.toISOString()}
+                  onClick={() => {
+                    const el = document.getElementById(`day-card-2w-${format(day, 'yyyy-MM-dd')}`);
+                    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className={`py-2 px-1 rounded-lg text-center transition-all min-h-[56px] ${
+                    isToday
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  <div className="text-[10px] font-medium uppercase">{format(day, 'EEE')}</div>
+                  <div className="text-base font-bold">{format(day, 'd')}</div>
+                  {hasMeals && (
+                    <div className={`mt-0.5 w-1.5 h-1.5 rounded-full mx-auto ${isToday ? 'bg-white' : 'bg-orange-500'}`} />
+                  )}
+                </button>
+              );
+            })}
+          </div>
           <div className="space-y-3">
             {firstWeekDays.map(day => renderMobileDayCard(day))}
           </div>
@@ -289,9 +317,37 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
 
         {/* Week 2 */}
         <div>
-          <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1">
+          <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 px-1 uppercase tracking-wide">
             Week 2: {format(addWeeks(firstWeekStart, 1), 'MMM d')} - {format(secondWeekEnd, 'MMM d')}
           </h4>
+          {/* Week 2 Day Grid */}
+          <div className="grid grid-cols-7 gap-1 mb-3">
+            {secondWeekDays.map((day) => {
+              const isToday = isSameDay(day, new Date());
+              const dayMeals = getMealsForDate(day);
+              const hasMeals = dayMeals.length > 0;
+              return (
+                <button
+                  key={day.toISOString()}
+                  onClick={() => {
+                    const el = document.getElementById(`day-card-2w-${format(day, 'yyyy-MM-dd')}`);
+                    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className={`py-2 px-1 rounded-lg text-center transition-all min-h-[56px] ${
+                    isToday
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  <div className="text-[10px] font-medium uppercase">{format(day, 'EEE')}</div>
+                  <div className="text-base font-bold">{format(day, 'd')}</div>
+                  {hasMeals && (
+                    <div className={`mt-0.5 w-1.5 h-1.5 rounded-full mx-auto ${isToday ? 'bg-white' : 'bg-orange-500'}`} />
+                  )}
+                </button>
+              );
+            })}
+          </div>
           <div className="space-y-3">
             {secondWeekDays.map(day => renderMobileDayCard(day))}
           </div>

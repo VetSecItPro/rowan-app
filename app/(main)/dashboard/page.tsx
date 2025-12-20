@@ -65,6 +65,7 @@ import { CTAButton } from '@/components/ui/EnhancedButton';
 import { TrialStatusBanner } from '@/components/subscription';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { format, isToday, isThisWeek, isPast, parseISO, startOfWeek, subWeeks } from 'date-fns';
 import { formatDate, formatTimestamp, getCurrentDateString } from '@/lib/utils/date-utils';
 
@@ -1045,6 +1046,7 @@ export default function DashboardPage() {
         backgroundVariant="vibrant"
         enableTimeAware={true}
       >
+      <PullToRefresh onRefresh={loadAllStats}>
       <div className="min-h-screen p-4 sm:p-6 md:p-8">
         <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4">
           {/* Compact Time-Aware Welcome Header */}
@@ -2338,6 +2340,7 @@ export default function DashboardPage() {
         mood={lastCheckInMood}
         streak={checkInStats?.currentStreak || 0}
       />
+      </PullToRefresh>
     </FeatureLayout>
     </PageErrorBoundary>
   );

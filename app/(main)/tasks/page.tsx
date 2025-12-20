@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, Home, Filter, Download, Repeat, FileText, Zap, TrendingUp, TrendingDown, Minus, ChevronDown, X } from 'lucide-react';
+import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
@@ -642,6 +643,7 @@ export default function TasksPage() {
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Tasks & Chores' }]}>
       <PageErrorBoundary>
+        <PullToRefresh onRefresh={loadData}>
         <div className="min-h-full p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
@@ -1007,6 +1009,7 @@ export default function TasksPage() {
           </div>
         </div>
       </div>
+      </PullToRefresh>
       </PageErrorBoundary>
 
       {/* Unified Modals */}
