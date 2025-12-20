@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Menu, X, Search, Command as CommandIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -11,11 +12,20 @@ import { useScrollLock } from '@/lib/hooks/useScrollLock';
 
 export function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const portalRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useAuth();
   // const { trigger } = useCommandPaletteTrigger(); // Temporarily disabled
+
+  // Mount check for portal
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   // Close menu when route changes
   useEffect(() => {
@@ -25,10 +35,15 @@ export function HamburgerMenu() {
   // Lock scroll on the correct scroll container (main element)
   useScrollLock(isOpen);
 
-  // Close menu when clicking outside (desktop only)
+  // Close menu when clicking outside - check both button container AND portal content
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      const isInsideButton = menuRef.current?.contains(target);
+      const isInsidePortal = portalRef.current?.contains(target);
+
+      // Only close if click is outside BOTH the button and the portal menu
+      if (!isInsideButton && !isInsidePortal) {
         setIsOpen(false);
       }
     }
@@ -44,34 +59,32 @@ export function HamburgerMenu() {
 
   return (
     <div className="relative" ref={menuRef}>
-      {/* Hamburger Button with Tooltip */}
-      <div className="relative">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-10 h-10 rounded-lg transition-colors active:scale-95 cursor-pointer flex items-center justify-center"
-          aria-label="Menu"
-          title="Menu"
-        >
-          {isOpen ? (
-            <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-          ) : (
-            <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-          )}
-        </button>
+      {/* Hamburger Button */}
+      <button
+        ref={buttonRef}
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-10 h-10 rounded-lg transition-colors active:scale-95 cursor-pointer flex items-center justify-center"
+        aria-label="Menu"
+        title="Menu"
+      >
+        {isOpen ? (
+          <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+        ) : (
+          <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+        )}
+      </button>
 
-      </div>
-
-      {/* Mobile: Full-Screen Overlay | Desktop: Dropdown */}
-      {isOpen && (
-        <>
+      {/* Mobile: Full-Screen Overlay | Desktop: Dropdown - Rendered via Portal */}
+      {isOpen && mounted && createPortal(
+        <div ref={portalRef}>
           {/* Mobile Backdrop */}
           <div
-            className="fixed inset-0 bg-black/50 z-[55] sm:hidden animate-in fade-in duration-200"
+            className="fixed inset-0 bg-black/50 z-[9998] sm:hidden animate-in fade-in duration-200"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Menu Panel */}
-          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-gray-900 shadow-2xl z-[60] flex flex-col sm:absolute sm:inset-auto sm:top-full sm:right-0 sm:mt-2 sm:w-80 sm:max-w-none sm:rounded-xl sm:border sm:border-gray-200 sm:dark:border-gray-700 animate-in slide-in-from-right duration-300 sm:slide-in-from-top-2 sm:fade-in sm:duration-200">
+          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-gray-900 shadow-2xl z-[9999] flex flex-col sm:absolute sm:inset-auto sm:top-16 sm:right-4 sm:w-80 sm:max-w-none sm:max-h-[calc(100vh-5rem)] sm:rounded-xl sm:border sm:border-gray-200 sm:dark:border-gray-700 animate-in slide-in-from-right duration-300 sm:slide-in-from-top-2 sm:fade-in sm:duration-200">
             {/* Mobile Header - Sticky at top */}
             <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800 sm:hidden pt-safe">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Menu</h2>
@@ -122,11 +135,37 @@ export function HamburgerMenu() {
               <nav className="space-y-1 sm:space-y-0">
                 {NAVIGATION_ITEMS.map((item) => {
                   const Icon = item.icon;
+                  const hasHash = item.href.includes('#');
+
+                  const handleClick = (e: React.MouseEvent) => {
+                    setIsOpen(false);
+
+                    // Handle hash navigation specially
+                    if (hasHash) {
+                      e.preventDefault();
+                      const [path, hash] = item.href.split('#');
+                      const targetPath = path || '/dashboard';
+
+                      // If we're already on the target page, scroll directly
+                      if (pathname === targetPath || (pathname === '/' && targetPath === '/dashboard')) {
+                        setTimeout(() => {
+                          const element = document.getElementById(hash);
+                          if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }
+                        }, 100);
+                      } else {
+                        // Navigate to page first, then scroll
+                        router.push(item.href);
+                      }
+                    }
+                  };
+
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      onClick={() => setIsOpen(false)}
+                      onClick={handleClick}
                       className="btn-touch flex items-center gap-3 px-4 py-4 sm:py-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors active:scale-[0.98] group"
                     >
                       <div className={`w-11 h-11 sm:w-10 sm:h-10 rounded-lg ${item.gradient} flex items-center justify-center flex-shrink-0`}>
@@ -176,7 +215,8 @@ export function HamburgerMenu() {
               <div className="pb-safe sm:hidden" />
             </div>
           </div>
-        </>
+        </div>,
+        document.body
       )}
     </div>
   );

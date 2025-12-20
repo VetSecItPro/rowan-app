@@ -18,10 +18,10 @@ interface WeekCalendarViewProps {
 }
 
 const MEAL_TYPE_CONFIG = {
-  breakfast: { icon: Sunrise, color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-300 dark:border-orange-700' },
-  lunch: { icon: Sun, color: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-900/20', border: 'border-yellow-300 dark:border-yellow-700' },
-  dinner: { icon: Moon, color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20', border: 'border-indigo-300 dark:border-indigo-700' },
-  snack: { icon: Cookie, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20', border: 'border-amber-300 dark:border-amber-700' },
+  breakfast: { icon: Sunrise, color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-300 dark:border-orange-700', label: 'Breakfast' },
+  lunch: { icon: Sun, color: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-900/20', border: 'border-yellow-300 dark:border-yellow-700', label: 'Lunch' },
+  dinner: { icon: Moon, color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20', border: 'border-indigo-300 dark:border-indigo-700', label: 'Dinner' },
+  snack: { icon: Cookie, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20', border: 'border-amber-300 dark:border-amber-700', label: 'Snack' },
 };
 
 export const WeekCalendarView = memo(function WeekCalendarView({
@@ -112,43 +112,45 @@ export const WeekCalendarView = memo(function WeekCalendarView({
 
   return (
     <div className="w-full space-y-4">
-      {/* Week Navigation Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      {/* Week Navigation Header - Mobile Optimized */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center justify-center sm:justify-start gap-2">
           <button
             onClick={handlePreviousWeek}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             title="Previous week"
           >
             <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
           </button>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white whitespace-nowrap">
             {format(weekStart, 'MMM d')} - {format(weekEnd, 'MMM d, yyyy')}
           </h3>
           <button
             onClick={handleNextWeek}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             title="Next week"
           >
             <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
           </button>
         </div>
 
-        <div className="flex items-center gap-2 mr-4">
+        {/* Action Buttons - Stack on Mobile */}
+        <div className="flex flex-wrap items-center gap-2">
           {onGenerateList && !selectionMode && (
             <button
               onClick={onGenerateList}
-              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 rounded-lg transition-all flex items-center gap-2 text-sm font-medium shadow-sm"
+              className="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 rounded-lg transition-all flex items-center justify-center gap-2 text-sm font-medium shadow-sm"
               title="Generate shopping list from meals"
             >
               <ShoppingBag className="w-4 h-4" />
-              Generate Shopping List
+              <span className="hidden sm:inline">Generate Shopping List</span>
+              <span className="sm:hidden">Generate</span>
             </button>
           )}
 
           <button
             onClick={toggleSelectionMode}
-            className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium ${
+            className={`flex-1 sm:flex-none px-3 sm:px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 text-sm font-medium ${
               selectionMode
                 ? 'bg-red-600 text-white hover:bg-red-700'
                 : 'bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-sm'
@@ -156,18 +158,9 @@ export const WeekCalendarView = memo(function WeekCalendarView({
             title={selectionMode ? 'Cancel selection' : 'Select meals for bulk delete'}
           >
             {selectionMode ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
-            {selectionMode ? 'Cancel' : 'Select for Delete'}
+            <span className="hidden sm:inline">{selectionMode ? 'Cancel' : 'Select for Delete'}</span>
+            <span className="sm:hidden">{selectionMode ? 'Cancel' : 'Select'}</span>
           </button>
-
-          {!isCurrentWeek && !selectionMode && (
-            <button
-              onClick={handleToday}
-              className="px-4 py-2 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded-lg hover:bg-orange-200 dark:hover:bg-orange-900/50 transition-colors flex items-center gap-2 text-sm font-medium"
-            >
-              <CalendarIcon className="w-4 h-4" />
-              Jump to Today
-            </button>
-          )}
         </div>
       </div>
 
@@ -187,8 +180,141 @@ export const WeekCalendarView = memo(function WeekCalendarView({
         </div>
       )}
 
-      {/* Week Grid */}
-      <div className="grid grid-cols-7 gap-3">
+      {/* Mobile: Full-Width Day Grid (No Scrolling) */}
+      <div className="sm:hidden">
+        <div className="grid grid-cols-7 gap-1">
+          {weekDays.map((day) => {
+            const isToday = isSameDay(day, new Date());
+            const dayMeals = getMealsForDate(day);
+            const hasMeals = dayMeals.length > 0;
+            return (
+              <button
+                key={day.toISOString()}
+                onClick={() => {
+                  const el = document.getElementById(`day-card-${format(day, 'yyyy-MM-dd')}`);
+                  el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+                className={`py-2 px-1 rounded-lg text-center transition-all min-h-[60px] ${
+                  isToday
+                    ? 'bg-orange-500 text-white'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                }`}
+              >
+                <div className="text-[10px] font-medium uppercase">{format(day, 'EEE')}</div>
+                <div className="text-base font-bold">{format(day, 'd')}</div>
+                {hasMeals && (
+                  <div className={`mt-0.5 w-1.5 h-1.5 rounded-full mx-auto ${isToday ? 'bg-white' : 'bg-orange-500'}`} />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Mobile: Vertical Card Layout */}
+      <div className="sm:hidden space-y-3">
+        {weekDays.map((day) => {
+          const dayMeals = getMealsForDate(day);
+          const isToday = isSameDay(day, new Date());
+
+          return (
+            <div
+              key={day.toISOString()}
+              id={`day-card-${format(day, 'yyyy-MM-dd')}`}
+              className={`rounded-xl border-2 p-4 transition-all ${
+                isToday
+                  ? 'border-orange-500 bg-orange-50/50 dark:bg-orange-900/10'
+                  : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
+              }`}
+            >
+              {/* Day Header */}
+              <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className={`text-center ${isToday ? 'text-orange-600 dark:text-orange-400' : 'text-gray-900 dark:text-white'}`}>
+                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{format(day, 'EEEE')}</div>
+                    <div className="text-2xl font-bold">{format(day, 'd')}</div>
+                  </div>
+                  {isToday && (
+                    <span className="px-2 py-1 bg-orange-500 text-white text-xs font-medium rounded-full">Today</span>
+                  )}
+                </div>
+                <button
+                  onClick={() => onAddMeal(day)}
+                  className="p-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
+                >
+                  <Plus className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Meals */}
+              <div className="space-y-2">
+                {dayMeals.length > 0 ? (
+                  dayMeals.map((meal) => {
+                    const config = MEAL_TYPE_CONFIG[meal.meal_type];
+                    const Icon = config.icon;
+                    const isSelected = selectedMealIds.has(meal.id);
+                    const mealDate = parseDateString(meal.scheduled_date);
+                    const now = new Date();
+                    const isPastMeal = mealDate < now;
+
+                    return (
+                      <button
+                        key={meal.id}
+                        onClick={() => selectionMode ? toggleMealSelection(meal.id) : onMealClick(meal)}
+                        className={`w-full text-left p-3 rounded-lg border-l-4 ${config.bg} ${config.border} hover:shadow-md transition-all ${
+                          isSelected ? 'ring-2 ring-orange-500' : ''
+                        } ${isPastMeal ? 'opacity-60' : ''}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          {selectionMode && (
+                            <div className="flex-shrink-0">
+                              {isSelected ? (
+                                <CheckSquare className="w-5 h-5 text-orange-600" />
+                              ) : (
+                                <Square className="w-5 h-5 text-gray-400" />
+                              )}
+                            </div>
+                          )}
+                          <Icon className={`w-5 h-5 flex-shrink-0 ${config.color} ${isPastMeal ? 'opacity-70' : ''}`} />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className={`text-xs font-medium ${config.color}`}>{config.label}</span>
+                              {isPastMeal && (
+                                <CheckSquare className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
+                              )}
+                            </div>
+                            <p className={`font-medium text-gray-900 dark:text-white text-base ${isPastMeal ? 'line-through' : ''}`}>
+                              {meal.recipe?.name || meal.name || 'Untitled Meal'}
+                            </p>
+                            {meal.notes && (
+                              <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                                {meal.notes}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })
+                ) : (
+                  <div className="py-6 text-center">
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">No meals planned</p>
+                    <button
+                      onClick={() => onAddMeal(day)}
+                      className="px-4 py-2 text-orange-600 dark:text-orange-400 border border-orange-300 dark:border-orange-600 hover:bg-orange-500 hover:text-white hover:border-orange-500 text-sm font-medium rounded-lg transition-all"
+                    >
+                      Add Meal
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Desktop: 7-Column Grid */}
+      <div className="hidden sm:grid grid-cols-7 gap-3">
         {weekDays.map((day) => {
           const dayMeals = getMealsForDate(day);
           const isToday = isSameDay(day, new Date());
