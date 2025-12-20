@@ -391,23 +391,23 @@ export default function ProjectsPage() {
               </div>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-amber-100 to-amber-100 dark:from-amber-900/30 dark:to-amber-900/30 rounded-xl border border-amber-200 dark:border-amber-700 w-full sm:w-auto overflow-x-auto">
+              <div className="grid grid-cols-5 sm:flex sm:items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-amber-100 to-amber-100 dark:from-amber-900/30 dark:to-amber-900/30 rounded-xl border border-amber-200 dark:border-amber-700 w-full sm:w-auto">
                 {(['projects', 'budgets', 'bills', 'expenses', 'receipts'] as TabType[]).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => handleTabChange(tab)}
-                    className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] ${
+                    className={`sm:flex-none px-1 sm:px-4 py-2 rounded-lg flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 transition-all font-medium ${
                       activeTab === tab
                         ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white'
                         : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                     }`}
                   >
-                    {tab === 'projects' && <Folder className="w-4 h-4" />}
-                    {tab === 'budgets' && <Wallet className="w-4 h-4" />}
-                    {tab === 'bills' && <FileCheck className="w-4 h-4" />}
-                    {tab === 'expenses' && <Receipt className="w-4 h-4" />}
-                    {tab === 'receipts' && <Receipt className="w-4 h-4" />}
-                    <span className="text-sm capitalize">{tab}</span>
+                    {tab === 'projects' && <Folder className="w-4 h-4 flex-shrink-0" />}
+                    {tab === 'budgets' && <Wallet className="w-4 h-4 flex-shrink-0" />}
+                    {tab === 'bills' && <FileCheck className="w-4 h-4 flex-shrink-0" />}
+                    {tab === 'expenses' && <Receipt className="w-4 h-4 flex-shrink-0" />}
+                    {tab === 'receipts' && <Receipt className="w-4 h-4 flex-shrink-0" />}
+                    <span className="text-[10px] sm:text-sm capitalize leading-tight">{tab}</span>
                   </button>
                 ))}
               </div>
@@ -549,10 +549,10 @@ export default function ProjectsPage() {
 
               {/* Category Filter for Projects - Segmented Buttons */}
               {activeTab === 'projects' && projects.length > 0 && (
-                <div className="bg-gray-50 dark:bg-gray-900 border-2 border-amber-200 dark:border-amber-700 rounded-lg p-1 flex gap-1 w-fit">
+                <div className="bg-gray-50 dark:bg-gray-900 border-2 border-amber-200 dark:border-amber-700 rounded-lg p-1 grid grid-cols-3 gap-1 w-full sm:w-auto sm:flex">
                   <button
                     onClick={() => setProjectFilter('all')}
-                    className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[60px] ${
+                    className={`px-3 py-2.5 text-sm font-medium sm:px-4 min-h-[44px] sm:min-h-0 rounded-md transition-all whitespace-nowrap ${
                       projectFilter === 'all'
                         ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md'
                         : 'text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20'
@@ -562,7 +562,7 @@ export default function ProjectsPage() {
                   </button>
                   <button
                     onClick={() => setProjectFilter('active')}
-                    className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[60px] ${
+                    className={`px-3 py-2.5 text-sm font-medium sm:px-4 min-h-[44px] sm:min-h-0 rounded-md transition-all whitespace-nowrap ${
                       projectFilter === 'active'
                         ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md'
                         : 'text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20'
@@ -572,7 +572,7 @@ export default function ProjectsPage() {
                   </button>
                   <button
                     onClick={() => setProjectFilter('completed')}
-                    className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs min-h-[44px] md:min-h-0 rounded-md transition-all whitespace-nowrap min-w-[80px] ${
+                    className={`px-3 py-2.5 text-sm font-medium sm:px-4 min-h-[44px] sm:min-h-0 rounded-md transition-all whitespace-nowrap ${
                       projectFilter === 'completed'
                         ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md'
                         : 'text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20'

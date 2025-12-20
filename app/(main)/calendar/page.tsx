@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, List, X, RefreshCw, Archive } from 'lucide-react';
+import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { z } from 'zod';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
@@ -831,6 +832,7 @@ export default function CalendarPage() {
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Calendar' }]}>
       <PageErrorBoundary>
+        <PullToRefresh onRefresh={loadEvents}>
         <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
@@ -2007,6 +2009,7 @@ export default function CalendarPage() {
           </div>
         </div>
       </div>
+      </PullToRefresh>
       </PageErrorBoundary>
 
       {/* New/Edit Event Modal */}

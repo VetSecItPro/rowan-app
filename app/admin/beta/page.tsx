@@ -28,7 +28,10 @@ import {
   Target,
   Award,
   Sun,
-  Moon
+  Moon,
+  Ticket,
+  Mail,
+  Copy
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
@@ -97,11 +100,26 @@ interface BetaStats {
   }>;
 }
 
+interface InviteCode {
+  id: string;
+  code: string;
+  email: string | null;
+  used_by: string | null;
+  is_active: boolean;
+  expires_at: string | null;
+  source: string;
+  notes: string | null;
+  created_at: string;
+  used_at: string | null;
+}
+
 export default function AdminBetaPage() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [activeTab, setActiveTab] = useState<'requests' | 'users' | 'feedback' | 'settings'>('requests');
+  const [activeTab, setActiveTab] = useState<'requests' | 'users' | 'codes' | 'feedback' | 'settings'>('requests');
+  const [inviteCodes, setInviteCodes] = useState<InviteCode[]>([]);
+  const [codeFilter, setCodeFilter] = useState<'all' | 'used' | 'pending' | 'expired'>('all');
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -115,7 +133,7 @@ export default function AdminBetaPage() {
     approvedRequests: 0,
     pendingRequests: 0,
     activeUsers: 0,
-    capacity: 30,
+    capacity: 100,
     conversionRate: 0,
     averageActivityScore: 0,
     recentActivity: [],
@@ -132,11 +150,12 @@ export default function AdminBetaPage() {
       setIsLoading(true);
 
       // Fetch beta data in parallel
-      const [requestsResponse, usersResponse, feedbackResponse, statsResponse] = await Promise.all([
+      const [requestsResponse, usersResponse, feedbackResponse, statsResponse, codesResponse] = await Promise.all([
         fetch('/api/admin/beta/requests'),
         fetch('/api/admin/users/online'),
         fetch('/api/admin/beta/feedback'),
-        fetch('/api/admin/beta/stats')
+        fetch('/api/admin/beta/stats'),
+        fetch('/api/admin/beta/invite-codes')
       ]);
 
       if (requestsResponse.ok) {
@@ -157,6 +176,11 @@ export default function AdminBetaPage() {
       if (statsResponse.ok) {
         const statsData = await statsResponse.json();
         setStats(prevStats => ({ ...prevStats, ...statsData.stats }));
+      }
+
+      if (codesResponse.ok) {
+        const codesData = await codesResponse.json();
+        setInviteCodes(codesData.codes || []);
       }
     } catch (error) {
       logger.error('Failed to fetch beta data:', error, { component: 'page', action: 'execution' });
@@ -359,6 +383,7 @@ export default function AdminBetaPage() {
           <div className="flex space-x-8">
             {[
               { id: 'requests', label: 'Access Requests', count: stats.totalRequests },
+              { id: 'codes', label: 'Invite Codes', count: inviteCodes.length },
               { id: 'users', label: 'Beta Users', count: stats.activeUsers },
               { id: 'feedback', label: 'Feedback', count: betaFeedback.length },
               { id: 'settings', label: 'Settings', count: null },
@@ -529,6 +554,166 @@ export default function AdminBetaPage() {
                     <div className="p-12 text-center">
                       <Shield className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                       <p className="text-gray-600 dark:text-gray-400">No beta requests found</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {activeTab === 'codes' && (
+          <>
+            {/* Invite Codes Management */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Search by code or email..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Filter className="w-5 h-5 text-gray-400" />
+                  <select
+                    value={codeFilter}
+                    onChange={(e) => setCodeFilter(e.target.value as any)}
+                    className="px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                  >
+                    <option value="all">All Codes</option>
+                    <option value="pending">Pending (Unused)</option>
+                    <option value="used">Used</option>
+                    <option value="expired">Expired</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+              {isLoading ? (
+                <div className="p-12 text-center">
+                  <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-gray-600 dark:text-gray-400">Loading invite codes...</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 dark:bg-gray-700">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          Code
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          Email
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          Source
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          Created
+                        </th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                      {inviteCodes
+                        .filter(code => {
+                          const matchesSearch =
+                            code.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            code.email?.toLowerCase().includes(searchTerm.toLowerCase());
+                          const now = new Date();
+                          const isExpired = code.expires_at && new Date(code.expires_at) < now;
+                          const matchesFilter =
+                            codeFilter === 'all' ||
+                            (codeFilter === 'pending' && !code.used_by && code.is_active && !isExpired) ||
+                            (codeFilter === 'used' && code.used_by) ||
+                            (codeFilter === 'expired' && isExpired);
+                          return matchesSearch && matchesFilter;
+                        })
+                        .map((code) => {
+                          const isExpired = code.expires_at && new Date(code.expires_at) < new Date();
+                          return (
+                            <tr key={code.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex items-center gap-2">
+                                  <code className="font-mono text-sm bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                                    {code.code}
+                                  </code>
+                                  <button
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(code.code);
+                                    }}
+                                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                    title="Copy code"
+                                  >
+                                    <Copy className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                {code.email ? (
+                                  <div className="flex items-center gap-2">
+                                    <Mail className="w-4 h-4 text-gray-400" />
+                                    <span className="text-sm text-gray-900 dark:text-white">{code.email}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-sm text-gray-400">Not assigned</span>
+                                )}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                {code.used_by ? (
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
+                                    <CheckCircle className="w-3 h-3 mr-1" />
+                                    Used
+                                  </span>
+                                ) : isExpired ? (
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400">
+                                    <XCircle className="w-3 h-3 mr-1" />
+                                    Expired
+                                  </span>
+                                ) : !code.is_active ? (
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400">
+                                    <XCircle className="w-3 h-3 mr-1" />
+                                    Inactive
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
+                                    <Clock className="w-3 h-3 mr-1" />
+                                    Pending
+                                  </span>
+                                )}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className="text-sm text-gray-900 dark:text-white capitalize">
+                                  {code.source?.replace('_', ' ') || 'Unknown'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                {formatDate(code.created_at)}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300">
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                  {inviteCodes.length === 0 && (
+                    <div className="p-12 text-center">
+                      <Ticket className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600 dark:text-gray-400">No invite codes found</p>
                     </div>
                   )}
                 </div>

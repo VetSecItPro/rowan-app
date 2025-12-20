@@ -147,16 +147,19 @@ export default function LoginPage() {
         }`}
       >
         <div className="w-full max-w-md">
-          {/* Mobile logo */}
-          <div className="lg:hidden flex justify-center mb-8">
+          {/* Mobile logo with link to homepage */}
+          <Link href="/" className="lg:hidden flex flex-col items-center mb-8 group">
             <Image
               src="/rowan-logo.png"
               alt="Rowan Logo"
               width={64}
               height={64}
-              className="w-16 h-16"
+              className="w-16 h-16 group-hover:scale-105 transition-transform duration-200"
             />
-          </div>
+            <span className="mt-2 text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
+              Rowan
+            </span>
+          </Link>
 
           {/* Header */}
           <div className="mb-8">

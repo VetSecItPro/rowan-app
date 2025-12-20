@@ -5,23 +5,19 @@ import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import crypto from 'crypto';
 
-// Security: Beta password moved to environment variable (CRITICAL-3 fix)
-// Set BETA_PASSWORD in Vercel environment variables
-const MAX_BETA_USERS = 30;
+// Beta program configuration
+const MAX_BETA_USERS = 100;
+const BETA_DEADLINE = '2026-02-15T23:59:59Z';
 
 /**
  * Constant-time string comparison to prevent timing attacks
  * Returns true if strings are equal, false otherwise
  */
 function timingSafeCompare(a: string, b: string): boolean {
-  // Convert to buffers for comparison
   const bufA = Buffer.from(a);
   const bufB = Buffer.from(b);
 
-  // If lengths differ, still do a comparison to maintain constant time
-  // but compare against a dummy buffer of the correct length
   if (bufA.length !== bufB.length) {
-    // Compare bufA against itself to maintain constant timing
     crypto.timingSafeEqual(bufA, bufA);
     return false;
   }
@@ -30,17 +26,22 @@ function timingSafeCompare(a: string, b: string): boolean {
 }
 
 /**
+ * Normalize invite code for comparison (remove dashes, uppercase)
+ */
+function normalizeCode(code: string): string {
+  return code.replace(/-/g, '').toUpperCase().trim();
+}
+
+/**
  * POST /api/beta/validate
- * Validate beta password and check user capacity
+ * Validate beta invite code and check user capacity
+ *
+ * Supports:
+ * - Invite codes (new system): { inviteCode: "XXXX-XXXX-XXXX" }
+ * - Legacy password (deprecated): { password: "..." }
  */
 export async function POST(req: NextRequest) {
   try {
-    // Validate that BETA_PASSWORD is configured (runtime check)
-    const BETA_PASSWORD = process.env.BETA_PASSWORD;
-    if (!BETA_PASSWORD) {
-      throw new Error('BETA_PASSWORD environment variable is required');
-    }
-
     // Rate limiting with automatic fallback
     const ip = extractIP(req.headers);
     const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
@@ -52,84 +53,199 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Parse request body
     const body = await req.json();
-    const { password } = body;
+    const { inviteCode, password } = body;
 
-    if (!password) {
-      return NextResponse.json(
-        { error: 'Password is required' },
-        { status: 400 }
-      );
-    }
-
-    // Create Supabase client with service role for public access
+    // Create Supabase client
     const supabase = await createClient();
 
-    // Use timing-safe comparison to prevent timing attacks
-    const isValidPassword = timingSafeCompare(password, BETA_PASSWORD);
-
-    // Log the beta access attempt (password NOT stored for security)
-    const { error: logError } = await supabase
-      .from('beta_access_requests')
-      .insert({
-        email: null, // Will be filled when user actually signs up
-        // password_attempt intentionally omitted - never store plaintext passwords
-        ip_address: ip,
-        user_agent: req.headers.get('user-agent') || null,
-        access_granted: isValidPassword,
-        created_at: new Date().toISOString(),
-      });
-
-    // Beta access attempts logged to database for audit trail
-
-    // Check password (using pre-computed timing-safe result)
-    if (!isValidPassword) {
+    // Check if beta program has ended
+    const now = new Date();
+    const deadline = new Date(BETA_DEADLINE);
+    if (now > deadline) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid beta password. Please check with your invitation source.'
-        },
-        { status: 401 }
-      );
-    }
-
-    // Check current beta user count
-    const { count: betaUserCount, error: countError } = await supabase
-      .from('beta_access_requests')
-      .select('*', { count: 'exact', head: true })
-      .eq('access_granted', true)
-      .not('user_id', 'is', null);
-
-    if (countError) {
-      throw new Error(`Failed to check beta user count: ${countError.message}`);
-    }
-
-    // Check if we've reached capacity
-    if (betaUserCount !== null && betaUserCount >= MAX_BETA_USERS) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: `Beta program is currently at capacity (${MAX_BETA_USERS} users). Join our launch notification list to be notified when we open more spots!`,
-          at_capacity: true
+          error: 'The beta program has ended. Please sign up for a regular account.',
+          beta_ended: true
         },
         { status: 403 }
       );
     }
 
-    // Increment daily analytics for beta requests
-    const today = new Date().toISOString().split('T')[0];
-    const { error: analyticsError } = await supabase
-      .rpc('increment_beta_requests', { target_date: today });
+    // Get current beta user count using the database function
+    const { data: slotsData, error: slotsError } = await supabase
+      .rpc('get_beta_slots_remaining');
 
-    // Analytics increment failures are non-critical
+    const slotsRemaining = slotsError ? MAX_BETA_USERS : (slotsData ?? MAX_BETA_USERS);
 
-    // Success response
-    return NextResponse.json({
-      success: true,
-      message: `Welcome to Rowan Beta! You're user ${(betaUserCount || 0) + 1} of ${MAX_BETA_USERS}.`,
-      slots_remaining: MAX_BETA_USERS - (betaUserCount || 0) - 1,
-    });
+    // Check if we've reached capacity
+    if (slotsRemaining <= 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Beta program has reached capacity (100 users). Join our launch notification list to be notified when we launch!',
+          at_capacity: true,
+          slots_remaining: 0
+        },
+        { status: 403 }
+      );
+    }
+
+    // === NEW: Invite Code Validation ===
+    if (inviteCode) {
+      const normalizedCode = normalizeCode(inviteCode);
+
+      if (normalizedCode.length < 8) {
+        return NextResponse.json(
+          { success: false, error: 'Invalid invite code format' },
+          { status: 400 }
+        );
+      }
+
+      // Check if invite code exists and is valid
+      const { data: codeData, error: codeError } = await supabase
+        .from('beta_invite_codes')
+        .select('id, code, used_by, expires_at, is_active')
+        .or(`code.eq.${inviteCode},code.eq.${normalizedCode}`)
+        .single();
+
+      if (codeError || !codeData) {
+        // Log failed attempt
+        await supabase.from('beta_access_requests').insert({
+          email: null,
+          ip_address: ip,
+          user_agent: req.headers.get('user-agent') || null,
+          access_granted: false,
+          notes: `Invalid invite code: ${inviteCode.substring(0, 4)}****`,
+          created_at: new Date().toISOString(),
+        });
+
+        return NextResponse.json(
+          { success: false, error: 'Invalid invite code. Please check your code and try again.' },
+          { status: 401 }
+        );
+      }
+
+      // Check if code is already used
+      if (codeData.used_by) {
+        return NextResponse.json(
+          { success: false, error: 'This invite code has already been used.' },
+          { status: 401 }
+        );
+      }
+
+      // Check if code is expired
+      if (codeData.expires_at && new Date(codeData.expires_at) < now) {
+        return NextResponse.json(
+          { success: false, error: 'This invite code has expired.' },
+          { status: 401 }
+        );
+      }
+
+      // Check if code is active
+      if (!codeData.is_active) {
+        return NextResponse.json(
+          { success: false, error: 'This invite code is no longer active.' },
+          { status: 401 }
+        );
+      }
+
+      // Log successful validation
+      await supabase.from('beta_access_requests').insert({
+        email: null,
+        ip_address: ip,
+        user_agent: req.headers.get('user-agent') || null,
+        access_granted: true,
+        notes: `Valid invite code: ${codeData.code}`,
+        created_at: new Date().toISOString(),
+      });
+
+      // Increment daily analytics
+      const today = new Date().toISOString().split('T')[0];
+      await supabase.rpc('increment_beta_requests', { target_date: today });
+
+      return NextResponse.json({
+        success: true,
+        message: `Welcome to Rowan Beta! You have until February 15, 2026 to explore all features.`,
+        invite_code_id: codeData.id,
+        slots_remaining: slotsRemaining - 1,
+        beta_ends_at: BETA_DEADLINE,
+        current_users: MAX_BETA_USERS - slotsRemaining,
+        max_users: MAX_BETA_USERS
+      });
+    }
+
+    // === LEGACY: Password Validation (for backward compatibility) ===
+    if (password) {
+      const BETA_PASSWORD = process.env.BETA_PASSWORD;
+
+      // Check if legacy password is enabled
+      const { data: configData } = await supabase
+        .from('beta_config')
+        .select('value')
+        .eq('key', 'allow_legacy_password')
+        .single();
+
+      const legacyEnabled = configData?.value === true || configData?.value === 'true';
+
+      if (!legacyEnabled && BETA_PASSWORD) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Password-based beta access is no longer available. Please use an invite code.',
+            require_invite_code: true
+          },
+          { status: 400 }
+        );
+      }
+
+      if (!BETA_PASSWORD) {
+        return NextResponse.json(
+          { success: false, error: 'Beta access is currently unavailable.' },
+          { status: 503 }
+        );
+      }
+
+      const isValidPassword = timingSafeCompare(password, BETA_PASSWORD);
+
+      // Log the attempt
+      await supabase.from('beta_access_requests').insert({
+        email: null,
+        ip_address: ip,
+        user_agent: req.headers.get('user-agent') || null,
+        access_granted: isValidPassword,
+        notes: 'Legacy password validation',
+        created_at: new Date().toISOString(),
+      });
+
+      if (!isValidPassword) {
+        return NextResponse.json(
+          { success: false, error: 'Invalid beta password.' },
+          { status: 401 }
+        );
+      }
+
+      // Increment daily analytics
+      const today = new Date().toISOString().split('T')[0];
+      await supabase.rpc('increment_beta_requests', { target_date: today });
+
+      return NextResponse.json({
+        success: true,
+        message: `Welcome to Rowan Beta! You have until February 15, 2026 to explore all features.`,
+        slots_remaining: slotsRemaining - 1,
+        beta_ends_at: BETA_DEADLINE,
+        current_users: MAX_BETA_USERS - slotsRemaining,
+        max_users: MAX_BETA_USERS,
+        legacy_access: true
+      });
+    }
+
+    // No valid authentication method provided
+    return NextResponse.json(
+      { success: false, error: 'Invite code is required' },
+      { status: 400 }
+    );
 
   } catch (error) {
     Sentry.captureException(error, {
@@ -141,9 +257,42 @@ export async function POST(req: NextRequest) {
         timestamp: new Date().toISOString(),
       },
     });
-    // Error already captured by Sentry above
     return NextResponse.json(
       { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * GET /api/beta/validate
+ * Get beta program status (slots remaining, deadline, etc.)
+ */
+export async function GET(req: NextRequest) {
+  try {
+    const supabase = await createClient();
+
+    // Get slots remaining
+    const { data: slotsData } = await supabase.rpc('get_beta_slots_remaining');
+    const slotsRemaining = slotsData ?? MAX_BETA_USERS;
+
+    // Check if beta has ended
+    const now = new Date();
+    const deadline = new Date(BETA_DEADLINE);
+    const betaEnded = now > deadline;
+
+    return NextResponse.json({
+      slots_remaining: betaEnded ? 0 : slotsRemaining,
+      max_users: MAX_BETA_USERS,
+      current_users: MAX_BETA_USERS - slotsRemaining,
+      beta_ends_at: BETA_DEADLINE,
+      beta_ended: betaEnded,
+      at_capacity: slotsRemaining <= 0
+    });
+  } catch (error) {
+    Sentry.captureException(error);
+    return NextResponse.json(
+      { error: 'Failed to get beta status' },
       { status: 500 }
     );
   }

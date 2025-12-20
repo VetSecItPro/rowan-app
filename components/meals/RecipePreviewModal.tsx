@@ -204,34 +204,38 @@ export function RecipePreviewModal({
           )}
         </div>
 
-        {/* Footer Actions */}
-        <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-6 flex items-center justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="px-6 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-          >
-            Close
-          </button>
-          <button
-            onClick={() => {
-              onAddToLibrary(recipe);
-              onClose();
-            }}
-            className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg transition-all flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Add to Library
-          </button>
-          <button
-            onClick={() => {
-              onPlanMeal(recipe);
-              onClose();
-            }}
-            className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg transition-all flex items-center gap-2"
-          >
-            <Calendar className="w-4 h-4" />
-            Plan Meal
-          </button>
+        {/* Footer Actions - Mobile Optimized */}
+        <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              onClick={onClose}
+              className="px-3 sm:px-6 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm sm:text-base font-medium"
+            >
+              Close
+            </button>
+            <button
+              onClick={() => {
+                onAddToLibrary(recipe);
+                onClose();
+              }}
+              className="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base font-medium"
+            >
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Add to Library</span>
+              <span className="sm:hidden">Add to Library</span>
+            </button>
+            <button
+              onClick={() => {
+                onPlanMeal(recipe);
+                onClose();
+              }}
+              className="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base font-medium"
+            >
+              <Calendar className="w-4 h-4" />
+              <span className="hidden sm:inline">Plan Meal</span>
+              <span className="sm:hidden">Plan</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

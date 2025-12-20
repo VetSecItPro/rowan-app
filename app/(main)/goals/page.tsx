@@ -57,7 +57,7 @@ const HabitTracker = dynamicImport(() => import('@/components/goals/HabitTracker
 });
 
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
-import { PullToRefresh } from '@/components/shared/PullToRefresh';
+import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { GoalCardSkeleton, MilestoneCardSkeleton, StatsCardSkeleton } from '@/components/ui/Skeleton';
 
 const BadgesWidget = dynamicImport(() => import('@/components/goals/badges/BadgesWidget'), {
@@ -671,7 +671,7 @@ export default function GoalsPage() {
     >
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
       <PageErrorBoundary>
-        <PullToRefresh onRefresh={loadData} disabled={loading}>
+        <PullToRefresh onRefresh={loadData} enabled={!loading}>
           <div className="p-4 sm:p-8">
           <div className="max-w-7xl mx-auto space-y-8">
             {/* Header */}
@@ -911,46 +911,105 @@ export default function GoalsPage() {
 
               {/* Filter Controls Container - Only show for goals view */}
               {viewMode === 'goals' && (
-                <div className="flex flex-col sm:flex-row gap-2">
-                  {/* Status Filter */}
-                  <div className="bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 w-fit">
-                    <button
-                      onClick={() => setStatusFilter('all')}
-                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
-                        statusFilter === 'all'
-                          ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
-                          : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
-                      }`}
-                    >
-                      All
-                    </button>
-                    <button
-                      onClick={() => setStatusFilter('active')}
-                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
-                        statusFilter === 'active'
-                          ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
-                          : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
-                      }`}
-                    >
-                      Active
-                    </button>
-                    <button
-                      onClick={() => setStatusFilter('completed')}
-                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[80px] ${
-                        statusFilter === 'completed'
-                          ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
-                          : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
-                      }`}
-                    >
-                      Completed
-                    </button>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  {/* Combined Filter - Mobile: single row with all options, Desktop: two separate rows */}
+                  <div className="bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 w-full sm:w-auto">
+                    {/* Mobile: Combined single-row filter */}
+                    <div className="grid grid-cols-5 gap-0.5 sm:hidden">
+                      <button
+                        onClick={() => { setStatusFilter('all'); setAssignmentFilter('all'); }}
+                        className={`px-2 py-2.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+                          statusFilter === 'all' && assignmentFilter === 'all' && !focusMode
+                            ? 'bg-gradient-goals text-white shadow-md'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                        }`}
+                      >
+                        All
+                      </button>
+                      <button
+                        onClick={() => { setStatusFilter('active'); setAssignmentFilter('all'); setFocusMode(false); }}
+                        className={`px-2 py-2.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+                          statusFilter === 'active' && assignmentFilter === 'all' && !focusMode
+                            ? 'bg-gradient-goals text-white shadow-md'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                        }`}
+                      >
+                        Active
+                      </button>
+                      <button
+                        onClick={() => { setStatusFilter('completed'); setAssignmentFilter('all'); setFocusMode(false); }}
+                        className={`px-2 py-2.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+                          statusFilter === 'completed' && assignmentFilter === 'all' && !focusMode
+                            ? 'bg-gradient-goals text-white shadow-md'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                        }`}
+                      >
+                        Done
+                      </button>
+                      <button
+                        onClick={() => { setStatusFilter('all'); setAssignmentFilter('assigned-to-me'); setFocusMode(false); }}
+                        className={`px-2 py-2.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+                          assignmentFilter === 'assigned-to-me' && !focusMode
+                            ? 'bg-gradient-goals text-white shadow-md'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                        }`}
+                      >
+                        Mine
+                      </button>
+                      <button
+                        onClick={() => { setFocusMode(!focusMode); if (!focusMode) { setStatusFilter('all'); setAssignmentFilter('all'); } }}
+                        className={`px-2 py-2.5 text-xs font-medium rounded-md transition-all whitespace-nowrap flex items-center justify-center gap-1 ${
+                          focusMode
+                            ? 'bg-gradient-goals text-white shadow-md'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                        }`}
+                        title="Focus on top 3 priority goals"
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        <span>Top 3</span>
+                      </button>
+                    </div>
+
+                    {/* Desktop: Status Filter */}
+                    <div className="hidden sm:flex gap-1">
+                      <button
+                        onClick={() => setStatusFilter('all')}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap min-w-[60px] ${
+                          statusFilter === 'all'
+                            ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                        }`}
+                      >
+                        All
+                      </button>
+                      <button
+                        onClick={() => setStatusFilter('active')}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap min-w-[60px] ${
+                          statusFilter === 'active'
+                            ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                        }`}
+                      >
+                        Active
+                      </button>
+                      <button
+                        onClick={() => setStatusFilter('completed')}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap min-w-[80px] ${
+                          statusFilter === 'completed'
+                            ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                        }`}
+                      >
+                        Completed
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Assignment Filter */}
-                  <div className="bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 flex gap-1 w-fit">
+                  {/* Desktop: Assignment Filter */}
+                  <div className="hidden sm:flex bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 gap-1">
                     <button
                       onClick={() => setAssignmentFilter('all')}
-                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[60px] ${
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                         assignmentFilter === 'all'
                           ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
                           : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
@@ -960,7 +1019,7 @@ export default function GoalsPage() {
                     </button>
                     <button
                       onClick={() => setAssignmentFilter('assigned-to-me')}
-                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[80px] ${
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                         assignmentFilter === 'assigned-to-me'
                           ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
                           : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
@@ -970,7 +1029,7 @@ export default function GoalsPage() {
                     </button>
                     <button
                       onClick={() => setAssignmentFilter('unassigned')}
-                      className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap min-w-[100px] ${
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap min-w-[90px] ${
                         assignmentFilter === 'unassigned'
                           ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
                           : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
@@ -982,11 +1041,11 @@ export default function GoalsPage() {
                 </div>
               )}
 
-              {/* Focus Mode Toggle */}
+              {/* Focus Mode Toggle - Desktop only (mobile has it in combined filter) */}
               {viewMode === 'goals' && filteredGoals.length > 3 && (
                 <button
                   onClick={() => setFocusMode(!focusMode)}
-                  className={`px-4 py-2.5 text-sm font-medium md:px-3 md:py-1.5 md:text-xs rounded-md transition-all whitespace-nowrap flex items-center gap-2 ${
+                  className={`hidden sm:flex px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap items-center gap-2 ${
                     focusMode
                       ? 'bg-indigo-600 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 border border-indigo-300 dark:border-indigo-700'
@@ -994,8 +1053,7 @@ export default function GoalsPage() {
                   title="Show only top 3 priority goals"
                 >
                   <Sparkles className="w-4 h-4" />
-                  <span className="hidden sm:inline">Focus Mode</span>
-                  <span className="sm:hidden">Focus</span>
+                  <span>Focus Mode</span>
                 </button>
               )}
             </div>
