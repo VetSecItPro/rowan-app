@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as ImageIcon, Paperclip, TrendingUp, X, CalendarClock } from 'lucide-react';
+import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';

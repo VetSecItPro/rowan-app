@@ -15,8 +15,21 @@ import { LogOut, User as UserIcon, ChevronDown, Trophy, Shield, UserPlus, TestTu
 import { hasAdminAccess } from '@/lib/utils/admin-utils';
 
 // Helper to check beta tester status
-const isBetaTester = (user: { is_beta_tester?: boolean; beta_status?: string } | null) => {
-  return user?.is_beta_tester && user.beta_status === 'approved';
+const isBetaTester = (user: {
+  is_beta_tester?: boolean;
+  beta_status?: string;
+  beta_invite_code_id?: string;
+  beta_ends_at?: string;
+} | null) => {
+  if (!user) return false;
+  // Check legacy flag
+  if (user.is_beta_tester && user.beta_status === 'approved') return true;
+  // Check new invite code system - has valid beta access
+  if (user.beta_invite_code_id && user.beta_ends_at) {
+    const endsAt = new Date(user.beta_ends_at);
+    return endsAt > new Date();
+  }
+  return false;
 };
 
 const COLOR_THEMES = {

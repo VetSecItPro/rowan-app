@@ -5,12 +5,30 @@ import { TestTube, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useAdmin } from '@/hooks/useAdmin';
 
+// Helper to check beta tester status (supports both legacy and invite code system)
+function checkIsBetaTester(user: {
+  is_beta_tester?: boolean;
+  beta_status?: string;
+  beta_invite_code_id?: string;
+  beta_ends_at?: string;
+} | null): boolean {
+  if (!user) return false;
+  // Check legacy flag
+  if (user.is_beta_tester && user.beta_status === 'approved') return true;
+  // Check new invite code system - has valid beta access
+  if (user.beta_invite_code_id && user.beta_ends_at) {
+    const endsAt = new Date(user.beta_ends_at);
+    return endsAt > new Date();
+  }
+  return false;
+}
+
 export function BetaFeedbackButton() {
   const { user } = useAuth();
   const { isAdmin, loading: adminLoading } = useAdmin();
 
   // Show for beta testers or admin
-  const isBetaTester = user?.is_beta_tester && user.beta_status === 'approved';
+  const isBetaTester = checkIsBetaTester(user);
 
   // Don't render anything while checking admin status
   if (adminLoading) {

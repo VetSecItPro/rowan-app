@@ -8,6 +8,7 @@ import {
   DragOverlay,
   DragStartEvent,
   PointerSensor,
+  TouchSensor,
   KeyboardSensor,
   useSensor,
   useSensors,
@@ -133,14 +134,14 @@ function SortableItem({ item, onItemClick, onStatusChange, onEdit, onDelete, onV
     >
       <div className="flex items-start justify-between mb-3 gap-3">
         <div className="flex items-start gap-3 flex-1">
-          {/* Drag Handle */}
+          {/* Drag Handle - larger touch target on mobile */}
           <button
             {...attributes}
             {...listeners}
-            className="mt-0.5 flex-shrink-0 w-5 h-5 rounded flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing"
+            className="mt-0.5 flex-shrink-0 w-8 h-8 sm:w-5 sm:h-5 rounded-lg sm:rounded flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-grab active:cursor-grabbing active:bg-gray-200 dark:active:bg-gray-600 touch-manipulation transition-colors"
             aria-label="Drag to reorder"
           >
-            <GripVertical className="w-4 h-4" />
+            <GripVertical className="w-5 h-5 sm:w-4 sm:h-4" />
           </button>
 
           {/* Checkbox */}
@@ -298,6 +299,12 @@ export function DraggableItemList({
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200, // 200ms press-and-hold to start drag (prevents accidental drags while scrolling)
+        tolerance: 5, // Allow 5px of movement during delay
       },
     }),
     useSensor(KeyboardSensor, {

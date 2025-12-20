@@ -34,7 +34,8 @@
 ## Stack
 
 ### Core Framework
-- **Next.js 15.4.10** (App Router) - React framework (stable with Node 22)
+- **Next.js 15.4.10** (App Router) - React framework
+- **Node.js 20.x LTS** - Runtime (use `nvm use 20`)
 - **React 19** - UI library
 - **TypeScript 5** - Strict mode enabled
 
@@ -64,12 +65,15 @@
 
 ## Development Server Setup (IMPORTANT)
 
-### Stable Configuration (December 2024)
-**Next.js Version:** 15.4.10 (security patched, 0 vulnerabilities, stable with Node 22)
-**Node.js Version:** 22.x (current LTS)
+> **MANDATORY:** Always reference this section before starting a dev server.
 
-> **CRITICAL:** Next.js 15.5.x has filesystem race conditions with Node 22 that cause 500 errors.
-> Always use Next.js 15.4.10 which is the latest stable version without these issues.
+### Stable Configuration (December 2024)
+**Next.js Version:** 15.4.10 (security patched, 0 vulnerabilities)
+**Node.js Version:** 20.x LTS (use `nvm use 20`)
+**Bundler:** Webpack (NOT Turbopack)
+
+> **CRITICAL:** Node 22 + Next.js 15.4.10 has filesystem race conditions. Use Node 20.
+> Next.js 15.5.x has race conditions with ANY Node version. Always use 15.4.10.
 
 ### Quick Start (Recommended) - USE THIS EVERY TIME
 ```bash
@@ -89,12 +93,13 @@ npm run dev
 
 ### Nuclear Option (For Persistent Issues)
 ```bash
-# Full reinstall - use only when nothing else works
+# Full reinstall - USE THIS when middleware-manifest.json errors persist
 pkill -f "next" 2>/dev/null || true
 rm -rf .next node_modules package-lock.json
 npm install
 npm run dev
 ```
+**When to use:** After Node version changes, after switching between Turbopack/Webpack, or when quick start fails repeatedly with ENOENT errors.
 
 ### Production Mode Testing
 ```bash
@@ -104,23 +109,29 @@ rm -rf .next && npm run build && npm run start
 
 ### Why This Configuration Works
 
-**1. Next.js 15.4.10 (NOT 15.5.x or 15.1.x)**
-- 15.5.x has filesystem race conditions with Node 22 (`.tmp` file errors, missing manifests)
+**1. Node.js 20.x LTS (NOT Node 22)**
+- Node 22 has filesystem race conditions with Next.js webpack caching
+- Node 20 is more stable with Next.js 15.4.x
+- Switch with: `nvm use 20` (install first: `nvm install 20`)
+
+**2. Next.js 15.4.10 (NOT 15.5.x or 15.1.x)**
+- 15.5.x has filesystem race conditions (`.tmp` file errors, missing manifests)
 - 15.1.x has critical security vulnerabilities
-- 15.4.10 is the sweet spot: security patched AND stable with Node 22
+- 15.4.10 is the sweet spot: security patched AND stable
 - Run `npm audit` to verify 0 vulnerabilities
 
-**2. Webpack Mode (NOT Turbopack)**
+**3. Webpack Mode (NOT Turbopack)**
 - Next.js 15.4.x uses Webpack by default
-- Turbopack in 15.5.x has the race condition bugs
+- Turbopack has race condition bugs in all 15.x versions
 - Webpack is slower but more stable
+- `next.config.mjs` has `config.cache = false` for dev to prevent race conditions
 
-**3. Always Kill Before Start**
+**4. Always Kill Before Start**
 - Orphaned Next.js processes can hold file locks
 - Always run `pkill -f "next"` before starting
 - This prevents "address already in use" and cache conflicts
 
-**4. Always Clear .next Cache**
+**5. Always Clear .next Cache**
 - Corrupted cache causes 500 errors and missing manifest files
 - `rm -rf .next` ensures clean compilation
 - Takes ~15-20 seconds for initial compile but prevents hours of debugging
@@ -140,10 +151,12 @@ Note: No `--turbopack` flag - use Webpack for stability.
 | Error | Cause | Solution |
 |-------|-------|----------|
 | `ENOENT: .next/server/app-paths-manifest.json` | Cache corruption | `rm -rf .next && npm run dev` |
-| `middleware-manifest.json not found` | Race condition | Use Next.js 15.4.10, not 15.5.x |
+| `middleware-manifest.json not found` | Race condition | Nuclear option: full reinstall |
 | `address already in use` | Orphaned process | `pkill -f "next"` first |
 | `500 Internal Server Error` | Multiple causes | Full clean start |
-| `.tmp` file errors | Node 22 + Next.js 15.5.x bug | Downgrade to 15.4.10 |
+| `.tmp` file errors | Node version issue | Use Node 20: `nvm use 20` |
+| `next-font-manifest.json not found` | Corrupted node_modules | Nuclear option |
+| Persistent 500s after clean start | node_modules corruption | Nuclear option |
 
 ### Hot Module Replacement (HMR) - IMPORTANT
 **DO NOT restart the dev server for file edits.** HMR handles changes automatically.

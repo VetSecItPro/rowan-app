@@ -7,6 +7,7 @@ import { useState, useEffect, useMemo, useCallback, memo, useRef } from 'react';
 import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, TrendingUp, ShoppingBag, ChevronLeft, ChevronRight, LayoutGrid, List, ChefHat, ExternalLink, X, CheckSquare } from 'lucide-react';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import Link from 'next/link';
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -23,7 +24,7 @@ import {
   WeekCalendarView,
   TwoWeekCalendarView,
 } from '@/components/ui/DynamicMealComponents';
-import { MealCardSkeleton, CalendarDaySkeleton, RecipeCardSkeleton } from '@/components/ui/Skeleton';
+import { MealCardSkeleton, CalendarDaySkeleton, RecipeCardSkeleton, MobileCalendarSkeleton } from '@/components/ui/Skeleton';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { mealsService, Meal, CreateMealInput, Recipe, CreateRecipeInput } from '@/lib/services/meals-service';
 import { shoppingService } from '@/lib/services/shopping-service';
@@ -810,6 +811,11 @@ export default function MealsPage() {
     }
   ]);
 
+  // Pull-to-refresh handler
+  const handlePullToRefresh = useCallback(async () => {
+    await Promise.all([loadMeals(), loadRecipes()]);
+  }, [loadMeals, loadRecipes]);
+
   const handleIngredientConfirm = useCallback(async (selectedIngredients: string[]) => {
     if (!pendingMealData || !selectedRecipeForReview || !spaceId) return;
 
@@ -863,6 +869,7 @@ export default function MealsPage() {
       description="Plan your family meals, save recipes, and automatically generate shopping lists. Upgrade to Pro to unlock this feature."
     >
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Meal Planning' }]}>
+      <PullToRefresh onRefresh={handlePullToRefresh}>
       <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -1116,10 +1123,16 @@ export default function MealsPage() {
                 ) : viewMode === 'calendar' ? (
                   /* Loading Skeletons for Calendar */
                   <div>
-                    <div className="flex items-center justify-center mb-6">
-                      <div className="h-12 w-[500px] bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
+                    {/* Toggle skeleton */}
+                    <div className="flex items-center justify-center mb-6 px-2 sm:px-0">
+                      <div className="h-12 w-full sm:w-[400px] bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
                     </div>
-                    <div className="grid grid-cols-7 gap-3">
+                    {/* Mobile: Stacked card skeleton */}
+                    <div className="sm:hidden">
+                      <MobileCalendarSkeleton />
+                    </div>
+                    {/* Desktop: Grid skeleton */}
+                    <div className="hidden sm:grid grid-cols-7 gap-3">
                       {[...Array(7)].map((_, i) => (
                         <CalendarDaySkeleton key={i} />
                       ))}
@@ -1180,38 +1193,40 @@ export default function MealsPage() {
             ) : viewMode === 'calendar' ? (
               /* Calendar View */
               <div className="w-full">
-                {/* Calendar View Mode Selector */}
-                <div className="flex items-center justify-center mb-6">
-                  <div className="inline-flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700">
+                {/* Calendar View Mode Selector - Full Width on Mobile */}
+                <div className="flex items-center justify-center mb-6 px-2 sm:px-0">
+                  <div className="flex items-center w-full sm:w-auto sm:inline-flex gap-1 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700">
                     <button
                       onClick={() => setCalendarViewMode('week')}
-                      className={`px-3 sm:px-4 py-2 rounded-lg transition-all font-medium text-sm min-w-[100px] sm:min-w-[120px] ${
+                      className={`flex-1 sm:flex-none px-3 sm:px-5 py-3 sm:py-2.5 rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
                         calendarViewMode === 'week'
-                          ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
+                          ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900/50'
                       }`}
                     >
-                      Current Week
+                      <span className="hidden sm:inline">Current Week</span>
+                      <span className="sm:hidden">Week</span>
                     </button>
                     <button
                       onClick={() => setCalendarViewMode('2weeks')}
-                      className={`px-3 sm:px-4 py-2 rounded-lg transition-all font-medium text-sm min-w-[100px] sm:min-w-[130px] ${
+                      className={`flex-1 sm:flex-none px-3 sm:px-5 py-3 sm:py-2.5 rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
                         calendarViewMode === '2weeks'
-                          ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
+                          ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900/50'
                       }`}
                     >
-                      Next Two Weeks
+                      <span className="hidden sm:inline">Two Weeks</span>
+                      <span className="sm:hidden">2 Weeks</span>
                     </button>
                     <button
                       onClick={() => setCalendarViewMode('month')}
-                      className={`px-3 sm:px-4 py-2 rounded-lg transition-all font-medium text-sm min-w-[100px] sm:min-w-[130px] ${
+                      className={`flex-1 sm:flex-none px-3 sm:px-5 py-3 sm:py-2.5 rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
                         calendarViewMode === 'month'
-                          ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
+                          ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900/50'
                       }`}
                     >
-                      Current Month
+                      Month
                     </button>
                   </div>
                 </div>
@@ -1244,62 +1259,142 @@ export default function MealsPage() {
                   /* Month Calendar View */
                   <div className="w-full space-y-4">
                     {/* Month Navigation and Actions */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center justify-center sm:justify-start gap-2">
                         <button
                           onClick={handlePreviousMonth}
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                         >
                           <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                         </button>
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                           {format(currentMonth, 'MMMM yyyy')}
                         </h3>
                         <button
                           onClick={handleNextMonth}
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                         >
                           <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                         </button>
                       </div>
 
-                      <div className="flex items-center gap-2 mr-4">
-                        <button
-                          onClick={() => setIsGenerateListOpen(true)}
-                          className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 rounded-lg transition-all flex items-center gap-2 text-sm font-medium shadow-sm"
-                          title="Generate shopping list from meals"
-                        >
-                          <ShoppingBag className="w-4 h-4" />
-                          Generate Shopping List
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => setIsGenerateListOpen(true)}
+                        className="px-3 sm:px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 rounded-lg transition-all flex items-center justify-center gap-2 text-sm font-medium shadow-sm"
+                        title="Generate shopping list from meals"
+                      >
+                        <ShoppingBag className="w-4 h-4" />
+                        <span className="hidden sm:inline">Generate Shopping List</span>
+                        <span className="sm:hidden">Generate List</span>
+                      </button>
                     </div>
 
-                    {/* Calendar Grid */}
-                    <div className="grid grid-cols-7 gap-2">
-                      {/* Day headers */}
-                      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                        <div key={day} className="text-center text-sm font-medium text-gray-600 dark:text-gray-400 py-2">
-                          {day}
-                        </div>
-                      ))}
+                    {/* Mobile: Week-by-Week List View */}
+                    <div className="sm:hidden space-y-4">
+                      {(() => {
+                        // Group calendar days by week
+                        const weeks: Date[][] = [];
+                        for (let i = 0; i < calendarDays.length; i += 7) {
+                          weeks.push(calendarDays.slice(i, i + 7));
+                        }
+                        return weeks.map((week, weekIndex) => (
+                          <div key={weekIndex} className="space-y-2">
+                            <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 px-1">
+                              Week of {format(week[0], 'MMM d')}
+                            </h4>
+                            <div className="space-y-2">
+                              {week.map((day) => {
+                                const dayMeals = getMealsForDate(day);
+                                const isCurrentMonth = isSameMonth(day, currentMonth);
+                                const isToday = isSameDay(day, new Date());
 
-                      {/* Calendar days */}
-                      {calendarDays.map((day, index) => {
-                        const dayMeals = getMealsForDate(day);
-                        return (
-                          <CalendarDayCell
-                            key={index}
-                            day={day}
-                            index={index}
-                            currentMonth={currentMonth}
-                            dayMeals={dayMeals}
-                            getUserColor={getUserColor}
-                            onMealClick={handleMealClick}
-                            onAddClick={handleAddMealClick}
-                          />
-                        );
-                      })}
+                                if (!isCurrentMonth) return null;
+
+                                return (
+                                  <div
+                                    key={day.toISOString()}
+                                    className={`rounded-xl border-2 p-3 transition-all ${
+                                      isToday
+                                        ? 'border-orange-500 bg-orange-50/50 dark:bg-orange-900/10'
+                                        : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
+                                    }`}
+                                  >
+                                    <div className="flex items-center justify-between mb-2">
+                                      <div className="flex items-center gap-2">
+                                        <span className={`text-sm font-medium ${isToday ? 'text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                                          {format(day, 'EEE')}
+                                        </span>
+                                        <span className={`text-lg font-bold ${isToday ? 'text-orange-600 dark:text-orange-400' : 'text-gray-900 dark:text-white'}`}>
+                                          {format(day, 'd')}
+                                        </span>
+                                        {isToday && (
+                                          <span className="px-2 py-0.5 bg-orange-500 text-white text-xs font-medium rounded-full">Today</span>
+                                        )}
+                                      </div>
+                                      <button
+                                        onClick={handleAddMealClick}
+                                        className="p-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
+                                      >
+                                        <Plus className="w-4 h-4" />
+                                      </button>
+                                    </div>
+
+                                    {dayMeals.length > 0 ? (
+                                      <div className="space-y-1.5">
+                                        {dayMeals.map((meal) => (
+                                          <button
+                                            key={meal.id}
+                                            onClick={() => handleMealClick(meal)}
+                                            className="w-full text-left px-3 py-2 rounded-lg text-sm bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-500 hover:shadow-md transition-all"
+                                          >
+                                            <p className="font-medium text-gray-900 dark:text-white">
+                                              {meal.recipe?.name || meal.name || 'Untitled'}
+                                            </p>
+                                            <p className="text-xs text-orange-600 dark:text-orange-400 capitalize">
+                                              {meal.meal_type}
+                                            </p>
+                                          </button>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-2">No meals planned</p>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+
+                    {/* Desktop: Calendar Grid */}
+                    <div className="hidden sm:block">
+                      <div className="grid grid-cols-7 gap-2">
+                        {/* Day headers */}
+                        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                          <div key={day} className="text-center text-sm font-medium text-gray-600 dark:text-gray-400 py-2">
+                            {day}
+                          </div>
+                        ))}
+
+                        {/* Calendar days */}
+                        {calendarDays.map((day, index) => {
+                          const dayMeals = getMealsForDate(day);
+                          return (
+                            <CalendarDayCell
+                              key={index}
+                              day={day}
+                              index={index}
+                              currentMonth={currentMonth}
+                              dayMeals={dayMeals}
+                              getUserColor={getUserColor}
+                              onMealClick={handleMealClick}
+                              onAddClick={handleAddMealClick}
+                            />
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1397,6 +1492,7 @@ export default function MealsPage() {
         spaceId={spaceId}
         onSuccess={() => loadMeals()}
       />
+      </PullToRefresh>
     </FeatureLayout>
     </FeatureGateWrapper>
   );
