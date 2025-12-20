@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
@@ -74,14 +74,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create Supabase client
-    const supabase = await createClient();
-
     // Get current timestamp for unsubscribed_at
     const unsubscribedAt = new Date().toISOString();
 
     // Perform bulk unsubscribe operation
-    const { data: updatedRecords, error } = await supabase
+    const { data: updatedRecords, error } = await supabaseAdmin
       .from('launch_notifications')
       .update({
         subscribed: false,

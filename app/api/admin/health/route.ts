@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
@@ -76,8 +76,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Create Supabase client
-    const supabase = await createClient();
     const now = new Date().toISOString();
 
     // Health checks array
@@ -86,7 +84,7 @@ export async function GET(req: NextRequest) {
       (async (): Promise<HealthMetric> => {
         try {
           const start = Date.now();
-          const { error } = await supabase.from('beta_access_requests').select('id').limit(1);
+          const { error } = await supabaseAdmin.from('beta_access_requests').select('id').limit(1);
           const responseTime = Date.now() - start;
 
           if (error) {
@@ -120,7 +118,7 @@ export async function GET(req: NextRequest) {
       // Beta program capacity check
       (async (): Promise<HealthMetric> => {
         try {
-          const { data, error } = await supabase
+          const { data, error } = await supabaseAdmin
             .from('beta_access_requests')
             .select('*', { count: 'exact', head: true })
             .eq('access_granted', true)
@@ -208,7 +206,7 @@ export async function GET(req: NextRequest) {
         try {
           const testStart = Date.now();
           // Test a simple database query to measure API response time
-          await supabase.from('beta_access_requests').select('id').limit(1);
+          await supabaseAdmin.from('beta_access_requests').select('id').limit(1);
           const apiResponseTime = Date.now() - testStart;
 
           return {

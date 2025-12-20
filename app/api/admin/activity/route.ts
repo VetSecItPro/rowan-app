@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { isAdmin } from '@/lib/utils/admin-check';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
+import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger';
+
+// Force dynamic rendering for admin authentication
+export const dynamic = 'force-dynamic';
 
 interface ActivityItem {
   id: string;
@@ -54,24 +59,30 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
 
-    const supabase = await createClient();
+    // Check admin authentication using secure AES-256-GCM encryption
+    const cookieStore = await safeCookiesAsync();
+    const adminSession = cookieStore.get('admin-session');
 
-    // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    if (!adminSession) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
+        { error: 'Admin authentication required' },
         { status: 401 }
       );
     }
 
-    // Check admin access
-    const isAdminUser = await isAdmin();
-    if (!isAdminUser) {
+    // Decrypt and validate admin session
+    try {
+      const sessionData = await decryptSessionData(adminSession.value);
+      if (!validateSessionData(sessionData)) {
+        return NextResponse.json(
+          { error: 'Invalid or expired session' },
+          { status: 401 }
+        );
+      }
+    } catch {
       return NextResponse.json(
-        { success: false, error: 'Forbidden - Admin access required' },
-        { status: 403 }
+        { error: 'Invalid session' },
+        { status: 401 }
       );
     }
 
@@ -86,8 +97,8 @@ export async function GET(request: NextRequest) {
 
     const activities: ActivityItem[] = [];
 
-    // 1. Recent user signups from profiles table (join with auth.users is restricted)
-    const { data: recentUsers, error: usersError } = await supabase
+    // 1. Recent user signups from profiles table (using admin client to bypass RLS)
+    const { data: recentUsers, error: usersError } = await supabaseAdmin
       .from('profiles')
       .select('id, email, full_name, created_at')
       .gte('created_at', cutoffIso)
@@ -108,7 +119,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 2. Recent beta access grants
-    const { data: betaGrants, error: betaError } = await supabase
+    const { data: betaGrants, error: betaError } = await supabaseAdmin
       .from('beta_access_requests')
       .select('id, email, access_granted_at')
       .eq('access_granted', true)
@@ -131,7 +142,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 3. Recent beta feedback
-    const { data: betaFeedback, error: feedbackError } = await supabase
+    const { data: betaFeedback, error: feedbackError } = await supabaseAdmin
       .from('beta_feedback')
       .select(`
         id,
@@ -160,7 +171,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 4. Recent feedback submissions
-    const { data: feedbackSubmissions, error: submissionsError } = await supabase
+    const { data: feedbackSubmissions, error: submissionsError } = await supabaseAdmin
       .from('feedback_submissions')
       .select(`
         id,
