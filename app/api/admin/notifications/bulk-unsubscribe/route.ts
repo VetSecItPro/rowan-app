@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import { safeCookies } from '@/lib/utils/safe-cookies';
+import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger';
 
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check admin authentication using secure AES-256-GCM encryption
-    const cookieStore = safeCookies();
+    const cookieStore = await safeCookiesAsync();
     const adminSession = cookieStore.get('admin-session');
 
     if (!adminSession) {

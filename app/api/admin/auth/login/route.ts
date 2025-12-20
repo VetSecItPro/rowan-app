@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import { safeCookies } from '@/lib/utils/safe-cookies';
+import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { encryptSessionData } from '@/lib/utils/session-crypto-edge';
 import { createClient as createStandaloneClient } from '@supabase/supabase-js';
 
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
 
     // Set admin session cookie
     // Use path '/' so cookie is available to both /admin pages and /api/admin routes
-    const cookieStore = safeCookies();
+    const cookieStore = await safeCookiesAsync();
     cookieStore.set('admin-session', sessionPayload, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
