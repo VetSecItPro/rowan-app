@@ -71,7 +71,7 @@ WITH CHECK (
 
 CREATE POLICY "Users can view own invite code" ON public.beta_invite_codes
 FOR SELECT
-USING (user_id = (select auth.uid()));
+USING (used_by = (select auth.uid()));
 
 
 -- Fix feature_events policy
