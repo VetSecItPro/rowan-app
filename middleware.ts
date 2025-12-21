@@ -118,7 +118,23 @@ export async function middleware(req: NextRequest) {
     try {
       const { data: adminData, error: adminError } = await supabase.rpc('get_admin_details');
 
-      if (adminError || !adminData || adminData.length === 0) {
+      if (adminError) {
+        // RPC error - log details and redirect with specific error
+        logger.error('Admin RPC error', adminError, {
+          component: 'middleware',
+          action: 'admin_rpc_check',
+          path: req.nextUrl.pathname,
+          errorCode: adminError.code,
+          errorMessage: adminError.message,
+        });
+        const redirectUrl = new URL('/dashboard', req.url);
+        redirectUrl.searchParams.set('error', 'admin_rpc_error');
+        const res = NextResponse.redirect(redirectUrl);
+        res.cookies.delete('admin-session');
+        return res;
+      }
+
+      if (!adminData || adminData.length === 0) {
         // Not an admin - redirect to dashboard with error
         const redirectUrl = new URL('/dashboard', req.url);
         redirectUrl.searchParams.set('error', 'admin_required');
