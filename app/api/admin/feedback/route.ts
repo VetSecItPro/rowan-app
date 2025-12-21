@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { feedbackService } from '@/lib/services/feedback-service';
-import { isAdmin } from '@/lib/utils/admin-check';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { FeedbackStatus, FeedbackType } from '@/lib/types';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
+import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
+import { sanitizeSearchInput } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+
+// Force dynamic rendering for admin authentication
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,24 +20,30 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
 
-    const supabase = await createClient();
+    // Check admin authentication
+    const cookieStore = await safeCookiesAsync();
+    const adminSession = cookieStore.get('admin-session');
 
-    // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    if (!adminSession) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
+        { error: 'Admin authentication required' },
         { status: 401 }
       );
     }
 
-    // Check admin access
-    const isAdminUser = await isAdmin();
-    if (!isAdminUser) {
+    // Decrypt and validate admin session
+    try {
+      const sessionData = await decryptSessionData(adminSession.value);
+      if (!validateSessionData(sessionData)) {
+        return NextResponse.json(
+          { error: 'Invalid or expired session' },
+          { status: 401 }
+        );
+      }
+    } catch {
       return NextResponse.json(
-        { success: false, error: 'Forbidden - Admin access required' },
-        { status: 403 }
+        { error: 'Invalid session' },
+        { status: 401 }
       );
     }
 
@@ -43,27 +53,43 @@ export async function GET(request: NextRequest) {
     const feedback_type = searchParams.get('feedback_type') as FeedbackType | null;
     const search = searchParams.get('search');
 
-    const filters: {
-      status?: FeedbackStatus;
-      feedback_type?: string;
-      search?: string;
-    } = {};
+    // Fetch feedback directly with supabaseAdmin (bypasses RLS)
+    let query = supabaseAdmin
+      .from('feedback_submissions')
+      .select(`
+        *,
+        user:users(id, name, email, avatar_url)
+      `)
+      .order('created_at', { ascending: false });
 
-    if (status) filters.status = status;
-    if (feedback_type) filters.feedback_type = feedback_type;
-    if (search) filters.search = search;
+    // Apply filters
+    if (status) {
+      query = query.eq('status', status);
+    }
 
-    // Fetch feedback
-    const result = await feedbackService.getAllFeedback(filters);
+    if (feedback_type) {
+      query = query.eq('feedback_type', feedback_type);
+    }
 
-    if (!result.success) {
+    if (search) {
+      // Search in description and feature_name (sanitized to prevent SQL injection)
+      const sanitizedSearch = sanitizeSearchInput(search);
+      if (sanitizedSearch) {
+        query = query.or(`description.ilike.%${sanitizedSearch}%,feature_name.ilike.%${sanitizedSearch}%`);
+      }
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      logger.error('Error fetching feedback:', error, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
-        { success: false, error: result.error },
+        { success: false, error: error.message },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ success: true, data: result.data });
+    return NextResponse.json({ success: true, data });
   } catch (error: any) {
     logger.error('Error in admin feedback API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import { safeCookies } from '@/lib/utils/safe-cookies';
+import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger';
 
@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
 interface AdminUser {
   id: string;
   email: string;
-  full_name: string | null;
+  name: string | null;
   avatar_url: string | null;
   is_beta_tester: boolean | null;
   beta_status: string | null;
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Check admin authentication using secure AES-256-GCM encryption
-    const cookieStore = safeCookies();
+    const cookieStore = await safeCookiesAsync();
     const adminSession = cookieStore.get('admin-session');
 
     if (!adminSession) {
@@ -86,16 +86,13 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Create Supabase client
-    const supabase = await createClient();
-
-    // Get all users with their presence info
-    const { data: users, error: usersError } = await supabase
+    // Get all users with their presence info (using admin client to bypass RLS)
+    const { data: users, error: usersError } = await supabaseAdmin
       .from('users')
       .select(`
         id,
         email,
-        full_name,
+        name,
         avatar_url,
         is_beta_tester,
         beta_status,
@@ -112,12 +109,12 @@ export async function GET(req: NextRequest) {
     }
 
     // Get beta access requests for additional info
-    const { data: betaRequests, error: betaError } = await supabase
+    const { data: betaRequests, error: betaError } = await supabaseAdmin
       .from('beta_access_requests')
       .select('user_id, email, access_granted, created_at, approved_at');
 
     // Get recent activity for online users
-    const { data: recentActivity, error: activityError } = await supabase
+    const { data: recentActivity, error: activityError } = await supabaseAdmin
       .from('beta_tester_activity')
       .select('user_id, activity_type, created_at')
       .gte('created_at', new Date(Date.now() - 5 * 60 * 1000).toISOString()) // Last 5 minutes
@@ -164,6 +161,9 @@ export async function GET(req: NextRequest) {
     });
 
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
     Sentry.captureException(error, {
       tags: {
         endpoint: '/api/admin/users/online',
@@ -171,9 +171,15 @@ export async function GET(req: NextRequest) {
       },
       extra: {
         timestamp: new Date().toISOString(),
+        errorMessage,
+        errorStack,
       },
     });
-    logger.error('[API] /api/admin/users/online GET error:', error, { component: 'api-route', action: 'api_request' });
+    logger.error('[API] /api/admin/users/online GET error:', error, {
+      component: 'api-route',
+      action: 'api_request',
+      errorMessage,
+    });
     return NextResponse.json(
       { error: 'Failed to fetch user data' },
       { status: 500 }

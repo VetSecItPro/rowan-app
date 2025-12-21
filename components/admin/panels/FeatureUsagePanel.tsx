@@ -4,16 +4,10 @@ import { useState, memo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   Layers,
-  Eye,
-  Users,
-  MousePointerClick,
   TrendingUp,
   TrendingDown,
   Minus,
   RefreshCw,
-  Smartphone,
-  Monitor,
-  Tablet,
 } from 'lucide-react';
 
 interface FeatureUsageSummary {
@@ -155,65 +149,35 @@ export const FeatureUsagePanel = memo(function FeatureUsagePanel() {
         </button>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-1">
-            <Eye className="w-3 h-3" />
-            Page Views
-          </div>
-          <p className="text-xl font-bold text-gray-900 dark:text-white">
-            {formatNumber(data.totals.totalPageViews)}
-          </p>
+      {/* Stats Row - All 7 cards in single row */}
+      <div className="grid grid-cols-7 gap-2 flex-shrink-0">
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 text-center">
+          <p className="text-lg font-bold text-gray-900 dark:text-white">{formatNumber(data.totals.totalPageViews)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Views</p>
         </div>
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-1">
-            <Users className="w-3 h-3" />
-            Unique Users
-          </div>
-          <p className="text-xl font-bold text-gray-900 dark:text-white">
-            {formatNumber(data.totals.totalUniqueUsers)}
-          </p>
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 text-center">
+          <p className="text-lg font-bold text-gray-900 dark:text-white">{formatNumber(data.totals.totalUniqueUsers)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Users</p>
         </div>
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-1">
-            <MousePointerClick className="w-3 h-3" />
-            Actions
-          </div>
-          <p className="text-xl font-bold text-gray-900 dark:text-white">
-            {formatNumber(data.totals.totalActions)}
-          </p>
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 text-center">
+          <p className="text-lg font-bold text-gray-900 dark:text-white">{formatNumber(data.totals.totalActions)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Actions</p>
         </div>
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-1">
-            <Layers className="w-3 h-3" />
-            Active Features
-          </div>
-          <p className="text-xl font-bold text-gray-900 dark:text-white">
-            {data.summary.length}
-          </p>
+        <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-2 text-center border border-amber-200 dark:border-amber-800">
+          <p className="text-lg font-bold text-amber-600 dark:text-amber-400">{data.summary.length}</p>
+          <p className="text-xs text-amber-600 dark:text-amber-400">Features</p>
         </div>
-      </div>
-
-      {/* Device Distribution */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3">Device Distribution</p>
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div>
-            <Smartphone className="w-5 h-5 mx-auto mb-1 text-blue-500" />
-            <p className="text-lg font-bold text-gray-900 dark:text-white">{formatNumber(data.totals.deviceBreakdown.mobile)}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Mobile</p>
-          </div>
-          <div>
-            <Monitor className="w-5 h-5 mx-auto mb-1 text-purple-500" />
-            <p className="text-lg font-bold text-gray-900 dark:text-white">{formatNumber(data.totals.deviceBreakdown.desktop)}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Desktop</p>
-          </div>
-          <div>
-            <Tablet className="w-5 h-5 mx-auto mb-1 text-green-500" />
-            <p className="text-lg font-bold text-gray-900 dark:text-white">{formatNumber(data.totals.deviceBreakdown.tablet)}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Tablet</p>
-          </div>
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 text-center">
+          <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{formatNumber(data.totals.deviceBreakdown.mobile)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Mobile</p>
+        </div>
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 text-center">
+          <p className="text-lg font-bold text-purple-600 dark:text-purple-400">{formatNumber(data.totals.deviceBreakdown.desktop)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Desktop</p>
+        </div>
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 text-center">
+          <p className="text-lg font-bold text-green-600 dark:text-green-400">{formatNumber(data.totals.deviceBreakdown.tablet)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Tablet</p>
         </div>
       </div>
 

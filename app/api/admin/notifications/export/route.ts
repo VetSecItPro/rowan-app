@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import { safeCookies } from '@/lib/utils/safe-cookies';
+import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger';
 
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check admin authentication using secure AES-256-GCM encryption
-    const cookieStore = safeCookies();
+    const cookieStore = await safeCookiesAsync();
     const adminSession = cookieStore.get('admin-session');
 
     if (!adminSession) {
@@ -58,11 +58,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { ids, format = 'csv', includeAll = false } = body;
 
-    // Create Supabase client
-    const supabase = await createClient();
-
     // Build query
-    let query = supabase
+    let query = supabaseAdmin
       .from('launch_notifications')
       .select('*')
       .order('created_at', { ascending: false });
@@ -157,7 +154,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     // Check admin authentication using secure AES-256-GCM encryption
-    const cookieStore = safeCookies();
+    const cookieStore = await safeCookiesAsync();
     const adminSession = cookieStore.get('admin-session');
 
     if (!adminSession) {

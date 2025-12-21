@@ -99,7 +99,7 @@ export const BetaProgramPanel = memo(function BetaProgramPanel() {
     approvedRequests: 0,
     pendingRequests: 0,
     activeUsers: 0,
-    capacity: 30,
+    capacity: 100, // Beta program has 100 user capacity
     conversionRate: 0,
     averageActivityScore: 0,
   };

@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { feedbackService } from '@/lib/services/feedback-service';
-import { isAdmin } from '@/lib/utils/admin-check';
 import { UpdateFeedbackInput } from '@/lib/types';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
+import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger';
+
+// Force dynamic rendering for admin authentication
+export const dynamic = 'force-dynamic';
 
 export async function PATCH(
   request: NextRequest,
@@ -19,24 +23,30 @@ export async function PATCH(
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
 
-    const supabase = await createClient();
+    // Check admin authentication
+    const cookieStore = await safeCookiesAsync();
+    const adminSession = cookieStore.get('admin-session');
 
-    // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    if (!adminSession) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
+        { error: 'Admin authentication required' },
         { status: 401 }
       );
     }
 
-    // Check admin access
-    const isAdminUser = await isAdmin();
-    if (!isAdminUser) {
+    // Decrypt and validate admin session
+    try {
+      const sessionData = await decryptSessionData(adminSession.value);
+      if (!validateSessionData(sessionData)) {
+        return NextResponse.json(
+          { error: 'Invalid or expired session' },
+          { status: 401 }
+        );
+      }
+    } catch {
       return NextResponse.json(
-        { success: false, error: 'Forbidden - Admin access required' },
-        { status: 403 }
+        { error: 'Invalid session' },
+        { status: 401 }
       );
     }
 
@@ -80,24 +90,30 @@ export async function DELETE(
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
 
-    const supabase = await createClient();
+    // Check admin authentication
+    const cookieStore = await safeCookiesAsync();
+    const adminSession = cookieStore.get('admin-session');
 
-    // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    if (!adminSession) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
+        { error: 'Admin authentication required' },
         { status: 401 }
       );
     }
 
-    // Check admin access
-    const isAdminUser = await isAdmin();
-    if (!isAdminUser) {
+    // Decrypt and validate admin session
+    try {
+      const sessionData = await decryptSessionData(adminSession.value);
+      if (!validateSessionData(sessionData)) {
+        return NextResponse.json(
+          { error: 'Invalid or expired session' },
+          { status: 401 }
+        );
+      }
+    } catch {
       return NextResponse.json(
-        { success: false, error: 'Forbidden - Admin access required' },
-        { status: 403 }
+        { error: 'Invalid session' },
+        { status: 401 }
       );
     }
 

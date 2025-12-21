@@ -70,56 +70,8 @@ const ErrorFallback = ({
 );
 
 /**
- * Admin Analytics Dashboard - Dynamic Import
- * Heavy component with complex chart components (5.32 kB)
- */
-export const AdminAnalyticsPage = dynamic(
-  () => import('@/app/admin/analytics/page').then(mod => ({ default: mod.default })),
-  {
-    loading: () => <LoadingFallback text="Loading analytics dashboard..." size="lg" />,
-    ssr: false, // Admin pages don't need SSR
-  }
-);
-
-/**
- * Admin Users Management - Dynamic Import
- * Heavy component with user management tables (4.24 kB)
- */
-export const AdminUsersPage = dynamic(
-  () => import('@/app/admin/users/page').then(mod => ({ default: mod.default })),
-  {
-    loading: () => <LoadingFallback text="Loading user management..." size="lg" />,
-    ssr: false,
-  }
-);
-
-/**
- * Admin Beta Management - Dynamic Import
- * Beta user management component (5.54 kB)
- */
-export const AdminBetaPage = dynamic(
-  () => import('@/app/admin/beta/page').then(mod => ({ default: mod.default })),
-  {
-    loading: () => <LoadingFallback text="Loading beta management..." size="lg" />,
-    ssr: false,
-  }
-);
-
-/**
- * Admin Notifications - Dynamic Import
- * Notifications management component (5.3 kB)
- */
-export const AdminNotificationsPage = dynamic(
-  () => import('@/app/admin/notifications/page').then(mod => ({ default: mod.default })),
-  {
-    loading: () => <LoadingFallback text="Loading notifications..." size="lg" />,
-    ssr: false,
-  }
-);
-
-/**
  * Admin Dashboard - Dynamic Import
- * Main admin dashboard component (4.72 kB)
+ * Unified admin operations dashboard (all functionality in one place)
  */
 export const AdminDashboardPage = dynamic(
   () => import('@/app/admin/dashboard/page').then(mod => ({ default: mod.default })),

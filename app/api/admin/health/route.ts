@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import { safeCookies } from '@/lib/utils/safe-cookies';
+import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger';
 
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Check admin authentication
-    const cookieStore = safeCookies();
+    const cookieStore = await safeCookiesAsync();
     const adminSession = cookieStore.get('admin-session');
 
     if (!adminSession) {
@@ -76,8 +76,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Create Supabase client
-    const supabase = await createClient();
     const now = new Date().toISOString();
 
     // Health checks array
@@ -86,7 +84,7 @@ export async function GET(req: NextRequest) {
       (async (): Promise<HealthMetric> => {
         try {
           const start = Date.now();
-          const { error } = await supabase.from('beta_access_requests').select('id').limit(1);
+          const { error } = await supabaseAdmin.from('beta_access_requests').select('id').limit(1);
           const responseTime = Date.now() - start;
 
           if (error) {
@@ -120,7 +118,7 @@ export async function GET(req: NextRequest) {
       // Beta program capacity check
       (async (): Promise<HealthMetric> => {
         try {
-          const { data, error } = await supabase
+          const { data, error } = await supabaseAdmin
             .from('beta_access_requests')
             .select('*', { count: 'exact', head: true })
             .eq('access_granted', true)
@@ -129,7 +127,7 @@ export async function GET(req: NextRequest) {
           if (error) throw error;
 
           const activeBetaUsers = Number(data) || 0;
-          const capacity = 30;
+          const capacity = 100; // Beta program capacity is 100 users
           const usage = Math.round((activeBetaUsers / capacity) * 100);
 
           return {
@@ -208,7 +206,7 @@ export async function GET(req: NextRequest) {
         try {
           const testStart = Date.now();
           // Test a simple database query to measure API response time
-          await supabase.from('beta_access_requests').select('id').limit(1);
+          await supabaseAdmin.from('beta_access_requests').select('id').limit(1);
           const apiResponseTime = Date.now() - testStart;
 
           return {
