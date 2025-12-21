@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect, memo, useCallback, Suspense } from 'react';
+import { useState, memo, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useTheme } from 'next-themes';
 import { useQuery } from '@tanstack/react-query';
 import {
   Users,
@@ -15,22 +14,17 @@ import {
   RefreshCw,
   Monitor,
   BarChart3,
-  Sun,
-  Moon,
   ArrowLeft,
   MessageSquare,
   CreditCard,
   Layers,
-  ExternalLink,
   Clock,
   UserPlus,
-  CheckCircle,
-  Bell,
   HeartPulse,
-  TestTube,
   Download,
   type LucideIcon
 } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 // Import content panels for tabbed management console
 import {
@@ -38,7 +32,6 @@ import {
   BetaProgramPanel,
   AnalyticsPanel,
   FeatureUsagePanel,
-  FeedbackPanel,
   SubscriptionsPanel,
   BetaFeedbackPanel,
   NotificationsPanel,
@@ -64,7 +57,7 @@ interface ActivityItem {
   email?: string;
 }
 
-type TabId = 'users' | 'beta' | 'notifications' | 'analytics' | 'subscriptions' | 'features' | 'beta-feedback' | 'feedback' | 'health' | 'export';
+type TabId = 'users' | 'beta' | 'notifications' | 'analytics' | 'subscriptions' | 'features' | 'feedback' | 'health' | 'export';
 
 interface Tab {
   id: TabId;
@@ -75,12 +68,11 @@ interface Tab {
 
 const TABS: Tab[] = [
   { id: 'users', label: 'Users', icon: Users, color: 'text-blue-500' },
-  { id: 'beta', label: 'Beta', icon: Shield, color: 'text-purple-500' },
-  { id: 'notifications', label: 'Launch', icon: Mail, color: 'text-green-500' },
+  { id: 'beta', label: 'Beta Program', icon: Shield, color: 'text-purple-500' },
+  { id: 'notifications', label: 'Launch Signups', icon: Mail, color: 'text-green-500' },
   { id: 'analytics', label: 'Analytics', icon: BarChart3, color: 'text-cyan-500' },
-  { id: 'subscriptions', label: 'Subs', icon: CreditCard, color: 'text-emerald-500' },
+  { id: 'subscriptions', label: 'Subscriptions', icon: CreditCard, color: 'text-emerald-500' },
   { id: 'features', label: 'Features', icon: Layers, color: 'text-amber-500' },
-  { id: 'beta-feedback', label: 'Beta FB', icon: TestTube, color: 'text-violet-500' },
   { id: 'feedback', label: 'Feedback', icon: MessageSquare, color: 'text-pink-500' },
   { id: 'health', label: 'Health', icon: HeartPulse, color: 'text-red-500' },
   { id: 'export', label: 'Export', icon: Download, color: 'text-gray-500' },
@@ -221,14 +213,12 @@ const StatsSkeleton = memo(function StatsSkeleton() {
 });
 
 function AdminDashboardContent() {
-  const { theme, setTheme } = useTheme();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [mounted, setMounted] = useState(false);
 
   // Get initial tab from URL or default to null (no default tab)
   const tabFromUrl = searchParams.get('tab') as TabId | null;
-  const validTabs: TabId[] = ['users', 'beta', 'notifications', 'analytics', 'subscriptions', 'features', 'beta-feedback', 'feedback', 'health', 'export'];
+  const validTabs: TabId[] = ['users', 'beta', 'notifications', 'analytics', 'subscriptions', 'features', 'feedback', 'health', 'export'];
   const initialTab = tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : null;
 
   const [activeTab, setActiveTabState] = useState<TabId | null>(initialTab);
@@ -240,11 +230,6 @@ function AdminDashboardContent() {
     params.set('tab', tab);
     router.replace(`?${params.toString()}`, { scroll: false });
   }, [router, searchParams]);
-
-  // Prevent hydration mismatch with theme
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Use React Query with stale-while-revalidate for instant loading
   const { data: stats, isLoading, isFetching, refetch } = useQuery({
@@ -348,10 +333,8 @@ function AdminDashboardContent() {
         return <SubscriptionsPanel />;
       case 'features':
         return <FeatureUsagePanel />;
-      case 'beta-feedback':
-        return <BetaFeedbackPanel />;
       case 'feedback':
-        return <FeedbackPanel />;
+        return <BetaFeedbackPanel />;
       case 'health':
         return <HealthPanel />;
       case 'export':
@@ -388,14 +371,7 @@ function AdminDashboardContent() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              {mounted && (
-                <button
-                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                  className="p-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                >
-                  {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                </button>
-              )}
+              <ThemeToggle />
               <button
                 onClick={() => refetch()}
                 disabled={isFetching}
@@ -434,11 +410,11 @@ function AdminDashboardContent() {
             />
             <StatCard
               title="Beta Users"
-              value={`${stats.betaUsers}/30`}
+              value={`${stats.betaUsers}/100`}
               icon={Shield}
               color="purple"
               trend={stats.betaUsers > 0 ? "up" : undefined}
-              trendValue={stats.betaUsers < 30 ? `${30 - stats.betaUsers} left` : "Full"}
+              trendValue={stats.betaUsers < 100 ? `${100 - stats.betaUsers} slots left` : "Full"}
             />
             <StatCard
               title="Launch Signups"
@@ -474,12 +450,12 @@ function AdminDashboardContent() {
               <Monitor className="w-4 h-4 text-emerald-500" />
               System Status
             </h3>
-            <Link
-              href="/admin/health"
+            <button
+              onClick={() => setActiveTab('health')}
               className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
             >
               View Details
-            </Link>
+            </button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="flex items-center gap-2">
@@ -507,7 +483,7 @@ function AdminDashboardContent() {
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               <div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">Beta</p>
-                <p className="text-xs text-gray-500">{stats?.betaUsers ?? 0}/30</p>
+                <p className="text-xs text-gray-500">{stats?.betaUsers ?? 0}/100</p>
               </div>
             </div>
           </div>
@@ -562,23 +538,6 @@ function AdminDashboardContent() {
                   />
                 ))}
               </div>
-              {activeTab && (
-                <Link
-                  href={`/admin/${
-                    activeTab === 'users' ? 'users' :
-                    activeTab === 'beta' ? 'beta' :
-                    activeTab === 'features' ? 'feature-usage' :
-                    activeTab === 'beta-feedback' ? 'beta-feedback' :
-                    activeTab === 'feedback' ? 'beta-feedback' :
-                    activeTab === 'export' ? 'health' :
-                    activeTab
-                  }`}
-                  className="flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors flex-shrink-0 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  <span className="hidden sm:inline">Full Page</span>
-                </Link>
-              )}
             </div>
           </div>
 
