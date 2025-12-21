@@ -213,12 +213,12 @@ export function RewardsManagement({
     <>
       <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 ${className}`}>
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-          <div className="flex items-center justify-between">
-            <div>
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex-1 min-w-0">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                <Gift className="w-5 h-5 text-amber-500" />
-                Manage Family Rewards
+                <Gift className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                <span className="truncate">Manage Family Rewards</span>
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 Create rewards your family can earn by completing tasks and chores
@@ -226,7 +226,7 @@ export function RewardsManagement({
             </div>
             <button
               onClick={openCreateModal}
-              className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors font-medium"
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors font-medium text-sm whitespace-nowrap flex-shrink-0"
             >
               <Plus className="w-4 h-4" />
               Add Reward
@@ -236,13 +236,13 @@ export function RewardsManagement({
 
         {/* Error Message */}
         {error && (
-          <div className="mx-6 mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <div className="mx-4 sm:mx-6 mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
             <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
           </div>
         )}
 
         {/* Rewards List */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {rewards.length === 0 ? (
             <div className="text-center py-12">
               <Gift className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />

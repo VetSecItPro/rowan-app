@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import { safeCookies } from '@/lib/utils/safe-cookies';
+import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger';
 
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Check admin authentication using secure AES-256-GCM encryption
-    const cookieStore = safeCookies();
+    const cookieStore = await safeCookiesAsync();
     const adminSession = cookieStore.get('admin-session');
 
     if (!adminSession) {
@@ -57,11 +57,8 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Create Supabase client
-    const supabase = await createClient();
-
     // Get beta users by joining beta_access_requests with auth.users
-    const { data: betaRequests, error: betaError } = await supabase
+    const { data: betaRequests, error: betaError } = await supabaseAdmin
       .from('beta_access_requests')
       .select('user_id, email, created_at, approved_at')
       .eq('access_granted', true)
@@ -78,7 +75,7 @@ export async function GET(req: NextRequest) {
       const userIds = betaRequests.map((request: any) => request.user_id);
 
       // Get auth users data
-      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers({
+      const { data: authUsers, error: authError } = await supabaseAdmin.auth.admin.listUsers({
         page: 1,
         perPage: 1000, // Adjust as needed
       });

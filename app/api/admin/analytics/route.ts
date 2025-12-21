@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import { cookies } from 'next/headers';
+import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { withCache, ADMIN_CACHE_KEYS, ADMIN_CACHE_TTL } from '@/lib/services/admin-cache-service';
 import { logger } from '@/lib/logger';
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Check admin authentication
-    const cookieStore = await cookies();
+    const cookieStore = await safeCookiesAsync();
     const adminSession = cookieStore.get('admin-session');
 
     if (!adminSession) {
@@ -58,9 +58,6 @@ export async function GET(req: NextRequest) {
         { status: 401 }
       );
     }
-
-    // Create Supabase client
-    const supabase = await createClient();
 
     // Get query parameters for time range
     const { searchParams } = new URL(req.url);
@@ -93,22 +90,22 @@ export async function GET(req: NextRequest) {
           usersResult,
           betaUsersResult,
         ] = await Promise.allSettled([
-          // Beta requests over time
-          supabase
+          // Beta requests over time (using admin client to bypass RLS)
+          supabaseAdmin
             .from('beta_access_requests')
             .select('created_at, access_granted')
             .gte('created_at', startDate.toISOString())
             .order('created_at', { ascending: true }),
 
           // Launch notifications over time
-          supabase
+          supabaseAdmin
             .from('launch_notifications')
             .select('created_at, source')
             .gte('created_at', startDate.toISOString())
             .order('created_at', { ascending: true }),
 
           // User registrations over time (from beta users)
-          supabase
+          supabaseAdmin
             .from('beta_access_requests')
             .select('approved_at, user_id')
             .not('user_id', 'is', null)
@@ -116,7 +113,7 @@ export async function GET(req: NextRequest) {
             .order('approved_at', { ascending: true }),
 
           // Current beta user activity
-          supabase
+          supabaseAdmin
             .from('beta_access_requests')
             .select('user_id, email, created_at, approved_at')
             .eq('access_granted', true)
@@ -164,8 +161,8 @@ export async function GET(req: NextRequest) {
         const totalLaunchNotifications = launchNotifications.length;
         const totalUserRegistrations = userRegistrations.length;
 
-        // Beta program status
-        const betaCapacity = 30;
+        // Beta program status (100 users limit)
+        const betaCapacity = 100;
         const activeBetaUsers = betaUsers.length;
         const capacityUsage = Math.round((activeBetaUsers / betaCapacity) * 100);
 

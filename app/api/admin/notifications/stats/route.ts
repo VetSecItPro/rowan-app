@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import { safeCookies } from '@/lib/utils/safe-cookies';
+import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger';
 
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Check admin authentication
-    const cookieStore = safeCookies();
+    const cookieStore = await safeCookiesAsync();
     const adminSession = cookieStore.get('admin-session');
 
     if (!adminSession) {
@@ -57,9 +57,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Create Supabase client
-    const supabase = await createClient();
-
     // Get date ranges
     const today = new Date().toISOString().split('T')[0];
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -74,37 +71,37 @@ export async function GET(req: NextRequest) {
       sourcesResult,
     ] = await Promise.allSettled([
       // Total notifications
-      supabase
+      supabaseAdmin
         .from('launch_notifications')
         .select('*', { count: 'exact', head: true }),
 
       // Subscribed count
-      supabase
+      supabaseAdmin
         .from('launch_notifications')
         .select('*', { count: 'exact', head: true })
         .eq('subscribed', true),
 
       // Unsubscribed count
-      supabase
+      supabaseAdmin
         .from('launch_notifications')
         .select('*', { count: 'exact', head: true })
         .eq('subscribed', false),
 
       // Today's signups
-      supabase
+      supabaseAdmin
         .from('launch_notifications')
         .select('*', { count: 'exact', head: true })
         .gte('created_at', `${today}T00:00:00.000Z`)
         .lt('created_at', `${today}T23:59:59.999Z`),
 
       // This week's signups
-      supabase
+      supabaseAdmin
         .from('launch_notifications')
         .select('*', { count: 'exact', head: true })
         .gte('created_at', `${weekAgo}T00:00:00.000Z`),
 
       // Source breakdown
-      supabase
+      supabaseAdmin
         .from('launch_notifications')
         .select('source')
         .eq('subscribed', true),

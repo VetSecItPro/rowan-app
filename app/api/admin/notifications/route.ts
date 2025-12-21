@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import { safeCookies } from '@/lib/utils/safe-cookies';
+import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { sanitizeSearchInput } from '@/lib/utils';
 import { z } from 'zod';
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Check admin authentication using secure AES-256-GCM encryption
-    const cookieStore = safeCookies();
+    const cookieStore = await safeCookiesAsync();
     const adminSession = cookieStore.get('admin-session');
 
     if (!adminSession) {
@@ -66,9 +66,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Create Supabase client
-    const supabase = await createClient();
-
     // Parse and validate query parameters
     const { searchParams } = new URL(req.url);
     const validatedParams = QueryParamsSchema.parse({
@@ -80,7 +77,7 @@ export async function GET(req: NextRequest) {
     const { page, limit, status, search } = validatedParams;
 
     // Build query
-    let query = supabase
+    let query = supabaseAdmin
       .from('launch_notifications')
       .select('*', { count: 'exact' })
       .order('created_at', { ascending: false });
