@@ -53,29 +53,29 @@ export default function RewardsPage() {
               </div>
 
               {/* Action buttons */}
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
                 {/* Parent Management Toggle */}
                 {isParent && (
                   <button
                     onClick={() => setShowManagement(!showManagement)}
-                    className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                    className={`px-3 py-2 rounded-lg transition-colors flex items-center gap-2 text-sm ${
                       showManagement
                         ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700'
                         : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                     }`}
                   >
                     <Settings className="w-4 h-4" />
-                    <span className="text-sm">{showManagement ? 'View Shop' : 'Manage Rewards'}</span>
+                    <span>{showManagement ? 'View Shop' : 'Manage'}</span>
                   </button>
                 )}
 
                 {/* Quick link to tasks */}
                 <Link
                   href="/tasks"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                  className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm"
                 >
                   <TrendingUp className="w-4 h-4" />
-                  <span className="text-sm">Earn More Points</span>
+                  <span>Earn More Points</span>
                 </Link>
               </div>
             </div>

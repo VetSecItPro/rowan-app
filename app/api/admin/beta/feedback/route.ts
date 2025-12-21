@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import { safeCookies } from '@/lib/utils/safe-cookies';
+import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger';
 
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Check admin authentication using secure AES-256-GCM encryption
-    const cookieStore = safeCookies();
+    const cookieStore = await safeCookiesAsync();
     const adminSession = cookieStore.get('admin-session');
 
     if (!adminSession) {
@@ -57,11 +57,8 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Create Supabase client
-    const supabase = await createClient();
-
     // Get all feedback with user information and engagement metrics
-    const { data: feedback, error: feedbackError } = await supabase
+    const { data: feedback, error: feedbackError } = await supabaseAdmin
       .from('beta_feedback')
       .select(`
         id,
@@ -89,6 +86,12 @@ export async function GET(req: NextRequest) {
     }
 
     // Get engagement metrics (votes and comments count) for each feedback item
+    interface UserInfo {
+      id: string;
+      email: string;
+      full_name?: string;
+      avatar_url?: string;
+    }
     interface FeedbackItem {
       id: string;
       title: string;
@@ -101,32 +104,29 @@ export async function GET(req: NextRequest) {
       updated_at?: string;
       admin_response?: string;
       admin_notes?: string;
-      users: {
-        id: string;
-        email: string;
-        full_name?: string;
-        avatar_url?: string;
-      };
+      users: UserInfo | UserInfo[];
     }
     const feedbackWithMetrics = await Promise.all(
       (feedback || []).map(async (item: FeedbackItem) => {
         // Get votes count
-        const { count: votesCount, error: votesError } = await supabase
+        const { count: votesCount, error: votesError } = await supabaseAdmin
           .from('beta_feedback_votes')
           .select('*', { count: 'exact', head: true })
           .eq('feedback_id', item.id);
 
         // Get comments count
-        const { count: commentsCount, error: commentsError } = await supabase
+        const { count: commentsCount, error: commentsError } = await supabaseAdmin
           .from('beta_feedback_comments')
           .select('*', { count: 'exact', head: true })
           .eq('feedback_id', item.id);
 
+        // Handle users - can be object or array depending on Supabase response
+        const userInfo = Array.isArray(item.users) ? item.users[0] : item.users;
         return {
           ...item,
           votes_count: votesError ? 0 : (votesCount || 0),
           comments_count: commentsError ? 0 : (commentsCount || 0),
-          user: item.users
+          user: userInfo
         };
       })
     );

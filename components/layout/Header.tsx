@@ -217,7 +217,7 @@ export function Header() {
               <div className="hidden sm:flex">
                 {hasAdminAccess(user) ? (
                   <Link
-                    href="/admin/beta"
+                    href="/admin/dashboard"
                     className="flex items-center gap-1.5 px-2.5 py-1 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-300 dark:border-indigo-700 text-indigo-800 dark:text-indigo-300 rounded-full text-xs font-medium hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors"
                   >
                     <Shield className="w-3 h-3" />
@@ -338,7 +338,7 @@ export function Header() {
                     {/* Admin Dashboard - Only show for admin users */}
                     {hasAdminAccess(user) && (
                       <Link
-                        href="/admin/beta"
+                        href="/admin/dashboard"
                         onClick={() => setIsDropdownOpen(false)}
                         className="flex items-center gap-2 w-full px-4 py-2 text-sm text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors active:scale-[0.98] border-t border-gray-200/50 dark:border-gray-700/50 mt-1 pt-3"
                       >
