@@ -4,6 +4,7 @@ import { FileUploadResult } from './file-upload-service';
 import { enhancedNotificationService } from './enhanced-notification-service';
 import { sanitizeSearchInput } from '@/lib/utils/input-sanitization';
 import { logger } from '@/lib/logger';
+import { cacheAside, cacheKeys, deleteCache, deleteCachePattern, CACHE_TTL, CACHE_PREFIXES } from '@/lib/cache';
 
 /**
  * Security: Default maximum limit for list queries to prevent unbounded data retrieval
@@ -235,6 +236,11 @@ export const messagesService = {
         logger.error('Failed to send message notification:', error, { component: 'lib-messages-service', action: 'service_call' });
         // Don't throw here - message creation should succeed even if notification fails
       }
+    }
+
+    // Invalidate conversation cache (affects unread counts) - fire-and-forget
+    if (input.space_id) {
+      deleteCachePattern(`${CACHE_PREFIXES.CONVERSATIONS}${input.space_id}*`).catch(() => {});
     }
 
     return data;
@@ -859,38 +865,47 @@ export const messagesService = {
   /**
    * Get all conversations for a space with unread counts
    * Uses optimized RPC function to avoid N+1 query pattern
+   * Results are cached for 2 minutes to reduce database load
    */
   async getConversationsList(spaceId: string, userId: string): Promise<Conversation[]> {
-    const supabase = createClient();
+    const cacheKey = cacheKeys.conversations(spaceId, userId);
 
-    // Use RPC function that joins conversations with unread counts in a single query
-    // This replaces the previous N+1 pattern (1 query + N queries for unread counts)
-    const { data: conversations, error } = await supabase.rpc(
-      'get_conversations_with_unread',
-      {
-        space_id_param: spaceId,
-        user_id_param: userId,
-      }
+    return cacheAside(
+      cacheKey,
+      async () => {
+        const supabase = createClient();
+
+        // Use RPC function that joins conversations with unread counts in a single query
+        // This replaces the previous N+1 pattern (1 query + N queries for unread counts)
+        const { data: conversations, error } = await supabase.rpc(
+          'get_conversations_with_unread',
+          {
+            space_id_param: spaceId,
+            user_id_param: userId,
+          }
+        );
+
+        if (error) {
+          logger.error('Error fetching conversations with unread counts:', error, {
+            component: 'lib-messages-service',
+            action: 'service_call',
+          });
+          throw error;
+        }
+
+        if (!conversations || conversations.length === 0) {
+          return [];
+        }
+
+        // Map RPC results to Conversation interface
+        // RPC returns unread_count as BIGINT, ensure it's cast to number
+        return conversations.map((conv: Conversation & { unread_count: number | bigint }) => ({
+          ...conv,
+          unread_count: Number(conv.unread_count) || 0,
+        }));
+      },
+      CACHE_TTL.SHORT * 2 // 2 minutes - conversations change frequently
     );
-
-    if (error) {
-      logger.error('Error fetching conversations with unread counts:', error, {
-        component: 'lib-messages-service',
-        action: 'service_call',
-      });
-      throw error;
-    }
-
-    if (!conversations || conversations.length === 0) {
-      return [];
-    }
-
-    // Map RPC results to Conversation interface
-    // RPC returns unread_count as BIGINT, ensure it's cast to number
-    return conversations.map((conv: Conversation & { unread_count: number | bigint }) => ({
-      ...conv,
-      unread_count: Number(conv.unread_count) || 0,
-    }));
   },
 
   /**
@@ -919,6 +934,9 @@ export const messagesService = {
       logger.error('Error creating conversation:', error, { component: 'lib-messages-service', action: 'service_call' });
       throw error;
     }
+
+    // Invalidate conversation cache for all users in this space (fire-and-forget)
+    deleteCachePattern(`${CACHE_PREFIXES.CONVERSATIONS}${input.space_id}*`).catch(() => {});
 
     return data as Conversation;
   },

@@ -109,6 +109,16 @@
   - achievements/BadgeGallery.tsx (300ms debounce)
   - expenses/ReceiptLibrary.tsx (300ms debounce)
 
+### Batch 8 (Completed)
+- [x] Redis caching for conversation lists (2-minute TTL)
+  - Added CONVERSATIONS and GOAL_STATS cache prefixes
+  - Wrapped getConversationsList with cacheAside
+  - Cache invalidation on createConversation and createMessage
+- [x] Redis caching for goal statistics (5-minute TTL)
+  - Wrapped getGoalStats with cacheAside
+  - Cache invalidation on createGoal and updateGoal
+- [x] Updated invalidateSpaceCache to include new cache types
+
 ### Build Fixes
 - [x] beta-expiration-emails route: Use centralized supabaseAdmin (build-safe)
 
