@@ -115,8 +115,9 @@ export async function encryptSessionData(data: object): Promise<string> {
     return btoa(String.fromCharCode(...combined));
 
   } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown';
     logger.error('Session encryption failed:', error, { component: 'lib-session-crypto-edge', action: 'service_call' });
-    throw new Error('Failed to encrypt session data');
+    throw new Error(`Failed to encrypt session data: ${errorMsg}`);
   }
 }
 
