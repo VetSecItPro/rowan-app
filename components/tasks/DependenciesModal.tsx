@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useDebounce } from 'use-debounce';
 import { X, Link2, AlertCircle, Search, Trash2 } from 'lucide-react';
 import { taskDependenciesService } from '@/lib/services/task-dependencies-service';
 import { createClient } from '@/lib/supabase/client';
@@ -33,6 +34,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
   const [dependencies, setDependencies] = useState<TaskDependency[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
   const [searchResults, setSearchResults] = useState<Task[]>([]);
   const [dependencyType, setDependencyType] = useState<'blocks' | 'relates_to'>('blocks');
   const [adding, setAdding] = useState(false);
@@ -42,12 +44,12 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
   }, [isOpen, taskId]);
 
   useEffect(() => {
-    if (searchTerm.length >= 2) {
+    if (debouncedSearchTerm.length >= 2) {
       searchTasks();
     } else {
       setSearchResults([]);
     }
-  }, [searchTerm]);
+  }, [debouncedSearchTerm]);
 
   async function loadDependencies() {
     try {
