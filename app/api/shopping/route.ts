@@ -10,6 +10,7 @@ import { createShoppingListSchema } from '@/lib/validations/shopping-schemas';
 import { ZodError } from 'zod';
 import { checkUsageLimit, trackUsage } from '@/lib/middleware/usage-check';
 import { logger } from '@/lib/logger';
+import { withUserDataCache } from '@/lib/utils/cache-headers';
 
 /**
  * GET /api/shopping
@@ -78,10 +79,12 @@ export async function GET(req: NextRequest) {
     // Get shopping lists from service
     const lists = await shoppingService.getLists(spaceId);
 
-    return NextResponse.json({
-      success: true,
-      data: lists,
-    });
+    return withUserDataCache(
+      NextResponse.json({
+        success: true,
+        data: lists,
+      })
+    );
   } catch (error) {
     logger.error('[API] /api/shopping GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(

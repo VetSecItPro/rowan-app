@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -59,7 +59,7 @@ interface YearInReviewDashboardProps {
 // YEAR IN REVIEW DASHBOARD
 // =====================================================
 
-export function YearInReviewDashboard({ year, className }: YearInReviewDashboardProps) {
+export const YearInReviewDashboard = memo(function YearInReviewDashboard({ year, className }: YearInReviewDashboardProps) {
   const { currentSpace, spaces, switchSpace, user } = useAuth();
   const [data, setData] = useState<YearInReviewData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -274,7 +274,7 @@ export function YearInReviewDashboard({ year, className }: YearInReviewDashboard
       </Tabs>
     </div>
   );
-}
+});
 
 // =====================================================
 // OVERVIEW CARD COMPONENT
