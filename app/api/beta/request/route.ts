@@ -247,7 +247,8 @@ async function sendBetaInviteEmail(
 
   try {
     await resend.emails.send({
-      from: 'Rowan <hello@rowan.app>',
+      from: 'Rowan <notifications@rowanapp.com>',
+      replyTo: 'support@rowanapp.com',
       to: email,
       subject: "You're invited to Rowan Beta! 🌳",
       html: `
