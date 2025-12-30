@@ -1,0 +1,12 @@
+app/api/auth/mfa/enroll/route.ts
+app/api/auth/mfa/unenroll/route.ts
+app/api/auth/mfa/verify/route.ts
+app/api/bulk/delete-expenses/route.ts
+app/api/privacy/account-deletion/route.ts
+app/api/spaces/[spaceId]/delete/route.ts
+app/api/storage/delete/route.ts
+app/api/stripe/create-checkout-session/route.ts
+app/api/stripe/customer-portal/route.ts
+app/api/user/cancel-deletion/route.ts
+app/api/user/privacy-settings/route.ts
+app/api/user/profile/route.ts
