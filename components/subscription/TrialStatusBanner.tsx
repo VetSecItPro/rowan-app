@@ -5,9 +5,9 @@
  * Displays trial status on dashboard with countdown and upgrade CTA
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Clock, Sparkles, AlertTriangle, X, Crown, Zap } from 'lucide-react';
+import { Clock, Gift, AlertTriangle, X, Crown, Zap } from 'lucide-react';
 import { useSubscription, useSubscriptionSafe } from '@/lib/contexts/subscription-context';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -19,9 +19,10 @@ interface TrialStatusBannerProps {
 
 export function TrialStatusBanner({
   onDismiss,
-  showDismiss = false,
+  showDismiss = true,
   compact = false,
 }: TrialStatusBannerProps) {
+  const [isDismissed, setIsDismissed] = useState(false);
   const {
     isLoading,
     isInTrial,
@@ -32,8 +33,30 @@ export function TrialStatusBanner({
     effectiveTier,
   } = useSubscription();
 
-  // Don't show if loading or user has paid subscription
-  if (isLoading || tier === 'pro' || tier === 'family') {
+  // Check localStorage on mount for dismiss state (resets every 3 days)
+  useEffect(() => {
+    const dismissedTimestamp = localStorage.getItem('trial-banner-dismissed');
+    if (dismissedTimestamp) {
+      const dismissedDate = new Date(parseInt(dismissedTimestamp, 10));
+      const now = new Date();
+      const daysSinceDismissed = Math.floor((now.getTime() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24));
+      if (daysSinceDismissed < 3) {
+        setIsDismissed(true);
+      } else {
+        // Clear old dismissal
+        localStorage.removeItem('trial-banner-dismissed');
+      }
+    }
+  }, []);
+
+  const handleDismiss = () => {
+    localStorage.setItem('trial-banner-dismissed', Date.now().toString());
+    setIsDismissed(true);
+    onDismiss?.();
+  };
+
+  // Don't show if loading, user has paid subscription, or dismissed
+  if (isLoading || tier === 'pro' || tier === 'family' || isDismissed) {
     return null;
   }
 
@@ -67,7 +90,7 @@ export function TrialStatusBanner({
                 </div>
               ) : (
                 <div className="flex-shrink-0 rounded-full bg-white/20 p-2">
-                  <Sparkles className="h-5 w-5 text-white" />
+                  <Gift className="h-5 w-5 text-white" />
                 </div>
               )}
 
@@ -100,9 +123,9 @@ export function TrialStatusBanner({
                 <span>Upgrade</span>
               </Link>
 
-              {showDismiss && onDismiss && (
+              {showDismiss && (
                 <button
-                  onClick={onDismiss}
+                  onClick={handleDismiss}
                   className="rounded-full p-1.5 text-white/70 hover:bg-white/10 hover:text-white transition-colors"
                   aria-label="Dismiss banner"
                 >
@@ -167,9 +190,9 @@ export function TrialStatusBanner({
                 <span>Upgrade Now</span>
               </Link>
 
-              {showDismiss && onDismiss && (
+              {showDismiss && (
                 <button
-                  onClick={onDismiss}
+                  onClick={handleDismiss}
                   className="rounded-full p-1.5 text-gray-400 hover:bg-white/10 hover:text-white transition-colors"
                   aria-label="Dismiss banner"
                 >
