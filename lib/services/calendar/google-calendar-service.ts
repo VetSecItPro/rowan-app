@@ -51,28 +51,30 @@ async function getAuthenticatedClient(connectionId: string) {
 
   logger.info('[OAuth] Getting tokens for connection:', { component: 'lib-google-calendar-service', data: connectionId });
 
-  // Get tokens from vault using RPC
-  const { data: accessToken, error: accessError } = await supabase
-    .rpc('get_oauth_token', {
+  // PERFORMANCE: Fetch both tokens in parallel instead of sequential
+  const [accessResult, refreshResult] = await Promise.all([
+    supabase.rpc('get_oauth_token', {
       p_connection_id: connectionId,
       p_token_type: 'access_token',
-    });
+    }),
+    supabase.rpc('get_oauth_token', {
+      p_connection_id: connectionId,
+      p_token_type: 'refresh_token',
+    }),
+  ]);
 
-  if (accessError) {
-    logger.error('[OAuth] Failed to get access token:', accessError, { component: 'lib-google-calendar-service', action: 'service_call' });
+  if (accessResult.error) {
+    logger.error('[OAuth] Failed to get access token:', accessResult.error, { component: 'lib-google-calendar-service', action: 'service_call' });
     throw new Error('Failed to retrieve access token');
   }
 
-  const { data: refreshToken, error: refreshError } = await supabase
-    .rpc('get_oauth_token', {
-      p_connection_id: connectionId,
-      p_token_type: 'refresh_token',
-    });
-
-  if (refreshError) {
-    logger.error('[OAuth] Failed to get refresh token:', refreshError, { component: 'lib-google-calendar-service', action: 'service_call' });
+  if (refreshResult.error) {
+    logger.error('[OAuth] Failed to get refresh token:', refreshResult.error, { component: 'lib-google-calendar-service', action: 'service_call' });
     throw new Error('Failed to retrieve refresh token');
   }
+
+  const accessToken = accessResult.data;
+  const refreshToken = refreshResult.data;
 
   // Check if tokens were actually retrieved (never log token values, only success/failure)
   logger.info('[OAuth] Token retrieval status:', { component: 'lib-google-calendar-service', data: { access: !!accessToken, refresh: !!refreshToken } });
