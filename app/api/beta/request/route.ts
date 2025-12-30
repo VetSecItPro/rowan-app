@@ -133,9 +133,11 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Resend the existing code
+      // Resend the existing code (non-blocking for fast response)
       if (resend) {
-        await sendBetaInviteEmail(normalizedEmail, existingCode.code, name);
+        sendBetaInviteEmail(normalizedEmail, existingCode.code, name).catch((err) => {
+          console.error('Failed to resend beta invite email:', err);
+        });
       }
 
       return NextResponse.json({
@@ -197,18 +199,16 @@ export async function POST(req: NextRequest) {
       created_at: new Date().toISOString(),
     });
 
-    // Send the invite email
+    // Send the invite email (non-blocking for fast response)
     if (resend) {
-      const emailResult = await sendBetaInviteEmail(normalizedEmail, inviteCode, name);
-      if (!emailResult.success) {
-        // Log email failure but don't fail the request
-        console.error('Failed to send beta invite email:', emailResult.error);
-      }
+      sendBetaInviteEmail(normalizedEmail, inviteCode, name).catch((err) => {
+        console.error('Failed to send beta invite email:', err);
+      });
     }
 
-    // Increment daily analytics
+    // Increment daily analytics (non-blocking)
     const today = new Date().toISOString().split('T')[0];
-    await supabaseAdmin.rpc('increment_beta_requests', { target_date: today });
+    supabaseAdmin.rpc('increment_beta_requests', { target_date: today }).catch(() => {});
 
     return NextResponse.json({
       success: true,
