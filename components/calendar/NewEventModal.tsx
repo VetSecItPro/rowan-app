@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { X, Smile, Image as ImageIcon, Paperclip, Calendar, ChevronDown, ShoppingCart, Trash2, Timer } from 'lucide-react';
 import { CreateEventInput, CalendarEvent } from '@/lib/services/calendar-service';
 import { eventAttachmentsService } from '@/lib/services/event-attachments-service';
@@ -51,7 +51,7 @@ const ALLOWED_FILE_TYPES = [
 
 const ALLOWED_FILE_EXTENSIONS = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.txt', '.csv', '.zip'];
 
-export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, spaceId }: NewEventModalProps) {
+export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, spaceId }: NewEventModalProps) {
   const [formData, setFormData] = useState<CreateEventInput>({
     space_id: spaceId,
     title: '',
@@ -854,4 +854,4 @@ export function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, sp
       </div>
     </div>
   );
-}
+});

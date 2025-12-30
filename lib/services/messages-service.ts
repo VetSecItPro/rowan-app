@@ -858,44 +858,39 @@ export const messagesService = {
 
   /**
    * Get all conversations for a space with unread counts
+   * Uses optimized RPC function to avoid N+1 query pattern
    */
   async getConversationsList(spaceId: string, userId: string): Promise<Conversation[]> {
     const supabase = createClient();
 
-    // Get all conversations for the space
-    const { data: conversations, error: conversationsError } = await supabase
-      .from('conversations')
-      .select('*')
-      .eq('space_id', spaceId)
-      .order('last_message_at', { ascending: false, nullsFirst: false });
+    // Use RPC function that joins conversations with unread counts in a single query
+    // This replaces the previous N+1 pattern (1 query + N queries for unread counts)
+    const { data: conversations, error } = await supabase.rpc(
+      'get_conversations_with_unread',
+      {
+        space_id_param: spaceId,
+        user_id_param: userId,
+      }
+    );
 
-    if (conversationsError) {
-      logger.error('Error fetching conversations:', conversationsError, { component: 'lib-messages-service', action: 'service_call' });
-      throw conversationsError;
+    if (error) {
+      logger.error('Error fetching conversations with unread counts:', error, {
+        component: 'lib-messages-service',
+        action: 'service_call',
+      });
+      throw error;
     }
 
     if (!conversations || conversations.length === 0) {
       return [];
     }
 
-    // Get unread counts for each conversation
-    const conversationsWithUnread = await Promise.all(
-      conversations.map(async (conv: Conversation) => {
-        const { count } = await supabase
-          .from('messages')
-          .select('*', { count: 'exact', head: true })
-          .eq('conversation_id', conv.id)
-          .eq('read', false)
-          .neq('sender_id', userId);
-
-        return {
-          ...conv,
-          unread_count: count || 0,
-        };
-      })
-    );
-
-    return conversationsWithUnread as Conversation[];
+    // Map RPC results to Conversation interface
+    // RPC returns unread_count as BIGINT, ensure it's cast to number
+    return conversations.map((conv: Conversation & { unread_count: number | bigint }) => ({
+      ...conv,
+      unread_count: Number(conv.unread_count) || 0,
+    }));
   },
 
   /**

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { X, Smile, ChevronDown, Repeat, Calendar, User, Clock, MessageSquare, Tag, Star, Users, CheckSquare, Home, Loader2, Trophy } from 'lucide-react';
 import { CreateTaskInput, CreateChoreInput, Task, Chore } from '@/lib/types';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
@@ -33,7 +33,7 @@ interface UnifiedItemModalProps {
   mode?: ModalMode;
 }
 
-export function UnifiedItemModal({
+export const UnifiedItemModal = memo(function UnifiedItemModal({
   isOpen,
   onClose,
   onSave,
@@ -920,4 +920,4 @@ export function UnifiedItemModal({
       </div>
     </div>
   );
-}
+});

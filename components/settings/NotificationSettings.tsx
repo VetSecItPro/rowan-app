@@ -245,7 +245,7 @@ const TimezoneSelector = memo(function TimezoneSelector({
 });
 
 
-export function NotificationSettings() {
+export const NotificationSettings = memo(function NotificationSettings() {
   const { user, currentSpace } = useAuthWithSpaces();
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
   const [loading, setLoading] = useState(true);
@@ -843,6 +843,6 @@ export function NotificationSettings() {
       </Section>
     </motion.div>
   );
-}
+});
 
 export default NotificationSettings;
