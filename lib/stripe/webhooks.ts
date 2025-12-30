@@ -207,20 +207,22 @@ async function handleCheckoutSessionCompleted(
     .single();
 
   if (user?.email) {
-    // Send welcome email
-    const emailResult = await sendSubscriptionWelcomeEmail({
+    // Send welcome email (non-blocking to not delay webhook response)
+    sendSubscriptionWelcomeEmail({
       recipientEmail: user.email,
       recipientName: user.name || 'there',
       tier,
       period,
       dashboardUrl: `${BASE_URL}/dashboard`,
+    }).then(emailResult => {
+      if (emailResult.success) {
+        logger.info(`Welcome email sent`, { component: 'stripe-webhooks', action: 'send_welcome_email' });
+      } else {
+        logger.error('Failed to send welcome email', undefined, { component: 'stripe-webhooks', action: 'send_welcome_email', error: emailResult.error });
+      }
+    }).catch(err => {
+      logger.error('Welcome email error', err, { component: 'stripe-webhooks', action: 'send_welcome_email' });
     });
-
-    if (emailResult.success) {
-      logger.info(`Welcome email sent`, { component: 'stripe-webhooks', action: 'send_welcome_email' });
-    } else {
-      logger.error('Failed to send welcome email', undefined, { component: 'stripe-webhooks', action: 'send_welcome_email', error: emailResult.error });
-    }
   }
 
   logger.info('Subscription created', { component: 'stripe-webhooks', userId, tier, period });
@@ -396,19 +398,22 @@ async function handleSubscriptionDeleted(
       year: 'numeric',
     });
 
-    const emailResult = await sendSubscriptionCancelledEmail({
+    // Send cancellation email (non-blocking to not delay webhook response)
+    sendSubscriptionCancelledEmail({
       recipientEmail: user.email,
       recipientName: user.name || 'there',
       tier,
       accessUntil,
       resubscribeUrl: `${BASE_URL}/pricing`,
+    }).then(emailResult => {
+      if (emailResult.success) {
+        logger.info('Cancellation email sent', { component: 'stripe-webhooks', action: 'send_cancellation_email' });
+      } else {
+        logger.error('Failed to send cancellation email', undefined, { component: 'stripe-webhooks', action: 'send_cancellation_email', error: emailResult.error });
+      }
+    }).catch(err => {
+      logger.error('Cancellation email error', err, { component: 'stripe-webhooks', action: 'send_cancellation_email' });
     });
-
-    if (emailResult.success) {
-      logger.info('Cancellation email sent', { component: 'stripe-webhooks', action: 'send_cancellation_email' });
-    } else {
-      logger.error('Failed to send cancellation email', undefined, { component: 'stripe-webhooks', action: 'send_cancellation_email', error: emailResult.error });
-    }
   }
 
   logger.info('Subscription canceled', { component: 'stripe-webhooks', userId });
@@ -525,20 +530,23 @@ async function handleInvoicePaymentFailed(
     const tier = subscription.tier as 'pro' | 'family';
     const attemptCount = invoice.attempt_count || 1;
 
-    const emailResult = await sendPaymentFailedEmail({
+    // Send payment failed email (non-blocking to not delay webhook response)
+    sendPaymentFailedEmail({
       recipientEmail: user.email,
       recipientName: user.name || 'there',
       tier,
       attemptCount,
       updatePaymentUrl: `${BASE_URL}/settings/billing`,
       gracePeriodDays: 7, // Standard 7-day grace period
+    }).then(emailResult => {
+      if (emailResult.success) {
+        logger.info('Payment failed email sent', { component: 'stripe-webhooks', action: 'send_payment_failed_email' });
+      } else {
+        logger.error('Failed to send payment failed email', undefined, { component: 'stripe-webhooks', action: 'send_payment_failed_email', error: emailResult.error });
+      }
+    }).catch(err => {
+      logger.error('Payment failed email error', err, { component: 'stripe-webhooks', action: 'send_payment_failed_email' });
     });
-
-    if (emailResult.success) {
-      logger.info('Payment failed email sent', { component: 'stripe-webhooks', action: 'send_payment_failed_email' });
-    } else {
-      logger.error('Failed to send payment failed email', undefined, { component: 'stripe-webhooks', action: 'send_payment_failed_email', error: emailResult.error });
-    }
   }
 
   logger.info('Payment failed', { component: 'stripe-webhooks', subscriptionId });

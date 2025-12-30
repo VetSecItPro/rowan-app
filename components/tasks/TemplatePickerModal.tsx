@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useDebounce } from 'use-debounce';
 import { X, Star, Zap } from 'lucide-react';
 import { taskTemplatesService, TaskTemplate } from '@/lib/services/task-templates-service';
 import { logger } from '@/lib/logger';
@@ -16,6 +17,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelect, spaceId }: Temp
   const [templates, setTemplates] = useState<TaskTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch] = useDebounce(search, 300);
 
   useEffect(() => {
     if (isOpen) loadTemplates();
@@ -32,10 +34,12 @@ export function TemplatePickerModal({ isOpen, onClose, onSelect, spaceId }: Temp
     }
   }
 
-  const filteredTemplates = templates.filter(t =>
-    t.name.toLowerCase().includes(search.toLowerCase()) ||
-    t.title.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredTemplates = useMemo(() => {
+    return templates.filter(t =>
+      t.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      t.title.toLowerCase().includes(debouncedSearch.toLowerCase())
+    );
+  }, [templates, debouncedSearch]);
 
   if (!isOpen) return null;
 

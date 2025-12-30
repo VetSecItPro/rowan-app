@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
@@ -104,7 +105,8 @@ export async function POST(req: NextRequest) {
       }
 
       // Check if invite code exists and is valid
-      const { data: codeData, error: codeError } = await supabase
+      // Use admin client to bypass RLS (anonymous users can't read invite codes)
+      const { data: codeData, error: codeError } = await supabaseAdmin
         .from('beta_invite_codes')
         .select('id, code, used_by, expires_at, is_active')
         .or(`code.eq.${inviteCode},code.eq.${normalizedCode}`)

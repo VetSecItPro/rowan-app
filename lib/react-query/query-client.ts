@@ -32,7 +32,7 @@ export const queryClient = new QueryClient({
       // BACKGROUND REFETCHING: Keep data fresh while showing cached data
       refetchOnWindowFocus: true,   // Refetch when user returns to tab
       refetchOnReconnect: true,     // Refetch when internet reconnects
-      refetchOnMount: 'always',     // Always check for fresh data on mount
+      refetchOnMount: false,        // Trust cache - don't refetch if data exists (staleTime handles freshness)
 
       // RETRY CONFIGURATION: Smart retries for failed requests
       retry: (failureCount, error: any) => {

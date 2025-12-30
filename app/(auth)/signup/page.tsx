@@ -206,20 +206,20 @@ export default function SignUpPage() {
               Rowan
             </h1>
           </div>
-          <p className="text-lg xl:text-xl text-purple-100 dark:text-purple-200 mb-8 text-center px-4">
+          <p className="text-lg xl:text-xl text-emerald-100 dark:text-emerald-200 mb-8 text-center px-4">
             Collaborative life management for couples and families
           </p>
-          <div className="space-y-4 text-lg text-purple-100 dark:text-purple-200 max-w-md mx-auto">
+          <div className="space-y-4 text-lg text-emerald-100 dark:text-emerald-200 max-w-md mx-auto">
             <p className="flex items-center gap-3">
-              <span className="w-2 h-2 bg-purple-300 rounded-full flex-shrink-0"></span>
+              <span className="w-2 h-2 bg-emerald-300 rounded-full flex-shrink-0"></span>
               Shared calendars & task management
             </p>
             <p className="flex items-center gap-3">
-              <span className="w-2 h-2 bg-purple-300 rounded-full flex-shrink-0"></span>
+              <span className="w-2 h-2 bg-emerald-300 rounded-full flex-shrink-0"></span>
               Shopping lists & meal planning
             </p>
             <p className="flex items-center gap-3">
-              <span className="w-2 h-2 bg-purple-300 rounded-full flex-shrink-0"></span>
+              <span className="w-2 h-2 bg-emerald-300 rounded-full flex-shrink-0"></span>
               Goal tracking & household management
             </p>
           </div>
@@ -233,16 +233,19 @@ export default function SignUpPage() {
         }`}
       >
         <div className="w-full max-w-md py-8">
-          {/* Mobile logo */}
-          <div className="lg:hidden flex justify-center mb-8">
+          {/* Mobile logo with link to homepage */}
+          <Link href="/" className="lg:hidden flex flex-col items-center mb-8 group">
             <Image
               src="/rowan-logo.png"
               alt="Rowan Logo"
               width={64}
               height={64}
-              className="w-16 h-16"
+              className="w-16 h-16 group-hover:scale-105 transition-transform duration-200"
             />
-          </div>
+            <span className="mt-2 text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
+              Rowan
+            </span>
+          </Link>
 
           {/* Header */}
           <div className="mb-8">
@@ -276,7 +279,7 @@ export default function SignUpPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
                   placeholder="Alex Johnson"
                   disabled={isLoading}
                   autoFocus
@@ -300,7 +303,7 @@ export default function SignUpPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
                   placeholder="alex@example.com"
                   disabled={isLoading}
                   autoComplete="email"
@@ -323,7 +326,7 @@ export default function SignUpPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={12}
-                  className="w-full pl-11 pr-12 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                  className="w-full pl-11 pr-12 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
                   placeholder="••••••••••••"
                   disabled={isLoading}
                   autoComplete="new-password"
@@ -362,7 +365,7 @@ export default function SignUpPage() {
                     setSpaceTouched(true);
                   }}
                   required
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
                   placeholder="Samira's Space"
                   disabled={isLoading}
                 />
@@ -379,7 +382,7 @@ export default function SignUpPage() {
                   type="button"
                   onClick={() => setShowColorDropdown(!showColorDropdown)}
                   disabled={isLoading}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200 flex items-center justify-between"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors duration-200 flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-lg shadow-lg ${getColorClasses(colorTheme)}`} />
@@ -413,7 +416,7 @@ export default function SignUpPage() {
                           {theme.label}
                         </span>
                         {colorTheme === theme.value && (
-                          <Check className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                          <Check className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                         )}
                       </button>
                     ))}
@@ -466,7 +469,7 @@ export default function SignUpPage() {
               Already have an account?{' '}
               <Link
                 href="/login"
-                className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-semibold transition-colors duration-200"
+                className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-semibold transition-colors duration-200"
               >
                 Sign in
               </Link>

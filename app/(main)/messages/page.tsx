@@ -4,6 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as ImageIcon, Paperclip, TrendingUp, X, CalendarClock } from 'lucide-react';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
@@ -58,6 +59,7 @@ export default function MessagesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [searchResults, setSearchResults] = useState<Message[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -95,14 +97,14 @@ export default function MessagesPage() {
 
   // Use search results if searching, otherwise show current conversation messages
   const filteredMessages = useMemo(() => {
-    if (searchQuery && searchResults.length > 0) {
+    if (debouncedSearchQuery && searchResults.length > 0) {
       return searchResults;
     }
-    if (searchQuery && !isSearching && searchResults.length === 0) {
+    if (debouncedSearchQuery && !isSearching && searchResults.length === 0) {
       return []; // Show empty state when search has no results
     }
     return messages;
-  }, [messages, searchQuery, searchResults, isSearching]);
+  }, [messages, debouncedSearchQuery, searchResults, isSearching]);
 
   // Memoize date label computation
   const getDateLabel = useCallback((date: Date): string => {
@@ -596,7 +598,7 @@ export default function MessagesPage() {
 
   // Memoize empty state message
   const emptyStateMessage = useMemo(() => {
-    if (searchQuery) {
+    if (debouncedSearchQuery) {
       return {
         primary: 'No messages found',
         secondary: 'Try a different search'
@@ -606,7 +608,7 @@ export default function MessagesPage() {
       primary: 'No messages yet',
       secondary: 'Start the conversation below!'
     };
-  }, [searchQuery]);
+  }, [debouncedSearchQuery]);
 
 
   // Handle opening thread view
