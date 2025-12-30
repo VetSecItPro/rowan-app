@@ -31,6 +31,7 @@ export function TrialStatusBanner({
     hasTrialExpired,
     tier,
     effectiveTier,
+    isBetaTester,
   } = useSubscription();
 
   // Check localStorage on mount for dismiss state (resets every 3 days)
@@ -55,8 +56,9 @@ export function TrialStatusBanner({
     onDismiss?.();
   };
 
-  // Don't show if loading, user has paid subscription, or dismissed
-  if (isLoading || tier === 'pro' || tier === 'family' || isDismissed) {
+  // Don't show if loading, beta tester, user has paid subscription, or dismissed
+  // Beta testers have access until Feb 15, 2026 - no upgrade pressure needed
+  if (isLoading || isBetaTester || tier === 'pro' || tier === 'family' || isDismissed) {
     return null;
   }
 
@@ -222,9 +224,10 @@ export function TrialBadge() {
     return null;
   }
 
-  const { isInTrial, trialDaysRemaining, hasTrialExpired, tier, isLoading } = subscription;
+  const { isInTrial, trialDaysRemaining, hasTrialExpired, tier, isLoading, isBetaTester } = subscription;
 
-  if (isLoading || tier === 'pro' || tier === 'family') {
+  // Beta testers have access until Feb 15, 2026 - no upgrade badge needed
+  if (isLoading || isBetaTester || tier === 'pro' || tier === 'family') {
     return null;
   }
 
