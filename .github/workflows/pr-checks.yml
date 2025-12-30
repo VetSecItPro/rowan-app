@@ -41,26 +41,28 @@ jobs:
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
           NEXT_PUBLIC_ENABLE_MONETIZATION: 'true'
 
-      - name: Verify build output
+      - name: Prepare build artifact
         run: |
           echo "Checking .next directory..."
           ls -la .next || echo ".next directory not found!"
           if [ -d ".next" ]; then
-            echo "Build output size:"
+            echo "Original build output size:"
             du -sh .next
             # Remove cache to reduce artifact size
             rm -rf .next/cache
             echo "After cache removal:"
             du -sh .next
+            # Copy to non-hidden directory (workaround for upload-artifact v4 issue)
+            cp -r .next next-build
+            echo "Copied to next-build:"
+            ls -la next-build
           fi
-          echo "Current directory: $(pwd)"
-          echo "Full path to .next: $(pwd)/.next"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: ${{ github.workspace }}/.next
+          path: next-build
           retention-days: 1
           if-no-files-found: error
 
