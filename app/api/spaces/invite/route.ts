@@ -84,26 +84,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get space name and inviter name for email
-    const { data: spaceData } = await supabase
-      .from('spaces')
-      .select('name')
-      .eq('id', validatedData.space_id)
-      .single();
+    // Get space name and inviter name in parallel for speed
+    const [spaceResult, userResult] = await Promise.all([
+      supabase.from('spaces').select('name').eq('id', validatedData.space_id).single(),
+      supabase.from('users').select('name').eq('id', session.user.id).single(),
+    ]);
 
-    // Try to get inviter name, but handle permission errors gracefully
-    let inviterData = null;
-    const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('name')
-      .eq('id', session.user.id)
-      .single();
+    const spaceData = spaceResult.data;
+    const inviterData = userResult.error ? null : userResult.data;
 
-    if (userError) {
-      // If we can't access user table due to RLS, use fallback
+    if (userResult.error) {
       logger.info('Could not fetch inviter name due to permissions, using fallback', { component: 'api-route' });
-    } else {
-      inviterData = userData;
     }
 
     const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/invitations/accept?token=${result.data.token}`;
@@ -112,38 +103,37 @@ export async function POST(req: NextRequest) {
     const expiresAt = new Date(result.data.expires_at);
     const expirationText = `${Math.ceil((expiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days`;
 
-    // Send invitation email
-    const emailResult = await sendSpaceInvitationEmail({
+    // Send invitation email in background (don't block response)
+    // This makes the API respond instantly while email sends asynchronously
+    sendSpaceInvitationEmail({
       recipientEmail: validatedData.email,
       inviterName: inviterData?.name || 'Someone',
       spaceName: spaceData?.name || 'a workspace',
       invitationUrl,
       expiresAt: expirationText,
+    }).then((emailResult) => {
+      if (!emailResult.success) {
+        logger.error('Failed to send invitation email:', undefined, { component: 'api-route', action: 'api_request', details: emailResult.error });
+        Sentry.captureException(new Error(`Invitation email failed: ${emailResult.error}`), {
+          tags: { feature: 'space-invitation', email_error: true },
+          extra: {
+            recipientEmail: validatedData.email.replace(/(.{2}).*(@.*)/, '$1***$2'),
+            spaceId: validatedData.space_id,
+            timestamp: new Date().toISOString(),
+          },
+        });
+      }
+    }).catch((error) => {
+      logger.error('Email send threw exception:', error, { component: 'api-route', action: 'api_request' });
+      Sentry.captureException(error);
     });
-
-    // Log email result but don't fail the invitation if email fails
-    if (!emailResult.success) {
-      logger.error('Failed to send invitation email:', undefined, { component: 'api-route', action: 'api_request', details: emailResult.error });
-      // Log to Sentry for monitoring
-      Sentry.captureException(new Error(`Invitation email failed: ${emailResult.error}`), {
-        tags: {
-          feature: 'space-invitation',
-          email_error: true,
-        },
-        extra: {
-          recipientEmail: validatedData.email.replace(/(.{2}).*(@.*)/, '$1***$2'), // Partially mask for privacy
-          spaceId: validatedData.space_id,
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
 
     return NextResponse.json({
       success: true,
       data: {
         ...result.data,
-        invitation_url: invitationUrl, // Include URL in response for testing
-        email_sent: emailResult.success,
+        invitation_url: invitationUrl,
+        email_sent: true, // Email is being sent asynchronously
       },
     });
   } catch (error) {

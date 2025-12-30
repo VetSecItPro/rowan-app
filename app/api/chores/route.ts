@@ -9,6 +9,7 @@ import { createChoreSchema } from '@/lib/validations/chore-schemas';
 import { ZodError } from 'zod';
 import { extractIP, fallbackRateLimit } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { withUserDataCache } from '@/lib/utils/cache-headers';
 
 // Types for query options
 interface ChoreQueryOptions {
@@ -86,10 +87,12 @@ export async function GET(req: NextRequest) {
     // Get chores from service
     const chores = await choresService.getChores(spaceId, options);
 
-    return NextResponse.json({
-      success: true,
-      data: chores,
-    });
+    return withUserDataCache(
+      NextResponse.json({
+        success: true,
+        data: chores,
+      })
+    );
   } catch (error) {
     Sentry.captureException(error, {
       tags: {

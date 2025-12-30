@@ -4,6 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, Home, Filter, Download, Repeat, FileText, Zap, TrendingUp, TrendingDown, Minus, ChevronDown, X } from 'lucide-react';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { format } from 'date-fns';
@@ -56,6 +57,7 @@ export default function TasksPage() {
     statusChanging?: boolean;
   }>>({});
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300); // Debounce search for 300ms
   const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   // Removed activeTab state - now showing all items together
@@ -156,9 +158,9 @@ export default function TasksPage() {
       filtered = filtered.filter(item => item.status === statusFilter);
     }
 
-    // Enhanced search filter - includes type-specific fields
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+    // Enhanced search filter - includes type-specific fields (uses debounced value)
+    if (debouncedSearchQuery) {
+      const query = debouncedSearchQuery.toLowerCase();
       filtered = filtered.filter(item => {
         // Common fields for both tasks and chores
         const matchesCommon =
@@ -200,7 +202,7 @@ export default function TasksPage() {
     }
 
     return filtered;
-  }, [allItems, statusFilter, searchQuery, filters]);
+  }, [allItems, statusFilter, debouncedSearchQuery, filters]);
 
   // Paginated items for performance with large lists
   const paginatedItems = useMemo(() => {
@@ -222,7 +224,7 @@ export default function TasksPage() {
   // Reset pagination when filters change
   useEffect(() => {
     setDisplayLimit(ITEMS_PER_PAGE);
-  }, [statusFilter, searchQuery, ITEMS_PER_PAGE]);
+  }, [statusFilter, debouncedSearchQuery, ITEMS_PER_PAGE]);
 
   // Memoized loadData function to fetch both tasks and chores
   const loadData = useCallback(async () => {

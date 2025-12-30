@@ -89,137 +89,180 @@ export async function processDailyDigest(): Promise<DigestResult> {
       action: 'check_users',
     });
 
-    // Process each user
-    for (const pref of digestPreferences as UserDigestPreference[]) {
-      try {
-        // Check if it's time to send this user's digest
-        // The digest_time is stored as HH:MM:SS in their local timezone
-        // We need to convert to UTC and check if it matches
-        if (!shouldSendDigest(pref.digest_time, pref.digest_timezone, now)) {
-          continue;
-        }
+    // PERFORMANCE: Filter users who should receive digest now first
+    const usersToProcess = (digestPreferences as UserDigestPreference[]).filter(
+      (pref) => shouldSendDigest(pref.digest_time, pref.digest_timezone, now)
+    );
 
-        result.usersProcessed++;
+    if (usersToProcess.length === 0) {
+      logger.info('No users due for digest at this time', {
+        component: 'DailyDigestJob',
+        action: 'filter_users',
+      });
+      return result;
+    }
 
-        // Get user profile
-        const { data: profile, error: profileError } = await supabaseAdmin
-          .from('profiles')
-          .select('id, email, name')
-          .eq('id', pref.user_id)
-          .single();
+    logger.info(`${usersToProcess.length} users due for digest now`, {
+      component: 'DailyDigestJob',
+      action: 'filter_users',
+    });
 
-        if (profileError || !profile) {
-          result.errors.push(`Failed to get profile for user ${pref.user_id}`);
-          continue;
-        }
+    // PERFORMANCE: Batch fetch all profiles at once instead of N queries
+    const userIds = usersToProcess.map((p) => p.user_id);
+    const { data: profiles, error: profilesError } = await supabaseAdmin
+      .from('profiles')
+      .select('id, email, name')
+      .in('id', userIds);
 
-        // Get user's primary space (first space they're a member of)
-        const { data: spaceMembership, error: spaceError } = await supabaseAdmin
-          .from('space_members')
-          .select('space_id, spaces(id, name)')
-          .eq('user_id', pref.user_id)
-          .limit(1)
-          .single();
+    if (profilesError) {
+      throw new Error(`Failed to batch fetch profiles: ${profilesError.message}`);
+    }
 
-        if (spaceError || !spaceMembership) {
-          // User might not have a space yet
-          continue;
-        }
+    // Create lookup map for profiles
+    const profileMap = new Map<string, UserProfile>();
+    (profiles || []).forEach((p) => {
+      profileMap.set(p.id, p as UserProfile);
+    });
 
-        const spaceId = (spaceMembership as unknown as SpaceMember).spaces.id;
-        const spaceName = (spaceMembership as unknown as SpaceMember).spaces.name;
+    // PERFORMANCE: Batch fetch all space memberships at once instead of N queries
+    const { data: spaceMemberships, error: membershipsError } = await supabaseAdmin
+      .from('space_members')
+      .select('user_id, space_id, spaces(id, name)')
+      .in('user_id', userIds);
 
-        // Fetch today's data for the user
-        const digestData = await fetchDigestData(pref.user_id, spaceId, pref.digest_timezone);
+    if (membershipsError) {
+      throw new Error(`Failed to batch fetch space memberships: ${membershipsError.message}`);
+    }
 
-        // Determine time of day for AI context
-        const timeOfDay = getTimeOfDay(pref.digest_time);
-        const dayOfWeek = new Intl.DateTimeFormat('en-US', {
-          weekday: 'long',
-          timeZone: pref.digest_timezone || 'America/Chicago',
-        }).format(now);
+    // Create lookup map for space memberships (first space per user)
+    const spaceMembershipMap = new Map<string, SpaceMember>();
+    (spaceMemberships || []).forEach((sm) => {
+      // Only keep the first space for each user
+      if (!spaceMembershipMap.has(sm.user_id)) {
+        spaceMembershipMap.set(sm.user_id, sm as unknown as SpaceMember);
+      }
+    });
 
-        // Format the date for the email
-        const dateFormatter = new Intl.DateTimeFormat('en-US', {
-          weekday: 'long',
-          month: 'long',
-          day: 'numeric',
-          year: 'numeric',
-          timeZone: pref.digest_timezone || 'America/Chicago',
-        });
-        const formattedDate = dateFormatter.format(now);
+    // PERFORMANCE: Process users in parallel batches of 5 to balance throughput vs rate limiting
+    const BATCH_SIZE = 5;
+    for (let i = 0; i < usersToProcess.length; i += BATCH_SIZE) {
+      const batch = usersToProcess.slice(i, i + BATCH_SIZE);
 
-        // Prepare AI input
-        const aiInput: DigestInput = {
-          recipientName: (profile as UserProfile).name || 'there',
-          date: formattedDate,
-          dayOfWeek,
-          timeOfDay,
-          events: digestData.events,
-          tasksDue: digestData.tasksDue,
-          overdueTasks: digestData.overdueTasks,
-          meals: digestData.meals,
-          reminders: digestData.reminders,
-          timezone: pref.digest_timezone || 'America/Chicago',
-        };
+      await Promise.all(
+        batch.map(async (pref) => {
+          try {
+            result.usersProcessed++;
 
-        // Generate AI content with fallback
-        let aiContent;
-        const aiResult = await digestGeneratorService.generateDigest(aiInput);
+            const profile = profileMap.get(pref.user_id);
+            if (!profile) {
+              result.errors.push(`Failed to get profile for user ${pref.user_id}`);
+              return;
+            }
 
-        if (aiResult.success) {
-          aiContent = aiResult.data;
-          logger.info('AI digest generated successfully', {
-            component: 'DailyDigestJob',
-            action: 'ai_generate',
-            userId: pref.user_id,
-            aiGenerated: true,
-          });
-        } else {
-          // Fallback to template-based content
-          aiContent = digestGeneratorService.generateFallbackDigest(aiInput);
-          logger.warn('AI digest failed, using fallback', {
-            component: 'DailyDigestJob',
-            action: 'ai_fallback',
-            userId: pref.user_id,
-            error: aiResult.error,
-          });
-        }
+            const spaceMembership = spaceMembershipMap.get(pref.user_id);
+            if (!spaceMembership) {
+              // User might not have a space yet
+              return;
+            }
 
-        // Send the email with AI content
-        const emailData: AIDailyDigestData = {
-          recipientEmail: (profile as UserProfile).email,
-          recipientName: (profile as UserProfile).name || 'there',
-          date: formattedDate,
-          spaceName,
-          spaceId,
-          events: digestData.events,
-          tasksDue: digestData.tasksDue,
-          overdueTasks: digestData.overdueTasks,
-          meals: digestData.meals,
-          reminders: digestData.reminders,
-          narrativeIntro: aiContent.narrativeIntro,
-          closingMessage: aiContent.closingMessage,
-          aiGenerated: aiContent.aiGenerated,
-        };
+            const spaceId = spaceMembership.spaces.id;
+            const spaceName = spaceMembership.spaces.name;
 
-        const emailResult = await sendAIDailyDigestEmail(emailData);
+            // Fetch today's data for the user
+            const digestData = await fetchDigestData(pref.user_id, spaceId, pref.digest_timezone);
 
-        if (emailResult.success) {
-          result.emailsSent++;
-          logger.info(`Daily digest sent to ${(profile as UserProfile).email}`, {
-            component: 'DailyDigestJob',
-            action: 'send_email',
-            userId: pref.user_id,
-          });
-        } else {
-          result.errors.push(`Failed to send email to ${(profile as UserProfile).email}: ${emailResult.error}`);
-        }
+            // Determine time of day for AI context
+            const timeOfDay = getTimeOfDay(pref.digest_time);
+            const dayOfWeek = new Intl.DateTimeFormat('en-US', {
+              weekday: 'long',
+              timeZone: pref.digest_timezone || 'America/Chicago',
+            }).format(now);
 
-        // Small delay between emails to avoid rate limiting
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      } catch (userError) {
-        result.errors.push(`Error processing user ${pref.user_id}: ${userError instanceof Error ? userError.message : 'Unknown error'}`);
+            // Format the date for the email
+            const dateFormatter = new Intl.DateTimeFormat('en-US', {
+              weekday: 'long',
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric',
+              timeZone: pref.digest_timezone || 'America/Chicago',
+            });
+            const formattedDate = dateFormatter.format(now);
+
+            // Prepare AI input
+            const aiInput: DigestInput = {
+              recipientName: profile.name || 'there',
+              date: formattedDate,
+              dayOfWeek,
+              timeOfDay,
+              events: digestData.events,
+              tasksDue: digestData.tasksDue,
+              overdueTasks: digestData.overdueTasks,
+              meals: digestData.meals,
+              reminders: digestData.reminders,
+              timezone: pref.digest_timezone || 'America/Chicago',
+            };
+
+            // Generate AI content with fallback
+            let aiContent;
+            const aiResult = await digestGeneratorService.generateDigest(aiInput);
+
+            if (aiResult.success) {
+              aiContent = aiResult.data;
+              logger.info('AI digest generated successfully', {
+                component: 'DailyDigestJob',
+                action: 'ai_generate',
+                userId: pref.user_id,
+                aiGenerated: true,
+              });
+            } else {
+              // Fallback to template-based content
+              aiContent = digestGeneratorService.generateFallbackDigest(aiInput);
+              logger.warn('AI digest failed, using fallback', {
+                component: 'DailyDigestJob',
+                action: 'ai_fallback',
+                userId: pref.user_id,
+                error: aiResult.error,
+              });
+            }
+
+            // Send the email with AI content
+            const emailData: AIDailyDigestData = {
+              recipientEmail: profile.email,
+              recipientName: profile.name || 'there',
+              date: formattedDate,
+              spaceName,
+              spaceId,
+              events: digestData.events,
+              tasksDue: digestData.tasksDue,
+              overdueTasks: digestData.overdueTasks,
+              meals: digestData.meals,
+              reminders: digestData.reminders,
+              narrativeIntro: aiContent.narrativeIntro,
+              closingMessage: aiContent.closingMessage,
+              aiGenerated: aiContent.aiGenerated,
+            };
+
+            const emailResult = await sendAIDailyDigestEmail(emailData);
+
+            if (emailResult.success) {
+              result.emailsSent++;
+              logger.info(`Daily digest sent to ${profile.email}`, {
+                component: 'DailyDigestJob',
+                action: 'send_email',
+                userId: pref.user_id,
+              });
+            } else {
+              result.errors.push(`Failed to send email to ${profile.email}: ${emailResult.error}`);
+            }
+          } catch (userError) {
+            result.errors.push(`Error processing user ${pref.user_id}: ${userError instanceof Error ? userError.message : 'Unknown error'}`);
+          }
+        })
+      );
+
+      // Small delay between batches to avoid rate limiting
+      if (i + BATCH_SIZE < usersToProcess.length) {
+        await new Promise((resolve) => setTimeout(resolve, 200));
       }
     }
 

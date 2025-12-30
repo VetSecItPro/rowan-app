@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import type { Chore } from '@/lib/types';
@@ -19,6 +19,28 @@ interface UseChoreRealtimeOptions {
   onChoreDeleted?: (choreId: string) => void;
 }
 
+// Optimized filter function
+function chorePassesFilters(chore: Chore, filters?: UseChoreRealtimeOptions['filters']): boolean {
+  if (!filters) return true;
+
+  return (
+    (!filters.status ||
+      (Array.isArray(filters.status) ? filters.status.includes(chore.status) : filters.status === chore.status)) &&
+    (!filters.frequency ||
+      (Array.isArray(filters.frequency) ? filters.frequency.includes(chore.frequency) : filters.frequency === chore.frequency)) &&
+    (!filters.assignedTo || chore.assigned_to === filters.assignedTo)
+  );
+}
+
+// Debounce helper for batched state updates
+function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number): T {
+  let timeoutId: NodeJS.Timeout;
+  return ((...args: Parameters<T>) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func(...args), delay);
+  }) as T;
+}
+
 export function useChoreRealtime({
   spaceId,
   filters,
@@ -30,6 +52,70 @@ export function useChoreRealtime({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [timeoutReached, setTimeoutReached] = useState(false);
+
+  // Performance optimizations: batch updates queue
+  const updateQueueRef = useRef<{
+    inserts: Chore[];
+    updates: Chore[];
+    deletes: string[];
+  }>({ inserts: [], updates: [], deletes: [] });
+
+  // Memoized filters to prevent unnecessary re-renders
+  const memoizedFilters = useMemo(() => filters, [
+    filters?.status?.join(','),
+    filters?.frequency?.join(','),
+    filters?.assignedTo
+  ]);
+
+  // Memoized filter function to avoid recalculation
+  const choreFilter = useCallback((chore: Chore) => chorePassesFilters(chore, memoizedFilters), [memoizedFilters]);
+
+  // Debounced batch update function - use useRef to avoid recreation
+  const debouncedBatchUpdateRef = useRef<(() => void) | null>(null);
+
+  if (!debouncedBatchUpdateRef.current) {
+    debouncedBatchUpdateRef.current = debounce(() => {
+      const queue = updateQueueRef.current;
+      if (queue.inserts.length === 0 && queue.updates.length === 0 && queue.deletes.length === 0) {
+        return;
+      }
+
+      setChores(prev => {
+        let result = [...prev];
+
+        // Process deletes first
+        if (queue.deletes.length > 0) {
+          const deleteSet = new Set(queue.deletes);
+          result = result.filter(chore => !deleteSet.has(chore.id));
+        }
+
+        // Process updates
+        if (queue.updates.length > 0) {
+          const updateMap = new Map(queue.updates.map(chore => [chore.id, chore]));
+          result = result.map(chore => updateMap.get(chore.id) || chore);
+        }
+
+        // Process inserts
+        if (queue.inserts.length > 0) {
+          const existingIds = new Set(result.map(chore => chore.id));
+          const newChores = queue.inserts.filter(chore => !existingIds.has(chore.id));
+          result = [...result, ...newChores];
+        }
+
+        // Sort once at the end (handle null sort_order)
+        return result.sort((a, b) => {
+          const aOrder = a.sort_order ?? 999999;
+          const bOrder = b.sort_order ?? 999999;
+          return aOrder - bOrder;
+        });
+      });
+
+      // Clear the queue
+      updateQueueRef.current = { inserts: [], updates: [], deletes: [] };
+    }, 50); // 50ms debounce for smooth updates
+  }
+
+  const debouncedBatchUpdate = debouncedBatchUpdateRef.current;
 
   // Emergency timeout to prevent perpetual loading (12 seconds max)
   useEffect(() => {
@@ -155,28 +241,10 @@ export function useChoreRealtime({
           (payload: RealtimePostgresChangesPayload<Chore>) => {
             const newChore = payload.new as Chore;
 
-            // Apply filters
-            const passesFilters =
-              (!filters?.status ||
-                (Array.isArray(filters.status) ? filters.status.includes(newChore.status) : filters.status === newChore.status)) &&
-              (!filters?.frequency ||
-                (Array.isArray(filters.frequency) ? filters.frequency.includes(newChore.frequency) : filters.frequency === newChore.frequency)) &&
-              (!filters?.assignedTo || newChore.assigned_to === filters.assignedTo);
-
-            if (passesFilters) {
-              setChores((prev) => {
-                // Check if chore already exists (prevent duplicates)
-                if (prev.some((c) => c.id === newChore.id)) {
-                  return prev;
-                }
-                // Insert in sort order (handle nulls)
-                const updated = [...prev, newChore].sort((a, b) => {
-                  const aOrder = a.sort_order ?? 999999;
-                  const bOrder = b.sort_order ?? 999999;
-                  return aOrder - bOrder;
-                });
-                return updated;
-              });
+            if (choreFilter(newChore)) {
+              // Add to batch queue instead of immediate state update
+              updateQueueRef.current.inserts.push(newChore);
+              debouncedBatchUpdate();
               onChoreAdded?.(newChore);
             }
           }
@@ -192,38 +260,15 @@ export function useChoreRealtime({
           (payload: RealtimePostgresChangesPayload<Chore>) => {
             const updatedChore = payload.new as Chore;
 
-            // Apply filters
-            const passesFilters =
-              (!filters?.status ||
-                (Array.isArray(filters.status) ? filters.status.includes(updatedChore.status) : filters.status === updatedChore.status)) &&
-              (!filters?.frequency ||
-                (Array.isArray(filters.frequency) ? filters.frequency.includes(updatedChore.frequency) : filters.frequency === updatedChore.frequency)) &&
-              (!filters?.assignedTo || updatedChore.assigned_to === filters.assignedTo);
-
-            if (passesFilters) {
-              setChores((prev) => {
-                const index = prev.findIndex((c) => c.id === updatedChore.id);
-                if (index === -1) {
-                  // Chore wasn't in list, add it
-                  return [...prev, updatedChore].sort((a, b) => {
-                    const aOrder = a.sort_order ?? 999999;
-                    const bOrder = b.sort_order ?? 999999;
-                    return aOrder - bOrder;
-                  });
-                }
-                // Update existing chore
-                const updated = [...prev];
-                updated[index] = updatedChore;
-                return updated.sort((a, b) => {
-                  const aOrder = a.sort_order ?? 999999;
-                  const bOrder = b.sort_order ?? 999999;
-                  return aOrder - bOrder;
-                });
-              });
+            if (choreFilter(updatedChore)) {
+              // Add to batch queue for updates
+              updateQueueRef.current.updates.push(updatedChore);
+              debouncedBatchUpdate();
               onChoreUpdated?.(updatedChore);
             } else {
-              // Chore no longer passes filters, remove it
-              setChores((prev) => prev.filter((c) => c.id !== updatedChore.id));
+              // Chore no longer passes filters, add to deletes queue
+              updateQueueRef.current.deletes.push(updatedChore.id);
+              debouncedBatchUpdate();
             }
           }
         )
@@ -237,7 +282,9 @@ export function useChoreRealtime({
           },
           (payload: RealtimePostgresChangesPayload<Chore>) => {
             const deletedChoreId = (payload.old as Chore).id;
-            setChores((prev) => prev.filter((c) => c.id !== deletedChoreId));
+            // Add to batch queue for deletes
+            updateQueueRef.current.deletes.push(deletedChoreId);
+            debouncedBatchUpdate();
             onChoreDeleted?.(deletedChoreId);
           }
         )
@@ -270,8 +317,10 @@ export function useChoreRealtime({
       if (accessCheckInterval) {
         clearInterval(accessCheckInterval);
       }
+      // Clear any pending batched updates
+      updateQueueRef.current = { inserts: [], updates: [], deletes: [] };
     };
-  }, [spaceId, filters?.status, filters?.frequency, filters?.assignedTo]);
+  }, [spaceId, memoizedFilters]); // Only depend on spaceId and memoized filters
 
   function refreshChores() {
     setLoading(true);

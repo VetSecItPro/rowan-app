@@ -24,7 +24,33 @@ import { logger } from '@/lib/logger-edge';
 /** Admin session duration in seconds (2 hours) */
 const ADMIN_SESSION_DURATION = 2 * 60 * 60;
 
+/** Beta validation cache duration in seconds (1 hour) */
+const BETA_CACHE_DURATION = 60 * 60;
+
 export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // PERFORMANCE: Skip middleware for static assets and public files
+  // These don't need auth checks and should serve as fast as possible
+  if (
+    pathname.startsWith('/_next/static') ||
+    pathname.startsWith('/_next/image') ||
+    pathname.startsWith('/images') ||
+    pathname.startsWith('/fonts') ||
+    pathname === '/favicon.ico' ||
+    pathname === '/manifest.json' ||
+    pathname === '/sw.js' ||
+    pathname === '/rowan-logo.png' ||
+    pathname.endsWith('.png') ||
+    pathname.endsWith('.jpg') ||
+    pathname.endsWith('.jpeg') ||
+    pathname.endsWith('.svg') ||
+    pathname.endsWith('.ico') ||
+    pathname.endsWith('.webp')
+  ) {
+    return NextResponse.next();
+  }
+
   let response = NextResponse.next({
     request: {
       headers: req.headers,
@@ -118,7 +144,23 @@ export async function middleware(req: NextRequest) {
     try {
       const { data: adminData, error: adminError } = await supabase.rpc('get_admin_details');
 
-      if (adminError || !adminData || adminData.length === 0) {
+      if (adminError) {
+        // RPC error - log details and redirect with specific error
+        logger.error('Admin RPC error', adminError, {
+          component: 'middleware',
+          action: 'admin_rpc_check',
+          path: req.nextUrl.pathname,
+          errorCode: adminError.code,
+          errorMessage: adminError.message,
+        });
+        const redirectUrl = new URL('/dashboard', req.url);
+        redirectUrl.searchParams.set('error', 'admin_rpc_error');
+        const res = NextResponse.redirect(redirectUrl);
+        res.cookies.delete('admin-session');
+        return res;
+      }
+
+      if (!adminData || adminData.length === 0) {
         // Not an admin - redirect to dashboard with error
         const redirectUrl = new URL('/dashboard', req.url);
         redirectUrl.searchParams.set('error', 'admin_required');
@@ -154,13 +196,20 @@ export async function middleware(req: NextRequest) {
 
     } catch (error) {
       // SECURITY: Log admin access failures for audit trail
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorStack = error instanceof Error ? error.stack : '';
       logger.error('Admin SSO check failed', error, {
         component: 'middleware',
         action: 'admin_sso_check',
         path: req.nextUrl.pathname,
+        errorMessage,
       });
       const redirectUrl = new URL('/dashboard', req.url);
-      redirectUrl.searchParams.set('error', 'admin_check_failed');
+      // Include error hint for debugging (sanitized, truncated)
+      // Extract actual error from "Failed to encrypt session data: <actual error>"
+      const actualError = errorMessage.includes(': ') ? errorMessage.split(': ').pop() || '' : errorMessage;
+      const sanitizedError = actualError.substring(0, 50).replace(/[^a-zA-Z0-9_\- ]/g, '').replace(/\s+/g, '_');
+      redirectUrl.searchParams.set('error', `admin_err_${sanitizedError}`);
       return NextResponse.redirect(redirectUrl);
     }
   }
@@ -194,44 +243,84 @@ export async function middleware(req: NextRequest) {
   }
 
   // Check beta access expiration for logged-in users
+  // PERFORMANCE: Use cached result from cookie to avoid RPC on every request
   if (isProtectedPath && session?.user?.email) {
-    try {
-      const { data: isValid, error: rpcError } = await supabase.rpc('is_beta_access_valid', {
-        user_email: session.user.email
-      });
+    const betaCacheCookie = req.cookies.get('beta-validation')?.value;
+    let needsValidation = true;
 
-      // SECURITY: Fail-closed - if we can't verify, deny access
-      // This prevents expired beta users from gaining access during DB issues
-      if (rpcError) {
-        logger.error('Beta validation RPC error', rpcError, {
+    // Check if we have a valid cached result
+    if (betaCacheCookie) {
+      try {
+        const cacheData = JSON.parse(betaCacheCookie);
+        // Cache is valid if: same user, not expired, and was previously valid
+        if (
+          cacheData.email === session.user.email &&
+          cacheData.expiresAt > Date.now() &&
+          cacheData.isValid === true
+        ) {
+          needsValidation = false;
+        }
+      } catch {
+        // Invalid cookie, will revalidate
+      }
+    }
+
+    if (needsValidation) {
+      try {
+        const { data: isValid, error: rpcError } = await supabase.rpc('is_beta_access_valid', {
+          user_email: session.user.email
+        });
+
+        // SECURITY: Fail-closed - if we can't verify, deny access
+        // This prevents expired beta users from gaining access during DB issues
+        if (rpcError) {
+          logger.error('Beta validation RPC error', rpcError, {
+            component: 'middleware',
+            action: 'beta_validation',
+            path: req.nextUrl.pathname,
+            userEmail: session.user.email,
+          });
+          // For database errors, redirect to an error page instead of allowing access
+          const errorUrl = new URL('/error?code=beta_check_failed', req.url);
+          return NextResponse.redirect(errorUrl);
+        }
+
+        if (isValid === false) {
+          // Beta access expired - redirect to beta-expired page
+          // Clear the cache cookie
+          response.cookies.delete('beta-validation');
+          await supabase.auth.signOut();
+          const redirectUrl = new URL('/beta-expired', req.url);
+          const res = NextResponse.redirect(redirectUrl);
+          res.cookies.delete('sb-access-token');
+          res.cookies.delete('sb-refresh-token');
+          res.cookies.delete('beta-validation');
+          return res;
+        }
+
+        // Cache the successful validation result
+        const cacheData = {
+          email: session.user.email,
+          isValid: true,
+          expiresAt: Date.now() + (BETA_CACHE_DURATION * 1000),
+        };
+        response.cookies.set('beta-validation', JSON.stringify(cacheData), {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: BETA_CACHE_DURATION,
+          path: '/',
+        });
+      } catch (error) {
+        // SECURITY: Fail-closed on unexpected errors
+        logger.error('Beta validation exception', error, {
           component: 'middleware',
           action: 'beta_validation',
           path: req.nextUrl.pathname,
-          userEmail: session.user.email,
         });
-        // For database errors, redirect to an error page instead of allowing access
-        const errorUrl = new URL('/error?code=beta_check_failed', req.url);
+        const errorUrl = new URL('/error?code=beta_check_error', req.url);
         return NextResponse.redirect(errorUrl);
       }
-
-      if (isValid === false) {
-        // Beta access expired - redirect to beta-expired page
-        await supabase.auth.signOut();
-        const redirectUrl = new URL('/beta-expired', req.url);
-        const res = NextResponse.redirect(redirectUrl);
-        res.cookies.delete('sb-access-token');
-        res.cookies.delete('sb-refresh-token');
-        return res;
-      }
-    } catch (error) {
-      // SECURITY: Fail-closed on unexpected errors
-      logger.error('Beta validation exception', error, {
-        component: 'middleware',
-        action: 'beta_validation',
-        path: req.nextUrl.pathname,
-      });
-      const errorUrl = new URL('/error?code=beta_check_error', req.url);
-      return NextResponse.redirect(errorUrl);
     }
   }
 

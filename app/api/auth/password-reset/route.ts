@@ -76,12 +76,14 @@ export async function POST(request: NextRequest) {
             userAgent: userAgent
           };
 
-          const emailResult = await sendPasswordResetEmail(emailData);
-          
-          if (!emailResult.success) {
-            logger.error('Failed to send password reset email:', undefined, { component: 'api-route', action: 'api_request', details: emailResult.error });
-            // Still return success to user
-          }
+          // Send email in background (non-blocking for fast response)
+          sendPasswordResetEmail(emailData).then((emailResult) => {
+            if (!emailResult.success) {
+              logger.error('Failed to send password reset email:', undefined, { component: 'api-route', action: 'api_request', details: emailResult.error });
+            }
+          }).catch((err) => {
+            logger.error('Password reset email error:', err, { component: 'api-route', action: 'api_request' });
+          });
         }
       } catch (emailError) {
         logger.error('Password reset email error:', emailError, { component: 'api-route', action: 'api_request' });

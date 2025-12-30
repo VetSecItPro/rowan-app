@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useDebounce } from 'use-debounce';
 import { Filter, SortAsc, Search, RefreshCw, AlertCircle } from 'lucide-react';
 import { PatternCard } from './PatternCard';
 import type { RecurringExpensePattern } from '@/lib/services/recurring-expenses-service';
@@ -24,17 +25,18 @@ export function RecurringPatternsList({
   className = '',
 }: RecurringPatternsListProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   const [sortBy, setSortBy] = useState<SortOption>('confidence');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
   const [processingPatterns, setProcessingPatterns] = useState<Set<string>>(new Set());
 
-  // Filter and sort patterns
+  // Filter and sort patterns - using debounced search to prevent excessive recalculations
   const filteredAndSortedPatterns = useMemo(() => {
     let result = [...patterns];
 
     // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+    if (debouncedSearchQuery.trim()) {
+      const query = debouncedSearchQuery.toLowerCase();
       result = result.filter(
         (p) =>
           p.pattern_name.toLowerCase().includes(query) ||
@@ -73,7 +75,7 @@ export function RecurringPatternsList({
     });
 
     return result;
-  }, [patterns, searchQuery, sortBy, filterBy]);
+  }, [patterns, debouncedSearchQuery, sortBy, filterBy]);
 
   const handleAction = async (patternId: string, action: 'confirm' | 'ignore' | 'create') => {
     if (!onPatternAction) return;

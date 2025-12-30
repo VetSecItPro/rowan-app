@@ -32,6 +32,9 @@ export const CACHE_PREFIXES = {
   CALENDAR_STATS: 'calendar:stats:',
   TASK_STATS: 'task:stats:',
   REMINDER_STATS: 'reminder:stats:',
+  ACTIVITY_FEED: 'activity:feed:',
+  CONVERSATIONS: 'conversations:',
+  GOAL_STATS: 'goal:stats:',
 } as const;
 
 // Default TTL values (in seconds)
@@ -163,6 +166,9 @@ export async function invalidateSpaceCache(spaceId: string): Promise<void> {
     `${CACHE_PREFIXES.CALENDAR_STATS}${spaceId}*`,
     `${CACHE_PREFIXES.TASK_STATS}${spaceId}*`,
     `${CACHE_PREFIXES.REMINDER_STATS}${spaceId}*`,
+    `${CACHE_PREFIXES.ACTIVITY_FEED}${spaceId}*`,
+    `${CACHE_PREFIXES.CONVERSATIONS}${spaceId}*`,
+    `${CACHE_PREFIXES.GOAL_STATS}${spaceId}*`,
   ];
 
   await Promise.all(patterns.map(pattern => deleteCachePattern(pattern)));
@@ -192,6 +198,9 @@ export const cacheKeys = {
   calendarStats: (spaceId: string) => `${CACHE_PREFIXES.CALENDAR_STATS}${spaceId}`,
   taskStats: (spaceId: string) => `${CACHE_PREFIXES.TASK_STATS}${spaceId}`,
   reminderStats: (spaceId: string) => `${CACHE_PREFIXES.REMINDER_STATS}${spaceId}`,
+  activityFeed: (spaceId: string, limit: number) => `${CACHE_PREFIXES.ACTIVITY_FEED}${spaceId}:${limit}`,
+  conversations: (spaceId: string, userId: string) => `${CACHE_PREFIXES.CONVERSATIONS}${spaceId}:${userId}`,
+  goalStats: (spaceId: string) => `${CACHE_PREFIXES.GOAL_STATS}${spaceId}`,
 };
 
 /**

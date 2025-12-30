@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useDebounce } from 'use-debounce';
 import { X, Search, TrendingUp, ChevronRight } from 'lucide-react';
 import { GoalTemplate } from '@/lib/services/goals-service';
 import { goalsService } from '@/lib/services/goals-service';
@@ -25,6 +26,7 @@ export function TemplateSelectionModal({
   const [categories, setCategories] = useState<Array<{ category: string; count: number; icon: string }>>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -158,10 +160,12 @@ export function TemplateSelectionModal({
     }
   };
 
-  const filteredTemplates = templates.filter(template =>
-    template.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    template.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredTemplates = useMemo(() => {
+    return templates.filter(template =>
+      template.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+      template.description?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+    );
+  }, [templates, debouncedSearchQuery]);
 
   const getCategoryIcon = (category: string) => {
     const categoryData = categories.find(c => c.category === category);

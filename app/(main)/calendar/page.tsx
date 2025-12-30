@@ -4,6 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, List, X, RefreshCw, Archive } from 'lucide-react';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { z } from 'zod';
@@ -124,6 +125,7 @@ export default function CalendarPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -236,17 +238,17 @@ export default function CalendarPage() {
       filtered = events.filter(e => e.status === statusFilter);
     }
 
-    // Apply search filter
-    if (searchQuery) {
+    // Apply search filter (uses debounced value for performance)
+    if (debouncedSearchQuery) {
       filtered = filtered.filter(e =>
-        e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        e.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        e.location?.toLowerCase().includes(searchQuery.toLowerCase())
+        e.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        e.description?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        e.location?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
       );
     }
 
     return filtered;
-  }, [events, searchQuery, statusFilter]);
+  }, [events, debouncedSearchQuery, statusFilter]);
 
   // Memoize filtered unified items (tasks, meals, reminders, goals)
   const filteredUnifiedItems = useMemo(() => {

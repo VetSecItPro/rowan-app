@@ -1,22 +1,10 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import { supabaseAdmin, isSupabaseAdminConfigured } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
 // Initialize Resend only if API key is available (build-time safe)
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-
-// Create Supabase admin client for server-side operations
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  }
-);
 
 interface ExpiringUser {
   email: string;
@@ -137,6 +125,14 @@ export async function GET(request: Request) {
     const authHeader = request.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Verify Supabase admin is configured
+    if (!isSupabaseAdminConfigured()) {
+      return NextResponse.json(
+        { error: 'Supabase admin not configured' },
+        { status: 500 }
+      );
     }
 
     // Verify Resend is configured

@@ -10,6 +10,7 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { createExpenseSchema } from '@/lib/validations/expense-schemas';
 import { sanitizePlainText } from '@/lib/sanitize';
+import { withUserDataCache } from '@/lib/utils/cache-headers';
 
 /**
  * GET /api/expenses
@@ -78,10 +79,12 @@ export async function GET(req: NextRequest) {
     // Get expenses from service
     const expenses = await projectsService.getExpenses(spaceId);
 
-    return NextResponse.json({
-      success: true,
-      data: expenses,
-    });
+    return withUserDataCache(
+      NextResponse.json({
+        success: true,
+        data: expenses,
+      })
+    );
   } catch (error) {
     logger.error('[API] /api/expenses GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(

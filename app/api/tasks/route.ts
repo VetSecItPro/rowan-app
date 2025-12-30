@@ -10,6 +10,7 @@ import { ZodError } from 'zod';
 import { extractIP, fallbackRateLimit } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 import { checkUsageLimit, trackUsage } from '@/lib/middleware/usage-check';
+import { withUserDataCache } from '@/lib/utils/cache-headers';
 
 // Types for query options
 interface TaskQueryOptions {
@@ -90,10 +91,13 @@ export async function GET(req: NextRequest) {
     // Get tasks from service
     const tasks = await tasksService.getTasks(spaceId, options);
 
-    return NextResponse.json({
-      success: true,
-      data: tasks,
-    });
+    // Add cache headers for browser caching (30s with stale-while-revalidate)
+    return withUserDataCache(
+      NextResponse.json({
+        success: true,
+        data: tasks,
+      })
+    );
   } catch (error) {
     Sentry.captureException(error, {
       tags: {

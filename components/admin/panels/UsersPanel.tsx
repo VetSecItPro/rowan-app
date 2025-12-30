@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, memo, useCallback } from 'react';
+import { useState, memo, useCallback, useMemo } from 'react';
+import { useDebounce } from 'use-debounce';
 import { useQuery } from '@tanstack/react-query';
 import {
   Users,
@@ -62,6 +63,7 @@ const StatusBadge = memo(function StatusBadge({ status, isBeta }: { status: stri
 
 export const UsersPanel = memo(function UsersPanel() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
   const [filter, setFilter] = useState<'all' | 'beta' | 'active' | 'inactive'>('all');
   const [activeTab, setActiveTab] = useState<'users' | 'beta'>('users');
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
@@ -101,19 +103,23 @@ export const UsersPanel = memo(function UsersPanel() {
     refetchBeta();
   }, [refetchUsers, refetchBeta]);
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter =
-      filter === 'all' ||
-      (filter === 'beta' && user.is_beta) ||
-      (filter === 'active' && user.status === 'active') ||
-      (filter === 'inactive' && user.status === 'inactive');
-    return matchesSearch && matchesFilter;
-  });
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      const matchesSearch = user.email.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
+      const matchesFilter =
+        filter === 'all' ||
+        (filter === 'beta' && user.is_beta) ||
+        (filter === 'active' && user.status === 'active') ||
+        (filter === 'inactive' && user.status === 'inactive');
+      return matchesSearch && matchesFilter;
+    });
+  }, [users, debouncedSearchTerm, filter]);
 
-  const filteredBetaRequests = betaRequests.filter(request =>
-    request.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredBetaRequests = useMemo(() => {
+    return betaRequests.filter(request =>
+      request.email.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+    );
+  }, [betaRequests, debouncedSearchTerm]);
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'Never';
