@@ -28,6 +28,29 @@ const ADMIN_SESSION_DURATION = 2 * 60 * 60;
 const BETA_CACHE_DURATION = 60 * 60;
 
 export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // PERFORMANCE: Skip middleware for static assets and public files
+  // These don't need auth checks and should serve as fast as possible
+  if (
+    pathname.startsWith('/_next/static') ||
+    pathname.startsWith('/_next/image') ||
+    pathname.startsWith('/images') ||
+    pathname.startsWith('/fonts') ||
+    pathname === '/favicon.ico' ||
+    pathname === '/manifest.json' ||
+    pathname === '/sw.js' ||
+    pathname === '/rowan-logo.png' ||
+    pathname.endsWith('.png') ||
+    pathname.endsWith('.jpg') ||
+    pathname.endsWith('.jpeg') ||
+    pathname.endsWith('.svg') ||
+    pathname.endsWith('.ico') ||
+    pathname.endsWith('.webp')
+  ) {
+    return NextResponse.next();
+  }
+
   let response = NextResponse.next({
     request: {
       headers: req.headers,

@@ -192,7 +192,7 @@ export default function GoalsPage() {
 
     // Subscribe to goals changes
     const goalsChannel = supabase
-      .channel('goals-changes')
+      .channel(`goals-changes:${currentSpace.id}`)
       .on(
         'postgres_changes',
         {
@@ -234,7 +234,7 @@ export default function GoalsPage() {
     // Subscribe to milestones changes
     // Note: goal_milestones doesn't have space_id, so we check if the milestone belongs to a goal in current space
     const milestonesChannel = supabase
-      .channel('milestones-changes')
+      .channel(`milestones-changes:${currentSpace.id}`)
       .on(
         'postgres_changes',
         {
