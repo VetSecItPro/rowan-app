@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { useDebounce } from 'use-debounce';
 import { createPortal } from 'react-dom';
 import { MessageCircle, Search, Plus, Archive, X, Edit2, Check, X as XIcon, MoreVertical, Trash2 } from 'lucide-react';
 import { Conversation } from '@/lib/services/messages-service';
@@ -32,6 +33,7 @@ export function ConversationSidebar({
   className = '',
 }: ConversationSidebarProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   const [editingConversationId, setEditingConversationId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState('');
   const [dropdownOpenForId, setDropdownOpenForId] = useState<string | null>(null);
@@ -44,21 +46,23 @@ export function ConversationSidebar({
     setMounted(true);
   }, []);
 
-  // Filter conversations based on search and archived status
-  const filteredConversations = conversations.filter((conv) => {
-    // Filter by archived status
-    if (conv.is_archived && !showArchived) return false;
+  // Filter conversations based on search and archived status (memoized with debounced search)
+  const filteredConversations = useMemo(() => {
+    return conversations.filter((conv) => {
+      // Filter by archived status
+      if (conv.is_archived && !showArchived) return false;
 
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      const titleMatch = conv.title?.toLowerCase().includes(query);
-      const previewMatch = conv.last_message_preview?.toLowerCase().includes(query);
-      return titleMatch || previewMatch;
-    }
+      // Filter by debounced search query
+      if (debouncedSearchQuery) {
+        const query = debouncedSearchQuery.toLowerCase();
+        const titleMatch = conv.title?.toLowerCase().includes(query);
+        const previewMatch = conv.last_message_preview?.toLowerCase().includes(query);
+        return titleMatch || previewMatch;
+      }
 
-    return true;
-  });
+      return true;
+    });
+  }, [conversations, debouncedSearchQuery, showArchived]);
 
   // Handle starting rename
   const handleStartRename = (conversation: Conversation) => {

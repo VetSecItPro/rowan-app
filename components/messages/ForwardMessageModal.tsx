@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useDebounce } from 'use-debounce';
 import { X, Send, Search } from 'lucide-react';
 import { Conversation } from '@/lib/services/messages-service';
 import { logger } from '@/lib/logger';
@@ -22,7 +23,14 @@ export function ForwardMessageModal({
 }: ForwardMessageModalProps) {
   const [selectedConversations, setSelectedConversations] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   const [isForwarding, setIsForwarding] = useState(false);
+
+  const filteredConversations = useMemo(() => {
+    if (!debouncedSearchQuery) return conversations;
+    const query = debouncedSearchQuery.toLowerCase();
+    return conversations.filter((conv) => conv.title?.toLowerCase().includes(query));
+  }, [conversations, debouncedSearchQuery]);
 
   if (!isOpen) return null;
 
@@ -51,12 +59,6 @@ export function ForwardMessageModal({
       setIsForwarding(false);
     }
   };
-
-  const filteredConversations = conversations.filter((conv) => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return conv.title?.toLowerCase().includes(query);
-  });
 
   return (
     <>
