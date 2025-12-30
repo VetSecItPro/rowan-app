@@ -3,11 +3,13 @@
  * Handles all subscription-related business logic
  *
  * IMPORTANT: Server-side only - contains sensitive operations
+ * OPTIMIZATION: Redis caching for subscription lookups (5-minute TTL)
  */
 
 import { createClient } from '../supabase/server';
 import type { SubscriptionTier, SubscriptionStatus, Subscription, TrialStatus } from '../types';
 import { logger } from '@/lib/logger';
+import { cacheAside, cacheKeys, CACHE_TTL, deleteCache } from '@/lib/cache';
 
 // Trial configuration
 export const TRIAL_DURATION_DAYS = 14;
@@ -88,22 +90,31 @@ export async function getBetaTesterStatus(userId: string): Promise<BetaTesterSta
 
 /**
  * Get user's current subscription
+ * OPTIMIZATION: Cached in Redis for 5 minutes to reduce DB lookups
  */
 export async function getUserSubscription(userId: string): Promise<Subscription | null> {
-  const supabase = await createClient();
+  const cacheKey = cacheKeys.subscription(userId);
 
-  const { data, error } = await supabase
-    .from('subscriptions')
-    .select('*')
-    .eq('user_id', userId)
-    .single();
+  return cacheAside<Subscription | null>(
+    cacheKey,
+    async () => {
+      const supabase = await createClient();
 
-  if (error) {
-    logger.error('Error fetching subscription:', error, { component: 'lib-subscription-service', action: 'service_call' });
-    return null;
-  }
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
 
-  return data;
+      if (error) {
+        logger.error('Error fetching subscription:', error, { component: 'lib-subscription-service', action: 'service_call' });
+        return null;
+      }
+
+      return data;
+    },
+    CACHE_TTL.MEDIUM // 5 minutes
+  );
 }
 
 /**
@@ -219,6 +230,7 @@ export async function isSubscriptionExpiringSoon(
 
 /**
  * Create or update subscription
+ * Invalidates subscription cache on success
  */
 export async function upsertSubscription(
   userId: string,
@@ -239,11 +251,15 @@ export async function upsertSubscription(
     return { success: false, error: error.message };
   }
 
+  // Invalidate subscription cache
+  deleteCache(cacheKeys.subscription(userId)).catch(() => {});
+
   return { success: true };
 }
 
 /**
  * Cancel subscription (mark as canceled, keep active until period end)
+ * Invalidates subscription cache on success
  */
 export async function cancelSubscription(
   userId: string
@@ -263,6 +279,9 @@ export async function cancelSubscription(
     return { success: false, error: error.message };
   }
 
+  // Invalidate subscription cache
+  deleteCache(cacheKeys.subscription(userId)).catch(() => {});
+
   // Log the cancellation event
   await supabase.from('subscription_events').insert({
     user_id: userId,
@@ -275,6 +294,7 @@ export async function cancelSubscription(
 
 /**
  * Reactivate a canceled subscription
+ * Invalidates subscription cache on success
  */
 export async function reactivateSubscription(
   userId: string
@@ -293,6 +313,9 @@ export async function reactivateSubscription(
     logger.error('Error reactivating subscription:', error, { component: 'lib-subscription-service', action: 'service_call' });
     return { success: false, error: error.message };
   }
+
+  // Invalidate subscription cache
+  deleteCache(cacheKeys.subscription(userId)).catch(() => {});
 
   // Log the reactivation event
   await supabase.from('subscription_events').insert({
