@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useDebounce } from 'use-debounce';
 import { Search, Filter, Trophy, Star, Award, Users, Calendar, Target } from 'lucide-react';
 import { BadgeCard } from './BadgeCard';
 import { BadgeModal } from './BadgeModal';
@@ -33,6 +34,7 @@ export function BadgeGallery({
   defaultFilter = 'all'
 }: BadgeGalleryProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   const [selectedCategory, setSelectedCategory] = useState<BadgeCategory | 'all'>(defaultFilter);
   const [selectedRarity, setSelectedRarity] = useState<BadgeRarity | 'all'>('all');
   const [showEarnedOnly, setShowEarnedOnly] = useState(false);
@@ -55,7 +57,7 @@ export function BadgeGallery({
     return map;
   }, [progress]);
 
-  // Filter badges based on current criteria
+  // Filter badges based on current criteria - using debounced search to prevent excessive recalculations
   const filteredBadges = useMemo(() => {
     let filtered = badges;
 
@@ -75,8 +77,8 @@ export function BadgeGallery({
     }
 
     // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+    if (debouncedSearchQuery) {
+      const query = debouncedSearchQuery.toLowerCase();
       filtered = filtered.filter(badge =>
         badge.name.toLowerCase().includes(query) ||
         badge.description.toLowerCase().includes(query)
@@ -84,7 +86,7 @@ export function BadgeGallery({
     }
 
     return filtered;
-  }, [badges, selectedCategory, selectedRarity, showEarnedOnly, searchQuery, achievementMap]);
+  }, [badges, selectedCategory, selectedRarity, showEarnedOnly, debouncedSearchQuery, achievementMap]);
 
   const categoryIcons: Record<BadgeCategory, React.ComponentType<{ className?: string }>> = {
     goals: Target,

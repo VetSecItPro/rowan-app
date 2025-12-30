@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useDebounce } from 'use-debounce';
 import { Search, X } from 'lucide-react';
 import Link from 'next/link';
 
@@ -137,14 +138,15 @@ const DOCUMENTATION_INDEX: SearchResult[] = [
 
 export function SearchBar() {
   const [query, setQuery] = useState('');
+  const [debouncedQuery] = useDebounce(query, 200);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Search functionality
+  // Search functionality - using debounced query to reduce re-renders
   useEffect(() => {
-    if (query.length < 2) {
+    if (debouncedQuery.length < 2) {
       setResults([]);
       setIsOpen(false);
       setIsTyping(false);
@@ -154,7 +156,7 @@ export function SearchBar() {
     setIsTyping(true);
     const timeoutId = setTimeout(() => setIsTyping(false), 1000);
 
-    const searchTerm = query.toLowerCase();
+    const searchTerm = debouncedQuery.toLowerCase();
     const filtered = DOCUMENTATION_INDEX.filter(item =>
       item.title.toLowerCase().includes(searchTerm) ||
       item.description.toLowerCase().includes(searchTerm) ||
@@ -165,7 +167,7 @@ export function SearchBar() {
     setIsOpen(filtered.length > 0);
 
     return () => clearTimeout(timeoutId);
-  }, [query]);
+  }, [debouncedQuery]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
