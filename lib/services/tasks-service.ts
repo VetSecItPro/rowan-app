@@ -522,6 +522,9 @@ export const tasksService = {
   /**
    * Get comprehensive task statistics for a space
    *
+   * Uses a database RPC function for efficient server-side aggregation,
+   * avoiding fetching all tasks to the client.
+   *
    * @param spaceId - Space ID
    * @returns Promise<TaskStats> - Task statistics including totals and breakdowns
    *
@@ -539,37 +542,28 @@ export const tasksService = {
       async () => {
         const supabase = createClient();
         try {
+          // Use RPC for efficient server-side aggregation
           const { data, error } = await supabase
-            .from('tasks')
-            .select('status, priority')
-            .eq('space_id', spaceId);
+            .rpc('get_task_stats', { p_space_id: spaceId });
 
           if (error) {
             throw new Error(`Failed to get task stats: ${error.message}`);
           }
 
-          const total = data.length;
-          const completed = data.filter((t: Task) => t.status === 'completed').length;
-          const inProgress = data.filter((t: Task) => t.status === 'in-progress').length;
-          const pending = data.filter((t: Task) => t.status === 'pending').length;
-          const blocked = data.filter((t: Task) => t.status === 'blocked').length;
-          const onHold = data.filter((t: Task) => t.status === 'on-hold').length;
-
-          const byPriority = {
-            low: data.filter((t: Task) => t.priority === 'low').length,
-            medium: data.filter((t: Task) => t.priority === 'medium').length,
-            high: data.filter((t: Task) => t.priority === 'high').length,
-            urgent: data.filter((t: Task) => t.priority === 'urgent').length,
-          };
-
+          // RPC returns the stats object directly
           return {
-            total,
-            completed,
-            inProgress,
-            pending,
-            blocked,
-            onHold,
-            byPriority,
+            total: data?.total ?? 0,
+            completed: data?.completed ?? 0,
+            inProgress: data?.inProgress ?? 0,
+            pending: data?.pending ?? 0,
+            blocked: data?.blocked ?? 0,
+            onHold: data?.onHold ?? 0,
+            byPriority: {
+              low: data?.byPriority?.low ?? 0,
+              medium: data?.byPriority?.medium ?? 0,
+              high: data?.byPriority?.high ?? 0,
+              urgent: data?.byPriority?.urgent ?? 0,
+            },
           };
         } catch (error) {
           logger.error('Error in getTaskStats', error, { component: 'tasksService', action: 'getTaskStats' });

@@ -169,6 +169,9 @@ export default function MealsPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('calendar');
   const [calendarViewMode, setCalendarViewMode] = useState<CalendarViewMode>('week');
   const [pendingDeletions, setPendingDeletions] = useState<Map<string, { type: 'meal' | 'recipe', data: Meal | Recipe, timeoutId: NodeJS.Timeout }>>(new Map());
+  // OPTIMIZATION: Use ref to avoid subscription recreation when pendingDeletions changes
+  const pendingDeletionsRef = useRef(pendingDeletions);
+  pendingDeletionsRef.current = pendingDeletions;
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -362,10 +365,10 @@ export default function MealsPage() {
       supabase.removeChannel(mealsChannel);
       supabase.removeChannel(recipesChannel);
 
-      // Clear all pending deletion timeouts
-      pendingDeletions.forEach(({ timeoutId }) => clearTimeout(timeoutId));
+      // Clear all pending deletion timeouts using ref (avoids subscription recreation)
+      pendingDeletionsRef.current.forEach(({ timeoutId }) => clearTimeout(timeoutId));
     };
-  }, [spaceId, pendingDeletions]);
+  }, [spaceId]); // OPTIMIZATION: Removed pendingDeletions from deps - use ref instead
 
   // Memoized handlers
   const handleCreateMeal = useCallback(async (mealData: CreateMealInput, createShoppingList?: boolean) => {

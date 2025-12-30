@@ -22,6 +22,44 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 const FROM_EMAIL = 'Rowan <notifications@rowanapp.com>';
 const REPLY_TO_EMAIL = 'support@rowanapp.com';
 
+/**
+ * OPTIMIZATION: Retry helper with exponential backoff
+ * Retries failed email sends with delays: 1s, 2s, 4s
+ */
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelayMs: number = 1000
+): Promise<T> {
+  let lastError: Error | undefined;
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      // Don't retry on certain errors (auth, validation)
+      const errorMessage = lastError.message.toLowerCase();
+      if (
+        errorMessage.includes('invalid api key') ||
+        errorMessage.includes('unauthorized') ||
+        errorMessage.includes('invalid email')
+      ) {
+        throw lastError;
+      }
+
+      // Calculate exponential backoff delay
+      if (attempt < maxRetries - 1) {
+        const delay = baseDelayMs * Math.pow(2, attempt);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+
+  throw lastError;
+}
+
 // Email service types
 export interface EmailResult {
   success: boolean;
