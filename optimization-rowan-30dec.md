@@ -1,7 +1,7 @@
 # Rowan App Optimization Audit - Final Report
 **Date:** December 30, 2024
 **Auditor:** Claude Code
-**Status:** ✅ Primary Optimization Complete (Batches 1-8 Merged)
+**Status:** ✅ Primary Optimization Complete (Batches 1-9 Merged)
 
 ---
 
@@ -11,13 +11,14 @@
 
 | Category | Items Completed | Impact |
 |----------|-----------------|--------|
-| Database/Queries | N+1 fix, Redis caching (3 services), Activity feed cache | -90% redundant queries |
-| Real-Time | Channel filtering, Chore batching, Goals filter | Reduced event noise |
+| Database/Queries | N+1 fix, Redis caching (5 services), Activity feed cache | -90% redundant queries |
+| Real-Time | Channel filtering, Chore batching, Goals filter, Meals fix | Reduced event noise |
 | HTTP Caching | Cache-Control headers on 10 routes | Browser-level caching |
 | Search/Forms | Debouncing on 10 components | -70% unnecessary re-renders |
-| Third-Party | Email parallelization, Calendar token batching, Stripe async | Faster external calls |
+| Third-Party | Email parallelization, Calendar token batching, Stripe async, Gemini timeout | Faster external calls |
 | Components | 5 large component memoization | Reduced re-renders |
 | Assets | Logo compression (456KB → ~80KB) | -82% image size |
+| Monitoring | Sentry sampling (50%/5%), endpoint filtering | Reduced Sentry costs |
 
 ## Scores After Optimization
 
@@ -92,6 +93,18 @@
 ## CI/CD Fix ✅
 - [x] **GitHub Actions**: Fixed upload-artifact@v4 hidden directory bug
   - Copy `.next` → `next-build` before upload
+
+## Batch 9: Caching, Timeouts & Monitoring ✅
+- [x] **Invoice Cache**: 30-minute Redis cache for Stripe invoices
+  - Cache key: `invoices:{customerId}`
+- [x] **Subscription Cache**: 5-minute Redis cache for subscription lookups
+  - Cache key: `subscription:{userId}`
+  - Invalidation: upsert, cancel, reactivate
+- [x] **Gemini Timeout**: 30-second timeout with fallback to template
+- [x] **Sentry Dynamic Sampling**: 50% errors, 5% transactions
+- [x] **Sentry Endpoint Filtering**: Filter health, cron, auth, static routes
+- [x] **Meals Subscription Fix**: useRef for pendingDeletions (prevents recreation)
+- [x] **Email Retry Helper**: Exponential backoff (1s, 2s, 4s) for transient failures
 
 ---
 
