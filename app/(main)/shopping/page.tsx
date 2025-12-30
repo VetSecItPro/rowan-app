@@ -4,6 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package, X, TrendingUp } from 'lucide-react';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
@@ -35,6 +36,7 @@ export default function ShoppingPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingList, setEditingList] = useState<ShoppingList | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed'>('active');
   const [timeFilter, setTimeFilter] = useState<'all' | 'week'>('all');
@@ -80,9 +82,9 @@ export default function ShoppingPage() {
       });
     }
 
-    // Filter by search
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+    // Filter by search (uses debounced value for performance)
+    if (debouncedSearchQuery) {
+      const query = debouncedSearchQuery.toLowerCase();
       filtered = filtered.filter(l =>
         l.title.toLowerCase().includes(query) ||
         l.description?.toLowerCase().includes(query)
@@ -90,7 +92,7 @@ export default function ShoppingPage() {
     }
 
     return filtered;
-  }, [lists, searchQuery, statusFilter, timeFilter]);
+  }, [lists, debouncedSearchQuery, statusFilter, timeFilter]);
 
   // Memoized stats calculations
   const memoizedStats = useMemo(() => stats, [stats]);

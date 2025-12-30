@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { Calendar, RefreshCw, Unlink, AlertCircle, CheckCircle, Clock, Loader2, X, Mail, Key, ExternalLink, Link, Upload, FileText } from 'lucide-react';
@@ -87,7 +87,7 @@ const STATUS_CONFIG: Record<string, { icon: typeof CheckCircle; color: string; l
   },
 };
 
-export function CalendarConnections() {
+export const CalendarConnections = memo(function CalendarConnections() {
   const { currentSpace } = useAuthWithSpaces();
   const [connections, setConnections] = useState<CalendarConnection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1339,4 +1339,4 @@ export function CalendarConnections() {
       )}
     </div>
   );
-}
+});
