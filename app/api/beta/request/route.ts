@@ -208,7 +208,7 @@ export async function POST(req: NextRequest) {
 
     // Increment daily analytics (non-blocking)
     const today = new Date().toISOString().split('T')[0];
-    supabaseAdmin.rpc('increment_beta_requests', { target_date: today }).catch(() => {});
+    Promise.resolve(supabaseAdmin.rpc('increment_beta_requests', { target_date: today })).catch(() => {});
 
     return NextResponse.json({
       success: true,
