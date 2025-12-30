@@ -41,14 +41,24 @@ jobs:
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
           NEXT_PUBLIC_ENABLE_MONETIZATION: 'true'
 
+      - name: Verify build output
+        run: |
+          echo "Checking .next directory..."
+          ls -la .next || echo ".next directory not found!"
+          if [ -d ".next" ]; then
+            echo "Build output size:"
+            du -sh .next
+            # Remove cache to reduce artifact size
+            rm -rf .next/cache
+          fi
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: |
-            .next
-            !.next/cache
+          path: .next
           retention-days: 1
+          if-no-files-found: error
 
   # Deploy preview (parallel with tests)
   deploy-preview:
