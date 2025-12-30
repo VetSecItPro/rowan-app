@@ -204,7 +204,7 @@ const container = {
 
 const header = {
   padding: '40px 40px 30px 40px',
-  background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
+  backgroundColor: '#3b82f6',
   textAlign: 'center' as const,
 };
 
@@ -260,7 +260,7 @@ const text = {
 };
 
 const codeCard = {
-  background: 'linear-gradient(135deg, #eff6ff 0%, #ecfeff 100%)',
+  backgroundColor: '#eff6ff',
   border: '2px solid #3b82f6',
   borderRadius: '12px',
   padding: '24px',
@@ -298,7 +298,7 @@ const buttonContainer = {
 };
 
 const button = {
-  background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
+  backgroundColor: '#3b82f6',
   borderRadius: '12px',
   color: '#ffffff',
   fontSize: '16px',
@@ -308,7 +308,6 @@ const button = {
   display: 'inline-block',
   padding: '16px 40px',
   lineHeight: '24px',
-  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
 };
 
 const smallText = {
